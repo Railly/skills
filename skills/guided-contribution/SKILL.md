@@ -31,9 +31,11 @@ Find the invariant skeleton and the meaningful deltas. In a `core + N adapters` 
 Pick one real flow, the one the task touches. Break it into **waypoints**: a `file:line` anchor plus a reconstruction question ("what does this do? why this order? find the bug"). Send one waypoint at a time; the user reconstructs, you correct, then advance.
 **Done when:** the user has reconstructed every waypoint and can narrate the whole flow end to end.
 
-### 3. Ship (compiler-driven)
+### 3. Ship (compiler-driven, but the compiler is not complete)
 Change the contract, rebuild, check the dependents: the errors are the list of sites to fix. Teach the reflex: grep the implementation pattern, use find-references, follow the compiler. When you widen a type to a union, search every call site, because old ones keep compiling while silently wrong.
-**Done when:** the change compiles and every site the compiler flagged is addressed.
+
+The compiler finds sites, not completeness, and two traps slip past it. A symmetric change (an X and its mirror Y) or a fan-out (one contract, N adapters) is really a matrix: enumerate every cell up front and work the list, or you will fix X and forget Y, once per layer. And loosely-checked file types (templates, component files, dynamically-typed modules) can stay green with the bug inside, so read the code or verify the behavior there rather than trusting the green. The moment one green-but-wrong site turns up, stop and sweep the whole matrix instead of continuing case by case.
+**Done when:** every cell of the change is addressed, not just the ones the compiler flagged.
 
 ### 4. Verify behavior
 Green types and green existing tests prove shapes fit and the old contract holds, not that the change is correct. Test at two levels: unit (fast, but it may mock the very code you changed) and integration (drives the real pipeline). Then **falsify** the test: break the code it covers, confirm it fails, restore. Match the repo's canonical test location and pairing (check git history for how a sibling change was tested). A failing assertion is your logic; a file that won't load is build or setup, so isolate yours by stashing your diff.
