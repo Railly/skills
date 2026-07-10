@@ -15,9 +15,15 @@ When you could explain something, instead ask the user to reconstruct or predict
 
 State a fact about the repo, environment, or tooling only after running the `grep`/`ls`/`git`/API call that proves it. If you cannot, say "unknown, here is how to check". Read an errored or empty command as "couldn't confirm", never as proof of absence. If you asserted from assumption and were wrong, correct it plainly. That models the discipline.
 
+## Meet the user's level: teach the base before the trace
+
+Reconstruction only works on a foundation the user already has. Sometimes a waypoint or a fix depends on a concept the user is missing: they ask "what is a proxy, a dial, a WebSocket upgrade", or their answer reveals a wrong mental model of a load-bearing primitive. When that happens, **stop and teach that concept first**, from the ground up, before continuing the phase. Do not push forward on a base they don't have; a prediction made without the underlying concept is noise, not learning. Give the 101 (plain analogy, then the real mechanism, then how it maps to this repo's files), confirm they've got it with one check question, then return to the waypoint. Detecting the gap and filling it is part of tutoring, not a detour from it.
+
 ## The arc
 
 Six phases. Advance only when the current phase's **Done when** holds. A tiny change starts at Ship.
+
+**Two modes, and the user picks.** Pure-guided is the default: the user writes the code, you only ask and correct. Once they own the pattern (they've shipped one change this way and can predict the shape), they may switch to **execute-with-approval** for the next, similar change: you write it, but you still (a) explain the bug and the approach *before* touching code, and (b) stop before any commit or push so they review and approve the diff. This is not autopilot. The understanding gate (explain first) and the approval gate (review the diff) both stay. Use it for repetition of a pattern they already reconstructed, never for a genuinely new concept. When in doubt, stay in pure-guided.
 
 ### 0. Recon + verify environment
 Map structure, package manager, build tool, scripts. Verify signing, formatter, and access by checking, not assuming. Surface gotchas early (a hardcoded cap, a pre-dev guard, an unusual test command).
@@ -39,7 +45,9 @@ The compiler finds sites, not completeness, and two traps slip past it. A symmet
 
 ### 4. Verify behavior
 Green types and green existing tests prove shapes fit and the old contract holds, not that the change is correct. Test at two levels: unit (fast, but it may mock the very code you changed) and integration (drives the real pipeline). Then **falsify** the test: break the code it covers, confirm it fails, restore. Match the repo's canonical test location and pairing (check git history for how a sibling change was tested). A failing assertion is your logic; a file that won't load is build or setup, so isolate yours by stashing your diff.
-**Done when:** a test that exercises the real change passes, and you have watched it fail without the change.
+
+When the change has a runtime surface, add one level the unit test can't give: **exercise the built artifact** the way a user would. Build, then drive the real binary, server, or CLI against a fixture that reproduces the issue, and watch the symptom flip (red on the old build, green on the fixed one). A unit test can pass while the shipped artifact still breaks; driving the artifact is what closes that gap. This is the same red-capable loop as the `diagnosing-bugs` skill, reused here as the acceptance check.
+**Done when:** a test that exercises the real change passes, you have watched it fail without the change, and (if it has a runtime surface) the built artifact shows the fixed behavior end to end.
 
 ### 5. Document the journey
 Capture the reusable learnings (architecture, conventions, where and how to test, release and collaboration mechanics, language gotchas, and the task as a worked case study) as a small linked knowledge base in the user's notes system: a hub plus focused notes, cross-linked, in their voice. Writing it is the processing.
@@ -52,6 +60,7 @@ Capture the reusable learnings (architecture, conventions, where and how to test
 - Answer from the codebase whatever the code can answer, rather than asking the user.
 - Name the transferable rule in each correction ("when a value's meaning changes, rename it").
 - In someone else's repo, follow its conventions: formatter, commit style, test layout.
+- This skill starts once there is a specific change to ship. If the user is still staring at a backlog deciding *what* to pick up, that selection (quality filter, virgin-vs-has-PR, verify-before-investing, PR-with-credit) is the `pick-an-issue` skill. Run it first, then bring the chosen issue here.
 
 ## Success
 

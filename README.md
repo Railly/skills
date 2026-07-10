@@ -17,6 +17,7 @@ Inspired by [`mattpocock/skills`](https://github.com/mattpocock/skills) and Anth
 
 | Skill | What it does |
 |---|---|
+| [`pick-an-issue`](skills/pick-an-issue) | Choose what's worth fixing in someone else's issue backlog, verify it's real before investing, and ship it as a clean PR with credit. Contributor-side selection: quality filter, virgin-vs-has-PR cross-reference, verify-before-invest, PR hygiene. Pairs with `guided-contribution` for the fix. |
 | [`guided-contribution`](skills/guided-contribution) | Learn an unfamiliar codebase by shipping a real change: the agent tutors you (you reconstruct, predict, and write the tests) instead of doing it for you. Full arc: recon, mental model, guided trace, ship, verify behavior, document. |
 
 ## Install
