@@ -20,6 +20,8 @@ How these skills work:
 | skill | what it does |
 |---|---|
 | [pick-an-issue](skills/pick-an-issue) | filter a backlog you do not own, confirm a bug is real, ship a clean PR with credit |
+| [repro-an-issue](skills/repro-an-issue) | build a signal that goes red on the bug before you theorize or fix it |
+| [prove-the-test](skills/prove-the-test) | prove a test fails when the code is wrong before you trust it green |
 | [guided-contribution](skills/guided-contribution) | learn a codebase by shipping a change with a tutor, you predict and rebuild, agent checks |
 
 ## Install
