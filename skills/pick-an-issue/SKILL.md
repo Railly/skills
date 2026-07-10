@@ -7,8 +7,8 @@ description: Choose what's worth fixing in someone else's issue backlog, verify 
 
 You are a contributor landing in a backlog that is not yours. The scarce resource is your attention, and most open issues are not worth it. This skill is the quality gate that decides what to pick up and takes it to a clean PR with credit. It does not re-teach how to reproduce a bug or how to write the fix. It delegates those:
 
-- **Reproduce or build the failing signal:** `diagnosing-bugs` (its Phase 1 "feedback loop" is the validation path).
-- **Write the fix test-first:** `tdd`.
+- **Reproduce or build the failing signal:** `repro-an-issue` (its Phase 1 "feedback loop" is the validation path).
+- **Write the fix test-first:** `prove-the-test`.
 - **Learn the codebase while fixing** (optional): `guided-contribution`.
 
 ## The prime rule
@@ -35,7 +35,7 @@ Drop anything that fails the rubric. In order of how fast it eliminates:
 
 1. **Bug, not feature.** Bugs first. A feature or enhancement is a heavier conversation and rarely what a maintainer wants an unfamiliar contributor to start with.
 2. **Reproducible on your machine.** No hardware, OS, or service you don't have (a Windows-only crash, a Tailscale/SSH/Docker-only repro) unless you can actually run it. No repro means no validation path means no pick.
-3. **Deterministic validation path.** A signal that goes red on this bug and green when fixed: a test, a curl, a CLI diff. This is the `diagnosing-bugs` feedback loop. If you can't imagine one, skip the issue.
+3. **Deterministic validation path.** A signal that goes red on this bug and green when fixed: a test, a curl, a CLI diff. This is the `repro-an-issue` feedback loop. If you can't imagine one, skip the issue.
 4. **Non-breaking fix.** Favor fixes that are additive or a surgical alignment of existing behavior. Anything that changes a contract, a default, or a privileged or security path is high-risk for an outsider's first PRs. Flag it and prefer something cleaner unless asked.
 5. **Well-scoped.** A root cause the reporter already localized (with `file:line`) beats a vague "doesn't work".
 
@@ -74,13 +74,13 @@ If you can't tell the policy, ask the maintainer in one line before opening a co
 
 ## Phase 4: verify the claim
 
-Now, and only now, read the full body and comments of your top pick. Then reproduce it: hand off to `diagnosing-bugs` to build the red-capable, deterministic, fast loop. Report which: **confirmed** (name the code path), **failed to reproduce** (a strong signal to skip or ask the reporter), or **insufficient detail**. If the repro dies, you spent minutes, not hours. That is the point of doing it before the fix.
+Now, and only now, read the full body and comments of your top pick. Then reproduce it: hand off to `repro-an-issue` to build the red-capable, deterministic, fast loop. Report which: **confirmed** (name the code path), **failed to reproduce** (a strong signal to skip or ask the reporter), or **insufficient detail**. If the repro dies, you spent minutes, not hours. That is the point of doing it before the fix.
 
 **Done when:** the pick's claim is confirmed by a loop that goes red on it, or you have dropped it as unreproducible.
 
 ## Phase 5: ship
 
-Fix it (`tdd`, or `guided-contribution` if you're learning the repo), then apply PR hygiene:
+Fix it (`prove-the-test`, or `guided-contribution` if you're learning the repo), then apply PR hygiene:
 
 - **Branch from the base branch, independent.** `git checkout -b fix/<slug> main`. Each PR merges on its own, in any order. Stacking a fix on another unmerged fix's branch contaminates the diff and forces a merge order.
 - **Falsify your own test.** Revert the fix, watch the test or repro go red, restore. A test you haven't watched fail has no teeth.
