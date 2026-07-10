@@ -1,53 +1,55 @@
 # skills
 
-Opinionated, **agnostic** agent skills: the way I actually work with coding agents, packaged so anyone can drop them into their own setup.
+Agent skills that encode how I work. Drop them into any setup.
 
-These are not utilities. Each skill encodes a *methodology*, a repeatable way of working that fights the failure modes of agent-assisted coding (cognitive debt, unverified assertions, green-but-wrong code). Portable across repos, tools, and stacks. No personal paths, no per-project assumptions.
+Each skill is a method, not a utility. It helps you avoid common failures when you code with agents: you do not understand the code, you claim without proof, your tests pass while the code is still wrong. Works in any repo and stack. No hardcoded paths.
 
-Inspired by [`mattpocock/skills`](https://github.com/mattpocock/skills) and Anthropic's [Agent Skills](https://docs.claude.com/en/docs/agents-and-tools/agent-skills).
+Inspired by [mattpocock/skills](https://github.com/mattpocock/skills) and [Anthropic agent skills](https://docs.claude.com/en/docs/agents-and-tools/agent-skills).
 
 ## Philosophy
 
-- **Agnostic.** A skill here works in any repo, any language, any editor. If it hardcodes a path or assumes a stack, it doesn't belong.
-- **Generation over consumption.** The best skills make *you* think, not the agent think for you. Understanding is what lets you evolve a system; verifying an agent's output is not the same as understanding it.
-- **Verify before asserting.** Skills push the agent to check reality (filesystem, API, git) before claiming a fact, and to say "unknown" rather than guess.
-- **Opinionated.** These reflect how I work. Fork and bend them to how *you* work.
+How these skills work:
+
+- agnostic: works in any repo, language, editor. If it assumes your stack, it does not belong
+- you think, agent checks: skills make you rebuild ideas, not read answers. Understanding lets you change a system, checking output does not
+- check before you claim: use filesystem, api, git. Say unknown when you cannot prove it
+- opinionated: these reflect how I work. Fork them to match how you work
 
 ## Skills
 
-| Skill | What it does |
+| skill | what it does |
 |---|---|
-| [`pick-an-issue`](skills/pick-an-issue) | Choose what's worth fixing in someone else's issue backlog, verify it's real before investing, and ship it as a clean PR with credit. Contributor-side selection: quality filter, virgin-vs-has-PR cross-reference, verify-before-invest, PR hygiene. Pairs with `guided-contribution` for the fix. |
-| [`guided-contribution`](skills/guided-contribution) | Learn an unfamiliar codebase by shipping a real change: the agent tutors you (you reconstruct, predict, and write the tests) instead of doing it for you. Full arc: recon, mental model, guided trace, ship, verify behavior, document. |
+| [pick-an-issue](skills/pick-an-issue) | filter a backlog you do not own, confirm a bug is real, ship a clean PR with credit |
+| [guided-contribution](skills/guided-contribution) | learn a codebase by shipping a change with a tutor, you predict and rebuild, agent checks |
 
 ## Install
 
-A skill is a folder with a `SKILL.md`. Make it discoverable to your agent by linking or copying it into your agent's skills directory.
+A skill is a folder with `SKILL.md`. Link it where your agent loads skills.
 
-**Claude Code**
+Claude Code:
+
 ```bash
 git clone https://github.com/Railly/skills.git ~/railly-skills
 ln -s ~/railly-skills/skills/guided-contribution ~/.claude/skills/guided-contribution
 ```
 
-**Cursor / Codex / others**
-Copy or symlink the skill folder into wherever your tool loads skills, or paste the `SKILL.md` body as a rule or instruction. The content is tool-agnostic prose, so it works anywhere an agent reads instructions.
+Cursor, Codex, others:
 
-Then invoke by name (`guided-contribution`) or just describe the intent; the `description` frontmatter drives discovery.
+Copy the folder to your skills directory or paste `SKILL.md` as a rule. The file is plain prose, so it works anywhere.
 
-## Anatomy of a skill
+Trigger is the `description` in frontmatter. Keep it close to user intent.
+
+## How a skill is built
 
 ```
 skills/<name>/
-└── SKILL.md        # frontmatter (name, description) + the methodology
+└── SKILL.md
 ```
-
-`description` is the most important line. It is what the agent matches on to decide relevance, so it carries explicit trigger phrases.
 
 ## Contributing
 
-Fork, add a skill under `skills/<name>/SKILL.md`, keep it agnostic, open a PR. CI validates that every skill has well-formed frontmatter.
+Fork, add `skills/<name>/SKILL.md`, keep it agnostic, open a PR. CI checks frontmatter.
 
 ## License
 
-MIT © Railly Hugo
+MIT (c) Railly Hugo
