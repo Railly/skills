@@ -1,0 +1,31 @@
+{
+	"skill_name": "pick-an-issue",
+	"evals": [
+		{
+			"id": 1,
+			"name": "compare-public-backlog",
+			"prompt": "Find a worthwhile open bug in this public repository. I want to choose what to work on.",
+			"expected_output": "The skill states its inspection boundary, filters cheaply, presents three to five qualified candidates in an evidence-backed matrix, recommends one, and stops for the user's choice.",
+			"assertions": [
+				"States the inspected backlog window and truncation",
+				"Uses a matrix with uncertainty instead of fake scores",
+				"Explains one recommendation",
+				"Stops before reproduction or implementation"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "already-selected-near-miss",
+			"prompt": "Issue #88 is already selected and reproduced. Walk me through implementing it so I learn the codebase.",
+			"expected_output": "The skill does not repeat backlog selection and routes the existing mission to Unfold Change with the guided policy.",
+			"assertions": [
+				"Recognizes that selection is complete",
+				"Does not rescan the backlog",
+				"Hands off to Unfold Change guided",
+				"Does not claim ownership of implementation"
+			],
+			"files": []
+		}
+	]
+}
