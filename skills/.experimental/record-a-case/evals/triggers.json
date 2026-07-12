@@ -1,0 +1,32 @@
+[
+	{
+		"id": "positive-finished-fix",
+		"query": "I finished this issue and verified the patch. Capture the work as a foundry case before we move on.",
+		"should_trigger": true
+	},
+	{
+		"id": "positive-backfill",
+		"query": "Backfill yesterday's agent session into our maintenance case corpus, but mark anything I have not reviewed as unvalidated.",
+		"should_trigger": true
+	},
+	{
+		"id": "positive-disproven",
+		"query": "We investigated this old issue and current main does not reproduce it. Record the evidence and why it is green.",
+		"should_trigger": true
+	},
+	{
+		"id": "negative-session-handoff",
+		"query": "Write a handoff prompt so another agent can continue implementing this unfinished fix.",
+		"should_trigger": false
+	},
+	{
+		"id": "negative-release-notes",
+		"query": "Write release notes for the three merged PRs in this version.",
+		"should_trigger": false
+	},
+	{
+		"id": "negative-promote-rule",
+		"query": "This one case looks convincing. Add its lesson directly to the production skill now.",
+		"should_trigger": false
+	}
+]

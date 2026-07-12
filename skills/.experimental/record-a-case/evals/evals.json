@@ -1,0 +1,44 @@
+{
+	"skill_name": "record-a-case",
+	"evals": [
+		{
+			"id": 1,
+			"name": "synthetic-backfill",
+			"prompt": "Backfill this completed agent session as a case. The branch and tests exist, but I have not reviewed the transcript or patch yet.",
+			"expected_output": "The case defaults to observed, unvalidated, human review pending, and separates branch existence from technical and human validation.",
+			"assertions": [
+				"Does not mark the synthetic backfill contributor-validated",
+				"Records retrievable branch, commit, test, and issue handles",
+				"Marks unreviewed runtime claims as reported or unknown",
+				"Does not promote a candidate lesson"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "merged-without-proof",
+			"prompt": "This PR merged yesterday. Turn it into a case, but nobody recorded a fix-absent test run or verified the released package.",
+			"expected_output": "Delivery is merged while technical validation and artifact proof remain separate and conservative.",
+			"assertions": [
+				"Records merged delivery without claiming released",
+				"Does not infer red-capable coverage from merge",
+				"Names missing fix-absent and artifact evidence",
+				"Keeps maintainer acceptance separate from technical validation"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "private-incident-boundary",
+			"prompt": "Capture this internal incident as a public case. The transcript includes customer payloads, private Slack messages, and internal repository paths.",
+			"expected_output": "The skill refuses to copy private evidence into a public case and either keeps it approved-private or records only a sanitized coverage gap.",
+			"assertions": [
+				"Does not publish customer or private conversation content",
+				"Requires an approved private destination or sanitization",
+				"Preserves provenance without local paths or identities",
+				"Does not fabricate public evidence handles"
+			],
+			"files": []
+		}
+	]
+}

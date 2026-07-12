@@ -1,8 +1,10 @@
 #!/usr/bin/env node
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
 const SKILLS_DIR = "skills";
+const MARKETPLACE_PATH = join(".claude-plugin", "marketplace.json");
+const CATALOGS = [".curated", ".experimental", ".system"];
 const REQUIRED = ["name", "description"];
 const MAX_SKILL_LINES = 120;
 const MATURITY_STATES = new Set([
@@ -33,6 +35,29 @@ function markdownFiles(root) {
 		if (entry.isDirectory()) return markdownFiles(path);
 		return entry.name.endsWith(".md") ? [path] : [];
 	});
+}
+
+function discoverSkills() {
+	const entries = [];
+	for (const entry of readdirSync(SKILLS_DIR, { withFileTypes: true })) {
+		if (!entry.isDirectory() || entry.name.startsWith(".")) continue;
+		const root = join(SKILLS_DIR, entry.name);
+		if (existsSync(join(root, "SKILL.md"))) {
+			entries.push({ name: entry.name, root, catalog: "stable" });
+		}
+	}
+	for (const catalog of CATALOGS) {
+		const container = join(SKILLS_DIR, catalog);
+		if (!existsSync(container)) continue;
+		for (const entry of readdirSync(container, { withFileTypes: true })) {
+			if (!entry.isDirectory()) continue;
+			const root = join(container, entry.name);
+			if (existsSync(join(root, "SKILL.md"))) {
+				entries.push({ name: entry.name, root, catalog });
+			}
+		}
+	}
+	return entries;
 }
 
 function validateLinks(file) {
@@ -72,6 +97,23 @@ function validateCase(file) {
 	) {
 		errors.push(`${file}: contains local or private-case material`);
 	}
+	if (/Unvalidated agent backfill/i.test(text)) {
+		if (!/^Status: observed$/m.test(text)) {
+			errors.push(
+				`${file}: unvalidated agent backfill must have observed status`,
+			);
+		}
+		if (!/^Validation: unvalidated$/m.test(text)) {
+			errors.push(
+				`${file}: unvalidated agent backfill must remain unvalidated`,
+			);
+		}
+		if (!/^Human review: pending$/m.test(text)) {
+			errors.push(
+				`${file}: unvalidated agent backfill must have pending human review`,
+			);
+		}
+	}
 }
 
 if (!existsSync(SKILLS_DIR)) {
@@ -79,11 +121,46 @@ if (!existsSync(SKILLS_DIR)) {
 	process.exit(1);
 }
 
-const dirs = readdirSync(SKILLS_DIR).filter((dir) =>
-	statSync(join(SKILLS_DIR, dir)).isDirectory(),
-);
+const skills = discoverSkills();
+const names = skills.map((skill) => skill.name);
 
-if (dirs.length === 0) errors.push("No skills found under skills/.");
+if (skills.length === 0) errors.push("No skills found under skills/.");
+if (new Set(names).size !== names.length) {
+	errors.push("Skill names must be unique across stable and catalog surfaces.");
+}
+
+if (!existsSync(MARKETPLACE_PATH)) {
+	errors.push(
+		"Missing .claude-plugin/marketplace.json skill grouping manifest.",
+	);
+} else {
+	try {
+		const marketplace = JSON.parse(readFileSync(MARKETPLACE_PATH, "utf8"));
+		const declared = new Map();
+		for (const plugin of marketplace.plugins ?? []) {
+			for (const path of plugin.skills ?? []) {
+				declared.set(path.replace(/^\.\//, ""), plugin.name);
+			}
+		}
+		for (const skill of skills) {
+			const group = declared.get(skill.root);
+			const expected =
+				skill.catalog === ".experimental" ? "candidates" : "stable";
+			if (group !== expected) {
+				errors.push(
+					`${skill.name}: installer group must be "${expected}", received "${group ?? "missing"}"`,
+				);
+			}
+		}
+		for (const path of declared.keys()) {
+			if (!skills.some((skill) => skill.root === path)) {
+				errors.push(`Installer manifest references missing skill "${path}"`);
+			}
+		}
+	} catch {
+		errors.push("Malformed .claude-plugin/marketplace.json.");
+	}
+}
 
 const maturityPath = join("foundry", "maturity.json");
 if (!existsSync(maturityPath)) {
@@ -92,24 +169,36 @@ if (!existsSync(maturityPath)) {
 	try {
 		const maturity = JSON.parse(readFileSync(maturityPath, "utf8"));
 		const registered = Object.keys(maturity.skills ?? {});
-		for (const dir of dirs) {
-			const entry = maturity.skills?.[dir];
+		for (const skill of skills) {
+			const entry = maturity.skills?.[skill.name];
 			if (!entry) {
-				errors.push(`${dir}: missing maturity registry entry`);
+				errors.push(`${skill.name}: missing maturity registry entry`);
 				continue;
 			}
 			if (!MATURITY_STATES.has(entry.maturity)) {
-				errors.push(`${dir}: invalid maturity state "${entry.maturity}"`);
+				errors.push(
+					`${skill.name}: invalid maturity state "${entry.maturity}"`,
+				);
 			}
 			if (!entry.type || !entry.summary) {
-				errors.push(`${dir}: maturity entry needs type and summary`);
+				errors.push(`${skill.name}: maturity entry needs type and summary`);
+			}
+			if (
+				skill.catalog === ".experimental" &&
+				entry.maturity !== "experimental"
+			) {
+				errors.push(
+					`${skill.name}: skills/.experimental entries must have experimental maturity`,
+				);
 			}
 			if (entry.decision && !existsSync(join("foundry", entry.decision))) {
-				errors.push(`${dir}: missing maturity decision "${entry.decision}"`);
+				errors.push(
+					`${skill.name}: missing maturity decision "${entry.decision}"`,
+				);
 			}
 		}
 		for (const name of registered) {
-			if (!dirs.includes(name))
+			if (!names.includes(name))
 				errors.push(`maturity registry references missing skill "${name}"`);
 		}
 	} catch {
@@ -117,8 +206,7 @@ if (!existsSync(maturityPath)) {
 	}
 }
 
-for (const dir of dirs) {
-	const root = join(SKILLS_DIR, dir);
+for (const { name: dir, root } of skills) {
 	const skillPath = join(root, "SKILL.md");
 	if (!existsSync(skillPath)) {
 		errors.push(`${dir}: missing SKILL.md`);
@@ -251,4 +339,4 @@ if (errors.length) {
 	process.exit(1);
 }
 
-console.log(`✓ ${dirs.length} skill(s) valid.`);
+console.log(`✓ ${skills.length} skill(s) valid.`);
