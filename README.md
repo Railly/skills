@@ -1,8 +1,8 @@
-# Railly Skills
+# Agentic Engineering, Applied
 
-**Evidence-driven methods for agentic engineering, dogfooded on real maintenance work.**
+**Evidence-driven methods, dogfooded on real engineering work.**
 
-Railly Skills turns real maintenance work into portable agent protocols. It favors retrievable evidence over confident prose and keeps public methods agnostic across repositories, stacks, editors, and agents.
+These skills turn real engineering work into portable agent protocols. They favor retrievable evidence over confident prose and keep public methods agnostic across repositories, stacks, editors, and agents.
 
 ## Skills
 
