@@ -17,6 +17,7 @@ real work
 - [governance.md](governance.md): evidence ownership, maturity, and promotion rules.
 - [case-template.md](case-template.md): how to record a real issue, method, outcome, and lesson.
 - [eval-protocol.md](eval-protocol.md): how to compare no skill, current skill, and candidate skill.
+- [candidates/](candidates): aggregated rules, exemplars, eval ideas, and coverage gaps awaiting a round.
 - [rounds/](rounds): immutable promotion decisions and benchmark summaries.
 
 ## Maturity
@@ -48,3 +49,8 @@ An exemplar belongs under `skills/<name>/references/` only when a promotion roun
 Before v0.0.1, `guided-contribution`, `repro-an-issue`, and `prove-the-test` were also reviewed as public trigger surfaces. Their useful behavior was absorbed into Unfold Change, Triage, and Review because the methods share one mission and evidence chain. The original names remain in [deprecated](deprecated) and Git history.
 
 Rejection and absorption are intended outcomes of this system. A new skill is the most expensive result, not the default one.
+
+## Current candidates
+
+- [agent-browser evidence pack](candidates/2026-07-agent-browser-evidence-pack.md): unvalidated Triage and Review rules awaiting a baseline round.
+- [record-a-case](../skills/.experimental/record-a-case): installable candidate for conservative post-work case capture. It defaults synthetic backfills to unvalidated and pending human review.

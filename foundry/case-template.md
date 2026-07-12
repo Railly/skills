@@ -66,3 +66,5 @@ What can be public, what must remain private, and who approved that boundary?
 Do not replace unavailable evidence with plausible reconstruction. Mark it unknown.
 
 These fields are independent. A merged change is not automatically validated, and contributor validation is not maintainer acceptance.
+
+An agent-generated or synthetic backfill defaults to `Status: observed`, `Validation: unvalidated`, and `Human review: pending`. Upgrade those fields only after explicit review of the underlying evidence.

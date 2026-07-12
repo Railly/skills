@@ -1,14 +1,16 @@
 # Case: Falsify a discarded-tab revival regression
 
-Status: candidate
-Validation: contributor-validated
-Human review: contributor-complete
+Status: observed
+Validation: unvalidated
+Human review: pending
 Maintainer acceptance: pending
 Delivery: PR open
 Upstream status checked: 2026-07-12
 Visibility: public
 Repository: vercel-labs/agent-browser
 Source: https://github.com/vercel-labs/agent-browser/pull/1532
+
+> Unvalidated agent backfill. The PR state is live-verified; technical claims and candidate changes still require human review.
 
 ## Observed failure
 

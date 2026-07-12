@@ -23,6 +23,14 @@ The modes reuse one mission and evidence chain instead of restarting repository 
 
 [Pick an Issue](skills/pick-an-issue) surveys an external backlog, qualifies three to five candidates, presents an evidence-backed comparison matrix, recommends one, and lets the user make the final choice. It ends at selection and hands a bug to Unfold Triage or a specified enhancement to Unfold Change.
 
+## Candidate skills
+
+Candidate skills are installable for dogfooding but remain experimental until a Foundry round demonstrates value against a baseline.
+
+### Record a Case
+
+[Record a Case](skills/.experimental/record-a-case) captures completed, interrupted, or backfilled maintenance work as an evidence ledger. It keeps validation, human review, maintainer acceptance, and delivery independent.
+
 ## Workflow
 
 ```mermaid
@@ -60,6 +68,20 @@ Install interactively into supported agents:
 bunx skills add Railly/skills
 ```
 
+The interactive installer groups skills under `Stable` and `Candidates`; `record-a-case` also identifies itself as a candidate in its description. Install only the stable surface with:
+
+```bash
+bunx skills add Railly/skills --skill unfold --skill pick-an-issue
+```
+
+Install the candidate explicitly with:
+
+```bash
+bunx skills add Railly/skills --skill record-a-case
+```
+
+`--all` includes experimental candidates.
+
 Or clone and link one skill:
 
 ```bash
@@ -72,13 +94,14 @@ For Codex, Cursor, and other compatible agents, install or link the same folder 
 ## Repository structure
 
 ```text
-skills/    installable runtime surface
-cases/     public-safe evidence ledger
-foundry/   governance, candidates, absorbed methods, eval rounds, and decisions
-scripts/   deterministic validation and eval machinery
+skills/                 stable installable surface
+skills/.experimental/   installable candidates awaiting evaluation
+cases/                  public-safe evidence ledger
+foundry/                governance, lessons, eval rounds, and decisions
+scripts/                deterministic validation and eval machinery
 ```
 
-The installable surface stays flat while the catalog is small. Candidate and absorbed methods live outside `skills/` so they cannot be installed accidentally.
+Stable skills stay flat. Candidate skills use the standard `skills/.experimental/` catalog recognized by the skills CLI. The plugin manifest supplies the visible `Stable` and `Candidates` installer groups.
 
 ## Skill foundry
 

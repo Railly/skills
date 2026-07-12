@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Twelve public-safe Agent Browser cases and ten unvalidated Portless backfills
+- `record-a-case` as an experimental, installable candidate
+- Stable and Candidates grouping in the interactive skills installer
+
+### Changed
+
+- Validation now covers experimental skills, installer groups, and conservative synthetic-backfill statuses
+
 ## 0.0.1 - 2026-07-12
 
 First public release of the evidence-driven maintenance workflow.
