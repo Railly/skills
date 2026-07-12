@@ -1,0 +1,134 @@
+{
+	"skill_name": "unfold",
+	"evals": [
+		{
+			"id": 1,
+			"name": "learn-runtime-flow",
+			"prompt": "I just cloned this repository and do not understand it. Show me the major runtime pieces, then walk me through how one incoming request reaches its final handler. Keep it visual and ask me one question at a time.",
+			"expected_output": "Unfold selects Learn, builds an evidence-backed Architecture Map and Flow Trace, uses progressive zoom, asks one neutral reconstruction question at a time, and anchors decisive claims to source.",
+			"assertions": [
+				"Selects Learn without starting implementation",
+				"Uses one mission-scoped visual rather than a repository dump",
+				"Separates evidence from inference",
+				"Asks one non-leaking reconstruction question at a time"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "triage-stale-route",
+			"prompt": "Issue #1532 says a CLI sometimes leaves a stale route. Diagnose it, but do not patch anything yet.",
+			"expected_output": "Unfold selects Triage, establishes and minimizes a deterministic red signal before root-cause claims, produces a Failure Map with competing hypotheses, and leaves an evidence-backed Change Surface without modifying code.",
+			"assertions": [
+				"Establishes the exact red signal before root-cause analysis",
+				"Matches the reported execution path",
+				"Tests competing hypotheses one variable at a time",
+				"Remains read-only and produces a justified Change Surface"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "guided-change",
+			"prompt": "Issue #42 is reproduced and the Change Surface is known. Help me implement it, but I want to understand the architecture and write the change myself.",
+			"expected_output": "Unfold selects Change with the guided policy, reuses existing evidence, teaches only missing concepts, lets the user predict and write, and transitions to Review without taking unauthorized authorship.",
+			"assertions": [
+				"Selects Change with the guided policy",
+				"Does not repeat completed Triage work",
+				"Lets the user write the meaningful change",
+				"Enumerates semantic consumers beyond compiler errors"
+			],
+			"files": []
+		},
+		{
+			"id": 4,
+			"name": "helper-versus-caller",
+			"fixture": "helper-versus-caller",
+			"prompt": "I refactored multi-app naming and added a test. Everything passes. Review the diff before I commit and make any verification changes you think are necessary. Do not commit.",
+			"expected_output": "Unfold selects Review, mutates the changed caller while retaining the test, observes helper-only coverage stay green, adds a caller-level guard, then records bug-specific red and restored green evidence.",
+			"verification": {
+				"command": ["bun", "test"],
+				"expected_exit": 0
+			},
+			"assertions": [
+				"Selects Review without restarting repository onboarding",
+				"Mutates or reverts the changed caller rather than only the helper",
+				"Adds or identifies a caller-level behavioral test",
+				"Records a fix-absent bug-specific failure and restored green result"
+			],
+			"files": []
+		},
+		{
+			"id": 5,
+			"name": "regression-test-teeth",
+			"fixture": "regression-test-teeth",
+			"prompt": "Review this route-matching change and its new test before I commit. Everything currently passes. Make any verification changes you think are necessary. Do not commit.",
+			"expected_output": "Unfold selects Review, creates a fix-absent state that keeps the test, observes failure for the wrong-port route, restores the fix, observes green, and records both commands and outcomes.",
+			"verification": {
+				"command": ["bun", "test"],
+				"expected_exit": 0
+			},
+			"assertions": [
+				"Runs the new test with the production fix absent",
+				"Confirms failure for routing behavior rather than setup",
+				"Restores the production fix and confirms green",
+				"Leaves commands, outcomes, and remaining boundaries"
+			],
+			"files": []
+		},
+		{
+			"id": 6,
+			"name": "subprocess-diagnostics",
+			"fixture": "subprocess-diagnostics",
+			"prompt": "This subprocess test fails in CI with only `child failed`, and I cannot tell why. Diagnose the test harness without changing `src/child.ts`. Do not commit.",
+			"expected_output": "Unfold selects Triage or Review based on the existing failure, captures child stderr, proves the diagnostic guard, and avoids inferring a platform root cause beyond captured output.",
+			"verification": {
+				"command": ["bun", "test"],
+				"expected_exit": 1
+			},
+			"assertions": [
+				"Captures child stderr or equivalent subprocess output",
+				"Makes the committed assertion expose spawn npm ENOENT",
+				"Shows fix-absent red and restored green for diagnostics",
+				"Does not generalize simulated output into an unverified platform claim"
+			],
+			"files": []
+		},
+		{
+			"id": 7,
+			"name": "non-behavioral-near-miss",
+			"fixture": "non-behavioral-near-miss",
+			"prompt": "I only renamed a local variable for readability. Check it before commit and keep the verification proportional. Do not commit.",
+			"expected_output": "Unfold selects Review, recognizes that the diff has no behavioral delta, runs proportional checks, and does not manufacture a revert-proof ritual.",
+			"verification": {
+				"command": ["bun", "test"],
+				"expected_exit": 0
+			},
+			"assertions": [
+				"Recognizes the absence of intended behavioral change",
+				"Runs the existing test or relevant static check",
+				"Does not demand or fabricate regression proof",
+				"Reports limited verification accurately"
+			],
+			"files": []
+		},
+		{
+			"id": 8,
+			"name": "python-transfer-holdout",
+			"fixture": "python-transfer-holdout",
+			"prompt": "I changed retry semantics in this small Python package and added a unittest. Review the diff before I commit and make any verification changes you think are necessary. Do not commit.",
+			"expected_output": "Unfold selects Review and applies fix-absent red and restored green proof to a Python boundary without relying on TypeScript or repository-specific terminology.",
+			"verification": {
+				"command": ["python3", "-m", "unittest"],
+				"expected_exit": 0
+			},
+			"assertions": [
+				"Runs the Python regression with the production fix absent",
+				"Observes a behavior-specific retry-count failure",
+				"Restores the fix and confirms the unittest passes",
+				"Leaves an inspectable proof record without stack-specific overclaim"
+			],
+			"files": []
+		}
+	]
+}

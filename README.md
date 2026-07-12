@@ -1,56 +1,110 @@
-# skills
+# Railly Skills
 
-Agent skills that encode how I work. Drop them into any setup.
+**Evidence-driven methods for agentic engineering, dogfooded on real maintenance work.**
 
-Each skill is a method, not a utility. It helps you avoid common failures when you code with agents: you do not understand the code, you claim without proof, your tests pass while the code is still wrong. Works in any repo and stack. No hardcoded paths.
-
-Inspired by [mattpocock/skills](https://github.com/mattpocock/skills) and [Anthropic agent skills](https://docs.claude.com/en/docs/agents-and-tools/agent-skills).
-
-## Philosophy
-
-How these skills work:
-
-- agnostic: works in any repo, language, editor. If it assumes your stack, it does not belong
-- you think, agent checks: skills make you rebuild ideas, not read answers. Understanding lets you change a system, checking output does not
-- check before you claim: use filesystem, api, git. Say unknown when you cannot prove it
-- opinionated: these reflect how I work. Fork them to match how you work
+Railly Skills turns real maintenance work into portable agent protocols. It favors retrievable evidence over confident prose and keeps public methods agnostic across repositories, stacks, editors, and agents.
 
 ## Skills
 
-| skill | what it does |
+### Unfold
+
+[Unfold](skills/unfold) carries one unfamiliar-codebase mission through the earliest unfinished mode:
+
+| Mode | Outcome |
 |---|---|
-| [pick-an-issue](skills/pick-an-issue) | filter a backlog you do not own, confirm a bug is real, ship a clean PR with credit |
-| [repro-an-issue](skills/repro-an-issue) | build a signal that goes red on the bug before you theorize or fix it |
-| [prove-the-test](skills/prove-the-test) | prove a test fails when the code is wrong before you trust it green |
-| [guided-contribution](skills/guided-contribution) | learn a codebase by shipping a change with a tutor, you predict and rebuild, agent checks |
+| Learn | Evidence-backed architecture, flow traces, progressive zoom, and reconstruction |
+| Triage | Deterministic red signal, failure map, surviving hypothesis, and Change Surface |
+| Change | Complete implementation under `guided`, `execute`, or `execute-with-approval` collaboration |
+| Review | Change Surface review, revert proof, restored green, and artifact verification |
+
+The modes reuse one mission and evidence chain instead of restarting repository exploration at every phase.
+
+### Pick an Issue
+
+[Pick an Issue](skills/pick-an-issue) surveys an external backlog, qualifies three to five candidates, presents an evidence-backed comparison matrix, recommends one, and lets the user make the final choice. It ends at selection and hands a bug to Unfold Triage or a specified enhancement to Unfold Change.
+
+## Workflow
+
+```mermaid
+flowchart LR
+  Backlog[Issue backlog] --> Pick[pick-an-issue]
+  Pick --> Choice{User chooses}
+  Choice --> Triage[Unfold Triage]
+  Learn[Unfold Learn] -. supports .-> Triage
+  Triage --> Change[Unfold Change]
+  Change --> Review[Unfold Review]
+  Review --> Result[Evidence-backed result]
+```
+
+Each mode can also be entered directly. A diff can begin at Review; a read-only question can remain in Learn.
+
+## Maturity
+
+v0.0.1 is an honest first release, not a validation claim. Both public skills are **dogfooded**. The consolidated Unfold protocol and the Pick an Issue selection matrix still need controlled comparisons against no-skill and prior-skill baselines.
+
+The source of truth is [foundry/maturity.json](foundry/maturity.json).
+
+| State | Meaning |
+|---|---|
+| experimental | Coherent method and trigger boundary, without real-work use |
+| dogfooded | Used on real work, without a reliable baseline comparison |
+| evaluated | Compared against a baseline, but evidence remains incomplete or inconclusive |
+| validated | Repeatable positive effect across holdouts and trials, with human review |
+| deprecated | Retained for provenance but no longer recommended |
 
 ## Install
 
-A skill is a folder with `SKILL.md`. Link it where your agent loads skills.
+Install interactively into supported agents:
 
-Claude Code:
+```bash
+bunx skills add Railly/skills
+```
+
+Or clone and link one skill:
 
 ```bash
 git clone https://github.com/Railly/skills.git ~/railly-skills
-ln -s ~/railly-skills/skills/guided-contribution ~/.claude/skills/guided-contribution
+ln -s ~/railly-skills/skills/unfold ~/.claude/skills/unfold
 ```
 
-Cursor, Codex, others:
+For Codex, Cursor, and other compatible agents, install or link the same folder under the corresponding project or personal skills directory.
 
-Copy the folder to your skills directory or paste `SKILL.md` as a rule. The file is plain prose, so it works anywhere.
+## Repository structure
 
-Trigger is the `description` in frontmatter. Keep it close to user intent.
-
-## How a skill is built
-
-```
-skills/<name>/
-└── SKILL.md
+```text
+skills/    installable runtime surface
+cases/     public-safe evidence ledger
+foundry/   governance, candidates, absorbed methods, eval rounds, and decisions
+scripts/   deterministic validation and eval machinery
 ```
 
-## Contributing
+The installable surface stays flat while the catalog is small. Candidate and absorbed methods live outside `skills/` so they cannot be installed accidentally.
 
-Fork, add `skills/<name>/SKILL.md`, keep it agnostic, open a PR. CI checks frontmatter.
+## Skill foundry
+
+Real work becomes a case before it becomes an instruction:
+
+```text
+maintenance work
+→ case
+→ candidate lesson
+→ baseline comparison
+→ human review
+→ promote, absorb, or reject
+```
+
+Read the [foundry overview](foundry), [governance](foundry/governance.md), [eval protocol](foundry/eval-protocol.md), and [case template](foundry/case-template.md). Historical methods absorbed into Unfold are recorded under [foundry/deprecated](foundry/deprecated).
+
+Public issues and pull requests may become public cases. Confidential evidence stays in an organization-approved private system; only generalized, sanitized lessons cross into this repository.
+
+## Validate
+
+```bash
+bun scripts/validate-skills.mjs
+bun scripts/verify-eval-fixtures.mjs
+```
+
+CI checks frontmatter, progressive disclosure, internal links, maturity metadata, public-case boundaries, eval metadata, and executable fixtures.
 
 ## License
 
