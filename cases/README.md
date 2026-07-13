@@ -8,7 +8,7 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 
 - [Portless #352: match the full routing discriminator](portless/0352-tailscale-authority-matching.md)
 - [Portless #355: test the changed caller](portless/0355-changed-caller-coverage.md)
-- [agent-browser #1532: falsify a renderer-revival regression](agent-browser/1532-discarded-tab-revival.md)
+- [agent-browser #1532: revive a discarded tab without losing live-tab state](agent-browser/1532-discarded-tab-revival.md)
 
 ### Portless unvalidated backfill
 
@@ -53,7 +53,7 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 | [Portless #346](portless/346-lan-tlds.md) | [issue](https://github.com/vercel-labs/portless/issues/346) · [PR](https://github.com/vercel-labs/portless/pull/348) | unvalidated | PR open | compose additive modes without replacing explicit config | review exemplar candidate |
 | Portless PR #352 | [PR](https://github.com/vercel-labs/portless/pull/352) | contributor-validated | PR open | use the full routing discriminator before fallback | retained as a case, not loaded by a skill |
 | Portless PR #355 | [PR](https://github.com/vercel-labs/portless/pull/355) | contributor-validated | PR open | mutate the changed caller; surface subprocess output | round 1 evidence; exemplar rejected |
-| [agent-browser PR #1532](agent-browser/1532-discarded-tab-revival.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1532) | unvalidated | PR open | prove red before green; distinguish proxy from exact trigger | round 1 evidence; exemplar rejected |
+| [agent-browser PR #1532](agent-browser/1532-discarded-tab-revival.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1532) | contributor-validated | PR open | prefer a non-destructive recovery so a heuristic false positive is harmless | review notes addressed |
 | [agent-browser #1291](agent-browser/1291-state-load-timeout.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1291) · [branch](https://github.com/Railly/agent-browser/tree/fix/state-load-unreachable-origin) | unvalidated | local | bound each batch item and cancel abandoned side effects | Review rule and eval candidate |
 | [agent-browser #1105](agent-browser/1105-select-silent-success.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1105) · [branch](https://github.com/Railly/agent-browser/tree/fix/select-non-select-errors) | unvalidated | local | observe the substrate when success output may lie | Review rule and eval candidate |
 | [agent-browser #1204](agent-browser/1204-har-response-bodies.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1204) · [branch](https://github.com/Railly/agent-browser/tree/fix/har-response-bodies) | unvalidated | local | verify serialized payloads through the artifact | record only |
