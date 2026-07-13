@@ -4,7 +4,7 @@ Start from a diff, patch, test, or PR. Review the behavior and boundaries rather
 
 ## 1. Reconstruct the claim
 
-Name the intended behavior, contracts and state changed, affected callers and consumers, lifecycle effects, and untested Change Surface. Separate behavioral changes from mechanical refactors.
+Name the intended behavior, contracts and state changed, affected callers and consumers, lifecycle effects, and untested Change Surface. Include the failure modes the change itself introduces (new branches, waits, acquisitions, recovery actions), not only the ones it fixes. Separate behavioral changes from mechanical refactors.
 
 ## 2. Review the guard
 

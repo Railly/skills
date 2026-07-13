@@ -26,7 +26,11 @@ Change the contract, then enumerate every consumer. The compiler finds invalid s
 
 Treat the change as a matrix and account for every cell. A green compiler cannot prove a behavioral migration is complete.
 
-## 4. Prepare proof candidates
+## 4. Attack the change's own new failure modes
+
+Proving the reported symptom is gone does not prove the change is safe. Enumerate what the change introduces (new branches or selection logic, new waits or timeouts, new acquisitions, changed contracts) and give each its own red signal or explicit reasoning. A bounded probe can reintroduce the leak it was meant to avoid; a new concurrent path can re-run a single-path bug at fan-out; a recovery action can be destructive on a false positive, so prefer one that is harmless when the detector misfires. State any introduced failure mode you cannot cheaply test rather than hiding it.
+
+## 5. Prepare proof candidates
 
 Run proportional checks and identify the highest behavioral seam affected by the patch. Preserve the original red signal for acceptance. Transition to Review with the patch, commands run, and unverified boundaries.
 
