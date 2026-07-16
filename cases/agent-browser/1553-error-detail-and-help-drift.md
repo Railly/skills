@@ -4,7 +4,7 @@ Status: candidate
 Validation: independently-validated
 Human review: received 2026-07-16 (maintainer; two findings, both confirmed real and fixed locally)
 Maintainer acceptance: pending
-Delivery: PR open (rebased onto v0.32.1; review-response commits local, not yet pushed)
+Delivery: PR open (main merged for the eve changes; review-response commits pushed 2026-07-16)
 Visibility: public
 Repository: vercel-labs/agent-browser
 Role: contributor
@@ -32,7 +32,7 @@ Ran the reported failing commands against a real build: a role-name miss and a n
 7. Reverted the catch-all to a real `Err`, then had a second review pass catch that the "accepted actions" test asserted a literal list against itself and never touched the real guard or match arms; extracted a single shared constant and added a real end-to-end test that dispatches every accepted action against a live browser.
 8. Fixed two more accuracy issues a third pass caught: a PR-description claim that the new end-to-end test ran under plain `cargo test` when it was in fact `#[ignore]`d and required a separate `--ignored` invocation, and an in-code comment narrating the panic investigation in past tense, which belonged in the PR description, not the source.
 9. A maintainer review pass (2026-07-16) found two defects the three prior passes missed: the step-2 sweep left two more copies of the stale action list standing -- the root README and the eve extension's find tool (a package merged one day before the branch was cut), whose zod enum still offered `type`/`focus`/`uncheck` that the CLI rejects -- and the new e2e drift test could not catch the drift it was named for: an action added to `FIND_ACTIONS` without a match arm falls through to the internal-error fallback, whose message does not start with "Unknown action", the only thing the test asserted.
-10. Fixed all three after rebasing onto v0.32.1: aligned README and eve with the dispatcher (eve typechecks; `type` and `uncheck` remain reachable through eve's standalone fill and set_checked tools), and rewrote the drift test to assert `success == true` per action with a checkbox fixture for `check`. Proved the new assertion by forcing the exact drift (a bogus guard entry with no handler), watching the test go red on the internal-error message, then reverting.
+10. Fixed all three after merging main (v0.32.1, which carried the eve changes): aligned README and eve with the dispatcher (eve typechecks; `type` and `uncheck` remain reachable through eve's standalone fill and set_checked tools), and rewrote the drift test to assert `success == true` per action with a checkbox fixture for `check`. Proved the new assertion by forcing the exact drift (a bogus guard entry with no handler), watching the test go red on the internal-error message, then reverting.
 
 ## Outcome
 
@@ -40,7 +40,7 @@ Ran the reported failing commands against a real build: a role-name miss and a n
 - Documented find actions now match what dispatches; an unknown action returns the valid list immediately, before any locator resolution runs.
 - The `unreachable!()` was never reached in the shipped diff, but the safe-fallback fix is the actual deliverable of this case: the panic only existed for one build, during the pass that found it, and was fixed before any commit shipped it.
 - `cargo test`: 954 passed, 0 failed, 84 ignored (including a real-Chrome end-to-end test run separately with `--ignored`); `clippy` and `fmt` clean.
-- Post-review (2026-07-16): README and eve now carry the real action set, the drift test asserts dispatch success and was proven red under forced drift, and the branch sits on v0.32.1. 956 unit tests pass; clippy, fmt, and eve's tsc clean.
+- Post-review (2026-07-16): README and eve now carry the real action set, the drift test asserts dispatch success and was proven red under forced drift, and the branch carries main at v0.32.1 via merge (no force push). 956 unit tests pass; clippy, fmt, and eve's tsc clean.
 - Why the misses happened: the sweep fixed the copies of the action list it found rather than running one repo-wide search for the stale tokens and driving that to zero hits -- closure by enumeration, when the case's own "three separate files carried this independently" was already evidence the copy count was unbounded (a fourth surface, eve, had merged the day before). And the drift test's assertion was written against yesterday's observed failure ("Unknown subaction") instead of the invariant in its own doc comment; the `Err` fallback added in this same PR to defuse the panic is exactly what let it pass silently -- the safe fallback and the test meant to catch drift neutralized each other, and the test was never once run against the drift it was named for.
 
 ## Evidence
