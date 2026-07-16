@@ -36,6 +36,9 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 - [#1460: use a working contrast to find the seam](agent-browser/1460-frame-aware-locators.md)
 - [Disproven batch: explain the green](agent-browser/disproven-current-main.md)
 - [Cross-case session observations](agent-browser/session-observations.md)
+- [#1552: trace a silent same-day revert before writing a new fix](agent-browser/1552-getbyrole-implicit-roles-regression.md)
+- [#1553: force a guard-and-match drift to see the real failure mode](agent-browser/1553-error-detail-and-help-drift.md)
+- [Shared daemon cross-worktree contamination](agent-browser/shared-daemon-cross-worktree-contamination.md)
 
 ## Cases
 
@@ -65,6 +68,9 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 | [agent-browser #1460](agent-browser/1460-frame-aware-locators.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1460) · [branch](https://github.com/Railly/agent-browser/tree/fix/semantic-locators-active-frame) | unvalidated | local | use a working contrast to find the reusable seam | exemplar and eval candidate |
 | [agent-browser disproven batch](agent-browser/disproven-current-main.md) | public issues linked in case | unvalidated | local | explain why current main is green | Triage rule and eval candidate |
 | [agent-browser session observations](agent-browser/session-observations.md) | public case cluster | unvalidated | local | cross-case operational and diagnostic patterns | candidate generator only |
+| [agent-browser PR #1552](agent-browser/1552-getbyrole-implicit-roles-regression.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1552) | independently-validated | PR open | a same-day merge on the same file is a checkable revert signature | review reference-rule candidate |
+| [agent-browser PR #1553](agent-browser/1553-error-detail-and-help-drift.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1553) | independently-validated | PR open | force a "can't happen" fallback once against a live instance before trusting it | review reference-rule candidate |
+| [agent-browser shared daemon](agent-browser/shared-daemon-cross-worktree-contamination.md) | PRs [#1552](https://github.com/vercel-labs/agent-browser/pull/1552) · [#1553](https://github.com/vercel-labs/agent-browser/pull/1553) | independently-validated | local | check who actually answered before trusting a live verification result | review reference-rule candidate |
 
 One merged case remains to be backfilled. It is not required for round 1 because merge status and technical validation are independent dimensions.
 
