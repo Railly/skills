@@ -4,7 +4,7 @@ Status: candidate
 Validation: independently-validated
 Human review: received 2026-07-16 (maintainer; two findings, both confirmed real and fixed locally)
 Maintainer acceptance: pending
-Delivery: PR open (review-response commits local, not yet pushed)
+Delivery: PR open (review-response commits pushed 2026-07-16)
 Visibility: public
 Repository: vercel-labs/agent-browser
 Role: contributor
@@ -39,7 +39,7 @@ Built the exact commit a third-party bug report cited (`dcbe3522`, v0.31.2) in a
 - Patch: `find_ax_node_by_role` queries `Accessibility.getFullAXTree` and matches role and name case-insensitively (non-exact) against the browser's computed values; a role match with no name match reports the names actually seen; the missing-live-DOM-node fallback no longer names internal CDP fields.
 - `cargo test`: 961 passed, 0 failed, 84 ignored; `clippy` and `fmt` clean.
 - Two residuals inherited from #1331's design (an AX node matching role and name but exposing no live DOM node, and lookup continuing past such a node) remain unit-tested only. Five real HTML constructs plausibly hitting that path (closed `<select>`/`<option>`, `<datalist>`, image-map `<area>`, a customizable `<select>`) were tried against real Chrome; none reached it.
-- Post-review (2026-07-16): both maintainer findings fixed on the branch after a rebase onto v0.32.1 -- presentational roles resolve through a DOM-attribute fallback (live-verified: `none` -> alpha, `presentation` -> beta, `heading` still via AX), and `--help` plus the MCP schema now state the real `--exact` contract. 964 unit tests pass plus a new `#[ignore]`d real-Chrome e2e; clippy and fmt clean. One cross-PR interaction: until #1553's error-flattening fix lands, `to_ai_friendly_error` still rewrites this fallback's specific miss message into the generic one.
+- Post-review (2026-07-16): both maintainer findings fixed on the branch after merging main (v0.32.1) -- presentational roles resolve through a DOM-attribute fallback (live-verified: `none` -> alpha, `presentation` -> beta, `heading` still via AX), and `--help` plus the MCP schema now state the real `--exact` contract. 964 unit tests pass plus a new `#[ignore]`d real-Chrome e2e; clippy and fmt clean. One cross-PR interaction: until #1553's error-flattening fix lands, `to_ai_friendly_error` still rewrites this fallback's specific miss message into the generic one.
 - Why the misses happened: the verification matrix (heading, list, banner, link, case, exact) only contained roles whose point is to exist in the AX tree, so no check could catch the roles whose point is absence from it; and the docs pass equated "docs" with markdown, so the two runtime doc surfaces (binary help, MCP schema) never entered the sweep -- the same night the sibling PR #1553 was fixing exactly that class of drift on the same two files.
 
 ## Evidence
