@@ -2,9 +2,9 @@
 
 Status: candidate
 Validation: independently-validated
-Human review: pending
+Human review: received 2026-07-16 (maintainer; two findings, both confirmed real and fixed locally)
 Maintainer acceptance: pending
-Delivery: PR open
+Delivery: PR open (rebased onto v0.32.1; review-response commits local, not yet pushed)
 Visibility: public
 Repository: vercel-labs/agent-browser
 Role: contributor
@@ -31,6 +31,8 @@ Ran the reported failing commands against a real build: a role-name miss and a n
 6. Observed the actual failure mode: the task panicked, the daemon process itself survived (`tokio::sync::Mutex` is not poisoned by a panicking holder, confirmed by sending a normal command immediately after and getting a clean success), but the caller got a bare connection EOF after five retries instead of any error message, a worse outcome than the bug being fixed.
 7. Reverted the catch-all to a real `Err`, then had a second review pass catch that the "accepted actions" test asserted a literal list against itself and never touched the real guard or match arms; extracted a single shared constant and added a real end-to-end test that dispatches every accepted action against a live browser.
 8. Fixed two more accuracy issues a third pass caught: a PR-description claim that the new end-to-end test ran under plain `cargo test` when it was in fact `#[ignore]`d and required a separate `--ignored` invocation, and an in-code comment narrating the panic investigation in past tense, which belonged in the PR description, not the source.
+9. A maintainer review pass (2026-07-16) found two defects the three prior passes missed: the step-2 sweep left two more copies of the stale action list standing -- the root README and the eve extension's find tool (a package merged one day before the branch was cut), whose zod enum still offered `type`/`focus`/`uncheck` that the CLI rejects -- and the new e2e drift test could not catch the drift it was named for: an action added to `FIND_ACTIONS` without a match arm falls through to the internal-error fallback, whose message does not start with "Unknown action", the only thing the test asserted.
+10. Fixed all three after rebasing onto v0.32.1: aligned README and eve with the dispatcher (eve typechecks; `type` and `uncheck` remain reachable through eve's standalone fill and set_checked tools), and rewrote the drift test to assert `success == true` per action with a checkbox fixture for `check`. Proved the new assertion by forcing the exact drift (a bogus guard entry with no handler), watching the test go red on the internal-error message, then reverting.
 
 ## Outcome
 
@@ -38,6 +40,8 @@ Ran the reported failing commands against a real build: a role-name miss and a n
 - Documented find actions now match what dispatches; an unknown action returns the valid list immediately, before any locator resolution runs.
 - The `unreachable!()` was never reached in the shipped diff, but the safe-fallback fix is the actual deliverable of this case: the panic only existed for one build, during the pass that found it, and was fixed before any commit shipped it.
 - `cargo test`: 954 passed, 0 failed, 84 ignored (including a real-Chrome end-to-end test run separately with `--ignored`); `clippy` and `fmt` clean.
+- Post-review (2026-07-16): README and eve now carry the real action set, the drift test asserts dispatch success and was proven red under forced drift, and the branch sits on v0.32.1. 956 unit tests pass; clippy, fmt, and eve's tsc clean.
+- Why the misses happened: the sweep fixed the copies of the action list it found rather than running one repo-wide search for the stale tokens and driving that to zero hits -- closure by enumeration, when the case's own "three separate files carried this independently" was already evidence the copy count was unbounded (a fourth surface, eve, had merged the day before). And the drift test's assertion was written against yesterday's observed failure ("Unknown subaction") instead of the invariant in its own doc comment; the `Err` fallback added in this same PR to defuse the panic is exactly what let it pass silently -- the safe fallback and the test meant to catch drift neutralized each other, and the test was never once run against the drift it was named for.
 
 ## Evidence
 
@@ -53,6 +57,10 @@ Ran the reported failing commands against a real build: a role-name miss and a n
 
 Secondary: a test that compares a hardcoded list to itself proves nothing about the code it is meant to guard; the guard, the message, and the test all need to read from one shared source of truth, or the test can pass forever while the real contract silently drifts.
 
+Third (from maintainer review): a test that exists to catch a specific drift has not been written until it has been forced red by that drift once. Asserting against the failure message already observed (the past bug) instead of the invariant (dispatch succeeded) left a third outcome -- the internal-error fallback added in this very PR -- that the assertion could not distinguish from success.
+
+Fourth (from maintainer review): a contract duplicated across N surfaces is only aligned when a repo-wide search for the stale value returns zero hits. Fixing the copies you already know about is closure by enumeration; the number of independent copies already found is itself the signal that N is unbounded, and new packages merged since the branch was cut are part of N.
+
 ## Exceptions
 
 - The forced-drift technique only tells you what happens when the specific fault is triggered; it does not prove the fault is unreachable in practice, only what its blast radius is if it occurs.
@@ -64,6 +72,9 @@ Secondary: a test that compares a hardcoded list to itself proves nothing about 
 - Reference rule (test review): a test that asserts a literal list matches an identically-typed literal list is not testing the production code path; require it to call through the real guard, dispatcher, or const the production code uses.
 - Eval: given a diff that adds a validation guard ahead of a match with a separate catch-all, does the agent check whether the guard and the match arms are the same source of truth, or two lists that can drift?
 - Coverage gap: no current check catches a PR description claiming a test ran under a command that would not actually execute it (an `#[ignore]`d test under plain `cargo test`); this was caught by a third human-style review pass, not by any tooling.
+- Reference rule (drift/invariant tests, from maintainer review): before accepting a test whose purpose is to catch a specific drift, introduce that drift deliberately once and confirm the test fails; a drift test that has never been red against its target drift is unverified. Assert the invariant (the operation succeeded), not the absence of one known failure message -- enumerate the other error paths that could reach the assertion and pass it.
+- Reference rule (duplicated contracts, from maintainer review): when fixing a value duplicated across surfaces, finish with a repo-wide search for the stale tokens and require zero hits, explicitly including packages merged after the branch was cut; "I updated the N places I found" is not alignment.
+- Eval: given a test asserting on an error-message prefix, does the agent enumerate the other error paths whose messages would also pass the assertion?
 
 ## Confidentiality review
 
