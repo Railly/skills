@@ -2,14 +2,14 @@
 
 Status: candidate
 Validation: independently-validated
-Human review: received 2026-07-16 (maintainer; two findings, both confirmed real and fixed locally)
-Maintainer acceptance: pending
-Delivery: PR open (review-response commits pushed 2026-07-16)
+Human review: received 2026-07-16 and 2026-07-17 (maintainer; two rounds, five findings, all confirmed real and fixed)
+Maintainer acceptance: pending (round-2 response pushed, CI green)
+Delivery: PR open (round-2 fixes pushed 2026-07-17)
 Visibility: public
 Repository: vercel-labs/agent-browser
 Role: contributor
 Source: https://github.com/vercel-labs/agent-browser/pull/1552
-Upstream status checked: 2026-07-16
+Upstream status checked: 2026-07-17
 
 > Independently validated: a second, blind agent session reproduced both the original failure and the fix from a self-contained prompt, without access to this session's reasoning.
 
@@ -76,3 +76,9 @@ Third (from maintainer review): replacing a syntactic matcher with a semantic on
 ## Confidentiality review
 
 Public. vercel-labs/agent-browser is a public repository; PR #1552 and the full #1145/#1153/#1325/#1331 chain are public, with timestamps and diffs read from the public GitHub API. Internal team chat coordinated the assignment of this work but is not quoted or referenced by channel; only the fact that it was assigned is stated. No local machine paths appear in this record.
+
+## Round-2 delivery (2026-07-17)
+
+The second maintainer round raised three findings: AX roles not normalized to ARIA names (`image` vs `img`), ordered role fallbacks ignored (`role="button none"` answered a query for `none`), and docs that did not scope case-insensitivity to role accessible names. All three were fixed and pushed, each verified end to end against the built binary. Checking the fixes against Playwright's full getByRole contract surfaced two adjacent gaps the review had not named, fixed in the same pass: internal whitespace was not normalized in exact accessible-name matching, and the presentational fallback matched raw text that a higher-precedence name source (`aria-labelledby`, `aria-label`) overrides. A docs claim shipped by the round-1 fix itself was also wrong: `<header>=banner` holds only for a top-level header, corrected across the five surfaces carrying the example.
+
+Both rounds were used as the answer key for the review-gate blind-replication round ([foundry/rounds/002](../../foundry/rounds/002-review-gate-blind-replication/README.md)); every finding is now a deterministic gate, a lens, or a conventions entry.
