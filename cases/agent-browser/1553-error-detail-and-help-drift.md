@@ -2,14 +2,14 @@
 
 Status: candidate
 Validation: independently-validated
-Human review: received 2026-07-16 (maintainer; two findings, both confirmed real and fixed locally)
-Maintainer acceptance: pending
-Delivery: PR open (main merged for the eve changes; review-response commits pushed 2026-07-16)
+Human review: received 2026-07-16 and 2026-07-17 (maintainer; two rounds, five findings, all confirmed real and fixed)
+Maintainer acceptance: pending (round-2 response pushed, CI green)
+Delivery: PR open (round-2 fixes pushed 2026-07-17)
 Visibility: public
 Repository: vercel-labs/agent-browser
 Role: contributor
 Source: https://github.com/vercel-labs/agent-browser/pull/1553
-Upstream status checked: 2026-07-16
+Upstream status checked: 2026-07-17
 
 > Independently validated: a second, blind agent session reproduced the fixed behavior from a self-contained prompt, without access to this session's reasoning.
 
@@ -79,3 +79,11 @@ Fourth (from maintainer review): a contract duplicated across N surfaces is only
 ## Confidentiality review
 
 Public. vercel-labs/agent-browser is a public repository; PR #1553 is public. Internal team chat coordinated the assignment of this work but is not quoted or referenced by channel. No local machine paths appear in this record.
+
+## Round-2 delivery (2026-07-17)
+
+The second maintainer round raised two findings plus a style note, all confirmed and fixed. Invalid find actions were validated only inside `execute_subaction`, which runs after locator resolution, and the daemon auto-launches before dispatch: the fix rejects unsupported actions at the dispatch entry before any browser work, keeping the inner guard as defense in depth. The "wrapped locator errors" finding was root-caused to the WebDriver engine: a genuine miss surfaces as the driver's "no such element" error payload, which `find_element` reduced to the protocol-shaped "No element ID in response", so the narrowed classifier (this PR's own change) stripped it of selector detail and guidance. The PR's own committed test asserted that pass-through as correct, which defeated two independent review passes; the payload now translates to the anchored "No element found by <strategy> '<value>'" form. Five ` -- ` comment-punctuation instances were cleaned.
+
+One extra lesson: CI resolves rust stable at run time, and a stale local toolchain produced a false clippy green (needless_borrow on clippy 1.97 caught only in CI). Harvested to the [project conventions](conventions.md) as a pre-push toolchain rule.
+
+Both rounds were used as the answer key for the review-gate blind-replication round ([foundry/rounds/002](../../foundry/rounds/002-review-gate-blind-replication/README.md)); every finding is now a deterministic gate, a lens, or a conventions entry.
