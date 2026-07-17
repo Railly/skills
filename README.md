@@ -31,6 +31,10 @@ Candidate skills are installable for dogfooding but remain experimental until a 
 
 [Record a Case](skills/.experimental/record-a-case) captures completed, interrupted, or backfilled maintenance work as an evidence ledger. It keeps validation, human review, maintainer acceptance, and delivery independent.
 
+### Review Gate
+
+[Review Gate](skills/.experimental/review-gate) runs a pre-review pass on a diff before pushing: deterministic checks first, then focused review lenses selected by what the diff changes, every gate carrying provenance from a recorded case. External review findings are harvested back into the catalog; the success metric is external findings per review round, trending to zero. Per-project overlays live beside the cases that produced them (`cases/<repo>/conventions.md`).
+
 ## Workflow
 
 ```mermaid
