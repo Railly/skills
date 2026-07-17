@@ -10,6 +10,8 @@ Usage:
   gate.sh stale <pattern> [<path>...]         Repo-wide search for a retired value must return zero hits
   gate.sh surfaces <conventions.md> [<base-ref>]
                                               Touched paths in the surface map require their listed surfaces in the diff
+  gate.sh siblings <pattern> [<base-ref>] [<path>...]
+                                              Files mentioning a behavior-delta keyword must be in the diff or exempted
   gate.sh all <conventions.md> [<base-ref>]   style + surfaces
 
 <base-ref> defaults to the merge base with origin/HEAD (falls back to HEAD~1).
@@ -72,6 +74,37 @@ check_stale() {
 	return 0
 }
 
+# Doc-sibling sweep: when a diff documents a behavior delta in one surface,
+# every other file that mentions the feature's keyword is a sibling surface.
+# A sibling absent from the diff is a finding until updated or exempted with
+# a reason (changelogs and lockfiles are typical legitimate exemptions).
+check_siblings() {
+	local pattern="${1:-}"
+	[[ -z "$pattern" ]] && usage
+	shift
+	local ref=""
+	if [[ -n "${1:-}" ]] && git rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then
+		ref="$1"
+		shift
+	fi
+	local base findings=0
+	base=$(base_ref "$ref")
+	local changed
+	changed=$(git diff --name-only "$base" 2>/dev/null)
+	local hits
+	hits=$(git grep -lI --untracked -e "$pattern" -- "${@:-.}" 2>/dev/null || true)
+	[[ -z "$hits" ]] && { echo "PASS [siblings] no file mentions '$pattern'"; return 0; }
+	while IFS= read -r f; do
+		[[ -z "$f" ]] && continue
+		if ! grep -qxF "$f" <<<"$changed"; then
+			echo "FINDING [siblings] '$f' mentions '$pattern' but is not in the diff; update it or acknowledge why it is unaffected"
+			findings=1
+		fi
+	done <<<"$hits"
+	[[ $findings -eq 0 ]] && echo "PASS [siblings] every file mentioning '$pattern' is in the diff"
+	return $findings
+}
+
 # Surface map lines live in the conventions file inside a fenced block:
 #   ```surfaces
 #   <touched-glob> :: <required-glob>[, <required-glob>...]
@@ -124,6 +157,7 @@ case "$cmd" in
 	style) check_style "$@" ;;
 	stale) check_stale "$@" ;;
 	surfaces) check_surfaces "$@" ;;
+	siblings) check_siblings "$@" ;;
 	all)
 		conv="${1:-}"
 		ref="${2:-}"
