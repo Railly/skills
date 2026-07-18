@@ -4,8 +4,8 @@ Status: observed
 Validation: unvalidated
 Human review: pending
 Maintainer acceptance: pending
-Delivery: PR open
-Upstream status checked: 2026-07-12
+Delivery: superseded (see [366](366-script-indirection-blast-radius.md) — #303's approach re-applied, generalized, and delivered as PR #366 with co-author credit)
+Upstream status checked: 2026-07-18
 Visibility: public
 Repository: vercel-labs/portless
 Role: contributor
@@ -146,4 +146,4 @@ Add exemplar. The caller-level regression demonstrates the helper-versus-wiring 
 
 ## Missing evidence
 
-- Live Vite bind and proxy request.
+- ~~Live Vite bind and proxy request.~~ Resolved 2026-07-16 by the E2E matrix in [366](366-script-indirection-blast-radius.md): route port == listening port, HTTP 200 observed per invocation.
