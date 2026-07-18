@@ -28,7 +28,7 @@ When the diff is in a TS/JS or Rust repo and the `radius` CLI is on PATH, also r
 
 ## 3. Select and run lenses
 
-Read [references/gates.md](references/gates.md). Each **lens** declares a trigger, a property of the diff. Run each triggered lens as its own focused pass over the full diff; a merged mega-pass dilutes every lens it carries. When an Impact Map exists from step 2, each lens inspects the convergence items first, then top-confidence items, and findings cite the propagation path (`X → Y via call`) — but always spend passes beyond the map too: in the radius A/B, reviewers who only followed the map missed bugs free exploration caught. The map directs attention; directed attention is also narrowed attention. Prefer a reviewer model different from the one that wrote the diff: a same-model reviewer shares its priors and its blind spots.
+Read [references/gates.md](references/gates.md). Each **lens** declares a trigger, a property of the diff. Run each triggered lens as its own focused pass over the full diff; a merged mega-pass dilutes every lens it carries. When an Impact Map exists from step 2, each lens inspects the convergence items first, then top-confidence items, and findings cite the propagation path (`X → Y via call`) — but always spend passes beyond the map too: in the radius A/B, reviewers who only followed the map missed bugs free exploration caught. The map directs attention; directed attention is also narrowed attention. Prefer a reviewer model different from the one that wrote the diff: a same-model reviewer shares its priors and its blind spots. Whichever way it lands, record `author_model` and `reviewer_model` in the run report; when they share a family, set `same_family: true` and carry a visible warning in the prose report — recorded, not blocking.
 
 **Complete when:** every lens in the catalog is classified as triggered-and-run or skipped-with-reason.
 
@@ -42,12 +42,14 @@ Two rules bound what counts as a refutation:
 - **A verification gap is not a refutation.** When the empirical layer is unavailable (a browser that cannot launch, a platform not present), report the candidate as unverified with its gap named. Dropping it silently converts an environment limitation into a false negative.
 - **An exemption is a claim.** Every absence or silence exonerated along the way (a required surface left untouched, a deterministic finding acknowledged away) is itself a finding-level claim and gets verified at its own layer before it exempts anything. A "this surface doesn't carry semantics" exemption is checked by reading the surface, not by assuming its genre (portless #363: a CLI help section with behavior prose was waved through as a terse listing).
 
-The report ends with two mandatory sections beyond the findings themselves:
+The report is written twice from the same content: the prose report for the human, and a run report JSON at `evals/runs/<date>-<repo>-<shortsha>.json` in this skill's directory, per the schema in [references/run-report.md](references/run-report.md). The JSON is the ledger's view — findings with their states (`confirmed | unverified | refuted | exempted | issue_candidate`), lens dispositions, deterministic outcomes, and provenance. A run whose lens runtime dies or whose steps are left incomplete reports `run.status: incomplete` with each gap named; an incomplete run is never presented as a pass — this is the run-level twin of "a verification gap is not a refutation".
+
+The prose report ends with two mandatory sections beyond the findings themselves:
 
 - **Exemptions claimed** — every exemption, with its evidence, not just its conclusion, so a human can veto any of them cheaply. An exemption whose evidence cannot be stated in one sentence is a finding.
 - **Issue candidates** — real defects and gaps that fall outside the diff's scope: pre-existing bugs surfaced while verifying, residuals deliberately descoped, coverage gaps beyond the change, upstream quirks worked around. Each carries a one-line title, the evidence already gathered, and why it is out of scope — enough to open an issue without re-deriving the work. Out-of-scope findings that stay buried in a "known/deferred" paragraph die there.
 
-**Complete when:** every reported finding carries evidence, every dropped finding carries a refutation at the claim's own layer, and the report carries both mandatory sections (empty is a valid state, silence is not).
+**Complete when:** every reported finding carries evidence, every dropped finding carries a refutation at the claim's own layer, the report carries both mandatory sections (empty is a valid state, silence is not), and the run report JSON is written with an honest `run.status`.
 
 ## 5. Harvest after external review
 
@@ -69,4 +71,4 @@ When a review used an Impact Map, append one line to `evals/radius-dogfood/ledge
 {"date":"YYYY-MM-DD","repo":"...","base":"...","changed":N,"impacted":N,"edges":N,"unresolvedCalls":N,"findings":N,"map_attributed":N,"convergence_inspected":N,"convergence_with_finding":N,"outside_map":N,"map_json":"<date>-<repo>.json"}
 ```
 
-`map_attributed` = findings whose evidence cites a propagation path from the map. `outside_map` = findings from free exploration the map did not rank. When an external review round or a shipped regression later surfaces a bug in a change that had a map, run the **escape autopsy**: open the saved `map_json` and record in the gate-miss ledger whether the buggy symbol was in the map (in-map-but-missed = reading/anchoring failure; not-in-map = coverage gap → feeds radius `references/tuning.md`, never hand-tuned). The ledger is swept by `/pulse`; decision review at n≈20 entries.
+`map_attributed` = findings whose evidence cites a propagation path from the map. `outside_map` = findings from free exploration the map did not rank. When an external review round or a shipped regression later surfaces a bug in a change that had a map, run the **escape autopsy**: open the saved `map_json` and record in the gate-miss ledger whether the buggy symbol was in the map (in-map-but-missed = reading/anchoring failure; not-in-map = coverage gap → feeds radius `references/tuning.md`, never hand-tuned). The ledger and `evals/runs/` are swept by `/pulse`; decision review at n≈20 entries.

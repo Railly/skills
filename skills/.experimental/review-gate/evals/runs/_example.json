@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-18",
+    "repo": "example-repo",
+    "base": "main",
+    "head": "abc1234",
+    "status": "complete",
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5.6-codex",
+    "reviewer_model": "claude-opus-4-8",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "contract-drift", "status": "run", "reason": "" },
+    { "name": "security", "status": "skipped", "reason": "diff touches no input handling, auth, or secrets" }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "pass", "reason": "" },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "README section is a terse flag listing with no behavior prose; read to confirm" },
+    { "check": "callers", "outcome": "finding-fixed", "reason": "call site in src/session.ts mutated state before the now-failable call" }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "handle() drops the retry budget when validateToken() returns the new expired outcome",
+      "evidence": "forced the expired outcome in a scratch test; retry budget reset observed",
+      "layer": "caller ordering",
+      "source": "map",
+      "path": "src/auth.ts#validateToken → src/middleware.ts#handle via call"
+    },
+    {
+      "id": "F2",
+      "state": "unverified",
+      "claim": "browser flow re-prompts login on token refresh",
+      "evidence": "gap: no browser available in this environment to drive the flow",
+      "layer": "end-to-end path",
+      "source": "lens",
+      "path": ""
+    }
+  ],
+  "exemptions": [
+    { "claim": "docs/cli.md untouched despite feature keyword match", "evidence": "section is a flag listing with no behavior prose; read in full" }
+  ],
+  "issue_candidates": [
+    { "title": "pre-existing: config reload ignores SIGHUP on darwin", "evidence": "observed while forcing F1; reproduced on main", "why_out_of_scope": "predates the diff; separate surface" }
+  ]
+}
