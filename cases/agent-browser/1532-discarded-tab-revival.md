@@ -9,7 +9,7 @@ Visibility: public
 Repository: vercel-labs/agent-browser
 Role: contributor
 Source: https://github.com/vercel-labs/agent-browser/pull/1532
-Upstream status checked: 2026-07-13
+Upstream status checked: 2026-07-18
 
 > Contributor-validated: the unit suite, clippy 1.97, and a real-Chrome plus mock-daemon dogfood were run against the pushed artifact. Maintainer re-review of the review-response commit is pending.
 
@@ -64,6 +64,18 @@ Secondary: verify a "no signal exists" claim against the full API surface before
 - Deterministic check: none committed; the regression lives as the four tests.
 - Eval: a fix that adds a probe-with-timeout plus a recovery action should be tested for (a) a probe false positive, (b) a recovery that stalls, and (c) cleanup of the cancelled probe.
 - No change: the liveness probe stays a short timeout because false positives are now harmless.
+
+## Round 2 (2026-07-18, changes requested again)
+
+Three maintainer findings on the review-response commit, harvested to the [gate-miss ledger](conventions.md):
+
+1. The liveness probe misclassifies live tabs with open `confirm()`/`prompt()` dialogs as discarded (reproduced in Chrome by the maintainer). A modal dialog pauses the renderer main thread, so `Runtime.evaluate` never answers; the switch then fails on a live tab. The input class was discoverable from the repo's own `dialog accept/dismiss` commands.
+2. A failed switch preserves the old tab's index but wipes its refs and frame context: `handle_tab_switch` (`actions.rs`) clears `ref_map`/`iframe_sessions`/`active_frame_id` before delegating, which was benign while the switch could only succeed or hang. The fix's fail-fast path made the pre-cleared state user-visible. Spawned the "New-failure-outcome propagation" lens.
+3. Reload risk and the `revived` result need full CLI, skill, and docs coverage, not README plus one flagged surface. Closed by keying `browser.rs` in the conventions surface map.
+
+Blind replication (2026-07-18, gpt-5.6-sol via `codex exec`, neutral prompt, no knowledge of the maintainer's notes): converged on all three maintainer findings, including the same dialog repro chain and the same `actions.rs:4856` wipe line. It also surfaced two findings nobody had: `tab_close` commits the successor and calls `enable_domains` with no recovery (`browser.rs:1245`, code-trace confirmed, the original #1528 stall through a second entry point), and the connect-path first-target gap (already recorded above as the #1036 residual). Its evidence source for the dialog finding was the repo's own comments (`actions.rs:1775` documents dialog-blocking; `:1791` deliberately allows `tab_switch` during dialogs), reachable only by walking callers outside the diff. It did not see the `waitForDebuggerOnStart` merge interaction, since it reviewed the branch as-is, not against moved main; the two reviews are complementary, supporting the different-model-reviewer rule.
+
+Open engineering question for the next loop: the same-day gate run flagged the post-#1546 merge interaction (`waitForDebuggerOnStart: true` can leave a revived renderer paused, blocking the second probe), which is the same blocked-but-alive family as finding 1; a fix should handle both with one mechanism (e.g. treat only probe timeout with no dialog open and no pending attach pause as discard, or probe via a browser-level signal like `Target.getTargetInfo` before declaring death).
 
 ## Confidentiality review
 
