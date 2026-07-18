@@ -32,11 +32,7 @@ Judgment surface (not blocking, review by hand): `apps/docs/src/app/**/*.mdx`. T
 
 ## Verification norms
 
-<<<<<<< HEAD
 - A relaxed validator or widened trigger regenerates the verification matrix from the new input domain: enumerate the input classes now reachable and exercise one of each; the bug report's matrix verifies the old fix, not the new code. Matrix cells are derived from the input domain the composed helpers accept, never from the argument positions the new guard inspects: cells derived from the guard under test inherit its blind spot. Provenance: [365](365-risky-suffix-overgeneralization.md) and [366](366-guard-derived-matrix.md).
-=======
-- A relaxed validator or widened trigger regenerates the verification matrix from the new input domain: enumerate the input classes now reachable and exercise one of each; the bug report's matrix verifies the old fix, not the new code. Provenance: [366](366-script-indirection-blast-radius.md); [260](260-multi-segment-tlds.md).
->>>>>>> 8e5c873 (docs(cases): sync portless #366 delivery — blast-radius case, supersede #285 backfill, close conventions provenance)
 - Helper tests prove the helper; when behavior changes in orchestration, drive and mutate the changed caller. Provenance: [0355](0355-changed-caller-coverage.md).
 
 ## Gate-miss ledger

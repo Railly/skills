@@ -1,5 +1,7 @@
 # Case: Generalized trigger verified against the bug's inputs, not the new domain
 
+> Contribution-side ledger for PR #366 (the fix's delivery). The review-side ledger for the same PR — the gate run, its guard-derived-matrix miss, and the external bot round — is [366-guard-derived-matrix](366-guard-derived-matrix.md).
+
 Status: observed
 Validation: contributor-validated
 Human review: reviewed (Hunter directed base, scope, commit split, and the miss analysis)
@@ -65,6 +67,7 @@ reproduced + evaluated + based-on-best + extended + hardened post-gate + re-gate
 ### Unknowns
 
 - yarn forwarding never observed against a real binary (not installed locally; the PR's E2E covered bun/npm/pnpm). The "yarn forwards trailing arguments directly" claim rests on shape-level unit tests. Suggested pre-merge probe: `corepack enable` + 30s check with yarn 1 and berry.
+- Runner-wrapped build scripts (`"dev": "bunx vite build"`) bypass the build guard, which inspects only `rawScript[1]` while `findFrameworkBasename` skips runner wrappers — confirmed by the external bot round and repro (see [366-guard-derived-matrix](366-guard-derived-matrix.md)); unfixed at head `a9c7726`.
 - Multi-app workspace mode never calls the injector (cli.ts:3725/3595) — pre-existing gap, acknowledged in PR body prose only; issue not yet opened. Warning for whoever extends it: there the CWD mismatch is real (default packageDir ≠ pkg.dir).
 
 ## Transferable lesson
