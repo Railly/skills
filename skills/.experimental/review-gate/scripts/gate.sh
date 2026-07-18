@@ -12,6 +12,8 @@ Usage:
                                               Touched paths in the surface map require their listed surfaces in the diff
   gate.sh siblings <pattern> [<base-ref>] [<path>...]
                                               Files mentioning a behavior-delta keyword must be in the diff or exempted
+  gate.sh callers <fn> [<base-ref>] [<path>...]
+                                              Call sites of a changed-contract function outside the diff must be read or acknowledged
   gate.sh all <conventions.md> [<base-ref>]   style + surfaces
 
 <base-ref> defaults to the merge base with origin/HEAD (falls back to HEAD~1).
@@ -93,7 +95,18 @@ check_siblings() {
 	changed=$(git diff --name-only "$base" 2>/dev/null)
 	local hits
 	hits=$(git grep -lI --untracked -e "$pattern" -- "${@:-.}" 2>/dev/null || true)
-	[[ -z "$hits" ]] && { echo "PASS [siblings] no file mentions '$pattern'"; return 0; }
+	if [[ -z "$hits" ]]; then
+		# Zero hits right after the diff added the keyword means the search
+		# space was wrong (bad pathspec), not that no sibling exists.
+		local added_hit
+		added_hit=$(git diff "$base" --unified=0 -- . 2>/dev/null | grep -E '^\+' | grep -vE '^\+\+\+' | grep -F -- "$pattern" || true)
+		if [[ -n "$added_hit" ]]; then
+			echo "ERROR [siblings] '$pattern' appears in the diff's added lines but the repo-wide search returned zero hits; check the pathspec arguments"
+			return 2
+		fi
+		echo "PASS [siblings] no file mentions '$pattern'"
+		return 0
+	fi
 	while IFS= read -r f; do
 		[[ -z "$f" ]] && continue
 		if ! grep -qxF "$f" <<<"$changed"; then
@@ -102,6 +115,44 @@ check_siblings() {
 		fi
 	done <<<"$hits"
 	[[ $findings -eq 0 ]] && echo "PASS [siblings] every file mentioning '$pattern' is in the diff"
+	return $findings
+}
+
+# Caller sweep: when a diff changes a function's contract (a new failure
+# outcome, a new return field, changed semantics), every call site OUTSIDE the
+# diff is a reading obligation: state mutated before the call, and assumptions
+# about the old contract, break without the caller ever appearing in the diff.
+# Mechanical stand-in for a radius Impact Map where the CLI has no language
+# support. Each flagged site is read or acknowledged, never skipped silently.
+check_callers() {
+	local symbol="${1:-}"
+	[[ -z "$symbol" ]] && usage
+	shift
+	local ref=""
+	if [[ -n "${1:-}" ]] && git rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then
+		ref="$1"
+		shift
+	fi
+	local base findings=0
+	base=$(base_ref "$ref")
+	local changed
+	changed=$(git diff --name-only "$base" 2>/dev/null)
+	local hits
+	hits=$(git grep -nI --untracked -e "${symbol}[[:space:]]*(" -- "${@:-.}" 2>/dev/null || true)
+	if [[ -z "$hits" ]]; then
+		echo "ERROR [callers] no call sites of '${symbol}(' found; check the symbol name and pathspec"
+		return 2
+	fi
+	while IFS= read -r line; do
+		[[ -z "$line" ]] && continue
+		local f="${line%%:*}"
+		if ! grep -qxF "$f" <<<"$changed"; then
+			echo "FINDING [callers] call site of '$symbol' outside the diff; read it for state mutated before the call and assumptions the new outcome breaks:"
+			echo "  $line"
+			findings=1
+		fi
+	done <<<"$hits"
+	[[ $findings -eq 0 ]] && echo "PASS [callers] every call site of '$symbol' is in a diffed file"
 	return $findings
 }
 
@@ -158,6 +209,7 @@ case "$cmd" in
 	stale) check_stale "$@" ;;
 	surfaces) check_surfaces "$@" ;;
 	siblings) check_siblings "$@" ;;
+	callers) check_callers "$@" ;;
 	all)
 		conv="${1:-}"
 		ref="${2:-}"

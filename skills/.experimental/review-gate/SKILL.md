@@ -20,13 +20,15 @@ When none exists, build one now from the target repo's own instruction files (AG
 
 ## 2. Run the deterministic layer
 
-Run every applicable check in [scripts/gate.sh](scripts/gate.sh): `style`, `surfaces` (needs the conventions file), `stale` for each contract value the diff renames or retires, and `siblings` for each behavior delta the diff documents — pick the keyword that names the feature (the noun a section heading would use, not the bug), and every file that mentions it yet is absent from the diff must be updated or exempted. These checks are cheap and have full recall on their class; a finding here is fixed or explicitly acknowledged, never skipped silently.
+Run every applicable check in [scripts/gate.sh](scripts/gate.sh): `style`, `surfaces` (needs the conventions file), `stale` for each contract value the diff renames or retires, `siblings` for each behavior delta the diff documents — pick the keyword that names the feature (the noun a section heading would use, not the bug), and every file that mentions it yet is absent from the diff must be updated or exempted — and `callers` for each function whose contract the diff changes (a new failure outcome, a new return field, changed semantics): every call site outside the diff is read for state mutated before the call, or acknowledged. Callers are enumerated by the check, never from memory: attention follows the diff, and the callers a contract change breaks are precisely the code the diff never shows (1532 round 2). These checks are cheap and have full recall on their class; a finding here is fixed or explicitly acknowledged, never skipped silently.
+
+When the diff is in a TS/JS repo and the `radius` CLI is on PATH, also run `radius impact --base <merge-base>` here and save the JSON to `evals/radius-dogfood/<date>-<repo>.json` in this skill's directory. The Impact Map is a deterministic input, not a gate: it ranks where the diff propagates so the lens passes in step 3 spend budget on the right symbols. Two reading rules carry over from the radius skill: convergence items (2+ changed symbols reaching the same impacted item) outrank raw confidence, and when `visibilityBoundary.unresolvedCalls` dwarfs `edges` the map under-covers — say so in the report; absence of impact is not safety. CLI absent or repo not TS/JS → skip silently, the gate does not depend on it.
 
 **Complete when:** every deterministic gate reports pass, or each finding is fixed or acknowledged with a reason.
 
 ## 3. Select and run lenses
 
-Read [references/gates.md](references/gates.md). Each **lens** declares a trigger, a property of the diff. Run each triggered lens as its own focused pass over the full diff; a merged mega-pass dilutes every lens it carries. Prefer a reviewer model different from the one that wrote the diff: a same-model reviewer shares its priors and its blind spots.
+Read [references/gates.md](references/gates.md). Each **lens** declares a trigger, a property of the diff. Run each triggered lens as its own focused pass over the full diff; a merged mega-pass dilutes every lens it carries. When an Impact Map exists from step 2, each lens inspects the convergence items first, then top-confidence items, and findings cite the propagation path (`X → Y via call`) — but always spend passes beyond the map too: in the radius A/B, reviewers who only followed the map missed bugs free exploration caught. The map directs attention; directed attention is also narrowed attention. Prefer a reviewer model different from the one that wrote the diff: a same-model reviewer shares its priors and its blind spots.
 
 **Complete when:** every lens in the catalog is classified as triggered-and-run or skipped-with-reason.
 
@@ -58,3 +60,13 @@ After any external review round on the same change, classify each external findi
 A finding an existing gate should have caught is a gate bug: record why it missed, both in the catalog entry's provenance and in the project conventions file's **gate-miss ledger** (date, finding, which gate missed, why, what closed it). The ledger keeps repo-local recurrence visible where the next review of that repo will actually look. Provenance is mandatory: a gate enters the catalog only from a recorded case or a confirmed external-review miss.
 
 **Complete when:** every external finding is matched to an existing gate that missed (with the miss explained) or captured as a new gate with provenance.
+
+## 6. Radius dogfood ledger
+
+When a review used an Impact Map, append one line to `evals/radius-dogfood/ledger.jsonl` in this skill's directory:
+
+```json
+{"date":"YYYY-MM-DD","repo":"...","base":"...","changed":N,"impacted":N,"edges":N,"unresolvedCalls":N,"findings":N,"map_attributed":N,"convergence_inspected":N,"convergence_with_finding":N,"outside_map":N,"map_json":"<date>-<repo>.json"}
+```
+
+`map_attributed` = findings whose evidence cites a propagation path from the map. `outside_map` = findings from free exploration the map did not rank. When an external review round or a shipped regression later surfaces a bug in a change that had a map, run the **escape autopsy**: open the saved `map_json` and record in the gate-miss ledger whether the buggy symbol was in the map (in-map-but-missed = reading/anchoring failure; not-in-map = coverage gap → feeds radius `references/tuning.md`, never hand-tuned). The ledger is swept by `/pulse`; decision review at n≈20 entries.
