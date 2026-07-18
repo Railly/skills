@@ -32,10 +32,16 @@ Judgment surface (not blocking, review by hand): `apps/docs/src/app/**/*.mdx`. T
 
 ## Verification norms
 
+<<<<<<< HEAD
 - A relaxed validator or widened trigger regenerates the verification matrix from the new input domain: enumerate the input classes now reachable and exercise one of each; the bug report's matrix verifies the old fix, not the new code. Matrix cells are derived from the input domain the composed helpers accept, never from the argument positions the new guard inspects: cells derived from the guard under test inherit its blind spot. Provenance: [365](365-risky-suffix-overgeneralization.md) and [366](366-guard-derived-matrix.md).
+=======
+- A relaxed validator or widened trigger regenerates the verification matrix from the new input domain: enumerate the input classes now reachable and exercise one of each; the bug report's matrix verifies the old fix, not the new code. Provenance: [366](366-script-indirection-blast-radius.md); [260](260-multi-segment-tlds.md).
+>>>>>>> 8e5c873 (docs(cases): sync portless #366 delivery — blast-radius case, supersede #285 backfill, close conventions provenance)
 - Helper tests prove the helper; when behavior changes in orchestration, drive and mutate the changed caller. Provenance: [0355](0355-changed-caller-coverage.md).
 
 ## Gate-miss ledger
+
+- **2026-07-17 — PR #365, gate-fix over-reach (caught by human review, not a gate).** The review-gate correctly flagged that `RISKY_TLDS` exact lookup never warned for multi-segment TLDs, but the applied fix suffix-matched every risky entry — making the flagship documented workflow (`--tld dev.example.com`) warn about DNS leaks on every proxy start. The warning classes needed the same domain analysis as the code: tree-wide risks (`local` mDNS, `dev`/`app` HSTS preload) suffix-match; ownership-class TLDs stay exact. Lesson for the gate: when a finding's fix touches a warning/error taxonomy, classify each entry's failure mode before generalizing the match rule. Provenance: [260](260-multi-segment-tlds.md).
 
 - **2026-07-17 — PR #366, bot review finding: runner-wrapped build scripts bypass the `rawScript[1]` build guard.** The new-domain matrix lens ran and probed build cells (`vite build --watch`, `next build`) but enumerated them from the guard's own inspected position instead of from the domain `findFrameworkBasename` accepts (runner wrappers: npx, bunx, pnpx, dlx, exec — a class #150 had already named in the same file). `"dev": "bunx vite build"` got dev-server flags forwarded; confirmed by repro. Closed by: guard-derived-cells rule added to the verification norm above and to the lens entry in the catalog. Case: [366](366-guard-derived-matrix.md).
 - **2026-07-17 — PR #366, self-caught gate bug: `gate.sh siblings` returned a false PASS on an invocation error.** A stray literal `--` passed as a pathspec matched no files, so zero hits read as "no file mentions the keyword" right after the diff itself added the keyword to three files. A deterministic gate whose expected state is "hits exist" must fail loudly when its search space is empty. Closed by: `gate.sh` now errors when the pattern appears in the diff's added lines but the repo-wide search returns nothing.
