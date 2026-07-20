@@ -2,16 +2,25 @@
 
 Status: observed
 Validation: unvalidated
-Human review: pending
+Human review: maintainer-reviewed (2026-07-20, two edge cases, both fixed)
 Maintainer acceptance: pending
-Delivery: PR open
-Upstream status checked: 2026-07-17
+Delivery: PR pushed (head `cf596be`)
+Upstream status checked: 2026-07-20
 Visibility: public
 Repository: vercel-labs/portless
 Role: contributor
 Source: https://github.com/vercel-labs/portless/pull/366; base 74c9868; heads reviewed a4f0628 then a9c7726
 
 > Agent-authored record of a live review-gate run. Evidence is session-run output plus public PR state; claims and statuses pending human review.
+
+## 2026-07-20 update — the same guard-derived blind spot recurred on the fix's own new guard
+
+The maintainer reviewed #366 and raised two edge cases. Both are the same mechanism as this case, one layer deeper: the guard-derived-cells rule was applied to the reused helper but not recursively to the guards this PR itself added.
+
+- **`bunx vite build` still forwarded server flags.** The build guard inspected a fixed `rawScript[1]`, which a runner wrapper shifts. This is the exact bypass this case names; it had been left as a deliberate conservative descope, and the maintainer re-flagging it means the descope was wrong. Fixed in commit `f35193c`: locate the framework past the runner via `findFrameworkIndex`, then scan every bare positional after it (also catches `vite --mode production build`, a flag value preceding the subcommand).
+- **`vite dev&&node` (glued operator) still forwarded and 502'd.** The compound-script skip guard this PR added matched operators as whole tokens; `splitCommand` keeps a glued `&&` inside one token, so it slipped through. The guard's own cells inherited its whitespace-tokenization assumption. Fixed in commit `cf596be`: test the raw script string (not the tokens) for control operators, including newline separators, which `splitCommand` also collapses.
+
+The first cold agnostic gate on this session's fix caught both `bunx vite build` and the glued form plus the newline residual before the maintainer's list arrived; a re-gate against the committed tip returned PASS. Catalog updated: new-domain-matrix now carries an explicit guard-recursion clause (a detector the fix adds is itself an artifact under test). Delivery advanced observed → PR pushed; maintainer acceptance still pending.
 
 ## Observed condition or claim
 

@@ -2,16 +2,25 @@
 
 Status: observed
 Validation: independently-validated
-Human review: pending
+Human review: maintainer-reviewed (2026-07-20, two findings, both fixed)
 Maintainer acceptance: pending
-Delivery: PR open
-Upstream status checked: 2026-07-17
+Delivery: PR pushed (head `1593007`)
+Upstream status checked: 2026-07-20
 Visibility: public
 Repository: vercel-labs/portless
 Role: contributor
 Source: https://github.com/vercel-labs/portless/pull/365 (issue #260); commits `e13ff81`, `f991a40`, `8d9fcbf`, `8ecf74f` on `refs/pull/365/head`
 Issue or PR: https://github.com/vercel-labs/portless/pull/365
 Date: 2026-07-17
+
+## 2026-07-20 update — maintainer review, two new findings, both fixed and pushed
+
+The maintainer reviewed #365 and raised two findings, both distinct from this case's suffix-over-generalization lesson and both confirmed by repro against the branch head:
+
+- **Cert filename exceeds `NAME_MAX`.** A 248–253 char hostname is valid DNS (the widened validator accepts it) but its sanitized cert cache filename (`${host}-key.pem`) exceeds the 255-byte filesystem per-component limit, so generation fails with `ENAMETOOLONG`. The new-domain-matrix pass had enumerated the parsing and routing consumers but stopped at the DNS-length invariant, never reaching the cert consumer's own substrate limit. Fixed in commit `78c2f00`: bound the sanitized base to `255 - "-key.pem".length` and append a SHA-256 slice on overflow (deterministic, collision-resistant). Regression test force-red: naive body composes to 259 bytes, bounded body to 255.
+- **Stale doc claim.** README asserted custom TLDs are reachable across LAN/tailnet via wildcard DNS, but outside LAN mode the proxy binds loopback only, and `--lan` forces the `.local` TLD and ignores a custom `--tld`, so the combination is unreachable. The claim was true when written and falsified by the loopback-binding hardening that landed later. Fixed in commit `1593007`; swept all surfaces, README was the only one that claimed it.
+
+New transferable lessons recorded in the review-gate catalog, not here: new-domain-matrix substrate-not-semantics clause, and docs-behavior-parity inverse-direction clause. A cold agnostic re-gate against the committed tip returned PASS. Delivery advanced observed → PR pushed; maintainer acceptance still pending.
 
 > Agent-authored during the review session. Implementation by a separate coding agent; findings verified by review subagents on a different model and re-verified at source level by the orchestrator. The contributor approved the narrowing direction and scope decisions in-session; the case artifact itself is pending human review.
 
