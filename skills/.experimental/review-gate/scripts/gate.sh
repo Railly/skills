@@ -14,6 +14,9 @@ Usage:
                                               Files mentioning a behavior-delta keyword must be in the diff or exempted
   gate.sh callers <fn> [<base-ref>] [<path>...]
                                               Call sites of a changed-contract function outside the diff must be read or acknowledged
+  gate.sh producers <shape-regex> [<base-ref>] [<path>...]
+                                              When a diff narrows an error classifier, every error-string producer matching the OLD shape
+                                              and living outside the diff must be re-checked against the NEW predicate or acknowledged
   gate.sh all <conventions.md> [<base-ref>]   style + surfaces
 
 <base-ref> defaults to the merge base with origin/HEAD (falls back to HEAD~1).
@@ -156,6 +159,65 @@ check_callers() {
 	return $findings
 }
 
+# Inverse of check_callers: when a diff NARROWS an error classifier (a predicate
+# that decides whether a message is a locator miss, a retryable error, etc.), the
+# regression lives in error-string PRODUCERS outside the diff whose output used to
+# match the broad predicate and no longer matches the narrow one. This enumerates
+# every producer matching the old error shape; each is re-checked against the new
+# predicate or acknowledged. Provenance: agent-browser #1553 round 3 (F4): the diff
+# narrowed is_locator_miss, and handle_multiselect's "Select element not found"
+# (outside the diff) stopped classifying and surfaced raw. Full-recall on its class.
+check_producers() {
+	local shape="${1:-}"
+	[[ -z "$shape" ]] && usage
+	shift
+	local ref=""
+	if [[ -n "${1:-}" ]] && git rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then
+		ref="$1"
+		shift
+	fi
+	local base findings=0
+	base=$(base_ref "$ref")
+	# Added-line ranges per file (NEW-side line numbers) from the diff. A producer
+	# is "in the diff" only if its own line was added/changed; a producer in a
+	# changed FILE but on an untouched LINE is exactly the regression this gate
+	# exists for (agent-browser #1553 F4 and #1532 both lived in the same file as
+	# the change, on lines the diff never showed). File-level granularity misses them.
+	local added
+	added=$(git diff -U0 "$base" -- "${@:-.}" 2>/dev/null | awk '
+		/^\+\+\+ /{ f=$2; sub(/^b\//,"",f); next }
+		/^@@ /{ split($3,a,","); s=a[1]; sub(/^\+/,"",s); n=(a[2]==""?1:a[2]); if(n>0) print f":"s":"(s+n-1) }')
+	# Producer sites: an error string being constructed (throw new Error, format!,
+	# ok_or/ok_or_else, Err(...)) whose text matches the shape regex.
+	local hits
+	hits=$(git grep -nIE "(throw new Error|format!|ok_or|ok_or_else|return Err|Err)\(.*(${shape})" -- "${@:-.}" 2>/dev/null || true)
+	if [[ -z "$hits" ]]; then
+		echo "ERROR [producers] no error producers matching /$shape/ found; check the shape regex and pathspec"
+		return 2
+	fi
+	while IFS= read -r line; do
+		[[ -z "$line" ]] && continue
+		grep -qiE "test|assert" <<<"$line" && continue
+		local f="${line%%:*}"
+		local rest="${line#*:}"
+		local ln="${rest%%:*}"
+		local in_diff=0
+		while IFS= read -r range; do
+			[[ -z "$range" ]] && continue
+			local rf="${range%%:*}"; local rr="${range#*:}"
+			local lo="${rr%%:*}"; local hi="${rr##*:}"
+			if [[ "$rf" == "$f" && "$ln" -ge "$lo" && "$ln" -le "$hi" ]]; then in_diff=1; break; fi
+		done <<<"$added"
+		if [[ $in_diff -eq 0 ]]; then
+			echo "FINDING [producers] error producer matching /$shape/ on a line the diff never touched; re-check it against the narrowed classifier or acknowledge:"
+			echo "  $line"
+			findings=1
+		fi
+	done <<<"$hits"
+	[[ $findings -eq 0 ]] && echo "PASS [producers] every producer matching /$shape/ sits on a changed line"
+	return $findings
+}
+
 # Surface map lines live in the conventions file inside a fenced block:
 #   ```surfaces
 #   <touched-glob> :: <required-glob>[, <required-glob>...]
@@ -210,6 +272,7 @@ case "$cmd" in
 	surfaces) check_surfaces "$@" ;;
 	siblings) check_siblings "$@" ;;
 	callers) check_callers "$@" ;;
+	producers) check_producers "$@" ;;
 	all)
 		conv="${1:-}"
 		ref="${2:-}"
