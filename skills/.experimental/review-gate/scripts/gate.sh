@@ -115,9 +115,22 @@ check_siblings() {
 		if ! grep -qxF "$f" <<<"$changed"; then
 			echo "FINDING [siblings] '$f' mentions '$pattern' but is not in the diff; update it or acknowledge why it is unaffected"
 			findings=1
+		else
+			# File is in the diff, but a passage inside it can still be stale.
+			# Line-level check: matching lines in the working file vs matching
+			# lines the diff added. More in the file than the diff touched means
+			# an untouched sibling passage still describes the behavior
+			# (#364/#367 intra-file miss the file-presence check cannot catch).
+			local file_hits added_hits
+			file_hits=$(grep -cF -- "$pattern" "$f" 2>/dev/null) || file_hits=0
+			added_hits=$(git diff "$base" -- "$f" 2>/dev/null | grep -E '^\+' | grep -vE '^\+\+\+' | grep -cF -- "$pattern") || added_hits=0
+			if [[ "$file_hits" -gt "$added_hits" ]]; then
+				echo "FINDING [siblings] '$f' is in the diff but mentions '$pattern' on $((file_hits - added_hits)) line(s) the diff did not add; check those passages for stale behavior text or acknowledge"
+				findings=1
+			fi
 		fi
 	done <<<"$hits"
-	[[ $findings -eq 0 ]] && echo "PASS [siblings] every file mentioning '$pattern' is in the diff"
+	[[ $findings -eq 0 ]] && echo "PASS [siblings] every file mentioning '$pattern' is in the diff, and no untouched line in a diffed file still mentions it"
 	return $findings
 }
 
