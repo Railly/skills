@@ -1,5 +1,16 @@
 # 1589: pin-tab shipped without the dispatch-path sweep
 
+Status: candidate
+Validation: contributor-validated
+Human review: pending
+Maintainer acceptance: changes-requested (ctate round 1, 4 lens-class defects)
+Delivery: PR open
+Visibility: public
+Repository: vercel-labs/agent-browser
+Role: maintainer
+Source: https://github.com/vercel-labs/agent-browser/pull/1589
+Upstream status checked: 2026-07-22
+
 **Repo:** vercel-labs/agent-browser · **PR:** #1589 (session tab binding + `--pin-tab`) · **Date:** 2026-07-21 · **Status:** round 1, maintainer-confirmed misses
 
 ## What happened
