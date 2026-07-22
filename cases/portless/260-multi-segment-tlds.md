@@ -1,19 +1,19 @@
 # Case: Relaxing a validator widens the input domain of every consumer
 
 Status: observed
-Validation: contributor-validated
-Human review: pending
-Maintainer acceptance: pending
-Delivery: PR open (ready for review since 2026-07-17)
-Upstream status checked: 2026-07-18
+Validation: maintainer-merged
+Human review: done (ctate approved 2026-07-22)
+Maintainer acceptance: merged
+Delivery: merged to main (15ef064) 2026-07-22
+Upstream status checked: 2026-07-22
 Visibility: public
 Repository: vercel-labs/portless
 Role: contributor
 Source: https://github.com/vercel-labs/portless/issues/260 and https://github.com/vercel-labs/portless/pull/365
-Issue or PR: https://github.com/vercel-labs/portless/pull/365 (closes #260; supersedes #277 with credit; related #58, #319, #348)
-Date: 2026-07-16 (updated 2026-07-18)
+Issue or PR: https://github.com/vercel-labs/portless/pull/365 (closed #260; superseded #277 with credit; related #58, #319, #348)
+Date: 2026-07-16 (updated 2026-07-22)
 
-> Contributor-side validation in four passes: author pass, adversarial gate (2 bugs), review-gate skill (2 bugs + docs silence, 2026-07-17), and a human-review follow-up that corrected the third pass's over-reach. No maintainer response yet.
+> Contributor-side validation in four passes: author pass, adversarial gate (2 bugs), review-gate skill (2 bugs + docs silence, 2026-07-17), and a human-review follow-up that corrected the third pass's over-reach. Merged 2026-07-22 after a fifth maintainer-review round (ctate).
 
 ## Observed failure
 
@@ -40,7 +40,20 @@ Date: 2026-07-16 (updated 2026-07-18)
 
 ## Outcome
 
-PR #365 ready for review. `validateTld` multi-label (63/label, 253 total), longest-match strip, composed-hostname limit, suffix-scoped risky-TLD warnings, resilient TLD config reads, regression tests in 4 modules, docs on 4 surfaces plus the docs site. Branch head `8ecf74f` (history `4889a48 → e13ff81 → f991a40 → merge e0c2af5 → 8d9fcbf → 8ecf74f`).
+Merged to main as `15ef064` on 2026-07-22, ctate approved. `validateTld` multi-label (63/label, 253 total), longest-match strip, composed-hostname limit, suffix-scoped risky-TLD warnings, resilient TLD config reads, regression tests in 4 modules, docs on 4 surfaces plus the docs site. A fifth review round (ctate) added `fix(proxy): use longest-match TLD suffix in 404 suggestion` and a NAME_MAX cert-cache filename bound; see [365](365-risky-suffix-overgeneralization.md).
+
+## Lifecycle closure (2026-07-22)
+
+The three linked issues were closed clean, credit routed through the mechanism that actually reaches a profile:
+
+- **Credit is the co-author trailer, not a comment.** The merged commit `fix: support multi-segment custom TLDs` carries `Co-Authored-By: KingPsychopath` (verified: `gh pr view 365 --json commits` shows authors `[Railly, KingPsychopath]`). A "thanks" in a comment is cosmetic and never touches the contributor's GitHub profile.
+- **#260** auto-closed by `Fixes #260` in the merge. Closing comment written by hand (not by the agent) summarizing what shipped and answering the issue's three open questions (validation rules, per-host SNI over a single wildcard cert, `/etc/hosts` auto-sync).
+- **#277** (KingPsychopath, same fix, went CONFLICTING) closed as superseded with a thank-you comment.
+- **#58** (`.localhost` OAuth) left closed; the merge improves ergonomics but is not a new fix of the original bug.
+
+**Honest-scope check that changed the copy.** The draft closing comment claimed run-mode `--tld` was a "separable follow-up." Verified on main that run mode genuinely lacks it (`--tld` is parsed only in `handleProxy`/`proxy start` at `cli.ts:2824`; `parseRunArgs` at `cli.ts:1598` rejects it as `Unknown flag`), but no open issue or PR tracks it. A public "follow-up" implies it is on a roadmap; nothing backed the word. Line cut rather than left as an untracked soft-promise.
+
+**Caveat surfaced to subscribers, not buried.** The loopback-binding correction (`docs: correct README claim that custom TLDs reach other devices`) means a custom-TLD app is not reachable from other machines: normal mode binds loopback, LAN mode forces `.local` and ignores `--tld`. The #58 closing comment states this directly so the multi-dev askers (zwily, SharadKumar, aurelticot) get the URL-standardization win without inheriting the false "shared network domain" promise. aurelticot's external-reverse-proxy setup keeps working because portless only resolves the name locally.
 
 ## Evidence
 
@@ -65,11 +78,10 @@ Observable pass signal: at least one test per newly-reachable input class, each 
 
 ## Promotion recommendation
 
-Provisional only. Do not promote before human review.
+Merged and maintainer-accepted (ctate, 2026-07-22); the provisional bar is cleared.
 
 The verification norm ("regenerate the verification matrix from the new input domain") is already in `conventions.md`; this case is its provenance. Candidate addition: the exception-without-evidence lesson as a reference rule for case authoring.
 
 ## Missing evidence
 
-- Maintainer review and merge.
 - Real OAuth callback flow against a multi-segment TLD (the #58 use case) — covered by unit/routing tests only.
