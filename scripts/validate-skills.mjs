@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 
 const SKILLS_DIR = "skills";
 const MARKETPLACE_PATH = join(".claude-plugin", "marketplace.json");
@@ -326,8 +326,9 @@ for (const file of [
 	validateLinks(file);
 }
 
+const NON_CASE_BASENAMES = new Set(["README.md", "conventions.md"]);
 for (const file of markdownFiles("cases").filter(
-	(file) => file !== join("cases", "README.md"),
+	(file) => !NON_CASE_BASENAMES.has(basename(file)),
 )) {
 	validateCase(file);
 }
