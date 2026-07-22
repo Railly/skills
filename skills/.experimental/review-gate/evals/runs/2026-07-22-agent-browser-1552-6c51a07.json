@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-22",
+    "repo": "agent-browser",
+    "base": "origin/main",
+    "head": "59f5d9f80ac3996bb7a29055d91afc44ae49da32",
+    "status": "incomplete",
+    "gaps": [
+      "The read-only filesystem prevented Cargo tests, end-to-end browser tests, and force-red mutation checks from running.",
+      "radius impact could not create the repository .radius directory, so no Impact Map or dogfood artifact was produced.",
+      "Network access was unavailable for reopening the external Playwright, WAI-ARIA, HTML-ARIA, and Chromium sources named by the getByRole checklist."
+    ]
+  },
+  "provenance": {
+    "author_model": "opus (direct edits)",
+    "reviewer_model": "openai/gpt-5.6-sol",
+    "same_family": false
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Role lookup changes from DOM selectors to the accessibility tree with a DOM fallback."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Role lookup now accepts implicit roles and additional computed accessibility-tree forms."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "The new DOM fallback resolves ordered role-token lists."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No warning channel or one-shot latch is added."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No external-binary shim is added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Default accessible-name matching changes from case-sensitive matching to case-insensitive substring matching."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "The diff does not patch a runtime or framework to expose a new signal."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "The diff reimplements Playwright getByRole and WAI-ARIA semantics."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "The changed handler already returned errors; no formerly success-only or hanging call becomes returnably fallible."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "The diff adds accessibility-tree misses, virtual-node errors, DOM fallback misses, and frame-evaluation branches."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No heuristic recovery action is added."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No timeout, cancellation mechanism, or independently pending operation is added."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Presentational-role discovery and action execution are extended into selected same-origin and out-of-process frames."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "The new end-to-end tests claim DOM interaction results and accessibility-tree behavior."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "The diff changes role matching and edits CLI, MCP, README, docs, skill, and Eve capability descriptions."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "The diff adds examples intended to demonstrate implicit-role support."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision-trail file exists."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "The diff scans every AX node and deduplicates names inside the per-node loop."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "No added em dash or prohibited comment punctuation was found."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "The actions and MCP changes include every required mapped documentation and skill surface."
+    },
+    {
+      "check": "stale",
+      "outcome": "pass",
+      "reason": "The diff does not rename or retire a duplicated contract value."
+    },
+    {
+      "check": "siblings:getByRole",
+      "outcome": "pass",
+      "reason": "Current-contract passages were inspected; untouched changelog occurrences are historical release records."
+    },
+    {
+      "check": "siblings:implicit roles",
+      "outcome": "pass",
+      "reason": "Every current file mentioning implicit-role support is included in the diff."
+    },
+    {
+      "check": "callers:handle_getbyrole",
+      "outcome": "pass",
+      "reason": "The only dispatch caller is in the changed actions file and performs no state mutation before the call."
+    },
+    {
+      "check": "force-red",
+      "outcome": "acknowledged",
+      "reason": "The regression tests describe force-red mutations, but the read-only filesystem prevented performing those mutations and running Cargo."
+    },
+    {
+      "check": "cargo-test",
+      "outcome": "acknowledged",
+      "reason": "Cargo failed before compilation because it could not create cli/target temporary files."
+    },
+    {
+      "check": "radius-impact",
+      "outcome": "acknowledged",
+      "reason": "radius failed because it could not create .radius in the read-only repository."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The advertised find actions type, focus, and uncheck always fail after locator resolution.",
+      "evidence": "The Eve schema advertises type, focus, and uncheck and forwards each action unchanged, while execute_subaction has arms only for click, fill, check, hover, and text and routes every other value to \"Unknown subaction\". CLI help and README advertise the same broader action set.",
+      "layer": "advertised capability end-to-end dispatch",
+      "source": "lens",
+      "path": "packages/@agent-browser/eve/extension/tools/find.ts:10 -> cli/src/commands.rs:2610 -> cli/src/native/actions.rs:7794"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Presentational-role conflict resolution omits two WAI-ARIA 1.2 global properties.",
+      "evidence": "GLOBAL_ARIA omits aria-braillelabel and aria-brailleroledescription. Therefore an element such as role=\"none\" aria-braillelabel=\"x\" is treated as genuinely presentational even though the global property requires the none/presentation role to be ignored.",
+      "layer": "getByRole contract check 4b",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:7874"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "The ordered-fallback role set omits the valid WAI-ARIA role suggestion.",
+      "evidence": "VALID_ROLES contains the other concrete WAI-ARIA 1.2 roles but not suggestion. For role=\"suggestion none\", tokens.find therefore skips the operative suggestion role and incorrectly lets a query for none match the element.",
+      "layer": "getByRole contract checks 2 and 3",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:7854"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "A page-authored data-agent-browser-located attribute can redirect presentational-role actions to the wrong element.",
+      "evidence": "The fallback marks the matched element but executes the action through document.querySelector(\"[data-agent-browser-located='true']\"). If an earlier element already carries that public attribute, querySelector resolves the earlier element; cleanup also removes the first marker rather than necessarily the marker added by this command.",
+      "layer": "DOM discovery-to-action pipeline",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:7886 -> cli/src/native/actions.rs:7913"
+    },
+    {
+      "id": "R1",
+      "state": "refuted",
+      "claim": "Failed name queries have quadratic deduplication complexity.",
+      "evidence": "The loop preserves display order in names_seen while names_set.insert performs expected constant-time membership checks, making the AX-node scan linear in the number of nodes and accumulated name bytes.",
+      "layer": "complexity budget",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:8082"
+    },
+    {
+      "id": "E1",
+      "state": "exempted",
+      "claim": "Historical changelog passages mentioning getByRole need current semantic wording.",
+      "evidence": "CHANGELOG.md and docs/src/app/changelog/page.mdx record behavior of prior releases and do not advertise the current command contract.",
+      "layer": "documentation surface",
+      "source": "gate",
+      "path": "CHANGELOG.md"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Historical changelog passages mentioning getByRole need current semantic wording.",
+      "evidence": "The changelog occurrences are immutable release history rather than current usage documentation."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Choose and document first-match versus strict-mode role behavior",
+      "evidence": "Both the AX path and DOM fallback return the first matching element and never detect multiple matches, diverging from Playwright strict locator actions.",
+      "why_out_of_scope": "The supplied house norm classifies strict-mode versus first-match behavior as a genuine product decision."
+    }
+  ]
+}

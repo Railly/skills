@@ -2,6 +2,8 @@
 
 A forced-enumeration checklist for any diff that touches role matching (`find role`, `build_role_selector`, `handle_getbyrole`, the AX-tree walk, or the presentational-role path). The reference implementation is Playwright's `getByRole`; the authority for role names is the WAI-ARIA spec and the browser's own accessibility-tree role computation.
 
+**Run this only when the diff changes role matching.** Applied blind to an unrelated diff it reports the pre-existing world, not the change: running it on the error-messages branch (which does not touch role matching) flagged main's old getbyrole state as that PR's findings (cross-domain noise, 2026-07-22 dogfood). Gate the checklist on the diff touching one of the paths above.
+
 This exists because the prose oracle "check against Playwright" ran as judgment and judgment sampled the cases the bug report cited (`image`→`img` fixed, `directory`→`list` missed; `button none` fixed, an incomplete role list missed). A checklist item is not "check role X" — it is "regenerate list Y from the reference and diff the code against it." A finding must emerge from the diff, not from this file naming it.
 
 Sources (open them; do not answer from memory):
