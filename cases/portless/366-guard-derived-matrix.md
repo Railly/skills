@@ -13,6 +13,16 @@ Source: https://github.com/vercel-labs/portless/pull/366; base 74c9868; heads re
 
 > Agent-authored record of a live review-gate run. Evidence is session-run output plus public PR state; claims and statuses pending human review.
 
+## 2026-07-22 update — round 3, three maintainer findings; blind gate caught all three
+
+The maintainer (ctate) raised three more findings on #366. All confirmed by reading the diff at head `cf596be`; none fixed on the branch as of 2026-07-22 (no commits since 07-21). A blind review-gate run (codex, gpt-5.6-sol, hint-free) surfaced all three independently at exact file:line before harvest.
+
+- **Quoted metacharacters and redirections misread as compound scripts.** `"vite dev --open '/foo&bar'"` and `"vite dev >vite.log 2>&1"` are single commands, but the raw-string control-operator test (added in the 07-20 fix) sees `&`/`>`, classifies them compound, skips injection, and leaves Vite on 5173 while portless routes to the assigned port → 502. Same guard-derived blind spot, one form deeper: the detector's cells never included quoted or redirection forms the shell still honors. Blind gate: `cli-utils.ts:1144`.
+- **Partial flag injection blocked by a present sibling.** With app port 4567 and `"dev": "expo start --port 4567"`, an existing `--port` returns before independently injecting the missing `--host localhost`, so Expo stays in LAN mode. The injection matrix tested all-present/all-absent, never the partial cell. Blind gate: `cli-utils.ts:1201`.
+- **Test shim shadowed by a real binary.** The new integration tests fail when Bun is installed beside Node: `spawnCommand` resolves the real Bun ahead of the PATH-prepended shim, so no capture file is written and the test reads a missing file. Test-harness hermeticity, not a product bug. Blind gate: `cli.test.ts:1724`.
+
+Catalog updated: new-domain-matrix detector cells now include quoted metacharacters, redirections, and the partial-injection cell; new **Shim hermeticity** lens added. Harvest-loop validation, not unseen-bug proof.
+
 ## 2026-07-20 update — the same guard-derived blind spot recurred on the fix's own new guard
 
 The maintainer reviewed #366 and raised two edge cases. Both are the same mechanism as this case, one layer deeper: the guard-derived-cells rule was applied to the reused helper but not recursively to the guards this PR itself added.

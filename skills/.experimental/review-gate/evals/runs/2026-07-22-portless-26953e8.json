@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 0,
+  "run": { "date": "2026-07-22", "repo": "vercel-labs/portless", "base": "e0c2af5", "head": "26953e8", "status": "complete", "gaps": [] },
+  "provenance": { "author_model": "claude-opus-4-8", "reviewer_model": "openai/gpt-5.6-sol", "same_family": false },
+  "lenses": [
+    { "name": "emission-channel-and-one-shot-latch-reachability", "status": "run", "reason": "diff adds a user-facing warning guarded by a once-latch in a CLI-plus-daemon system" },
+    { "name": "docs-behavior-parity", "status": "run", "reason": "" },
+    { "name": "error-path-forcing", "status": "run", "reason": "diff adds a failure branch on an unwritable hosts file" }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "acknowledged", "reason": "em dash is the house norm; inverted style gate" },
+    { "check": "surfaces", "outcome": "pass", "reason": "" }
+  ],
+  "findings": [
+    { "id": "F1", "state": "confirmed", "claim": "warning emitted inside the detached proxy (stderr -> proxy.log); attached CLI shows nothing", "evidence": "blind codex run at cli.ts:584 with proxy.log redirect at cli.ts:3358; matches ctate 2026-07-22", "layer": "process emission channel", "source": "lens", "path": "" },
+    { "id": "F2", "state": "confirmed", "claim": "initial empty sync consumes hostsSyncWarned; first real route registration failure is silent", "evidence": "blind codex run at cli.ts:666; matches ctate 2026-07-22", "layer": "one-shot latch lifetime", "source": "lens", "path": "" }
+  ],
+  "exemptions": [
+    { "claim": "em dash in added lines flagged by style gate", "evidence": "AGENTS.md mandates em dash for this repo" }
+  ],
+  "issue_candidates": [],
+  "note": "Blind harvest-loop validation; both findings encoded before the run. Bugs still present on branch as of 2026-07-22."
+}

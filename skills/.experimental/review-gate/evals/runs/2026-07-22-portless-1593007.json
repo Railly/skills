@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 0,
+  "run": { "date": "2026-07-22", "repo": "vercel-labs/portless", "base": "e0c2af5", "head": "1593007", "status": "complete", "gaps": [] },
+  "provenance": { "author_model": "claude-opus-4-8", "reviewer_model": "openai/gpt-5.6-sol", "same_family": false },
+  "lenses": [
+    { "name": "resolution-rule-consistency-across-consumers", "status": "run", "reason": "" },
+    { "name": "new-domain-matrix", "status": "run", "reason": "diff widens the TLD validator" },
+    { "name": "docs-behavior-parity", "status": "run", "reason": "" }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "acknowledged", "reason": "em dash is the house norm in portless; the em-dash half of the style gate does not apply" },
+    { "check": "surfaces", "outcome": "pass", "reason": "" }
+  ],
+  "findings": [
+    { "id": "F1", "state": "confirmed", "claim": "404 suggestion ignores longest-match for overlapping TLDs: missing.dev.example.com suggests `portless missing.dev`, registering the wrong hostname set", "evidence": "blind codex run located proxy.ts:206 with the exact overlapping-TLD scenario; matches maintainer (ctate) finding 2026-07-22", "layer": "consumer consistency of a resolution rule", "source": "lens", "path": "" }
+  ],
+  "exemptions": [
+    { "claim": "em dash in added comment lines flagged by style gate", "evidence": "AGENTS.md mandates em dash and bans ` -- `; the em-dash half of the gate is inverted for this repo" }
+  ],
+  "issue_candidates": [],
+  "note": "Blind harvest-loop validation: F1 was encoded as a general lens before this run; a different-family reviewer relocated it in the diff. Not a proof the gate catches unseen bugs. Bug still present on branch (no fix commit as of 2026-07-22)."
+}
