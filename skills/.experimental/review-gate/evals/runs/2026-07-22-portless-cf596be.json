@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 0,
+  "run": { "date": "2026-07-22", "repo": "vercel-labs/portless", "base": "74c9868", "head": "cf596be", "status": "complete", "gaps": [] },
+  "provenance": { "author_model": "claude-opus-4-8", "reviewer_model": "openai/gpt-5.6-sol", "same_family": false },
+  "lenses": [
+    { "name": "new-domain-matrix", "status": "run", "reason": "diff adds a compound-script detector and a flag-injection guard" },
+    { "name": "shim-hermeticity", "status": "run", "reason": "integration tests stub an external binary via PATH" },
+    { "name": "docs-behavior-parity", "status": "run", "reason": "" }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "acknowledged", "reason": "em dash is the house norm; inverted style gate" },
+    { "check": "surfaces", "outcome": "pass", "reason": "README, SKILL.md, cli.ts all touched" }
+  ],
+  "findings": [
+    { "id": "F1", "state": "confirmed", "claim": "quoted metacharacters/redirections ('/foo&bar', >vite.log) misclassified as compound scripts, injection skipped, Vite left on 5173 -> 502", "evidence": "blind codex run at cli-utils.ts:1144; matches ctate 2026-07-22", "layer": "detector input domain", "source": "lens", "path": "" },
+    { "id": "F2", "state": "confirmed", "claim": "existing --port returns before injecting the missing --host; Expo stays in LAN mode (partial-injection cell)", "evidence": "blind codex run at cli-utils.ts:1201; matches ctate 2026-07-22", "layer": "flag-injection matrix", "source": "lens", "path": "" },
+    { "id": "F3", "state": "confirmed", "claim": "test shim shadowed by a real Bun installed beside Node; spawnCommand resolves real Bun first, capture file never written, test fails", "evidence": "blind codex run at cli.test.ts:1724; matches ctate 2026-07-22", "layer": "test harness hermeticity", "source": "lens", "path": "" }
+  ],
+  "exemptions": [
+    { "claim": "em dash in added lines flagged by style gate", "evidence": "AGENTS.md mandates em dash for this repo" }
+  ],
+  "issue_candidates": [],
+  "note": "Blind harvest-loop validation; all three findings encoded before the run. Bugs still present on branch as of 2026-07-22."
+}

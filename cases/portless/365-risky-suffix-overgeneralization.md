@@ -13,6 +13,14 @@ Source: https://github.com/vercel-labs/portless/pull/365 (issue #260); commits `
 Issue or PR: https://github.com/vercel-labs/portless/pull/365
 Date: 2026-07-17
 
+## 2026-07-22 update — round 3, maintainer finding: 404 suggestion ignores longest-match
+
+The maintainer (ctate) raised a third finding, distinct from both prior rounds and confirmed by reading the resolution paths at head `1593007`:
+
+- **404 suggestion does not apply longest-match ordering for overlapping TLDs.** With `example.com` and `dev.example.com` both registered, a request to unregistered `missing.dev.example.com` matches `.example.com` first, so the 404 page suggests `portless missing.dev your-command`. That registers the wrong hostname set (`missing.dev.example.com` would need `portless missing` under the `dev.example.com` TLD). The primary resolver applies longest-match; the suggestion builder re-split the host with a naive rule. Root cause is a resolution rule implemented in one consumer and not mirrored in another.
+
+Not yet fixed on the branch as of 2026-07-22 (no commits since 07-21). This finding was **caught by a blind review-gate run** (codex, gpt-5.6-sol, hint-free) before being harvested — the run independently landed on `proxy.ts:206` with the exact overlapping-TLD failure scenario. New transferable lesson recorded in the catalog: **Resolution-rule consistency across consumers** lens, plus the same-named subsystem invariant in `conventions.md`. This is a harvest-loop validation (finding encoded as a general lens → blind different-family reviewer relocated it in the diff), not a proof the gate catches unseen bugs.
+
 ## 2026-07-20 update — maintainer review, two new findings, both fixed and pushed
 
 The maintainer reviewed #365 and raised two findings, both distinct from this case's suffix-over-generalization lesson and both confirmed by repro against the branch head:
