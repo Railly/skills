@@ -4,8 +4,8 @@ Status: observed
 Validation: independently-validated
 Human review: maintainer-reviewed (2026-07-20, two findings, both fixed)
 Maintainer acceptance: pending
-Delivery: PR pushed (head `1593007`)
-Upstream status checked: 2026-07-20
+Delivery: PR pushed (head `06f8e07`, rebased onto main `e0c2af5` 2026-07-22)
+Upstream status checked: 2026-07-22
 Visibility: public
 Repository: vercel-labs/portless
 Role: contributor
@@ -20,6 +20,8 @@ The maintainer (ctate) raised a third finding, distinct from both prior rounds a
 - **404 suggestion does not apply longest-match ordering for overlapping TLDs.** With `example.com` and `dev.example.com` both registered, a request to unregistered `missing.dev.example.com` matches `.example.com` first, so the 404 page suggests `portless missing.dev your-command`. That registers the wrong hostname set (`missing.dev.example.com` would need `portless missing` under the `dev.example.com` TLD). The primary resolver applies longest-match; the suggestion builder re-split the host with a naive rule. Root cause is a resolution rule implemented in one consumer and not mirrored in another.
 
 Not yet fixed on the branch as of 2026-07-22 (no commits since 07-21). This finding was **caught by a blind review-gate run** (codex, gpt-5.6-sol, hint-free) before being harvested — the run independently landed on `proxy.ts:206` with the exact overlapping-TLD failure scenario. New transferable lesson recorded in the catalog: **Resolution-rule consistency across consumers** lens, plus the same-named subsystem invariant in `conventions.md`. This is a harvest-loop validation (finding encoded as a general lens → blind different-family reviewer relocated it in the diff), not a proof the gate catches unseen bugs.
+
+**Fix (pushed 2026-07-22, commit in `06f8e07`).** `proxy.ts` now selects the longest matching TLD suffix — `tldSuffixes.filter((s) => host.endsWith(s)).sort((a, b) => b.length - a.length)[0]` — with a guard (`matchedSuffix.length < host.length`) so a full-host match never slices to an empty string. Regression test `suggests the longest matching overlapping TLD in 404 page (issue #260)` in `proxy.test.ts` went red against the prior head (suggested `missing.dev`) and green after. Build/typecheck clean. Issue candidate left open: `findRoute`'s wildcard tier (`proxy.ts` `routes.find((r) => hostname.endsWith("." + r.hostname))`) has the same first-match-not-longest risk for overlapping *registered* routes, out of scope for this 404-suggestion fix.
 
 ## 2026-07-20 update — maintainer review, two new findings, both fixed and pushed
 
