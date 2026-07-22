@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-22",
+    "repo": "agent-browser",
+    "base": "81c336c1c20b80ac648e0416a7b6e0c0ae7878bb",
+    "head": "d549648734986f380b4b4825ea39e690c1f8da6b",
+    "status": "complete",
+    "gaps": [
+      "e2e e2e_stream_command_requires_same_origin_before_daemon_relay never reached its assertion: it panics at fixture setup (UnixListener bind, socket path 161 > macOS SUN_LEN 104). The behavior it would test (same-origin gate before daemon relay) is unchanged by this diff; the security path was not exercised end-to-end from this worktree."
+    ]
+  },
+  "provenance": {
+    "author_model": "claude (occam/opus wrote+reviewed the diff pre-gate)",
+    "reviewer_model": "codex openai/gpt-5.6-sol + claude-opus-4-8 (gate runner)",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "new-domain-matrix", "status": "run", "reason": "diff adds a new input class (config/maxFps message); matrix regenerated: parse clamp cells (valid/0/120/500/u64-overflow/negative/string/missing) covered by unit tests; downstream consumer (timer math 1_000_000/fps, fps>0 guarded, no div-by-zero); the mid-stream cap-change input class surfaced the confirmed stall finding" },
+    { "name": "cancellation-and-timeout-hygiene", "status": "run", "reason": "diff adds reader_task (spawn+abort), sleep_until timer, watch.changed(); reader abort drops ws_rx cleanly; partial-input-on-abort matches pre-diff behavior (old inline select! also stopped dispatch on disconnect); converges with the stall finding on the timer arm" },
+    { "name": "error-path-forcing", "status": "run", "reason": "new guards (changed.is_err break, if !pending_frame / if pending_frame, clamp) forced: clamp via unit tests, channel-close break reasoned (watch sender lives server-lifetime), reader-completion break exercised" },
+    { "name": "docs-behavior-parity", "status": "run", "reason": "README + streaming.mdx + output.rs help all state latest-first, maxFps 1-120, 0=uncapped, per-client, immediate input; consistent with binary and with each other; skill-data exemption recorded" },
+    { "name": "deliberate-default-check", "status": "run", "reason": "frame delivery flips ordered-broadcast(64) to latest-frame-wins watch; old path already dropped on Lagged; no test asserts ordered frame delivery; dashboard renders latest only; default flip justified" },
+    { "name": "inverse-regression-surface", "status": "run", "reason": "frames moved broadcast->watch erases all-intermediate-frames delivery; only affects live preview (recording is CDP-side, separate); exemption recorded" },
+    { "name": "substrate-verification", "status": "run", "reason": "A/B evidence and tests assert on actually-received WS messages/frames, not command self-report; viewport e2e passes in isolation against real Chrome" },
+    { "name": "reference-implementation-oracle", "status": "skipped", "reason": "diff reimplements no external spec (no Playwright/W3C/RFC contract)" },
+    { "name": "fresh-seam-scan", "status": "skipped", "reason": "diff does not patch a runtime/framework to expose a signal to app code" },
+    { "name": "boundary-pipeline-trace", "status": "skipped", "reason": "no new frame/shadow/process/protocol boundary; WS boundary pre-existed" },
+    { "name": "non-destructive-recovery", "status": "skipped", "reason": "no heuristic-driven recovery action added" },
+    { "name": "demonstrative-example", "status": "skipped", "reason": "no doc example added that must fail without the fix" },
+    { "name": "choice-audit", "status": "skipped", "reason": "no .decisions.tsv trail emitted; lens does not fire without one" }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "pass", "reason": "no em dash in added lines (repo permits em dash in MD/MDX prose per AGENTS.md, but none added); no ' -- ' prose punctuation in comments" },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "diff touches cli/src/native/stream/* but not skill-data/core/SKILL.md; exempted: core skill has never documented the WS streaming protocol (only AGENT_BROWSER_STREAM_PORT env var); WS frame-delivery is a programmatic integration surface documented in README + docs site" },
+    { "check": "siblings maxFps", "outcome": "pass", "reason": "every file mentioning maxFps is in the diff; no untouched line stale" },
+    { "check": "siblings latest-first", "outcome": "pass", "reason": "every file mentioning latest-first is in the diff" },
+    { "check": "callers broadcast_frame", "outcome": "pass", "reason": "all call sites in diffed files" },
+    { "check": "callers broadcast_screencast_frame", "outcome": "pass", "reason": "all call sites in diffed files" },
+    { "check": "stale last_frame", "outcome": "pass", "reason": "zero repo-wide hits; the removed RwLock frame cache is fully gone, no dangling reader" },
+    { "check": "unit tests (cargo test)", "outcome": "pass", "reason": "964 passed, 0 failed, 84 ignored" },
+    { "check": "cargo fmt --check", "outcome": "pass", "reason": "clean" },
+    { "check": "cargo clippy", "outcome": "pass", "reason": "0 warnings" },
+    { "check": "e2e (cargo test e2e --ignored --test-threads=1)", "outcome": "acknowledged", "reason": "81 passed, 2 failed; both failures environmental, not regressions: viewport test passes in isolation (was a poisoned-ENV_MUTEX cascade); same-origin test dies at socket fixture (path 161 > SUN_LEN 104, test bakes 63-char fn-name as socket filename under CARGO_MANIFEST_DIR); both tests untouched since base; diff touches no origin/relay logic; upstream branch ctate/fix-flaky-stream-viewport-test confirms pre-existing fragility" }
+  ],
+  "findings": [
+    {
+      "id": "F1-cap-loosen-stall",
+      "state": "confirmed",
+      "claim": "When a client loosens its own frame-rate cap mid-stream (e.g. maxFps 1 -> 0/uncapped, or 1 -> 30), the next frame is delayed by up to the previous frame interval. The reader task stores the new max_fps in the atomic but has no channel to wake the writer, which stays blocked in sleep_until(next_allowed) on the stale deadline computed from the old (slower) rate.",
+      "evidence": "Forced empirically: scratch test set maxFps=1, sent+received a frame (setting next_allowed=+1s), sent maxFps=0, then a new frame arrived in 850ms instead of immediately (assert <200ms failed). Reverted after. Only affects the transition when loosening; tightening (30->1) is sound; the uncapped-from-start and set-once-at-connect paths are unaffected. Transient one-frame stall, no data loss, no crash.",
+      "layer": "writer select! timer arm / config-change propagation to the writer loop (websocket.rs:286-306)",
+      "source": "lens",
+      "path": "reader_loop stores max_fps (websocket.rs ~354) -> writer sleep_until(next_allowed) never re-evaluated while blocked (websocket.rs:292)"
+    }
+  ],
+  "exemptions": [
+    { "claim": "cli/src/mcp.rs not updated (CLI/MCP parity rule)", "evidence": "The maxFps/latest-first feature is a WebSocket client->server protocol message, not a CLI command/flag/env-var; the three stream MCP tools (mcp.rs:1604-1618) are one-line declarations describing the CLI subcommand and carry no protocol semantics to sync. Verified by reading mcp.rs:1585-1645." },
+    { "claim": "skill-data/core/SKILL.md not updated (5-doc-surfaces rule)", "evidence": "The core skill has never documented the WS streaming protocol (grep: only AGENT_BROWSER_STREAM_PORT in references/commands.md); it teaches CLI usage to agents, while frame delivery is a programmatic integration surface documented in README + docs site." },
+    { "claim": "Intermediate frames are dropped (old ordered broadcast delivered all frames up to lag)", "evidence": "Only live preview consumes WS frames; video recording is CDP-side screencast-to-file, independent of the WS broadcast. Dropping intermediate frames is the intended tradeoff for latest-frame-wins and affects no recording path." }
+  ],
+  "issue_candidates": [
+    { "title": "e2e_stream_command_requires_same_origin_before_daemon_relay unrunnable on macOS due to socket path length", "evidence": "Test builds the UDS socket path as CARGO_MANIFEST_DIR/target/t/<tmp>/<63-char-fn-name>.sock = 161 chars > macOS SUN_LEN 104; fails at fixture bind on any moderately long repo path (main worktree ~138 chars too).", "why_out_of_scope": "Untouched test, pre-existing (upstream ctate/fix-flaky-stream-viewport-test branch), unrelated to this diff's frame-delivery/input changes." },
+    { "title": "Poisoned ENV_MUTEX cascades one test failure into unrelated tests", "evidence": "test_utils.rs:15 ENV_MUTEX.lock().unwrap() panics with PoisonError when a prior EnvGuard-holding test panics; the same-origin socket panic cascaded into e2e_stream_frame_metadata_respects_custom_viewport, which passes cleanly in isolation.", "why_out_of_scope": "Test-harness fragility, not diff behavior; would be closed by .lock().unwrap_or_else(|e| e.into_inner()) in EnvGuard." }
+  ]
+}
