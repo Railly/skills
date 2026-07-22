@@ -4,8 +4,8 @@ Status: observed
 Validation: unvalidated
 Human review: maintainer-reviewed (2026-07-20, two edge cases, both fixed)
 Maintainer acceptance: pending
-Delivery: PR pushed (head `cf596be`)
-Upstream status checked: 2026-07-20
+Delivery: PR pushed (head `1aba57e`, rebased onto main `e0c2af5` 2026-07-22)
+Upstream status checked: 2026-07-22
 Visibility: public
 Repository: vercel-labs/portless
 Role: contributor
@@ -22,6 +22,8 @@ The maintainer (ctate) raised three more findings on #366. All confirmed by read
 - **Test shim shadowed by a real binary.** The new integration tests fail when Bun is installed beside Node: `spawnCommand` resolves the real Bun ahead of the PATH-prepended shim, so no capture file is written and the test reads a missing file. Test-harness hermeticity, not a product bug. Blind gate: `cli.test.ts:1724`.
 
 Catalog updated: new-domain-matrix detector cells now include quoted metacharacters, redirections, and the partial-injection cell; new **Shim hermeticity** lens added. Harvest-loop validation, not unseen-bug proof.
+
+**Fix (pushed 2026-07-22, commit in `1aba57e`).** Three changes in `cli-utils.ts` (+ `cli.test.ts`): (1) the regex `SHELL_CONTROL_OPERATOR_PATTERN` was replaced with `isCompoundShellScript()`, a quote-aware scanner that tracks single/double-quote and escape state (like `splitCommand`) and only counts `;`, `|`, newline/CR, or a non-redirection `&` outside quotes as a separator — so `'/foo&bar'` and `2>&1`/`&>`/`>&` no longer misclassify a single command; (2) the blanket `if (hasCliOption(..., "--port")) return` early-out was removed so `injectFrameworkFlags` injects `--port` and `--host` independently (partial-injection); (3) the integration-test shim is written to `node_modules/.bin/<pm>` and run under an isolated `PATH`, so a real `bun` colocated with Node (which `augmentedPath()` prepends) can no longer shadow it. The exact decoy-bun failure (`ENOENT capture.json`) was reproduced red, then green with the decoy still live. Issue candidates left open: `augmentedPath()` unconditionally prioritizes Node's own bin dir over the caller's `PATH` (intentional for Windows `.cmd`, but can shadow a user's chosen runtime in production), and the `npm` forwarding path can't be shadowed the same way in tests.
 
 ## 2026-07-20 update — the same guard-derived blind spot recurred on the fix's own new guard
 

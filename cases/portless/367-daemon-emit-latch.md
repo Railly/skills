@@ -1,10 +1,10 @@
 # Case: A user-facing warning emitted by the daemon, then silenced by a one-shot latch the empty sync consumed
 
 Status: observed
-Validation: unvalidated
-Human review: maintainer-reviewed (2026-07-22, two findings, not yet fixed)
-Maintainer acceptance: changes-requested
-Delivery: PR open (head `26953e8`)
+Validation: contributor-validated
+Human review: maintainer-reviewed (2026-07-22, two findings, both fixed and pushed)
+Maintainer acceptance: pending
+Delivery: PR pushed (head `67572f9`, on main `e0c2af5`)
 Upstream status checked: 2026-07-22
 Visibility: public
 Repository: vercel-labs/portless
@@ -35,7 +35,11 @@ PR #367 (issue #364) adds a warning when automatic `/etc/hosts` sync cannot writ
 
 ## Outcome
 
-Findings confirmed, not yet fixed on the branch (no commits since 07-21). Recorded as gate-misses closed by a new lens and subsystem invariant; the blind run validates that the encoded gate relocates them.
+Both findings fixed and pushed 2026-07-22 across two commits (`6e93549` then refinement `67572f9`, branch on main `e0c2af5`). Recorded as gate-misses closed by a new lens and subsystem invariant; the blind run validated that the encoded gate relocates them.
+
+**Fix.** (1) Latch: `syncHostsWithWarning` returns early (`if (hostnames.length === 0) return alreadyWarned`) so an empty/warm-up sync failure neither warns nor spends the warn-once latch; a red test (`does not consume the warn-once latch when an empty-route sync fails`) confirmed it. (2) Emission channel: the daemon writes a one-shot marker file (`writeHostsSyncWarningMarker`) that a CLI-attached process consumes and prints — at `doProxyStart` (startup failures) and after every `addRoutes` in a user-attached flow. The refinement commit wired all four such call sites (`runApp`, `handleAlias`, `spawnProxiedApp`, `runWithTurbo`, each verified not to run inside the detached daemon) and replaced the original fixed `setTimeout(DEBOUNCE_MS+100)` single check with `pollForHostsSyncWarningMarker(dir, 50, 1500)` — bounded polling that returns as soon as the marker appears and never blocks the happy path (awaited only in the one-shot `alias` command). Tests red-then-green; build/typecheck/lint clean.
+
+**Residual (issue candidate, out of scope).** The marker is a single one-shot file keyed on `stateDir`. In a multi-app run (`spawnProxiedApp`/`runWithTurbo`) two concurrent polls can race to consume the same marker, so a second app's own sync failure could be swallowed by the first app's poll. The one-shot marker design predates this change; the added coverage makes the race more likely. A per-app-attributable warning channel would close it.
 
 ## Evidence
 
