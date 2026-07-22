@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-22",
+    "repo": "agent-browser",
+    "base": "81c336c1c20b80ac648e0416a7b6e0c0ae7878bb",
+    "head": "792a24cd5",
+    "status": "complete",
+    "gaps": [
+      "e2e suite not re-run this round: the fix touched only the writer loop in websocket.rs plus one new unit regression test; e2e behavior is unchanged from the prior run (2026-07-22-agent-browser-d549648), where the frame-metadata e2e passed in isolation and the 2 failures were environmental."
+    ]
+  },
+  "provenance": {
+    "author_model": "claude-opus-4-8 (gate runner applied the F1 fix)",
+    "reviewer_model": "codex openai/gpt-5.6-sol + claude-opus-4-8",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "cancellation-and-timeout-hygiene", "status": "run", "reason": "the fix swaps AtomicU32 for a watch channel and adds a select arm; verified no busy-loop on sender drop (breaks on changed()=Err, mirrors reader_task arm), no leak, single client_count decrement on every exit path" },
+    { "name": "new-domain-matrix", "status": "run", "reason": "the config-change input class now includes mid-stream tightening and loosening; loosening fixed (F1) and force-red guarded; tightening surfaced the benign boundary finding F2" },
+    { "name": "error-path-forcing", "status": "run", "reason": "new guard changed()=Err -> break forced by reasoning (sender lives for reader lifetime); deadline_from fps=0 past-deadline path exercised by the uncapped tests" },
+    { "name": "deliberate-default-check", "status": "skipped", "reason": "no default-behavior change beyond what the prior run already assessed" },
+    { "name": "docs-behavior-parity", "status": "run", "reason": "fix makes config take effect immediately, which is what the docs already imply; no doc contradiction introduced" },
+    { "name": "inverse-regression-surface", "status": "skipped", "reason": "data source unchanged this round (watch channel introduced in prior run, already assessed)" },
+    { "name": "substrate-verification", "status": "run", "reason": "force-red regression test asserts on actually-received WS frame timing against a real StreamServer + tokio-tungstenite client" },
+    { "name": "reference-implementation-oracle", "status": "skipped", "reason": "no external spec reimplemented" },
+    { "name": "fresh-seam-scan", "status": "skipped", "reason": "no runtime/framework patch" },
+    { "name": "boundary-pipeline-trace", "status": "skipped", "reason": "no new boundary" },
+    { "name": "non-destructive-recovery", "status": "skipped", "reason": "no heuristic recovery" },
+    { "name": "demonstrative-example", "status": "skipped", "reason": "no doc example added" },
+    { "name": "choice-audit", "status": "skipped", "reason": "no .decisions.tsv trail" }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "pass", "reason": "no em dash / no ' -- ' prose punctuation in added lines" },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "same skill-data/core exemption as prior run (core skill never documented the WS protocol)" },
+    { "check": "siblings maxFps", "outcome": "pass", "reason": "all mentioning files in diff" },
+    { "check": "callers deadline_from", "outcome": "pass", "reason": "new private helper, all call sites in websocket.rs (in diff)" },
+    { "check": "unit tests (cargo test)", "outcome": "pass", "reason": "965 passed, 0 failed, 84 ignored (up 1 from prior run: the new regression test)" },
+    { "check": "cargo fmt --check", "outcome": "pass", "reason": "clean" },
+    { "check": "cargo clippy", "outcome": "pass", "reason": "0 warnings" },
+    { "check": "force-red (F1 regression test)", "outcome": "pass", "reason": "test_loosening_cap_midstream_takes_effect_immediately fails at 851ms against the pre-fix code, passes with the fix" }
+  ],
+  "findings": [
+    {
+      "id": "F2-tightening-boundary-frame",
+      "state": "issue_candidate",
+      "claim": "Tightening a client's own cap mid-stream (e.g. 0 -> 1 fps) while a frame is pending and the old deadline is already elapsed can let one frame through immediately before the tighter cap applies, because tokio::select! is unbiased and may pick the throttle arm over the config arm on simultaneous readiness.",
+      "evidence": "Confirmed by code inspection and Codex: on the tie the throttle arm can win. Self-correcting: even when it wins, its final `next_allowed = deadline_from(last_sent, *max_fps_rx.borrow())` reads the already-updated watch value (new fps), so only the single boundary frame is early; the next frame respects the new cap. No frame lost, no stall. Benign direction (client asked for fewer frames, got one extra). Not reproduced deterministically because it is an unbiased-select tie.",
+      "layer": "writer select! tie-break between the config arm and the throttle arm (websocket.rs:309/323)",
+      "source": "lens"
+    }
+  ],
+  "exemptions": [
+    { "claim": "cli/src/mcp.rs and skill-data/core not updated", "evidence": "unchanged from prior run: config/maxFps is a WS protocol message, not a CLI/MCP surface; core skill never documented the WS protocol." }
+  ],
+  "issue_candidates": [
+    { "title": "One frame can exceed a just-tightened maxFps at the transition boundary", "evidence": "Unbiased select! tie between throttle and config arms; self-correcting after one frame. Strict enforcement would need a biased select (risks starving other arms) or a re-check in the throttle arm.", "why_out_of_scope": "Benign rate-limiter boundary slop in the harmless direction; does not affect the common set-once-at-connect usage; fix cost/risk exceeds the one-frame benefit. Left as-is by decision." }
+  ]
+}
