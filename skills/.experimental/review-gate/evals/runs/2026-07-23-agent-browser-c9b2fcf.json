@@ -57,7 +57,14 @@
       "API change: base made ensure_renderer_alive take dialog_session: Option<&str> and return RendererState (was bool). Updated my connect-revive call to pass None (no dialog at connect); return value discarded."
     ],
     "verification": "cargo build clean; full suite 1013 passed / 0 failed (incl. my 5 connect tests + base's dialog test); fmt + clippy clean. Re-dogfooded the all-discarded revive on real Chrome (genuine chrome://discards Urgent Discard) because that path now flows through the refactored ensure_renderer_alive: connect returned 9.5s bounded, active tab revived to ALIVE via Target.activateTarget, others stay discarded. Behavior identical to pre-merge. Skip-to-live path unchanged (byte-identical + covered by mock + prior real-Chrome drive), not re-driven.",
-    "result": "Pushed e3c8fb1; PR mergeable."
+    "result": "Pushed e3c8fb1; PR mergeable.",
+    "retarget_to_main": {
+      "head_sha": "4044a25",
+      "reason": "#1532 (fix/discarded-tab-switch) squash-merged to main at 2026-07-23T17:32Z; retargeted PR #1543 base from fix/discarded-tab-switch to main.",
+      "conflict": "Merging upstream/main re-conflicted browser.rs: our branch carries #1532 via its real commits, main carries #1532 squashed (1ed371f). Resolved: kept our find_live_page_index + connect tests (main side empty at both hunks); dialog helper/test already common, deduped (each fn present once).",
+      "verification": "build clean; test_connect (20) + dialog test pass; fmt + clippy clean. Connect logic and revive path byte-identical to the e3c8fb1 real-Chrome dogfood, so not re-driven.",
+      "final": "PR base=main, mergeable, 1 file +297/-2 (connect change only)."
+    }
   },
   "exemptions": [
     "siblings 'discarded' in CDP protocol JSONs: vendored wire-protocol schemas, not agent-browser behavior text.",
