@@ -1,0 +1,56 @@
+{
+  "date": "2026-07-22",
+  "repo": "agent-browser",
+  "pr": 1596,
+  "head_sha": "bb35ceb",
+  "base_ref": "81c336c1c20b80ac648e0416a7b6e0c0ae7878bb",
+  "title": "feat: add a11y command for axe-core accessibility audits",
+  "author_model": "unknown (human PR by ctate)",
+  "reviewer_model": "claude-opus-4-8",
+  "same_family": false,
+  "run": {
+    "status": "complete",
+    "gaps": []
+  },
+  "deterministic": {
+    "style": "pass (em dashes present but permitted by AGENTS.md house norm; no `--` prose dashes, no emojis)",
+    "surfaces": "pass (all 5 doc surfaces + mcp.rs parity present)",
+    "unit_tests": "pass (978 passed, 0 failed)",
+    "fmt": "pass",
+    "clippy": "pass (no a11y-related warnings)",
+    "e2e": "pass (86 passed, 0 failed, real Chrome incl. 3 a11y tests)"
+  },
+  "dogfood": {
+    "driven_as_user": true,
+    "binary": "built from pr-1596 worktree",
+    "runs": [
+      "a11y <url> against a hand-built page with 8 real violations + cross-origin iframe: frame-boundary selector paths (iframe -> button, iframe -> img) confirmed the cross-frame runPartial/finishRun merge",
+      "--selector #main scoped to 1 violation (reused open page, no re-navigate)",
+      "--tags wcag2aa filtered to color-contrast only",
+      "--json returned structured counts/violations/url/axeVersion",
+      "selector no-match -> friendly 'Element not found' error (not raw internal string)",
+      "unknown flag -> error + usage"
+    ],
+    "not_driven": ["MCP round-trip via agent_browser_a11y tool — call_a11y delegates to the same CLI path; unit-tested formatting"]
+  },
+  "lenses": {
+    "docs-behavior-parity": "run — pass (offline/CSP, Safari/iOS-unsupported claims match code; WebDriver unsupported list updated)",
+    "reference-implementation-oracle": "run — axe cross-frame runPartial/finishRun merge; verified empirically by 3 a11y e2e tests + live dogfood",
+    "boundary-pipeline-trace": "run — frame/shadow/process boundary; verified by nested-frame + sibling-frame-order + shadow-target e2e + live iframe audit",
+    "new-failure-outcome-propagation": "run — iframe_sessions retention refactor; off-diff consumers (snapshot/screenshot/click) read stale-safe frame_id keys; verified by full e2e",
+    "error-path-forcing": "run — parser + policy + audit error branches; unit-tested + live-forced",
+    "new-domain-matrix": "run — a11y parser flag/value guard; unit-tested incl. adversarial flag-as-value",
+    "deliberate-default": "run — iframe retention across nav is intended (background-tab OOPIF preservation), tested",
+    "complexity-budget": "skipped — frame counts bounded; per-session getFrameTree with visited-set cycle guard"
+  },
+  "findings": [],
+  "issue_candidates": [
+    "handle_requests enables Network only on the top session, not active_iframe_sessions (handle_har_start loops over them) — the `requests` command may not surface cross-origin iframe traffic. Pre-existing: filter + enable shape unchanged by this PR. Unrelated to a11y (separate surface). Follow-up issue, ~4-line fix mirroring har_start's loop.",
+    "refresh_active_iframe_sessions uses unwrap_or_default(), so a transient CDP getFrameTree failure silently empties active_iframe_sessions and momentarily under-scopes network/HAR capture. By-design reliability tradeoff."
+  ],
+  "exemptions": [
+    "Em dashes in prose and Rust doc comments: exempt per AGENTS.md ('— allowed sparingly').",
+    "CHANGELOG.md not updated: exempt — AGENTS.md releases are manual single-PR affairs; feature branches do not edit the changelog.",
+    "Isolated-world contexts from createIsolatedWorld not explicitly destroyed: exempt — Chrome GCs isolated worlds on frame navigation/detach; not a within-session leak."
+  ]
+}
