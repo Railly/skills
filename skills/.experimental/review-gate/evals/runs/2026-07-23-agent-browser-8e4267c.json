@@ -1,0 +1,52 @@
+{
+  "run": { "status": "complete", "date": "2026-07-23", "repo": "vercel-labs/agent-browser", "pr": 1589, "sha": "8e4267c", "branch": "feat/session-tab-binding" },
+  "models": { "author_model": "claude (writer)", "reviewer_model": "codex/gpt (cross-family)", "same_family": false },
+  "deterministic": {
+    "style": "findings: em dashes in output strings (actions.rs:289,352), comments, README:1959 — house-style, acknowledged (AGENTS permits em dash sparingly)",
+    "surfaces": "PASS",
+    "siblings": { "pin-tab": "PASS", "tab_gone": "PASS", "targetId": "FINDING browser_protocol.json (CDP schema, exempt), inspect_server.rs (direct target_id API, exempt)" },
+    "callers": { "tab_switch_by_id": "PASS", "register_discovered_page": "PASS", "bind_active_target": "PASS" }
+  },
+  "radius": { "changed": 138, "impacted": 821, "edges": 0, "unresolvedCalls": 2362, "convergence": 0, "note": "under-covers: SCIP did not resolve call edges; impacted dominated by tests; treated as orientation only" },
+  "findings": [
+    { "id": "E", "state": "confirmed", "verdict": "CONFIRMED", "severity": "medium", "category": "security-hygiene",
+      "summary": "tab_gone error prints the raw live page URL (token/credential leak); sanitize_url is applied only on the persistence write path, not the runtime-removal error path",
+      "evidence": "page.url (raw target.url) passed to handle_bound_target_removed at browser.rs:1438,1794 -> bound_target_gone -> tab_gone_error prints ', last url {}' verbatim (browser.rs:392-402); sanitize_url used only at actions.rs:2597. Codex dogfood reproduced token=secret123&user=alice:password in both batch and single-command JSON errors.",
+      "verified_by": "source-read (kai) + dogfood (codex)" },
+    { "id": "F", "state": "unverified", "verdict": "PLAUSIBLE", "severity": "medium", "category": "partial-commit",
+      "summary": "tab_switch mutates active index + binding (and the handler clears ref/frame state) before the fallible enable_domains, so a failed switch can strand state",
+      "evidence": "browser.rs:1388 order; actions.rs:6127 ref/frame clear before switch success. Source-proven; not forced end-to-end.",
+      "verified_by": "source-read (codex + kai); needs forced enable_domains failure" },
+    { "id": "G", "state": "unverified", "verdict": "PLAUSIBLE", "severity": "low", "category": "substrate-verification",
+      "summary": "tab_close removes the page locally and discards Target.closeTarget result, then reports closed:true even if the CDP close failed",
+      "evidence": "browser.rs:1433,1439 discard close result; response reports closed:true at ~1462. Source-proven; not forced.",
+      "verified_by": "source-read (codex); needs forced close failure" },
+    { "id": "A", "state": "unverified", "verdict": "PLAUSIBLE", "severity": "low", "category": "flag-propagation",
+      "summary": "Local (non-CDP) launch stores a default-unpinned manager without set_pin_tab (actions.rs:3363,4257); under --pin-tab a locally-launched browser may not enter tab_gone on close",
+      "evidence": "Contested: writer refuted A end-to-end (round 1); codex re-raises by source read but did NOT dogfood the local-launch path (its dogfood was shared-CDP). pin-tab primary use is shared CDP.",
+      "verified_by": "source-read (codex); disputed vs writer end-to-end refutation; needs local-launch force" },
+    { "id": "B", "state": "refuted", "verdict": "PLAUSIBLE", "severity": "low", "category": "silent-recovery",
+      "summary": "ensure_page (called when page_count==0) creates+attaches a replacement about:blank; codex claims it can bypass tab_gone",
+      "evidence": "Codex's own cross-session dogfood returned code:tab_gone correctly. The OPEN claim targets the all-pages-gone branch, unforced. Refuted at the dogfooded layer; residual is the page_count==0 branch.",
+      "verified_by": "dogfood shows tab_gone works (codex); source concern on ensure_page branch unforced" },
+    { "id": "C", "state": "confirmed", "verdict": "CONFIRMED", "severity": "n/a-closed", "category": "regression-closed",
+      "summary": "Round-1 partial-path (auto-attach steal) is CLOSED: both Target.attachedToTarget and Target.targetCreated go through register_discovered_page (add_page_without_activation). Guardless test now binds to production.",
+      "evidence": "actions.rs:960,1091; browser.rs:1845. Codex force-red: flipping the production call to add_page failed test_register_discovered_page_untracked_target_does_not_steal_pinned_tab (active moved AAAA->4F0A); restored green.",
+      "verified_by": "force-red (codex)" },
+    { "id": "D", "state": "confirmed", "verdict": "CONFIRMED", "severity": "n/a-closed", "category": "batch-parity-closed",
+      "summary": "Batch propagates pinTab per command and preserves Response::code (tab_gone). daemon_config_fingerprint omits pin_tab, but that is by-design: pin is applied via runtime toggle (actions.rs:2101), proven sticky in dogfood.",
+      "evidence": "main.rs:1804,1823; connection.rs:591 (fingerprint, intentional). Codex dogfood: --pin-tab against running unpinned daemon -> target pinned:true.",
+      "verified_by": "dogfood (codex)" }
+  ],
+  "issue_candidates": [
+    { "title": "Discarded-first / all-discarded browser can hang connect on the CDP timeout", "severity": "high", "evidence": "discover_and_attach_targets enables Page.enable on pages[0] (browser.rs:684); Target.getTargets not activity-sorted, no renderer-readiness probe.", "scope": "OUT OF SCOPE for #1589 — this is exactly what open PR #1543 fixes (select a live tab at CDP connect). Present on this branch because #1543 not merged." },
+    { "title": "Pin persistence save/load errors silently ignored on running-daemon toggle", "severity": "medium", "evidence": "actions.rs:2110 discards both binding-load and binding-save Results, so --pin-tab can report success without persisting.", "scope": "adjacent to #1589 pin path; small hardening." },
+    { "title": "Tab-ref parser error text omits the newly accepted target-id domain", "severity": "low", "evidence": "empty/numeric parse errors still say only 't<N> or a label' (browser.rs:256,280) though resolution accepts target ids.", "scope": "in-scope docs/UX nit for #1589's tab <targetId> feature." }
+  ],
+  "exemptions": [
+    { "claim": "targetId siblings in browser_protocol.json exempt", "evidence": "CDP DevTools protocol schema field, not the feature's tab-ref resolution." },
+    { "claim": "targetId in inspect_server.rs exempt", "evidence": "consumes target_id directly as its WS-proxy API param; does not route through the tab-ref resolver." },
+    { "claim": "MCP pin propagation OK", "evidence": "mcp.rs:1597,2312 map pinTab -> --pin-tab/--no-pin-tab; codex confirmed." },
+    { "claim": "em dashes acknowledged", "evidence": "AGENTS.md permits em dash sparingly in docs; output-string dashes are house-style, not a gate violation." }
+  ]
+}

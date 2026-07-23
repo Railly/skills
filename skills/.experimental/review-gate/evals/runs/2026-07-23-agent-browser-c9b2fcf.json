@@ -1,0 +1,58 @@
+{
+  "date": "2026-07-23",
+  "repo": "agent-browser",
+  "pr": 1543,
+  "base": "upstream/fix/discarded-tab-switch",
+  "head_sha": "c9b2fcf",
+  "run": { "status": "complete" },
+  "author_model": "unknown (Hunter-authored, agent-assisted)",
+  "reviewer_model": "claude-opus-4-8",
+  "same_family": false,
+  "diff": { "files": 1, "additions": 293, "deletions": 2, "file": "cli/src/native/browser.rs" },
+  "deterministic": {
+    "style": { "result": "finding-then-fixed", "detail": "em dash in test comment (line 2765); rewritten to two clauses, re-run PASS, committed c9b2fcf" },
+    "surfaces": { "result": "pass", "detail": "browser.rs is not a feature surface in the map (flags/main/commands only)" },
+    "siblings:discarded": {
+      "result": "exempted",
+      "detail": "hits are vendored CDP protocol JSONs (browser_protocol.json, js_protocol.json) defining the wire `discarded` field, plus #1532 pre-existing browser.rs code the fix builds on. No behavior text to sync."
+    },
+    "callers:active_page_index": {
+      "result": "pass",
+      "detail": "contract change = active_page_index may be non-zero after connect (was always 0). All 20 consumers use it as a bounds-checked index into self.pages; none assume post-connect==0. find_live_page_index always returns an in-range index."
+    }
+  },
+  "findings": [
+    {
+      "id": "style-em-dash",
+      "state": "confirmed",
+      "layer": "house style",
+      "summary": "Em dash in added test comment violates the no-dash house norm.",
+      "evidence": "gate.sh style flagged line 2765; norm: prefer rewriting to avoid dashes.",
+      "resolution": "Fixed in c9b2fcf (rewritten to two clauses). Style gate re-run PASS."
+    }
+  ],
+  "verification": {
+    "tests_run": "cargo test test_connect (20 tests) all pass; 5 new #1036 regression tests green",
+    "drift_forced_red": "Reverted the fix (active=0 blindly); test_connect_skips_discarded_first_target times out (Elapsed) at 15s. Guard is real. Restored.",
+    "fmt": "cargo fmt --check clean",
+    "clippy": "cargo clippy clean (no warnings/errors)",
+    "dogfood_built_artifact": {
+      "built": "cargo build (debug) target/debug/agent-browser v0.31.1",
+      "substrate": "real Google Chrome, --remote-debugging-port=9333, 3-tab profile",
+      "discard_repro": "chrome://discards is gated + shadow-DOM; instead killed real renderers with CDP Page.crash on tracked https tabs (keeps https URL so should_track_target retains them), verified DEAD via Page.enable-no-answer probe.",
+      "test_artifact_caught": "First drive crashed a chrome://crash tab = filtered by should_track_target (is_internal_chrome_target); never in selection set. Re-ran with tracked https tabs and the artifact's own tab ids per lens rule (2).",
+      "drive_all_live": "connect selects idx0 (t1, live), active tab correct, instant.",
+      "drive_dead_idx0_and_idx1": "getTargets order idx0 DEAD, idx1 DEAD, idx2 LIVE (example.com). FIXED binary: connect returned in 6179ms (bounded: 3s idx0 probe + 3s concurrent round), active tab = t3 example.com (only live one), all 3 tabs still listed.",
+      "user_layer_repro": "REVERTED binary (active_page_index=0 blindly) against identical Chrome: connect still running past 12s → wedged toward the 30s ceiling. Confirms the bug at the CLI layer, not just the unit-test layer (lens rule 1).",
+      "observation": "Leading-discarded-tab connect pays a flat ~6s ceiling (two sequential 3s probe rounds) regardless of discard count, since the tail is concurrent. By design (idx0-first keeps all-live instant). Bounded and acceptable; noted as issue candidate, not a defect.",
+      "true_discard_revive_branch": "Self-unblocked: enabled chrome://discards via CDP shadow-pierce eval on chrome://chrome-urls ('Enable internal debugging pages'), then clicked [Urgent Discard] (div[is=action-link]) on all 3 tabs = genuine Chrome Memory-Saver discard (all renderers DEAD, targets retained). FIXED binary connect returned in 9662ms (bounded: 3s idx0 + 3s concurrent tail + ensure_renderer_alive re-probe/activate/re-probe), active tab t1 example.com REVIVED to ALIVE via Target.activateTarget, other two stay discarded as designed. The all-discarded revive path is now verified on real Chrome, not only the mock. UX note: worst-case connect ~10s when the active tab is discarded."
+    }
+  },
+  "exemptions": [
+    "siblings 'discarded' in CDP protocol JSONs: vendored wire-protocol schemas, not agent-browser behavior text.",
+    "siblings 'discarded' in browser.rs non-added lines: #1532 helper code (ensure_renderer_alive/renderer_responds) this PR reuses; already reviewed in its own PR."
+  ],
+  "issue_candidates": [
+    "PR body says 'Suite 911/911'; local suite is now ~989 total (969 filtered when running one connect test). Count is stale relative to current tree, not wrong at authoring time. Cosmetic; no action."
+  ]
+}

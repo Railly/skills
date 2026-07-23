@@ -1,0 +1,27 @@
+{
+  "date": "2026-07-23",
+  "repo": "vercel-labs/agent-browser",
+  "pr": 1589,
+  "head": "e9fc50e",
+  "base": "1ed371f",
+  "run": { "status": "complete" },
+  "scope": "merge-resolution review: origin/main (a11y #1596, release #1601, tab-revival #1532) merged into pin-tab branch; conflicts in README.md, commands.md, browser.rs (tab_switch/tab_close)",
+  "reviewer_model": "claude-opus-4-8",
+  "deterministic": { "style": "pass_with_exemption", "surfaces": "pass", "callers": "pass", "siblings": "pass" },
+  "lenses": { "merge_seam_correctness": "run", "contract_consistency": "run" },
+  "findings": [],
+  "verification": [
+    "tab_close signature change (main added dialog_session) — all call sites in diffed files; fixed our stale test caller tab_close(None,None)",
+    "tab_close successor-revival guarded by !bound_target_is_gone(): non-pin/pin-alive sessions still revive (guard false); pin+gone skips touching the neighbor — reasoned + e2e",
+    "tab_switch bind_active_target() rebind verified live: pinned session switching by targetId re-binds, binding file updated, pinned=true",
+    "e2e both features green: e2e_pin_tab_gone/rebinds/auto_attached_foreign + tab_new_with_label switch/close + switch_rejects_bare_integer",
+    "1048 unit tests pass, fmt+clippy clean"
+  ],
+  "exemptions": [
+    { "claim": "em dashes in added lines", "evidence": "AGENTS.md allows emdash sparingly, forbids only '--'; all flagged lines use ' — ' in prose/error strings with base precedent" }
+  ],
+  "issue_candidates": [
+    { "title": "shared-Chrome tab list returns all tabs incl. other sessions'; tabs[0] is not the session's own bound tab", "evidence": "dogfood: A's tab list[0] was the host tab; naive tabs[0] operates on a foreign tab", "scope": "pre-existing shared-Chrome semantics, not introduced by this PR" },
+    { "title": "non-pin session connect+open navigates the existing active tab (can clobber host/other session)", "evidence": "dogfood step: C without --pin-tab navigated the host tab", "scope": "by-design; pin is the isolation opt-in" }
+  ]
+}
