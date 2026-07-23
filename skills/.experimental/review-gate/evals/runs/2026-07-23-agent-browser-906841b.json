@@ -1,0 +1,67 @@
+{
+  "date": "2026-07-23",
+  "repo": "vercel-labs/agent-browser",
+  "pr": 1605,
+  "head_sha": "906841b3dce9b3859e4ea027b2a1924cff0fbac1",
+  "base_sha": "1ed371f3af472cc0d6cd8fdaea75d1a085ff7534",
+  "title": "feat(native): ship a default 1h daemon idle timeout",
+  "author": "ctate (human, co-authored joelhooks/jadenfix)",
+  "author_model": "unknown (human-authored)",
+  "reviewer_model": "claude-opus-4-8",
+  "same_family": false,
+  "run": {
+    "status": "complete"
+  },
+  "deterministic": {
+    "style": "pass",
+    "surfaces": "pass",
+    "siblings": "findings acknowledged (see exemptions)",
+    "callers": "compile-enforced; release build succeeded so every call site of the two changed signatures (StreamServer::start_without_client, DaemonState::new_with_stream) is updated"
+  },
+  "radius": {
+    "map_json": "2026-07-23-agent-browser-906841b.json",
+    "changed": 69,
+    "impacted": 492,
+    "edges": 7437,
+    "unresolvedCalls": 2377,
+    "note": "convergence set (393 items) is dominated by test functions constructing DaemonState; map under-covers real runtime callers (unresolvedCalls ~32% of edges, scipUnmapped 65). Directed attention to DaemonState + daemon loops + stream server, which free exploration also covered. No finding attributed solely to the map."
+  },
+  "lenses": {
+    "deliberate-default-check": "run \u2014 default change (unset: never-shutdown -> 1h) is intentional, documented across CHANGELOG/README/schema/docs/SKILL, and gated so it never reaps headed/attached/webdriver browsers. Clear.",
+    "emission-channel-and-latch": "run \u2014 stderr idle-shutdown notice is emitted by the daemon; lands in daemon log, not the attached CLI. Cleared as exemption: idle shutdown fires only when no CLI is attached, so the daemon log is the only available sink. No one-shot latch in the diff.",
+    "cancellation-timeout-hygiene": "run \u2014 timer re-arm on activity (Notify permit semantics safe), remaining-recheck handles command holding state lock past deadline, default re-arm for exempt browsers. Dogfooded: explicit reaps, 0 disables, default no early reap. Clear.",
+    "flag-propagation-dispatch-sweep": "run \u2014 idleTimeout reachable from CLI flag, env, config, and MCP; MCP maps to --idle-timeout with parity test. Dogfooded flag==env parity. Clear.",
+    "error-path-forcing": "run \u2014 unparseable -> default fallback forced (dogfood: banana -> warn + fallback, backstop intact). Clear.",
+    "new-failure-outcome-propagation": "run \u2014 close_all_browser_backends wraps close_current_browser + webdriver/appium/safari; swapped only into daemon-exit paths; drain (browser-process-died) path correctly keeps close_current_browser. handle_close ? semantics preserved. Clear.",
+    "docs-behavior-parity": "run \u2014 observable behavior fully documented; behavior matches docs including 'actively controlled' streaming wording. Clear.",
+    "dogfood-built-artifact": "run \u2014 built pr-1605 release binary, drove real headless Chrome (see verification)."
+  },
+  "findings": [],
+  "verification": {
+    "driven": [
+      "explicit AGENT_BROWSER_IDLE_TIMEOUT_MS=3000 open data-url -> daemon + socket/pid reaped within ~6s",
+      "next command in same session after reap -> transparent relaunch, exit 0",
+      "explicit =0 -> daemon persists past 4s",
+      "unset (default 1h) -> daemon NOT reaped early (alive after 4s)",
+      "env=banana -> flags warning shown + daemon launches (fallback to default backstop)",
+      "flag --idle-timeout 2s -> reaps (flag/env parity)",
+      "flag --idle-timeout banana -> warning + fallback, daemon launches",
+      "--help shows --idle-timeout and default: 3600000 = 1h"
+    ],
+    "unverified_gaps": [
+      "The 1h DEFAULT actually firing (cannot wait 1h in-session) \u2014 covered by unit tests test_resolve_idle_timeout_* and reasoning.",
+      "DEFAULT headed/attached/webdriver exemption re-arm under the real 1h default \u2014 covered by unit tests (blocks_default_idle_shutdown, test_default_idle_timeout_does_not_close_webdriver_sessions, test_provider_owned_cdp_connection_remains_idle_cleanup_eligible) + code reasoning; explicit timeouts intentionally do not exercise the exemption."
+    ]
+  },
+  "issue_candidates": [
+    "Passive dashboard/stream viewer of a headless browser: only input_mouse/keyboard/touch reset the idle clock, so a stream watched with zero input for the full default hour is reaped. Matches the 'actively controlled' docs wording, so not a defect, but monitoring-only use loses its browser. Low.",
+    "WebDriver-backed provider sessions are always blocked from default cleanup (is_webdriver short-circuits the provider-eligible override in default_idle_shutdown_is_blocked), which reads against the 'provider-owned cloud browsers remain eligible' phrasing. Defensible because WebDriver providers are local devices/simulators (genuinely headed). Doc-nuance only.",
+    "Pre-existing: docs/src/app/changelog/page.mdx:638 uses ' -- ' as a dash (house-norm violation). Not introduced by this PR."
+  ],
+  "exemptions": [
+    "siblings flags.rs/connection.rs/main.rs: idle-timeout plumbing unchanged; default is intentionally applied at the daemon layer (resolve_idle_timeout), unset stays None through flags so no spurious relaunch (fingerprint unchanged). Verified by reading each.",
+    "siblings doctor/launch.rs:85, doctor/webgpu.rs:228, commands.rs:3229 (idle_timeout: None): struct-literal fixture defaults, no behavior about the timeout default.",
+    "siblings docs/src/app/changelog/page.mdx: repo convention updates the docs changelog only in 'Prepare vX release' PRs (git log confirms); feature PRs add to root CHANGELOG.md 'Unreleased', which this PR did.",
+    "stderr idle-shutdown notice channel: acceptable \u2014 no CLI is attached during idle shutdown; daemon log is the only sink."
+  ]
+}
