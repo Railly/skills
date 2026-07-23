@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-22",
+    "repo": "agent-browser",
+    "base": "81c336c",
+    "head": "11fceed",
+    "status": "complete",
+    "gaps": ["ctate#1 and ctate#3 end-to-end triggers need real Chrome (e2e --ignored); verified at unit/caller-sweep layer only"]
+  },
+  "provenance": {
+    "author_model": "unknown (Codex/GPT per Hunter workflow)",
+    "reviewer_model": "claude-opus-4-8[1m]",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "new-failure-outcome-propagation", "status": "run", "reason": "tab_gone new outcome on active_session_id/active_target_id; all callers propagate via ? or degrade via .ok()" },
+    { "name": "non-destructive-recovery", "status": "run", "reason": "binding_snapshot returns None while gone; stale binding not overwritten" },
+    { "name": "error-path-forcing", "status": "run", "reason": "tab_binding load/save error branches forced by author tests, re-run green" },
+    { "name": "inverse-regression-surface", "status": "run", "reason": "index-0 default -> bound target; legacy unpinned path preserved and tested" },
+    { "name": "boundary-pipeline-trace", "status": "run", "reason": "batch + MCP boundaries traced; batch drops code and pinTab" },
+    { "name": "cancellation-timeout-hygiene", "status": "run", "reason": "no new unbounded waits; save() fsync bounded, no new async timeouts" },
+    { "name": "docs-behavior-parity", "status": "run", "reason": "all surface-map files present in diff (output.rs, README, SKILL, docs, mcp.rs)" }
+  ],
+  "deterministic": [
+    { "check": "surface-sweep (AGENTS.md surface map)", "outcome": "pass", "reason": "output.rs, README.md, skill-data SKILL+refs, docs/src/app, mcp.rs all in diff" },
+    { "check": "cli-mcp-parity", "outcome": "pass", "reason": "connect gains pinTab via call_connect; tab switch/close descriptions updated" },
+    { "check": "kebab-case flags", "outcome": "pass", "reason": "--pin-tab / --no-pin-tab kebab-case" },
+    { "check": "stale-value tab_gone/pinTab", "outcome": "pass", "reason": "TAB_GONE_PREFIX single source of truth" }
+  ],
+  "findings": [
+    { "id": "F1-ctate3", "state": "confirmed", "claim": "attachedToTarget auto-attach path still steals active tab and overwrites pin binding", "evidence": "actions.rs:949 uses add_page (activates+binds) for attached_page_sessions; setAutoAttach waitForDebuggerOnStart makes attachedToTarget the primary path for new pages; no-steal fix only patched targetCreated at actions.rs:1082; test_add_page_activates_and_binds proves add_page steals", "layer": "caller-sweep + manager unit; e2e trigger unverified (Chrome)", "source": "lens", "path": "cli/src/native/actions.rs:949" },
+    { "id": "F2-ctate4a", "state": "confirmed", "claim": "batch --json output omits the tab_gone code field", "evidence": "main.rs:1800 run_batch builds json!{command,success,result,error} with no code key; single-command path serializes full Response (code present via serde). Source-layer definitive.", "layer": "source enumeration", "source": "lens", "path": "cli/src/main.rs:1800" },
+    { "id": "F3-ctate4b", "state": "confirmed", "claim": "--pin-tab/--no-pin-tab not injected per-command in batch mode", "evidence": "pinTab injection lives only in single-command flow main.rs:1162-1166; run_batch only calls attach_plugins_to_command + attach_restore_config_to_command; an already-running unpinned daemon is never pinned by a --pin-tab batch, and --no-pin-tab cannot disable in batch", "layer": "source enumeration", "source": "lens", "path": "cli/src/main.rs:1794" },
+    { "id": "F4-ctate1", "state": "refuted", "claim": "pinning applied too late or binds index-0 not active tab", "evidence": "execute_command sets state.pin_tab before dispatch; apply_tab_binding_on_attach runs inside auto_launch/handle_launch before the triggering action; auto-connect unbound path opens fresh tab (open_fresh_tab_for_auto_connect) so bound tab is agent-owned not foreign index-0; restore_target_binding selects the bound index. Traced at source; full attach ordering not e2e-forced (Chrome).", "layer": "source trace; e2e gap noted", "source": "lens", "path": "cli/src/native/actions.rs:2561" },
+    { "id": "F5-ctate2", "state": "refuted", "claim": "gone bound tab silently recovers instead of tab_gone under pin", "evidence": "all active-page commands funnel through active_session_id()/active_target_id() which call check_bound(); tab_close(None) guarded; forced via test_restore_target_binding_missing_with_pin_enters_tab_gone + test_tab_close_current_in_tab_gone_state_errors (green). No unguarded active_page_index page-command path found in grep.", "layer": "manager unit (forced)", "source": "lens", "path": "cli/src/native/browser.rs:757" }
+  ],
+  "issueCandidates": [
+    { "id": "IC1", "claim": "looks_like_target_id treats any >=16-char all-hex string as a target id; a user label that happens to be 16+ hex chars and is not a valid label resolves as Target, but is_valid_label gate mitigates", "path": "cli/src/native/browser.rs:50", "whyOutOfScope": "heuristic is new in this diff but no concrete collision demonstrated; low severity" }
+  ]
+}
