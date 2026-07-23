@@ -48,6 +48,17 @@
       "true_discard_revive_branch": "Self-unblocked: enabled chrome://discards via CDP shadow-pierce eval on chrome://chrome-urls ('Enable internal debugging pages'), then clicked [Urgent Discard] (div[is=action-link]) on all 3 tabs = genuine Chrome Memory-Saver discard (all renderers DEAD, targets retained). FIXED binary connect returned in 9662ms (bounded: 3s idx0 + 3s concurrent tail + ensure_renderer_alive re-probe/activate/re-probe), active tab t1 example.com REVIVED to ALIVE via Target.activateTarget, other two stay discarded as designed. The all-discarded revive path is now verified on real Chrome, not only the mock. UX note: worst-case connect ~10s when the active tab is discarded."
     }
   },
+  "merge_reverify": {
+    "head_sha": "e3c8fb1",
+    "reason": "Base branch fix/discarded-tab-switch advanced (merged main, v0.33.0); PR went CONFLICTING. Merged base into branch (no rebase).",
+    "conflicts_resolved": [
+      "browser.rs: my find_live_page_index vs base's new resume_if_waiting at same insertion point -> kept both.",
+      "browser.rs tests: my 5 connect tests + start_mock_cdp_connect vs base's dialog-blocked helper + test, interleaved by git -> reconstructed both intact (no stitched mutant fn).",
+      "API change: base made ensure_renderer_alive take dialog_session: Option<&str> and return RendererState (was bool). Updated my connect-revive call to pass None (no dialog at connect); return value discarded."
+    ],
+    "verification": "cargo build clean; full suite 1013 passed / 0 failed (incl. my 5 connect tests + base's dialog test); fmt + clippy clean. Re-dogfooded the all-discarded revive on real Chrome (genuine chrome://discards Urgent Discard) because that path now flows through the refactored ensure_renderer_alive: connect returned 9.5s bounded, active tab revived to ALIVE via Target.activateTarget, others stay discarded. Behavior identical to pre-merge. Skip-to-live path unchanged (byte-identical + covered by mock + prior real-Chrome drive), not re-driven.",
+    "result": "Pushed e3c8fb1; PR mergeable."
+  },
   "exemptions": [
     "siblings 'discarded' in CDP protocol JSONs: vendored wire-protocol schemas, not agent-browser behavior text.",
     "siblings 'discarded' in browser.rs non-added lines: #1532 helper code (ensure_renderer_alive/renderer_responds) this PR reuses; already reviewed in its own PR."
