@@ -267,8 +267,23 @@ check_timings() {
 		grep -E '^\+' | grep -vE '^\+\+\+' |
 		grep -oE "${ceiling_re}[[:space:]]*[:=][[:space:]]*[0-9_]+" |
 		sed -E 's/[[:space:]]*[:=][[:space:]]*/ /' | sort -u || true)
+	# A ceiling bound to an expression over other constants is the shape this
+	# gate wants authors to reach; it has no literal to compare, so report it
+	# for a read instead of letting it read as "no ceiling added".
+	local derived
+	derived=$(git diff "$base" --unified=0 -- "${@:-.}" 2>/dev/null |
+		grep -E '^\+' | grep -vE '^\+\+\+' |
+		grep -oE "${ceiling_re}[[:space:]]*[:=][[:space:]]*[A-Za-z_][A-Za-z0-9_]*[[:space:]]*[-+*][^;,)]*" | sort -u || true)
+	if [[ -n "$derived" ]]; then
+		echo "NOTE [timings] ceiling derived from other constants; confirm the operands are the producer's worst case:"
+		printf '    %s\n' "$derived"
+	fi
 	if [[ -z "$added_consts" ]]; then
-		echo "PASS [timings] the diff adds no wait ceiling"
+		if [[ -n "$derived" ]]; then
+			echo "PASS [timings] every added ceiling is derived, none is a bare literal"
+		else
+			echo "PASS [timings] the diff adds no wait ceiling"
+		fi
 		return 0
 	fi
 	local all_consts=""
