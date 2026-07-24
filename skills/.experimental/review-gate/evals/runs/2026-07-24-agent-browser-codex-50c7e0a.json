@@ -1,0 +1,27 @@
+{
+  "date": "2026-07-24", "repo": "vercel-labs/agent-browser", "pr": 1589,
+  "head_reviewed": "d007487", "merged_head": "50c7e0a", "base": "1ed371f",
+  "run": { "status": "complete" },
+  "scope": "final independent pass: review-gate skill executed verbatim by a Codex subagent (gpt-5.6-sol) over the PR",
+  "author_model": "claude-opus-4-8", "reviewer_model": "gpt-5.6-sol", "same_family": false,
+  "findings": [
+    { "id": "F1", "severity": "high", "state": "confirmed_and_fixed",
+      "claim": "A failed runtime pin toggle mutated state.pin_tab and BrowserManager before persisting, so a load/save error returned an error while the live isolation mode had already flipped (torn state).",
+      "verified_by": "reproduced through the built CLI: failed --no-pin-tab left the daemon unpinned in memory (tab close gave code=None instead of tab_gone) despite the command erroring",
+      "fix": "persist first, commit state.pin_tab + set_pin_tab only after persistence succeeds (commit 28560b9)",
+      "revalidated": "post-fix dogfood: failed --no-pin-tab then tab close now yields tab_gone (still pinned in memory)" },
+    { "id": "F2", "severity": "low", "state": "refuted_as_house_style",
+      "claim": "8 added lines contain em dashes, flagged as a style violation.",
+      "refutation": "em dashes are established repo style in code: 12 files on origin/main use them (actions.rs 10, e2e_tests.rs 15, interaction.rs 13). AGENTS.md forbids '--' double-hyphen, not em dashes, and permits emdash sparingly. The universal em-dash gate over-fires against the repo's own convention; kept exempt, did not churn author lines." },
+    { "id": "G1", "severity": "info", "state": "not_a_gap",
+      "claim": "force-red of the new regression tests was unverified.",
+      "note": "artifact of the reviewer's no-source-modification constraint; force-red was already verified by the author in earlier runs for all new tests." }
+  ],
+  "exemptions": [
+    { "claim": "em dashes exempt", "evidence": "established repo-wide code style (see F2)" }
+  ],
+  "issue_candidates": [
+    { "title": "respawned daemon on a non-attach command returns about:blank instead of reconnecting to the (pinned) tab", "scope": "pre-existing daemon respawn behavior, out of scope for this PR" }
+  ],
+  "also": "resolved a fresh origin/main merge round (a11y #1596, release v0.33.0 #1601, revive-discarded-tabs #1532, invalid-CSS-selector #1604, tab-select-at-connect #1543, 1h idle timeout #1605); struct gained a `headless` field, reconciled in 4 initializers + test helper. 1067 unit tests, clippy, pin+a11y e2e all green."
+}

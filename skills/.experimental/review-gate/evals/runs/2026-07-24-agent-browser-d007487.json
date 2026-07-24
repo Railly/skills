@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-24",
+    "repo": "vercel-labs/agent-browser",
+    "base": "1ed371f3af472cc0d6cd8fdaea75d1a085ff7534",
+    "head": "d0074876d354083fb02574cc6f8c35dddb6d4af5",
+    "status": "incomplete",
+    "gaps": [
+      "Force-red validation of the new regression tests could not be run because it requires temporarily reverting source code, while this review explicitly prohibits modifying source files."
+    ]
+  },
+  "provenance": {
+    "author_model": "claude-opus-4-8",
+    "reviewer_model": "gpt-5.6-sol",
+    "same_family": false
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, or lookup data source was replaced."},
+    {"name":"New-domain matrix","status":"skipped","reason":"No validator or trigger condition was widened."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No overlapping hostname, route, or key resolution rule changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No one-shot warning latch was added; response warnings are returned through the daemon response to the attached CLI and were covered by error-path and serialization passes."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No external-binary shim was added."},
+    {"name":"Deliberate-default check","status":"run","reason":"Discovered-target activation behavior changes; legacy non-pin activation was checked in code and by the a11y e2e."},
+    {"name":"Fresh-seam scan","status":"skipped","reason":"The diff does not patch a runtime or framework to expose a signal."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"No reference semantic or written-spec behavior is reimplemented."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Pin persistence and tab-gone add new error outcomes; callers and daemon state mutations were inspected and forced."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"The new pin-tab mode crosses single command, batch, MCP, daemon launch/reuse, attach, restore, and event handlers."},
+    {"name":"Error-path forcing","status":"run","reason":"Persistence load/save failures, tab-gone recovery, and target-event branches were reviewed; runtime toggle persistence failure was forced through the built CLI."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic-driven recovery action is introduced."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Changed tab switch and close paths interact with bounded renderer probes; focused and full tests passed."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Persistent binding crosses CLI, daemon, filesystem, CDP target discovery, and restart boundaries."},
+    {"name":"Substrate verification","status":"run","reason":"The built binary was driven with isolated socket directories and binding persistence failures were observed on the filesystem boundary."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The exact debug binary was driven with real Chrome for pin enable/disable, batch, restart-related persistence, and error cases."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Observable flag, error, persistence, and target-id behavior was compared across help, MCP, README, docs, and skill data."},
+    {"name":"Demonstrative example","status":"run","reason":"New shared-CDP pin-tab examples were checked against the built CLI behavior."},
+    {"name":"Choice audit","status":"skipped","reason":"No .decisions.tsv decision trail exists."},
+    {"name":"Complexity budget","status":"skipped","reason":"No new per-element or per-candidate loop or nested membership check is introduced in the focused subsystem."}
+  ],
+  "deterministic": [
+    {"check":"style","outcome":"acknowledged","reason":"Eight added code, comment, and documentation lines contain em dashes, forbidden by the project conventions."},
+    {"check":"surfaces","outcome":"pass","reason":"All convention-mapped surfaces required by actions.rs and browser.rs are present in the diff."},
+    {"check":"stale","outcome":"pass","reason":"Not applicable: the diff adds pin-tab and does not rename or retire a duplicated contract value."},
+    {"check":"siblings: pin-tab","outcome":"pass","reason":"Every file mentioning pin-tab is in the diff and no untouched pin-tab passage was flagged."},
+    {"check":"siblings: activation","outcome":"acknowledged","reason":"Protocol JSON, axe.min.js, skills-page prose, README generic activation, and unrelated command prose do not describe discovered-tab activation; browser.rs activation passages were read and remain consistent."},
+    {"check":"callers","outcome":"pass","reason":"All mechanically enumerated call sites for the changed tab-binding, tab-switch, tab-close, and batch functions are in diffed files and were inspected."},
+    {"check":"force-red","outcome":"acknowledged","reason":"Applicable new regression tests could not be forced red without violating the no-source-modification constraint."},
+    {"check":"cargo fmt --check","outcome":"pass","reason":"Passed."},
+    {"check":"cargo clippy -D warnings","outcome":"pass","reason":"Passed."},
+    {"check":"cargo test","outcome":"pass","reason":"1049 unit tests and 2 integration tests passed; 100 ignored e2e tests were not part of this command."},
+    {"check":"focused e2e","outcome":"pass","reason":"Both pin-tab e2e tests and the a11y nested-frame tab-switch regression e2e passed serially."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"Map generated with 141 changed and 836 impacted symbols, but 0 edges and 2381 unresolved calls make it severely under-covering."}
+  ],
+  "findings": [
+    {
+      "id":"F1",
+      "state":"confirmed",
+      "claim":"A failed runtime pin toggle is not rolled back, so the command reports failure after already changing the daemon's live isolation mode.",
+      "evidence":"actions.rs sets state.pin_tab and calls BrowserManager::set_pin_tab before loading/saving the binding. With a live pinned session and a non-writable binding directory, `--no-pin-tab get url --json` returned a persistence error; the following unflagged command succeeded with a persistence warning that omitted the pin-isolation warning, confirming the daemon remained unpinned. The symmetric failed enable remained enabled in memory.",
+      "layer":"foreground CLI through daemon state and filesystem persistence",
+      "source":"lens",
+      "path":"CLI pinTab envelope -> execute_command state mutation -> tab_binding::save failure -> next command observes mutated state"
+    },
+    {
+      "id":"F2",
+      "state":"confirmed",
+      "claim":"Added lines violate the repository rule that forbids em dashes in code, output, and documentation.",
+      "evidence":"gate.sh style reported eight added lines containing an em dash: four user-facing error strings, three comments/doc comments, and one skill-data prose line.",
+      "layer":"deterministic house style",
+      "source":"gate",
+      "path":""
+    },
+    {
+      "id":"G1",
+      "state":"unverified",
+      "claim":"The new regression tests have not been proven to fail when their guarded implementation is reverted.",
+      "evidence":"The force-red gate requires reverting implementation code while retaining tests; the review hard constraint prohibits any source modification, so this empirical layer was unavailable.",
+      "layer":"regression-test sensitivity",
+      "source":"gate",
+      "path":""
+    }
+  ],
+  "exemptions": [
+    {"claim":"The broad activation sibling hits outside the diff are unaffected.","evidence":"The protocol JSON and axe.min.js hits are vendored API/accessibility text, docs/src/app/skills is general skill activation prose, and the README and commands-reference hits describe unrelated activation concepts rather than CDP discovered-tab activation."},
+    {"claim":"No same-family review warning is required.","evidence":"The recorded author model is claude-opus-4-8 and reviewer model is gpt-5.6-sol, so same_family is false."}
+  ],
+  "issue_candidates": []
+}
