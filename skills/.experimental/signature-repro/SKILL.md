@@ -33,6 +33,20 @@ you closed the loop.
 The failure mode to avoid: seeing a missing flag and declaring victory. A missing
 flag is a lead, not a proof. If you can't confirm, say STRONG HYPOTHESIS honestly.
 
+## Before you invest: is it already fixed?
+
+Before repro'ing or writing a fix, check whether a fix already exists — search the
+tracker for PRs that reference the issue (`gh issue view N --json` timeline, or
+`gh pr list --search "N in:body"`), and read the closed ones too. A generic
+"related PRs" graph tool can miss these; the issue's own timeline cross-references
+are authoritative. If an open PR already fixes it, your value is NOT a duplicate
+fix — it's whatever that PR lacks: an independent repro, a cross-platform
+confirmation (most community fixes are confirmed on one OS only), or a missing test
+case. Building a parallel fix you can't merge, or opening a competing PR, is wasted
+work. (This session: a from-memory "no competing PR" was wrong — two PRs already
+fixed it identically; the real contribution was confirming the open one on the two
+OSes nobody had tested.)
+
 ## The method
 
 1. **State the mechanism hypothesis.** What class of thing produces this symptom?
@@ -59,6 +73,14 @@ flag is a lead, not a proof. If you can't confirm, say STRONG HYPOTHESIS honestl
    platform's mood — decides the outcome. (Worked example: to hit a launch error
    path, point the launcher at a fake browser that spawns a child tree and never
    opens its port, forcing the timeout branch identically on all three OSes.)
+   **Confirm the fix with an ISOLATED probe, not a live-system count.** Counting
+   surviving processes after driving the real daemon is often confounded: a daemon
+   that retries the failing operation keeps one attempt in-flight at all times, so
+   the count reads a constant (e.g. "3 orphans") on BOTH the buggy and the fixed
+   build — it can't discriminate. The decisive verification is the fix's own unit
+   test built and run on each OS (deterministic, no daemon), or a single-shot call
+   to the faulty function. When the end-to-end count won't discriminate, say so —
+   don't report a confounded number as a contradiction.
 5. **Write cause + fix direction + certainty label**, citing the exact signature.
 
 ## Visual bugs: capture and LOOK
