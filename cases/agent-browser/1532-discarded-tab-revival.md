@@ -1,17 +1,17 @@
 # Case: Revive a discarded tab on switch without losing live-tab state
 
-Status: candidate
+Status: reviewed
 Validation: contributor-validated
 Human review: pending
-Maintainer acceptance: changes-requested (round-2 points addressed in rounds 3-6, re-review pending)
-Delivery: PR open (branch head 0cfb8a6)
+Maintainer acceptance: approved (merged 2026-07-23)
+Delivery: merged (squash commit 1ed371f on main)
 Visibility: public
 Repository: vercel-labs/agent-browser
 Role: contributor
 Source: https://github.com/vercel-labs/agent-browser/pull/1532
-Upstream status checked: 2026-07-21
+Upstream status checked: 2026-07-23
 
-> Contributor-validated: the unit suite, clippy 1.97, and a real-Chrome plus mock-daemon dogfood were run against the pushed artifact. Maintainer re-review of the review-response commit is pending.
+> Contributor-validated: the unit suite, clippy 1.97, and a real-Chrome plus mock-daemon dogfood were run against the pushed artifact. Merged to main as squash commit 1ed371f (2026-07-23) after a merge-with-main conflict resolution (round 7 below).
 
 ## Observed failure
 
@@ -106,6 +106,21 @@ Smallest destination: `reference rule` — extends the existing new-failure-outc
 Deferred as issue candidates (not blockers): two simultaneous dialogs in different tabs (single-slot `pending_dialog`), DevTools debugger-pause misclassification, the sub-second auto-handled-dialog tracking race, and the connect-path first-target gap (covered by PR #1543).
 
 Run reports: `evals/runs/2026-07-20-agent-browser-61b6c63.json`, `2026-07-21-agent-browser-45d724b.json`, `2026-07-21-agent-browser-25c81ec.json` in the review-gate skill.
+
+## Round 7 (2026-07-23): merge-with-main conflict, then merged
+
+Between review and merge, `main` advanced (through `2a6d5d0`, the v0.33.0 release) and `git merge origin/main` conflicted in one file, `cli/src/native/actions.rs`, in `handle_tab_close` — the exact function the round-6 fix had touched. Two collisions in one function, both between this PR's behavioral change and a main-side refactor:
+
+1. `tab_id` resolution block: the PR kept `mgr` borrowed inside the `Some` arm; main had hoisted the `state.browser` borrow to the top of the block and added the `None => None` arm. Structurally independent of the PR's intent — took main's hoisted form.
+2. The clear-refs region: the PR's round-6 ordering (`result` block first, then clear `ref_map`/`active_frame_id`) collided with main's rename `iframe_sessions` → `active_iframe_sessions` plus a new `state.refresh_active_iframe_sessions().await` call. Kept the PR's clear-after-commit ordering AND main's rename and refresh call; dropped main's duplicate second `result` block (the PR had already moved it above the clear).
+
+Correctness anchor for the resolution: the merged `browser.rs` already carried the PR's two-arg `tab_close_by_id(tab_id, dialog_session)` signature (auto-merged), so the resolved `actions.rs` had to call it with both args — a one-arg call would not have compiled. Verified: `cargo check` clean, and the pre-push hook ran `cargo fmt --check` + `cargo clippy -D warnings` green before the push. PR flipped from CONFLICTING/DIRTY to MERGEABLE, then squash-merged as `1ed371f`.
+
+### Transferable lesson (round 7)
+
+> A merge conflict inside a function you just refactored is usually a real semantic overlap, not a textual accident: resolve by identity, not by picking a side. Each hunk here mixed one behavioral intent (clear-after-commit, two-arg close) with one main-side refactor (borrow hoist, field rename, new refresh call); the correct resolution keeps both and drops only what the PR had already superseded (the duplicate `result` block). The cross-file signature already on merged `main` (`tab_close_by_id`'s two args) is the anchor that tells you which side is load-bearing — let the type checker, not memory, confirm it (`cargo check` + the pre-push clippy gate). Merge, not rebase, so the reviewed SHAs upstream are preserved.
+
+Smallest destination: `no change` — reinforces the existing merge-not-rebase reference rule; adds no new gate.
 
 ## Confidentiality review
 
