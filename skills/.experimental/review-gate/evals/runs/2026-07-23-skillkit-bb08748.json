@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-23",
+    "repo": "crafter-station/skillkit",
+    "base": "58ece3a3ebce12fcf6c121343eceee1b7d6d4aa3",
+    "head": "bb08748",
+    "status": "complete",
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "unknown (commits carry no model trace; Hunter pipeline typically Codex)",
+    "reviewer_model": "claude-opus-4-8",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "double-count / dedupe key stability", "status": "run", "reason": "diff adds multi-source connectors sharing recordNewInvocations dedupe" },
+    { "name": "cross-connector source collision (cline-family vs cursor/windsurf)", "status": "run", "reason": "vscodeGlobalStorageBases spans Cursor/Windsurf app dirs" },
+    { "name": "registry id / flag consistency", "status": "run", "reason": "new ids vs AGENT_FLAGS and LEGACY_IDS" },
+    { "name": "resolveRegistryDir token coverage", "status": "run", "reason": "vendored JSON tokens vs resolver prefixes" },
+    { "name": "complexity budget / perf", "status": "run", "reason": "scan was 25s cold; new connectors must be cache-gated" },
+    { "name": "error-path forcing (missing/corrupt sources)", "status": "run", "reason": "each count/scan claims 0 on absent source" },
+    { "name": "docs-behavior parity", "status": "run", "reason": "README supported-agents table + filter claims" },
+    { "name": "new-domain matrix", "status": "skipped", "reason": "no validator widened; connectors add new domains covered by the double-count lens" },
+    { "name": "force-red", "status": "skipped", "reason": "all new tests are birth tests for new parsers; no fix to revert against. The dedupe drift has no guarding test, reported as finding F1/F2" },
+    { "name": "choice audit", "status": "skipped", "reason": "no decision trail emitted" }
+  ],
+  "deterministic": [
+    { "check": "bun test packages/cli", "outcome": "pass", "reason": "135 pass 0 fail" },
+    { "check": "biome check scanner/ scripts/", "outcome": "acknowledged", "reason": "6 errors 9 warnings; in-diff: registry.ts format+organizeImports, sync-agent-registry.ts 4x noNonNullAssertion + noAssignInExpressions; rest preexisting (gemini/cursor/claude/auto-scan/index AlreadyTracked already orphaned in main)" },
+    { "check": "tsc --noEmit (minus stated exemptions)", "outcome": "acknowledged", "reason": "3 NEW errors in new files: amp.ts:51, copilot.ts:45, openhands.ts:37 (string|undefined vs string|null, same class as exempted codex.ts:41 but new code)" },
+    { "check": "smoke scan/stats", "outcome": "pass", "reason": "both exit 0; cold --full scan 24.5s (matches 25s baseline), cached 0.1s" },
+    { "check": "radius impact", "outcome": "pass", "reason": "182 changed, 28 impacted, 844 edges, unresolvedCalls 2321 >> edges: map under-covers (dynamic import of registry.ts is invisible); top items runScan/performScan/scanInstalledSkills all inspected" },
+    { "check": "heavy/sensitive staged content", "outcome": "pass", "reason": "only .ts/.json/.md fixtures, largest 482 lines" }
+  ],
+  "findings": [
+    { "id": "F1", "state": "confirmed", "claim": "Cline-family: one skill invocation recorded twice per task (ui_messages.json real ts + api_conversation_history.json fallback ts produce distinct trackedSet keys); deduplicateInvocations cannot clean it (groups by exact timestamp)", "evidence": "repro: scanClineFamilyTasks over the repo's own cline-task fixture recorded resend x2 and deslop x2 for one task", "layer": "scan pipeline, in-memory db", "source": "lens", "path": "packages/cli/src/scanner/connectors/cline-family.ts:457-476" },
+    { "id": "F2", "state": "confirmed", "claim": "Windsurf ItemTable chat bubbles re-record every historical invocation on every scan where state.vscdb fingerprint changed (fallbackTimestamp = new Date() per scan); unbounded growth for active Windsurf users, fired automatically by SessionEnd auto-scan", "evidence": "repro: two parses of the unchanged windsurf-chatdata fixture 1.1s apart recorded resend twice", "layer": "scan pipeline, in-memory db", "source": "lens", "path": "packages/cli/src/scanner/connectors/windsurf.ts:304,150-188" },
+    { "id": "F3", "state": "confirmed", "claim": "Continue sessions not in sessions.json index use file mtime as the single timestamp for all invocations; an active session re-records its full history each scan while it keeps changing", "evidence": "repro: same session file, mtime moved, second scan recorded the same call1 invocation again", "layer": "scan pipeline, in-memory db", "source": "lens", "path": "packages/cli/src/scanner/connectors/continue.ts:194,135-141" },
+    { "id": "F4", "state": "confirmed", "claim": "4 of 9 new connectors (cline, kilocode, copilot, openhands) unreachable via agent filter: AGENT_FLAGS has no flags for them, while README claims 'Filter any command by agent' over the full table; --kiro and --antigravity flags map to ids with no connector so they silently scan nothing", "evidence": "tui/args.ts AGENT_FLAGS enumerated vs registry.ts connector ids; args.ts absent from diff", "layer": "static enumeration", "source": "gate", "path": "packages/cli/src/tui/args.ts:1-14" },
+    { "id": "F5", "state": "confirmed", "claim": "Regression vs main: skillkit --kiro matched installed-skill detection in main (hardcoded id 'kiro'); registry-driven skills.ts now yields id 'kiro-cli' with no LEGACY_IDS mapping, so --kiro matches nothing", "evidence": "main:skills.ts had { agent: 'Kiro', id: 'kiro' }; generated JSON only has kiro-cli; LEGACY_IDS lacks the entry", "layer": "static, main-vs-branch diff", "source": "lens", "path": "packages/cli/src/scanner/skills.ts:13-18" },
+    { "id": "F6", "state": "confirmed", "claim": "3 new tsc errors in new connector files (string|undefined not assignable to string|null on regex match[1])", "evidence": "tsc --noEmit output: amp.ts(51), copilot.ts(45), openhands.ts(37)", "layer": "typecheck", "source": "gate", "path": "packages/cli/src/scanner/connectors/amp.ts:51" },
+    { "id": "F7", "state": "confirmed", "claim": "Loose SKILL.md-path text extraction (requireKnown:false) records invocations from mere path mentions in assistant prose, and the auto-scan garbage cleanup only covers codex/cursor/gemini, never the 9 new agents", "evidence": "repro recorded x-momentum from a plain string mention and tiktok from a read path; auto-scan.ts:177 DELETE clause agent IN ('codex','cursor','gemini')", "layer": "scan pipeline + cleanup query", "source": "lens", "path": "packages/cli/src/scanner/auto-scan.ts:175-181" },
+    { "id": "F8", "state": "unverified", "claim": "Kilo Code may double-count migrated sessions: scanKiloSessions sums legacy task dirs + kilo.db unconditionally, unlike goose which treats the db as single source of truth once it exists; countKiloSessions definitely sums both. Whether the same invocation lands twice depends on whether kilo's legacy migration preserves original timestamps and keeps legacy dirs on disk", "evidence": "gap: kilo upstream migration semantics (packages/kilo-vscode/src/legacy-migration/task-store.ts) not fetched/verified in this run", "layer": "static contrast against goose.ts:360-362 comment", "source": "lens", "path": "packages/cli/src/scanner/connectors/kilocode.ts:187-214" }
+  ],
+  "exemptions": [
+    { "claim": "Preexisting Biome errors (gemini/cursor/claude noAssignInExpressions+noNonNullAssertion, auto-scan noUnusedImports, index.ts AlreadyTracked) are not this diff's debt", "evidence": "files untouched by diff; AlreadyTracked had exactly 1 occurrence (declaration only) in main too" },
+    { "claim": "queries.test.ts / burn.ts / codex.ts:41 tsc errors exempted per task brief", "evidence": "verified all listed errors match the brief's exemption list" },
+    { "claim": "cursor and windsurf dedicated connectors do NOT collide with cline-family's Cursor/Windsurf globalStorage bases", "evidence": "cursor reads ~/.cursor/projects jsonl; windsurf reads state.vscdb; cline-family reads globalStorage/saoudrizwan.claude-dev/tasks -- disjoint stores, cline tasks in Cursor storage are correctly attributed to cline" },
+    { "claim": "goose has no db+legacy double count", "evidence": "scanGooseSessions returns after db path when sessions.db exists; legacy files only scanned when db absent (goose.ts:363-368)" },
+    { "claim": "resolveRegistryDir handles every token in the vendored JSON", "evidence": "all 73 non-null globalSkillsDir values start with ~/, $XDG_CONFIG/, $CODEX_HOME/ or $CLAUDE_HOME/; sync script returns null for unresolvable expressions and skills.ts skips nulls" },
+    { "claim": "no perf regression: new connectors are all cache-gated per file or per db fingerprint", "evidence": "cold --full 24.5s equals the 25s pre-diff baseline; cached 0.1s; every new scan loop calls cache.shouldSkip before parsing" },
+    { "claim": "crash safety holds for missing and corrupt sources", "evidence": "full scan on machine with zero new-connector sources exits 0; corrupt sessions.db and missing db both return 0 via scanGooseDb" }
+  ],
+  "issue_candidates": [
+    { "title": "roundTs-based dedupe key is structurally fragile for any connector whose two views of one event carry timestamps >1s apart", "evidence": "trackedSet key skillName::second-rounded-ts; F1/F2/F3 are three instances of the same root cause; a per-event stable id (sessionId+callId) would fix the class", "why_out_of_scope": "recordNewInvocations and roundTs predate this diff; the diff only multiplied the exposure" },
+    { "title": "copilot connector dedupes skill.invoked/tool-path per session (seenSkills) but the knownSkills branch bypasses push and records every occurrence", "evidence": "copilot.ts:122-131 pushes directly to results, skipping the seenSkills guard used by every other branch", "why_out_of_scope": "internal inconsistency with no confirmed miscount repro in this run; behavior question (dedupe-per-session vs count-each) for the author" },
+    { "title": "cline registry entry maps to ~/.agents/skills == sharedDir, so getDetectedAgents('cline') always returns [] even with Cline installed", "evidence": "skills.ts:47 dir===sharedDir continue; cline's globalSkillsDir in the JSON is ~/.agents/skills", "why_out_of_scope": "intended per the double-count comment, but the user-visible effect (cline never 'detected') is a design question, not a diff defect" }
+  ]
+}
