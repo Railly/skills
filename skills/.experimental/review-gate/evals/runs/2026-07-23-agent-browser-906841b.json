@@ -48,11 +48,17 @@
       "flag --idle-timeout banana -> warning + fallback, daemon launches",
       "--help shows --idle-timeout and default: 3600000 = 1h",
       "GAP CLOSED via manually-lowered DEFAULT_IDLE_TIMEOUT_MS (1h->3s, rebuilt): default(unset)+headless -> reaped in ~6s (default fires on headless)",
-      "default(unset)+headed (--headed) -> ALIVE after 8s (>2 timer cycles): headed exemption re-arms and does not close the browser under a human"
+      "default(unset)+headed (--headed) -> ALIVE after 8s (>2 timer cycles): headed exemption re-arms and does not close the browser under a human",
+      "FULL DIMENSION SWEEP (default lowered to 3s, rebuilt): default+attached(--cdp 9333 external Chrome) -> daemon ALIVE 8s, external Chrome not killed (attached exempt)",
+      "default+headless+extension (effectively-headed, subject of 906841b) -> ALIVE 8s (exempt)",
+      "explicit 2s + headed -> reaped (explicit not exempt, contrast)",
+      "default + PASSIVE stream (ws client connected, 0 input) -> reaped (frames/connection do not reset timer; confirms issue candidate #1)",
+      "default + ACTIVE stream (ws input_mouse every 1s) -> ALIVE at 7s; input stops -> reaped ~5s later (dashboard input marks shared IdleActivity end-to-end through the real websocket)"
     ],
     "unverified_gaps": [
-      "attached(connect_cdp) and WebDriver default exemptions not driven individually, but hit the SAME daemon-loop re-arm branch as the driven headed case (only the blocks_default_idle_shutdown predicate differs; those predicates are unit-tested).",
-      "The literal 1h wall-clock value (only the mechanism was driven, at 3s)."
+      "provider-owned CDP eligible-for-cleanup and WebDriver/Safari/iOS exempt: not driven (need a provider plugin / iOS device); hit unit-tested predicates (test_provider_owned_cdp_connection_remains_idle_cleanup_eligible, test_default_idle_timeout_does_not_close_webdriver_sessions).",
+      "lightpanda engine eligible: not installed on this machine.",
+      "literal 1h wall-clock (mechanism driven at 3s)."
     ]
   },
   "issue_candidates": [
@@ -66,5 +72,6 @@
     "siblings docs/src/app/changelog/page.mdx: repo convention updates the docs changelog only in 'Prepare vX release' PRs (git log confirms); feature PRs add to root CHANGELOG.md 'Unreleased', which this PR did.",
     "stderr idle-shutdown notice channel: acceptable \u2014 no CLI is attached during idle shutdown; daemon log is the only sink."
   ],
-  "method_note": "Default-path exemption gap closed by temporarily editing DEFAULT_IDLE_TIMEOUT_MS to 3s, rebuilding, driving headless(reap) vs headed(survive), then reverting the edit."
+  "method_note": "Default-path exemption gap closed by temporarily editing DEFAULT_IDLE_TIMEOUT_MS to 3s, rebuilding, driving headless(reap) vs headed(survive), then reverting the edit.",
+  "dimension_sweep": "7 runtime cases of blocks_default_idle_shutdown + idle path driven against a 3s-default build: headless(reap), headed(survive), attached(survive), extension-forced-headed(survive), explicit+headed(reap), passive-stream(reap), active-stream(survive->reap). No new nits or bugs; all match docs."
 }
