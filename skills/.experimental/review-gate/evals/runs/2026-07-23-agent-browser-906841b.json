@@ -46,11 +46,13 @@
       "env=banana -> flags warning shown + daemon launches (fallback to default backstop)",
       "flag --idle-timeout 2s -> reaps (flag/env parity)",
       "flag --idle-timeout banana -> warning + fallback, daemon launches",
-      "--help shows --idle-timeout and default: 3600000 = 1h"
+      "--help shows --idle-timeout and default: 3600000 = 1h",
+      "GAP CLOSED via manually-lowered DEFAULT_IDLE_TIMEOUT_MS (1h->3s, rebuilt): default(unset)+headless -> reaped in ~6s (default fires on headless)",
+      "default(unset)+headed (--headed) -> ALIVE after 8s (>2 timer cycles): headed exemption re-arms and does not close the browser under a human"
     ],
     "unverified_gaps": [
-      "The 1h DEFAULT actually firing (cannot wait 1h in-session) \u2014 covered by unit tests test_resolve_idle_timeout_* and reasoning.",
-      "DEFAULT headed/attached/webdriver exemption re-arm under the real 1h default \u2014 covered by unit tests (blocks_default_idle_shutdown, test_default_idle_timeout_does_not_close_webdriver_sessions, test_provider_owned_cdp_connection_remains_idle_cleanup_eligible) + code reasoning; explicit timeouts intentionally do not exercise the exemption."
+      "attached(connect_cdp) and WebDriver default exemptions not driven individually, but hit the SAME daemon-loop re-arm branch as the driven headed case (only the blocks_default_idle_shutdown predicate differs; those predicates are unit-tested).",
+      "The literal 1h wall-clock value (only the mechanism was driven, at 3s)."
     ]
   },
   "issue_candidates": [
@@ -63,5 +65,6 @@
     "siblings doctor/launch.rs:85, doctor/webgpu.rs:228, commands.rs:3229 (idle_timeout: None): struct-literal fixture defaults, no behavior about the timeout default.",
     "siblings docs/src/app/changelog/page.mdx: repo convention updates the docs changelog only in 'Prepare vX release' PRs (git log confirms); feature PRs add to root CHANGELOG.md 'Unreleased', which this PR did.",
     "stderr idle-shutdown notice channel: acceptable \u2014 no CLI is attached during idle shutdown; daemon log is the only sink."
-  ]
+  ],
+  "method_note": "Default-path exemption gap closed by temporarily editing DEFAULT_IDLE_TIMEOUT_MS to 3s, rebuilding, driving headless(reap) vs headed(survive), then reverting the edit."
 }
