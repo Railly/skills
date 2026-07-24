@@ -17,6 +17,9 @@ Usage:
   gate.sh producers <shape-regex> [<base-ref>] [<path>...]
                                               When a diff narrows an error classifier, every error-string producer matching the OLD shape
                                               and living outside the diff must be re-checked against the NEW predicate or acknowledged
+  gate.sh timings [<base-ref>] [<path>...]    Every timing constant the diff adds (a ceiling, timeout, or deadline in ms)
+                                              is listed against every larger timing constant in the same search space;
+                                              each larger one is cleared or acknowledged
   gate.sh all <conventions.md> [<base-ref>]   style + surfaces
 
 <base-ref> defaults to the merge base with origin/HEAD (falls back to HEAD~1).
@@ -231,6 +234,68 @@ check_producers() {
 	return $findings
 }
 
+# Timing sweep: a wait ceiling the diff adds is only correct against the
+# worst-case cadence of whatever it waits on, and that cadence lives in another
+# constant the author did not necessarily remember. This enumerates every
+# millisecond constant in the search space that is LARGER than a ceiling the
+# diff adds; each is cleared ("cannot gate my event") or acknowledged. Full
+# recall on its class: the constants are named and greppable.
+# Provenance: portless #367 round 4 (ctate-confirmed): a 1500ms CLI poll ceiling
+# sized against DEBOUNCE_MS=100 while the daemon's watcher fallback ran at
+# POLL_INTERVAL_MS=3000, same file, 550 lines away.
+check_timings() {
+	local ref=""
+	if [[ -n "${1:-}" ]] && git rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then
+		ref="$1"
+		shift
+	fi
+	local base findings=0
+	base=$(base_ref "$ref")
+	# A "ceiling" is a bound on how long we wait: only CEILING/TIMEOUT/DEADLINE/
+	# WAIT names qualify. Bare intervals and durations are cadences, not bounds,
+	# and flagging them buries the real finding in noise.
+	local ceiling_re='[A-Za-z_][A-Za-z0-9_]*([Cc]eiling|CEILING|[Tt]imeout|TIMEOUT|[Dd]eadline|DEADLINE|MaxWait|MAX_WAIT)[A-Za-z0-9_]*'
+	# Any millisecond constant, ceiling or cadence: the comparison set.
+	local any_re='[A-Za-z_][A-Za-z0-9_]*(_MS|_TIMEOUT|_CEILING|Ms|MS)[[:space:]]*[:=][[:space:]]*[0-9_]+'
+	# Files the diff touches: the producer's constants live where the producer
+	# lives, and a repo-wide set drowns the signal (portless: 16 unrelated
+	# timeouts around the one that mattered, POLL_INTERVAL_MS in the same file).
+	local changed_files
+	changed_files=$(git diff --name-only "$base" -- "${@:-.}" 2>/dev/null | grep -vE '(test|spec)\.' || true)
+	local added_consts
+	added_consts=$(git diff "$base" --unified=0 -- "${@:-.}" 2>/dev/null |
+		grep -E '^\+' | grep -vE '^\+\+\+' |
+		grep -oE "${ceiling_re}[[:space:]]*[:=][[:space:]]*[0-9_]+" |
+		sed -E 's/[[:space:]]*[:=][[:space:]]*/ /' | sort -u || true)
+	if [[ -z "$added_consts" ]]; then
+		echo "PASS [timings] the diff adds no wait ceiling"
+		return 0
+	fi
+	local all_consts=""
+	while IFS= read -r f; do
+		[[ -z "$f" || ! -f "$f" ]] && continue
+		all_consts+=$(grep -hoE "$any_re" "$f" 2>/dev/null |
+			sed -E 's/[[:space:]]*[:=][[:space:]]*/ /' | tr -d '_')$'\n'
+	done <<<"$changed_files"
+	all_consts=$(printf '%s' "$all_consts" | sort -u)
+	while read -r name value; do
+		[[ -z "${name:-}" ]] && continue
+		local clean_value="${value//_/}"
+		local larger
+		larger=$(while read -r oname ovalue; do
+			[[ -z "${oname:-}" || "$oname" == "${name//_/}" ]] && continue
+			[[ "$ovalue" -gt "$clean_value" ]] && echo "    $oname = $ovalue"
+		done <<<"$all_consts")
+		if [[ -n "$larger" ]]; then
+			echo "FINDING [timings] '$name = $clean_value' bounds a wait; these timing constants in the changed files are larger and may gate the event it waits for. Clear each ('cannot delay my event') or acknowledge:"
+			printf '%s\n' "$larger"
+			findings=1
+		fi
+	done <<<"$added_consts"
+	[[ $findings -eq 0 ]] && echo "PASS [timings] every added ceiling clears the timing constants in the changed files"
+	return $findings
+}
+
 # Surface map lines live in the conventions file inside a fenced block:
 #   ```surfaces
 #   <touched-glob> :: <required-glob>[, <required-glob>...]
@@ -286,6 +351,7 @@ case "$cmd" in
 	siblings) check_siblings "$@" ;;
 	callers) check_callers "$@" ;;
 	producers) check_producers "$@" ;;
+	timings) check_timings "$@" ;;
 	all)
 		conv="${1:-}"
 		ref="${2:-}"
