@@ -51,6 +51,14 @@ flag is a lead, not a proof. If you can't confirm, say STRONG HYPOTHESIS honestl
    should NOT appear matter as much as the target); or (b) fix-and-verify (apply
    the implied fix, show the symptom disappears). If you can do neither, it's a
    STRONG HYPOTHESIS — label it. Confirmation can DISCONFIRM, and that's the point.
+   **Force the defective path; don't wait for its natural trigger.** If your repro
+   depends on the bug's real-world precondition firing (e.g. "the launch fails only
+   on Windows"), that precondition may not fire on CI and you'll burn runs on a
+   disconfirm that proves nothing. Instead inject the fault so the exact defective
+   branch runs on EVERY platform, controls included. Then the mechanism — not the
+   platform's mood — decides the outcome. (Worked example: to hit a launch error
+   path, point the launcher at a fake browser that spawns a child tree and never
+   opens its port, forcing the timeout branch identically on all three OSes.)
 5. **Write cause + fix direction + certainty label**, citing the exact signature.
 
 ## Visual bugs: capture and LOOK
@@ -73,6 +81,31 @@ clearly drawn in the screenshot, yet `Get-Process | where MainWindowTitle` lists
 ZERO titled windows. A visible surface the window manager doesn't track IS the bug
 (a phantom, software-drawn surface). Cross two cheap observations and let their
 disagreement be the signature.
+
+## CI confirmation gotchas (get the matrix green on the first run)
+
+A cross-platform matrix is the best confirmation, but three things make the first
+run fail for reasons unrelated to the bug. Handle them up front:
+
+- **Fault-inject with a NATIVE binary, not a script.** The launcher execs your fake
+  via `Command::new(path)`, which won't run a `.sh`/`.bat` on Windows and won't run
+  `bun x.ts` anywhere. Compile once, cross-OS: `bun build fake.ts --compile
+  --outfile fake` yields a real `.exe`/ELF/Mach-O the launcher runs directly. Tag
+  the fake's child processes with a unique marker in **argv** (not env — argv is
+  what `ps`/`Win32_Process.CommandLine` shows) so you can count them.
+- **Bound every external call by PID; assume no self-timeout on Windows.** A CLI
+  that returns in 90s on Unix can retry a connect (`os error 10060`) and hang past
+  the job timeout on Windows, cancelling the job before it counts anything. Run it
+  backgrounded and kill by PID after a fixed wait (portable across git-bash/unix);
+  leave the daemon and orphan tree behind on purpose — that leftover IS the finding.
+- **Your PowerShell counter self-matches its own marker.** `Get-CimInstance
+  Win32_Process | ? CommandLine -match $MARK` catches the querying process too
+  (its command line contains `$MARK`). Exclude it (`-notmatch 'CimInstance'`), or a
+  constant +1 skews the count.
+- **Free independent evidence: the runner's own reaper.** GitHub Actions prints
+  `Terminate orphan process: pid (N) (name)` for anything alive at job end that it
+  had to clean up. `grep -i "Terminate orphan process"` in the raw log — those
+  lines are a second, tool-independent witness that your process tree leaked.
 
 ## References
 
