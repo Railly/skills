@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-24",
+    "repo": "vercel-labs/portless",
+    "pr": 367,
+    "base": "e0c2af5",
+    "head": "67572f9",
+    "status": "complete",
+    "gaps": [
+      "root-writable /etc/hosts not exercised: the happy-path sync-succeeds case was simulated with PORTLESS_SYNC_HOSTS=0, not with a privileged writable hosts file"
+    ]
+  },
+  "provenance": {
+    "author_model": "claude-opus-4-8",
+    "reviewer_model": "claude-opus-5",
+    "same_family": true
+  },
+  "lenses": [
+    { "name": "emission-channel-and-one-shot-latch-reachability", "status": "run", "reason": "round-3 fix adds a daemon-to-CLI marker channel plus a warn-once latch" },
+    { "name": "error-path-forcing", "status": "run", "reason": "new failure branch on an unwritable hosts file; forced by running unprivileged" },
+    { "name": "dogfood-the-built-artifact", "status": "run", "reason": "built dist/cli.js and drove proxy start / app run / alias / restart against a real unwritable /etc/hosts" },
+    { "name": "docs-behavior-parity", "status": "run", "reason": "diff changes observable behavior and touches four doc surfaces" },
+    { "name": "new-failure-outcome-propagation", "status": "run", "reason": "gate.sh callers addRoutes: all four call sites in the diff" },
+    { "name": "cancellation-and-timeout-hygiene", "status": "run", "reason": "diff adds a bounded polling loop awaited by a one-shot command" },
+    { "name": "new-domain-matrix", "status": "run", "reason": "marker consumer accepts any pending marker; enumerated stale/concurrent producers" },
+    { "name": "shim-hermeticity", "status": "skipped", "reason": "no external binary shimmed by the added tests" },
+    { "name": "resolution-rule-consistency-across-consumers", "status": "skipped", "reason": "diff does not change hostname resolution" },
+    { "name": "complexity-budget", "status": "skipped", "reason": "no per-element loop added beyond a bounded 50ms poll" },
+    { "name": "choice-audit", "status": "skipped", "reason": "no decision trail emitted" }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "acknowledged", "reason": "em dash in an added comment; portless AGENTS.md mandates the em dash, so that half of the gate is inverted here" },
+    { "check": "surfaces", "outcome": "pass", "reason": "" },
+    { "check": "siblings 'hosts sync'", "outcome": "finding", "reason": "cli.ts untouched passage: `portless hosts --help` Auto-sync section still silent (F4). CHANGELOG.md and apps/docs changelog exempt as historical records; README/SKILL/commands remaining hits are terse listings" },
+    { "check": "siblings 'Auto-syncs'", "outcome": "finding", "reason": "same cli.ts passage; changelog exempt" },
+    { "check": "callers addRoutes", "outcome": "pass", "reason": "all four call sites inside the diff" },
+    { "check": "callers syncHostsFile", "outcome": "acknowledged", "reason": "only hit is the definition in hosts.ts" },
+    { "check": "radius impact", "outcome": "acknowledged", "reason": "104 impacted, unresolvedCalls 5528 dwarfs resolved edges; map under-covers, all findings came from free exploration" }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The warn-once latch lives in the daemon while delivery is per-CLI-process, so only the first attached app ever sees the warning: a second `portless app2 -- cmd` against the same daemon with the same unwritable hosts file prints nothing",
+      "evidence": "drove built dist/cli.js with PORTLESS_STATE_DIR=/tmp/pl364-a: proxy start --port 1355 --no-tls, then `app1 -- sleep 6` printed 'Could not write /etc/hosts...' on the CLI; then `app2 -- sleep 6` printed nothing, no marker written, only the daemon's original proxy.log line. app2.localhost is exactly the hostname that will not resolve",
+      "layer": "latch scope vs delivery scope",
+      "source": "lens: emission-channel-and-one-shot-latch-reachability",
+      "path": "packages/portless/src/cli-utils.ts:syncHostsWithWarning + cli.ts:613-625"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "`portless alias` awaits the marker poll to its full 1500ms ceiling on every successful run, turning a ~0.2s command into ~1.6s; the code comment claims the poll never blocks the happy path, which is true only for the void'd callers",
+      "evidence": "PORTLESS_SYNC_HOSTS=0, proxy on 1356: `alias happyapp 4444` 1.596s total, `alias happyapp2 4445` 1.613s; the same command with a failure marker present returned in 0.212s",
+      "layer": "timeout hygiene on a one-shot command",
+      "source": "lens: cancellation-and-timeout-hygiene",
+      "path": "packages/portless/src/cli.ts:2383 (handleAlias) + cli-utils.ts:pollForHostsSyncWarningMarker"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "The marker carries no freshness or ownership: it is never deleted when a later sync succeeds or when the daemon restarts, so an unconsumed marker makes an unrelated later command print a hosts-sync failure that is no longer true",
+      "evidence": "with PORTLESS_SYNC_HOSTS=0 (auto-sync entirely off for the run) and a marker file planted in the state dir, `alias staleapp 4446` printed 'Could not write /etc/hosts...'. Reachable without planting whenever a CLI is interrupted inside its 1500ms poll window, or a concurrent poll loses the race",
+      "layer": "marker lifetime / invalidation",
+      "source": "lens: new-domain-matrix (consumer input domain)",
+      "path": "packages/portless/src/cli-utils.ts:consumeHostsSyncWarningMarker"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "`portless hosts --help` has a bolded Auto-sync section with behavior prose that still says only 'updates /etc/hosts by default. Disable with PORTLESS_SYNC_HOSTS=0' while README, SKILL, both docs pages and the main --help gained the failure-warning sentence",
+      "evidence": "gate.sh siblings flagged cli.ts on 7 untouched lines; the passage is cli.ts:2401-2404. House norm: cli.ts --help bolded feature sections are contract-carrying, not terse listings. Same class as the 2026-07-20 gate-miss ledger entry for this PR",
+      "layer": "intra-file doc sibling",
+      "source": "deterministic: siblings + docs-behavior-parity",
+      "path": "packages/portless/src/cli.ts:2401"
+    }
+  ],
+  "exemptions": [
+    { "claim": "em dash in an added comment line (cli.ts:288 of the diff)", "evidence": "portless AGENTS.md mandates the em dash and bans ' -- '; the em-dash half of the style gate is inverted for this repo" },
+    { "claim": "CHANGELOG.md and apps/docs/src/app/changelog/page.mdx mention 'hosts sync' but are absent from the diff", "evidence": "both are dated historical records of released versions; restating current behavior there would falsify the record" },
+    { "claim": "README:213/372/429, SKILL:166/187/313, commands/page.mdx:270 mention hosts sync but were not updated", "evidence": "read each: all are terse command listings or env-var table rows with no behavior contract; each file already states the new behavior at its canonical auto-sync passage" },
+    { "claim": "gate.sh callers syncHostsFile flagged hosts.ts:76", "evidence": "the hit is the function definition, not a call site" },
+    { "claim": "six failing tests in cli.test.ts are not a regression of this diff", "evidence": "all six fail on the worktree branch-name prefix leaking into hostnames (expected myapp.localhost, got issue-364-hosts-sync-warning.myapp.localhost); unrelated to hosts sync, reproduces on any branch-prefixed worktree" }
+  ],
+  "issue_candidates": [
+    { "title": "cli.test.ts is not hermetic against the worktree branch prefix", "evidence": "6 tests fail in packages/portless when run from a git worktree whose branch name becomes a hostname prefix (get subcommand x2, rsbuild x2, expo LAN, per-TLD routes)", "why_out_of_scope": "pre-existing test-harness coupling, independent of the hosts-sync change" },
+    { "title": "Concurrent multi-app polls race for the single one-shot marker", "evidence": "recorded in case 367 as the known residual; spawnProxiedApp and runWithTurbo each void a poll against the same stateDir marker", "why_out_of_scope": "the one-shot marker design predates this PR; a per-app attributable channel is the real fix and is larger than the warning" },
+    { "title": "An all-routes-removed sync failure is silently swallowed", "evidence": "syncHostsWithWarning returns early for hostnames.length === 0, so a failed cleanup of the managed block never warns; deliberate, but it means stale portless entries can survive in /etc/hosts with no signal", "why_out_of_scope": "deliberate trade-off of the warm-up-latch fix; cleanup failures are a separate surface" }
+  ],
+  "note": "Round 4 on PR #367, after the two ctate findings of 2026-07-22 (case 367-daemon-emit-latch) were fixed across 6e93549 and 67572f9. Both original findings verified fixed by driving the artifact: startup with a persisted route printed the warning on the CLI 3/3 restarts, and the empty warm-up sync no longer consumed the latch. F1 is the same defect class one layer out: the latch was made warm-up-safe but is still daemon-scoped while delivery became per-process."
+}

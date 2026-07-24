@@ -41,6 +41,19 @@ Both findings fixed and pushed 2026-07-22 across two commits (`6e93549` then ref
 
 **Residual (issue candidate, out of scope).** The marker is a single one-shot file keyed on `stateDir`. In a multi-app run (`spawnProxiedApp`/`runWithTurbo`) two concurrent polls can race to consume the same marker, so a second app's own sync failure could be swallowed by the first app's poll. The one-shot marker design predates this change; the added coverage makes the race more likely. A per-app-attributable warning channel would close it.
 
+## Round 4 (2026-07-24)
+
+Gate re-run on head `67572f9`, with the artifact built and driven against a real unwritable `/etc/hosts` (unprivileged, isolated `PORTLESS_STATE_DIR`). Both original findings verified fixed empirically: the warning reached the CLI on 3/3 proxy restarts with a persisted route, and the empty warm-up sync no longer consumed the latch.
+
+Maintainer (ctate) raised two findings on this round:
+
+1. **The 1.5s marker-poll ceiling sits under the daemon's 3s watcher fallback** (`POLL_INTERVAL_MS`, `cli.ts:141`), so warnings are missed and later surface stale. The gate reported the stale-marker symptom but called its reachability an edge case instead of reading the producer's timing constants; the diff's own comment sized the ceiling against `DEBOUNCE_MS = 100`. Gate miss. Closed by `gate.sh timings`, the wait-ceiling lens clause, and the wait-ceiling subsystem invariant.
+2. **A successful `alias` always waits the full timeout** (measured 1.62s with hosts sync disabled). Caught independently by the gate in the same round (1.596s / 1.613s), from the dogfood pass, not from reading the code.
+
+Two further gate findings not raised externally: the warn-once latch is daemon-scoped while delivery is per-CLI-process, so a second attached app is silent under the same failure (driven: `app1` warns, `app2` prints nothing); and `portless hosts --help`'s bolded Auto-sync section stayed stale while every other surface gained the sentence.
+
+Run report: `evals/runs/2026-07-24-portless-67572f9.json`.
+
 ## Evidence
 
 - Source: `packages/portless/src/cli.ts:584` (warning emission inside the detached proxy), `cli.ts:3358` (proxy stderr → `proxy.log`), `cli.ts:666` (initial empty sync path and `hostsSyncWarned`), head `26953e8`.
