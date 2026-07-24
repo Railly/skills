@@ -1,0 +1,29 @@
+{
+  "skill_name": "signature-repro",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "There's a bug report that says agent-browser open hangs on Windows when you capture the output in PowerShell, but works fine without capture. I'm on a Mac and I don't have a Windows machine. Can you figure out what's actually causing it? The repo is at ~/Programming/vercel-labs/agent-browser and agent-browser is installed globally.",
+      "expected_output": "Names the mechanism (held fd / unclosed pipe), inspects the running daemon with lsof to find the orphan pipe, explains why PowerShell Receive-Job hangs on it while bash tolerates it, and gives a fix direction — without claiming it needs Windows.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "This issue says Chrome exits immediately with exit code 0 on Windows right after writing DevToolsActivePort, and the reporter thinks it's because the process isn't detached. I only have a Mac here. Is that the real cause? How would I even check without a Windows box?",
+      "expected_output": "Inspects how the tool spawns Chrome via ps, notes the ABSENCE of a detach flag, explains that Unix keeps children alive by default (so no repro on Mac) while Windows kills a non-detached child when the parent returns — confirming the reporter's hypothesis structurally, on a Mac.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Someone reported that installing our npm package fails on their machine because of an engines constraint, and separately that the Windows ARM64 binary is a 0-byte placeholder. I don't want to spin up a Windows ARM VM just to check these. What's the fastest way to confirm both?",
+      "expected_output": "Uses curl on the npm registry manifest to check the engines field, and tar -tzf on the published tarball to check whether the win32-arm64 binary is present/absent — confirming both by artifact inspection with no VM.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "A user filed a bug: our headless browser tool leaves a black rectangle on their Windows desktop, on their middle monitor. I only have a Mac and a Windows Server CI runner, no multi-monitor Windows 11 box. I already tried a pixel-diff on before/after screenshots and it said no change, so I was about to close it as not-reproducible. Is there anything else I can do?",
+      "expected_output": "Rejects the pixel-diff conclusion as an unreliable detector, captures the desktop and looks at the image directly, and cross-checks with a window enumeration (a surface visible in the screenshot but absent from the window list = the phantom-window signature). Reaches the mechanism and honestly labels which part still needs the reporter's exact hardware, rather than closing as not-reproducible.",
+      "files": []
+    }
+  ]
+}
