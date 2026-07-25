@@ -1,0 +1,86 @@
+{
+  "run": {
+    "date": "2026-07-25",
+    "repo": "vercel-labs/portless",
+    "branch": "railly/hosts-atomic-write",
+    "sha": "2470ad3",
+    "sha_note": "Re-signed to 6504b97 after the push to a sibling branch was rejected by the repository's verified-signatures rule. Same tree.",
+    "base": "15ef064",
+    "status": "complete",
+    "author_model": "claude-opus-5[1m]",
+    "reviewer_model": "claude-opus-5[1m]",
+    "same_family": true,
+    "same_family_warning": "Reviewer and author are the same model instance; shares priors and blind spots. Findings here should be treated as a floor, not a ceiling."
+  },
+  "deterministic": {
+    "style": "pass",
+    "surfaces": "pass",
+    "stale": "pass",
+    "timings": "pass (diff adds no wait ceiling)",
+    "siblings": "5 findings (README.md, apps/docs/commands/page.mdx, apps/docs/changelog/page.mdx, cli.ts, skills/portless/SKILL.md mention Auto-sync, absent from diff)",
+    "callers": "7 findings (3 syncHostsFile, 3 cleanHostsFile, 1 getManagedHostnames), all read",
+    "radius": "skipped: CLI not on PATH"
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "severity": "moderate",
+      "title": "Read-failure diagnosis is wrong once PR #367 lands, and its remediation can repeat the same failure",
+      "evidence": "Merged both branches in a scratch worktree (clean merge, no textual conflict). Composed syncHostsWithWarning + syncHostsFile against an unreadable hosts file: emitted 'Could not write /etc/hosts; hostnames may not resolve. Run: portless hosts sync' for a READ failure, and the suggested remediation returned false against the same file.",
+      "layer": "seam between this diff and open PR #367",
+      "class": "plausible-but-wrong diagnostic; same family as the #365 404-suggestion miss"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "severity": "low",
+      "title": "hosts.ts is absent from the conventions surface map although it carries documented behavior",
+      "evidence": "gate.sh surfaces passed only because hosts.ts is not a mapped path; gate.sh siblings independently flagged the same 5 documentation surfaces. PR #367 proves hosts-sync behavior deltas require README + SKILL.md + cli.ts help.",
+      "layer": "conventions file",
+      "class": "gate bug"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "6 of 7 call sites are unaffected by the contract change",
+      "evidence": "cli.ts:2092/2344/2402 already branch on false and escalate to sudo; /etc/hosts is world-readable 0644 so a non-root read still succeeds and the false still originates at the write, unchanged. cli.ts:2784 getManagedHostnames previously returned [] via readHostsFile returning empty string, and returns [] now via the added catch: identical observable behavior. cli.ts:615/652 ignore the boolean, which is pre-existing and is what PR #367 fixes."
+    },
+    {
+      "claim": "The new throw in readHostsFile cannot escape into reloadRoutes",
+      "evidence": "syncHostsFile and cleanHostsFile each wrap the read in their own try/catch returning false; getManagedHostnames gained an explicit catch. No unguarded call path remains."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Unit suite is coupled to the git branch name",
+      "evidence": "5 cli.test.ts tests fail on any non-default branch; reproduced unmodified on railly/issue-364-hosts-sync-warning with the branch name appearing in the asserted hostname. CI never sees it because it runs on main and merge refs.",
+      "scope": "pre-existing, unrelated to this diff"
+    },
+    {
+      "title": "No macOS runner in CI",
+      "evidence": "ci.yml has ubuntu-latest and windows-latest only; 16 darwin branches in src and 2 darwin-only tests that never execute.",
+      "scope": "pre-existing, out of diff scope"
+    },
+    {
+      "title": "Python e2e fixtures skip silently in CI",
+      "evidence": "flask.test.ts:12 and fastapi.test.ts:12 skipIf on a missing venv; ci.yml never runs the setup:python script the e2e package defines.",
+      "scope": "pre-existing, out of diff scope"
+    },
+    {
+      "title": "No atomic write anywhere else in src",
+      "evidence": "grep for renameSync over 23 files returns only the helper this diff adds; routes.ts, certs.ts, service.ts, turbo.ts all writeFileSync in place.",
+      "scope": "deliberately descoped; those files are portless-owned and regenerable"
+    }
+  ],
+  "unverified": [
+    {
+      "gap": "Could not drive a read failure on the real /etc/hosts",
+      "reason": "Making the live system hosts file unreadable is a destructive change to this machine. Verified at the claim's layer with the injectable path instead."
+    },
+    {
+      "gap": "Windows renameSync over an existing hosts file locked by antivirus",
+      "reason": "No Windows machine driven in this run. The AGENTS.md SSM instance was not started."
+    }
+  ]
+}

@@ -54,6 +54,18 @@ Two further gate findings not raised externally: the warn-once latch is daemon-s
 
 Run report: `evals/runs/2026-07-24-portless-67572f9.json`.
 
+## Round 5 (2026-07-25)
+
+Gate re-run on head `6a2fb82`, which addressed both round-4 findings. Both verified fixed by driving the built CLI with an isolated `PORTLESS_STATE_DIR`: the ceiling is now derived as `DEBOUNCE_MS + POLL_INTERVAL_MS + 1000`, and the wait returns on publication rather than after a fixed delay, so the case ctate measured at 1.62s now costs 0.052s.
+
+One new finding, self-caught, and it is a regression the round-4 fix introduced:
+
+1. **With auto-sync on and no daemon running, `alias` waits the full 4.1s ceiling** (measured 4.202s; 4.2s again with a stale PID file, against 0.155s with the daemon alive). The daemon is the only process that publishes an outcome, so where it is absent the wait cannot end early and returns the same null it could have returned immediately. Registering an alias before starting the proxy is an ordinary flow. Sharpening the ceiling in round 4 made this strictly worse: the better-derived the ceiling, the longer the no-producer path hangs. Neither `gate.sh timings` nor the wait-ceilings invariant covers it, because both reason about how long to wait and the defect is whether to wait at all. Closed by the **a wait on a producer first establishes that the producer exists** invariant. Fixed in `c826d10`: 0.053s with no daemon, 0.060s with a stale PID file, 0.166s with the daemon alive and the warning still delivered.
+
+A second finding lives outside this PR's diff and is recorded in the ledger rather than here: a separate branch widens what `syncHostsFile` returning `false` means, which falsifies the `Could not write ...` diagnosis this PR writes onto five surfaces. Disjoint files, clean merge, both suites green, so no automated check can see it.
+
+Run report: `evals/runs/2026-07-25-portless-2470ad3.json` (the sibling branch's gate run, where the collision surfaced).
+
 ## Evidence
 
 - Source: `packages/portless/src/cli.ts:584` (warning emission inside the detached proxy), `cli.ts:3358` (proxy stderr → `proxy.log`), `cli.ts:666` (initial empty sync path and `hostsSyncWarned`), head `26953e8`.

@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-25",
+    "repo": "vercel-labs/agent-browser",
+    "base": "origin/main (3cc7022)",
+    "head": "d86d230",
+    "status": "complete",
+    "gaps": [],
+    "note": "Conflict resolution round on PR #1594 (feat/stream-input-priority-latest-frame) after main landed #1605 (daemon idle timeout). Gate scoped to the merge resolution plus the full branch diff."
+  },
+  "provenance": {
+    "author_model": "claude-opus-5[1m]",
+    "reviewer_model": "claude-opus-5[1m]",
+    "same_family": true
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "run", "reason": "Merge removed handle_client_message; checked that every behavior it carried (input dispatch, idle marking) survives in reader_loop." },
+    { "name": "New-domain matrix", "status": "run", "reason": "maxFps domain re-driven post-merge: 0 (uncapped), 2, 10, 30, plus negative/string/oversized covered by unit tests." },
+    { "name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Enumerated every consumer of the idle-activity rule: daemon startup, handle_stream_enable, WS reader. All three wire the daemon-owned Arc." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "run", "reason": "frame_watch is a latest-value latch; verified borrow_and_update at send time, not arrival time, and that the seeded initial frame is marked seen." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No shim, wrapper, or launcher in the diff." },
+    { "name": "Deliberate-default check", "status": "run", "reason": "Default maxFps 0 (uncapped) preserves pre-PR behavior for clients that never send config." },
+    { "name": "Fresh-seam scan", "status": "run", "reason": "The merge itself is the fresh seam: reader task vs writer loop lifecycle, and the new idle-activity crossing between them." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "No upstream reference implementation; independent reimplementation per PR body." },
+    { "name": "New-failure-outcome propagation", "status": "run", "reason": "reader_task completion now terminates the writer loop; verified cleanup (client_count decrement, notify) still runs on that path." },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No CLI flag added; config is a WS protocol message." },
+    { "name": "Error-path forcing", "status": "run", "reason": "ws send error on both the throttled and broadcast arms breaks the loop; exercised by client disconnect during streaming." },
+    { "name": "Non-destructive recovery", "status": "skipped", "reason": "Diff writes no persistent state." },
+    { "name": "Cancellation and timeout hygiene", "status": "run", "reason": "reader_task.abort() on every writer-loop exit; shutdown_rx arm sends Close first. No orphaned task on any break path." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "Traced CDP screencast frame to WS text frame across the new watch channel; ack-immediately semantics in cdp_loop.rs unchanged by the merge." },
+    { "name": "Substrate verification", "status": "run", "reason": "Driven against real Chrome 151 over CDP, not mocks." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "Release binary built from the merged branch and driven: maxFps throttling measured, clicks landed on a real page, idle seam A/B tested against a separately built origin/main binary." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "README, docs/src/app/streaming/page.mdx, and stream --help all describe latest-first delivery and maxFps 1-120 / 0; measured behavior matches." },
+    { "name": "Demonstrative example", "status": "run", "reason": "docs carry a config message example; verified the exact payload shape works against the binary." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail recorded for this change." },
+    { "name": "Complexity budget", "status": "run", "reason": "Merge resolution adds one function parameter and one guarded call; no new abstraction." }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "pass", "reason": "" },
+    { "check": "surfaces", "outcome": "pass", "reason": "" },
+    { "check": "timings", "outcome": "pass", "reason": "diff adds no wait ceiling" },
+    { "check": "siblings maxFps", "outcome": "pass", "reason": "" },
+    { "check": "stale handle_client_message", "outcome": "pass", "reason": "zero hits; the function main deleted-into is fully retired" },
+    { "check": "callers reader_loop", "outcome": "pass", "reason": "" },
+    { "check": "callers dispatch_input", "outcome": "pass", "reason": "" },
+    { "check": "callers is_user_input_message_type", "outcome": "pass", "reason": "" },
+    { "check": "callers handle_connection", "outcome": "acknowledged", "reason": "Four call sites outside the diff, all of two unrelated same-named private functions (daemon.rs:503, inspect_server.rs:97). The stream module's handle_connection is private and called only from websocket.rs:81, inside the diff. Gate matches on bare symbol name and cannot see module scope." },
+    { "check": "cargo fmt --check", "outcome": "pass", "reason": "" },
+    { "check": "cargo clippy --all-targets -D warnings", "outcome": "pass", "reason": "" },
+    { "check": "cargo test", "outcome": "pass", "reason": "1033 passed, 0 failed, 96 ignored; doctor_cli 2 passed" },
+    { "check": "radius impact", "outcome": "acknowledged", "reason": "Not run; the operator interrupted the invocation. Map is a ranking aid, not a gate, and every lens ran on the full diff without it." }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The merge resolution marked idle activity before the CDP client guard, silently widening #1605's semantics: dashboard input on a session with no attached client would defer daemon idle shutdown, which main never did.",
+      "evidence": "Pre-merge main marked inside `if let Some(ref client) = *guard` in handle_client_message (websocket.rs, origin/main). The first resolution hoisted the mark above the guard in reader_loop. Fixed in d86d230 by moving the mark inside the guard; 1033 tests, clippy, and fmt green after.",
+      "layer": "merge semantics of an adjacent PR's contract",
+      "source": "lens",
+      "path": "reader_loop -> IdleActivity::mark -> daemon idle select loop"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Feature behavior survives the merge intact: per-client maxFps throttling and immediate input dispatch both work on the merged binary.",
+      "evidence": "Release binary from d86d230 against Chrome 151 on an rAF-animating page: maxFps=0 -> 181 frames/3s, maxFps=2 -> 6, maxFps=10 -> 30, maxFps=30 -> 87. Three WS mousePressed/mouseReleased pairs produced clicks=3 read back via eval on the page.",
+      "layer": "end-to-end shipped surface",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F3",
+      "state": "issue_candidate",
+      "claim": "A connected stream WebSocket client defers daemon idle shutdown indefinitely even with zero user input, so #1605's idle timeout does not fire for any session with a dashboard attached.",
+      "evidence": "AGENT_BROWSER_IDLE_TIMEOUT_MS=8000, daemon pid resolved via lsof on the stream port. No WS client: daemon EXITED by t=14s. WS client connected receiving frames only, no input, 20s: ALIVE. Identical on a separately built origin/main binary (/tmp/ab-main-idle), so this predates the branch.",
+      "layer": "daemon lifecycle end-to-end",
+      "source": "lens",
+      "path": ""
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "The four out-of-diff handle_connection call sites do not need reading for this change.",
+      "evidence": "grep -rn 'fn handle_connection' returns three distinct private functions in three modules; the stream one at websocket.rs:120 has exactly one caller, websocket.rs:81, which is inside the diff."
+    },
+    {
+      "claim": "Skipping the Impact Map does not leave the review under-covered.",
+      "evidence": "The diff spans six files in one subsystem, all read in full during the lens passes; the map ranks propagation but adds no reachable symbol the passes did not already cover."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Stream WS client with no input keeps the daemon alive past its idle timeout",
+      "evidence": "See F3. Reproduced on origin/main (3cc7022) with the shipped 8s-override path; no-WS control exits on schedule.",
+      "why_out_of_scope": "Pre-existing in #1605, reproduced identically on main; PR #1594 neither introduces nor worsens it. Fixing it means deciding whether a connected dashboard counts as activity, which is a lifecycle policy call for the #1605 author."
+    },
+    {
+      "title": "review-gate skill copy in the kai vault has drifted from railly/skills",
+      "evidence": "~/kai/.agents/skills/review-gate/SKILL.md is 15905 bytes (Jul 25) vs 16003 in ~/Programming/railly/skills/skills/.experimental/review-gate (Jul 24); the vault copy is a real directory, gitignored, not the documented symlink.",
+      "why_out_of_scope": "Harness hygiene, unrelated to the reviewed diff. Logged to PAPERCUTS.md."
+    }
+  ]
+}
