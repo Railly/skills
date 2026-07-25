@@ -6,22 +6,9 @@ These skills turn real engineering work into portable agent protocols. They favo
 
 ## Skills
 
-### Unfold
-
-[Unfold](skills/unfold) carries one unfamiliar-codebase mission through the earliest unfinished mode:
-
-| Mode | Outcome |
-|---|---|
-| Learn | Evidence-backed architecture, flow traces, progressive zoom, and reconstruction |
-| Triage | Deterministic red signal, failure map, surviving hypothesis, and Change Surface |
-| Change | Complete implementation under `guided`, `execute`, or `execute-with-approval` collaboration |
-| Review | Change Surface review, revert proof, restored green, and artifact verification |
-
-The modes reuse one mission and evidence chain instead of restarting repository exploration at every phase.
-
 ### Pick an Issue
 
-[Pick an Issue](skills/pick-an-issue) surveys an external backlog, qualifies three to five candidates, presents an evidence-backed comparison matrix, recommends one, and lets the user make the final choice. It ends at selection and hands a bug to Unfold Triage or a specified enhancement to Unfold Change.
+[Pick an Issue](skills/pick-an-issue) surveys an external backlog, qualifies three to five candidates, presents an evidence-backed comparison matrix, recommends one, and lets the user make the final choice. It ends at selection and creates the canonical Issue Contract seed.
 
 ### Record a Case
 
@@ -30,6 +17,10 @@ The modes reuse one mission and evidence chain instead of restarting repository 
 ### Review Gate
 
 [Review Gate](skills/review-gate) runs a pre-review pass on a diff before pushing: deterministic checks first, then focused review lenses selected by what the diff changes. External review findings are harvested back into the catalog.
+
+## Issue Contract
+
+The [Issue Contract](foundry/missions) is a phase-neutral state carrier, not an installable skill. It preserves outcome, observed and expected behavior, acceptance IDs, non-goals, invariants, change surface, verification claims, risk, promotion state, and the exact handoff command.
 
 ## Candidate skills
 
@@ -71,20 +62,21 @@ flowchart LR
   Backlog[Issue backlog] --> Pick[pick-an-issue]
   Pick --> Choice{User chooses}
   Gap --> Choice
-  Choice --> Triage[Unfold Triage]
-  Learn[Unfold Learn] -. supports .-> Triage
-  Triage --> Change[Unfold Change]
-  Change --> Proof[test-strength, performance-proof, or resilience-audit]
-  Proof --> Review[review-gate]
+  Choice --> Contract[Issue Contract]
+  Contract --> Reproduce[Reproduce and map]
+  Reproduce --> Change[Implement acceptance IDs]
+  Change --> Proof[Deterministic proof]
+  Proof --> Spec[Spec review]
+  Spec --> Review[review-gate]
   Review --> Case[record-a-case]
   Case --> Result[Evidence-backed result]
 ```
 
-Each mode can also be entered directly. A diff can begin at Review; a read-only question can remain in Learn.
+Enter at the earliest incomplete state. A reproduced issue can begin at implementation, and an existing diff can begin at proof or review.
 
 ## Maturity
 
-Distribution channel and evidence maturity are separate. Stable currently contains three dogfooded skills and the evaluated Review Gate. Candidate and Experimental skills remain installable without implying validation.
+Distribution channel and evidence maturity are separate. Stable currently contains two dogfooded skills and the evaluated Review Gate. Candidate and Experimental skills remain installable without implying validation.
 
 The source of truth is [foundry/maturity.json](foundry/maturity.json).
 
@@ -107,7 +99,7 @@ bunx skills add Railly/skills
 The interactive installer exposes three distinct groups: `Stable`, `Candidates`, and `Experimental`. Install only the stable surface with:
 
 ```bash
-bunx skills add Railly/skills --skill unfold --skill pick-an-issue --skill record-a-case --skill review-gate
+bunx skills add Railly/skills --skill pick-an-issue --skill record-a-case --skill review-gate
 ```
 
 Install a candidate explicitly with:
@@ -128,7 +120,7 @@ Or clone and link one skill:
 
 ```bash
 git clone https://github.com/Railly/skills.git ~/railly-skills
-ln -s ~/railly-skills/skills/unfold ~/.claude/skills/unfold
+ln -s ~/railly-skills/skills/review-gate ~/.claude/skills/review-gate
 ```
 
 For Codex, Cursor, and other compatible agents, install or link the same folder under the corresponding project or personal skills directory.
@@ -139,11 +131,13 @@ For Codex, Cursor, and other compatible agents, install or link the same folder 
 skills/                 stable installable surface
 skills/.experimental/   candidate and experimental installable surfaces
 cases/                  public-safe evidence ledger
-foundry/                governance, lessons, eval rounds, and decisions
+foundry/                governance, lessons, eval rounds, live runs, and decisions
 scripts/                deterministic validation and eval machinery
 ```
 
 Stable skills stay flat. Candidate and Experimental skills use the standard `skills/.experimental/` catalog recognized by the skills CLI. The maturity registry assigns their distribution channel, and the plugin manifest supplies the visible `Stable`, `Candidates`, and `Experimental` installer groups.
+
+All cases, evals, run reports, decision trails, and Foundry logs follow the [canonical source repository policy](foundry/source-of-truth.md). Installed copies under `.agents/skills`, `.claude/skills`, or another agent directory are read-only distribution surfaces.
 
 ## Skill foundry
 
@@ -158,7 +152,7 @@ maintenance work
 → promote, absorb, or reject
 ```
 
-Read the [foundry overview](foundry), [governance](foundry/governance.md), [eval protocol](foundry/eval-protocol.md), and [case template](foundry/case-template.md). Historical methods absorbed into Unfold are recorded under [foundry/deprecated](foundry/deprecated).
+Read the [foundry overview](foundry), [governance](foundry/governance.md), [source repository policy](foundry/source-of-truth.md), [Issue Contract workflow](foundry/missions), [eval protocol](foundry/eval-protocol.md), and [case template](foundry/case-template.md). Deprecated methods and the archived Unfold protocol remain under [foundry/deprecated](foundry/deprecated).
 
 Public issues and pull requests may become public cases. Confidential evidence stays in an organization-approved private system; only generalized, sanitized lessons cross into this repository.
 
@@ -166,10 +160,11 @@ Public issues and pull requests may become public cases. Confidential evidence s
 
 ```bash
 bun scripts/validate-skills.mjs
+bun scripts/validate-issue-contracts.mjs
 bun scripts/verify-eval-fixtures.mjs
 ```
 
-CI checks frontmatter, progressive disclosure, internal links, maturity metadata, public-case boundaries, eval metadata, and executable fixtures.
+CI checks frontmatter, progressive disclosure, internal links, maturity metadata, public-case boundaries, Issue Contracts, eval metadata, and executable fixtures.
 
 ## License
 

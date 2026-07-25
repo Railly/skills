@@ -102,7 +102,7 @@ A candidate must pass trigger, method, outcome, transfer, and negative evals aga
 
 ### C6. Protocol decision
 
-Do not create a repository-wide `railly` router. Consolidate the maintenance loop into `unfold` because Learn, Triage, Change, and Review share one mission, evidence chain, and artifact contract. Keep mode instructions behind progressive-disclosure references. Keep backlog selection separate because it occurs before a maintenance mission exists.
+Historical Round 003 decision: consolidate the maintenance loop into Unfold while keeping backlog selection separate. [Round 004](rounds/004-skill-lifecycle-audit/README.md) superseded this after the usage and overlap audit. The active design uses a phase-neutral Issue Contract and keeps phase-specific methods separate.
 
 ### C7. Governance artifacts
 

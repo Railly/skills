@@ -65,7 +65,7 @@ Third (from maintainer review): replacing a syntactic matcher with a semantic on
 
 ## Candidate changes
 
-- Reference rule (issue triage or unfold Triage): before treating a "regressed" report as a fresh diagnosis, run the reference graph on the nearest related PR; a same-day merge on the same file with a declared scope that does not mention the affected function is a checkable revert signature.
+- Reference rule (Issue Contract reproduction): before treating a "regressed" report as a fresh diagnosis, run the reference graph on the nearest related PR; a same-day merge on the same file with a declared scope that does not mention the affected function is a checkable revert signature.
 - Reference rule (doc or example review): an example must fail under the pre-fix code to prove it demonstrates the fix; if it succeeds either way, it is decoration, not documentation.
 - Eval: given a bug report that references a prior fix by issue or PR number, does the agent check that PR's actual merge history for a same-day sibling touching the same file, before assuming the fix never landed?
 - Coverage gap: no current check flags a PR whose declared scope does not mention a function it happens to modify in a shared file, which is exactly the shape of the silent revert this case found.

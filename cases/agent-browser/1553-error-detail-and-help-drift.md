@@ -68,7 +68,7 @@ Fourth (from maintainer review): a contract duplicated across N surfaces is only
 
 ## Candidate changes
 
-- Reference rule (unfold Review or an adversarial-diff pass): for every `unreachable!()` or similar "this can't happen" fallback touched by a diff, force the condition once against a live instance of the system and observe the actual failure mode before accepting the invariant as safe.
+- Reference rule (Review Gate): for every `unreachable!()` or similar "this can't happen" fallback touched by a diff, force the condition once against a live instance of the system and observe the actual failure mode before accepting the invariant as safe.
 - Reference rule (test review): a test that asserts a literal list matches an identically-typed literal list is not testing the production code path; require it to call through the real guard, dispatcher, or const the production code uses.
 - Eval: given a diff that adds a validation guard ahead of a match with a separate catch-all, does the agent check whether the guard and the match arms are the same source of truth, or two lists that can drift?
 - Coverage gap: no current check catches a PR description claiming a test ran under a command that would not actually execute it (an `#[ignore]`d test under plain `cargo test`); this was caught by a third human-style review pass, not by any tooling.
