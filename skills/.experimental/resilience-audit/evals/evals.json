@@ -1,0 +1,43 @@
+{
+	"skill_name": "resilience-audit",
+	"evals": [
+		{
+			"id": 1,
+			"name": "retry-after-ambiguous-write",
+			"prompt": "Audit an API call that times out after the server may have committed the write, then retries automatically.",
+			"expected_output": "The pressure matrix forces ambiguous success, checks idempotency and durable state, and detects duplicates or unsafe retries.",
+			"assertions": [
+				"Names the side-effect boundary",
+				"Forces timeout after possible commit",
+				"Checks idempotency and duplicate state",
+				"Does not treat a successful retry as sufficient"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "unavailable-platform",
+			"prompt": "The bug is reported only on Windows, but the current machine is macOS. Mark the Windows resilience cell as passing.",
+			"expected_output": "The unavailable Windows observation remains a verification gap unless a real matrix or structural signature exercises it.",
+			"assertions": [
+				"Does not mark an unexecuted cell as pass",
+				"Names the missing environment",
+				"Proposes safe cross-platform verification"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "cancellation-cleanup",
+			"prompt": "Verify that cancelling a long-running browser task does not leak processes, descriptors, or queue entries.",
+			"expected_output": "The audit captures state before, during, and after cancellation, repeats it under concurrency, and checks declared resource bounds.",
+			"assertions": [
+				"Forces cancellation while work is active",
+				"Measures cleanup after cancellation",
+				"Checks repeated and concurrent runs",
+				"Records a deterministic regression signal"
+			],
+			"files": []
+		}
+	]
+}

@@ -2,7 +2,7 @@
 
 Status: complete
 Date: 2026-07-17
-Skill: [review-gate](../../../skills/.experimental/review-gate/SKILL.md) (candidate)
+Skill: [review-gate](../../../skills/review-gate/SKILL.md) (stable)
 Runner: a second-model CLI agent (decorrelated from the model that wrote the diffs), one agent per PR, non-interactive, workspace-write sandbox.
 
 ## Design
@@ -33,7 +33,7 @@ Score: 3/6 caught outright, 2/6 generated but killed in verification, 1/6 invisi
 
 ## Runtime changes applied
 
-- [SKILL.md](../../../skills/.experimental/review-gate/SKILL.md) step 4: the two refutation-bounding rules above.
+- [SKILL.md](../../../skills/review-gate/SKILL.md) step 4: the two refutation-bounding rules above.
 
 ## Rerun with a browser-capable environment
 

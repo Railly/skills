@@ -3,6 +3,7 @@
 Status: candidate
 Validation: independently-driven
 Human review: n/a (finding raised by the reviewer, not against the reviewer)
+Maintainer acceptance: pending
 Delivery: PR #1604 open (fix pushed 2026-07-23)
 Visibility: public
 Repository: vercel-labs/agent-browser
