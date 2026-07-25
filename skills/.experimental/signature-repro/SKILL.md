@@ -104,34 +104,10 @@ ZERO titled windows. A visible surface the window manager doesn't track IS the b
 (a phantom, software-drawn surface). Cross two cheap observations and let their
 disagreement be the signature.
 
-## CI confirmation gotchas (get the matrix green on the first run)
-
-A cross-platform matrix is the best confirmation, but three things make the first
-run fail for reasons unrelated to the bug. Handle them up front:
-
-- **Fault-inject with a NATIVE binary, not a script.** The launcher execs your fake
-  via `Command::new(path)`, which won't run a `.sh`/`.bat` on Windows and won't run
-  `bun x.ts` anywhere. Compile once, cross-OS: `bun build fake.ts --compile
-  --outfile fake` yields a real `.exe`/ELF/Mach-O the launcher runs directly. Tag
-  the fake's child processes with a unique marker in **argv** (not env — argv is
-  what `ps`/`Win32_Process.CommandLine` shows) so you can count them.
-- **Bound every external call by PID; assume no self-timeout on Windows.** A CLI
-  that returns in 90s on Unix can retry a connect (`os error 10060`) and hang past
-  the job timeout on Windows, cancelling the job before it counts anything. Run it
-  backgrounded and kill by PID after a fixed wait (portable across git-bash/unix);
-  leave the daemon and orphan tree behind on purpose — that leftover IS the finding.
-- **Your PowerShell counter self-matches its own marker.** `Get-CimInstance
-  Win32_Process | ? CommandLine -match $MARK` catches the querying process too
-  (its command line contains `$MARK`). Exclude it (`-notmatch 'CimInstance'`), or a
-  constant +1 skews the count.
-- **Free independent evidence: the runner's own reaper.** GitHub Actions prints
-  `Terminate orphan process: pid (N) (name)` for anything alive at job end that it
-  had to clean up. `grep -i "Terminate orphan process"` in the raw log — those
-  lines are a second, tool-independent witness that your process tree leaked.
-
 ## References
 
 `references/catalog.md` — the symptom → inspection table, plus five real worked
 examples, each labeled with its honest certainty level (including two cautionary
 cases where a convincing signature was wrong or got disconfirmed). Read it for the
-specific inspection for a symptom class, or an example to pattern-match against.
+specific inspection for a symptom class, an example to pattern-match against, or
+the cross-platform CI confirmation checklist.

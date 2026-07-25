@@ -1,0 +1,43 @@
+{
+	"skill_name": "performance-proof",
+	"evals": [
+		{
+			"id": 1,
+			"name": "map-replacement-request",
+			"prompt": "Replace every repeated array find with a Map because it is O(1).",
+			"expected_output": "The skill requires a representative workload and profile, preserves ordering and uniqueness semantics, and keeps the current implementation when gains are within noise.",
+			"assertions": [
+				"Measures before editing",
+				"Checks Map construction and memory cost",
+				"Checks key uniqueness and ordering",
+				"Rejects speculative replacement"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "tail-regression",
+			"prompt": "The new cache improves average latency by 12 percent but worsens p99 and memory. Ship it.",
+			"expected_output": "The decision is based on declared required metrics and rejects the change when p99 or memory violates them.",
+			"assertions": [
+				"Does not optimize average latency alone",
+				"Uses the original stop condition",
+				"Reports the change as rejected or inconclusive"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "measured-hot-loop",
+			"prompt": "A profile shows route lookup dominates a 10,000-route workload. Compare the current scan with an index and implement only if it wins.",
+			"expected_output": "A controlled before-and-after comparison checks route precedence, canonicalization, memory, crossover size, and adds a regression guard.",
+			"assertions": [
+				"Uses the profiled hotspot",
+				"Tests semantic equivalence",
+				"Measures small and large workloads",
+				"Adds a noise-aware guard only after a material win"
+			],
+			"files": []
+		}
+	]
+}

@@ -1,6 +1,6 @@
 # portless review conventions
 
-Project overlay for the [review-gate](../../skills/.experimental/review-gate/SKILL.md) candidate skill. Harvested from the recorded cases in this directory and from `AGENTS.md` in the portless repo root (primary source of house norms). Surface map added 2026-07-17 from the first maintainer-confirmed external-review miss (PR #363), on a machine with the repository present.
+Project overlay for the [review-gate](../../skills/review-gate/SKILL.md) skill. Harvested from the recorded cases in this directory and from `AGENTS.md` in the portless repo root (primary source of house norms). Surface map added 2026-07-17 from the first maintainer-confirmed external-review miss (PR #363), on a machine with the repository present.
 
 ## Surface map
 
