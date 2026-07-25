@@ -52,7 +52,7 @@ Maintainer (ctate) raised two findings on this round:
 
 Two further gate findings not raised externally: the warn-once latch is daemon-scoped while delivery is per-CLI-process, so a second attached app is silent under the same failure (driven: `app1` warns, `app2` prints nothing); and `portless hosts --help`'s bolded Auto-sync section stayed stale while every other surface gained the sentence.
 
-Run report: `evals/runs/2026-07-24-portless-67572f9.json`.
+Run report: `foundry/runs/review-gate/2026-07-24-portless-67572f9.json`.
 
 ## Round 5 (2026-07-25)
 

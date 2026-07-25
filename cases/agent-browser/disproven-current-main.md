@@ -56,7 +56,7 @@ One green run cannot disprove intermittent behavior. Use repetition and instrume
 
 ## Candidate changes
 
-- Reference rule: Unfold Triage should explain a green before accepting non-reproduction.
+- Reference rule: the Issue Contract reproduction phase should explain a green before accepting non-reproduction.
 - Eval: an old issue whose first green comes from a closed port or trivial artifact check.
 - Coverage gap: evidence-backed verdicts need a safe handoff to the upstream tracker.
 

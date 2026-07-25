@@ -5,9 +5,12 @@ import { resolve } from "node:path";
 
 const repository = resolve(import.meta.dir, "..");
 const evals = JSON.parse(
-	readFileSync(resolve(repository, "skills/unfold/evals/evals.json"), "utf8"),
+	readFileSync(
+		resolve(repository, "foundry/deprecated/unfold/evals/evals.json"),
+		"utf8",
+	),
 );
-const root = resolve("/tmp", `unfold-fixtures-${process.pid}`);
+const root = resolve("/tmp", `deprecated-unfold-fixtures-${process.pid}`);
 
 try {
 	for (const item of evals.evals.filter((item) => item.fixture)) {

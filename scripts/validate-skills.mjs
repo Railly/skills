@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
+import { validateIssueContracts } from "./lib/issue-contracts.mjs";
 
 const SKILLS_DIR = "skills";
 const MARKETPLACE_PATH = join(".claude-plugin", "marketplace.json");
@@ -20,6 +21,12 @@ const INSTALLER_GROUPS = {
 	candidate: "candidates",
 	experimental: "experimental",
 };
+const CANONICAL_WRITERS = new Set([
+	"pick-an-issue",
+	"record-a-case",
+	"review-gate",
+	"trail-decisions",
+]);
 const errors = [];
 
 function parseFrontmatter(text) {
@@ -251,6 +258,29 @@ for (const { name: dir, root } of skills) {
 			`${dir}: SKILL.md exceeds ${MAX_SKILL_LINES} lines; disclose reference material`,
 		);
 	}
+	if (CANONICAL_WRITERS.has(dir)) {
+		for (const marker of [
+			"RAILLY_SKILLS_REPO",
+			"scripts/resolve-source-root.mjs",
+			".agents/skills",
+			".claude/skills",
+		]) {
+			if (!skill.includes(marker)) {
+				errors.push(`${dir}: missing canonical write-root marker "${marker}"`);
+			}
+		}
+	}
+	for (const outputPath of [
+		join(root, "cases"),
+		join(root, "evals", "runs"),
+		join(root, "evals", "radius-dogfood"),
+	]) {
+		if (existsSync(outputPath)) {
+			errors.push(
+				`${dir}: live Foundry output must not ship inside "${outputPath}"`,
+			);
+		}
+	}
 
 	const evalPath = join(root, "evals", "evals.json");
 	if (existsSync(evalPath)) {
@@ -350,6 +380,8 @@ for (const file of markdownFiles("cases").filter(
 )) {
 	validateCase(file);
 }
+
+errors.push(...validateIssueContracts(resolve("."), []).errors);
 
 if (errors.length) {
 	console.error(

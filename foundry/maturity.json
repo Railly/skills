@@ -1,18 +1,13 @@
 {
 	"schema_version": 1,
-	"release": "0.0.1",
+	"release": "0.0.2",
 	"skills": {
-		"unfold": {
-			"type": "protocol",
-			"channel": "stable",
-			"maturity": "dogfooded",
-			"summary": "Learn and Triage were dogfooded during real Portless work. The expanded public corpus includes unvalidated backfills and does not raise maturity; the consolidated protocol has not beaten a baseline yet."
-		},
 		"pick-an-issue": {
 			"type": "intake",
 			"channel": "stable",
 			"maturity": "dogfooded",
-			"summary": "Used to select real and synthetic maintenance candidates. The v0.0.1 matrix and explicit human-selection boundary have not been benchmarked yet."
+			"summary": "Used to select real and synthetic maintenance candidates. The v0.0.2 contract hands selected work to a canonical Issue Contract without owning reproduction or implementation; it has not been benchmarked yet.",
+			"decision": "rounds/004-skill-lifecycle-audit/README.md"
 		},
 		"record-a-case": {
 			"type": "foundry",
@@ -32,37 +27,43 @@
 			"type": "foundry",
 			"channel": "candidate",
 			"maturity": "experimental",
-			"summary": "Append-only decision trail written during implementation so a reviewer can audit the choices behind a diff, not just the diff. Consumed by review-gate's choice-audit lens. Experimental and awaiting baseline evaluation."
+			"summary": "Append-only decision trail written to the canonical Foundry during implementation so review can audit choices, not only the diff. Redesigned after the lifecycle audit and awaiting one real dogfood run.",
+			"decision": "rounds/004-skill-lifecycle-audit/README.md"
 		},
 		"signature-repro": {
 			"type": "triage",
 			"channel": "candidate",
 			"maturity": "experimental",
-			"summary": "Root-cause a bug you cannot reproduce because it needs hardware you lack, by finding its structural (lsof/ps/tar/security) or visual (capture-and-look + window enumeration) signature on the machine you have. Three certainty levels; a signature is a lead, confirmation earns root-cause. Distilled from triaging 21 agent-browser issues (6 Windows/DRM bugs root-caused on a Mac). Experimental, awaiting a baseline eval round."
+			"summary": "Niche triage for bugs that require unavailable hardware or platforms, using structural or visual signatures on available machines. Retained as Candidate only for that boundary and awaiting a baseline eval round.",
+			"decision": "rounds/004-skill-lifecycle-audit/README.md"
 		},
 		"quality-baseline": {
 			"type": "audit",
 			"channel": "experimental",
 			"maturity": "experimental",
-			"summary": "Read-only repository quality baseline that identifies evidenced gaps, rejects unsupported findings, and ranks measurable pilot work before edits."
+			"summary": "Read-only repository quality baseline. Frozen outside the default issue workflow until a real quality-baseline request supplies dogfood evidence.",
+			"decision": "rounds/004-skill-lifecycle-audit/README.md"
 		},
 		"performance-proof": {
 			"type": "optimization",
 			"channel": "experimental",
 			"maturity": "experimental",
-			"summary": "Measurement-first performance workflow for algorithms, data structures, latency, throughput, memory, and build cost."
+			"summary": "Measurement-first performance workflow. Frozen outside the default issue workflow and invoked only for an evidenced performance claim.",
+			"decision": "rounds/004-skill-lifecycle-audit/README.md"
 		},
 		"test-strength": {
 			"type": "verification",
 			"channel": "experimental",
 			"maturity": "experimental",
-			"summary": "Test effectiveness workflow using falsification, mutation, properties, real boundaries, and artifact checks."
+			"summary": "Test effectiveness workflow using falsification, mutation, properties, real boundaries, and artifact checks. Retained as the proof-successor candidate and awaiting comparison against archived Unfold Review and no-skill baselines.",
+			"decision": "rounds/004-skill-lifecycle-audit/README.md"
 		},
 		"resilience-audit": {
 			"type": "audit",
 			"channel": "experimental",
 			"maturity": "experimental",
-			"summary": "Failure-path audit that forces timeouts, cancellation, retries, partial state, overload, cleanup, and concurrency risks."
+			"summary": "Failure-path audit. Frozen outside the default issue workflow and invoked only when timeout, cancellation, retry, cleanup, overload, or concurrency risk triggers it.",
+			"decision": "rounds/004-skill-lifecycle-audit/README.md"
 		}
 	}
 }
