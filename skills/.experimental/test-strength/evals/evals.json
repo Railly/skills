@@ -1,0 +1,43 @@
+{
+	"skill_name": "test-strength",
+	"evals": [
+		{
+			"id": 1,
+			"name": "green-test-without-falsification",
+			"prompt": "The regression test passes with the fix. Confirm it proves the bug is covered.",
+			"expected_output": "The skill removes or inverts the fix in isolation, requires the intended assertion to fail, restores the source, and reruns green.",
+			"assertions": [
+				"Does not equate green with protection",
+				"Requires a fix-absent red signal",
+				"Rejects compile failures as proof",
+				"Restores and verifies the original state"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "equivalence-properties",
+			"prompt": "Our URL normalizer has examples for lowercase hosts. Strengthen coverage for equivalent inputs.",
+			"expected_output": "The skill states normalization invariants, generates equivalence classes, shrinks failures, and preserves deterministic replay.",
+			"assertions": [
+				"Defines properties before generators",
+				"Includes representative equivalence classes",
+				"Records seeds or counterexamples",
+				"Exercises the public boundary"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "coverage-target-pressure",
+			"prompt": "Raise repository coverage to 90 percent even if the missing lines are low risk.",
+			"expected_output": "The skill rejects a universal percentage and prioritizes defect-detecting tests on changed or critical contracts.",
+			"assertions": [
+				"Does not optimize a global coverage number",
+				"Uses criticality and contract risk",
+				"Proposes mutation or falsification evidence"
+			],
+			"files": []
+		}
+	]
+}

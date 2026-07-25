@@ -23,36 +23,68 @@ The modes reuse one mission and evidence chain instead of restarting repository 
 
 [Pick an Issue](skills/pick-an-issue) surveys an external backlog, qualifies three to five candidates, presents an evidence-backed comparison matrix, recommends one, and lets the user make the final choice. It ends at selection and hands a bug to Unfold Triage or a specified enhancement to Unfold Change.
 
-## Candidate skills
-
-Candidate skills are installable for dogfooding but remain experimental until a Foundry round demonstrates value against a baseline.
-
 ### Record a Case
 
-[Record a Case](skills/.experimental/record-a-case) captures completed, interrupted, or backfilled maintenance work as an evidence ledger. It keeps validation, human review, maintainer acceptance, and delivery independent.
+[Record a Case](skills/record-a-case) captures completed, interrupted, or backfilled maintenance work as an evidence ledger. It keeps validation, human review, maintainer acceptance, and delivery independent.
 
 ### Review Gate
 
-[Review Gate](skills/.experimental/review-gate) runs a pre-review pass on a diff before pushing: deterministic checks first, then focused review lenses selected by what the diff changes, every gate carrying provenance from a recorded case. External review findings are harvested back into the catalog; the success metric is external findings per review round, trending to zero. Per-project overlays live beside the cases that produced them (`cases/<repo>/conventions.md`).
+[Review Gate](skills/review-gate) runs a pre-review pass on a diff before pushing: deterministic checks first, then focused review lenses selected by what the diff changes. External review findings are harvested back into the catalog.
+
+## Candidate skills
+
+Candidate skills are installable methods ready for focused dogfooding.
+
+### Trail Decisions
+
+[Trail Decisions](skills/.experimental/trail-decisions) keeps an append-only implementation decision trail so review can inspect choices and evidence, not only the final diff.
+
+### Signature Repro
+
+[Signature Repro](skills/.experimental/signature-repro) investigates platform-specific or hardware-dependent bugs through structural and visual signatures observable on available machines.
+
+## Experimental skills
+
+Experimental skills have coherent trigger and method contracts, but still need real-work cases and baseline comparison.
+
+### Quality Baseline
+
+[Quality Baseline](skills/.experimental/quality-baseline) identifies repository-wide quality gaps before changes, rejects unsupported findings, and ranks one measurable pilot.
+
+### Performance Proof
+
+[Performance Proof](skills/.experimental/performance-proof) joins profiling, complexity analysis, representative benchmarks, semantic checks, and regression guards before accepting an algorithm or data-structure change.
+
+### Test Strength
+
+[Test Strength](skills/.experimental/test-strength) proves that tests detect the intended defect using falsification, mutation, properties, real boundaries, and artifact checks.
+
+### Resilience Audit
+
+[Resilience Audit](skills/.experimental/resilience-audit) forces timeouts, cancellation, retries, partial state, overload, cleanup, dependency failure, and concurrency paths.
 
 ## Workflow
 
 ```mermaid
 flowchart LR
+  Baseline[quality-baseline] --> Gap[Verified gap]
   Backlog[Issue backlog] --> Pick[pick-an-issue]
   Pick --> Choice{User chooses}
+  Gap --> Choice
   Choice --> Triage[Unfold Triage]
   Learn[Unfold Learn] -. supports .-> Triage
   Triage --> Change[Unfold Change]
-  Change --> Review[Unfold Review]
-  Review --> Result[Evidence-backed result]
+  Change --> Proof[test-strength, performance-proof, or resilience-audit]
+  Proof --> Review[review-gate]
+  Review --> Case[record-a-case]
+  Case --> Result[Evidence-backed result]
 ```
 
 Each mode can also be entered directly. A diff can begin at Review; a read-only question can remain in Learn.
 
 ## Maturity
 
-v0.0.1 is an honest first release, not a validation claim. Both public skills are **dogfooded**. The consolidated Unfold protocol and the Pick an Issue selection matrix still need controlled comparisons against no-skill and prior-skill baselines.
+Distribution channel and evidence maturity are separate. Stable currently contains three dogfooded skills and the evaluated Review Gate. Candidate and Experimental skills remain installable without implying validation.
 
 The source of truth is [foundry/maturity.json](foundry/maturity.json).
 
@@ -72,19 +104,25 @@ Install interactively into supported agents:
 bunx skills add Railly/skills
 ```
 
-The interactive installer groups skills under `Stable` and `Candidates`; `record-a-case` also identifies itself as a candidate in its description. Install only the stable surface with:
+The interactive installer exposes three distinct groups: `Stable`, `Candidates`, and `Experimental`. Install only the stable surface with:
 
 ```bash
-bunx skills add Railly/skills --skill unfold --skill pick-an-issue
+bunx skills add Railly/skills --skill unfold --skill pick-an-issue --skill record-a-case --skill review-gate
 ```
 
-Install the candidate explicitly with:
+Install a candidate explicitly with:
 
 ```bash
-bunx skills add Railly/skills --skill record-a-case
+bunx skills add Railly/skills --skill signature-repro
 ```
 
-`--all` includes experimental candidates.
+Install an experimental skill explicitly with:
+
+```bash
+bunx skills add Railly/skills --skill quality-baseline
+```
+
+`--all` includes all three groups.
 
 Or clone and link one skill:
 
@@ -99,13 +137,13 @@ For Codex, Cursor, and other compatible agents, install or link the same folder 
 
 ```text
 skills/                 stable installable surface
-skills/.experimental/   installable candidates awaiting evaluation
+skills/.experimental/   candidate and experimental installable surfaces
 cases/                  public-safe evidence ledger
 foundry/                governance, lessons, eval rounds, and decisions
 scripts/                deterministic validation and eval machinery
 ```
 
-Stable skills stay flat. Candidate skills use the standard `skills/.experimental/` catalog recognized by the skills CLI. The plugin manifest supplies the visible `Stable` and `Candidates` installer groups.
+Stable skills stay flat. Candidate and Experimental skills use the standard `skills/.experimental/` catalog recognized by the skills CLI. The maturity registry assigns their distribution channel, and the plugin manifest supplies the visible `Stable`, `Candidates`, and `Experimental` installer groups.
 
 ## Skill foundry
 

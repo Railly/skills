@@ -4,33 +4,65 @@
 	"skills": {
 		"unfold": {
 			"type": "protocol",
+			"channel": "stable",
 			"maturity": "dogfooded",
 			"summary": "Learn and Triage were dogfooded during real Portless work. The expanded public corpus includes unvalidated backfills and does not raise maturity; the consolidated protocol has not beaten a baseline yet."
 		},
 		"pick-an-issue": {
 			"type": "intake",
+			"channel": "stable",
 			"maturity": "dogfooded",
 			"summary": "Used to select real and synthetic maintenance candidates. The v0.0.1 matrix and explicit human-selection boundary have not been benchmarked yet."
 		},
 		"record-a-case": {
 			"type": "foundry",
-			"maturity": "experimental",
-			"summary": "Derived from public maintenance backfills and structured as an evidence ledger. It has candidate evals but has not completed a baseline comparison or human review round."
+			"channel": "stable",
+			"maturity": "dogfooded",
+			"summary": "Used to capture real public maintenance work and backfills as evidence ledgers. Promoted to the stable distribution surface; it has not completed a baseline comparison.",
+			"decision": "rounds/003-distribution-ladder/README.md"
 		},
 		"review-gate": {
 			"type": "gate",
-			"maturity": "experimental",
-			"summary": "Pre-review gate harvested from maintainer review rounds across agent-browser and portless cases. A recorded baseline exists (findings per external review round on three reviewed PRs) but no eval round has run."
+			"channel": "stable",
+			"maturity": "evaluated",
+			"summary": "Pre-review gate harvested from maintainer review rounds across agent-browser and portless cases. Blind replication round 002 compared the method against an answer key and exposed both catches and verification losses.",
+			"decision": "rounds/003-distribution-ladder/README.md"
 		},
 		"trail-decisions": {
 			"type": "foundry",
+			"channel": "candidate",
 			"maturity": "experimental",
 			"summary": "Append-only decision trail written during implementation so a reviewer can audit the choices behind a diff, not just the diff. Consumed by review-gate's choice-audit lens. Experimental and awaiting baseline evaluation."
 		},
 		"signature-repro": {
 			"type": "triage",
+			"channel": "candidate",
 			"maturity": "experimental",
 			"summary": "Root-cause a bug you cannot reproduce because it needs hardware you lack, by finding its structural (lsof/ps/tar/security) or visual (capture-and-look + window enumeration) signature on the machine you have. Three certainty levels; a signature is a lead, confirmation earns root-cause. Distilled from triaging 21 agent-browser issues (6 Windows/DRM bugs root-caused on a Mac). Experimental, awaiting a baseline eval round."
+		},
+		"quality-baseline": {
+			"type": "audit",
+			"channel": "experimental",
+			"maturity": "experimental",
+			"summary": "Read-only repository quality baseline that identifies evidenced gaps, rejects unsupported findings, and ranks measurable pilot work before edits."
+		},
+		"performance-proof": {
+			"type": "optimization",
+			"channel": "experimental",
+			"maturity": "experimental",
+			"summary": "Measurement-first performance workflow for algorithms, data structures, latency, throughput, memory, and build cost."
+		},
+		"test-strength": {
+			"type": "verification",
+			"channel": "experimental",
+			"maturity": "experimental",
+			"summary": "Test effectiveness workflow using falsification, mutation, properties, real boundaries, and artifact checks."
+		},
+		"resilience-audit": {
+			"type": "audit",
+			"channel": "experimental",
+			"maturity": "experimental",
+			"summary": "Failure-path audit that forces timeouts, cancellation, retries, partial state, overload, cleanup, and concurrency risks."
 		}
 	}
 }

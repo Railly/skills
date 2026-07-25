@@ -53,4 +53,5 @@ Rejection and absorption are intended outcomes of this system. A new skill is th
 ## Current candidates
 
 - [agent-browser evidence pack](candidates/2026-07-agent-browser-evidence-pack.md): unvalidated Triage and Review rules awaiting a baseline round.
-- [record-a-case](../skills/.experimental/record-a-case): installable candidate for conservative post-work case capture. It defaults synthetic backfills to unvalidated and pending human review.
+- [trail-decisions](../skills/.experimental/trail-decisions): decision-trail method awaiting focused dogfooding.
+- [signature-repro](../skills/.experimental/signature-repro): structural-signature triage method awaiting a baseline comparison.
