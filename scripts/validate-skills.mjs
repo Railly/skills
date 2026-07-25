@@ -14,6 +14,12 @@ const MATURITY_STATES = new Set([
 	"validated",
 	"deprecated",
 ]);
+const DISTRIBUTION_CHANNELS = new Set(["stable", "candidate", "experimental"]);
+const INSTALLER_GROUPS = {
+	stable: "stable",
+	candidate: "candidates",
+	experimental: "experimental",
+};
 const errors = [];
 
 function parseFrontmatter(text) {
@@ -136,6 +142,9 @@ if (!existsSync(MARKETPLACE_PATH)) {
 } else {
 	try {
 		const marketplace = JSON.parse(readFileSync(MARKETPLACE_PATH, "utf8"));
+		const maturity = JSON.parse(
+			readFileSync(join("foundry", "maturity.json"), "utf8"),
+		);
 		const declared = new Map();
 		for (const plugin of marketplace.plugins ?? []) {
 			for (const path of plugin.skills ?? []) {
@@ -144,11 +153,10 @@ if (!existsSync(MARKETPLACE_PATH)) {
 		}
 		for (const skill of skills) {
 			const group = declared.get(skill.root);
-			const expected =
-				skill.catalog === ".experimental" ? "candidates" : "stable";
+			const expected = INSTALLER_GROUPS[maturity.skills?.[skill.name]?.channel];
 			if (group !== expected) {
 				errors.push(
-					`${skill.name}: installer group must be "${expected}", received "${group ?? "missing"}"`,
+					`${skill.name}: installer group must be "${expected ?? "declared by its distribution channel"}", received "${group ?? "missing"}"`,
 				);
 			}
 		}
@@ -183,12 +191,22 @@ if (!existsSync(maturityPath)) {
 			if (!entry.type || !entry.summary) {
 				errors.push(`${skill.name}: maturity entry needs type and summary`);
 			}
+			if (!DISTRIBUTION_CHANNELS.has(entry.channel)) {
+				errors.push(
+					`${skill.name}: invalid distribution channel "${entry.channel}"`,
+				);
+			}
+			if (skill.catalog === "stable" && entry.channel !== "stable") {
+				errors.push(
+					`${skill.name}: flat skills must use the stable distribution channel`,
+				);
+			}
 			if (
 				skill.catalog === ".experimental" &&
-				entry.maturity !== "experimental"
+				!["candidate", "experimental"].includes(entry.channel)
 			) {
 				errors.push(
-					`${skill.name}: skills/.experimental entries must have experimental maturity`,
+					`${skill.name}: skills/.experimental entries must use the candidate or experimental distribution channel`,
 				);
 			}
 			if (entry.decision && !existsSync(join("foundry", entry.decision))) {

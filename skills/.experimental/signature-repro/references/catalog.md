@@ -64,6 +64,15 @@ dependent (reporter's Windows 11 multi-monitor), which the runner couldn't force
 capture+look+cross-enumerate reached the mechanism without the reporter's hardware;
 the last mile is honestly labeled.
 
+## Cross-platform CI confirmation
+
+A matrix can fail for reasons unrelated to the bug. Handle these before interpreting the result:
+
+- Fault-inject with a native binary. A launcher using `Command::new(path)` will not run a shell script on every platform. Compile a small fixture when needed and tag child processes with a unique marker in `argv`.
+- Bound every external call by PID. A CLI may retry longer on Windows and consume the whole job timeout before evidence is collected.
+- Exclude the PowerShell query process when its own command line contains the marker being counted.
+- Inspect the runner's orphan-process cleanup lines as an independent witness for leaked process trees.
+
 ## When it genuinely doesn't apply (be honest)
 
 The method finds mechanisms observable in a process, artifact, or system. It does

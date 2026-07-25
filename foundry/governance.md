@@ -47,6 +47,18 @@ flowchart TB
 
 The machine-readable registry is [maturity.json](maturity.json). No existing skill is validated by default.
 
+## Distribution channels
+
+Distribution channel answers how strongly the catalog recommends installation. It is independent from evidence maturity.
+
+| Channel | Meaning | Repository surface |
+|---|---|---|
+| Stable | Recommended default surface | `skills/<name>` |
+| Candidate | Installable method ready for focused dogfooding | `skills/.experimental/<name>` |
+| Experimental | Early method whose contract and evals still need proof | `skills/.experimental/<name>` |
+
+Promotion between channels requires an explicit decision. Maturity changes only when the required evidence exists.
+
 ## Candidate decision states
 
 These states describe a proposed change moving through the foundry, not whether a public case may be recorded.

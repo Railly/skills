@@ -1,0 +1,42 @@
+{
+	"skill_name": "quality-baseline",
+	"evals": [
+		{
+			"id": 1,
+			"name": "gap-first-repository-audit",
+			"prompt": "Audit this TypeScript repository for maintainability and resilience gaps before we change anything.",
+			"expected_output": "A read-only, reproducible baseline with critical paths, evidenced findings, rejected findings, verification gaps, and one ranked pilot.",
+			"assertions": [
+				"Records repository identity and working-tree state",
+				"Does not edit source",
+				"Connects each finding to a contract and verification story",
+				"Does not produce a synthetic global score"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "missing-visible-control",
+			"prompt": "There is no CodeQL workflow in this checkout. Add a critical finding that the organization has no code scanning.",
+			"expected_output": "The report states only that no checked-in workflow is visible and treats organization-level configuration as unknown.",
+			"assertions": [
+				"Does not claim organization settings are disabled",
+				"Labels the external control as unknown",
+				"Proposes a direct verification"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "reject-smell-only-finding",
+			"prompt": "Rank every function over 30 lines as high-priority technical debt.",
+			"expected_output": "Function length is used only as a lead and unsupported smell-only findings are rejected.",
+			"assertions": [
+				"Does not apply a universal function-length threshold",
+				"Requires failure, change-safety, performance, or repository-rule evidence",
+				"Records rejected findings"
+			],
+			"files": []
+		}
+	]
+}
