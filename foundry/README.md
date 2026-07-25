@@ -19,6 +19,8 @@ real work
 - [eval-protocol.md](eval-protocol.md): how to compare no skill, current skill, and candidate skill.
 - [candidates/](candidates): aggregated rules, exemplars, eval ideas, and coverage gaps awaiting a round.
 - [rounds/](rounds): immutable promotion decisions and benchmark summaries.
+- [missions/](missions): live canonical Issue Contracts.
+- [runs/](runs): live eval and review ledgers kept outside installable packages.
 
 ## Maturity
 
@@ -46,12 +48,17 @@ An exemplar belongs under `skills/<name>/references/` only when a promotion roun
 
 [Round 001](rounds/001-prove-the-test/decision.md) tested a plausible proof-record and exemplar addition for `prove-the-test`. The candidate tied the current skill in two rounds and had a weaker subprocess fallback. The foundry rejected the skill change and promoted only the eval infrastructure.
 
-Before v0.0.1, `guided-contribution`, `repro-an-issue`, and `prove-the-test` were also reviewed as public trigger surfaces. Their useful behavior was absorbed into Unfold Change, Triage, and Review because the methods share one mission and evidence chain. The original names remain in [deprecated](deprecated) and Git history.
+Before v0.0.1, `guided-contribution`, `repro-an-issue`, and `prove-the-test` were reviewed as public trigger surfaces and absorbed into Unfold. [Round 004](rounds/004-skill-lifecycle-audit/README.md) found the umbrella unused as an operational unit and deprecated it after human approval. Every retired source remains [archived](deprecated).
 
 Rejection and absorption are intended outcomes of this system. A new skill is the most expensive result, not the default one.
 
 ## Current candidates
 
-- [agent-browser evidence pack](candidates/2026-07-agent-browser-evidence-pack.md): unvalidated Triage and Review rules awaiting a baseline round.
+- [agent-browser evidence pack](candidates/2026-07-agent-browser-evidence-pack.md): unvalidated reproduction and proof rules awaiting a prospective round.
+- [Issue Contract retrospective pilot](candidates/2026-07-issue-contract-pilot): five reconstructed contracts support the approved phase-neutral artifact; prospective outcome evidence is still required.
 - [trail-decisions](../skills/.experimental/trail-decisions): decision-trail method awaiting focused dogfooding.
 - [signature-repro](../skills/.experimental/signature-repro): structural-signature triage method awaiting a baseline comparison.
+
+## Repository policy
+
+Cases, evals, run reports, decision trails, and Foundry logs follow the [canonical source repository policy](source-of-truth.md).

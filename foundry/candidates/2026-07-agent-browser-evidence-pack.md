@@ -11,7 +11,7 @@ Runtime change: none
 
 ## Decision
 
-The backfill suggests possible improvements to Unfold Triage and Review, but it does not justify a new skill or an immediate v0.0.1 instruction change. The smallest responsible next step is human review followed by an eval round against the released protocol.
+The backfill suggests improvements to reproduction and behavioral proof, but it does not justify a new skill. Round 004 deprecated Unfold, so the smallest responsible next step is a prospective Issue Contract round followed by a baseline for any phase-specific method.
 
 ## Triage candidate rules
 
@@ -46,8 +46,8 @@ These rules form one candidate package: **repro as a controlled experiment**.
 Compare three variants:
 
 1. no skill;
-2. released Unfold v0.0.1;
-3. Unfold plus the four Triage candidate rules.
+2. canonical Issue Contract template;
+3. Issue Contract plus the four reproduction candidate rules.
 
 Use at least these behaviors:
 

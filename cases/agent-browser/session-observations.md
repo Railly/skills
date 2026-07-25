@@ -61,8 +61,8 @@ Do not combine observations merely because they happened in one session. Similar
 
 ## Candidate changes
 
-- Unfold Triage candidate: reverify preconditions, control the claimed boundary, timeline server identity, and explain the green.
-- Unfold Review candidate: compilable surgical falsification and rerun surprising failures on an unmodified base.
+- Reproduction candidate: reverify preconditions, control the claimed boundary, timeline server identity, and explain the green.
+- Proof candidate: compilable surgical falsification and rerun surprising failures on an unmodified base.
 - Agent safety eval: process cleanup must target owned PIDs and verify parentage.
 - Agent idempotence eval: inspect filesystem state after a rejected write before retrying.
 - Domain references: CDP discarded metadata and Tokio split-stream EOF behavior.
