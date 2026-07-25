@@ -1,6 +1,6 @@
 ---
 name: record-a-case
-description: "Candidate: Record completed or interrupted maintenance work as an evidence ledger. Use after resolving, disproving, reviewing, or investigating an issue, PR, incident, or agent run; when backfilling an old session; or when another skill needs a durable case before extracting a method. Experimental and awaiting baseline evaluation."
+description: "Record completed or interrupted maintenance work as an evidence ledger. Use after resolving, disproving, reviewing, or investigating an issue, PR, incident, or agent run; when backfilling an old session; or when another skill needs a durable case before extracting a method."
 compatibility: Requires access to the work evidence. Writing a case requires an authorized destination; live issue, PR, branch, and release checks require network access.
 ---
 
