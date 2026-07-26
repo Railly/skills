@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-25",
+    "repo": "vercel-labs/agent-browser",
+    "base": "3cc7022271235694b5b5ce8aaea8bbfaa66e8cd5",
+    "head": "d86d230826a7f61374b21d554fb4bc54c41b91cf",
+    "status": "complete",
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "unknown (human-authored PR)",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": false
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"The frame source changed from an ordered broadcast receiver plus cached last_frame to a latest-value watch receiver; checked what buffering and ordering the old source provided that the new design removes."},
+    {"name":"New-domain matrix","status":"run","reason":"The new config message accepts maxFps values; exercised 0, positive per-client caps, cap changes, oversized and invalid shapes through code/tests."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No overlapping hostname, route, or key resolution rule changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No user-facing warning or one-shot daemon diagnostic was added."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No test shims an external binary."},
+    {"name":"Deliberate-default check","status":"run","reason":"Default frame delivery changed from an ordered 64-message broadcast backlog to latest-value delivery; history, tests, and runtime behavior were checked."},
+    {"name":"Fresh-seam scan","status":"skipped","reason":"The diff does not patch a runtime/framework to expose a signal to application code."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"No named external reference contract is being reimplemented."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No formerly infallible or hanging function gained a returned error outcome."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"maxFps is a per-WebSocket config message, not a CLI/MCP flag or daemon launch mode."},
+    {"name":"Error-path forcing","status":"run","reason":"Forced invalid config shapes, connection closure, stalled output, cap changes, and the idle-timeout merge path."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action was added."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"The diff adds a spawned reader task, abort cleanup, throttle deadlines, and watch wakeups; cancellation and timing behavior were inspected and driven."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Frames and control traffic now cross separate channels and each WebSocket is split into reader/writer halves; discovery, initial delivery, steady-state delivery, and cleanup were traced."},
+    {"name":"Substrate verification","status":"run","reason":"All feature claims were checked against DOM state, received WebSocket messages, timing, and daemon process identity."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Built cli/target/release/agent-browser and drove unique sessions against real Chrome with raw WebSocket clients and a loopback slow-link proxy."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Compared the built binary's observed delivery/input behavior with CLI help, README, web docs, MCP descriptions, and core skill surfaces."},
+    {"name":"Demonstrative example","status":"run","reason":"The new maxFps JSON examples were sent to the built artifact and produced distinct measured per-client rates."},
+    {"name":"Choice audit","status":"skipped","reason":"No .decisions.tsv trail exists."},
+    {"name":"Complexity budget","status":"skipped","reason":"The diff adds no per-element loop with nested membership or lookup whose complexity scales with page candidates."}
+  ],
+  "deterministic": [
+    {"check":"gate.sh style origin/main","outcome":"pass","reason":"No prohibited added-line punctuation."},
+    {"check":"gate.sh surfaces conventions.md origin/main","outcome":"acknowledged","reason":"The original map passed because it had no native stream trigger; after harvesting this run, the new cli/src/native/stream/*.rs rule correctly flags missing skill-data/core/* while CLI help, README, and web streaming docs are present."},
+    {"check":"gate.sh siblings maxFps origin/main","outcome":"pass","reason":"Every existing maxFps mention is in a diffed file and no untouched passage mentions it."},
+    {"check":"gate.sh siblings stream/frame/input origin/main","outcome":"acknowledged","reason":"These generic nouns produce many unrelated protocol, iframe, UI, dependency, and changelog hits; relevant streaming passages were manually read, yielding the core-skill finding and exemptions recorded below."},
+    {"check":"gate.sh callers changed stream functions origin/main","outcome":"acknowledged","reason":"Changed stream call sites are in diffed files; the inspect_server.rs accept_loop hits are a distinct same-named local function."},
+    {"check":"gate.sh timings origin/main","outcome":"pass","reason":"The diff adds no timeout or wait ceiling constant."},
+    {"check":"radius impact --base 3cc7022","outcome":"acknowledged","reason":"Map saved with 29 changed and 368 impacted symbols, but under-covers because unresolvedCalls=2382 and rust-analyzer emitted duplicate/unmapped SCIP errors; used only for orientation."},
+    {"check":"cargo build --release","outcome":"pass","reason":"Release artifact built successfully."},
+    {"check":"cargo test","outcome":"pass","reason":"1033 passed, 96 ignored; doctor integration tests 2 passed."},
+    {"check":"cargo fmt -- --check","outcome":"pass","reason":"No formatting drift."},
+    {"check":"cargo clippy --all-targets -- -D warnings","outcome":"pass","reason":"No warnings."},
+    {"check":"force-red regression tests","outcome":"pass","reason":"Removing u64 clamping made test_parse_config_max_fps_clamps_without_wrapping fail; removing deadline recomputation made test_loosening_cap_midstream_takes_effect_immediately fail at 850ms."}
+  ],
+  "findings": [
+    {
+      "id":"F1",
+      "state":"confirmed",
+      "claim":"Input is still blocked by output backpressure during WebSocket connection setup, so it does not always dispatch immediately independent of frame delivery.",
+      "evidence":"websocket.rs:225-277 sends status, tabs, and the cached frame through ws_tx before spawning reader_loop. With real Chrome at 4000x4000 and a loopback proxy that stopped reading server output, 310651 bytes filled the proxy receive queue; one keyboard event sent upstream left DOM inputCount=0 at 0.5s and 1.5s, then became 4 after output resumed at 2s. The event was delayed, not malformed.",
+      "layer":"built CLI to daemon WebSocket to CDP to real Chrome DOM under transport backpressure",
+      "source":"lens",
+      "path":"handle_ws_client initial ws_tx.send calls → reader_loop spawn → dispatch_input → CdpClient::send_command"
+    },
+    {
+      "id":"F2",
+      "state":"confirmed",
+      "claim":"Latest-frame-wins does not hold for a genuinely lagging reader because already-written WebSocket frames accumulate in the transport buffer and drain as a stale backlog.",
+      "evidence":"With real Chrome animating at 320x200, a raw client drained for 1s, paused reads for 3s, then resumed. It received 189 frame messages in 155ms while the page advanced about 62 animation ticks during the pause. websocket.rs:330-340 replaces only frames not yet selected for ws_tx.send; it cannot replace frames already accepted by the socket. This contradicts README and streaming docs claims that lagging clients always receive the newest frame instead of draining a backlog.",
+      "layer":"real Chrome frame producer through daemon WebSocket and TCP transport to a paused user client",
+      "source":"lens",
+      "path":"cdp_event_loop Page.screencastFrame → frame_watch → handle_ws_client ws_tx.send → TCP receive buffer"
+    },
+    {
+      "id":"F3",
+      "state":"confirmed",
+      "claim":"The required AI-agent core skill surface does not document the new user-facing stream behavior or maxFps protocol.",
+      "evidence":"AGENTS.md requires every user-facing behavior to update skill-data/core/SKILL.md and/or its references. origin/main...HEAD changes README, CLI help, and docs streaming page but no skill-data/core file. The only stream protocol-related core reference line is AGENT_BROWSER_STREAM_PORT; neither maxFps nor latest-frame delivery appears under skill-data/core.",
+      "layer":"repository-mandated documentation surface parity",
+      "source":"gate",
+      "path":"AGENTS.md Documentation rule → skill-data/core/SKILL.md or references"
+    }
+  ],
+  "exemptions": [
+    {"claim":"cli/src/mcp.rs need not change for this PR.","evidence":"The CLI stream commands, flags, parser, outputs, environment variables, and MCP-dispatched command envelopes are unchanged; maxFps is a raw downstream WebSocket client message and MCP has no stream-protocol client surface."},
+    {"claim":"Unrelated broad siblings need not change.","evidence":"Manual passage review showed generic stream/frame/input hits outside README, CLI stream help, docs streaming, skill-data/core, MCP, and dashboard describe unrelated data streams, iframes, form input, dependencies, or terse command listings and make no delivery/backpressure claim."},
+    {"claim":"packages/dashboard does not need a maxFps change.","evidence":"The dashboard remains a valid uncapped client because 0/omitted is the documented default; its existing frame and input message shapes remain accepted."},
+    {"claim":"The inspect_server.rs accept_loop caller-gate hits are unrelated.","evidence":"cli/src/native/inspect_server.rs defines and calls its own module-local accept_loop, not native::stream::websocket::accept_loop whose signature changed."},
+    {"claim":"No changelog entry is required for an unreleased feature PR.","evidence":"Repository release instructions reserve changelog entries for manual release-preparation PRs, and this branch is a feature PR rather than a release PR."}
+  ],
+  "issue_candidates": [],
+  "prior_run_assessment": {
+    "F1": "confirmed: the first merge resolution widened idle marking outside the live-client guard; d86d230 restores origin/main placement.",
+    "F2": "refuted in its unconditional form: ordinary-path cap counts and clicks work, but input is delayed while initial server output is backpressured.",
+    "F3": "refuted: with identical --idle-timeout 5s fingerprints, both a passive-WebSocket daemon and no-WebSocket control exited within 11 seconds.",
+    "exemption_handle_connection": "confirmed: the out-of-diff hits are distinct private functions.",
+    "exemption_impact_map": "refuted: the skill requires the map when available, and the completed under-covering map still returned 368 impacted symbols; full-file reading did not prevent the prior run from missing the two transport/setup failures.",
+    "missed": [
+      "Initial status/tabs/cached-frame writes occur before reader_loop is spawned, leaving input dependent on output backpressure during setup.",
+      "WebSocket/TCP transport buffering drains stale frames despite the application watch channel.",
+      "The AGENTS.md-required skill-data/core documentation surface is absent."
+    ]
+  },
+  "dogfood": {
+    "artifact":"cli/target/release/agent-browser",
+    "browser":"real local Chrome",
+    "sessions":["gate2-d86d230-725","gate2-idle4-d86d230"],
+    "observations":[
+      "Two simultaneous clients configured to 2 fps and 10 fps received 6 and 31 frames over 3.2s, at approximately 0.501s and 0.102s intervals.",
+      "Twelve keyboard events on the throttled connection all reached the DOM.",
+      "A paused reader accumulated and then drained 189 stale frame messages in 155ms.",
+      "A proxy-stalled initial output path delayed input until output resumed.",
+      "With an identical --idle-timeout 5s launch fingerprint, eight seconds of one-per-second WebSocket input kept the daemon PID alive; it exited after subsequent silence."
+    ]
+  }
+}
