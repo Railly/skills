@@ -50,7 +50,7 @@ When no authoritative ID resolution exists, attribute matching may be unavoidabl
 
 ## Candidate changes
 
-- Reference rule: Unfold Triage should test the control outside the reporter's claimed boundary.
+- Reference rule: the Issue Contract reproduction phase should test the control outside the reporter's claimed boundary.
 - Eval: a dynamic-only report where the static control also fails.
 - Coverage gap: exact OOPIF placement and the reporter's older version were not reproduced.
 

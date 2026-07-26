@@ -8,6 +8,10 @@ compatibility: Requires access to the work evidence. Writing a case requires an 
 
 Treat the case as an evidence ledger. Preserve what happened before extracting a method. Promotion is a separate process.
 
+## Canonical write root
+
+Before writing, resolve the canonical `Railly/skills` checkout through `RAILLY_SKILLS_REPO`, `~/Programming/railly/skills`, or `~/railly-skills`. The canonical resolver is `scripts/resolve-source-root.mjs`. Never write a case, eval, or log into the current repo's `.agents/skills`, `.claude/skills`, another installed skill copy, or the target repository. If the source root is unavailable, return the draft and report the blocked write.
+
 ## 1. Bound one case
 
 Name the maintenance unit: one issue, PR, incident, review, disproven claim, or coherent batch with one transferable lesson. Split unrelated outcomes even when they occurred in the same session.
@@ -19,6 +23,7 @@ Name the maintenance unit: one issue, PR, incident, review, disproven claim, or 
 Inventory evidence before prose. Collect durable retrieval handles:
 
 - repository, commit, branch, issue, and PR
+- Issue Contract path, final state, and acceptance IDs when one exists
 - exact command and behavior-specific output
 - regression test and its fix-absent result
 - restored green command
@@ -71,8 +76,10 @@ For a public case, retain public repositories and the author's public work. Sani
 
 ## 6. Materialize the case
 
-Read [the case schema and allowed values](references/template.md), then write to the user-specified destination. When the repository has a case corpus, follow its naming and validation rules. Without write authority, return the complete draft in the response.
+Read [the case schema and allowed values](references/template.md), then write to `cases/<repo>/` under the canonical source root. Use another destination only when the user explicitly names it and it is not an installed skill copy. Follow the canonical corpus naming and validation rules. Without write authority, return the complete draft in the response.
 
 Set human-review status only from explicit human feedback or retrievable review evidence. Present new agent-authored records as pending review.
 
-**Complete when:** the artifact passes the destination's validator, all schema fields are resolved, and a reader can reconstruct the work from retrieval handles without trusting the narrative.
+When the case closes a live mission, update its canonical Issue Contract to `Status: closed` and record the case path and final delivery state. Do not fill missing proof retrospectively.
+
+**Complete when:** the artifact passes the destination's validator, all schema fields are resolved, the live contract points to the case when applicable, and a reader can reconstruct the work from retrieval handles without trusting the narrative.

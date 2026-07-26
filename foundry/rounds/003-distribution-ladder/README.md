@@ -2,6 +2,7 @@
 
 Status: complete
 Date: 2026-07-25
+Superseded for Unfold by [Round 004](../004-skill-lifecycle-audit/README.md).
 
 ## Decision
 
@@ -16,6 +17,8 @@ The marketplace now exposes three independent distribution channels:
 `review-gate` moves to Stable with evaluated maturity because round 002 performed a blind comparison against a maintainer-review answer key. Its mixed result remains visible and does not qualify as validated.
 
 The four new quality skills enter Experimental with method and trigger eval definitions but no real-work case or comparison result.
+
+This list records the Round 003 release state. Round 004 later removed Unfold from Stable without changing the remaining channels.
 
 ## Rule
 

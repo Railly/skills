@@ -50,7 +50,7 @@ Do not skip failed items when the operation is transactional or later items depe
 
 ## Candidate changes
 
-- Reference rule: Unfold Review should require artifact verification when a fix cancels work in an external system.
+- Reference rule: Review Gate should require artifact verification when a fix cancels work in an external system.
 - Eval: a unit-green cancellation fix that leaves real external state blocked.
 - Exemplar: fail-soft batch restoration with a side effect found only end to end.
 

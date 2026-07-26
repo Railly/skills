@@ -20,7 +20,7 @@ Score observable behavior as pass or fail. Do not grade writing style or require
 
 ```json
 {
-  "fixture": "unfold-003",
+  "fixture": "issue-contract-003",
   "variant": "candidate",
   "environment": {
     "repository": "owner/repo@sha",
