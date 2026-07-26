@@ -143,7 +143,7 @@ Observable pass signal: batch resources no longer collide.
 
 Provisional only. Do not promote before human review.
 
-Modify existing skill. Add explicit caller inventory to `prove-the-test`'s helper-versus-caller guidance.
+Historical recommendation: add explicit caller inventory to the proof workflow. The active destination is a Test Strength eval and the Review Gate caller check.
 
 ## Missing evidence
 

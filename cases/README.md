@@ -85,7 +85,7 @@ Cases: Portless #269, #285, PR #355, agent-browser PR #1532.
 
 Repeated method: remove the production behavior while retaining the committed test, require a bug-specific failure, then restore and require green. When the change lives in caller wiring, drive and mutate that caller rather than only its helper.
 
-Destination: Unfold Review behavior fixtures. The proposed exemplars and proof-record text did not outperform the prior standalone skill and were rejected.
+Destination: Test Strength behavior fixtures plus Review Gate. The proposed exemplars and proof-record text did not outperform the prior standalone skill and were rejected.
 
 ### B. Reproduction as a controlled experiment
 
@@ -93,7 +93,7 @@ Cases: Portless PR #352; agent-browser #1291, #1336, #1367, #1445, and the dispr
 
 Repeated method: verify the reported path and preconditions, run the control outside the claimed boundary, timeline process identity when state crosses commands, and explain a green before accepting non-reproduction.
 
-Destination: [candidate pack](../foundry/candidates/2026-07-agent-browser-evidence-pack.md) for a controlled Unfold Triage round.
+Destination: [candidate pack](../foundry/candidates/2026-07-agent-browser-evidence-pack.md) for a controlled Issue Contract reproduction round.
 
 ### C. Substrate and artifact verification
 
@@ -101,7 +101,7 @@ Cases: agent-browser #1105, #1204, #1266, #1291, and #1336.
 
 Repeated method: distrust a success output implicated by the bug, inspect the real substrate or serialized artifact, and verify external side effects end to end.
 
-Destination: retain as Unfold Review rule and eval candidates.
+Destination: retain as Review Gate rules and Test Strength eval candidates.
 
 ### D. Configuration and adapter boundaries
 

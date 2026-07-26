@@ -2,6 +2,8 @@
 
 Railly Skills is adopting a promotion system for methods grounded in real maintenance work and behavior evaluation. The initial catalog predates this system and must earn maturity retroactively. A lesson is not a skill merely because it worked once.
 
+All cases, evals, run reports, decision trails, and Foundry logs follow the [canonical source repository policy](source-of-truth.md). Installed skill copies are never write destinations.
+
 ## Evidence pipeline
 
 ```mermaid
@@ -46,6 +48,8 @@ flowchart TB
 | Deprecated | Evidence or overlap shows the skill should no longer be recommended |
 
 The machine-readable registry is [maturity.json](maturity.json). No existing skill is validated by default.
+
+Deprecated skills leave the active registry and marketplace. Preserve their complete source, references, and eval evidence under `foundry/deprecated/<name>/` with a decision link.
 
 ## Distribution channels
 

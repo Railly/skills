@@ -14,7 +14,7 @@ if (!fixtureName || !destinationArg) {
 
 const root = resolve(
 	import.meta.dir,
-	"../skills/unfold/evals/fixtures",
+	"../foundry/deprecated/unfold/evals/fixtures",
 	fixtureName,
 );
 const base = resolve(root, "base");

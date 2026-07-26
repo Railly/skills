@@ -50,7 +50,7 @@ The extra exception-channel check is unnecessary when the transport already mate
 
 ## Candidate changes
 
-- Reference rule: Unfold Review should observe the substrate directly when the reported failure is silent success.
+- Reference rule: Review Gate should observe the substrate directly when the reported failure is silent success.
 - Eval: a command returns success while DOM, filesystem, or database state remains unchanged.
 - Coverage gap: other `Runtime.callFunctionOn` call sites were not audited.
 

@@ -1,11 +1,12 @@
-# Absorbed methods
+# Deprecated and absorbed methods
 
-These names shipped before the v0.0.1 protocol was consolidated. Their useful behavior remains in Unfold, while Git history preserves the original skills.
+These names shipped in earlier catalog versions. They are not installable skills. Git history, archived sources, and Foundry rounds preserve their original contracts.
 
-| Former skill | Status | Current owner | Reason |
+| Former skill | Status | Current destination | Reason |
 |---|---|---|---|
-| `guided-contribution` | absorbed | `unfold` Change, `guided` policy | Human-agent control is a collaboration policy inside a maintenance mission. |
-| `repro-an-issue` | absorbed | `unfold` Triage, Establish Signal | Reproduction is the evidence gate for root-cause analysis. |
-| `prove-the-test` | absorbed | `unfold` Review, Revert Proof | Test falsification is one proof obligation inside behavioral review. |
+| `guided-contribution` | deprecated, absorbed | Normal task collaboration policy | Human-agent control is a policy, not a maintenance skill. |
+| `repro-an-issue` | deprecated, absorbed | Issue Contract reproduction phase, pending prospective eval | Reproduction is an evidence gate. The lifecycle audit does not justify restoring a public skill yet. |
+| `prove-the-test` | deprecated, absorbed | `test-strength` candidate plus `review-gate`, pending baseline | Test falsification is one proof obligation, not a complete review protocol. |
+| [`unfold`](unfold/SKILL.md) | deprecated, archived | Issue Contract workflow plus phase-specific methods | The umbrella had no explicit Vercel issue use, no baseline run, and a broad trigger surface that overlapped clearer units. |
 
-Absorption does not claim validation. It reduces public trigger and context surface while the combined protocol is evaluated.
+[Round 004](../rounds/004-skill-lifecycle-audit/README.md) records the evidence, human approval, decomposition, and active migration path.

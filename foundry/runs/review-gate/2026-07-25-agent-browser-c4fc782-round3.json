@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 0,
+  "run": { "date": "2026-07-25", "repo": "vercel-labs/agent-browser", "pr": 1589,
+    "head": "c4fc782", "status": "complete",
+    "scope": "maintainer round-3 (ctate): 3 findings + class sweep" },
+  "author_model": "claude-opus-4-8", "reviewer_model": "ctate (maintainer)", "same_family": false,
+  "findings": [
+    { "id": "R3a", "severity": "high", "state": "confirmed_and_fixed",
+      "claim": "Binding recovery error left state.browser alive; next command skipped attach and used the wrong tab.",
+      "fix": "all attach sites route through apply_tab_binding_on_attach_or_rollback (rollback_failed_launch on error)",
+      "class_sweep": "swept every fallible step after state.browser=Some; also fixed open_fresh_tab_for_auto_connect torn-browser" },
+    { "id": "R3b", "severity": "high", "state": "confirmed_and_fixed",
+      "claim": "ensure_page created+bound a blank tab, clearing tab_gone, when a pinned session's sole tab closed.",
+      "fix": "gone-guard inside ensure_page; unit regression test_ensure_page_skips_creation_for_gone_pinned_session",
+      "class_sweep": "audited all 6 bind_active_target call sites; only ensure_page + discovered-tab were unguarded" },
+    { "id": "R3c", "severity": "high", "state": "confirmed_and_fixed",
+      "claim": "Pin restore path called enable_domains directly, hanging on Page.enable for a discarded tab.",
+      "fix": "revive_and_enable_active reuses ensure_renderer_alive before enable_domains",
+      "class_sweep": "swept all enable_domains sites: fresh or already-revived; prepare_domains network-controls flagged as pre-existing issue candidate" }
+  ],
+  "autopsy": "all three are the same class as an already-fixed finding, in a sibling path the earlier fix never enumerated. Root cause: fixed-the-instance, not the class. New standing rule: after any finding, grep every call site of the operation and audit each in the same commit.",
+  "verification": "1068 unit + 2 integration tests, clippy 0, fmt clean; pin + a11y e2e green; F-A/F-B dogfooded on the built CLI (rollback confirmed via fresh-blank-browser not stale-CDP-tab; ensure_page unit force-red)",
+  "issue_candidates": [
+    { "title": "install_active_network_controls prepare_domains may hang on a discarded tab", "scope": "pre-existing main attach code, covered by #1543 live-tab-selection; not this PR" }
+  ]
+}

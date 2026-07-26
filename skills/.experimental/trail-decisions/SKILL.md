@@ -1,7 +1,7 @@
 ---
 name: trail-decisions
 description: "Candidate: Keep a decision trail (a.k.a. show-your-work) while implementing, so a later reviewer can audit the choices and not just the diff. A TSV appended one row per real decision (what, why, evidence), written in the moment, never reconstructed. Use at the start of any implementation task an agent runs unattended or that a human reviews after stepping away. Consumed by review-gate's choice-audit lens. Experimental and awaiting baseline evaluation."
-compatibility: Requires a writable working directory. The self-audit step wants a reviewer runtime on a different model family than the writer.
+compatibility: Requires a writable canonical Railly Skills source repository. The self-audit step wants a reviewer runtime on a different model family than the writer.
 ---
 
 # Trail decisions
@@ -12,7 +12,7 @@ It is PAPERCUTS.md for the act of building: a line captured in the moment, appen
 
 ## 1. Open the trail
 
-Start `.decisions.tsv` in the working directory at the start of the task (not the end — a trail reconstructed from the finished diff is fiction, it records the choices you can now see were made, not the ones you actually weighed). One header row, then one row per decision:
+Resolve the canonical `Railly/skills` checkout through `RAILLY_SKILLS_REPO`, `~/Programming/railly/skills`, or `~/railly-skills`; the canonical resolver is `scripts/resolve-source-root.mjs`. Start `foundry/trails/<repo>/<YYYY-MM-DD>-<branch-or-mission>.tsv` there at the start of the task. Never place the trail in the target repo, `.agents/skills`, `.claude/skills`, or another installed copy. A trail reconstructed from the finished diff is fiction: it records the choices you can now see were made, not the ones you actually weighed. Use one header row, then one row per decision:
 
 ```
 ts	phase	decision	why	evidence	result
@@ -49,7 +49,7 @@ Before returning the work, spawn a reviewer on a **different model family** than
 
 ## Where this connects
 
-- **[review-gate](../../review-gate/SKILL.md)** consumes `.decisions.tsv`: when the file exists, the choice-audit lens loads it as a first-class review surface and questions each declared decision by its consequence, not by whether the diff looks right. Without a trail that lens has nothing to fire on. This skill is the input that makes it exist.
+- **[review-gate](../../review-gate/SKILL.md)** consumes the canonical trail path from the task handoff: when the file exists, the choice-audit lens loads it as a first-class review surface and questions each declared decision by its consequence, not by whether the diff looks right. Without a trail that lens has nothing to fire on. This skill is the input that makes it exist.
 - Provenance the choice-audit lens will carry: Taelin's MatMul buffer-doubling (a symptom fix that passed and shipped the wrong behavior; only caught by asking what the agent decided) plus four agent-browser misses where a declared-looking decision was the bug — most cleanly #1041, a daemon port derived from a djb2 hash of the session name, fine in the diff, blocked by Hyper-V at runtime (maintainer-confirmed).
 
 ## Status

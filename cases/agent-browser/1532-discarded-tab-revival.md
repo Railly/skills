@@ -59,7 +59,7 @@ Secondary: verify a "no signal exists" claim against the full API surface before
 
 ## Candidate changes
 
-- Reference rule (unfold Change/Review): run an adversarial pass over the change's own new failure modes, and prefer a non-destructive recovery for a heuristic-detected fault. Promoted to skills/unfold/references/change.md (step 4) and review.md (step 1). Evidence pair: #1528 shipped four regressions without this pass; applying it on the #1036 connect fix self-caught an untested concurrent pending-request leak (a join_all fan-out re-ran the single-path #1528 leak) before review, plus an honestly-stated residual verified against real Chrome.
+- Reference rule (Issue Contract plus Review Gate): run an adversarial pass over the change's own new failure modes, and prefer a non-destructive recovery for a heuristic-detected fault. Historically promoted to the now-archived Unfold Change and Review references. Evidence pair: #1528 shipped four regressions without this pass; applying it on the #1036 connect fix self-caught an untested concurrent pending-request leak (a join_all fan-out re-ran the single-path #1528 leak) before review, plus an honestly-stated residual verified against real Chrome.
 - Coverage gap: the connect path (#1036) still hangs when a discarded tab is first in getTargets order. Against a mock, connect attaches all targets and enable_domains rides the retry amplifier (~2.5 minutes). A lazy-attach connect fix is the complement and is out of scope for this PR.
 - Deterministic check: none committed; the regression lives as the four tests.
 - Eval: a fix that adds a probe-with-timeout plus a recovery action should be tested for (a) a probe false positive, (b) a recovery that stalls, and (c) cleanup of the cancelled probe.
@@ -105,7 +105,7 @@ Smallest destination: `reference rule` — extends the existing new-failure-outc
 
 Deferred as issue candidates (not blockers): two simultaneous dialogs in different tabs (single-slot `pending_dialog`), DevTools debugger-pause misclassification, the sub-second auto-handled-dialog tracking race, and the connect-path first-target gap (covered by PR #1543).
 
-Run reports: `evals/runs/2026-07-20-agent-browser-61b6c63.json`, `2026-07-21-agent-browser-45d724b.json`, `2026-07-21-agent-browser-25c81ec.json` in the review-gate skill.
+Historical run reports were recorded before the canonical `foundry/runs/review-gate/` destination was established.
 
 ## Round 7 (2026-07-23): merge-with-main conflict, then merged
 

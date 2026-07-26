@@ -50,8 +50,8 @@ The patch proves the reproduced failure family, not every variant in the origina
 
 ## Candidate changes
 
-- Reference rule: Unfold Triage should timeline server identity for state-loss-between-command bugs.
-- Reference rule: Unfold Review falsification must preserve compilation and fail as a test.
+- Reference rule: the Issue Contract reproduction phase should timeline server identity for state-loss-between-command bugs.
+- Reference rule: Test Strength falsification must preserve compilation and fail as a test.
 - Coverage gap: exact WSL stale-content behavior remains unexplained.
 
 ## Confidentiality review
