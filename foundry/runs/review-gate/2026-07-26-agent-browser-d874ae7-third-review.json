@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-26",
+    "repo": "vercel-labs/agent-browser",
+    "base": "origin/main (3cc7022271235694b5b5ce8aaea8bbfaa66e8cd5)",
+    "head": "d874ae7d4f1217e21dfcc0a65b78056019008fad",
+    "status": "incomplete",
+    "gaps": [
+      "The full cargo test run has one repeatable out-of-diff timeout in native::parity_tests::test_all_documented_actions_are_handled at action screenshot; focused stream tests pass, but a base-build comparison was not completed.",
+      "Author model was not supplied, so same-family provenance cannot be determined.",
+      "The radius Impact Map was used for orientation but was intentionally not retained, and the radius dogfood ledger was not appended, because the user authorized no outside-worktree writes except this run report."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No Issue Contract or separate Spec review was supplied; this report is Standards review only."
+    ]
+  },
+  "provenance": {
+    "author_model": "not_provided",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": false
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"The ordered frame broadcast source was replaced with a latest-value watch source; inverse behavior for non-frame messages and seed delivery was inspected."},
+    {"name":"New-domain matrix","status":"run","reason":"New maxFps, pacing, ack, seq, and timestamp inputs were exercised across malformed, boundary, interleaved, reconnect, and multi-client cells."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No overlapping hostname, route, or key resolution rule changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No user-facing warning or one-shot latch was added."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No external binary shim or PATH mock was added."},
+    {"name":"Deliberate-default check","status":"run","reason":"Push and uncapped remain defaults; repository tests and live behavior were checked, including force-red of the uncapped-default regression."},
+    {"name":"Fresh-seam scan","status":"skipped","reason":"The diff does not patch a runtime/framework to expose a signal already plausibly available through a fresh seam."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Ack pacing explicitly mirrors Page.screencastFrameAck; the cumulative-ack state machine was checked against its own advertised contract."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No previously success-only or hanging function gained a new returnable error outcome."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"The per-client config modes were traced through connection setup, reader dispatch, writer selection, reconnect, and simultaneous clients."},
+    {"name":"Error-path forcing","status":"run","reason":"Malformed config, invalid ack, stale ack, future unsent ack, stopped acking, reader close, and channel lag branches were forced."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action was added."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Writer sleeps, reader task lifetime, shutdown, config deadline recomputation, and permanent-wedge paths were inspected and driven."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"The change crosses CDP events, application channels, WebSocket/TCP transport, client rendering, and input return to CDP."},
+    {"name":"Substrate verification","status":"run","reason":"Effects were observed in the real Chrome DOM, real TCP/WebSocket delivery, process identity, stream ports, and frame metadata."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The exact release binary was built and driven against real Chrome with session gate3-1594-d874ae7 and namespace gate3-d874ae7."},
+    {"name":"Docs-behavior parity","status":"run","reason":"README, CLI help, web docs, dashboard types, and core skill claims were compared with the built protocol."},
+    {"name":"Demonstrative example","status":"run","reason":"New JSON examples for maxFps, ack pacing, seq, and timestamps were executed against the built server."},
+    {"name":"Choice audit","status":"skipped","reason":"No .decisions.tsv trail was present."},
+    {"name":"Complexity budget","status":"run","reason":"Per-frame serialization, watch replacement, broadcast delivery, and per-client loops were checked; no new input-sized nested scan was found."}
+  ],
+  "deterministic": [
+    {"check":"gate.sh style origin/main","outcome":"acknowledged","reason":"Confirmed finding: skill-data/core/SKILL.md adds an em dash at line 501, prohibited by the project overlay style gate."},
+    {"check":"gate.sh surfaces conventions.md origin/main","outcome":"pass","reason":"All mapped stream surfaces are present in the diff."},
+    {"check":"gate.sh siblings maxFps origin/main","outcome":"pass","reason":"Every maxFps documentation sibling is in the diff and no untouched maxFps passage remains."},
+    {"check":"gate.sh siblings ack pacing origin/main","outcome":"pass","reason":"Every ack-pacing sibling is in the diff and no untouched passage remains."},
+    {"check":"gate.sh siblings frame rate origin/main","outcome":"pass","reason":"Every frame-rate sibling is in the diff and no untouched passage remains."},
+    {"check":"gate.sh callers handle_ws_client/reader_loop/dispatch_input/cdp_event_loop/broadcast_frame/broadcast_screencast_frame","outcome":"pass","reason":"Every enumerated call site is in a diffed file."},
+    {"check":"gate.sh timings origin/main cli/src/native/stream","outcome":"pass","reason":"No new runtime wait ceiling is added."},
+    {"check":"stale-value zero-hits","outcome":"pass","reason":"No contract value was renamed or retired."},
+    {"check":"force-red","outcome":"acknowledged","reason":"Timestamp and ack-hold regressions went red when reverted; the uncapped-default test stayed green with a 1 fps default, producing F4."},
+    {"check":"radius impact --base origin/main","outcome":"acknowledged","reason":"49 changed and 371 impacted symbols, 7,524 edges, 2,382 unresolved calls, and 70 unmapped SCIP items; useful for orientation but under-covering."},
+    {"check":"cargo fmt --manifest-path cli/Cargo.toml -- --check","outcome":"pass","reason":"Formatting passes."},
+    {"check":"cargo clippy --manifest-path cli/Cargo.toml -- -D warnings","outcome":"pass","reason":"Clippy passes."},
+    {"check":"cargo test --manifest-path cli/Cargo.toml native::stream","outcome":"pass","reason":"49 focused stream tests pass."},
+    {"check":"cargo test --manifest-path cli/Cargo.toml","outcome":"acknowledged","reason":"1,042 passed, 96 ignored, one repeatable parity-harness screenshot timeout; run remains incomplete because base comparison was not completed."}
+  ],
+  "findings": [
+    {"id":"F1","state":"confirmed","claim":"An acknowledgement for a frame id never sent to that client can poison the connection's monotonic ack watermark and wedge ack-paced delivery until pacing is switched back to push.","evidence":"Against the release binary and real Chrome, after ack opt-in an ack for seq 1000000000000 released one frame (936), but acking the actually sent 936 released no further frame for 700 ms; switching to push immediately resumed frames. reader_loop retains the maximum arbitrary client seq at websocket.rs:487-499, and the writer accepts acked >= awaiting at 410-420.","layer":"end-to-end WebSocket pacing state machine","source":"lens","path":"reader_loop ack.send_if_modified -> ack_rx watermark -> awaiting_ack release guard"},
+    {"id":"F2","state":"confirmed","claim":"Ack pacing does not bound a newly connected client to one frame in flight because the cached seed frame bypasses the pacing state machine.","evidence":"Five immediate opt-in connections each received two frames before sending any ack: [431,432], [477,478], [523,524], [570,571], [616,617]. websocket.rs:341-346 sends the cached frame before the writer initializes awaiting_ack at line 359 and observes config.","layer":"connection-opening end-to-end pacing contract","source":"lens","path":"handle_ws_client cached seed send -> writer pacing initialization"},
+    {"id":"F3","state":"confirmed","claim":"Interleaved config updates can be coalesced by the watch channel, so a transient switch to push that should release an outstanding frame can be lost before the writer observes it.","evidence":"With a held ack-paced frame, sending pacing=push immediately followed by pacing=ack failed to advance the stream in 9 of 10 real-Chrome trials. config.send_replace stores only the latest ClientConfig and config_rx.changed reads only the final state, so the line 404-407 release action for push is skipped.","layer":"end-to-end per-connection config state machine","source":"lens","path":"reader_loop config.send_replace -> watch coalescing -> writer config_rx.changed"},
+    {"id":"F4","state":"confirmed","claim":"The new test named to guard the uncapped default does not fail when the default is changed to 1 fps.","evidence":"Temporarily initializing ClientConfig with max_fps=1 left test_uncapped_client_receives_consecutive_frames green in 1.01 s because the test has no elapsed-time assertion; therefore the regression guard at mod.rs:830-851 does not prove uncapped behavior.","layer":"force-red regression-test contract","source":"gate","path":"ClientConfig default -> test_uncapped_client_receives_consecutive_frames"},
+    {"id":"F5","state":"confirmed","claim":"The new core skill falsely promises that ordered status, tabs, url, and console messages are never dropped.","evidence":"With a real ack-paced TCP client paused, emitting 200 distinct 20 KB console events and resuming yielded only 82 marks; marks 20 onward were missing in a contiguous lag window. websocket.rs:379-380 explicitly continues on broadcast RecvError::Lagged, contradicting skill-data/core/references/streaming.md:59.","layer":"documented protocol through real TCP transport","source":"lens","path":"broadcast console channel -> lagged receiver -> dropped events"},
+    {"id":"F6","state":"confirmed","claim":"The new core skill says out-of-range maxFps values are ignored, but values above 120 are clamped to 120.","evidence":"apply_config uses fps.min(120) at websocket.rs:35, and the committed test test_parse_config_max_fps_clamps_without_wrapping asserts 500 becomes 120; skill-data/core/references/streaming.md:74 says out-of-range values are ignored. Live Chrome also distinguished maxFps=5 (10 frames/2s) from maxFps=500 (186 frames/2s, approximately the 120 cap under production rate).","layer":"docs-behavior contract","source":"lens","path":"core streaming reference -> apply_config maxFps parser"},
+    {"id":"F7","state":"confirmed","claim":"The added core skill index line violates the repository's comment/document punctuation convention.","evidence":"gate.sh style reports the em dash in skill-data/core/SKILL.md:501; project conventions prohibit em dashes in added lines.","layer":"deterministic house style","source":"gate","path":"skill-data/core/SKILL.md:501"},
+    {"id":"R1-F1","state":"refuted","claim":"Prior review: input remained blocked behind connection-opening writes.","evidence":"The branch now spawns reader_loop before status/tabs/seed sends. A raw TCP client paused reads for 5 seconds, then sent a mouse click while still not reading; the real Chrome DOM counter changed to 1.","layer":"built CLI to WebSocket to CDP to real Chrome DOM","source":"lens","path":"handle_ws_client reader spawn -> stalled opening writes -> dispatch_input"},
+    {"id":"R1-F2","state":"refuted","claim":"Prior review: no mode prevented transport-buffer stale-frame drain.","evidence":"That finding remains true for default push and is now documented; opt-in ack pacing holds one frame after setup and live tests showed stopped acking halted frames while input and other clients continued. F1-F3 identify residual ack state-machine defects rather than refuting the new mode wholesale.","layer":"real Chrome frame producer through WebSocket/TCP transport","source":"lens","path":"frame_watch -> awaiting_ack -> TCP"},
+    {"id":"R1-F3","state":"refuted","claim":"Prior review: skill-data/core omitted streaming behavior.","evidence":"The current branch adds skill-data/core/references/streaming.md, a commands.md section, and the SKILL.md index pointer. F5-F7 identify correctness/style problems in that new documentation.","layer":"repository documentation surface","source":"gate","path":"stream source surface -> skill-data/core"},
+    {"id":"R0-F1","state":"confirmed","claim":"Prior merge review: IdleActivity must be marked only when input reaches an attached CDP client.","evidence":"Current reader_loop marks inside the Some(client) guard at websocket.rs:503-511, preserving main's semantics; no regression was observed.","layer":"merge semantics of adjacent idle-timeout contract","source":"lens","path":"reader_loop -> IdleActivity::mark"},
+    {"id":"R0-F2","state":"confirmed","claim":"Prior merge review: maxFps and immediate input survive the merge.","evidence":"Live release binary produced 10 frames over 2 seconds at maxFps=5; a click dispatched while an ack-paced frame was held changed the real DOM counter to 1.","layer":"end-to-end shipped surface","source":"lens","path":"config/input -> stream writer/CDP -> Chrome"},
+    {"id":"R0-F3","state":"exempted","claim":"Prior issue candidate: a passive connected stream client defers daemon idle shutdown.","evidence":"The prior run reproduced the same lifecycle on an exact origin/main build, and this diff preserves the IdleActivity semantics rather than introducing that policy.","layer":"daemon lifecycle end-to-end","source":"lens","path":"stream client count -> daemon idle select"},
+    {"id":"I1","state":"issue_candidate","claim":"The all-actions parity test repeatedly times out on screenshot.","evidence":"Full cargo test: 1,042 passed, 96 ignored, then native::parity_tests::test_all_documented_actions_are_handled timed out at screenshot; the isolated test repeated the same 13.17 s failure. The test and screenshot paths are absent from the diff, but base reproduction was not completed.","layer":"repository unit-test harness","source":"lens","path":"parity test -> execute_command screenshot"}
+  ],
+  "exemptions": [
+    {"claim":"cli/src/mcp.rs need not change for maxFps or ack pacing.","evidence":"These are raw downstream WebSocket protocol messages, while CLI stream commands, parser envelopes, flags, outputs, and environment variables are unchanged and existing MCP stream tools still delegate through the canonical CLI parser."},
+    {"claim":"No changelog entry is required.","evidence":"AGENTS.md reserves changelog edits for manual release-preparation PRs; this is a feature PR."},
+    {"claim":"Broad stream sibling hits outside the canonical streaming surfaces need no update.","evidence":"Manual passage review found those hits describe unrelated data streams, iframes, dependencies, generic input, or terse command listings and make no maxFps, ack-pacing, frame-delivery, or timestamp claim."},
+    {"claim":"The prior passive-WebSocket idle-timeout defect is out of scope.","evidence":"The prior run reproduced it identically on origin/main, and the current diff retains marking only input that reaches CDP."}
+  ],
+  "issue_candidates": [
+    {"title":"All-actions parity harness times out on screenshot","evidence":"The full suite and isolated rerun both timed out in native::parity_tests::test_all_documented_actions_are_handled at screenshot after more than 10 seconds.","why_out_of_scope":"Neither parity_tests.rs nor the screenshot implementation changed; base comparison was not completed, so this remains a gap rather than a PR finding."},
+    {"title":"Passive stream clients can keep idle-timeout daemons alive","evidence":"The first July 25 run reproduced the behavior both on this branch's predecessor and exact origin/main with an 8-second idle timeout.","why_out_of_scope":"Pre-existing lifecycle policy from #1605; this branch neither introduces nor worsens it."}
+  ],
+  "dogfood": {
+    "build":"cargo build --release --manifest-path cli/Cargo.toml completed in 2m10s",
+    "session":"gate3-1594-d874ae7",
+    "namespace":"gate3-d874ae7",
+    "substrate":"real Chrome with a CSS compositor animation",
+    "observations":[
+      "Push delivered 206 frames in 2.2 seconds; maxFps=5 delivered 10 frames in 2 seconds.",
+      "Frame timestamps were nonzero epoch milliseconds and seq increased from 570 to 571 across stream disable/enable.",
+      "Out-of-order stale acks did not release a held frame; reconnect reset per-client state; simultaneous clients retained independent pacing.",
+      "Input clicked the real DOM while an ack-paced frame was held and while a raw client had paused reads for 5 seconds.",
+      "Future unsent ack, opening-seed pacing, config coalescing, and ordered-channel loss were reproduced as described in F1, F2, F3, and F5."
+    ]
+  },
+  "prior_runs": [
+    {"path":"foundry/runs/review-gate/2026-07-25-agent-browser-d86d230.json","verdict":"Confirms its IdleActivity placement and merged maxFps/input findings; retains its passive-client idle-timeout issue candidate as out of scope. It predated ack pacing and therefore missed F1-F7."},
+    {"path":"foundry/runs/review-gate/2026-07-25-agent-browser-d86d230-second-review.json","verdict":"Its opening-write, transport-buffer, and missing-core-doc findings were valid at d86d230 but are refuted by the current branch's reader ordering, opt-in ack mode, and core docs. It necessarily missed the new ack-state and new-doc defects F1-F7."}
+  ]
+}
