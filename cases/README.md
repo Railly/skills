@@ -41,6 +41,8 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 - [#1589: cover every writer to a shared sink; force-red the regression test against the production revert](agent-browser/1589-sibling-sink-and-guardless-regression-test.md)
 - [#1589 round 3: fix the class, not the instance — sweep every call site of the operation in the same commit](agent-browser/1589-fix-the-class-not-the-instance.md)
 - [Shared daemon cross-worktree contamination](agent-browser/shared-daemon-cross-worktree-contamination.md)
+- [PR #1594: a drop-stale guarantee is void below the layer that enforces it](agent-browser/1594-latest-frame-below-the-socket.md)
+- [PR #1594 round 2: a regression test for a wedging defect reports nothing unless the deadline lives outside it](agent-browser/1594-a-test-that-hangs-reports-nothing.md)
 
 ## Cases
 
@@ -72,6 +74,8 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 | [agent-browser #1460](agent-browser/1460-frame-aware-locators.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1460) · [branch](https://github.com/Railly/agent-browser/tree/fix/semantic-locators-active-frame) | unvalidated | local | use a working contrast to find the reusable seam | exemplar and eval candidate |
 | [agent-browser disproven batch](agent-browser/disproven-current-main.md) | public issues linked in case | unvalidated | local | explain why current main is green | Triage rule and eval candidate |
 | [agent-browser session observations](agent-browser/session-observations.md) | public case cluster | unvalidated | local | cross-case operational and diagnostic patterns | candidate generator only |
+| [agent-browser PR #1594](agent-browser/1594-latest-frame-below-the-socket.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1594) | contributor-validated | PR open | a latest-wins guarantee holds only to the first hand-off; enforce it where the consumer's progress is known | review reference-rule candidate |
+| [agent-browser PR #1594 round 2](agent-browser/1594-a-test-that-hangs-reports-nothing.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1594) | contributor-validated | PR open | force-red must distinguish no-output from passed; a wedging defect needs a deadline outside the process | review reference-rule candidate |
 | [agent-browser PR #1552](agent-browser/1552-getbyrole-implicit-roles-regression.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1552) | independently-validated | PR open | a same-day merge on the same file is a checkable revert signature | review reference-rule candidate |
 | [agent-browser PR #1553](agent-browser/1553-error-detail-and-help-drift.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1553) | independently-validated | PR open | force a "can't happen" fallback once against a live instance before trusting it | review reference-rule candidate |
 | [agent-browser shared daemon](agent-browser/shared-daemon-cross-worktree-contamination.md) | PRs [#1552](https://github.com/vercel-labs/agent-browser/pull/1552) · [#1553](https://github.com/vercel-labs/agent-browser/pull/1553) | independently-validated | local | check who actually answered before trusting a live verification result | review reference-rule candidate |
