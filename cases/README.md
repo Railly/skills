@@ -39,6 +39,7 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 - [#1552: trace a silent same-day revert before writing a new fix](agent-browser/1552-getbyrole-implicit-roles-regression.md)
 - [#1553: force a guard-and-match drift to see the real failure mode](agent-browser/1553-error-detail-and-help-drift.md)
 - [#1589: cover every writer to a shared sink; force-red the regression test against the production revert](agent-browser/1589-sibling-sink-and-guardless-regression-test.md)
+- [#1589 round 3: fix the class, not the instance — sweep every call site of the operation in the same commit](agent-browser/1589-fix-the-class-not-the-instance.md)
 - [Shared daemon cross-worktree contamination](agent-browser/shared-daemon-cross-worktree-contamination.md)
 
 ## Cases
