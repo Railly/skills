@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-27",
+    "repo": "vercel-labs/agent-browser",
+    "base": "3cc7022271235694b5b5ce8aaea8bbfaa66e8cd5",
+    "head": "c4fc7820ec54f78012fcc3d74d5f15db54f4c0ef",
+    "pr": 1589,
+    "status": "incomplete",
+    "gaps": [
+      "The one candidate blocker (intermittent silent recovery on a pinned local-launch session) was observed twice and then failed to reproduce across six later sessions. Its discriminating condition is unknown, so the run cannot be presented as a pass.",
+      "The revive-on-restore fix could not be driven: Chrome Memory Saver discard was not inducible on demand.",
+      "Impact map under-covers: 0 edges vs 2384 unresolvedCalls, so no finding is map-attributed.",
+      "Codex reviewer ran read-only and could not run cargo tests; test execution was done by the primary reviewer instead."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "claude-opus-5",
+    "reviewer_model": "openai/gpt-5.6-sol (codex exec) + claude-opus-5 (primary)",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "risky-primitive call-site sweep (enable_domains / Page.enable vs ensure_renderer_alive)", "status": "run", "reason": "PR adds a new CDP-domain-enable site; invariant established by #1532" },
+    { "name": "rollback lens on set-then-validate", "status": "run", "reason": "PR commits state.browser before fallible binding recovery" },
+    { "name": "new-semantics vs pre-existing implicit page creation", "status": "run", "reason": "--pin-tab changes the meaning of zero tracked pages" },
+    { "name": "flag-propagation dispatch sweep", "status": "run", "reason": "--pin-tab is a config bit reachable from launch, cdp, cdp-port, auto-connect and provider entry points" },
+    { "name": "dogfood the built artifact", "status": "run", "reason": "runnable CLI feature; driven against real Chrome on both launch and cdp paths" },
+    { "name": "error-path forcing", "status": "run", "reason": "corrupt binding file used to force the recovery-failure branch" },
+    { "name": "docs-behavior parity", "status": "run", "reason": "README and docs describe --pin-tab semantics" },
+    { "name": "inverse regression surface", "status": "skipped", "reason": "no matcher/parser data-source swap in the diff" },
+    { "name": "shell re-parse append domain", "status": "skipped", "reason": "no shell-parsed argument construction in the diff" },
+    { "name": "shim hermeticity", "status": "skipped", "reason": "no external-binary stub added by the diff" },
+    { "name": "complexity budget", "status": "skipped", "reason": "no per-element loop added on a hot path" }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "acknowledged", "reason": "8 em dashes in added lines; user-facing error strings match a pre-existing sibling pattern on main (actions.rs:2579), docs files already carry em dashes on main" },
+    { "check": "surfaces", "outcome": "pass", "reason": "flags.rs/main.rs/commands.rs changes land with output.rs, mcp.rs, README, docs and skill-data in the same diff" },
+    { "check": "siblings pin-tab", "outcome": "pass", "reason": "" },
+    { "check": "siblings tab_gone", "outcome": "pass", "reason": "" },
+    { "check": "callers ensure_page / apply_tab_binding_on_attach / revive_and_enable_active / enable_domains_pub / restore_target_binding", "outcome": "pass", "reason": "all call sites live in diffed files; each read by hand because the gate is file-level, not site-level" },
+    { "check": "covered", "outcome": "finding-fixed", "reason": "no run report existed for c4fc782; this report closes it" }
+  ],
+  "findings": [
+    {
+      "id": "1589-pin-intermittent-silent-recovery-on-local-launch",
+      "state": "unverified",
+      "claim": "Observed twice, not reproducible on demand: a --pin-tab session on the default local-launch path silently recovered onto a fresh blank tab instead of failing with tab_gone when its bound tab was closed externally, and the binding file was overwritten with the blank tab's targetId and pinned:true. Whether this is a live defect or an artefact of my test setup is UNRESOLVED.",
+      "evidence": "Driven against real Chrome with the debug binary from c4fc782. Sessions gate1589 and gateX: `--pin-tab navigate example.com`, bound tab closed externally via CDP /json/close -> `snapshot` returned \"(empty page)\" exit 0, `tab list` showed a new t2 about:blank, and ~/.agent-browser/<session>.target was rewritten to {targetId:<blank tab>, pinned:true}. COUNTER-EVIDENCE, gathered after: six later sessions (r1, r2, r3, s1, gateV, gateW) under the same command sequence, including one where the extra blank tab was closed first so the bound tab was the sole tracked page (ctate's stated precondition), all returned the correct tab_gone error with the binding preserved. My first root-cause hypothesis (launch paths never reach mgr.set_pin_tab, so BrowserManager.pin_tab stays false) is contradicted by those runs, where the pin is demonstrably enforced on a local launch. The patch experiment that appeared to confirm it (adding apply_tab_binding_on_attach_or_rollback at actions.rs:3535) is invalidated by the same variance and proves nothing. What is real: two captured instances of silent recovery plus a rewritten binding file. What is missing: the discriminating condition.",
+      "layer": "end-to-end path, CLI flag to manager enforcement on the local-launch entry point",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:3474,3535,4373,4430"
+    },
+    {
+      "id": "1589-round3-fixes-verified-under-stated-preconditions",
+      "state": "refuted",
+      "claim": "Candidate: ctate's round-3 findings 1 and 2 might still be reachable at head.",
+      "evidence": "Finding 2 (sole pinned tab closes -> blank tab): forced the exact precondition on session s1 by closing the extra blank tab first, then closing the bound tab externally. Result: tab_gone error, empty tab list, binding file intact. Also correct on r1-r3 and over --cdp. Finding 1 (rollback): forced with a corrupted binding file; first and second commands both return the corrupt-binding error rather than acting on a neighbouring tab, and deleting the file rebinds the original target. Both refuted at the end-to-end layer.",
+      "layer": "end-to-end path",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:2858; cli/src/native/browser.rs:1345"
+    },
+    {
+      "id": "1589-revive-on-restore-undrivable",
+      "state": "unverified",
+      "claim": "ctate's round-3 finding 3 (Page.enable on a Memory-Saver-discarded tab during pin restore) is fixed in code by revive_and_enable_active, but the fix was not exercised.",
+      "evidence": "Chrome's Memory Saver discard could not be forced on demand in this environment, so the 30s-hang path was never driven. Static review (mine and codex's independently) agrees the call site now revives first via ensure_renderer_alive, matching tab switch and close. Named as a gap rather than assumed to work.",
+      "layer": "end-to-end path under a browser state I could not induce",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:2808"
+    },
+    {
+      "id": "1589-pin-coverage-blind-to-launch-path",
+      "state": "confirmed",
+      "claim": "No test can catch the finding above: all binding unit tests call mgr.set_pin_tab(true) by hand, bypassing the state-to-manager wiring, and both e2e tests (e2e_pin_tab_rebinds_after_daemon_restart, e2e_pin_tab_gone_error_and_recovery) attach over a ws_url via attach_pinned_session, exercising only the CDP path. The parity test asserts state.pin_tab, never mgr.pin_tab.",
+      "evidence": "grep of set_pin_tab production vs test callers (browser.rs:2992..3312 all hand-set); e2e_tests.rs:7731 and 7913 both use launch_binding_host + attach_pinned_session(&ws_url); parity_tests.rs:756-761 asserts state.pin_tab only.",
+      "layer": "test coverage of the flag-propagation path",
+      "source": "lens",
+      "path": "cli/src/native/e2e_tests.rs:7729,7911; cli/src/native/parity_tests.rs:751"
+    },
+    {
+      "id": "1589-rollback-verified",
+      "state": "refuted",
+      "claim": "Candidate: the new rollback could leave the session unusable or acting on the wrong tab after a binding-recovery failure.",
+      "evidence": "Forced the branch with a corrupted ~/.agent-browser/gateR.target. First command returns the corrupt-binding error; the second command returns the same error rather than silently acting on a neighbouring tab, proving the connection was torn down and the attach path re-runs. Deleting the file and re-running with --pin-tab rebinds the original target (1D3E0F17...). Refuted at the end-to-end layer, not by unit reasoning.",
+      "layer": "end-to-end recovery path",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:2858"
+    },
+    {
+      "id": "1589-rollback-untested",
+      "state": "confirmed",
+      "claim": "Two of the three round-3 fixes ship without any regression test: apply_tab_binding_on_attach_or_rollback and revive_and_enable_active on the restore path. Only the ensure_page guard has one.",
+      "evidence": "No test references or_rollback or revive_and_enable_active; the existing revive tests (test_tab_switch_revives_discarded_tab, test_tab_close_revives_discarded_successor, test_connect_all_discarded_revives_first_tab) cover switch/close/connect, not the pin restore path that regressed. The restore-path revive is exactly the seam an external reviewer already caught once.",
+      "layer": "regression coverage of the fixed seams",
+      "source": "lens",
+      "path": "cli/src/native/browser.rs:761; cli/src/native/actions.rs:2858"
+    },
+    {
+      "id": "1589-ensure-page-guard-force-red",
+      "state": "refuted",
+      "claim": "Candidate: the new regression test may be vacuous.",
+      "evidence": "Force-red verified. Removing the pin_tab && bound_target_gone guard at browser.rs:1345 makes test_ensure_page_skips_creation_for_gone_pinned_session FAIL (panicked at browser.rs:3148, 30.01s). Guard restored. Note the red is a 30s CDP timeout rather than a fast assertion.",
+      "layer": "unit seam",
+      "source": "gate",
+      "path": "cli/src/native/browser.rs:3142"
+    },
+    {
+      "id": "1589-close-current-browser-stale-state",
+      "state": "issue_candidate",
+      "claim": "close_current_browser clears launch_hash, iframe sessions, screencasting and mouse state, but not event_rx, fetch_handler_task, dialog_handler_task, pending_dialog or pending_pointer_release. Raised by the codex reviewer.",
+      "evidence": "actions.rs:1994-2014 vs field list at 367-412; reset_input_state (581) only resets mouse_state. Verified reachability empirically: after a forced rollback the next command re-enters the attach path, and subscribe_to_browser_events / start_fetch_handler / start_dialog_handler replace or abort the stale receiver and tasks on the next launch, so no wrong-tab or phantom-dialog behaviour was observable. Pre-existing: every relaunch path already goes through this function.",
+      "layer": "daemon state lifecycle",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:1994"
+    },
+    {
+      "id": "1589-enable-domains-pub-dead",
+      "state": "confirmed",
+      "claim": "enable_domains_pub (browser.rs:753) has no callers after the fix replaced its only use with revive_and_enable_active. It is the exact unguarded primitive whose misuse caused round-3 finding 3, left exported for the next call site to reach for.",
+      "evidence": "grep -rn enable_domains_pub across cli/src returns only the definition. Independently enumerated by the codex reviewer (its lens 1: \"No callers outside its definition\").",
+      "layer": "API surface of a risky primitive",
+      "source": "lens",
+      "path": "cli/src/native/browser.rs:753"
+    }
+  ],
+  "exemptions": [
+    { "claim": "8 em dashes in added lines do not violate the house norm", "evidence": "main already uses the same construction in user-facing error strings (actions.rs:2579: 'A JavaScript dialog is blocking the page: ... — use `dialog accept` ...') and in docs (webgpu 13, skills 7, commands 3), and the norm bans '--' as a dash, not the em dash itself." },
+    { "claim": "enable_domains at browser.rs:695, 1386 and 1538 needs no revive preamble", "evidence": "each operates on a target created by Target.createTarget immediately above, so no renderer can be discarded yet; independently reached by the codex reviewer." },
+    { "claim": "The rollback is not destructive for user-owned Chrome", "evidence": "BrowserManager::close (browser.rs:1249) only sends Browser.close when browser_process.is_some(), so --cdp and --auto-connect sessions disconnect without shutting down the user's browser." },
+    { "claim": "ensure_page returning Ok(()) with zero pages cannot panic downstream", "evidence": "active_session_id (browser.rs:962) calls check_bound first and returns the tab_gone error, and falls back to a 'No active page' Err rather than indexing; verified empirically on the --cdp path where the error surfaces correctly." }
+  ],
+  "issue_candidates": [
+    {
+      "title": "close_current_browser leaves event_rx, fetch/dialog handler tasks and pending_dialog / pending_pointer_release from the previous connection",
+      "evidence": "actions.rs:1994-2014; fields at 367-412; only mouse_state is reset. Next launch replaces them, so no observable defect was forced.",
+      "why_out_of_scope": "Pre-existing on every relaunch path, not introduced or worsened by this PR's rollback."
+    },
+    {
+      "title": "radius impact map is unusable on this repo (0 edges, 2384 unresolvedCalls)",
+      "evidence": "evals/radius-dogfood/2026-07-27-agent-browser.json; rust-analyzer present, SCIP generated in 21.6s, still no resolved edges.",
+      "why_out_of_scope": "Tooling coverage gap, feeds radius tuning, not a defect in the PR."
+    }
+  ]
+}

@@ -23,6 +23,9 @@ Usage:
   gate.sh shellmeta [<base-ref>] [<path>...]  A shell-metacharacter detector the diff adds or edits must cover every
                                               construct that changes command parsing, not only the separators
                                               (`#` comment, `(`/`)` subshell, `` ` ``/`$(` substitution), or acknowledge each
+  gate.sh rawinput <accessor> [<base-ref>] [<path>...]
+                                              When a diff deepens a resolution rule, every site that re-derives the answer
+                                              inline from the raw input, on a line the diff never touched, is updated or acknowledged
   gate.sh covered <runs-dir> [<pr>]           A run report for the exact HEAD sha must exist; a rebase or force-push
                                               retires every earlier report, including the one that found the bugs
                                               this head claims to fix
@@ -439,10 +442,62 @@ check_covered() {
 	return 1
 }
 
+# rawinput: when a diff deepens a resolution or discovery rule (the resolver now looks
+# through a package script, a runner wrapper, a config indirection), every OTHER site
+# that re-derives the same answer inline from the raw input still applies the shallow
+# rule. Those sites are invisible to `callers`, because they never call the resolver.
+# Line-level like `producers`: the sites live on untouched lines of files the diff also
+# changes. Provenance: portless #366 round 4 — a blind reviewer ran the
+# resolution-rule-consistency lens, opened both files, and still missed
+# `path.basename(commandArgs[0])` in the env binder. The lens said to grep the raw
+# input; judgment did not do it, so the sweep became a check.
+check_rawinput() {
+	local accessor="${1:-}"
+	[[ -z "$accessor" ]] && usage
+	shift
+	local ref=""
+	if [[ -n "${1:-}" ]] && git rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then
+		ref="$1"
+		shift
+	fi
+	local base findings=0
+	base=$(base_ref "$ref")
+	local added
+	added=$(git diff -U0 "$base" -- "${@:-.}" 2>/dev/null | awk '
+		/^\+\+\+ /{ f=$2; sub(/^b\//,"",f); next }
+		/^@@ /{ split($3,a,","); s=a[1]; sub(/^\+/,"",s); n=(a[2]==""?1:a[2]); if(n>0) print f":"s":"(s+n-1) }')
+	local hits
+	hits=$(git grep -nIF "$accessor" -- "${@:-.}" 2>/dev/null || true)
+	if [[ -z "$hits" ]]; then
+		echo "ERROR [rawinput] no reads of '$accessor' found; check the accessor and pathspec"
+		return 2
+	fi
+	while IFS= read -r line; do
+		[[ -z "$line" ]] && continue
+		grep -qiE "\.test\.|_test\.|/tests?/|spec\." <<<"$line" && continue
+		local f="${line%%:*}" rest ln in_diff=""
+		rest="${line#*:}"
+		ln="${rest%%:*}"
+		while IFS= read -r range; do
+			[[ -z "$range" ]] && continue
+			local rf="${range%%:*}" rr="${range#*:}"
+			[[ "$rf" != "$f" ]] && continue
+			local s="${rr%%:*}" e="${rr##*:}"
+			if ((ln >= s && ln <= e)); then in_diff=1; break; fi
+		done <<<"$added"
+		[[ -n "$in_diff" ]] && continue
+		echo "FINDING [rawinput] $f:$ln re-derives from '$accessor' on a line the diff never touched; apply the deepened rule here or acknowledge why the shallow one is still correct"
+		findings=1
+	done <<<"$hits"
+	[[ $findings -eq 0 ]] && echo "PASS [rawinput]"
+	return $findings
+}
+
 cmd="${1:-}"
 shift || true
 case "$cmd" in
 	shellmeta) check_shellmeta "$@" ;;
+	rawinput) check_rawinput "$@" ;;
 	covered) check_covered "$@" ;;
 	style) check_style "$@" ;;
 	stale) check_stale "$@" ;;

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-27",
+    "repo": "vercel-labs/portless",
+    "pr": 366,
+    "base": "e0c2af5",
+    "head": "1aba57e",
+    "status": "complete",
+    "mode": "blind replication of the #366 round 4 harvest: can an independent model, given the sharpened catalog but not the answers, relocate the three external findings?",
+    "gaps": [
+      "gate.sh covered could not run: the redacted snapshot omitted foundry/runs/, so the check errored on a missing directory instead of reporting the missing head report. Setup error, not a reviewer error",
+      "Leakage not redacted: gate.sh usage text and the shellmeta FINDING message both name '#' by design, so answer-key item 2 reached the reviewer through the deterministic layer",
+      "Leakage pre-existing: cases/portless/366-guard-derived-matrix.md already listed env-prefixed and nested-delegation scripts as silent skips, which is most of answer-key item 3"
+    ]
+  },
+  "provenance": {
+    "author_model": "claude-opus-4-8",
+    "reviewer_model": "openai/gpt-5.6-sol",
+    "same_family": false,
+    "reviewer_effort": "high",
+    "tokens": 173421
+  },
+  "setup": {
+    "catalog": "post-harvest, with answer-key artifacts redacted: the round-4 case file, the four 2026-07-27 ledger entries, the two round-4 subsystem invariants, and every round-4 provenance line in gates.md and gate.sh",
+    "method_retained": "both new deterministic gates, the widened resolution-rule trigger, the shell-reparse lens, the scope-limit-completeness clause",
+    "prompt": "hint-free: follow the SKILL, report every confirmed finding; no count, no areas, no mention of a maintainer round"
+  },
+  "answer_key": [
+    { "id": "K1", "claim": "Expo package scripts still receive HOST=127.0.0.1 in LAN mode, breaking Metro HMR", "result": "MISSED", "leakage": "none", "note": "The log shows the reviewer read cli.ts:1391-1394 and cli-utils.ts:1127 in the same session and listed resolution-consistency among lenses run, applying it to script resolution only. Both halves were on screen; the connection was not made" },
+    { "id": "K2", "claim": "A shell comment in a package script discards the injected --port/--host", "result": "CAUGHT", "leakage": "high (gate.sh usage text and FINDING message both name '#')", "note": "Credit is for the escalation, not the detection: the reviewer drove it to the substrate and captured child argv ['dev'] under both bun and npm, turning a coverage nit into the user-visible 502" },
+    { "id": "K3", "claim": "Docs overstate support: env-prefixed and wrapped scripts are silently skipped", "result": "CAUGHT AND EXTENDED", "leakage": "pre-existing (round-1 case file lists env-prefixed and nested as skips)", "note": "Added three forms neither the external report nor the harvest enumerated: subshell (vite dev), command substitution $(printf vite) dev, and backtick `printf vite` dev, each with captured child argv" }
+  ],
+  "extra_findings": [
+    { "id": "X1", "claim": "Workspace multi-app mode never invokes either injector (cli.ts:3728)", "assessment": "real behavior, driven empirically with a workspace fixture, but the PR body explicitly descopes it as a pre-existing gap. Should have been an issue candidate, not a blocking finding: scope-classification error" },
+    { "id": "X2", "claim": "`vite --mode build` is mistaken for the build subcommand and suppresses injection", "assessment": "real and driven; the code comment declares it ('errs conservative: a flag value equal to a subcommand also skips'), so it is a declared trade-off rather than a defect. Fair to surface, wrong severity" },
+    { "id": "X3", "claim": "`4000--4999` violates the house ban on '--' as prose punctuation", "assessment": "technically on added lines, but the '--' is pre-existing mdx prose that the diff touched only to append a sentence. Low value, misattributed to the PR" }
+  ],
+  "score": {
+    "answer_key_caught": 2,
+    "answer_key_total": 3,
+    "caught_with_zero_leakage": 0,
+    "missed_with_zero_leakage": 1,
+    "extra_confirmed_real": 2,
+    "extra_scope_or_severity_errors": 3
+  },
+  "harvest": [
+    { "finding": "K1 missed despite the lens firing", "gate": "new deterministic gate.sh rawinput: the lens already said to grep the raw input the resolver consumes; a lens instruction to run a grep is still judgment. Force-red at birth, flags cli.ts:1456 among six hits" }
+  ],
+  "note": "The honest read is uncomfortable and worth keeping: the two findings the reviewer reproduced are exactly the two that leaked through the deterministic layer or the older case files, and the one cell with no leakage is the one it missed. That is evidence for deterministic checks over sharpened lens prose, not evidence that the catalog now catches this class. This run measures relocation under a shaped catalog; it is not proof against unseen bugs."
+}
