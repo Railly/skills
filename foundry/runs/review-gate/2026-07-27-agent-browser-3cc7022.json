@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-27",
+    "repo": "vercel-labs/agent-browser",
+    "base": "3cc7022",
+    "head": "uncommitted-worktree:fix/policy-categories",
+    "status": "complete",
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "unknown (different model, per task brief)",
+    "reviewer_model": "claude-opus-5[1m]",
+    "same_family": false
+  },
+  "lenses": [
+    {
+      "name": "security / privilege-grant analysis",
+      "status": "run",
+      "reason": "diff is a security fix to an action-policy gate"
+    },
+    {
+      "name": "contract drift (docs vs code table)",
+      "status": "run",
+      "reason": "diff edits the spec it implements against"
+    },
+    {
+      "name": "correctness / precedence",
+      "status": "run",
+      "reason": "matching order changed in check() and requires_confirmation()"
+    },
+    {
+      "name": "test teeth",
+      "status": "run",
+      "reason": "5 new tests added; verified what they pin and what they lock in"
+    },
+    {
+      "name": "perf",
+      "status": "skipped",
+      "reason": "linear scan over a 14-entry const table per policy entry per command; policy checks are per-command, not per-frame"
+    },
+    {
+      "name": "concurrency",
+      "status": "skipped",
+      "reason": "no async or shared-state changes in the diff"
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "cargo fmt --check",
+      "outcome": "pass",
+      "reason": "run by task author"
+    },
+    {
+      "check": "cargo test --bin agent-browser policy",
+      "outcome": "pass",
+      "reason": "29 passed, run by task author"
+    },
+    {
+      "check": "enumerate daemon dispatch action set (165 arms) minus ACTION_CATEGORIES",
+      "outcome": "acknowledged",
+      "reason": "67 documented protocol actions land in no category; fail-closed under default:deny, fail-open under default:allow deny-lists"
+    },
+    {
+      "check": "ACTION_CATEGORIES minus parser-emitted action set",
+      "outcome": "acknowledged",
+      "reason": "11 entries unreachable from CLI and MCP, including 6 of 7 eval members"
+    },
+    {
+      "check": "ACTION_CATEGORIES minus DOCUMENTED_ACTIONS (parity_tests.rs)",
+      "outcome": "acknowledged",
+      "reason": "cdp_url is in the table but missing from DOCUMENTED_ACTIONS"
+    },
+    {
+      "check": "docs mdx table vs code table, row by row",
+      "outcome": "acknowledged",
+      "reason": "state row claims 'set credentials' which no code entry provides"
+    },
+    {
+      "check": "radius impact",
+      "outcome": "pass",
+      "reason": "skipped: Rust repo, radius is TS/JS only"
+    },
+    {
+      "check": "no heavy or sensitive content staged",
+      "outcome": "pass",
+      "reason": "3 source files, no media or credentials"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The new 'get' category grants the 8 locator actions, each of which dispatches click/fill/check/hover subactions, so the docs' restrictive policy permits arbitrary form fills and clicks it explicitly denies.",
+      "evidence": "Built the branch and ran it: with the docs policy verbatim, 'fill #s pwned' was denied, 'find label Secret fill pwned' returned Done, and 'get value #s' returned 'pwned'. FIND_ACTIONS at cli/src/native/actions.rs:8049 = click,fill,check,hover,text; all 8 FIND_SUBACTION_COMMANDS are in the get category.",
+      "layer": "end-to-end CLI against real Chrome",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:63-87"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The 'wait' category includes waitforfunction, which Runtime.evaluates a caller-supplied expression, so deny:['eval'] does not remove script execution and the docs' restrictive allow-list grants it.",
+      "evidence": "With {default:allow, deny:[eval]}: 'eval' denied, 'wait --fn \"(()=>{document.title=...})()\"' ran and the title changed. With the docs restrictive policy the same expression read #s and returned its value into agent output.",
+      "layer": "end-to-end CLI against real Chrome",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:59-62"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "removeinitscript is in no category, so deny:['eval'] does not gate removal of the init script that installs the WebSocket/EventSource override the docs point at.",
+      "evidence": "network.rs:174 installs the override via Page.addScriptToEvaluateOnNewDocument; handle_removeinitscript (actions.rs:7110) forwards any caller-supplied identifier to Page.removeScriptToEvaluateOnNewDocument; policy probe confirms check('removeinitscript') == Allow under deny:[eval].",
+      "layer": "policy unit probe plus call-path read; a working end-to-end removal of the allowlist script was not demonstrated",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:5-115"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "The 'state' category covers only 4 actions; the destructive and secret-reading state surface (state_clear, state_clean, state_rename, cookies_clear, cookies_get, storage_clear, storage_get, credentials, credentials_set, clipboard, headers, dialog) is uncategorized and passes a deny:['state'] policy.",
+      "evidence": "Policy probe asserted Allow for all 12 under {default:allow, deny:[state,fill,click]}; 'state list' ran successfully end-to-end under that policy.",
+      "layer": "policy unit probe plus end-to-end CLI",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:110-113"
+    },
+    {
+      "id": "F5",
+      "state": "confirmed",
+      "claim": "Text entry and clicking survive deny:['fill','click'] via the interact category (keydown/keyup, mouse down/up) and the uncategorized inserttext; the fill/interact split puts equivalent capabilities on opposite sides of the boundary.",
+      "evidence": "End-to-end: 'click button' denied while 'mouse move/down/up' all returned Done under {deny:[click,fill,...]}. Probe asserted Allow for keydown and inserttext.",
+      "layer": "end-to-end CLI plus policy unit probe",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:88-102"
+    },
+    {
+      "id": "F6",
+      "state": "confirmed",
+      "claim": "pushstate mutates the document URL and is in no category, so deny:['navigate'] does not gate it.",
+      "evidence": "End-to-end: 'open file:///...' denied with action 'navigate', 'pushstate /injected' passed the policy gate (failed later on a page JS error, not on policy).",
+      "layer": "end-to-end CLI",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:6-9"
+    },
+    {
+      "id": "F7",
+      "state": "confirmed",
+      "claim": "11 of the 83 table entries are unreachable from the CLI and from MCP, including 6 of the 7 eval members the issue names as the security motivation.",
+      "evidence": "parse_command_inner has no passthrough arm (commands.rs:2016 returns UnknownCommand); no parser arm or output.rs help entry emits addscript, addinitscript, addstyle, expose, setcontent, evalhandle, multiselect, selectall, setvalue, clear, dispatch. MCP builds CLI argv via call_cli_tool, so it inherits the parser's surface. --init-script rides on the launch command as an initScripts field (main.rs:86), not as an addinitscript action.",
+      "layer": "static enumeration of parser arms and MCP tool construction",
+      "source": "gate",
+      "path": "cli/src/native/policy.rs:37-45"
+    },
+    {
+      "id": "F8",
+      "state": "confirmed",
+      "claim": "The docs edit introduces a claim the code does not implement: the state row now says 'set credentials', but no credentials action is in the state category.",
+      "evidence": "docs/src/app/security/page.mdx:255 vs cli/src/native/policy.rs:110-113; policy probe shows check('credentials') and check('credentials_set') both Allow under deny:[state].",
+      "layer": "diff read plus policy unit probe",
+      "source": "lens",
+      "path": "docs/src/app/security/page.mdx:255"
+    },
+    {
+      "id": "F9",
+      "state": "confirmed",
+      "claim": "Nothing pins the docs table, the code table, and the real action set to each other, so the drift this PR fixes can silently recur.",
+      "evidence": "The new test_docs_restrictive_policy_allows_repro_actions hardcodes a 15-name list rather than deriving it; no test relates ACTION_CATEGORIES to DOCUMENTED_ACTIONS or to the dispatch match; the mdx is not parsed by any test.",
+      "layer": "test-suite read",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:338-425"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Precedence is correct: category deny beats category and exact allow; exact names stay narrow.",
+      "evidence": "check() evaluates deny before confirm before allow (policy.rs:205-241); action_matches only expands an entry that is itself a category name, so deny:['evalhandle'] leaves 'evaluate' allowed. The author's own tests cover both and pass."
+    },
+    {
+      "claim": "The multi-action vector composes correctly.",
+      "evidence": "policy_actions_for_command (actions.rs:2073) returns concrete action names plus plugin actions of the form plugin:<name>:<capability>; colons cannot equal a category name and appear in no table entry, so those fall through to exact equality. The loop at actions.rs:2213 checks every element and denies on the first Deny."
+    },
+    {
+      "claim": "Confirmation cannot leak across a category.",
+      "evidence": "handle_confirm (actions.rs:10648) inserts only pending.action, and the gate is an exact HashSet::contains at actions.rs:2223 and 2253, so approving evalhandle does not satisfy evaluate. Approval is also scoped to the replayed command and restored afterwards (10657)."
+    },
+    {
+      "claim": "requires_confirmation did not diverge from check.",
+      "evidence": "Both call the same action_matches; the author's test_each_category_resolves_to_all_members asserts them together over the whole table."
+    },
+    {
+      "claim": "Uncategorized actions are fail-closed under a default:deny allow-list.",
+      "evidence": "check() returns Deny for any action absent from a non-empty allow list when default is deny (policy.rs:225); verified end-to-end when 'fill' and 'click' were denied under the docs policy."
+    },
+    {
+      "claim": "The commands.rs edit is inert.",
+      "evidence": "One comment line; the stale action-policy.ts reference is gone and no code path reads it."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "DOCUMENTED_ACTIONS omits cdp_url",
+      "evidence": "cli/src/commands.rs:2529 emits action cdp_url and actions.rs dispatches it, but it is absent from DOCUMENTED_ACTIONS in cli/src/native/parity_tests.rs:45-190.",
+      "why_out_of_scope": "Pre-existing gap in the parity list; the diff neither created nor touched it."
+    },
+    {
+      "title": "The daemon socket accepts raw JSON commands, so action policy is advisory against any caller with shell access",
+      "evidence": "cli/src/native/daemon.rs:530-556 deserializes an arbitrary line into a command and calls execute_command; the policy gate is inside execute_command but the socket has no caller authentication.",
+      "why_out_of_scope": "Architectural property of the daemon, unrelated to categorization. Worth stating in the Known limitations section."
+    },
+    {
+      "title": "deny:['click'] is bypassable via mouse down/up regardless of categories",
+      "evidence": "Exact matching had the same hole; mousedown and mouseup are distinct actions that synthesize a click.",
+      "why_out_of_scope": "Pre-existing under exact matching; listed as F5 only because the diff turns interact into a grantable category."
+    },
+    {
+      "title": "`wait` silently swallows unknown flags instead of erroring",
+      "evidence": "`agent-browser wait --function \"expr\"` matched no flag branch in the wait arm (cli/src/commands.rs:690-760) and fell through to the selector path, hanging 25s and reporting 'Wait timed out' rather than naming the unknown flag. The correct flag is --fn.",
+      "why_out_of_scope": "Parser ergonomics unrelated to policy categories; found while probing waitforfunction."
+    }
+  ]
+}

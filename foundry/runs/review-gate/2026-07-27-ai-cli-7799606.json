@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-27",
+    "repo": "vercel-labs/ai-cli",
+    "base": "7799606",
+    "head": "uncommitted-worktree (feat/timeout-flag)",
+    "status": "incomplete",
+    "gaps": [
+      "No live generation was driven: no AI_GATEWAY_API_KEY / network access in this environment, so an end-to-end abort at a user-supplied --timeout was never observed against a real request. Abort behavior was forced at the helper layer under Node instead."
+    ]
+  },
+  "provenance": {
+    "author_model": "unknown (different model, per task framing)",
+    "reviewer_model": "claude-opus-5[1m]",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "contract drift (parser composition)", "status": "run", "reason": "diff adds an option through a homegrown parser; all composition cases probed against the real registered commands" },
+    { "name": "refactor fidelity (option inventory / help text)", "status": "run", "reason": "four fluent chains restructured; option lists diffed base vs head and real --help rendered for all 5 leaves" },
+    { "name": "numeric bounds / overflow", "status": "run", "reason": "seconds->ms conversion feeds a timer" },
+    { "name": "docs and sibling surfaces", "status": "run", "reason": "AGENTS.md mandates README + web docs + changelog; gate.sh siblings run" },
+    { "name": "test teeth", "status": "run", "reason": "new test file added; mutation-tested and coverage of the behavior change assessed" },
+    { "name": "changelog / release convention", "status": "run", "reason": "CHANGELOG.md touched; release.yml consumes it" },
+    { "name": "security / secrets", "status": "skipped", "reason": "no credential, network target, filesystem path or shell invocation in the diff" },
+    { "name": "performance / concurrency", "status": "skipped", "reason": "no scheduling, allocation or hot-path change; abort signal creation site unchanged" },
+    { "name": "error-path emission channel", "status": "skipped", "reason": "single-process CLI, one stdio pair; no daemon/channel topology to get wrong" }
+  ],
+  "deterministic": [
+    { "check": "gate.sh style", "outcome": "pass", "reason": "" },
+    { "check": "gate.sh timings", "outcome": "pass", "reason": "diff adds no wait ceiling constant; the ceiling here is user-supplied at runtime, which this gate does not model (recorded as a gate miss)" },
+    { "check": "gate.sh siblings timeout", "outcome": "finding-fixed", "reason": "one real hit: apps/web/docs/commands.mdx ## Timeouts prose left un-updated (finding F3). Others exempted: models.ts 5s gateway fetch, stdin.ts 1s read race, audio-preview.ts playback wait, release.yml workflow timeout-minutes, plus untracked-file noise for timeout.ts/.test.ts" },
+    { "check": "option inventory diff base vs head (4 command files)", "outcome": "pass", "reason": "identical option/argument/description call lists modulo line numbers; nothing dropped or reordered" },
+    { "check": "radius impact --base 7799606", "outcome": "acknowledged", "reason": "13 changed / 14 impacted / 504 edges but unresolvedCalls 1610 dwarfs edges, so the map under-covers; convergence item index.ts#<module> (9 changed symbols) inspected, cochange item cli.test.ts (4/4 co-changes, no structural path) attributed finding F5" }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "--timeout is unbounded above; under Node (the shipped runtime) a value above 2147483 seconds silently aborts the request in ~1ms with only a TimeoutOverflowWarning, and above 4294967 seconds AbortSignal.timeout throws RangeError inside the job callback",
+      "evidence": "node v24: `--timeout 3600000` -> 3600000000 ms -> aborted=true after 52ms with 'TimeoutOverflowWarning: 3600000000 does not fit into a 32-bit signed integer. Timeout duration was set to 1.'; `--timeout 4294968` -> 'RangeError: The value of \"delay\" is out of range. It must be >= 0 && <= 4294967295'. Driven through the real parsePositiveInt + timeoutMs from the diff. Same script under Bun stays pending, so bun test cannot see it.",
+      "layer": "runtime timer contract of the shipped binary (node), end-to-end from user input",
+      "source": "lens",
+      "path": "packages/ai-cli/src/lib/timeout.ts:16 -> AbortSignal.timeout at commands/{text,image,video,audio}.ts"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The CHANGELOG entry was inserted into the already-released 0.4.2 section, against the repo's convention that release-prep PRs write the changelog, so the note will not appear in the next release's notes",
+      "evidence": "package.json version 0.4.2, tag v0.4.2 exists, 0.4.2 section written by 2a72d32 'Prepare v0.4.2 release (#76)'; feature PR #77 (7799606) added no changelog line; release.yml awk-extracts the first <!-- release:start --> block, which will be 0.4.3's. Entry also cites issue #78 where all sibling entries cite PR numbers.",
+      "layer": "release process / published artifact",
+      "source": "gate",
+      "path": "CHANGELOG.md:10"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "apps/web/docs/commands.mdx documents the flag in each Property list but its ## Timeouts section still describes the timeout as a fixed per-command value, while README.md and troubleshooting.mdx both gained an override paragraph",
+      "evidence": "gate.sh siblings timeout flagged commands.mdx as in-diff with un-added 'timeout' lines; read lines 298-310, no mention of --timeout.",
+      "layer": "docs consistency across the three surfaces the change claims to update",
+      "source": "gate",
+      "path": "apps/web/docs/commands.mdx:298-310"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "troubleshooting.mdx replaced the 'try a faster model variant' guidance instead of adding to it, losing still-valid advice",
+      "evidence": "git diff shows the line removed at troubleshooting.mdx:34 and a --timeout paragraph substituted; nothing in the change makes the model-variant advice obsolete.",
+      "layer": "docs content",
+      "source": "lens",
+      "path": "apps/web/docs/troubleshooting.mdx:34"
+    },
+    {
+      "id": "F5",
+      "state": "confirmed",
+      "claim": "No test asserts that the four real commands expose --timeout; the new test builds a synthetic Command, so deleting addTimeoutOption from image.ts, video.ts or audio.ts would keep the suite green",
+      "evidence": "grep 'timeout' over cli.test.ts and commands/*.test.ts returns nothing; timeout.test.ts imports only Command and addTimeoutOption, never register*Command. The repo's established surface for this is cli.test.ts's '<cmd> --help exits 0 and lists flags' tests. radius flagged cli.test.ts as impacted by cochange (4/4 history) yet absent from the diff.",
+      "layer": "test coverage of the registration seam (not the parser seam the new test covers)",
+      "source": "map",
+      "path": "commands/{text,image,video,audio}.ts#register* -> cli.test.ts via cochange"
+    },
+    {
+      "id": "F6",
+      "state": "confirmed",
+      "claim": "timeoutMs() has zero test coverage; the seconds->milliseconds conversion that is the whole behavior change at six call sites is never asserted",
+      "evidence": "timeout.test.ts exercises only addTimeoutOption plumbing; no import of timeoutMs anywhere in *.test.ts.",
+      "layer": "unit seam",
+      "source": "lens",
+      "path": "packages/ai-cli/src/lib/timeout.ts:16"
+    },
+    {
+      "id": "F7",
+      "state": "confirmed",
+      "claim": "timeout.test.ts:30 omits await on an expect(...).rejects assertion; the assertion still has teeth under bun but failures are attributed to the wrong test case",
+      "evidence": "Mutated a copy of the test file in /tmp to expect a wrong message: 3 of 3 cases failed (so not toothless), but the -1 failure was reported under 'rejects invalid value 0'.",
+      "layer": "test harness semantics",
+      "source": "lens",
+      "path": "packages/ai-cli/src/lib/timeout.test.ts:30"
+    },
+    {
+      "id": "F8",
+      "state": "refuted",
+      "claim": "The fluent-chain refactor dropped, reordered or re-described a pre-existing option, or attached .action() to a different object",
+      "evidence": "Per-file diff of every .option/.argument/.description/.command/.action call between origin/main and the worktree: identical modulo line numbers. Real --help rendered for image, text, video, audio speak, audio transcribe: every prior option present in the prior order, --timeout appended last before -h, and cli.test.ts's 80-column help-width assertion still passes. Options captured through the real registered commands show correct per-command defaults (text/audio 120, image/video 300).",
+      "layer": "registration/help output of the real commands, not a synthetic parser",
+      "source": "lens",
+      "path": "packages/ai-cli/src/commands/*.ts"
+    },
+    {
+      "id": "F9",
+      "state": "refuted",
+      "claim": "addTimeoutOption composes wrongly with the homegrown parser (defaults, negated flags, -- terminator, missing/malformed values, parent/subcommand inheritance)",
+      "evidence": "21 probe cases driven through the real registered program: default applied when absent; `--timeout 600` and `--timeout=600` both 600; repeated flag last-wins; missing value -> CliUsageError \"option '--timeout <seconds>' argument missing\"; abc/0/-1/3.5/' 30' rejected with the parse.ts message; `audio speak --no-play --no-waveform --timeout 30` yields timeout=30 with both negations intact; `--timeout` before the subcommand correctly rejected as unknown option on the parent; `--` terminator behavior unchanged from base.",
+      "layer": "argument parser composition, exercised through registerTextCommand/registerImageCommand/registerVideoCommand/registerAudioCommand",
+      "source": "lens",
+      "path": "packages/ai-cli/src/lib/timeout.ts:4-14"
+    },
+    {
+      "id": "F10",
+      "state": "refuted",
+      "claim": "The change corrects documented timeout values that had drifted from the code",
+      "evidence": "The diff changes no number in any table. All five documented values at origin/main (text 120, image 300, video 300, audio speak 120, audio transcribe 120) already match DEFAULT_TIMEOUT_MS in the four command files. Grep for other documented second-values across apps/web and both READMEs found none. The stated drift did not exist; the claim in the change description is unsubstantiated, not a defect.",
+      "layer": "doc-vs-constant equality across every surface stating a timeout",
+      "source": "lens",
+      "path": "packages/ai-cli/README.md:248, apps/web/docs/commands.mdx:302, apps/web/docs/troubleshooting.mdx:26"
+    },
+    {
+      "id": "F11",
+      "state": "issue_candidate",
+      "claim": "README's 'All commands support:' block overclaims: models supports none of -o/-n/-p and now not --timeout either",
+      "evidence": "commands/models.ts registers only --type, --creator, --json; the new --timeout line inherits a pre-existing inaccuracy in that block.",
+      "layer": "docs scope claim",
+      "source": "lens",
+      "path": "packages/ai-cli/README.md:44-52"
+    }
+  ],
+  "exemptions": [
+    { "claim": "lib/models.ts GATEWAY_TIMEOUT_MS (5s) needs no --timeout wiring", "evidence": "It bounds the gateway model-list fetch, not a generation request; issue #78 is about generation requests, and no doc surface states that value." },
+    { "claim": "lib/stdin.ts 1s timeout is unaffected", "evidence": "It is a race that decides whether stdin is piped at all, before any request exists." },
+    { "claim": "lib/audio-preview.ts timeouts are unaffected", "evidence": "They bound local playback of an already-generated file, after the request completed." },
+    { "claim": ".github/workflows/release.yml 'timeout' hits are unaffected", "evidence": "They are job-level timeout-minutes for CI, unrelated to CLI request aborts." },
+    { "claim": "parsePositiveInt accepting '007' as 7 is not a new defect", "evidence": "Same shared parser already backs -n/-p/--max-tokens at origin/main with identical leading-zero behavior." },
+    { "claim": "Landing/marketing copy needed no update despite the AGENTS.md rule naming apps/web/components/landing/", "evidence": "Grep for any option flag or documented timeout value across apps/web/components and apps/web/app returns nothing, so no landing copy enumerates flags." },
+    { "claim": "Formatting/lint/type/test state was not re-verified", "evidence": "The requester ran bun test (159 pass), typecheck, lint and format:check green before handing over; format:check re-confirmed green incidentally at 45 files." }
+  ],
+  "issue_candidates": [
+    {
+      "title": "README 'All commands support' block does not hold for ai models",
+      "evidence": "models.ts registers only --type/--creator/--json; the block lists -m/-o/-n/-p/-q/--json and now --timeout.",
+      "why_out_of_scope": "Pre-existing inaccuracy for four flags; the diff only inherits it by adding a fifth line to the same block."
+    },
+    {
+      "title": "parsePositiveInt has no upper bound and returns non-integers for very long digit strings",
+      "evidence": "parse.ts:1-10 accepts /^\\d+$/ then parseInt; 30 nines returns 1e30. Shared by -n, -p, --max-tokens, --timeout.",
+      "why_out_of_scope": "Fixing the shared parser affects flags outside this change; F1 can be closed locally with a ceiling in addTimeoutOption."
+    },
+    {
+      "title": "Bun and Node disagree on timer delay limits, so bun test cannot catch timer-range regressions in the shipped binary",
+      "evidence": "Identical script: Node overflows at 2^31-1 and throws above 4294967295; Bun accepts 9999999999000 and only throws above 2^53-1.",
+      "why_out_of_scope": "A CI/runtime-parity concern for the repo, not a defect of this diff, though it is why F1 survived a green suite."
+    }
+  ]
+}
