@@ -20,6 +20,12 @@ Usage:
   gate.sh timings [<base-ref>] [<path>...]    Every timing constant the diff adds (a ceiling, timeout, or deadline in ms)
                                               is listed against every larger timing constant in the same search space;
                                               each larger one is cleared or acknowledged
+  gate.sh shellmeta [<base-ref>] [<path>...]  A shell-metacharacter detector the diff adds or edits must cover every
+                                              construct that changes command parsing, not only the separators
+                                              (`#` comment, `(`/`)` subshell, `` ` ``/`$(` substitution), or acknowledge each
+  gate.sh covered <runs-dir> [<pr>]           A run report for the exact HEAD sha must exist; a rebase or force-push
+                                              retires every earlier report, including the one that found the bugs
+                                              this head claims to fix
   gate.sh all <conventions.md> [<base-ref>]   style + surfaces
 
 <base-ref> defaults to the merge base with origin/HEAD (falls back to HEAD~1).
@@ -357,9 +363,87 @@ check_surfaces() {
 	return $findings
 }
 
+# shellmeta: when a diff adds or edits a detector that scans a string for shell
+# metacharacters, the detector's character set is the artifact under test. Detectors
+# written from a bug report enumerate SEPARATORS (what starts a new command) and stop
+# there, because that is the class the report named. The classes that survive are the
+# ones that change parsing without starting a command: `#` (everything after it is a
+# comment, so appended arguments are silently discarded), `(`/`)` (subshell), and
+# `` ` ``/`$(` (command substitution). Provenance: portless #366 round 4 — the
+# quote-aware isCompoundShellScript covers ; | & newline and quoting, and a script
+# ending in a comment swallowed every injected --port/--host, producing a 502.
+check_shellmeta() {
+	local ref=""
+	if [[ -n "${1:-}" ]] && git rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then
+		ref="$1"
+		shift
+	fi
+	local base findings=0
+	base=$(base_ref "$ref")
+	# Files whose added lines test a string for shell separators.
+	local candidates
+	candidates=$(git diff "$base" -- "${@:-.}" 2>/dev/null | awk '
+		/^\+\+\+ /{ f=$2; sub(/^b\//,"",f); next }
+		/^\+/ && !/^\+\+\+/ { if (f != "" && $0 ~ /["'"'"']([;|&]|\\n)["'"'"']/) print f }' | sort -u)
+	if [[ -z "$candidates" ]]; then
+		echo "PASS [shellmeta] diff adds no shell-metacharacter detector"
+		return 0
+	fi
+	local construct
+	while IFS= read -r f; do
+		[[ -z "$f" ]] && continue
+		grep -qiE "test|spec" <<<"$f" && continue
+		for construct in '#' '(' '`' '$('; do
+			if ! grep -qF -- "\"$construct\"" "$f" 2>/dev/null && ! grep -qF -- "'$construct'" "$f" 2>/dev/null; then
+				echo "FINDING [shellmeta] $f detects shell separators but never tests for '$construct'; a script containing it re-parses differently than the detector assumes (appended args after '#' are discarded), or acknowledge why it is unreachable"
+				findings=1
+			fi
+		done
+	done <<<"$candidates"
+	[[ $findings -eq 0 ]] && echo "PASS [shellmeta]"
+	return $findings
+}
+
+# covered: a run report must exist for the exact tree being pushed. A rebase or
+# force-push rewrites shas, so the report that found round N's bugs describes a tree
+# that is no longer an ancestor of HEAD, and the commit that FIXES those findings is
+# by construction the least-reviewed commit on the branch. Provenance: portless #366
+# round 4 — the last report was cf596be, retired by a force-push; the fix commit
+# 1aba57e was never gated and shipped three defects.
+check_covered() {
+	local runs="${1:-}"
+	[[ -z "$runs" ]] && usage
+	local sha short
+	sha=$(git rev-parse HEAD)
+	short=$(git rev-parse --short HEAD)
+	if [[ ! -d "$runs" ]]; then
+		echo "ERROR [covered] runs directory not found: $runs"
+		return 2
+	fi
+	if ls "$runs" | grep -q -- "$short"; then
+		echo "PASS [covered] run report exists for HEAD $short"
+		return 0
+	fi
+	echo "FINDING [covered] no run report for HEAD $short in $runs"
+	local prior
+	prior=$(grep -lE '"(head|sha)"[[:space:]]*:' "$runs"/*.json 2>/dev/null | while IFS= read -r r; do
+		local h
+		h=$(sed -nE 's/.*"(head|sha)"[[:space:]]*:[[:space:]]*"([0-9a-f]{7,40})".*/\2/p' "$r" | head -1)
+		[[ -z "$h" ]] && continue
+		if git rev-parse --verify --quiet "$h^{commit}" >/dev/null 2>&1 &&
+			! git merge-base --is-ancestor "$h" "$sha" 2>/dev/null; then
+			echo "  unreachable: $(basename "$r") reviewed $h, not an ancestor of HEAD (rebased, force-pushed, or a different branch)"
+		fi
+	done)
+	[[ -n "$prior" ]] && echo "$prior"
+	return 1
+}
+
 cmd="${1:-}"
 shift || true
 case "$cmd" in
+	shellmeta) check_shellmeta "$@" ;;
+	covered) check_covered "$@" ;;
 	style) check_style "$@" ;;
 	stale) check_stale "$@" ;;
 	surfaces) check_surfaces "$@" ;;

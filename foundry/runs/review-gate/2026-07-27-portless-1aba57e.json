@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-27",
+    "repo": "vercel-labs/portless",
+    "pr": 366,
+    "branch": "railly/issue-285-bun-script-port-injection",
+    "base": "e0c2af5",
+    "head": "1aba57e",
+    "status": "complete",
+    "mode": "retrospective harvest (step 6); findings supplied externally, not discovered by this run",
+    "gaps": [
+      "Finding 1 (Expo HOST) verified at the code layer plus the helper probe, not by driving a real Expo app in LAN mode through the proxy: the asymmetry is two lines and the flag half was driven, but the observed Metro HMR degradation is taken from the external report"
+    ]
+  },
+  "provenance": {
+    "author_model": "claude-opus-4-8",
+    "reviewer_model": "claude-opus-5[1m]",
+    "same_family": true,
+    "same_family_warning": "Reviewer shares a family with the author of the branch; treat as a floor"
+  },
+  "deterministic": [
+    { "check": "covered", "outcome": "finding", "reason": "no run report for HEAD 1aba57e; five prior reports unreachable from HEAD after the force-push. This is the dominant cause of all three misses and the gate is new as of this run" },
+    { "check": "shellmeta", "outcome": "finding", "reason": "cli-utils.ts detects ; | & newline and never tests #, (, backtick, $(. Gate is new as of this run; force-red against 1aba57e" }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Expo package scripts still receive HOST=127.0.0.1 in LAN mode: cli.ts computes isExpo from path.basename(commandArgs[0]) ('bun'), so the LAN carve-out never fires, while cli-utils correctly omits --host through the same script",
+      "evidence": "probe against the built helpers at 1aba57e: injectPackageScriptFrameworkFlags(['bun','run','expo'],4321) with PORTLESS_LAN=1 returns ['bun','run','expo','--port','4321'] (--host correctly omitted); cli.ts:1391-1394 read directly, hostBind = '127.0.0.1' for the same command",
+      "layer": "consumer split of a discovery rule",
+      "source": "external, reproduced",
+      "path": "packages/portless/src/cli.ts:1391 vs packages/portless/src/cli-utils.ts:1080"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "A trailing shell comment in a package script silently discards every injected flag: injection proceeds, the shell drops the tail, the framework keeps its default port and the route 502s",
+      "evidence": "script \"dev\": \"printf 'ARGS:[%s]\\n' \\\"$*\\\" # start the dev server\"; `bun run dev --port 4321 --strictPort` echoed the composed line and printed ARGS:[] — zero arguments delivered, exit 0, no error. isCompoundShellScript never tests '#'",
+      "layer": "shell re-parse of an appended argument list",
+      "source": "external, reproduced at the substrate",
+      "path": "packages/portless/src/cli-utils.ts:isCompoundShellScript"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "All five doc surfaces state the scope limit as compound scripts only, while the code also silently skips env-prefixed scripts, nested pm delegation, and any script whose first token is neither a framework nor a known runner",
+      "evidence": "probe: \"NODE_ENV=development vite\" and \"npm run dev:vite\" both return with zero flags injected (findFrameworkIndex returns null; npm is not in PACKAGE_RUNNERS). Docs diff adds the identical '&&, |, ;' sentence to README, apps/docs/page.mdx, apps/docs/configuration/page.mdx, SKILL.md and cli.ts --help. The PR body itself lists four skip classes",
+      "layer": "docs scope-limit completeness",
+      "source": "external, reproduced",
+      "path": "README.md:35, apps/docs/src/app/page.mdx:46, apps/docs/src/app/configuration/page.mdx:264, skills/portless/SKILL.md:170, packages/portless/src/cli.ts:1824"
+    }
+  ],
+  "exemptions": [],
+  "issue_candidates": [
+    {
+      "title": "The Expo LAN carve-out is gated differently in its two homes",
+      "evidence": "cli-utils.ts uses isLanEnvEnabled() alone; cli.ts uses lanMode || isLanEnvEnabled(). A --lan flag that does not reach the helper as an env var diverges in a third way, independent of F1",
+      "why_out_of_scope": "surfaced while reading for F1; not externally reported and not part of the three findings harvested"
+    }
+  ],
+  "harvest": [
+    { "finding": "F1", "gate": "resolution-rule-consistency-across-consumers: trigger widened to any discovery rule, pass question requires grepping the raw resolver input alongside gate.sh callers; lens promoted (second independent instance)" },
+    { "finding": "F2", "gate": "new deterministic gate.sh shellmeta + new lens 'Shell re-parse append domain'" },
+    { "finding": "F3", "gate": "scope-limit-completeness clause on docs-behavior-parity" },
+    { "finding": "dominant cause", "gate": "new deterministic gate.sh covered: a run report must exist for the exact HEAD sha; a force-push retires every earlier report" }
+  ],
+  "note": "Retrospective. The gate did not miss these findings by reasoning badly on this tree; it never ran on this tree. Last report was cf596be, retired by a force-push, and the round-3 fix commit 1aba57e that introduced F1 and F2 was never gated. Both new deterministic gates force-red against 1aba57e."
+}
