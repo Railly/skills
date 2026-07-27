@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-27",
+    "repo": "agent-browser",
+    "base": "3cc7022271235694b5b5ce8aaea8bbfaa66e8cd5",
+    "head": "uncommitted worktree fix/policy-categories",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "vercel-labs/agent-browser#1612",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No Issue Contract supplied; Spec review not performed."]
+  },
+  "provenance": {
+    "author_model": "unknown (different model, round 2)",
+    "reviewer_model": "claude-opus-5[1m]",
+    "same_family": false
+  },
+  "lenses": [
+    {"name": "security/capability-enumeration", "status": "run", "reason": "policy categories are a security control"},
+    {"name": "contract-drift (docs vs code)", "status": "run", "reason": "docs table edited alongside table"},
+    {"name": "test-teeth", "status": "run", "reason": "new coverage test claims recurrence prevention"},
+    {"name": "correctness/dispatch-parity", "status": "run", "reason": "DOCUMENTED_ACTIONS deletions"},
+    {"name": "perf", "status": "skipped", "reason": "linear scan over 14 categories per check; no hot path"}
+  ],
+  "deterministic": [
+    {"check": "style/fmt/clippy/tests", "outcome": "pass", "reason": "run by delegating agent; not re-run"},
+    {"check": "dispatch-arm vs DOCUMENTED_ACTIONS set diff", "outcome": "finding-fixed", "reason": "25 live dispatch arms absent from DOCUMENTED_ACTIONS; 11 deleted by this diff"},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "radius CLI not on PATH"}
+  ],
+  "findings": [
+    {"id": "R2-1", "state": "confirmed", "claim": "Deleting evalhandle/setcontent/addscript/addinitscript/addstyle/expose from ACTION_CATEGORIES and DOCUMENTED_ACTIONS leaves arbitrary JS execution reachable under deny:[\"eval\"] via the daemon socket.", "evidence": "Live daemon with deny:[eval]: evaluate DENIED; evalhandle and setcontent ALLOWED and mutated document.title to PWNED_EVALHANDLE / PWNED_SETCONTENT; addscript, addinitscript, expose ALLOWED.", "layer": "end-to-end daemon socket against real Chrome", "source": "lens", "path": "cli/src/native/parity_tests.rs:118-155, cli/src/native/policy.rs:47"},
+    {"id": "R2-2", "state": "confirmed", "claim": "cdp_url is a complete policy escape, not a metadata read.", "evidence": "Harvested cdpUrl from a daemon running deny:[eval]; attached a second unpoliced agent-browser via --cdp and executed document.title='ESCAPED_VIA_CDP_URL'; the policed daemon's own content shows the mutated title.", "layer": "end-to-end, cross-process", "source": "lens", "path": "cli/src/native/parity_tests.rs:49,224"},
+    {"id": "R2-3", "state": "confirmed", "claim": "setvalue/clear/selectall/dispatch bypass deny:[\"fill\"] and deny:[\"click\"].", "evidence": "deny:[fill,click,interact]: fill DENIED; setvalue ALLOWED and wrote PWNED_SETVALUE; clear ALLOWED and emptied the field; dispatch click ALLOWED.", "layer": "end-to-end daemon socket", "source": "lens", "path": "cli/src/native/actions.rs:2449,2450,2452,2459"},
+    {"id": "R2-4", "state": "confirmed", "claim": "content is an uncategorized full-DOM read that escapes every read category.", "evidence": "deny:[read,get,snapshot,network,state,eval]: read/gettext/snapshot DENIED; content ALLOWED and returned full page HTML including input values.", "layer": "end-to-end daemon socket", "source": "lens", "path": "cli/src/native/parity_tests.rs:192-234"},
+    {"id": "R2-5", "state": "confirmed", "claim": "The coverage test has no teeth against new actions: it is keyed on DOCUMENTED_ACTIONS, which nothing forces a new dispatch arm to join.", "evidence": "Set diff shows 25 live dispatch arms absent from DOCUMENTED_ACTIONS; no reverse-direction test exists (grep: DOCUMENTED_ACTIONS used only at :244, :250, :460).", "layer": "test-suite structure", "source": "lens", "path": "cli/src/native/parity_tests.rs:238-258"},
+    {"id": "R2-6", "state": "confirmed", "claim": "Uncategorized find and inspect leak page text; trace_start/permissions/offline mutate state, all invisible to denylist policies.", "evidence": "Under deny:[read,get,snapshot,...]: find returned element text STATUS_OK; inspect, permissions, offline, trace_start ALLOWED.", "layer": "end-to-end daemon socket", "source": "lens", "path": "cli/src/native/parity_tests.rs:192-234, cli/src/native/actions.rs:8805"},
+    {"id": "R2-7", "state": "refuted", "claim": "window_new bypasses deny:[\"navigate\"].", "evidence": "window_new is ALLOWED under deny:[navigate], but handle_window_new (actions.rs:9139-9146) creates the target at about:blank and ignores the url param; a follow-up navigate is still checked.", "layer": "handler source plus live run", "source": "lens", "path": "cli/src/native/actions.rs:9124"},
+    {"id": "R2-F1", "state": "confirmed", "claim": "Round-1 F1 (find subaction bypass) is fixed.", "evidence": "find label Secret fill pwned under deny:[fill] -> denied; get value #s still 'untouched'; find label Secret text and find label Secret click still permitted.", "layer": "end-to-end CLI, original repro", "source": "gate", "path": "cli/src/native/actions.rs:2079-2085"},
+    {"id": "R2-F2", "state": "confirmed", "claim": "Round-1 F2 (wait --fn eval bypass) is fixed.", "evidence": "wait --fn under deny:[eval] -> denied as waitforfunction; plain eval denied; plain wait 50 still allowed.", "layer": "end-to-end CLI, original repro", "source": "gate", "path": "cli/src/native/policy.rs:47"},
+    {"id": "R2-F456", "state": "confirmed", "claim": "Round-1 F4/F5/F6 recategorizations hold at dispatch.", "evidence": "Under a category denylist: mousedown, press, inserttext, pushstate, removeinitscript, cookies_get, credentials_list all denied.", "layer": "end-to-end daemon socket", "source": "gate", "path": "cli/src/native/policy.rs:7-146"},
+    {"id": "R2-CONF", "state": "confirmed", "claim": "Confirmation keying does not leak across a category and requires_confirmation does not diverge from check.", "evidence": "Both call the same action_matches (policy.rs:148, :199); handle_confirm stores the concrete pending.action and restores the previous set after the single re-execution (actions.rs:10655-10664).", "layer": "source, both call sites", "source": "gate", "path": "cli/src/native/actions.rs:10649"}
+  ],
+  "exemptions": [
+    {"claim": "Allowlist policies are unaffected by the uncategorized allowlist.", "evidence": "Under {default:deny, allow:[navigate,snapshot,click,scroll,wait,get]} every probed uncategorized action (cdp_url, content, responsebody, permissions, setcontent, evalhandle, addinitscript) was denied as 'not in the allow list'."},
+    {"claim": "The MCP path is not an extra bypass surface for the deleted actions.", "evidence": "cli/src/mcp.rs builds CLI argv strings (e.g. call_one_string(arguments, \"auth login\", \"name\")) and routes through the same parser, which rejects these verbs as Unknown command."},
+    {"claim": "Category matching stays narrow for exact names.", "evidence": "deny:[evalhandle] denies only evalhandle; evaluate and addscript remain Allow (policy.rs test at :391)."}
+  ],
+  "issue_candidates": [
+    {"title": "README.md:486 and docs/src/app/init-scripts/page.mdx:32 document `agent-browser addinitscript <js>` but the CLI parser has no arm for it (commands.rs:2016 UnknownCommand).", "evidence": "grep found addinitscript in README, init-scripts docs and skill-data/core/references/commands.md; no parse arm exists; the action is reachable only over the daemon socket.", "why_out_of_scope": "Pre-existing docs/parser drift; this diff neither created nor was asked to fix it, though it is the reason the writer read the action as dead."},
+    {"title": "Duplicate/alias dispatch arms: useragent vs user_agent, emulatemedia vs set_media.", "evidence": "Dispatch set diff lists useragent and emulatemedia as live arms absent from DOCUMENTED_ACTIONS while user_agent and set_media are documented.", "why_out_of_scope": "Pre-existing naming drift, not a policy defect on its own."},
+    {"title": "UNCATEGORIZED_ACTIONS is not itself validated: `inspect` and `session_info` are listed there but absent from DOCUMENTED_ACTIONS, so those entries are never exercised.", "evidence": "The coverage test only checks DOCUMENTED_ACTIONS members against the allowlist; extra allowlist entries are inert.", "why_out_of_scope": "Hygiene of the new test rather than a reachable bypass; folded into R2-5 as a mechanism note."}
+  ]
+}

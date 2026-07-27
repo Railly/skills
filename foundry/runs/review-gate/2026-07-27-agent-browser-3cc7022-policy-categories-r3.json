@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-27",
+    "repo": "agent-browser",
+    "base": "3cc7022271235694b5b5ce8aaea8bbfaa66e8cd5",
+    "head": "uncommitted worktree fix/policy-categories",
+    "status": "complete",
+    "gaps": [
+      "responsebody live capture not driven to completion: the daemon serializes commands under one state lock, so a waiting responsebody blocks the navigate that would satisfy it. Categorization verified from source instead.",
+      "auth_login fill/click path verified by source read (actions.rs:10508-10560), not driven live: requires a provisioned credential vault."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "unknown (different model, round 3)",
+    "reviewer_model": "claude-opus-5[1m]",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "security-capability-escape", "status": "run", "reason": "core of the diff: category table gates every daemon action" },
+    { "name": "contract-drift-docs-siblings", "status": "run", "reason": "AGENTS.md mandates 5 surfaces per user-facing change" },
+    { "name": "test-teeth", "status": "run", "reason": "coverage test is the load-bearing recurrence guard; attacked empirically" },
+    { "name": "correctness-dynamic-dispatch", "status": "run", "reason": "policy_actions_for_command gained conditional appends" },
+    { "name": "scope", "status": "run", "reason": "mcp.rs and output.rs edits were outside the brief" },
+    { "name": "perf", "status": "skipped", "reason": "linear scan over a 14-entry const table on a socket command path; no hot loop touched" }
+  ],
+  "deterministic": [
+    { "check": "cargo fmt --check", "outcome": "pass", "reason": "" },
+    { "check": "cargo clippy --all-targets", "outcome": "pass", "reason": "0 errors" },
+    { "check": "cargo test --bin agent-browser", "outcome": "finding-fixed", "reason": "1044 passed / 0 failed in 4 of 5 full runs; test_all_documented_actions_are_handled failed 1 in 3 early runs and spawns a real DevTools window (finding R3-2)" },
+    { "check": "siblings (grep action-policy across repo)", "outcome": "finding-fixed", "reason": "docs/src/app/commands/page.mdx:585-586 still carries the pre-diff help text; agent-browser.schema.json and docs/public/schema.json descriptions unreviewed" },
+    { "check": "stale (ACTION_CATEGORIES in action-policy.ts reference)", "outcome": "pass", "reason": "the stale TS reference in commands.rs was the only one; 0 remaining repo-wide" },
+    { "check": "heavy/sensitive staged content", "outcome": "pass", "reason": "9 source/doc files, no media or credentials" }
+  ],
+  "findings": [
+    {
+      "id": "R3-1",
+      "state": "confirmed",
+      "claim": "route fulfill executes attacker-chosen JavaScript in the page origin under deny:[\"eval\"], reopening the exact mitigation security/page.mdx:20 documents",
+      "evidence": "Live raw-socket drive against a real Chrome: route **/pwned.html with an HTML body containing <script>document.title='ROUTE_EVAL_PWNED_JS_RAN'</script>, then navigate; title action returned ROUTE_EVAL_PWNED_JS_RAN while every one of evaluate/evalhandle/setcontent/addscript/addinitscript/removeinitscript/addstyle/expose/waitforfunction/cdp_url/inspect was denied by the same policy. route is in the network category only (policy.rs:186-198); body is arbitrary caller input (actions.rs:10071-10101).",
+      "layer": "runtime, raw daemon socket under an active --action-policy",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:186"
+    },
+    {
+      "id": "R3-2",
+      "state": "confirmed",
+      "claim": "adding inspect to DOCUMENTED_ACTIONS makes the pre-existing parity test launch a real browser and pop a DevTools window on every cargo test run, and makes it flaky",
+      "evidence": "parity_tests.rs:51 adds \"inspect\"; test_all_documented_actions_are_handled (parity_tests.rs:525) executes a minimal command per documented action; inspect is not in skip_launch_action so a browser is launched, then handle_inspect (actions.rs:4487) starts an InspectServer and calls open_url_in_browser (actions.rs:4508) which spawns `open http://127.0.0.1:<port>`. Observed directly: DevTools windows opened repeatedly during suite runs (user reported the devtools_app.html URL mid-review). Test failed 1 in 3 full-suite runs, 0 in 6 isolated runs.",
+      "layer": "test harness, host side effect",
+      "source": "gate",
+      "path": "cli/src/native/parity_tests.rs:51"
+    },
+    {
+      "id": "R3-3",
+      "state": "confirmed",
+      "claim": "the coverage test's source-text extractor misses any dispatch arm whose pattern is not a string literal, so a new uncategorized action can be added and the guard stays green",
+      "evidence": "Added `other if other == PWN_ACTION => handle_evaluate(cmd, state).await,` with `const PWN_ACTION: &str = \"pwn_exec\";` to execute_command. cargo fmt clean, compiles, test_policy_category_coverage_matches_dispatched_actions PASSES. The control (a plain `\"pwn_exec\" => ...` arm) correctly FAILS with \"dispatched action 'pwn_exec' is missing from DOCUMENTED_ACTIONS\". Also uncovered by construction: actions handled before the match (INTERNAL_DAEMON_SHUTDOWN_ACTION at actions.rs:2204 returns before the policy gate) and all sub-dispatch (find subactions, clipboard operation, dialog response).",
+      "layer": "test harness recurrence guard",
+      "source": "lens",
+      "path": "cli/src/native/parity_tests.rs:233"
+    },
+    {
+      "id": "R3-4",
+      "state": "confirmed",
+      "claim": "auth_login fills two fields and clicks a submit button with only navigate appended, so deny:[\"fill\"] and deny:[\"click\"] do not stop credentials being driven into a page form",
+      "evidence": "handle_auth_login navigates at actions.rs:10508 then resolves username/password/submit selectors (10553 onward, auto_submit_selectors) and fills and clicks without re-entering the policy gate. policy_actions_for_command appends only navigate (actions.rs:2146). Mitigating: url comes from the stored profile, values come from the vault. Aggravating: usernameSelector, passwordSelector and submitSelector are caller-overridable per command.",
+      "layer": "capability model",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:2146"
+    },
+    {
+      "id": "R3-5",
+      "state": "confirmed",
+      "claim": "MCP now accepts actionPolicy and confirmActions on every tool call, but the daemon only honours them at startup, so a per-call policy is silently ignored against a running daemon",
+      "evidence": "Started session rev2 with no policy; ran `--action-policy deny-all.json get text \"#h\"`; daemon pid unchanged (48290) and the command returned HELLO. mcp.rs:3585 appends the flags via append_common_global_args, shared by every tool. The daemon-startup-only consumption is at main.rs:1277.",
+      "layer": "MCP surface / daemon lifecycle",
+      "source": "lens",
+      "path": "cli/src/mcp.rs:3585"
+    },
+    {
+      "id": "R3-6",
+      "state": "confirmed",
+      "claim": "docs/src/app/commands/page.mdx:585-586 still shows the pre-diff --action-policy help text while output.rs was updated",
+      "evidence": "grep of action-policy across the repo; commands/page.mdx mirrors the help block and reads \"Path to action policy JSON file\" / \"Action categories requiring confirmation\". AGENTS.md requires docs/src/app to be updated with output.rs.",
+      "layer": "docs parity",
+      "source": "gate",
+      "path": "docs/src/app/commands/page.mdx:585"
+    },
+    {
+      "id": "R3-7",
+      "state": "confirmed",
+      "claim": "vitals installs a persistent init script under deny:[\"eval\"]",
+      "evidence": "handle_vitals calls mgr.add_script_to_evaluate(VITALS_INIT) at actions.rs:7316, the same primitive as addinitscript which is in the eval category; vitals is categorized get + navigate. Payload is a fixed agent-browser constant, not caller input, so no arbitrary execution, but the init script is never removed.",
+      "layer": "capability model",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:7316"
+    },
+    {
+      "id": "R1-get-find-fill",
+      "state": "refuted",
+      "claim": "round 1: get grants arbitrary fills via find subactions",
+      "evidence": "Live: {\"action\":\"getbylabel\",\"subaction\":\"fill\"} under deny:[\"fill\"] returned \"Action 'fill' denied by policy\" before execution. policy_actions_for_command appends the subaction for every FIND_SUBACTION_COMMANDS entry except text (actions.rs:2133-2139). Under --confirm-actions the same path required two separate confirmations (getbylabel, then fill).",
+      "layer": "runtime raw socket",
+      "source": "lens",
+      "path": "cli/src/native/actions.rs:2133"
+    },
+    {
+      "id": "R1-wait-fn",
+      "state": "refuted",
+      "claim": "round 1: wait grants arbitrary JS via waitforfunction",
+      "evidence": "Live: waitforfunction denied by deny:[\"eval\"]; the wait category now contains only wait, waitforurl, waitforloadstate, and plain wait still succeeded under the same policy.",
+      "layer": "runtime raw socket",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:120"
+    },
+    {
+      "id": "R2-script-injection",
+      "state": "refuted",
+      "claim": "round 2: deleting evalhandle/setcontent/addscript/addinitscript/addstyle/expose reopened arbitrary JS under deny eval",
+      "evidence": "All seven restored to the eval category and all seven denied live at the policy gate before execution; page title unchanged after the battery.",
+      "layer": "runtime raw socket",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:106"
+    },
+    {
+      "id": "R2-cdp-escape",
+      "state": "refuted",
+      "claim": "round 2: cdp_url parked uncategorized was a total policy escape",
+      "evidence": "Live: cdp_url and inspect both denied under deny:[\"eval\"]; the gate fires before handle_inspect can start its server or spawn `open`.",
+      "layer": "runtime raw socket",
+      "source": "lens",
+      "path": "cli/src/native/policy.rs:116"
+    },
+    {
+      "id": "R2-fill-bypass",
+      "state": "refuted",
+      "claim": "round 2: setvalue/clear/selectall/dispatch bypassed deny fill",
+      "evidence": "Live: setvalue, clear, selectall, multiselect, inserttext, type, press, keyboard, keydown, input_keyboard, check, uncheck, select and clipboard write all denied under deny:[\"fill\"]. dispatch is in click+interact rather than fill, and that is correct: dispatch_event (interaction.rs:831) only builds `new Event(type, init)` with both arguments JSON-escaped, so it cannot set a value or inject script. It is denied by deny:[\"click\"], verified live.",
+      "layer": "runtime raw socket",
+      "source": "lens",
+      "path": "cli/src/native/interaction.rs:831"
+    }
+  ],
+  "exemptions": [
+    { "claim": "session_info stays uncategorized", "evidence": "handler at actions.rs:5721 returns pid, socketDir, engine, launchHash and restore metadata including restoreLoadedPath and restoreSavedPath; it discloses local filesystem paths but no page content, no token and no CDP endpoint, and the daemon offers no file-read action to follow those paths with." },
+    { "claim": "pause stays uncategorized", "evidence": "handle_pause (actions.rs:9004) returns a fixed json string and touches neither state nor browser; verified live, response was the static note only." },
+    { "claim": "confirm stays uncategorized", "evidence": "handle_confirm (actions.rs:10703) re-enters execute_command with the stored command, so deny rules run again; verified live that approving gettext did not approve innerhtml and that a find-fill needed two separate confirmations." },
+    { "claim": "deny stays uncategorized", "evidence": "handle_deny (actions.rs:10723) takes the pending confirmation and returns; it has no execution path." },
+    { "claim": "mcp.rs and output.rs edits are in scope", "evidence": "AGENTS.md requires output.rs help, README, SKILL.md, docs/src/app and MCP parity to be updated in the same change as any user-facing flag change, so both files are mandated surfaces rather than scope creep, though R3-5 says the MCP exposure needs a guard." },
+    { "claim": "responsebody in network rather than read is acceptable", "evidence": "the diff documents response body under network in the new docs table, so the sharp edge (deny read+get+snapshot does not stop page content reaching the caller) is disclosed rather than hidden." }
+  ],
+  "issue_candidates": [
+    {
+      "title": "{\"default\":\"deny\",\"allow\":[]} fails open and permits every action",
+      "evidence": "policy.rs:327 guards the allow-list branch with !allow.is_empty(), and the else-branch that honours default:deny only runs when allow is absent. Verified live: a fresh daemon started with {\"default\":\"deny\",\"allow\":[]} ran `get text \"#h\"` and returned HELLO.",
+      "why_out_of_scope": "the !allow.is_empty() guard is unchanged from origin/main; this diff only swapped the equality comparison inside it."
+    },
+    {
+      "title": "__agent_browser_internal_shutdown bypasses the policy gate entirely",
+      "evidence": "actions.rs:2204 handles the internal shutdown action and returns before the policy block at actions.rs:2270, so a raw socket client can close the browser under deny:[\"state\"] which contains close.",
+      "why_out_of_scope": "pre-existing ordering on main; denial of service only, no capability escalation."
+    },
+    {
+      "title": "requests leaks full request headers under the network category",
+      "evidence": "live under deny:[\"read\",\"get\",\"snapshot\",\"eval\"], the requests action returned complete request header maps; on a real site that includes Cookie and Authorization.",
+      "why_out_of_scope": "correctly categorized as network by this diff; the gap is that the docs never state that a data-exfiltration posture requires denying network and state as well as read/get/snapshot."
+    }
+  ]
+}
