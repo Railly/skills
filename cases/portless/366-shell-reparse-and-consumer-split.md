@@ -92,3 +92,15 @@ The part worth keeping: **the test added with the fix pinned the wrong behavior.
 **Harness finding, not a product one.** The reviewer's force-red created a scratch worktree and ran `pnpm install` there. That repointed `node_modules` symlinks inside the worktree under review at a temp store, which was then deleted, leaving the reviewed checkout unbuildable after the review finished. A force-red belongs in the checkout under review, reverting and restoring in place; scratch fixtures belong outside the repository entirely.
 
 Standing residual, recorded rather than fixed: a subshell (`(expo start)`) and a leading command substitution (`` `printf expo` start ``) hide the framework name from a tokenizer that does not parse shell syntax, so those Expo scripts still get `HOST` in LAN mode. Closing it means parsing shell, which is a larger change than this PR.
+
+## 2026-07-28 round 6 — the corpus pays for itself, and a method error
+
+The differential corpus landed green locally and failed on its first CI run, on a real defect: `&>` is a bash extension, and package managers hand scripts to `sh`, which is dash on Debian and Ubuntu. There `vite dev &> out.log --port 4567` backgrounds the framework and runs the redirect as its own command, so every appended flag is lost. Confirmed at the substrate by running the same line under bash and dash side by side, then by sweeping the whole corpus under `/bin/dash`: one violation before, zero after. The `&` exemption now covers only POSIX fd duplication.
+
+This is the argument for the corpus in one data point. Five rounds of enumeration by imagination each shipped with the next case open; the corpus found the sixth on a shell the author's machine does not have, in CI, before a maintainer saw it.
+
+Two harness defects came out of the same run, both mine. The sweep defaulted to bun and neither CI job installs bun, so the file skipped on both runners: a test nobody executes. And the shim helper forced `PATH=/usr/bin:/bin`, which on Windows leaves the child without System32, so the `.cmd` shim could never run.
+
+The method error is worth more than either. I reported the Windows failures as pre-existing baseline because they also failed at `1aba57e`. That commit is on this branch. The tests arrived in `13c2c38`, the branch's first commit, so `ci-windows` had been red for the whole PR and it was ours to fix. **A pre-existing claim is only pre-existing against the merge base.** I asserted an exoneration instead of verifying it, and it exonerated an entire platform for several rounds.
+
+All checks green at `d79d6bf`, including `ci-windows` for the first time in this PR's history.
