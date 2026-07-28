@@ -54,6 +54,8 @@ Source the model from `conventions.md` **subsystem invariants** and the repo's o
 
 Read [references/gates.md](references/gates.md). Each **lens** declares a trigger, a property of the diff. Run each triggered lens as its own focused pass over the full diff, against the subsystem model from step 3 (each lens must clear or confirm the adjacent layers named there); a merged mega-pass dilutes every lens it carries. When an Impact Map exists from step 2, each lens inspects the convergence items first, then top-confidence items, and findings cite the propagation path (`X → Y via call`) — but always spend passes beyond the map too: in the radius A/B, reviewers who only followed the map missed bugs free exploration caught. The map directs attention; directed attention is also narrowed attention. Prefer a reviewer model different from the one that wrote the diff: a same-model reviewer shares its priors and its blind spots. Whichever way it lands, record `author_model` and `reviewer_model` in the run report; when they share a family, set `same_family: true` and carry a visible warning in the prose report — recorded, not blocking.
 
+When a guard has now failed review twice on the same class, stop selecting lenses for it and build a substrate differential corpus instead (see the catalog entry). A third imagination pass is evidence that the input space is larger than the reviewer's model of it.
+
 **Complete when:** every lens in the catalog is classified as triggered-and-run or skipped-with-reason.
 
 ## 5. Verify findings before reporting

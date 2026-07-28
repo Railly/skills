@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-28",
+    "repo": "vercel-labs/portless",
+    "pr": 366,
+    "base": "1aba57e",
+    "head": "d1a78f7",
+    "status": "complete",
+    "mode": "author's own gate on the fix for rounds 4 through 6, plus the outcome of one agnostic review and one incomplete review",
+    "gaps": [
+      "Round 3 of the agnostic review died mid-step-5 on a stream disconnect and never wrote a report. It confirmed the line-continuation finding before dying; what else it would have raised is unknown",
+      "No completed agnostic review exists for this head. The two commits after the round-3 review, and the message-only rewrite, are ungated by an external reviewer"
+    ]
+  },
+  "provenance": {
+    "author_model": "claude-opus-5[1m]",
+    "reviewer_model": "openai/gpt-5.6-sol",
+    "same_family": false
+  },
+  "deterministic": [
+    { "check": "style", "outcome": "acknowledged", "reason": "em dashes only; portless inverts that half of the gate. Zero ' -- ' in added lines" },
+    { "check": "surfaces", "outcome": "pass", "reason": "" },
+    { "check": "stale isCompoundShellScript", "outcome": "pass", "reason": "detector renamed to isUnsafeToAppendArgs, zero hits for the old name" },
+    { "check": "siblings 'package script'", "outcome": "acknowledged", "reason": "one untouched line in cli-utils.ts, the npm '--' forwarding comment, accurate and unaffected" },
+    { "check": "rawinput commandArgs[0]", "outcome": "acknowledged", "reason": "cli.ts:1456, the defect, is gone from the list. Six remaining hits: the spawn itself, the resolver's own two sites, a diagnostic message, and two usesPortless checks that answer a different question" },
+    { "check": "shellmeta", "outcome": "acknowledged", "reason": "'(' , backtick and '$(' uncovered. The resolver already declines those scripts because their first token is not a framework name, so a guard clause would be unreachable; a regression test pins the outcome instead" },
+    { "check": "covered", "outcome": "finding", "reason": "self-inflicted: the message-only rewrite retired every sha the earlier reports name. This report closes it for d1a78f7" },
+    { "check": "radius", "outcome": "acknowledged", "reason": "CLI not installed" }
+  ],
+  "findings_fixed": [
+    { "id": "K1", "source": "external (ctate)", "claim": "Expo package scripts receive HOST=127.0.0.1 in LAN mode, breaking Metro HMR", "fix": "2884a08 + d85077a", "verification": "built CLI, real bun, LAN marker set: plain expo script and one ending in a comment both report HOST unset" },
+    { "id": "K2", "source": "external (ctate)", "claim": "A shell comment makes the injected --port/--host disappear", "fix": "2884a08", "verification": "child argv observed as ['dev'] under bun and npm; guard now rejects a word-initial '#'" },
+    { "id": "K3", "source": "external (ctate)", "claim": "Docs overstate support for env-prefixed and wrapped scripts", "fix": "2884a08 + d85077a", "verification": "five surfaces now name five skip classes, enumerated from the early returns rather than from the reports" },
+    { "id": "R1", "source": "agnostic review", "claim": "Framework discovery coupled to append safety, so the carve-out goes blind for any declined script", "fix": "d85077a", "verification": "resolveFrameworkBasename returns 'expo' for four declined shapes; the test that pinned the conflation was replaced" },
+    { "id": "R2", "source": "agnostic review", "claim": "An escaped space before '#' misread as a comment, a regression against 1aba57e", "fix": "d85077a", "verification": "word start tracked as state; '--open /foo\\ #bar' injects again" },
+    { "id": "R3", "source": "agnostic review", "claim": "The corrected scope limit still omitted runner flags before the script name", "fix": "d85077a", "verification": "fifth class documented on all five surfaces" },
+    { "id": "R4", "source": "incomplete agnostic review", "claim": "A comment after a line continuation still opens a comment", "fix": "8aff07c", "verification": "reproduced against real bun before fixing; test red without it" },
+    { "id": "C1", "source": "differential corpus, first CI run", "claim": "'&>' is a bash extension; dash backgrounds the command and loses every appended flag", "fix": "42763a2", "verification": "same line run under bash and dash side by side, then the whole corpus under /bin/dash: one violation before, zero after" }
+  ],
+  "harness_findings": [
+    { "claim": "The differential sweep defaulted to bun and neither CI job installs it, so the file skipped on both runners", "fix": "7887596", "note": "found by running it under a PATH that mimics CI, not by reading the workflow" },
+    { "claim": "The shim helper forced PATH=/usr/bin:/bin, leaving the Windows child without System32 so the .cmd shim never ran", "fix": "d1a78f7", "note": "six tests, red since 13c2c38, the branch's first commit. ci-windows now passes for the first time in the PR" }
+  ],
+  "method_errors": [
+    { "claim": "Six Windows failures reported as pre-existing baseline", "reality": "they arrived in 13c2c38, the branch's first commit. The comparison was against 1aba57e, also on this branch, instead of the merge base", "closed_by": "a pre-existing claim is only pre-existing against origin/main; recorded in the conventions ledger" },
+    { "claim": "A subshell guard clause was added alongside the '#' fix", "reality": "force-red showed the test passed before the fix too: the resolver already declines those scripts, so the clause was unreachable", "closed_by": "clause deleted, outcome pinned by a test instead" }
+  ],
+  "issue_candidates": [
+    { "title": "A subshell or leading command substitution hides the framework from the resolver", "evidence": "verified on the built CLI: '(expo start --port 4567)' and '`printf expo` start --port 4567' both export HOST=127.0.0.1 in LAN mode", "why_out_of_scope": "closing it requires parsing shell syntax, larger than this PR" },
+    { "title": "cli.test.ts is not hermetic against the worktree branch prefix", "evidence": "six tests fail locally when the branch name leaks into expected hostnames; CI never sees it", "why_out_of_scope": "pre-existing against main, verified this time" },
+    { "title": "Injection is skipped for scripts where appending would be safe", "evidence": "env prefix, exec, time, and leading substitution all resolve to no injection though the shell would accept the flags", "why_out_of_scope": "over-conservatism, documented as a scope limit; widening it is a feature decision for the maintainer" }
+  ],
+  "note": "The durable artifact of this round is not the fixes, it is the corpus. Five rounds hardened one guard by imagination and each shipped with the next cell open; the corpus found the sixth on a shell the author's machine does not have, in CI, before a maintainer saw it. Promoted to the catalog as substrate differential corpus."
+}
