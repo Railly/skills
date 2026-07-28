@@ -76,3 +76,19 @@ Two subsystem invariants added to [conventions](conventions.md): *framework disc
 ## Residual, not yet fixed on the branch
 
 The four defects above are recorded, not repaired. Separately: `injectFrameworkFlags` gates the Expo LAN carve-out on `isLanEnvEnabled()` alone while `cli.ts` uses `lanMode || isLanEnvEnabled()`, so `--lan` passed as a flag (without the env var reaching the helper) diverges in a third way. Surfaced while reading for finding 1; not externally reported.
+
+## 2026-07-27 round 5 — agnostic review of the fix, and the defect the fix reintroduced
+
+The round-4 fixes shipped as `8f9d332`. An agnostic review (gpt-5.6-sol, full catalog, hint-free on the fix commit) returned three confirmed findings and one verdict of request-changes. Round-2 fixes shipped as `f558828`.
+
+**P1, and it is the same bug.** `resolvePackageScriptTokens` was written to answer "which command will run", and then quietly also answered "may I append to it": it returned null for an unsafe script. `resolveFrameworkBasename` sat on top, so the Expo LAN carve-out went blind again for every script portless declines to touch. `"dev": "expo start --port 4567 # note"` supplies its own port, needs no injection at all, and still received `HOST=127.0.0.1` in LAN mode. The reviewer drove it against real Bun with a capture shim; the failure is the exact HMR-breaking condition the carve-out exists to prevent.
+
+The part worth keeping: **the test added with the fix pinned the wrong behavior.** `returns null for a script portless declines to touch` asserted the conflation, so a green suite certified the regression. A force-red proves a test can fail; it does not prove the thing it asserts is the thing you wanted.
+
+**P2, escaped space before `#`.** `--open /foo\ #bar` is one argument. The detector consumed the escape and then read the raw previous character, a space, and called the `#` word-initial. Injection that worked at `1aba57e` stopped working at `8f9d332`, so this is a regression the fix introduced, established by running both revisions rather than by reading either. Word start is now tracked as state.
+
+**P2, the scope limit was still incomplete.** The round-4 fix rewrote five surfaces from one skip class to four. There are five: runner flags before the script name (`bun run --bun dev`) hit an early return whose own comment said so. The clause says to enumerate the early returns; the author assembled the list from the reported cases instead.
+
+**Harness finding, not a product one.** The reviewer's force-red created a scratch worktree and ran `pnpm install` there. That repointed `node_modules` symlinks inside the worktree under review at a temp store, which was then deleted, leaving the reviewed checkout unbuildable after the review finished. A force-red belongs in the checkout under review, reverting and restoring in place; scratch fixtures belong outside the repository entirely.
+
+Standing residual, recorded rather than fixed: a subshell (`(expo start)`) and a leading command substitution (`` `printf expo` start ``) hide the framework name from a tokenizer that does not parse shell syntax, so those Expo scripts still get `HOST` in LAN mode. Closing it means parsing shell, which is a larger change than this PR.
