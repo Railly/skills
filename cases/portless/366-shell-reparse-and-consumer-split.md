@@ -4,8 +4,8 @@ Status: observed
 Validation: unvalidated
 Human review: pending
 Maintainer acceptance: pending
-Delivery: PR open (head `1aba57e`, base `e0c2af5`)
-Upstream status checked: 2026-07-27
+Delivery: PR open, all checks green (head `d1a78f7`, base `e0c2af5`; earlier shas retired by a message-only rewrite)
+Upstream status checked: 2026-07-28
 Visibility: public
 Repository: vercel-labs/portless
 Role: contributor
@@ -73,7 +73,7 @@ const hostBind = isExpoLan ? undefined : "127.0.0.1";
 
 Two subsystem invariants added to [conventions](conventions.md): *framework discovery has two consumers, and they live 400 lines apart*, and *a package script is re-parsed by a shell, so appending is not composition*.
 
-## Residual, not yet fixed on the branch
+## Residual at round 4 (rounds 5 and 6 fixed all four; see below)
 
 The four defects above are recorded, not repaired. Separately: `injectFrameworkFlags` gates the Expo LAN carve-out on `isLanEnvEnabled()` alone while `cli.ts` uses `lanMode || isLanEnvEnabled()`, so `--lan` passed as a flag (without the env var reaching the helper) diverges in a third way. Surfaced while reading for finding 1; not externally reported.
 
@@ -104,3 +104,11 @@ Two harness defects came out of the same run, both mine. The sweep defaulted to 
 The method error is worth more than either. I reported the Windows failures as pre-existing baseline because they also failed at `1aba57e`. That commit is on this branch. The tests arrived in `13c2c38`, the branch's first commit, so `ci-windows` had been red for the whole PR and it was ours to fix. **A pre-existing claim is only pre-existing against the merge base.** I asserted an exoneration instead of verifying it, and it exonerated an entire platform for several rounds.
 
 All checks green at `d79d6bf`, including `ci-windows` for the first time in this PR's history.
+
+## Delivery
+
+Eight commits on top of `1aba57e`, all checks green at `d1a78f7`, including `ci-windows` for the first time in the PR's history. Fixed: the three external findings of round 4, the three from the round-5 agnostic review (two of which the round-4 fix introduced), and the dash-only `&>` defect the corpus found in round 6.
+
+Still open and recorded rather than closed: a subshell (`(expo start)`) or a leading command substitution hides the framework name from a tokenizer that does not parse shell, so those Expo scripts still get `HOST` in LAN mode. Closing it means parsing shell.
+
+Two process notes from the delivery itself. The commit messages first went out written as a debugging narrative in first person, which puts the author's reasoning process into a permanent record signed by someone else; they were rewritten to state the change and the reason only. And the message-only rewrite retired every sha the run reports name, so `gate.sh covered` now reports no coverage for the head, which is the check working as designed on its own author.

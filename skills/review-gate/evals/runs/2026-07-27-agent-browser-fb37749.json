@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-27",
+    "repo": "vercel-labs/agent-browser",
+    "base": "c4fc7820ec54f78012fcc3d74d5f15db54f4c0ef",
+    "head": "fb3774908e28913280188b79b75286b924a6f86b",
+    "pr": 1589,
+    "status": "complete",
+    "gaps": [
+      "Addendum run: covers c4fc782..fb37749. The full-diff gate for this PR is 2026-07-27-agent-browser-codex-c4fc782.json, whose unresolved intermittent observation still stands and is untouched by these commits."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_applicable",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "claude-opus-5",
+    "reviewer_model": "claude-opus-5",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "error-path forcing",
+      "status": "run",
+      "reason": "the delta is two new tests guarding error/degraded paths; each was force-red verified"
+    },
+    {
+      "name": "risky-primitive call-site sweep",
+      "status": "run",
+      "reason": "the delta removes a public primitive; confirmed zero callers before removal and a clean build after"
+    },
+    {
+      "name": "dogfood the built artifact",
+      "status": "skipped",
+      "reason": "test-only delta plus a dead-code removal; no user-facing behaviour changes. The shipped surface was driven at c4fc782 in the parent run"
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "no em dash or ' -- ' in the lines this commit adds; the pre-existing hits are exempted in the parent run"
+    },
+    {
+      "check": "cargo fmt --check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo clippy --all-targets",
+      "outcome": "pass",
+      "reason": "no warnings"
+    },
+    {
+      "check": "cargo test",
+      "outcome": "pass",
+      "reason": "1070 passed, 0 failed, 100 ignored"
+    },
+    {
+      "check": "covered",
+      "outcome": "finding-fixed",
+      "reason": "the push retired the c4fc782 report; this report covers the new head so the fix commit is not the unreviewed one"
+    },
+    {
+      "check": "comment length vs house median",
+      "outcome": "finding-fixed",
+      "reason": "the two new test comments ran 11 and 6 lines against a house median of 3-4 in browser.rs, and carried review narrative that an earlier commit on this same branch (bdb0702) had explicitly stripped from pin-tab test comments. Trimmed to 5 and 4 lines in fb37749, keeping only the invariant and the force-red recipe."
+    }
+  ],
+  "findings": [
+    {
+      "id": "5cabec7-rollback-test-force-red",
+      "state": "refuted",
+      "claim": "Candidate: the new rollback test may not guard the drift it names.",
+      "evidence": "First force-red attempt was wrong: patching the four attach call sites left the test green, because the test calls the wrapper directly. Corrected the recipe and the doc comment. Removing rollback_failed_launch from the wrapper's error arm makes it FAIL on the launch_hash assertion. The test's stated coverage limit (it drives the corrupt-binding failure, before the manager is touched, so it pins the error branch rather than the teardown of a live CDP connection) is written into the test comment rather than left implicit.",
+      "layer": "unit seam of the wrapper",
+      "source": "gate",
+      "path": "cli/src/native/actions.rs"
+    },
+    {
+      "id": "5cabec7-revive-test-force-red",
+      "state": "refuted",
+      "claim": "Candidate: the new restore-revive test may be vacuous.",
+      "evidence": "Replacing ensure_renderer_alive with a bare enable_domains in revive_and_enable_active makes the test FAIL by 20s timeout (Elapsed) on the mock CDP endpoint with a discarded bound tab. Green in 3.01s with the fix in place.",
+      "layer": "unit seam over a scripted CDP endpoint",
+      "source": "gate",
+      "path": "cli/src/native/browser.rs"
+    },
+    {
+      "id": "fb37749-comment-narrative-regression",
+      "state": "confirmed",
+      "claim": "The regression tests added in 5cabec7 re-introduced review narrative into test doc comments (which round found the gap, coverage caveats, internal mechanism restated from the code), on a branch where an earlier commit had already removed exactly that from the pin-tab tests.",
+      "evidence": "bdb0702 'docs(session): make pin-tab test comments agnostic (drop finding numbers)'. Comment lengths measured against browser.rs: median 3-4 lines per test, mine 11 and 6. Fixed in fb37749.",
+      "layer": "house convention on comment content",
+      "source": "gate",
+      "path": "cli/src/native/actions.rs; cli/src/native/browser.rs"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Removing the public enable_domains_pub is not a breaking change",
+      "evidence": "grep across cli/src returned only its definition, and the crate builds and tests clean without it; it is an inherent method on an internal type, not part of a published API."
+    },
+    {
+      "claim": "A same-family reviewer is acceptable for this delta",
+      "evidence": "The delta is test-only plus a dead-code removal, and both tests were validated by force-red, an empirical check that does not depend on reviewer priors. WARNING recorded per the schema: author and reviewer share a family here, unlike the parent run which used codex."
+    }
+  ],
+  "issue_candidates": []
+}
