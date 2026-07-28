@@ -383,11 +383,15 @@ check_shellmeta() {
 	fi
 	local base findings=0
 	base=$(base_ref "$ref")
-	# Files whose added lines test a string for shell separators.
+	# Files whose added lines test a string for a shell metacharacter. The class
+	# includes the tail-discarding constructs, not only the separators: a diff
+	# that EDITS an existing detector (adding a `#` branch, say) never touches
+	# the separator lines, so a separator-only trigger reads it as "no detector
+	# added" and passes. Self-caught on the #366 round 4 fix.
 	local candidates
 	candidates=$(git diff "$base" -- "${@:-.}" 2>/dev/null | awk '
 		/^\+\+\+ /{ f=$2; sub(/^b\//,"",f); next }
-		/^\+/ && !/^\+\+\+/ { if (f != "" && $0 ~ /["'"'"']([;|&]|\\n)["'"'"']/) print f }' | sort -u)
+		/^\+/ && !/^\+\+\+/ { if (f != "" && $0 ~ /["'"'"']([;|&#()`]|\\n)["'"'"']/) print f }' | sort -u)
 	if [[ -z "$candidates" ]]; then
 		echo "PASS [shellmeta] diff adds no shell-metacharacter detector"
 		return 0
