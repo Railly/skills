@@ -23,6 +23,10 @@ Usage:
   gate.sh shellmeta [<base-ref>] [<path>...]  A shell-metacharacter detector the diff adds or edits must cover every
                                               construct that changes command parsing, not only the separators
                                               (`#` comment, `(`/`)` subshell, `` ` ``/`$(` substitution), or acknowledge each
+  gate.sh artifacts <cleanup-source> [<base-ref>] [<path>...]
+                                              Every persistent filename the diff starts writing must appear in the
+                                              source that removes them (a clean command's allowlist); a written path
+                                              with a dynamic component cannot be matched by a static list at all
   gate.sh rawinput <accessor> [<base-ref>] [<path>...]
                                               When a diff deepens a resolution rule, every site that re-derives the answer
                                               inline from the raw input, on a line the diff never touched, is updated or acknowledged
@@ -497,10 +501,89 @@ check_rawinput() {
 	return $findings
 }
 
+# A persistent artifact the diff starts writing must be registered with whatever
+# removes it. The two sides are joined by nothing but a hardcoded list, so they
+# drift silently: the writer works, the remover is simply unaware, and no test
+# fails. Dynamic names (a pid or timestamp spliced into the filename) are worse
+# than unregistered — a static allowlist cannot express them at all.
+check_artifacts() {
+	local cleanup="${1:-}"
+	[[ -z "$cleanup" ]] && usage
+	shift
+	local ref=""
+	if [[ -n "${1:-}" ]] && git rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then
+		ref="$1"
+		shift
+	fi
+	local base findings=0
+	base=$(base_ref "$ref")
+	if ! git grep -qI . -- "$cleanup" 2>/dev/null; then
+		echo "ERROR [artifacts] cleanup source not found or empty: $cleanup"
+		return 2
+	fi
+	# Tests write scratch files by design and clean up after themselves; excluded
+	# by path, not by line content, or a test's own temp prefix reads as a finding.
+	local added
+	added=$(git diff "$base" --unified=0 -- "${@:-.}" \
+		':(exclude)*.test.*' ':(exclude)*.spec.*' ':(exclude)*/tests/*' ':(exclude)*/test/*' 2>/dev/null |
+		grep -E '^\+' | grep -vE '^\+\+\+' || true)
+	# Only lines that build or write a path: this is what separates a state
+	# filename from an import specifier or an encoding argument.
+	local write_re='path\.join|path::join|PathBuf|writeFileSync|appendFileSync|createWriteStream|renameSync|openSync|writeFile\(|fs::write|File::create'
+	# A filename rarely sits on the line that writes it: the idiom is a named
+	# constant declared far from its use. Take both, or the gate reads a
+	# `path.join(dir, HOSTS_SYNC_STATUS_FILE)` and learns nothing.
+	local name_re='(const|let|var|static|final)[^=]*(FILE|File|PATH|Path|NAME|Name|_file|_path)[^=]*=[^=]*'
+	local decl_lines
+	decl_lines=$(grep -E "$name_re" <<<"$added" || true)
+	local path_lines
+	path_lines=$(grep -E "$write_re" <<<"$added" || true)
+	if [[ -z "$path_lines" && -z "$decl_lines" ]]; then
+		echo "PASS [artifacts] the diff writes no new path"
+		return 0
+	fi
+	# A dynamic component counts only inside the path expression itself. Judge
+	# the interpolated segment, never the whole line: `writeFileSync(pidPath,
+	# `${process.pid}\n`)` interpolates into the file's *contents* and names
+	# nothing, while `${target}.${process.pid}.tmp` names a file no static list
+	# can enumerate.
+	local dynamic
+	dynamic=$(grep -oE '`[^`]*`|format!\([^)]*\)' <<<"$added" |
+		grep -E '\$\{|\{\}' |
+		grep -E '\.(tmp|lock|log|pid|json|sock|part|bak|swp)([^A-Za-z0-9]|$)' |
+		sort -u || true)
+	if [[ -n "$dynamic" ]]; then
+		echo "FINDING [artifacts] a written path carries a dynamic component, which no static cleanup allowlist can match. Remove by prefix, or acknowledge why the file cannot outlive the process:"
+		printf '    %s\n' "$dynamic"
+		findings=1
+	fi
+	local candidates
+	candidates=$(printf '%s\n%s\n' "$path_lines" "$decl_lines" |
+		grep -oE '"[A-Za-z0-9_.-]+"|'"'"'[A-Za-z0-9_.-]+'"'"'' |
+		tr -d "\"'" |
+		grep -E '[.-]' |
+		grep -vE '^(utf-?8|utf-?16|base64|hex|ascii|binary|latin1|r|w|a|w\+|r\+|a\+)$' |
+		grep -vE '^\.+$' |
+		# A single-segment dotfile name (".portless", ".cache") is the state
+		# directory itself, not an artifact inside it.
+		grep -vE '^\.[A-Za-z0-9_-]+$' |
+		sort -u || true)
+	while IFS= read -r name; do
+		[[ -z "$name" ]] && continue
+		if ! git grep -qIF "$name" -- "$cleanup" 2>/dev/null; then
+			echo "FINDING [artifacts] '$name' is written by the diff and absent from $cleanup; register it for cleanup or acknowledge why it must survive"
+			findings=1
+		fi
+	done <<<"$candidates"
+	[[ $findings -eq 0 ]] && echo "PASS [artifacts] every filename the diff writes is known to $cleanup"
+	return $findings
+}
+
 cmd="${1:-}"
 shift || true
 case "$cmd" in
 	shellmeta) check_shellmeta "$@" ;;
+	artifacts) check_artifacts "$@" ;;
 	rawinput) check_rawinput "$@" ;;
 	covered) check_covered "$@" ;;
 	style) check_style "$@" ;;

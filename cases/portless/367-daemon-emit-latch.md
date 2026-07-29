@@ -2,10 +2,10 @@
 
 Status: observed
 Validation: contributor-validated
-Human review: maintainer-reviewed (2026-07-22, two findings, both fixed and pushed)
+Human review: maintainer-reviewed (rounds 3, 4 and 6; rounds 3 and 4 fixed and pushed, round 6 open)
 Maintainer acceptance: pending
-Delivery: PR pushed (head `67572f9`, on main `e0c2af5`)
-Upstream status checked: 2026-07-22
+Delivery: PR pushed (head `c0862b9`)
+Upstream status checked: 2026-07-28
 Visibility: public
 Repository: vercel-labs/portless
 Role: contributor
@@ -66,6 +66,21 @@ A second finding lives outside this PR's diff and is recorded in the ledger rath
 
 Run report: `evals/runs/2026-07-25-portless-2470ad3.json` (the sibling branch's gate run, where the collision surfaced).
 
+## Round 6 (2026-07-28)
+
+Maintainer (ctate) raised two findings on head `c0862b9`, both gate misses, and harvesting them surfaced a third.
+
+1. **`alias` pays the full 4.1s ceiling when the running proxy cannot publish an outcome** — an older proxy, or one started with `PORTLESS_SYNC_HOSTS=0`. Reproduced by ctate at 4.17s, which is exactly `DEBOUNCE_MS + POLL_INTERVAL_MS + 1000` (`cli.ts:127,130`). This is the third round on the same wait and the first where the previous round's invariant was *satisfied* and still missed. Round 5 answered "whether to wait at all" with `hasLiveHostsSyncPublisher`, and its invariant enumerates the liveness cells: not running yet, stopped, stale PID file, crashed mid-run. ctate's daemon passes all four — it is alive, its PID is valid, and it is mute. Two independent producers of muteness, and only the first is about waiting: a build that predates the publishing side (the routine state of every user at upgrade time, since the daemon already running when the fix lands is by construction the old one), and a daemon whose sync was disabled at spawn. The second is a different class entirely: `reportHostsSyncAfterRouteChange` calls `shouldAutoSyncHosts(process.env.PORTLESS_SYNC_HOSTS)` inside the **CLI** process to decide what the **daemon** will do, reading an environment the daemon never saw.
+2. **`portless clean` leaves the new sync-status artifact behind, registered hostnames included.** `PORTLESS_STATE_FILES` (`clean-utils.ts:6`) is a hardcoded allowlist of 17 names with no coupling to the code that writes them; `proxy.hosts-sync-status` was never added. Nothing could have failed — the writer works, the remover is unaware, both suites stay green. `surfaces` and `siblings` were both built as documentation rules and could not see a code surface. The file stores the hostnames the user registered, so this is `clean` failing to remove user data after promising to.
+
+Harvest-time finding, not raised externally: **the suite encodes finding 1 as expected behavior.** `cli-utils.test.ts` `"gives up at the ceiling when the daemon never publishes"` asserts precisely the hang ctate measured, green, with `ceilingMs: 100` injected. At 100ms "waits to the ceiling, returns null" reads as correct bounded behavior; at the shipped 4100ms it is a hang on a routine command. Round 4 already added *measure the happy path too*; the missing twin is measuring the no-answer path at the production constant.
+
+Second unreported artifact, found while building the gate: `writeHostsSyncStatus` writes `${target}.${process.pid}.tmp` and unlinks it only on the failure path, so a crash between write and rename orphans a file whose name no static allowlist can ever express. Needs prefix removal, not an entry.
+
+Closed by: the **liveness is not capability** clause on the producer-exists invariant; the **a process reads its own environment to describe only its own behavior** invariant; the **Artifact cleanup registration** deterministic gate (`gate.sh artifacts`), force-red at birth on `c0862b9` reporting exactly the two files and green on an unrelated branch in the same repo; a `cli-utils.ts :: clean-utils.ts` surface line; and two clauses on the cancellation-and-timeout lens (capability over liveness, and timing the no-answer path at the production constant).
+
+Fixes not yet written at record time; the gates were harvested first so the agnostic pass could run against the encoded catalog rather than the answer key.
+
 ## Evidence
 
 - Source: `packages/portless/src/cli.ts:584` (warning emission inside the detached proxy), `cli.ts:3358` (proxy stderr → `proxy.log`), `cli.ts:666` (initial empty sync path and `hostsSyncWarned`), head `26953e8`.
@@ -88,9 +103,9 @@ Run report: `evals/runs/2026-07-25-portless-2470ad3.json` (the sibling branch's 
 ## Candidate changes
 
 - Skill method: none.
-- Reference rule: selected. **Emission channel and one-shot latch reachability** lens added to the catalog (trigger: user-facing warning/error, or a once-latch, in a CLI-plus-daemon system). Plus the daemon-emission subsystem invariant in `conventions.md`.
+- Reference rule: selected. **Emission channel and one-shot latch reachability** lens added to the catalog (trigger: user-facing warning/error, or a once-latch, in a CLI-plus-daemon system). Plus the daemon-emission subsystem invariant in `conventions.md`. Round 6 adds two clauses to **cancellation and timeout hygiene** (a short-circuit guard establishes capability, not liveness; time the no-answer path at the production constant) and two subsystem invariants (liveness-is-not-capability on the producer-exists rule, and configuration is local to the process started with it).
 - Exemplar: none.
-- Deterministic check: none (which process emits and when the latch flips are judgment, traced per diff).
+- Deterministic check: selected at round 6. **Artifact cleanup registration** (`gate.sh artifacts <cleanup-source>`): every persistent filename the diff writes must appear in the source that removes them, and a written path with a runtime-assembled component is reported because no static allowlist can express it. Which process emits, when the latch flips, and whether a peer may be an older build all stay judgment.
 - Eval: none.
 - Coverage gap: none.
 - No change: none.
