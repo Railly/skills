@@ -90,7 +90,13 @@ After any external review round on the same change, classify each external findi
 
 A finding an existing gate should have caught is a gate bug: record why it missed, both in the catalog entry's provenance and in the project conventions file's **gate-miss ledger** (date, finding, which gate missed, why, what closed it). The ledger keeps repo-local recurrence visible where the next review of that repo will actually look. Provenance is mandatory: a gate enters the catalog only from a recorded case or a confirmed external-review miss.
 
-**Complete when:** every external finding is matched to an existing gate that missed (with the miss explained) or captured as a new gate with provenance.
+Two checks on the harvest itself, because a harvested rule is written under the same pressure as a fix and fails the same ways.
+
+**A new deterministic gate is born red AND green.** Red on the defect that motivated it is already the rule. Green on correct work is the missing half: run the new check against a diff that should pass — an unrelated branch in the same repo, or the fixed version of the same diff — before it enters the catalog. A gate that reports correct work as a defect is a gate that gets ignored, and it will be ignored precisely when it is right. (Origin: portless #367 round 6, 2026-07-29. `gate.sh artifacts` was force-red at birth, shipped, and on its first real use reported two findings against the correct fix: registering the filename through a constant shared by writer and remover, and removing orphaned temp files by prefix — the two things the gate exists to ask for. Only running it against the fix surfaced that.)
+
+**An invariant harvested from one symptom inherits that symptom's direction.** A reviewer reports the direction that bit them. The rule you write from it describes a root cause, and a root cause almost always runs both ways. Before recording it, state the cause in one sentence with no symptom in it, then ask what the opposite direction looks like and whether it is reachable. (Origin: portless #367 round 6, 2026-07-29. The maintainer reported a CLI reading its own environment to describe a daemon as *waiting 4.1s for a publication that never comes*; the invariant was written in that direction. The same cause runs the other way — the CLI discarding a real failure the daemon did publish — which is worse, was reachable, and was found later by a blind reviewer driving the binary rather than by the harvest.)
+
+**Complete when:** every external finding is matched to an existing gate that missed (with the miss explained) or captured as a new gate with provenance; every new deterministic gate has been run red on its defect and green on a correct diff; and every new invariant has had its opposite direction stated and either found unreachable or recorded as its own finding.
 
 ## 7. Radius dogfood ledger
 

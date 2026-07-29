@@ -38,6 +38,10 @@ Candidate skills are installable methods ready for focused dogfooding.
 
 Experimental skills have coherent trigger and method contracts, but still need real-work cases and baseline comparison.
 
+### Solution Gate
+
+[Solution Gate](skills/.experimental/solution-gate) gates the shape of a fix before it is written. Two proposers on different model families work from the same symptom-free brief and declare falsifiable predictions; the cheapest refuting probe runs before any synthesis; proposals are scored against a catalog of recorded fix-failure shapes. It sits on the arrow between a reproduced defect and the change that answers it.
+
 ### Quality Baseline
 
 [Quality Baseline](skills/.experimental/quality-baseline) identifies repository-wide quality gaps before changes, rejects unsupported findings, and ranks one measurable pilot.
@@ -64,7 +68,8 @@ flowchart LR
   Gap --> Choice
   Choice --> Contract[Issue Contract]
   Contract --> Reproduce[Reproduce and map]
-  Reproduce --> Change[Implement acceptance IDs]
+  Reproduce --> Shape[solution-gate]
+  Shape --> Change[Implement acceptance IDs]
   Change --> Proof[Deterministic proof]
   Proof --> Spec[Spec review]
   Spec --> Review[review-gate]
