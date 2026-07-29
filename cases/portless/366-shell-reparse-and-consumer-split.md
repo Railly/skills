@@ -105,6 +105,10 @@ The method error is worth more than either. I reported the Windows failures as p
 
 All checks green at `d79d6bf`, including `ci-windows` for the first time in this PR's history.
 
+## 2026-07-28 round 7 — continued in a separate case
+
+The maintainer's next round (server flags injected into `vite optimize`) and the two defects the fix for it shipped are recorded in [366-subcommand-classification-and-flag-arity](366-subcommand-classification-and-flag-arity.md).
+
 ## Delivery
 
 Eight commits on top of `1aba57e`, all checks green at `d1a78f7`, including `ci-windows` for the first time in the PR's history. Fixed: the three external findings of round 4, the three from the round-5 agnostic review (two of which the round-4 fix introduced), and the dash-only `&>` defect the corpus found in round 6.
