@@ -552,10 +552,18 @@ check_artifacts() {
 		grep -E '\$\{|\{\}' |
 		grep -E '\.(tmp|lock|log|pid|json|sock|part|bak|swp)([^A-Za-z0-9]|$)' |
 		sort -u || true)
-	if [[ -n "$dynamic" ]]; then
+	# Prefix removal is the correct answer to a dynamic name, so recognize it
+	# rather than demanding an acknowledgement for a fix that already landed.
+	local prefix_removal=""
+	git grep -qIE 'startsWith|starts_with|glob|readdir|read_dir' -- "$cleanup" 2>/dev/null &&
+		prefix_removal=1
+	if [[ -n "$dynamic" && -z "$prefix_removal" ]]; then
 		echo "FINDING [artifacts] a written path carries a dynamic component, which no static cleanup allowlist can match. Remove by prefix, or acknowledge why the file cannot outlive the process:"
 		printf '    %s\n' "$dynamic"
 		findings=1
+	elif [[ -n "$dynamic" ]]; then
+		echo "NOTE [artifacts] a written path carries a dynamic component and $cleanup does remove by prefix; confirm the prefix covers it:"
+		printf '    %s\n' "$dynamic"
 	fi
 	local candidates
 	candidates=$(printf '%s\n%s\n' "$path_lines" "$decl_lines" |
@@ -570,10 +578,20 @@ check_artifacts() {
 		sort -u || true)
 	while IFS= read -r name; do
 		[[ -z "$name" ]] && continue
-		if ! git grep -qIF "$name" -- "$cleanup" 2>/dev/null; then
-			echo "FINDING [artifacts] '$name' is written by the diff and absent from $cleanup; register it for cleanup or acknowledge why it must survive"
-			findings=1
+		git grep -qIF "$name" -- "$cleanup" 2>/dev/null && continue
+		# Sharing a named constant between the writer and the remover is the
+		# stronger fix than repeating the literal in both, so resolve the name
+		# to the identifier bound to it and look for that too. Without this the
+		# gate reports a finding against the very coupling it exists to ask for.
+		local ident=""
+		ident=$(git grep -hIE "^[[:space:]]*(export[[:space:]]+)?(const|let|var|static|final|pub[[:space:]]+const)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[^=]*=[[:space:]]*[\"']${name}[\"']" |
+			grep -oE '(const|let|var|static|final)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*' |
+			awk '{print $2}' | sort -u | head -1 || true)
+		if [[ -n "$ident" ]] && git grep -qIw "$ident" -- "$cleanup" 2>/dev/null; then
+			continue
 		fi
+		echo "FINDING [artifacts] '$name' is written by the diff and absent from $cleanup; register it for cleanup or acknowledge why it must survive"
+		findings=1
 	done <<<"$candidates"
 	[[ $findings -eq 0 ]] && echo "PASS [artifacts] every filename the diff writes is known to $cleanup"
 	return $findings
