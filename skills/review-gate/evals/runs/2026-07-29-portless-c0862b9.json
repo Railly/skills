@@ -1,0 +1,186 @@
+{
+ "schemaVersion": 0,
+ "run": {
+  "date": "2026-07-29",
+  "repo": "vercel-labs/portless",
+  "base": "15ef06434c81523b1b24db2d52a17caf31edecf1",
+  "head": "c0862b9",
+  "pr": 367,
+  "status": "complete",
+  "gaps": [
+   "Blind agnostic pass. Reviewer ran read-and-drive only; this report was written by the harvesting session, not the reviewer, which is why the reviewer's own log calls itself incomplete.",
+   "Windows rename-over-existing semantics for the status file unverified (no Windows host).",
+   "radius: 20 changed / 103 impacted / 1479 edges / 5691 unresolvedCalls, so the map materially under-covers."
+  ]
+ },
+ "contract": {
+  "path": "",
+  "spec_status": "not_applicable",
+  "acceptance_reviewed": [],
+  "gaps": []
+ },
+ "provenance": {
+  "author_model": "claude-opus-5",
+  "reviewer_model": "openai/gpt-5.6-sol",
+  "same_family": false,
+  "notes": "Hint-free run of the post-harvest catalog with answer-key artifacts redacted: the round-6 case section, the three round-6 ledger entries, and every provenance clause naming the round-6 defects were stripped by script with a leak assertion. Encoded rules kept, instances removed."
+ },
+ "lenses": [
+  {
+   "name": "Cancellation and timeout hygiene",
+   "disposition": "triggered-and-run",
+   "findings": [
+    "F1",
+    "F2"
+   ]
+  },
+  {
+   "name": "Emission channel and one-shot latch reachability",
+   "disposition": "triggered-and-run",
+   "findings": [
+    "F2",
+    "F4"
+   ]
+  },
+  {
+   "name": "Docs-behavior parity",
+   "disposition": "triggered-and-run",
+   "findings": [
+    "F4"
+   ]
+  },
+  {
+   "name": "Non-destructive recovery",
+   "disposition": "triggered-and-run",
+   "findings": [
+    "F3"
+   ]
+  },
+  {
+   "name": "Dogfood the built artifact",
+   "disposition": "triggered-and-run",
+   "findings": [
+    "F1",
+    "F2",
+    "F3",
+    "F4"
+   ]
+  }
+ ],
+ "deterministic": [
+  {
+   "check": "artifacts",
+   "outcome": "findings",
+   "detail": "proxy.hosts-sync-status absent from clean-utils.ts; ${target}.${process.pid}.tmp not expressible in a static allowlist"
+  },
+  {
+   "check": "surfaces",
+   "outcome": "findings",
+   "detail": "cli-utils.ts :: clean-utils.ts unmet"
+  },
+  {
+   "check": "timings",
+   "outcome": "pass"
+  },
+  {
+   "check": "callers",
+   "outcome": "pass"
+  },
+  {
+   "check": "siblings",
+   "outcome": "pass"
+  },
+  {
+   "check": "rawinput",
+   "outcome": "pass"
+  },
+  {
+   "check": "shellmeta",
+   "outcome": "pass"
+  },
+  {
+   "check": "producers",
+   "outcome": "pass"
+  },
+  {
+   "check": "style",
+   "outcome": "exempted",
+   "detail": "em dashes preferred by portless house norm"
+  },
+  {
+   "check": "covered",
+   "outcome": "findings",
+   "detail": "no run report existed for c0862b9 before this one"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "state": "confirmed",
+   "layer": "runtime",
+   "claim": "alias pays the full 4.1s ceiling whenever the running daemon is alive but cannot publish: an origin/main daemon after a CLI upgrade, or a daemon started with PORTLESS_SYNC_HOSTS=0. hasLiveHostsSyncPublisher proves liveness, not capability.",
+   "evidence": "Built origin/main, started its daemon, ran the PR CLI: alias 4.18s. PR daemon started with sync disabled: 4.17s. Controls: no daemon 0.04s, capable daemon 0.15s.",
+   "source": "reviewer",
+   "path": "packages/portless/src/cli-utils.ts:397, packages/portless/src/cli.ts:564",
+   "external_match": "ctate 2026-07-28, measured 4.17s"
+  },
+  {
+   "id": "F2",
+   "state": "confirmed",
+   "layer": "runtime",
+   "claim": "The inverse direction of the same root cause, not reported externally: a CLI invoked with PORTLESS_SYNC_HOSTS=0 against an enabled daemon suppresses a real sync failure entirely. reportHostsSyncAfterRouteChange reads the CLI's own env to decide what the daemon will do.",
+   "evidence": "Enabled daemon, then PORTLESS_SYNC_HOSTS=0 portless alias split 18186: returned 0.06s, no warning. One second later proxy.hosts-sync-status held ok:false with the full warning, and proxy.log had the same failure.",
+   "source": "reviewer",
+   "path": "packages/portless/src/cli.ts:563",
+   "external_match": null
+  },
+  {
+   "id": "F3",
+   "state": "confirmed",
+   "layer": "runtime",
+   "claim": "portless clean leaves proxy.hosts-sync-status behind, registered hostnames included; PID-suffixed temp files are not expressible by the static allowlist at all.",
+   "evidence": "Created the status file, ran the built portless clean: it printed 'Removed portless state files' and 'Clean finished' while find still returned proxy.hosts-sync-status. Both artifacts and surfaces gates flagged it.",
+   "source": "reviewer+gate",
+   "path": "packages/portless/src/clean-utils.ts:6, packages/portless/src/cli-utils.ts:318",
+   "external_match": "ctate 2026-07-28"
+  },
+  {
+   "id": "F4",
+   "state": "confirmed",
+   "layer": "docs",
+   "claim": "All five surfaces promise the sync failure 'warns once', but the latch is daemon-scoped while delivery is per-CLI-process, so a user registering two apps is warned twice. Not reported externally and not caught in six rounds.",
+   "evidence": "Two successive built-CLI calls, alias second and alias third, both printed the warning (0.15s, 0.14s) while the daemon log held one. Wording confirmed at README.md:483, SKILL.md:414, apps/docs page.mdx:114, commands/page.mdx:274, cli.ts:2016.",
+   "source": "reviewer",
+   "path": "README.md:483, packages/portless/src/cli.ts:2016",
+   "external_match": null
+  }
+ ],
+ "exemptions": [
+  {
+   "claim": "em dash style findings exempt",
+   "evidence": "portless house norm prefers the em dash and bans ' -- '; recorded in conventions.md"
+  },
+  {
+   "claim": "changelog and unrelated sibling passages unaffected",
+   "evidence": "not a release; those passages do not define hosts-sync behavior"
+  },
+  {
+   "claim": "transient LAN-marker test failure is a flake",
+   "evidence": "same test passed immediately afterward and at origin/main; 769 other tests passed"
+  },
+  {
+   "claim": "raw pidPath reads outside the publisher path are unrelated",
+   "evidence": "they concern proxy lifecycle, not hosts-sync capability"
+  }
+ ],
+ "issue_candidates": [
+  {
+   "title": "Windows atomic status replacement unverified",
+   "detail": "renameSync(temp, existingTarget) over an existing file could not be exercised; no Windows host available."
+  },
+  {
+   "title": "Orphaned ${target}.${pid}.tmp on crash",
+   "detail": "writeHostsSyncStatus unlinks the temp only on the failure path; a crash between write and rename orphans a file no static allowlist can name. Needs prefix removal in clean."
+  }
+ ]
+}
