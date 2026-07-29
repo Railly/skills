@@ -56,9 +56,31 @@ Run them concurrently and do not let either see the other's output. Record both 
 
 **Complete when:** two structured proposals exist, produced independently, each with falsifiable predictions and a stated downside.
 
-## 3. Run the cheapest probe that could refute
+## 3. Trace each proposal forward, and mark every link
 
-Collect every prediction from both proposals. For each, ask what the *smallest* observation would refute it — not a spike, not an implementation. Usually one of: measure the current behavior, grep for a consumer nobody enumerated, build the previous release and run it, force the error path, read the installed tool's own option table.
+A proposal's stated downside is its first-order effect. The defects that cost the most are not there. They are two and three steps out, where the fix for one finding becomes the cause of the next, and each round's author could not see it because they were reasoning one step at a time.
+
+For each proposal, build a chain forward from the change itself:
+
+```
+the change → first-order effect → second → third → fourth → fifth
+```
+
+Three rules make this a map instead of a story:
+
+- **Every link names its mechanism, not just its effect.** "This adds a file" is an effect. "This adds a file, and the component that removes state has a hardcoded list with no coupling to writers" is a mechanism, and a mechanism can be checked.
+- **Every link is marked `observed`, `inferred`, or `guessed`.** Observed means someone ran something and watched it. Inferred means it follows from code that was read. Guessed means it sounds right. A chain of five plausible steps reads as rigor and is usually four guesses wearing one observation, which is the specific way this step fails.
+- **Branch where more than one effect is plausible, and include the branches that help.** One chain per proposal favors a neat story. A proposal whose forward pass has no harmful branch has not been traced, it has been advertised.
+
+Do not add a backward five-whys pass. Diagnosis is not where this pipeline loses; the defect is usually already reproduced and understood by the time a shape is being chosen. Spending the budget on causes you already know buys nothing and pads the map.
+
+**The chain is not a forecast.** It is a list of claims cheap enough to check, ranked by how load-bearing they are. Its only product is the next step's target.
+
+**Complete when:** each proposal has a forward chain of at least three orders, every link carries a mechanism and an evidence mark, and at least one harmful branch exists per proposal.
+
+## 4. Run the cheapest probe that could refute
+
+Collect every prediction from both proposals, and every link from step 3 marked `guessed` or `inferred`. Rank them by how much the proposal rests on them, then work down that list. **Probe the weakest load-bearing link before the endpoints:** an endpoint prediction is what a proposal claims about its result, and the link is where its reasoning is actually wrong. For each, ask what the *smallest* observation would refute it — not a spike, not an implementation. Usually one of: measure the current behavior, grep for a consumer nobody enumerated, build the previous release and run it, force the error path, read the installed tool's own option table.
 
 Run those probes now, before scoring. Record the command and its output.
 
@@ -66,7 +88,7 @@ A probe is not proof that a shape is correct; it is a cheap chance to kill a wro
 
 **Complete when:** every prediction is refuted, survived, or named unprobeable with the reason; each carries its command and observed output.
 
-## 4. Score against the recorded failure shapes
+## 5. Score against the recorded failure shapes
 
 Read [references/failure-shapes.md](references/failure-shapes.md) and score each surviving proposal against every shape. This is the objective half: each shape is a recorded case, so "does this repeat S1" has a citable answer and two readers can disagree about a fact instead of a taste.
 
@@ -76,7 +98,7 @@ Weight **S1 (over-reach)** and **S2 (under-reach)** highest when the change is i
 
 **Complete when:** both proposals carry a per-shape verdict, each hit either designed out or accepted with a stated reason.
 
-## 5. Synthesize, and say which kind of synthesis it was
+## 6. Synthesize, and say which kind of synthesis it was
 
 The implementing runtime now decides, and states which of these happened:
 
@@ -88,9 +110,21 @@ Take proposals with tongs. Both proposers are confident by construction and neit
 
 **Complete when:** the chosen shape is written down with its synthesis kind, the losing material is accounted for, and every carried assumption is listed.
 
-## 6. Record and hand off
+## 7. Draw it, and keep evidence separate from proposal
 
-Write the decision to the canonical `Railly/skills` checkout, resolved through `RAILLY_SKILLS_REPO`, `~/Programming/railly/skills`, or `~/railly-skills` (`scripts/resolve-source-root.mjs`). Never into the target repo or an installed copy. The record holds both proposals verbatim, the probe log, the shape scoring, and the synthesis — a decision whose losing alternatives are not preserved cannot be re-examined when the fix turns out wrong.
+Prose is the wrong medium for behavior that is temporal, cross-process, or ordered, which is most of what this gate looks at. A sequence you can see is a sequence you can argue with. Produce one self-contained HTML page per run (no build step, no network, Mermaid inline or hand-drawn SVG) holding two clearly separated halves.
+
+**Observed behavior, before and after.** This half is evidence. Every element traces to something that was run: a real terminal transcript, a measured duration, the actual contents of a file at a moment in time. Timelines and sequence diagrams beat paragraphs here because the defects are ordering defects. Nothing enters this half that was not observed, and anything that could not be driven is drawn as an explicit gap rather than a guess.
+
+**Proposed shapes, side by side.** This half is argument, and it is labelled that way on the page. A clean diagram of a wrong design is more persuasive than a muddled diagram of a right one, so the visual carries no weight the probes did not give it: mark each proposed link with the same `observed` / `inferred` / `guessed` marks from step 3, in the drawing, where a reader cannot skip them.
+
+Never merge the halves into one diagram. Merged, a proposal inherits the credibility of the measurements next to it, which is exactly the mistake a picture makes easy.
+
+**Complete when:** one HTML page opens with no build step, its observed half traces every element to a command that was run, and its proposal half is labelled as argument with evidence marks visible in the drawing.
+
+## 8. Record and hand off
+
+Write the decision to the canonical `Railly/skills` checkout, resolved through `RAILLY_SKILLS_REPO`, `~/Programming/railly/skills`, or `~/railly-skills` (`scripts/resolve-source-root.mjs`). Never into the target repo or an installed copy. The record holds both proposals verbatim, the forward chains, the probe log, the shape scoring, the synthesis, and the HTML page from step 7 — a decision whose losing alternatives are not preserved cannot be re-examined when the fix turns out wrong.
 
 Then hand off:
 
