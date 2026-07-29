@@ -81,6 +81,17 @@ Closed by: the **liveness is not capability** clause on the producer-exists inva
 
 Fixes not yet written at record time; the gates were harvested first so the agnostic pass could run against the encoded catalog rather than the answer key.
 
+**Blind agnostic pass on the harvested catalog (gpt-5.6-sol, 2026-07-29).** Hint-free: the prompt named no finding, no maintainer, and no subsystem, and the catalog was redacted by script with a leak assertion, stripping this section, the three round-6 ledger entries, and every provenance clause naming the defects. Encoded rules kept, instances removed.
+
+Both of ctate's findings reproduced empirically, and each with the case the diff cannot test against itself: it built `origin/main`, started *that* daemon, then ran the PR CLI against it and measured `alias` at 4.18s, then 4.17s against a PR daemon started with sync disabled, against controls of 0.04s (no daemon) and 0.15s (capable daemon). The version-skew path was driven, not argued.
+
+Two findings beyond the external round, both from driving rather than reading:
+
+1. **The suppression direction of the same root cause, which nobody had reported.** A CLI invoked with `PORTLESS_SYNC_HOSTS=0` against an *enabled* daemon returns in 0.06s and prints nothing, while `proxy.hosts-sync-status` holds `ok:false` with the full warning one second later. ctate's report and this case's own invariant both describe the config-locality bug in the direction where the CLI waits too long; the direction where a real failure is silently swallowed is strictly worse and is the original #364 defect returning through the fix for it.
+2. **All five surfaces promise the failure "warns once" and the user is warned once per registering process.** The daemon-scoped latch versus per-CLI delivery was recorded as a round-4 gate finding in the *silence* direction (a second app stays quiet); the docs read the same mechanism in the opposite direction and are simply false. Two successive `alias` calls both printed the warning while the daemon log held one. Six rounds, five rewritten surfaces, and the sentence was never checked against the mechanism it describes.
+
+Run report: `evals/runs/2026-07-29-portless-c0862b9.json`.
+
 ## Evidence
 
 - Source: `packages/portless/src/cli.ts:584` (warning emission inside the detached proxy), `cli.ts:3358` (proxy stderr → `proxy.log`), `cli.ts:666` (initial empty sync path and `hostsSyncWarned`), head `26953e8`.
