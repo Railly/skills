@@ -40,6 +40,10 @@ Hand this to both proposers as the entire brief. Do not include a proposed fix, 
 
 Run two reviewer runtimes **on different model families**, neither of them the runtime that will implement. Same-family proposers share priors and blind spots, and their agreement carries no information. The implementer is excluded because it will be the one grafting and must not be defending.
 
+Isolate structurally, not by instruction. When a candidate shape already exists (a shipped fix being re-examined, a branch under review), put the proposers in a checkout that does not contain it — a clone from the remote is enough when the work is unpushed. Telling a proposer not to look leaves you trusting a report; removing the object leaves nothing to trust.
+
+Two operational notes that cost a run each. `codex exec` reads stdin in addition to its prompt argument and blocks forever when nothing closes it: redirect from `/dev/null` for any non-interactive launch. And give each proposer its own working directory, or their builds and test ports collide.
+
 Each returns, in this structure and no other:
 
 - **Shape** — where state lives, who owns each decision, what the contract becomes. Not code.
@@ -97,6 +101,10 @@ Then hand off:
 When a fix that passed this gate is later found defective, the failure is harvested back into [references/failure-shapes.md](references/failure-shapes.md) with its provenance, the same discipline Review Gate applies to its own catalog. A shape enters only from a recorded case.
 
 **Complete when:** the record exists at the canonical root, assumptions are handed to implementation, and the must-not-change list is handed to review.
+
+## Run log
+
+- **2026-07-29, portless #367 round-6 defects** (`foundry/runs/solution-gate/2026-07-29-portless-367-c0862b9.md`). Holdout: the implementer had already shipped a shape, sealed it before reading either proposal, and both proposers worked in clones that did not contain it. Both independently treated two separately-numbered defects as one root cause, and both reached the implementer's conclusion on a third. Both then found the same gap the implementer had missed, and named the same unstated cost in the shipped fix. Three grafts taken. First use, so the method is dogfooded once and evaluated zero times.
 
 ## Dogfood pairing
 
