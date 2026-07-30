@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-30",
+    "repo": "agent-browser",
+    "base": "2158803",
+    "head": "7499fc1",
+    "status": "complete",
+    "gaps": [
+      "Codex reviewed the worktree while the implementer was editing it, so its actions.rs line citations are against an intermediate tree. Its findings were re-verified against the final tree before being acted on.",
+      "Codex could not launch Chrome in its sandbox, so it reported the png reconfiguration as speculative. The implementer confirmed it empirically."
+    ]
+  },
+  "contract": { "path": "", "spec_status": "not_applicable", "acceptance_reviewed": [], "gaps": [] },
+  "provenance": {
+    "author_model": "claude-opus-5",
+    "reviewer_model": "openai/gpt-5.6-sol (codex, high effort)",
+    "same_family": false,
+    "note": "First cross-family review in this repo that actually completed. Two earlier attempts died before reading the diff."
+  },
+  "deterministic": [
+    { "check": "covered", "outcome": "finding-fixed", "reason": "No run report for HEAD; this run closes it." },
+    { "check": "style", "outcome": "pass", "reason": "no em dashes or ' -- ' in added lines" },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "actions.rs flagged against the command doc surfaces. screencast_start is documented on neither (0 mentions) and is not even a CLI command; it is reachable only over the raw daemon socket or MCP." },
+    { "check": "callers", "outcome": "acknowledged", "reason": "cdp_event_loop passes. from_env matched plugins_from_env in plugins.rs, a different function caught by substring." },
+    { "check": "siblings", "outcome": "acknowledged", "reason": "startScreencast flagged the vendored CDP protocol json (a spec, not behavior). quality flagged evals and video-recording.md; verified recording does not share this path, since stream::start_screencast has exactly one caller and the other screencastFrame consumer only collects acks." },
+    { "check": "timings", "outcome": "pass", "reason": "no wait ceiling added" },
+    { "check": "artifacts", "outcome": "pass", "reason": "no new persistent path" },
+    { "check": "rawinput", "outcome": "pass", "reason": "no site re-derives the screencast config inline" },
+    { "check": "fmt", "outcome": "pass", "reason": "cargo fmt --check clean" },
+    { "check": "clippy", "outcome": "pass", "reason": "cargo clippy --all-targets -- -D warnings clean" },
+    { "check": "unit tests", "outcome": "pass", "reason": "1058 passed, 0 failed, 96 ignored" },
+    { "check": "force-red", "outcome": "pass", "reason": "removing the i32 bound turns test_screencast_config_ignores_unusable_values red" }
+  ],
+  "findings": [
+    {
+      "id": "G1",
+      "state": "confirmed",
+      "claim": "EXTERNAL (codex). A frame dimension above i32::MAX stops the stream completely and silently.",
+      "evidence": "CDP types maxWidth and maxHeight as signed, so it rejects the whole startScreencast call; the caller discards the error and status still reports a screencast. Measured against real Chrome: AGENT_BROWSER_STREAM_MAX_WIDTH=4294967295 delivered zero frames, while 2147483647 and 99999 delivered 1280x577. The implementer's own adversarial test used 99999 and therefore missed it. Fixed by bounding the parse at i32::MAX; the value now falls back to the viewport, verified as 1280x577 frames restored, and the guard goes red without the bound.",
+      "layer": "env parse to CDP parameter contract",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "G2",
+      "state": "confirmed",
+      "claim": "EXTERNAL (codex, speculative and then confirmed). The 'stream frames are always jpeg' claim is false: screencast_start reconfigures the same shared screencast, so an explicit png request reaches live stream clients mid-flight.",
+      "evidence": "Codex reasoned it from the two independent state paths but could not launch Chrome to confirm. Driven end to end: a client receiving JPEG magic bytes switched to PNG magic bytes after screencast_start with format png on the same session, while packages/dashboard/src/components/viewport.tsx decodes with a hardcoded image/jpeg type. Pre-existing behavior, but this branch was the first to assert the invariant, in a code comment and on three doc surfaces. All four now describe the reconfiguration instead of promising jpeg.",
+      "layer": "shared screencast ownership across two entry points",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "G3",
+      "state": "confirmed",
+      "claim": "SELF. Feeding the frame-size env vars into screencast_start announced a viewport the page does not have.",
+      "evidence": "That command broadcasts its own maxWidth and maxHeight as the status viewport, and clients scale pointer coordinates by it. Measured: with AGENT_BROWSER_STREAM_MAX_WIDTH=640 on a 1280x720 page, status went 1280x720 to 640x360, which would halve every click. Fixed by keeping only quality on that path; status now holds at 1280x720 across a screencast_start while the stream still encodes at 640x289. Codex independently reached the same conclusion and used it to argue for cutting the actions.rs change.",
+      "layer": "status broadcast contract",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "G4",
+      "state": "exempted",
+      "claim": "EXTERNAL (codex). Silent fallback on an unusable value defeats a setting whose purpose is cost control: QUALITY=2O with a letter O silently bills quality 80.",
+      "evidence": "Accepted as a stated tradeoff rather than fixed. The counter-argument is real, but the daemon is detached and its stderr lands in a log the operator is not attached to, which is the wrong-layer delivery failure already recorded in this catalog. Failing startup on a typo would take the whole daemon down for a bandwidth hint. Documented as fallback behavior instead.",
+      "layer": "operator feedback channel",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "G5",
+      "state": "refuted",
+      "claim": "Making the encoded frame smaller than the metadata claims breaks coordinate mapping (interaction with open issue #1613).",
+      "evidence": "Refuted empirically at the end-to-end layer, not by reasoning: with MAX_WIDTH=640 on a 1280x720 page, a click sent at (640,360) arrived in the DOM at (640,360), identical to the uncapped run. Downscaling the encode does not move the CSS pixel space that input dispatch uses. Codex reached the same conclusion independently by reading the dashboard's canvas sizing. Frame metadata stays misleading for third-party clients, which is #1613 and pre-existing: metadata reports 1280x720 while the real frame is 1280x577 even with no env vars set."
+      ,
+      "layer": "input coordinate mapping",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "G6",
+      "state": "refuted",
+      "claim": "The stream env vars silently change what a video recording captures.",
+      "evidence": "Refuted by enumeration at the call-site layer: stream::start_screencast has exactly one caller, handle_screencast_start, and the only other Page.screencastFrame consumer (actions.rs:1661, guarded on stream_server.is_none()) just collects acks. No recording pipeline reads this path.",
+      "layer": "cross-feature interaction",
+      "source": "gate",
+      "path": "gate.sh siblings quality -> video-recording.md"
+    },
+    {
+      "id": "G7",
+      "state": "issue_candidate",
+      "claim": "screencast_start on a session that already has a live stream restarts the shared screencast with different parameters, silently overriding the stream's configuration.",
+      "evidence": "Observed twice: frame width jumped from 640 back to 1280 after the call, and format switched from JPEG to PNG. state.screencasting can be false while the stream server is screencasting, so the guard in handle_screencast_start does not stop it.",
+      "layer": "shared screencast ownership",
+      "source": "lens",
+      "path": ""
+    }
+  ],
+  "exemptions": [
+    { "claim": "actions.rs needs no command-doc update.", "evidence": "screencast_start has zero mentions in either command surface and is not a CLI command; only the raw daemon socket and MCP reach it." },
+    { "claim": "The from_env caller finding is a false positive.", "evidence": "The match is plugins_from_env in plugins.rs, an unrelated function sharing a substring." },
+    { "claim": "The vendored CDP protocol json needs no update.", "evidence": "It is the upstream protocol definition, not a description of this project's behavior." },
+    { "claim": "Video recording is unaffected.", "evidence": "stream::start_screencast has one caller and the other screencastFrame handler only collects acks." },
+    { "claim": "Silent fallback on an unusable env value is acceptable.", "evidence": "A daemon warning lands in a log the operator is not attached to, and failing startup would take the daemon down over a bandwidth hint; recorded as G4 rather than waved through." }
+  ],
+  "issue_candidates": [
+    {
+      "title": "screencast_start hijacks the live stream's shared screencast, changing format and frame size for connected clients",
+      "evidence": "Observed: JPEG to PNG mid-stream, and 640 to 1280 frame width, on a session with an active stream server. state.screencasting is false in that state so the existing guard does not fire.",
+      "why_out_of_scope": "Pre-existing ownership problem between two entry points, adjacent to #1358. Fixing it means deciding who owns the screencast, which is a design change rather than a bandwidth fix."
+    },
+    {
+      "title": "Frame metadata reports the configured viewport, not the real frame dimensions (#1613)",
+      "evidence": "Reconfirmed with no env vars set: metadata says 1280x720 while the encoded frame is 1280x577.",
+      "why_out_of_scope": "Already filed. This branch does not worsen input mapping, verified by driving a click."
+    }
+  ]
+}
