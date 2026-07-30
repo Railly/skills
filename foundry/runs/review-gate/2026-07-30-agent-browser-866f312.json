@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-30",
+    "repo": "agent-browser",
+    "base": "3cc7022271235694b5b5ce8aaea8bbfaa66e8cd5",
+    "head": "866f312abca0434aed1259e794564213f74e4139",
+    "status": "complete",
+    "gaps": [
+      "F2 (intermittent ack-paced stall) is confirmed as a behavior but its mechanism was not isolated: it did not reproduce in the two targeted isolation runs (10/10 and 3/3 healthy), so no root cause is asserted.",
+      "E2E suite was not run in this gate; CI does not run it on pull requests, and the prior round's local run is recorded in the 1594 case rather than re-verified here."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No Issue Contract exists. The acceptance criteria used here are the two customer requirements relayed in the requesting thread (input dispatched immediately during frame delivery; drop stale frames and send only the newest at a configurable rate). Requirement fit was assessed as Standards review, not Spec review."
+    ]
+  },
+  "provenance": {
+    "author_model": "claude-opus (author-assisted)",
+    "reviewer_model": "claude-opus-5",
+    "same_family": true
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "run", "reason": "Latest-frame-wins removes frames a consumer may have assumed it receives; swept for stream-socket consumers (record captures via CDP, dashboard is a viewer)." },
+    { "name": "New-domain matrix", "status": "run", "reason": "Matrix of {push, ack} x {idle, 30/60/90/120/160/200/250 input per second} x {cold start, warm} drove the dogfood; produced F2." },
+    { "name": "Resolution-rule consistency across consumers", "status": "run", "reason": "maxFps/pacing have exactly two consumers (config_from_upgrade for the URL, apply_config for the config message); clamping and rejection behavior compared and found identical." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "The diff builds no shell command and parses no shell string." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "run", "reason": "The seed frame is a one-shot emission and awaiting_ack is a latch; examined both, and the unisolated F2 stall lives in this area." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No wrapper, shim, or launcher is added or edited." },
+    { "name": "Deliberate-default check", "status": "run", "reason": "Push remains the default while the requirement is only satisfied under ack; produced F1." },
+    { "name": "Fresh-seam scan", "status": "run", "reason": "dispatch_input is a new extraction; scanning it produced F3." },
+    { "name": "Substrate differential corpus", "status": "run", "reason": "Three-cell CDP differential on Input.dispatchKeyEvent (code+text present, code null, text null) run against real Chrome; produced the F3 mechanism." },
+    { "name": "Reference-implementation oracle", "status": "run", "reason": "Chrome's Page.screencastFrameAck is the cited oracle for ack pacing; the implemented shape (one frame in flight, cumulative ack) matches it." },
+    { "name": "New-failure-outcome propagation", "status": "run", "reason": "New break paths (reader task completion, config/ack channel closure, writer send error) traced to cleanup; client_count decrement and reader_task.abort() reached on each." },
+    { "name": "Flag-propagation dispatch sweep", "status": "run", "reason": "pacing and maxFps traced from both entry points into the writer's throttle and latch; both verified live at 2/10/30 fps and via ?pacing=ack." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Forced: CDP invalid-parameter rejection, stalled reader with blocked writer, abrupt socket destroy, premature ack ahead of the stream." },
+    { "name": "Non-destructive recovery", "status": "run", "reason": "#1476 regression probe: 12 abrupt disconnects across push/ack/maxFps left URL, DOM, and stream enabled state intact." },
+    { "name": "Cancellation and timeout hygiene", "status": "run", "reason": "RAN AND WRONG. Verified reader_task.abort() sits on every writer exit path, but never asked whether the writer can fail to reach any of them. It can: a writer blocked in ws_tx.send() never reaches the select! shutdown arm, so the abort never runs. See F11, an external finding from ctate." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "Traced Chrome -> CDP -> watch channel -> writer -> socket -> kernel -> client; the push-mode residual backlog sits at the socket/kernel hop and is measured in F1." },
+    { "name": "Substrate verification", "status": "run", "reason": "All measurements against real Chrome via the release binary; CDP error text read directly from Chrome." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "Release binary rebuilt at HEAD (binary mtime predated the commit, so a forced rebuild was required) and confirmed to carry the new stream help text before any measurement." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "Advertised-capability direction traced each documented client message to dispatch; produced F3." },
+    { "name": "Demonstrative example", "status": "run", "reason": "The documented input_keyboard example is itself the non-functional shape; see F3." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail was supplied with the change." },
+    { "name": "Complexity budget", "status": "run", "reason": "Per-frame cost under ack pacing examined; produced F4 (full JSON reparse of each frame to read seq)." }
+  ],
+  "deterministic": [
+    { "check": "covered", "outcome": "finding-fixed", "reason": "No run report existed for HEAD 866f312; the prior report covered d874ae7, and 866f312 is the commit that fixes the previous round's findings. This run closes it." },
+    { "check": "style", "outcome": "pass", "reason": "No em dashes or ' -- ' prose punctuation in added lines." },
+    { "check": "surfaces", "outcome": "pass", "reason": "cli/src/native/stream/*.rs required output.rs, README.md, docs/src/app/streaming/page.mdx and skill-data/core/*; all four present in the diff." },
+    { "check": "stale", "outcome": "pass", "reason": "Zero repo-wide hits for the retired last_frame field." },
+    { "check": "callers", "outcome": "pass", "reason": "broadcast_frame and broadcast_screencast_frame have no call sites outside the diffed file." },
+    { "check": "siblings", "outcome": "acknowledged", "reason": "Keyword sweeps on 'screencast' and 'input_keyboard' flagged dashboard viewport.tsx, store/stream.ts, parity_tests.rs, webdriver/backend.rs, changelog and commands docs. Reading them produced F3 (viewport.tsx sends the broken keyboard shape). The rest are unaffected: parity_tests and backend.rs reference CDP screencast commands not the stream socket, changelog is historical, commands docs cover screencast_start/stop which the diff does not change." },
+    { "check": "timings", "outcome": "pass", "reason": "The diff adds no wait ceiling; the only new interval is the maxFps throttle, derived per send." },
+    { "check": "rawinput", "outcome": "pass", "reason": "No site re-derives pacing or maxFps inline from the raw upgrade request outside config_from_upgrade." },
+    { "check": "artifacts", "outcome": "pass", "reason": "The diff writes no new persistent path." },
+    { "check": "fmt", "outcome": "pass", "reason": "cargo fmt --check clean (CI's exact invocation)." },
+    { "check": "clippy", "outcome": "pass", "reason": "cargo clippy -- -D warnings clean (CI's exact invocation)." },
+    { "check": "unit tests", "outcome": "pass", "reason": "1048 passed, 0 failed, 96 ignored, run from the test binary under an external 900s alarm per the 1594 hang case." }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The shipped default does not satisfy the customer's stale-frame requirement. Latest-frame-wins is enforced only above the socket, so in the default push pacing a client that falls behind still drains a stale backlog. The requirement is met only when the client opts into ack pacing, which the default does not do.",
+      "evidence": "Release binary at HEAD against real Chrome, 4s reader stall, ~58 fps source. Push (default): 59 frames arrived in the first 300ms after resume, 40 of them measurably older than 1.5s, 2374 KB drained, oldest delivered frame 4003ms stale. Ack pacing via ?pacing=ack under the identical stall: exactly 1 stale frame. Independently reproduces the branch's own measurement.",
+      "layer": "end-to-end delivery path, transport hop below the application channel",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Ack-paced delivery, the only mode that satisfies the requirement, is not reliable. An ack-paced connection intermittently delivers zero or one frame and never recovers, and it degrades severely under sustained input on the same connection. Push is unaffected in every trial. The failure mode is a permanently blank or frozen preview, which is the outcome the change's own rationale gives for preferring push.",
+      "evidence": "Total stall observed on ~6 of ~35 ack connections across five independently written harnesses (0 frames in 3.5s with socket open and zero acks; 0 frames in 4s on a cold start; 1 frame in 2.5s), and never on ~20 push connections. Degradation under input on the same socket: ack delivered 3.7 fps at 200 input/s and 10.3 fps at 250 input/s against 60 fps idle, while push held 62.6-62.7 fps at every rate from 30 to 250 (6/6). Client-side write ordering excluded: the client's own socket write backlog measured 0 bytes in all four runs, so the acks left the client promptly and the delay is server-side. Mechanism not isolated: it did not reproduce in 10/10 or 3/3 targeted isolation runs, so no root cause is asserted.",
+      "layer": "end-to-end per-connection delivery under concurrent client traffic",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "Keyboard input, half of the customer's first requirement, does not work in the shape this change documents. dispatch_input forwards parsed.get(\"code\") and parsed.get(\"text\") straight into the CDP payload, so an absent field is sent as JSON null, Chrome rejects the whole command, and the error is discarded by `let _ =`. Every keyUp is dropped, and every non-printable key is dropped in both directions.",
+      "evidence": "Against real Chrome: the shape documented in README, docs/src/app/streaming/page.mdx and the new skill-data/core/references/streaming.md ({key, text}, no code) produced keys=[] at the DOM; adding code produced keys=[xyz]; {key, code} without text produced keys=[] again. Direct CDP probe returns -32602 'Failed to deserialize params.code - BINDINGS: string value expected' and the same for params.text. Replaying the dashboard's exact payload from packages/dashboard/src/components/viewport.tsx, which sets text: undefined for every keyUp and for every KEY_INFO entry without a text field (Escape, ArrowLeft/Up/Right/Down, Delete, Home, End, PageUp, PageDown), yielded keydown=[\"q\"] keyup=[] : arrows and Escape never arrived and no keyup ever arrived.",
+      "layer": "end-to-end input dispatch, CDP parameter contract",
+      "source": "gate",
+      "path": "gate.sh siblings input_keyboard -> packages/dashboard/src/components/viewport.tsx; corroborated by map depth-1 impact on packages/dashboard/src/types.ts#StreamMessage"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "Under ack pacing the writer reparses the entire frame message as JSON on every send purely to read seq, including the base64 image payload, when the value is already known at construction time.",
+      "evidence": "frame_seq_of does serde_json::from_str::<Value>(frame) on the whole message. Measured frame size ~40 KB (2374 KB over 59 frames), so at the observed ~60 fps this is roughly 2.4 MB/s of JSON parsing on the ack path, which is the path the customer must use. Avoidable by carrying seq beside the string in the watch channel.",
+      "layer": "per-frame hot path under ack pacing",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F5",
+      "state": "refuted",
+      "claim": "Adding required `seq` to the dashboard's FrameMessage interface breaks the dashboard TypeScript build, the failure mode recorded in the Rust-only prepush case.",
+      "evidence": "Refuted at the claim's layer (type checking, not reasoning): FrameMessage is referenced in exactly two places, its own declaration and the StreamMessage union in packages/dashboard/src/types.ts. Nothing in the repo constructs a FrameMessage, so a new required field is only ever narrowed, never supplied. CI builds the dashboard via next build on both ci.yml and release.yml.",
+      "layer": "TypeScript compile surface",
+      "source": "gate",
+      "path": ""
+    },
+    {
+      "id": "F6",
+      "state": "refuted",
+      "claim": "Moving idle_activity.mark() inside the client_slot guard lets an actively driven preview idle out, regressing the 1h idle timeout merged from main in #1605.",
+      "evidence": "Refuted on reachability at the claim's own layer: input only fails to mark activity while client_slot is None, which is the window where no CDP client is attached (browser relaunch). Starving the timer requires that window to cover the full 1h idle period with input arriving only inside it. No such state was reachable in ~35 connections and 12 churn cycles; the session never idled out and the page never reset.",
+      "layer": "daemon idle lifecycle",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F7",
+      "state": "refuted",
+      "claim": "The rewritten connect/teardown path regresses #1476, where a stream client disconnect intermittently reset the session's active page to about:blank.",
+      "evidence": "Refuted empirically at the end-to-end layer: 12 abrupt socket destroys (not WS close frames) across push, ?pacing=ack, and ?maxFps=5, including a disconnect while the writer was mid-flight, left get url at https://example.com/, the injected DOM node alive (animation counter still advancing), and the stream still enabled. Bounded claim: #1476 is reported as intermittent, so 12 cycles is absence of observed regression, not proof of absence.",
+      "layer": "end-to-end connection teardown",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F8",
+      "state": "refuted",
+      "claim": "A high ack banked before the opening frame is written wedges the connection, because the seed-frame path sets awaiting_ack without settling it against the already-banked watermark the way the writer loop does.",
+      "evidence": "Refuted by reading the channel contract at the layer of the claim: ack_rx is created from watch::channel(0) before the reader is spawned, so any send_if_modified from a premature ack bumps the version the writer has not yet observed, and ack_rx.changed() therefore resolves immediately on the first select pass and clears awaiting_ack. The branch's own test_ack_ahead_of_the_stream_does_not_wedge_the_writer covers the config-message variant. Note this refutation does not cover F2, which is a different and unexplained stall.",
+      "layer": "watch channel version/notification semantics",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F9",
+      "state": "issue_candidate",
+      "claim": "The WebSocket origin allowlist admits only localhost, 127.0.0.1, ::1 and file://, so the customer's stated topology (agent-browser in a sandbox, interactive preview rendered in the end user's browser) cannot connect a browser client directly and must proxy. Ack pacing then bounds only the daemon-to-proxy hop, leaving the proxy-to-browser hop with the buffering the change exists to remove, and nothing in the new documentation says so.",
+      "evidence": "Verified against the running server: Origin absent -> accepted, http://localhost:3000 -> accepted, https://app.example.com -> HTTP/1.1 403 Forbidden. is_allowed_origin at cli/src/native/stream/mod.rs:499 is untouched by this diff.",
+      "layer": "deployment topology and documented guarantee scope",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F11",
+      "state": "confirmed",
+      "claim": "EXTERNAL (ctate). stream disable returns while a slow client's input reader is still active. shutdown() awaits only accept_task and cdp_task; the per-client tasks are detached, and reader_task.abort() runs only if the writer reaches the select! shutdown arm, which a writer blocked in ws_tx.send() never does.",
+      "evidence": "Confirmed by reading at the layer of the claim: mod.rs:209-218 awaits accept_task and cdp_task only; websocket.rs aborts the reader after the select loop, and the shutdown arm is inside that loop. Reachability of the blocked-writer state is not theoretical, this gate created it deliberately to verify input priority. The exploitable consequence did NOT reproduce: 7 clicks written after 'Streaming disabled' returned produced 0 DOM mousedown events, apparently because tearing down cdp_task renders the stream's CdpClient unusable, so today the protection is incidental rather than enforced. Reasoned, not observed: idle_activity.mark() now sits inside the client_slot guard and the slot still holds a live Arc<CdpClient>, so a leaked reader can keep marking daemon activity after disable and hold the #1605 idle timeout open indefinitely.",
+      "layer": "task lifecycle and shutdown contract",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F12",
+      "state": "confirmed",
+      "claim": "EXTERNAL (ctate). Initial maxFps accounting is wrong in both directions. next_allowed and last_sent are stamped Instant::now() at connect regardless of whether the seed frame was actually sent, so a cached frame is not charged against the cap and a second frame follows immediately, while with no cache the phantom last_sent delays the first real frame by a full interval.",
+      "evidence": "Measured against the release binary at HEAD. Cache present: maxFps=2 delivered gaps of 8ms then 502/501/501/502ms, and maxFps=1 delivered 10ms then 1002/1002ms, so exactly one frame escapes the cap at connect. No cache, cap arriving by config message: first frame at 1002ms under maxFps=1 although nothing had ever been sent on that connection. Both halves share one root cause, the unconditional initialization at websocket.rs after the seed-frame block.",
+      "layer": "per-connection throttle accounting at connection setup",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F10",
+      "state": "issue_candidate",
+      "claim": "broadcast_frame is public with zero production call sites and emits a frame carrying no seq, which silently disables ack pacing for that frame because frame_seq_of returns None and the writer declines to hold. This is the unguarded-primitive-left-reachable shape already recorded in this repo's gate-miss ledger.",
+      "evidence": "Repo-wide grep: the only callers are the new tests in cli/src/native/stream/mod.rs. The branch's own test_frame_seq_of_reads_the_id_the_client_acks documents the None case as leaving the writer unblocked, so the degradation is by design for a seq-less frame; the hazard is that the public entry point producing seq-less frames remains available to the next caller.",
+      "layer": "public API reachability",
+      "source": "gate",
+      "path": "gate.sh callers broadcast_frame"
+    }
+  ],
+  "external_round": {
+    "date": "2026-07-30",
+    "reviewer": "ctate (maintainer)",
+    "findings_raised": 2,
+    "caught_by_this_gate": 0,
+    "note": "Both external findings were missed. One of them contradicts an exemption this report originally claimed, which is worse than a miss: the gate asserted reader_task.abort() covers every writer exit path without asking whether the writer can fail to reach one."
+  },
+  "exemptions": [
+    { "claim": "parity_tests.rs and webdriver/backend.rs mention screencast but need no change.", "evidence": "Both reference the CDP screencast_start/screencast_stop commands, which this diff does not touch; neither reads the stream WebSocket protocol." },
+    { "claim": "docs/src/app/changelog/page.mdx needs no update despite mentioning screencast.", "evidence": "It is a historical record of released versions and this change is unreleased." },
+    { "claim": "docs/src/app/commands/page.mdx needs no update despite mentioning screencast.", "evidence": "It documents the screencast_start/screencast_stop commands, whose behavior and surface are unchanged; the stream protocol lives in streaming/page.mdx, which is updated." },
+    { "claim": "packages/dashboard/src/store/stream.ts needs no change for seq or the new config messages.", "evidence": "It is a viewer that renders each frame as it arrives and never acks, so it stays on the unchanged push default; seq is additive and ignored." },
+    { "claim": "mcp.rs needs no change.", "evidence": "pacing and maxFps are WebSocket protocol messages rather than CLI or MCP commands, so no command surface gains an argument." },
+    { "claim": "The 'holds only the newest frame per client' phrasing in skill-data is acceptable though the watch channel is shared process-wide.", "evidence": "Each writer independently reads the newest value at its own send time, so the per-client observable behavior the sentence describes is accurate even though the storage is shared." }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Stream WebSocket origin allowlist blocks the remote-preview topology the streaming docs now target",
+      "evidence": "https://app.example.com -> 403 at the upgrade; only localhost/127.0.0.1/::1/file:// and absent Origin are admitted. is_allowed_origin is untouched by this diff.",
+      "why_out_of_scope": "Pre-existing policy in code the diff does not modify, and loosening an origin check is a security decision rather than a delivery fix. The documentation gap it creates for ack pacing across a proxy is in scope and is raised as such."
+    },
+    {
+      "title": "Keyboard input over the stream socket is broken for every keyUp and every non-printable key",
+      "evidence": "CDP -32602 on params.code / params.text null; DOM differential and dashboard-payload replay recorded under F3.",
+      "why_out_of_scope": "Not out of scope. Recorded here only because the buggy lines predate the branch; under this repo's PR-shipped-defect norm the fix belongs in this PR, which newly documents the failing shape and newly extracts the function that carries it."
+    },
+    {
+      "title": "broadcast_frame remains public and callerless while producing seq-less frames that silently opt out of ack pacing",
+      "evidence": "Repo-wide grep shows tests as the only callers; frame_seq_of(None) leaves the writer unblocked by design.",
+      "why_out_of_scope": "No current production caller, so nothing is broken today; it is a footgun-left-reachable hazard rather than a defect, and the same shape is already an entry in this repo's gate-miss ledger."
+    }
+  ]
+}

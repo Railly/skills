@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-30",
+    "repo": "agent-browser",
+    "base": "3cc7022271235694b5b5ce8aaea8bbfaa66e8cd5",
+    "head": "uncommitted working tree on feat/stream-input-priority-latest-frame, parent 866f312",
+    "status": "complete",
+    "gaps": [
+      "The fixes are not committed: git commit fails with '1Password: failed to fill whole buffer' because commit signing needs an interactive unlock. Everything is staged; the sha-anchored report follows the commit.",
+      "E2E was not run; CI does not run it on pull requests."
+    ]
+  },
+  "contract": {
+    "path": "foundry/runs/solution-gate/2026-07-30-agent-browser-1594-866f312.md",
+    "spec_status": "not_applicable",
+    "acceptance_reviewed": [
+      "D1",
+      "D2",
+      "D3",
+      "D4"
+    ],
+    "gaps": [
+      "The must-not-change list from the solution gate was driven, not reasoned: steady-state rates, uncapped default, mid-stream config, URL cap over the opening frame, input priority under a stalled client, page survival across abrupt disconnects, prompt teardown, re-enable."
+    ]
+  },
+  "provenance": {
+    "author_model": "claude-opus-5 (implementer)",
+    "reviewer_model": "claude-opus-5",
+    "same_family": true,
+    "note": "Fix shapes came from fable-5 and gpt-5.6-sol proposing independently; the implementer proposed nothing. Review of the resulting diff is same-family and carries the usual warning."
+  },
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "no em dashes or ' -- ' in added lines"
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "stream paths require output.rs, README, streaming docs and skill-data; all present from the branch"
+    },
+    {
+      "check": "stale",
+      "outcome": "pass",
+      "reason": "zero repo-wide hits for the retired frame_seq_of"
+    },
+    {
+      "check": "callers",
+      "outcome": "pass",
+      "reason": "deadline_from (contract changed to Option), keyboard_params, next_frame_seq: every call site is inside the diff"
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": "no wait ceiling added"
+    },
+    {
+      "check": "artifacts",
+      "outcome": "pass",
+      "reason": "no new persistent path"
+    },
+    {
+      "check": "rawinput",
+      "outcome": "pass",
+      "reason": "no site re-derives keyboard params inline"
+    },
+    {
+      "check": "fmt",
+      "outcome": "pass",
+      "reason": "cargo fmt --check clean"
+    },
+    {
+      "check": "clippy",
+      "outcome": "pass",
+      "reason": "cargo clippy --all-targets -- -D warnings clean"
+    },
+    {
+      "check": "unit tests",
+      "outcome": "pass",
+      "reason": "1054 passed, 0 failed, 96 ignored (1048 before, 6 new guards), run from the test binary under an external alarm"
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "8 of 8 mutations turned red: uncharging the seeded frame, stamping last_sent at connect, deadline_from(None) charging an interval, detaching the connection task, gutting the reader's abort-on-drop guard, reinstating null keyboard forwarding, dropping the legacy payload id, and offsetting the envelope id from the wire id."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F12",
+      "state": "refuted",
+      "claim": "FIXED (was ctate's finding 2). Initial maxFps accounting wrong in both directions.",
+      "evidence": "Release binary at HEAD+fix against real Chrome. Seeded, maxFps=2: gaps now 502/502/502/502/502ms, was 8ms then 502. Seeded, maxFps=1: 1002/1001ms, was 10ms then 1002. Unseeded with a config cap: first frame at 250ms (screencast start latency), was 1002ms. Must-not-change held: 2.0 / 10.0 / 28.3 fps at caps 2/10/30 over 3s. Three mutations forced red: uncharging the seeded frame, stamping last_sent at connect, and charging an interval for deadline_from(None).",
+      "layer": "per-connection throttle accounting at connection setup",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F3",
+      "state": "refuted",
+      "claim": "FIXED. Keyboard input broken in every shape this repo documents.",
+      "evidence": "Against real Chrome: documented key+text shape now yields down=[x,y,z] up=[x,y,z] (was keys=[]); the dashboard's exact payload yields down=[ArrowDown,Escape,q] up=[ArrowDown,q] (was down=[q] up=[]); the documented `char` shape types z (was nothing). Must-not-change held: the key+code+text shape still works, mouse input still works (clicks=5 with a stalled client). Mutation forced red: reinstating the raw forwarding.",
+      "layer": "end-to-end input dispatch, CDP parameter contract",
+      "source": "gate",
+      "path": ""
+    },
+    {
+      "id": "F11",
+      "state": "refuted",
+      "claim": "FIXED (was ctate's finding 1), with one declared coverage gap. Teardown could return while a connection's input reader was still running.",
+      "evidence": "accept_loop now owns every connection task in a JoinSet and drains it, and the reader is held by an abort-on-drop guard so aborting a connection reaches it. Must-not-change driven against the real binary: `stream disable` with a stalled client returned in 13ms (aborts, does not wait), the page survived 12 abrupt disconnects across push/ack/maxFps, re-enable works, and input priority under a stalled client still holds. Mutation forced red: gutting the abort-on-drop guard, which leaves an orphaned reader holding the read half. The earlier coverage gap is closed: the test now probes Arc::strong_count on the daemon activity clock, which both the connection task and its reader hold, so it needs no reading and cannot be satisfied by a writer that un-parks and exits on its own. Detaching the connection task and gutting the abort-on-drop guard both turn it red.",
+      "layer": "task lifecycle and shutdown contract",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F4",
+      "state": "refuted",
+      "claim": "FIXED. The writer reparsed the whole frame message, base64 included, to recover a value known at construction.",
+      "evidence": "Frames now travel as StreamFrame { seq, json }; the id is assigned once from next_frame_seq() into a local used for both the envelope and the wire. frame_seq_of is gone (gate.sh stale: zero hits) and no parse remains on the delivery path. Two mutations forced red: dropping the id from the legacy payload (ack pacing then fails to hold) and offsetting the envelope id from the wire id.",
+      "layer": "per-frame hot path under ack pacing",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F13",
+      "state": "confirmed",
+      "claim": "NEW, from reviewing the fix. Using a JoinSet means an accept() error now aborts every live connection, where previously they survived the accept loop's death.",
+      "evidence": "accept_loop breaks on `let Ok(...) = accept_result else { break }`, and both the explicit drain and the JoinSet's own drop abort the set. Reachable on fd exhaustion. Accepted deliberately rather than designed out: a client surviving the death of the loop that owns it is the same leak class the fix exists to close, and the daemon is already degraded in that state. Recorded so it is not silent.",
+      "layer": "accept loop error path",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F2",
+      "state": "refuted",
+      "claim": "REFUTED, both halves. Ack-paced delivery was reported as intermittently stalling and as degrading under same-socket input. Neither is a server defect.",
+      "evidence": "Isolated with temporary tracing in the writer's select arms, after eliminating an order confound (push run first on a daemon that had just wedged: push 0/10, ack 1/10 on its first trial). Stall half: the trace shows 'SEED sent seq=3294 ack_pacing=true awaiting=Some(3294)' followed by no 'READER got ack' at all. The server sent one frame and correctly waited for an acknowledgement the client never sent, which is the documented contract. Root cause was the test harness: connect() resolves the promise and parses the first TCP segment in the same tick, so when the seed frame shares that segment with the handshake response it is parsed before the caller can assign its onMessage handler, and the ack is never sent. Queueing pre-handler messages in the harness took the stall from 1/10 to 0/20 on the same daemon minutes later. Degradation half: survives the harness fix (ack 3.3 fps at 200 input/s vs push 62.6), but the trace shows the server is not the bottleneck. 'ACK arm' and the next 'SEND' occur in the same millisecond as 'READER got ack'; the growth is entirely in the send-to-ack round trip, doubling as 33, 71, 116, 191, 317, 546, 908ms. That is head-of-line blocking in the client's own outbound queue, where the ack sits behind its flood of input. Healthy at 30/60/90/120 messages per second, which covers real browser mousemove rates. Documented as a property of ack pacing rather than fixed.",
+      "layer": "end-to-end per-connection delivery; isolated with writer-side tracing",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F1",
+      "state": "exempted",
+      "claim": "Not a defect. The default push pacing still does not satisfy the customer's drop-stale requirement; only ack pacing does, and it is opt-in.",
+      "evidence": "A deliberate compatibility decision, documented in the branch and honest in the docs. Exempted as code, but it is a handoff requirement: a client that upgrades and changes nothing gets no fix, so the customer note must say to use ?pacing=ack explicitly.",
+      "layer": "product decision",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F10",
+      "state": "issue_candidate",
+      "claim": "Improved but not closed. broadcast_frame remains public with no production callers; it now reads its id back out of the payload, so a payload carrying one does participate in ack pacing.",
+      "evidence": "seq_in_serialized_frame is applied once per publish at that boundary; a payload with no id still leaves the writer unblocked, which is the pre-existing defined behavior.",
+      "layer": "public API reachability",
+      "source": "gate",
+      "path": ""
+    },
+    {
+      "id": "F9",
+      "state": "issue_candidate",
+      "claim": "Unchanged. The WebSocket origin allowlist admits only localhost, 127.0.0.1, ::1 and file://, so the customer's browser-preview topology must proxy, and ack pacing then bounds only the first hop.",
+      "evidence": "https://app.example.com returns 403 at the upgrade. is_allowed_origin untouched by this diff.",
+      "layer": "deployment topology",
+      "source": "lens",
+      "path": ""
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No documentation change is needed for the keyboard fix.",
+      "evidence": "The three shapes the docs already publish (printable keyDown without code, keyUp without text, and char) were promises the code failed to keep; they now work as written, so the docs become true rather than stale."
+    },
+    {
+      "claim": "No documentation change is needed for the cap fix.",
+      "evidence": "The docs state the cap limits delivery for that client and that only a URL-declared cap covers the opening frame; charging the opening frame makes both statements more accurate, not less."
+    },
+    {
+      "claim": "The dashboard needs no change despite emitting the payloads that were broken.",
+      "evidence": "Its payloads are valid client messages; the server was rejecting them, and it now accepts them unchanged."
+    },
+    {
+      "claim": "mcp.rs and the CLI surface need no change.",
+      "evidence": "All four fixes are internal to the stream server; no command, flag, or protocol message was added or renamed."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Stream WebSocket origin allowlist blocks the remote-preview topology the streaming docs target",
+      "evidence": "403 at the upgrade for a non-localhost origin.",
+      "why_out_of_scope": "Pre-existing policy the diff does not touch; loosening an origin check is a security decision."
+    }
+  ]
+}
