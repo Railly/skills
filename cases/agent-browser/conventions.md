@@ -134,6 +134,21 @@ Provenance: round-1 misses on #1552 (CLI help and MCP descriptions not updated f
 - **When a latency grows geometrically, measure both directions before blaming the server.** Send-to-ack delays of 33, 71, 116, 191, 317, 546, 908ms looked like a server backlog. Tracing showed the server's ack handling and its next send in the same millisecond: the growth was head-of-line blocking in the client's own outbound queue, behind its own input flood. `writableLength == 0` on the client does not rule this out, because it does not count bytes already in the kernel send buffer.
 - **Never restore a mutation with `git checkout --`.** In a force-red harness over uncommitted work it reverts the fix along with the mutation, and every subsequent case reports a meaningless GREEN. Snapshot the files to a temp path and restore from there.
 
+## Subsystem invariant: stream keyboard is platform-split (added 2026-07-30)
+
+Closing a keyboard-shortcut report needs two fixes on two platforms, and neither one alone closes it. Measured against real Chrome on macOS, with the Linux half taken from the reporter of #1615.
+
+| Remote Chrome | What a shortcut needs | Evidence |
+|---|---|---|
+| macOS | `commands` on `Input.dispatchKeyEvent` | `Ctrl+A` with the correct virtual key selects 0 characters; with `commands: ["selectAll"]` it selects 11 |
+| Linux | the correct virtual key code | Reported by the #1615 author, who tested on Linux. Not measured here |
+
+The property belongs to the Chrome the daemon drives, not to the machine the viewer sits at, because `commands` exists to reach the macOS responder chain. A sandboxed deployment therefore needs the Linux half regardless of what the end user runs.
+
+Two open community PRs split along exactly this line: #1499 covers macOS through `commands`, #1618 covers Linux through virtual-key derivation and adds a clipboard bridge. #1615 stays open while either half is missing, which is why two PRs point at it and none closes it.
+
+Also measured, because the two PRs disagree about it: with `commands` present, a `text` field is harmless. All of `rawKeyDown` and `keyDown`, with `text` absent, `text: "a"`, or `text: ""`, select all 11 characters and type nothing. #1499's premise that CDP drops a `keyDown` without `text` was true when written, because omitting the field client-side sent an explicit `null` that CDP rejected; #1594 fixed that root cause, so the workaround it built is no longer needed.
+
 ## Gate-miss ledger, 2026-07-30 round 2 (PR for #632/#633)
 
 | Date | Finding | Gate that missed | Why | What closed it |
