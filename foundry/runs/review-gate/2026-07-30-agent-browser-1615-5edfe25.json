@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-07-30",
+    "repo": "agent-browser",
+    "base": "2158803",
+    "head": "5edfe25",
+    "status": "complete",
+    "gaps": [
+      "Windows has never run CI for any stream change on this branch's lineage: the multi-platform matrix is gated to non-pull_request, and on main a permanently red macOS x86_64 job cancels the rest through fail-fast. Linux is covered by the ubuntu Rust job on every PR; macOS aarch64 is covered locally.",
+      "The reviewer's sandbox denied loopback binding, so it could not run the Chrome e2e. Its findings were re-verified locally."
+    ]
+  },
+  "contract": { "path": "", "spec_status": "not_applicable", "acceptance_reviewed": [], "gaps": [] },
+  "provenance": {
+    "author_model": "claude-opus-5",
+    "reviewer_model": "openai/gpt-5.6-sol (codex, high effort)",
+    "same_family": false
+  },
+  "deterministic": [
+    { "check": "style", "outcome": "pass", "reason": "no em dashes or ' -- ' in added lines" },
+    { "check": "surfaces", "outcome": "pass", "reason": "stream paths required output.rs, README, streaming docs and skill-data; all four updated with the input-contract sentence" },
+    { "check": "callers", "outcome": "pass", "reason": "every call site of dispatch_input is inside the diff" },
+    { "check": "stale", "outcome": "pass", "reason": "no send_command remains on the input path" },
+    { "check": "timings", "outcome": "pass", "reason": "no wait ceiling added" },
+    { "check": "artifacts", "outcome": "pass", "reason": "no new persistent path" },
+    { "check": "fmt", "outcome": "pass", "reason": "cargo fmt --check clean" },
+    { "check": "clippy", "outcome": "pass", "reason": "cargo clippy --all-targets -- -D warnings clean" },
+    { "check": "unit tests", "outcome": "pass", "reason": "1055 passed, 0 failed, 97 ignored" },
+    { "check": "force-red", "outcome": "pass", "reason": "both guards go red with the await restored: the e2e at 2493ms, the unit test at the 5s timeout" }
+  ],
+  "findings": [
+    {
+      "id": "L1",
+      "state": "confirmed",
+      "claim": "SELF, and it invalidates a doc claim already merged to main. The ack-pacing degradation under same-socket input, documented in #1594 as a client-side limit above ~120 messages per second, was the same root cause as this bug and is removed by this fix.",
+      "evidence": "Re-measured on the same page: ack-paced delivery holds 53 to 56 fps at every input rate from 30 to 250 per second, against 3.7 fps at 200/s and 10.3 fps at 250/s before. The original diagnosis attributed it to the client's own send queue on the strength of a zero-byte client write backlog. That measurement showed the ack had left the client, not that the server had read it; the reader was blocked awaiting CDP and was not reading. Two doc surfaces corrected in d49affd.",
+      "layer": "end-to-end delivery under concurrent input",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "L2",
+      "state": "confirmed",
+      "claim": "EXTERNAL (codex). The only guard was an ignored e2e, and e2e does not run on pull requests here, so a revert would reach main uncaught.",
+      "evidence": "Fixed by the reviewer's own suggested shape: a CdpClient connected to an endpoint that records commands and never replies. The awaiting version cannot get past the first event, failing in 5s on the timeout against 0.03s passing. Also asserts dispatch order and that pending_len stays 0.",
+      "layer": "test coverage reachability",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "L3",
+      "state": "exempted",
+      "claim": "EXTERNAL (codex, medium). Input now has only transport backpressure: a client can send events continuously, and if Chrome's socket stops draining, the write blocks while holding the shared CDP mutex, stalling other connections and CLI commands.",
+      "evidence": "Accepted as a residual rather than fixed, on two grounds verified here. The mutex-hold-on-blocked-write is identical before and after, since send_command takes the same lock and awaits the same write; only the attempt rate changed. And the exposure is localhost, because the WebSocket origin allowlist admits only loopback and file origins. Attempted to force it: with Chrome SIGSTOPped and 20k events flooding, a CLI command still returned, though that configuration does not discriminate, since a frozen Chrome stalls every CDP path regardless. Measured instead on a healthy Chrome: a second client's frame rate went 57.0 to 53.3 fps under 1000 events per second from the flooding client. Recorded as an issue candidate.",
+      "layer": "resource bounds on an untrusted local client",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "L4",
+      "state": "refuted",
+      "claim": "Ordering breaks without the await, so press could overtake move.",
+      "evidence": "Refuted at the end-to-end layer against real Chrome, and independently by the reviewer reading the client. Twenty tight click pairs arrive as DUDUDU with no reordering, a 100-move drag arrives as press then moves then release, and 25 typed characters arrive in sequence. Every CDP write takes the same socket mutex and the reader calls them sequentially from one task.",
+      "layer": "event ordering end to end",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "L5",
+      "state": "refuted",
+      "claim": "Discarding the CDP response leaks pending entries or floods the logs.",
+      "evidence": "Refuted at both layers. By reading: send_command_no_wait registers nothing, and an unmatched reply falls through if let Some(tx) = pending.remove(&id) with no log statement in that branch. By measurement: daemon RSS held at 105808 KB across 20k input events and the daemon still answered.",
+      "layer": "resource accounting",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "L6",
+      "state": "refuted",
+      "claim": "One client's input flood starves frame delivery for every other client, since input and Page.screencastFrameAck share the CDP socket mutex.",
+      "evidence": "Refuted by measurement: a viewer held 57.0 fps with no input, 55.3 fps while another client sent 250 events per second, and 53.3 fps at 1000 per second.",
+      "layer": "cross-connection interference",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "L7",
+      "state": "issue_candidate",
+      "claim": "EXTERNAL (codex, speculative). With an inspect subscriber attached, every orphan response enters the bounded 4096-message raw broadcast, so an input flood can cause inspect lag warnings and dropped DevTools messages.",
+      "evidence": "Accurate and correctly scoped by the reviewer. The broadcast is guarded by receiver_count() > 0, so it only fires with a subscriber attached, and the channel is bounded with existing lag handling. Bounded, not a leak.",
+      "layer": "inspect proxy interaction",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "L8",
+      "state": "issue_candidate",
+      "claim": "Windows is unverified for every stream change merged from this lineage, and will stay unverified while the macOS x86_64 job is red.",
+      "evidence": "The multi-platform matrix carries if: github.event_name != 'pull_request', so it runs only on main. On main the macOS x86_64 job has failed for five consecutive commits on a pre-existing browser-launch timeout in test_all_documented_actions_are_handled, and the matrix has no fail-fast: false, so Windows and macOS aarch64 are cancelled every time. Observed on the #1594 merge: windows cancelled, x86_64 failure, aarch64 cancelled.",
+      "layer": "CI coverage",
+      "source": "gate",
+      "path": ""
+    }
+  ],
+  "exemptions": [
+    { "claim": "Coalescing mouse moves is unnecessary.", "evidence": "The no-await change alone takes the reported symptom from 2471ms to 6ms, and dropping events would change what the page observes." },
+    { "claim": "Losing the CDP response is acceptable.", "evidence": "All three call sites already discarded the result with let _ =, so no error handling is removed." },
+    { "claim": "Two connections interleaving is not a regression.", "evidence": "Concurrent controllers never had an atomic-gesture guarantee; each connection's internal order is preserved, which the reviewer confirmed independently." }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Stream input has no rate bound, so a local client can drive the CDP socket as fast as it can write",
+      "evidence": "See L3: same mutex behavior as before, higher attempt rate, localhost-only exposure, no degradation measured on a healthy Chrome up to 1000 events per second.",
+      "why_out_of_scope": "A rate limiter is a policy decision with its own knob and disconnect semantics, and the change does not introduce the mechanism it would guard."
+    },
+    {
+      "title": "fail-fast on the multi-platform CI matrix hides Windows on every merge",
+      "evidence": "See L8. A permanently red macOS x86_64 job cancels Windows and macOS aarch64 before they run.",
+      "why_out_of_scope": "CI configuration, unrelated to this diff. One line, fail-fast: false, restores visibility without touching the flaky test."
+    }
+  ]
+}
