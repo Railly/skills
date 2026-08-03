@@ -1,0 +1,118 @@
+{
+  "date": "2026-08-01",
+  "repo": "vercel-labs/wterm",
+  "change": "PR #98, branch fix/ghostty-scrollback-line, merge-base 51a3446, head 888a46e",
+  "run": { "status": "complete" },
+  "spec": { "issue_contract": "not_provided", "review_status": "not_provided" },
+  "author_model": "claude-opus-5",
+  "reviewer_model": "openai/gpt-5.6-sol",
+  "same_family": false,
+  "conventions": {
+    "path": "cases/wterm/conventions.md",
+    "state": "bootstrapped_this_run",
+    "note": "No conventions file existed for wterm. Compiled from AGENTS.md docs rules, ci.yml, and three prior cases."
+  },
+  "deterministic": [
+    { "check": "style", "result": "pass", "tool": "prettier --check (repo formatter, not biome)" },
+    { "check": "type-check", "result": "pass" },
+    { "check": "surfaces", "result": "finding", "detail": "rebuild-wasm:docker added to package.json scripts while rebuild-wasm stayed documented in packages/@wterm/ghostty/README.md and apps/docs/src/app/ghostty/page.mdx", "state": "fixed" },
+    { "check": "siblings", "keyword": "rebuild-wasm", "result": "finding", "state": "fixed" },
+    { "check": "callers", "symbols": ["getScrollbackCell", "getScrollbackLineLen"], "result": "pass", "detail": "Sole non-test consumer is packages/@wterm/dom/src/renderer.ts:364-368, which reads len then cells for one offset with no state mutation between. Interface signatures unchanged." },
+    { "check": "covered", "result": "n/a", "detail": "first gate run on this branch" },
+    { "check": "artifacts", "result": "n/a" },
+    { "check": "shellmeta", "result": "n/a" },
+    { "check": "rawinput", "result": "n/a" },
+    { "check": "radius", "result": "skipped", "detail": "CLI not on PATH" }
+  ],
+  "findings": [
+    {
+      "id": 1,
+      "title": "u32 scrollback offset wraps to the newest row",
+      "severity": "low",
+      "state": "confirmed",
+      "in_scope": true,
+      "source": "reviewer",
+      "evidence": "getScrollbackLineLen(0xffffffff) returned 8 on an 8-column terminal instead of 0. usize is 32-bit on wasm32, so offset + 1 wrapped. First fix attempt (@as(usize, offset)) did not work for exactly that reason and was caught by the new test.",
+      "resolution": "std.math.add(usize, offset, 1) catch return 0, plus a regression test"
+    },
+    {
+      "id": 2,
+      "title": "scrollbackLimit documented as lines, is a byte budget",
+      "severity": "medium",
+      "state": "confirmed",
+      "in_scope": true,
+      "source": "gate step 3 (subsystem model), while verifying reviewer finding on page pruning",
+      "evidence": "ghostty src/terminal/Screen.zig:272 documents max_scrollback in bytes. Measured retained rows at the 10000 default: 40 cols 2304, 80 cols 1154, 160 cols 568. Halves as width doubles; never 10000.",
+      "resolution": "corrected in packages/@wterm/ghostty/README.md and apps/docs/src/app/ghostty/page.mdx"
+    },
+    {
+      "id": 3,
+      "title": "Detached DataView on the scrollback cache-hit path",
+      "severity": "high",
+      "state": "confirmed",
+      "in_scope": true,
+      "source": "Vercel Agent Review on PR #98",
+      "evidence": "memory.grow(64) between getScrollbackLineLen(0) and getScrollbackCell(0,1) threw TypeError: Underlying ArrayBuffer has been detached. Regression test verified red against the unfixed source.",
+      "resolution": "buffer identity check covering both hit and miss paths, commit f807b22"
+    },
+    {
+      "id": 4,
+      "title": "Reflow test did not pin reflow",
+      "severity": "low",
+      "state": "confirmed",
+      "in_scope": true,
+      "source": "reviewer",
+      "evidence": "fill() writes rows under 8 cells, so resizing 80 to 40 wrapped nothing. Writing a genuine 103-character logical line surfaced that the built-in core does not reflow at all (returns len 80 in a 40-column terminal) while ghostty rewraps correctly.",
+      "resolution": "test rewritten to assert ghostty's own reflow behavior rather than cross-core parity"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Wide-character scrollback cells render an extra column (reviewer finding 3)",
+      "evidence": "CellData carries no width field for any core, so getCell drops width identically in the viewport. Already tracked as open issue vercel-labs/wterm#71, which names this exact symptom.",
+      "verdict": "duplicate of a tracked pre-existing issue"
+    },
+    {
+      "claim": "Multi-codepoint graphemes lose continuation codepoints",
+      "evidence": "Measured viewport and scrollback on the same input: byte-identical output, both drop ZWJ and combining marks. get_viewport has the same one-u32-per-cell limit. Pre-existing.",
+      "verdict": "out of scope, tracked separately"
+    },
+    {
+      "claim": "_ensureViewport has the same early-return detached-view bug",
+      "evidence": "Reproduced against origin/main, so pre-existing and not introduced by this diff. Verified against the merge base, not an earlier commit on the branch.",
+      "verdict": "out of scope, issue candidate below"
+    },
+    {
+      "claim": "CHANGELOG and version untouched",
+      "evidence": "AGENTS.md states releases are manual, single-PR, maintainer-controlled.",
+      "verdict": "correct per house norm"
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Renderer corrupts scrollback when ghostty prunes a page",
+      "evidence": "syncScrollback treats a count delta as added or removed rows. ghostty prunes whole pages: at 80x24 with the default limit, count drops 1154 to 566 in a single write while a new newest row is added. The renderer removes 588 oldest elements and never inserts the new offset-0 row, shifting every rendered row by one from then on. The built-in core never decreases its count, so this path was only ever reachable with ghostty, and only observable once scrollback rendered at all.",
+      "scope": "packages/@wterm/dom, pre-existing, made visible by this PR"
+    },
+    {
+      "title": "Scrollback DOM rows are built once and never rebuilt",
+      "evidence": "syncScrollback returns early when the count is unchanged, so a content change to an existing row never reaches the DOM. Demonstrated with OSC 4: the core returns the new palette color for a scrolled-off cell while the rendered row keeps the old one. Same root cause as the prune finding.",
+      "scope": "packages/@wterm/dom, pre-existing"
+    },
+    {
+      "title": "_ensureViewport returns a possibly detached DataView",
+      "evidence": "Same early-return shape as the scrollback bug fixed here. Reproduced on origin/main: getCell after memory.grow throws.",
+      "scope": "packages/@wterm/ghostty, pre-existing, three-line fix"
+    },
+    {
+      "title": "Built-in core does not reflow scrollback on resize",
+      "evidence": "After resize(40,12) a scrollback row written at 80 columns still reports length 80 and keeps its original wrapping, while ghostty rewraps to 40.",
+      "scope": "packages/@wterm/core, pre-existing"
+    },
+    {
+      "title": "ghostty core drops grapheme continuation codepoints",
+      "evidence": "Built-in emits 1f468 200d 1f469 200d 1f467 and 65 301; ghostty emits 1f468 1f469 1f467 and 65. The README comparison table claims the opposite (built-in 'single codepoints', ghostty 'full grapheme clusters').",
+      "scope": "packages/@wterm/ghostty, pre-existing"
+    }
+  ]
+}

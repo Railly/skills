@@ -1,0 +1,104 @@
+{
+  "date": "2026-08-01",
+  "repo": "vercel-labs/wterm",
+  "change": "PR #102, branch fix/wide-unicode-cells, merge-base 3d74791, head 671a2eb",
+  "run": { "status": "complete" },
+  "spec": { "issue_contract": "not_provided", "issues_claimed": ["#54", "#71", "#101"] },
+  "author_model": "claude-opus-5 (commits dae5484, 671a2eb) and ctate (dda343f)",
+  "reviewer_model": "openai/gpt-5.6-sol",
+  "same_family": false,
+  "conventions": { "path": "cases/wterm/conventions.md", "state": "loaded" },
+  "deterministic": [
+    { "check": "covered", "result": "finding", "detail": "only run report was for 888a46e (PR #98 branch); this HEAD was uncovered", "state": "closed by this run" },
+    { "check": "style", "result": "pass", "tool": "prettier --check" },
+    { "check": "type-check", "result": "pass" },
+    { "check": "surfaces", "result": "finding", "detail": "packages/@wterm/ghostty/src touched, its README absent from the diff", "state": "exempted, evidence below" },
+    { "check": "siblings", "keyword": "width", "result": "finding", "detail": "markdown README and docs page mention width", "state": "exempted, different concept" },
+    { "check": "callers", "symbols": ["getCell", "getScrollbackCell"], "result": "pass", "detail": "one non-test call site outside the diff, dom/src/debug.ts:253, spreads the cell so the new field propagates; all others are tests" },
+    { "check": "radius", "result": "under-covering", "detail": "0 changedSymbols, 0 edges, 2437 unresolvedCalls. Map not used for lens direction.", "map_json": "radius-dogfood/2026-08-01-wterm-102.json" }
+  ],
+  "findings": [
+    {
+      "id": 1,
+      "title": "Horizontal shrink persists a width-2 cell with no continuation into scrollback",
+      "severity": "high",
+      "state": "confirmed",
+      "in_scope": true,
+      "introduced_by_pr": true,
+      "source": "reviewer",
+      "evidence": "init(6,3) + 'abc界\\r\\n' + 5 rows + resize(4,2). Scrollback offset 4 reads `61:1 62:1 63:1 754c:2` — a width-2 cell in the final column with nothing after it. The renderer emits .term-wide at two cell widths there and overflows the row. Permanent: it is in history. Separately, the same shrink on the active row deletes the glyph outright (`61:1 62:1 63:1 20:1`) while ghostty keeps a spacer."
+    },
+    {
+      "id": 2,
+      "title": "DECAWM off demotes a wide glyph to width 1 at the right margin",
+      "severity": "high",
+      "state": "confirmed",
+      "in_scope": true,
+      "introduced_by_pr": true,
+      "source": "found independently by the gate operator and the reviewer",
+      "evidence": "init(5,2) + ESC[?7l + 'abcd界' → cell(0,4) is `754c:1`. With room it is `754c:2` plus a `0` continuation. The DOM paints a fullwidth glyph in a one-cell span, which is the exact disagreement #54 exists to remove. ghostty drops the glyph instead."
+    },
+    {
+      "id": 3,
+      "title": "unicode_width classifies unassigned and narrow codepoints as wide",
+      "severity": "medium",
+      "state": "confirmed",
+      "in_scope": true,
+      "introduced_by_pr": true,
+      "source": "reviewer",
+      "evidence": "U+3040 (unassigned) reads `3040:2` on the built-in core and `3040:1` on ghostty. A false width 2 makes the renderer emit .term-wide for a narrow character, which is the same misalignment in the opposite direction. The classifier ranges whole blocks rather than following EAW."
+    },
+    {
+      "id": 4,
+      "title": "DCH on a continuation column shifts the row by two columns",
+      "severity": "medium",
+      "state": "confirmed",
+      "in_scope": true,
+      "introduced_by_pr": true,
+      "source": "reviewer",
+      "evidence": "'A界BC' then ESC[1;3H ESC[1P. Built-in gives `41:1 42:1 43:1 20:1 ...`: the wide glyph is gone and content moved two columns for a one-column delete. ghostty gives `41:1 20:1 42:1 43:1 ...`, one column. ICH shows the mirror: it rewinds the cursor to the wide lead and inserts before the requested column."
+    },
+    {
+      "id": 5,
+      "title": "Ghostty spacer heads are treated as continuations and dropped from the DOM",
+      "severity": "low",
+      "state": "confirmed",
+      "in_scope": true,
+      "introduced_by_pr": true,
+      "source": "reviewer",
+      "evidence": "wasm_api.zig cellWidth maps both .spacer_tail and .spacer_head to 0. A spacer head at the right margin has no wide cell before it and still owns a column. Renderer row [1,2,3,4,head] renders textContent '1234', expected '1234 '. Cosmetic while the cell is blank; a row background would lose its last column."
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "packages/@wterm/ghostty/README.md left untouched while ghostty/src changed",
+      "evidence": "Read it. It documents install, options and architecture, and defers the cell contract to the TerminalCore interface. The cell shape is documented in packages/@wterm/core/README.md and apps/docs/src/app/api-reference/page.mdx, both in the diff.",
+      "verdict": "exempt"
+    },
+    {
+      "claim": "markdown README and docs page mention width and are not in the diff",
+      "evidence": "Read both. `width` there is MarkdownRenderer's line width in columns, unrelated to cell width.",
+      "verdict": "exempt"
+    },
+    {
+      "claim": "Combining marks and ZWJ sequences consume columns on the built-in core",
+      "evidence": "'A'+U+0301+'B' leaves cursor.col 3 on the built-in core and 2 on ghostty; the family ZWJ emoji leaves 8 vs 6. printChar advanced one column per codepoint before this PR too, so the behavior is unchanged rather than regressed. unicode_width never returns 0.",
+      "verdict": "pre-existing scope gap, issue candidate below"
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "unicode_width has no zero-width class, so combining marks and ZWJ shift the grid",
+      "evidence": "See exemption above. Every codepoint consumes at least one column, so accented text and ZWJ emoji desync exactly the way #54 describes for wide characters.",
+      "scope": "pre-existing, adjacent to this PR's premise"
+    },
+    {
+      "title": "The two cores disagree on width for the same input",
+      "evidence": "Beyond the findings: U+3040 2 vs 1, combining marks 1 vs absorbed, DCH shift 2 vs 1, right-margin trailing cell 1 vs 0. Two advertised interchangeable cores are observably incompatible on wide-character edges.",
+      "scope": "cross-cutting, needs a shared conformance corpus"
+    }
+  ],
+  "verification_gaps": [
+    "zig build test could not run in the reviewer sandbox (Zig denied access to its cache manifests). The committed WASM was exercised directly instead, which covers behavior but not the Zig unit tests."
+  ]
+}
