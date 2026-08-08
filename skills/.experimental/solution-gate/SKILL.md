@@ -34,7 +34,9 @@ Write, before any proposal exists:
 
 Hand this to both proposers as the entire brief. Do not include a proposed fix, a hint, or a preference: a brief that names a direction gets that direction back from both runtimes, and their agreement will read as convergence.
 
-**Complete when:** the property, the observable, and the must-not-change list exist and contain no proposed solution.
+**Every factual claim in the brief carries a file:line, and the line is read before the brief is sent.** The brief is the one input to this method that nothing gates, and a wrong load-bearing fact in it propagates to both proposers at once, where their shared error will look like independent agreement. Cheap to prevent: if you cite a mechanism, open the line you are citing. (Origin: agent-browser #1670, 2026-08-08. The brief asserted a daemon spawned with `Stdio::null()` on stderr, citing a line that was the Windows `taskkill` path; the real spawn used `Stdio::piped()`, read only on early exit and then dropped. One proposer corrected it unprompted and neither was misled, so the conclusion survived by luck rather than by design.)
+
+**Complete when:** the property, the observable, and the must-not-change list exist, contain no proposed solution, and every factual claim in them has been read at its cited line.
 
 ## 2. Two independent proposals, blind to each other
 
