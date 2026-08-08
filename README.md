@@ -89,7 +89,7 @@ Not every cycle reaches a case. When work stops with the cycle still open, `hand
 
 ## Maturity
 
-Distribution channel and evidence maturity are separate. Stable currently contains two dogfooded skills and the evaluated Review Gate. Candidate and Experimental skills remain installable without implying validation.
+Distribution channel and evidence maturity are separate. Stable currently contains two dogfooded skills and the evaluated Review Gate; Solution Gate is dogfooded once but stays in Experimental until a baseline round exists. Candidate and Experimental skills remain installable without implying validation.
 
 The source of truth is [foundry/maturity.json](foundry/maturity.json).
 
