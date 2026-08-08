@@ -30,6 +30,10 @@ Usage:
   gate.sh rawinput <accessor> [<base-ref>] [<path>...]
                                               When a diff deepens a resolution rule, every site that re-derives the answer
                                               inline from the raw input, on a line the diff never touched, is updated or acknowledged
+  gate.sh flagsweep <new-flag> <sibling-flag> [<base-ref>] [<path>...]
+                                              A flag the diff introduces must appear on every doc surface that already
+                                              documents a comparable sibling flag. The surface map is keyed on code paths,
+                                              so a doc page reachable only by feature name is invisible to it
   gate.sh covered <runs-dir> [<pr>]           A run report for the exact HEAD sha must exist; a rebase or force-push
                                               retires every earlier report, including the one that found the bugs
                                               this head claims to fix
@@ -421,6 +425,49 @@ check_shellmeta() {
 # by construction the least-reviewed commit on the branch. Provenance: portless #366
 # round 4 — the last report was cf596be, retired by a force-push; the fix commit
 # 1aba57e was never gated and shipped three defects.
+# A new flag is documented wherever a comparable flag already is.
+#
+# `surfaces` keys on code paths the diff touches, so a doc page that no code
+# path points at stays invisible; `siblings` keys on a keyword that, for a
+# brand-new flag, exists nowhere else yet. Both pass while a page listing the
+# new flag's neighbours says nothing about it. The sibling flag supplies the
+# search space the other two cannot derive.
+check_flagsweep() {
+	local newflag="${1:-}" sibling="${2:-}"
+	[[ -z "$newflag" || -z "$sibling" ]] && usage
+	shift 2
+	local ref=""
+	if [[ -n "${1:-}" ]] && git rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then
+		ref="$1"
+		shift
+	fi
+	local base findings=0
+	base=$(base_ref "$ref")
+
+	local hits
+	hits=$(git grep -lI --untracked -e "$sibling" -- "${@:-.}" 2>/dev/null || true)
+	if [[ -z "$hits" ]]; then
+		echo "ERROR [flagsweep] sibling '$sibling' appears in no file; pick a flag that is already documented"
+		return 2
+	fi
+
+	while IFS= read -r f; do
+		[[ -z "$f" ]] && continue
+		case "$f" in
+		*.lock | */Cargo.lock | *.json) continue ;;
+		esac
+		if ! grep -qF -- "$newflag" "$f" 2>/dev/null; then
+			echo "FINDING [flagsweep] '$f' documents '$sibling' but never mentions '$newflag'; add it or acknowledge why that surface is unaffected"
+			findings=1
+		fi
+	done <<<"$hits"
+
+	if [[ "$findings" -eq 0 ]]; then
+		echo "PASS [flagsweep] every surface documenting '$sibling' also mentions '$newflag'"
+	fi
+	return "$findings"
+}
+
 check_covered() {
 	local runs="${1:-}"
 	[[ -z "$runs" ]] && usage
@@ -603,6 +650,7 @@ case "$cmd" in
 	shellmeta) check_shellmeta "$@" ;;
 	artifacts) check_artifacts "$@" ;;
 	rawinput) check_rawinput "$@" ;;
+	flagsweep) check_flagsweep "$@" ;;
 	covered) check_covered "$@" ;;
 	style) check_style "$@" ;;
 	stale) check_stale "$@" ;;

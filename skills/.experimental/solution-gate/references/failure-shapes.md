@@ -78,6 +78,13 @@ A list, a grammar, or an API shape written from what the docs say rather than fr
 - **Ask:** which claims in this proposal are load-bearing if wrong? For each, what command proves it against the real artifact?
 - **Provenance:** portless #366 round 7 — an astro sub-subcommand exclusion named commands the installed astro (5.17.3) does not have, guarding a dispatcher that validates no unknown flags anyway.
 
+## S11. Asymmetric validation across consumers of one input
+
+Two consumers read the same user-supplied input, and the one holding more authority validates it less. Each side looks defensible alone; the gap is only visible when you ask which of them can do more damage with a bad value.
+
+- **Ask:** list every consumer of this input, rank them by what a wrong value buys an attacker or a mistake, and check that validation strength runs in the same order. Where it does not, the weaker check is the real contract.
+- **Provenance:** agent-browser #1669 (2026-08-08) — `--ca-cert` fed both a rustls root store, which validated the certificate, and Chromium's `--ignore-certificate-errors-spki-list`, which suppresses every certificate error for a chain carrying the key and reached the file through a positional ASN.1 walk with no OID, signature, or structure check. A 37-byte file that openssl refuses to load produced a hash and Chromium received it. The stronger grant had the weaker validator. Closed by one shared loader whose discriminator is a certificate parser's verdict.
+
 ---
 
 ## Using the list
