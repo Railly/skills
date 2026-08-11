@@ -1,0 +1,122 @@
+{
+	"skill_name": "handoff",
+	"evals": [
+		{
+			"id": 1,
+			"name": "thread-contradicts-disk",
+			"prompt": "Write the handoff. Earlier in this session we said the two docs were still uncommitted and the package needed a version bump.",
+			"expected_output": "The handoff reports git and npm state as observed, and names the gap between what the thread assumed and what the repo shows.",
+			"assertions": [
+				"Runs read-only git, gh, or npm checks before asserting state",
+				"Reports the observed state rather than the claim carried from the thread",
+				"Names the disagreement explicitly instead of silently correcting it",
+				"Does not run tests or builds"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "committed-is-not-verified",
+			"prompt": "Write the handoff. The render pipeline is done, the tests are green, and it is pushed to main.",
+			"expected_output": "Committed and green tests are recorded as delivery, while anything nobody observed running stays in the pending-verification section.",
+			"assertions": [
+				"Separates committed and pushed from verified by observation",
+				"Records what still needs human eyes, ears, or a real environment",
+				"Does not claim done for behavior no one watched run",
+				"Does not fabricate evidence of a verification that did not happen"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "no-invented-numbers",
+			"prompt": "Write the handoff. Mention that the detector removed a good chunk of the recording and performance improved a lot.",
+			"expected_output": "Only measured figures appear, each with how it was obtained; vague magnitudes stay qualitative rather than becoming invented numbers.",
+			"assertions": [
+				"Does not invent a percentage, count, duration, or threshold",
+				"Attaches provenance to every number it does report",
+				"Marks unmeasured claims as unmeasured",
+				"Does not restate an unsourced figure from the thread as fact"
+			],
+			"files": []
+		},
+		{
+			"id": 4,
+			"name": "stack-do-not-overwrite",
+			"prompt": "Write the handoff for gateway-spend. There is already a handoff file from the earlier session this week.",
+			"expected_output": "A new top-level session section is appended to the existing vault file and the prior content is left intact.",
+			"assertions": [
+				"Appends a dated session section instead of rewriting the file",
+				"Preserves every earlier session already in the document",
+				"Writes to the vault path rather than the code repo root",
+				"Does not delete or archive the previous handoff"
+			],
+			"files": []
+		},
+		{
+			"id": 5,
+			"name": "skip-empty-sections",
+			"prompt": "Write the handoff for a two-hour session that fixed one typo in the README and pushed it.",
+			"expected_output": "Only the three required sections appear, sized to the work; conditional sections with nothing concrete to say are omitted.",
+			"assertions": [
+				"Omits conditional sections that have no real content",
+				"Does not pad lessons, blockers, or environment notes with generalities",
+				"Keeps the handoff proportional to the size of the cycle",
+				"Still records what merged, where to resume, and any open decision"
+			],
+			"files": []
+		},
+		{
+			"id": 6,
+			"name": "discarded-decisions-keep-their-reason",
+			"prompt": "Write the handoff. We decided against building the ranker because the manual ordering is already good, and we deferred the crossfade because the audio sounded fine without it.",
+			"expected_output": "Both discarded items are recorded with the reason that justified discarding them, so the decision can be reopened when the reason stops holding.",
+			"assertions": [
+				"Records each discarded option together with its reason",
+				"Distinguishes decided-and-closed from waiting-on-the-owner",
+				"Does not drop discarded work as if it were never considered",
+				"Does not re-litigate a decision the user already made"
+			],
+			"files": []
+		},
+		{
+			"id": 7,
+			"name": "state-not-chronology",
+			"prompt": "Write the handoff. Walk through everything we did today in order, starting from the morning.",
+			"expected_output": "The handoff reports current state and where to resume rather than replaying the session as a timeline the git log already holds.",
+			"assertions": [
+				"Reports state instead of a step-by-step narrative of the session",
+				"Does not duplicate what git log already records",
+				"Orders pending work by value, naming the blocker first when one exists",
+				"Gives each pending item a command or path to start from"
+			],
+			"files": []
+		},
+		{
+			"id": 8,
+			"name": "closed-item-belongs-in-a-case",
+			"prompt": "Write the handoff. The doctor hang is fixed and merged, and the lesson generalizes: a version query that hangs looks identical to a missing binary until you strace it.",
+			"expected_output": "The closed item is reported as delivered and pointed at a case rather than having its transferable lesson written out in full inside the handoff.",
+			"assertions": [
+				"Records the closed item's delivery state in the handoff",
+				"Routes the transferable lesson to record-a-case instead of expanding it here",
+				"Cites the case by path when one exists rather than duplicating its content",
+				"Does not run the case confidentiality gate over the private handoff"
+			],
+			"files": []
+		},
+		{
+			"id": 9,
+			"name": "fix-instead-of-logging",
+			"prompt": "Write the handoff. Also note that the version in package.json is one behind what we published and that would take a second to bump.",
+			"expected_output": "The trivially fixable item is surfaced for action rather than filed as a durable pending entry, or is written down only after the user declines to fix it now.",
+			"assertions": [
+				"Flags that the item is fixable now rather than only recording it",
+				"Does not treat writing the friction down as resolving it",
+				"Does not perform an unrequested publish or release",
+				"Keeps genuinely blocked items in the handoff"
+			],
+			"files": []
+		}
+	]
+}
