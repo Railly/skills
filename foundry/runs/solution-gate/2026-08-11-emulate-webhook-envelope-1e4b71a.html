@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solution gate: emulate webhook envelope</title>
+<style>
+  :root {
+    --bg:#fff; --bg2:#fafafa; --fg:#0a0a0a; --fg2:#666; --bd:#e5e5e5;
+    --obs:#45a557; --inf:#d27504; --gue:#d93036; --arg:#8e4ec6; --info:#0072f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0a0a0a; --bg2:#141414; --fg:#ededed; --fg2:#a1a1a1; --bd:#2e2e2e;
+      --obs:#62c073; --inf:#f1a10a; --gue:#ff6166; --arg:#bf7af0; --info:#52a8ff; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font-family:"Geist",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;
+    font-variant-numeric:tabular-nums}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 64px}
+  code{font-family:"Geist Mono",ui-monospace,SFMono-Regular,monospace;font-size:.9em}
+  h1{font-size:24px;margin:0 0 8px;letter-spacing:-.02em}
+  h2{font-size:18px;margin:40px 0 4px}
+  h3{font-size:14px;margin:20px 0 8px}
+  p.sub{color:var(--fg2);font-size:13px;margin:0 0 4px}
+  .half{border:1px solid var(--bd);border-radius:8px;padding:16px;margin-top:12px;background:var(--bg2)}
+  .half.observed{border-left:2px solid var(--obs)}
+  .half.argument{border-left:2px solid var(--arg)}
+  .tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:4px;border:1px solid var(--bd);
+    color:var(--fg2);font-family:"Geist Mono",monospace}
+  .tag.observed{color:var(--obs);border-color:var(--obs)}
+  .tag.inferred{color:var(--inf);border-color:var(--inf)}
+  .tag.guessed{color:var(--gue);border-color:var(--gue)}
+  .tag.refuted{color:var(--gue);border-color:var(--gue)}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd);vertical-align:top}
+  th{font-size:12px;color:var(--fg2);font-weight:500}
+  .cols{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+  @media (max-width:840px){.cols{grid-template-columns:1fr}}
+  svg{max-width:100%;height:auto;display:block;margin:8px 0}
+  .lbl{font:12px "Geist Mono",monospace;fill:var(--fg2)}
+  .box{fill:var(--bg);stroke:var(--bd)}
+  .boxo{fill:var(--bg);stroke:var(--obs)}
+  .boxa{fill:var(--bg);stroke:var(--arg)}
+  .t{font:12px "Geist",system-ui,sans-serif;fill:var(--fg)}
+  .ln{stroke:var(--bd);stroke-width:1;marker-end:url(#a)}
+  footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--bd);color:var(--fg2);font-size:13px}
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>Solution gate: per-service webhook envelope in emulate</h1>
+<p class="sub"><code>vercel-labs/emulate</code> at <code>1e4b71a</code> (0.9.0). Proposers: Claude Sonnet and openai/gpt-5.6-sol, blind to each other.</p>
+<p class="sub">The two halves below never merge. Everything under Observed traces to a command that was run. Everything under Proposed is argument.</p>
+
+<h2>Observed behavior</h2>
+<div class="half observed">
+
+<h3>Who can create a webhook subscription today <span class="tag observed">observed</span></h3>
+<p class="sub">Exhaustive sweep: <code>grep -rn "webhooks\.register(" packages/</code>, plus <code>packages/emulate/src/api.ts</code>.</p>
+<table>
+  <tr><th>Service</th><th>Registration site</th><th>Reachable by a consumer</th></tr>
+  <tr><td>github</td><td><code>routes/webhooks.ts:171, :390</code> (REST) and 6 tests</td><td>yes</td></tr>
+  <tr><td>stripe</td><td><code>index.ts:106</code>, from <code>config.webhooks</code></td><td>yes</td></tr>
+  <tr><td>slack</td><td><code>__tests__/helpers.ts:144</code> only</td><td>no</td></tr>
+  <tr><td>resend</td><td>none, anywhere</td><td>no</td></tr>
+</table>
+<p class="sub"><code>interface Emulator { url; reset(); close() }</code> at <code>api.ts:19</code>. The dispatcher is never handed to a caller.</p>
+
+<h3>Dispatcher lifetime <span class="tag observed">observed</span></h3>
+<p class="sub"><code>grep -rn "new WebhookDispatcher"</code> returns one production site.</p>
+<svg viewBox="0 0 700 132" role="img" aria-label="One server owns one plugin and one dispatcher">
+  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+    <path d="M0,1 L7,4 L0,7" fill="none" stroke="currentColor" stroke-width="1"/></marker></defs>
+  <rect class="boxo" x="8" y="12" width="200" height="52" rx="6"/>
+  <text class="t" x="20" y="34">createServer(plugin, opts)</text>
+  <text class="lbl" x="20" y="52">core/src/server.ts:24</text>
+  <rect class="boxo" x="264" y="4" width="190" height="40" rx="6"/>
+  <text class="t" x="276" y="22">new WebhookDispatcher()</text>
+  <text class="lbl" x="276" y="37">server.ts:30, one per server</text>
+  <rect class="boxo" x="264" y="60" width="190" height="40" rx="6"/>
+  <text class="t" x="276" y="78">plugin.register(...)</text>
+  <text class="lbl" x="276" y="93">server.ts:92, exactly one</text>
+  <rect class="box" x="510" y="60" width="180" height="52" rx="6"/>
+  <text class="t" x="522" y="80">webhooks.dispatch =</text>
+  <text class="lbl" x="522" y="96">github/src/index.ts:461</text>
+  <text class="lbl" x="522" y="108">replaces the method</text>
+  <line class="ln" x1="210" y1="30" x2="260" y2="24"/>
+  <line class="ln" x1="210" y1="46" x2="260" y2="78"/>
+  <line class="ln" x1="456" y1="80" x2="506" y2="82"/>
+</svg>
+<p class="sub">A dispatcher is never shared between services, so cross-service state on the instance cannot collide. The github plugin does replace <code>dispatch</code> at register time, binding the original.</p>
+
+<h3>Headers on the wire, before <span class="tag observed">observed</span></h3>
+<p class="sub"><code>core/src/webhooks.ts:106-120</code>, one block for every plugin.</p>
+<table>
+  <tr><th>Emulated service</th><th>Headers sent</th><th>Real consumer verifies</th></tr>
+  <tr><td>github</td><td><code>X-Hub-Signature-256</code>, <code>X-GitHub-Event</code>, <code>X-GitHub-Delivery</code></td><td>yes</td></tr>
+  <tr><td>stripe</td><td>the same three</td><td>no, needs <code>Stripe-Signature</code></td></tr>
+  <tr><td>slack, resend</td><td>the same three, but no delivery is reachable</td><td>not observable</td></tr>
+  <tr><td>linear</td><td><code>Linear-Signature</code>, from its own dispatcher at <code>linear/src/webhooks.ts:59</code></td><td>yes, by bypassing core</td></tr>
+</table>
+
+<h3>Probes that changed the outcome <span class="tag observed">observed</span></h3>
+<table>
+  <tr><th>Probe</th><th>Command</th><th>Result</th></tr>
+  <tr><td>Stripe SDK present for the proposed verification</td><td><code>ls node_modules/stripe/package.json</code></td><td><span class="tag refuted">refutes</span> both proposals' headline measurement. Absent</td></tr>
+  <tr><td>One dispatcher shared across services</td><td><code>grep -rn "new WebhookDispatcher"</code></td><td><span class="tag refuted">refutes</span> B's own stated downside. Cannot happen</td></tr>
+  <tr><td>Slack seed registers subscriptions</td><td><code>sed -n '330,360p' slack/src/index.ts</code></td><td>No. It inserts inbound URLs into <code>ss.incomingWebhooks</code></td></tr>
+</table>
+</div>
+
+<h2>Proposed shapes</h2>
+<p class="sub">Argument, not measurement. Neither proposer ran the code.</p>
+<div class="cols">
+
+  <div class="half argument">
+    <h3>A — Claude Sonnet: format enum on the subscription</h3>
+    <svg viewBox="0 0 340 150" role="img" aria-label="Core holds a table of four signers">
+      <rect class="boxa" x="8" y="8" width="150" height="44" rx="6"/>
+      <text class="t" x="20" y="27">subscription</text>
+      <text class="lbl" x="20" y="43">format: "stripe"</text>
+      <rect class="boxa" x="8" y="72" width="320" height="70" rx="6"/>
+      <text class="t" x="20" y="92">core/src/webhooks.ts</text>
+      <text class="lbl" x="20" y="110">SIGNERS = { github, stripe, slack, resend }</text>
+      <text class="lbl" x="20" y="128">core knows four vendors' crypto</text>
+      <line class="ln" x1="84" y1="54" x2="84" y2="68"/>
+    </svg>
+    <p class="sub"><span class="tag guessed">guessed</span> Every service can carry a format at its registration site. The observed half shows two cannot.</p>
+    <p class="sub"><span class="tag inferred">inferred</span> A fifth service still edits core, so the ownership property is half restored. Stated by the proposal itself.</p>
+  </div>
+
+  <div class="half argument">
+    <h3>B — gpt-5.6-sol: header factory on the dispatcher</h3>
+    <svg viewBox="0 0 340 150" role="img" aria-label="Plugin installs its own factory on the dispatcher instance">
+      <rect class="boxa" x="8" y="8" width="150" height="44" rx="6"/>
+      <text class="t" x="20" y="27">plugin.register</text>
+      <text class="lbl" x="20" y="43">installs its factory</text>
+      <rect class="boxa" x="8" y="72" width="320" height="70" rx="6"/>
+      <text class="t" x="20" y="92">WebhookDispatcher instance</text>
+      <text class="lbl" x="20" y="110">matching, transport, log, timeout</text>
+      <text class="lbl" x="20" y="128">core knows no vendor crypto</text>
+      <line class="ln" x1="84" y1="54" x2="84" y2="68"/>
+    </svg>
+    <p class="sub"><span class="tag observed">observed</span> Its stated risk, one dispatcher shared by unlike plugins, is impossible here. Probe P4.</p>
+    <p class="sub"><span class="tag inferred">inferred</span> The factory survives github replacing <code>dispatch</code>, because the original is bound to the same instance. Carried to implementation.</p>
+  </div>
+</div>
+
+<h2>Chosen</h2>
+<div class="half argument">
+<p>B whole, with the scope cut by the probes, plus A's argument against storing a function on the subscription (those objects flow through <code>getSubscriptions()</code> and structural assertions).</p>
+<table>
+  <tr><th>Service</th><th>In this change</th><th>Why</th></tr>
+  <tr><td>github</td><td>yes, as the default</td><td>Nothing may change on the wire</td></tr>
+  <tr><td>stripe</td><td>yes</td><td>Only non-GitHub service a consumer can subscribe to. Closes #97 and #98</td></tr>
+  <tr><td>slack</td><td>optional, with the limit written down</td><td>Testable through the existing helper, unreachable by a consumer</td></tr>
+  <tr><td>resend</td><td>no</td><td>No helper, no seed field, no route, so no observation is possible</td></tr>
+</table>
+</div>
+
+<footer>
+Record: <code>2026-08-11-emulate-webhook-envelope-1e4b71a.md</code>. Proposals verbatim: <code>-proposals.md</code>.
+Design direction originates in closed PR #100 by @EfeDurmaz16, credited at commit time.
+</footer>
+
+</div></body>
+</html>
