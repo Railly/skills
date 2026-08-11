@@ -13,6 +13,11 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 - [wterm #86: read the dependency's contract for the field, not just its type](wterm/0086-style-id-stale-across-screens.md)
 - [wterm #67: check who calls the function before accepting a reset](wterm/0067-reconnect-reset-breaks-backoff.md)
 - [wterm #65: keep the diagnosis, change the placement in a hot path](wterm/0065-hot-path-invalidation.md)
+- [wterm #105: response delivery is a continuation boundary](wterm/0105-response-delivery-is-a-continuation-boundary.md)
+- [wterm #106: repeated modes need generation identity](wterm/0106-generation-identity-across-synchronized-output.md)
+- [wterm #107: terminal mouse support is a browser interaction contract](wterm/0107-browser-native-mouse-contract.md)
+- [wterm #111: WASM view lifetime crosses secondary grapheme reads](wterm/0111-wasm-view-lifetime-across-grapheme-reads.md)
+- [wterm #112: a performance PR may prove only a simpler scheduler](wterm/0112-noisy-performance-proof.md)
 
 ### Portless unvalidated backfill
 
@@ -87,6 +92,11 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 | [wterm #86](wterm/0086-style-id-stale-across-screens.md) | [issue](https://github.com/vercel-labs/wterm/issues/86) · [PR](https://github.com/vercel-labs/wterm/pull/96) | contributor-validated | PR open | a conditional field over a reused buffer is stale, not undefined | review reference-rule candidate |
 | [wterm #67](wterm/0067-reconnect-reset-breaks-backoff.md) | [PR](https://github.com/vercel-labs/wterm/pull/67) | contributor-validated | local | enumerate callers before accepting a state reset | review reference-rule candidate |
 | [wterm #65](wterm/0065-hot-path-invalidation.md) | [PR](https://github.com/vercel-labs/wterm/pull/92) | contributor-validated | merged | keep the diagnosis, change the placement in a hot path | review reference-rule candidate |
+| [wterm PR #105](wterm/0105-response-delivery-is-a-continuation-boundary.md) | [PR](https://github.com/vercel-labs/wterm/pull/105) | contributor-validated | merged | a user callback inside an incremental loop becomes part of the continuation boundary | review reference-rule candidate |
+| [wterm PR #106](wterm/0106-generation-identity-across-synchronized-output.md) | [PR](https://github.com/vercel-labs/wterm/pull/106) | independently-validated | merged | carry occurrence identity across the authoritative boundary when repeated states look identical | review deterministic-check candidate |
+| [wterm PR #107](wterm/0107-browser-native-mouse-contract.md) | [PR](https://github.com/vercel-labs/wterm/pull/107) | contributor-validated | merged | derive browser-hosted protocol tests from both terminal and browser contracts | review behavior-eval candidate |
+| [wterm PR #111](wterm/0111-wasm-view-lifetime-across-grapheme-reads.md) | [PR](https://github.com/vercel-labs/wterm/pull/111) | contributor-validated | PR open | separate WASM data freshness from JavaScript view attachment | review reference-rule candidate |
+| [wterm PR #112](wterm/0112-noisy-performance-proof.md) | [PR](https://github.com/vercel-labs/wterm/pull/112) | contributor-validated | PR open | keep a proved structural performance claim and discard an unproved numeric claim | performance-proof method candidate |
 
 One merged case remains to be backfilled. It is not required for round 1 because merge status and technical validation are independent dimensions.
 

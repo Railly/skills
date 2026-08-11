@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-06",
+    "repo": "vercel-labs/wterm",
+    "base": "a1e12a10f10eeffae1e803aea7ede0ed030374ae",
+    "head": "3339765c0e291d053aaa291ff61e1f2a509e5d67",
+    "status": "incomplete",
+    "gaps": [
+      "GitHub API access was unavailable, so the PR/issue reference graph could not be verified.",
+      "No in-app/default browser was available for a fresh real-browser paint drive.",
+      "The normal pnpm wrapper did not finish after warning that SOCKET_PASSWORD_B64 was unavailable; equivalent focused checks passed."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No Issue Contract or separate Spec review result was supplied."]
+  },
+  "provenance": {
+    "author_model": "OpenAI GPT-family per handoff; exact author model not provided",
+    "reviewer_model": "OpenAI GPT-5",
+    "same_family": true
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, or lookup data source was replaced."},
+    {"name":"New-domain matrix","status":"skipped","reason":"No validator or trigger domain was widened."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No user-input resolution or discovery rule changed."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell-parsed command was rewritten."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No background process, user-facing warning, or one-shot latch exists in this path."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"The diff adds no external-binary shim."},
+    {"name":"Deliberate-default check","status":"skipped","reason":"The diff adds handling for a previously unsupported mode rather than reversing an asserted default."},
+    {"name":"Fresh-seam scan","status":"skipped","reason":"The diff does not patch a runtime or framework to expose an event."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No guard models an external substrate."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"No locally available normative implementation or enumerable contract was supplied; browser evidence was unavailable."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Paint suppression creates a new non-delivery outcome for side responses; the end-to-end caller path deadlocks while mode 2026 remains active."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No flag or config bit crosses multiple dispatch entry points."},
+    {"name":"Error-path forcing","status":"run","reason":"Forced missing-close, response-while-held, resize-while-held, close, soft reset, and full reset paths."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"The diff adds no heuristic recovery action."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Inspected timer-to-RAF cancellation, destroy, resize scheduling, and missing-close duration; confirmed no timeout recovery."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced bytes through parser, Zig state, WASM export, bridge, DOM scheduler, renderer, and callbacks."},
+    {"name":"Substrate verification","status":"run","reason":"Observed DOM text and callbacks from the built packages and committed WASM rather than trusting command output."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Drove built @wterm/core and @wterm/dom with the committed WASM through jsdom; a real browser was unavailable and is recorded as a gap."},
+    {"name":"Docs-behavior parity","status":"run","reason":"The diff adds public TerminalCore and WasmBridge methods; required package and web documentation omit them."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example was added or edited."},
+    {"name":"Choice audit","status":"skipped","reason":"No .decisions.tsv trail exists."},
+    {"name":"Complexity budget","status":"skipped","reason":"No new per-element loop, membership check, or lookup was added."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"pass","reason":"The exact-HEAD report is this file; the first pre-report invocation correctly failed."},
+    {"check":"style","outcome":"pass","reason":"gate.sh style origin/main passed."},
+    {"check":"surfaces","outcome":"pass","reason":"gate.sh surfaces passed mechanically; a tooling issue candidate records its missed wildcard obligation."},
+    {"check":"siblings synchronized output","outcome":"pass","reason":"All keyword-bearing files were in the diff and had no untouched matching passage."},
+    {"check":"callers synchronizedOutput","outcome":"pass","reason":"Every enumerated call site was in a changed file."},
+    {"check":"force-red","outcome":"acknowledged","reason":"Strict force-red is not satisfied: the new bridge test fails on base by missing method, while reverting the DOM fix leaves every PR test green."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"Map generated, but 2,498 unresolved calls versus 515 edges makes it under-covering; no finding was map-attributed."}
+  ],
+  "findings": [
+    {
+      "id":"F1",
+      "state":"confirmed",
+      "severity":"high",
+      "claim":"Host responses produced during synchronized output are withheld until paint resumes, allowing a producer waiting for CPR before close to deadlock.",
+      "evidence":"Built DOM plus committed WASM: CSI ? 2026 h followed by CSI 6 n produced no onData callback while open; ESC[1;1R arrived only after CSI ? 2026 l. getResponse is called only inside _doRender.",
+      "layer":"end-to-end parser/WASM/DOM callback path",
+      "source":"lens",
+      "path":"WTerm.write -> synchronizedOutput -> cancel render; Terminal response queue -> _doRender -> getResponse -> onData"
+    },
+    {
+      "id":"F2",
+      "state":"confirmed",
+      "severity":"high",
+      "claim":"An unterminated synchronized-output block suppresses all later rendering indefinitely.",
+      "evidence":"After CSI ? 2026 h plus NEVER-CLOSED, DOM text remained empty and synchronizedOutput stayed true after 5.2 seconds; additional writes did not paint.",
+      "layer":"end-to-end timeout and recovery behavior",
+      "source":"lens",
+      "path":"WTerm.write -> cancel timer/RAF with no recovery scheduler"
+    },
+    {
+      "id":"F3",
+      "state":"confirmed",
+      "severity":"medium",
+      "claim":"Resize bypasses the synchronized-output hold and exposes a partial frame.",
+      "evidence":"CSI ? 2026 h plus PARTIAL left the DOM blank; term.resize(80,24) exposed PARTIAL before CSI ? 2026 l because resize unconditionally calls renderer.setup and _scheduleRender.",
+      "layer":"DOM render lifecycle",
+      "source":"lens",
+      "path":"WTerm.resize -> Renderer.setup -> _scheduleRender -> _doRender"
+    },
+    {
+      "id":"F4",
+      "state":"confirmed",
+      "severity":"medium",
+      "claim":"The user-facing DOM atomic-render fix has no regression test that fails when the fix is removed.",
+      "evidence":"In a scratch HEAD copy, replacing dom/src/wterm.ts with origin/main while retaining all PR tests left core 32/32 and DOM 33/33 green.",
+      "layer":"regression-test contract",
+      "source":"gate",
+      "path":"PR tests -> parser/WASM getter only; no DOM scheduling assertion"
+    },
+    {
+      "id":"F5",
+      "state":"confirmed",
+      "severity":"medium",
+      "claim":"The new public synchronizedOutput methods are missing from required package and web documentation.",
+      "evidence":"TerminalCore and WasmBridge export synchronizedOutput, while core README and docs core/API surfaces have zero synchronizedOutput or mode-2026 entries.",
+      "layer":"public API documentation contract",
+      "source":"lens",
+      "path":"TerminalCore/WasmBridge public API -> package README and docs API reference"
+    },
+    {
+      "id":"R1",
+      "state":"refuted",
+      "claim":"Cancelling after the timeout callback has promoted work to requestAnimationFrame leaves a late paint.",
+      "evidence":"_cancelScheduledRender clears both _renderTimer and rafId, and destroy uses the same helper; focused cancellation drive showed no late frame.",
+      "layer":"timer-to-RAF cancellation seam",
+      "source":"lens",
+      "path":"_scheduleRender -> setTimeout -> requestAnimationFrame -> _cancelScheduledRender"
+    },
+    {
+      "id":"E1",
+      "state":"exempted",
+      "claim":"GhosttyCore must implement the new method for source compatibility.",
+      "evidence":"The interface method is optional and WTerm uses optional chaining, so GhosttyCore continues rendering without a runtime or type failure; feature parity remains an issue candidate.",
+      "layer":"alternative-core source compatibility",
+      "source":"lens",
+      "path":"TerminalCore optional method -> GhosttyCore -> WTerm optional chaining"
+    },
+    {
+      "id":"I1",
+      "state":"issue_candidate",
+      "claim":"Alternative cores lack a defined synchronized-output parity contract.",
+      "evidence":"GhosttyCore implements TerminalCore but has no synchronizedOutput method, so it renders each write under the new optional capability model.",
+      "layer":"cross-backend conformance",
+      "source":"lens",
+      "path":"GhosttyCore -> WTerm.write optional synchronizedOutput"
+    },
+    {
+      "id":"I2",
+      "state":"issue_candidate",
+      "claim":"The review-gate surface wildcard misses required package documentation.",
+      "evidence":"packages/@wterm/core/src changed with no core README or docs page in the diff, but gate.sh surfaces returned pass.",
+      "layer":"review tooling deterministic surface map",
+      "source":"gate",
+      "path":"conventions wildcard -> gate.sh surfaces"
+    }
+  ],
+  "exemptions": [
+    {"claim":"No stale-value sweep was needed.","evidence":"Mode 2026 and synchronizedOutput are additive; no prior contract value was renamed or retired."},
+    {"claim":"No documentation sibling keyword sweep beyond the recorded pass was needed.","evidence":"The diff adds no behavior sentence to a documentation surface; this does not exempt the missing public-API docs."},
+    {"claim":"GhosttyCore remains source-compatible without the optional method.","evidence":"TerminalCore marks synchronizedOutput optional and WTerm calls it with optional chaining."},
+    {"claim":"No choice audit was possible or required.","evidence":"No .decisions.tsv file exists in the repository."}
+  ],
+  "issue_candidates": [
+    {"title":"Define synchronized-output parity for alternative cores","evidence":"GhosttyCore lacks synchronizedOutput and therefore paints each write.","why_out_of_scope":"PR #106 changes only the built-in Zig/WASM core and shared DOM scheduler."},
+    {"title":"Fix the wterm surface-map wildcard check","evidence":"The mechanical surface gate passed despite a core public API change with no required README or docs update.","why_out_of_scope":"This is a defect in the external review-gate tooling, not the target repository."}
+  ]
+}
+

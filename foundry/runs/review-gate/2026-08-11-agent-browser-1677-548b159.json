@@ -1,0 +1,346 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-11",
+    "repo": "vercel-labs/agent-browser",
+    "base": "548b159b30eef119ccf6846c8bc807d0eaa3f6f8",
+    "head": "548b159b30eef119ccf6846c8bc807d0eaa3f6f8",
+    "status": "incomplete",
+    "gaps": [
+      "The implementation remains uncommitted, so the report cannot fingerprint the exact reviewed worktree tree even though covered passes for HEAD."
+    ]
+  },
+  "contract": {
+    "path": "https://github.com/vercel-labs/agent-browser/issues/1677",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "active-main-frame-full-navigation",
+      "chrome-history-api-navigation",
+      "chrome-fragment-navigation",
+      "ignore-child-frame-navigation",
+      "ignore-background-tab-navigation",
+      "keep-active-tab-url-cache-consistent"
+    ],
+    "gaps": [
+      "No separate Spec review result was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "Claude Sonnet",
+    "same_family": false
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher, parser, lookup, or data source was replaced."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Enumerated active/background sessions, main/child frames, full/same-document events, Chrome, direct-page Chrome, and Lightpanda."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No value resolution or discovery rule from user input changed."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command string or argument injection changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No warning, error emission, or one-shot latch was added."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No external binary shim was added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "The change adds navigation coverage and filtering rather than changing a documented default."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No runtime or framework was patched to expose a new application signal."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Compared CDP event/session/frame predicates across Chrome flattened sessions, direct-page events, and the Lightpanda engine path."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "The diff consumes existing CDP protocol events and does not reimplement an enumerable semantic contract."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No existing call gained a new return or failure outcome."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No flag, mode, or configuration bit was added."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Forced seed timeout, retry, cancellation, missing seed, bounded queue, stale session, background session, and shutdown paths."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No heuristic recovery action was added."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Verified one-second seed attempts, bounded retry delay, PendingGuard cleanup, rebind cancellation, and shutdown."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced CDP event through session/frame filtering, cache mutation, ordered broadcast, WebSocket bootstrap, and dashboard consumption."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Observed URL output and cached tab state through a real Chrome E2E."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Built and drove the real Chrome stream through History API, fragment, full navigation, child frame, background tab, and tab switching."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Verified README, CLI help, web docs, and skill prose against the Chrome-only same-document implementation and all skip classes."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "The added JSON snippets show message shape rather than a runnable capability example."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": "Audited every append-only decision trail row, which surfaced the engine-capability conflation and rebind ordering risk."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "The only event buffer is capped at 64; queue operations are O(1), publishing is O(tabs), and only one seed request is in flight."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "A run report exists for HEAD 548b159; the run remains incomplete because the implementation itself is an uncommitted worktree diff."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "The actions.rs change only synchronizes stream cache/rebind state; command documentation surfaces carry no affected semantics."
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "siblings active main-frame",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "siblings URL",
+      "outcome": "acknowledged",
+      "reason": "URL is too generic and matched unrelated concepts; feature-specific passages were read and the active main-frame sweep passed."
+    },
+    {
+      "check": "siblings navigatedWithinDocument",
+      "outcome": "acknowledged",
+      "reason": "The only non-trail repository hit is the vendored CDP schema, which already declares the consumed event."
+    },
+    {
+      "check": "callers cdp_event_loop",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "callers bind_cdp_session_and_broadcast_tabs",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo fmt",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo clippy all targets",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo test serial",
+      "outcome": "pass",
+      "reason": "1120 passed, 0 failed, 102 ignored."
+    },
+    {
+      "check": "real Chrome E2E",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "real-world Chrome stress E2E",
+      "outcome": "pass",
+      "reason": "100 iterations passed with seed 1677; 20 iterations each also passed with seeds 1677, 42, and 9001."
+    },
+    {
+      "check": "real Lightpanda 0.3.6 E2E",
+      "outcome": "pass",
+      "reason": "The streaming URL E2E passed 10 consecutive runs, and all three Lightpanda E2Es passed together."
+    },
+    {
+      "check": "stress force-red main-frame filter",
+      "outcome": "pass",
+      "reason": "Removing the main-frame ID predicate made the E2E fail on forbidden-2-active-child; restoring it passed 100 iterations."
+    },
+    {
+      "check": "Lightpanda force-red full-navigation main-frame filter",
+      "outcome": "pass",
+      "reason": "Removing is_main made the real Lightpanda E2E emit /child and fail; restoring it made the Lightpanda matrix green."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "45 changed symbols and 198 impacted items, but 0 resolved edges, 2402 unresolved calls, 74 unmapped SCIP entries, and rust-analyzer duplicate-symbol errors make the map strongly under-covering."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": ""
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Non-Chrome background full navigation could replace the active cached and emitted URL.",
+      "evidence": "The previous full-navigation predicate treated every non-screencast engine event as active. Independent reviewers identified the reachable Lightpanda path; the code now filters every engine by active CDP session.",
+      "layer": "browser-event predicate and active-tab cache",
+      "source": "lens",
+      "path": "Page.frameNavigated -> session predicate -> publish_url -> last_tabs/frame_tx"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "A late event from the old active session could be attributed to the new active tab during tab switching.",
+      "evidence": "The command path previously updated last_tabs before updating cdp_session_id. The fix binds them under a consistent lock order and publish_url rechecks the live session. Removing that recheck makes test_old_session_event_cannot_replace_new_active_tab_url fail.",
+      "layer": "cross-task ordering and end-to-end tab attribution",
+      "source": "lens",
+      "path": "tab_switch -> broadcast_tabs/session rebind -> cdp_event_loop -> publish_url -> WebSocket consumer"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "Documentation initially advertised History API and fragment URL updates without the Chrome scope.",
+      "evidence": "The implementation deliberately gates Page.navigatedWithinDocument on Chrome. README, CLI help, docs, and skill text now say so.",
+      "layer": "public behavior contract",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "R1",
+      "state": "refuted",
+      "claim": "A late timed-out Page.getFrameTree response can corrupt a retry.",
+      "evidence": "CdpClient PendingGuard removes the cancelled command entry, late responses have no pending receiver, and a real frameNavigated value is never overwritten by a seed.",
+      "layer": "CDP command lifecycle",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "R2",
+      "state": "refuted",
+      "claim": "The new lock order can deadlock stream readers or URL publishers.",
+      "evidence": "All two-lock paths acquire cdp_session_id before last_tabs; other readers acquire only one of those locks.",
+      "layer": "lock ordering",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "E1",
+      "state": "exempted",
+      "claim": "Command documentation must change because actions.rs is touched.",
+      "evidence": "The actions.rs delta only synchronizes internal stream binding/cache state and adds no command, argument, result, or user-facing command semantics.",
+      "layer": "documentation surface",
+      "source": "gate",
+      "path": ""
+    },
+    {
+      "id": "I1",
+      "state": "issue_candidate",
+      "claim": "Lightpanda 0.3.6 cannot reach a multiple-page state for real background-tab verification.",
+      "evidence": "Target.createTarget returned TargetAlreadyLoaded in the real E2E, matching open upstream issue lightpanda-io/browser#1962. Active main-frame and child-frame routing were verified against the real runtime.",
+      "layer": "real engine multi-page substrate",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "I2",
+      "state": "issue_candidate",
+      "claim": "The ordered non-frame broadcast remains lossy for lagging receivers.",
+      "evidence": "The channel is intentionally bounded and documented as non-durable; replaying bounded initialization URL events can contribute to lag but does not create an unbounded queue.",
+      "layer": "stream delivery semantics",
+      "source": "lens",
+      "path": ""
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Command docs are unaffected by the actions.rs synchronization change.",
+      "evidence": "No command, flag, wire shape, result field, or command behavior changed."
+    },
+    {
+      "claim": "The generic URL sibling sweep is not a useful completeness oracle for this change.",
+      "evidence": "It matched unrelated URL concepts while the feature-specific active main-frame sweep passed and all streaming passages were read."
+    },
+    {
+      "claim": "The vendored CDP protocol schema needs no edit.",
+      "evidence": "It already declares Page.navigatedWithinDocument and the code only begins consuming that existing event."
+    },
+    {
+      "claim": "MCP documentation and schema need no edit.",
+      "evidence": "The stream wire message shape and all commands remain unchanged."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Enable real Lightpanda background-tab stream coverage when multiple pages are supported",
+      "evidence": "Lightpanda 0.3.6 returns TargetAlreadyLoaded from Target.createTarget; upstream issue lightpanda-io/browser#1962 tracks the same limitation.",
+      "why_out_of_scope": "agent-browser cannot create the runtime state until Lightpanda implements multiple pages; the session predicate remains covered by the Lightpanda CDP harness."
+    },
+    {
+      "title": "Evaluate coalescing buffered initialization URL events",
+      "evidence": "The ordered channel is bounded and non-durable; up to 64 buffered URLs may be replayed when the frame-tree seed resolves.",
+      "why_out_of_scope": "Delivery durability and URL-event coalescing are separate stream protocol decisions."
+    }
+  ]
+}

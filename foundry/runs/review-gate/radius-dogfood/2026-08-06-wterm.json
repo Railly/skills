@@ -1,0 +1,55 @@
+{
+  "base": "a1e12a10f10eeffae1e803aea7ede0ed030374ae",
+  "head": "f2a475224e0c195449316000a55ee9ecd771c275",
+  "changed": [
+    "packages/@wterm/core/src/terminal-core.ts#TerminalCore",
+    "packages/@wterm/core/src/wasm-bridge.ts#WasmExports",
+    "packages/@wterm/core/src/wasm-bridge.ts#WasmBridge",
+    "packages/@wterm/dom/src/__tests__/input-mouse.test.ts#<module>",
+    "packages/@wterm/dom/src/input.ts#InputHandler"
+  ],
+  "convergence": [
+    {
+      "symbol": "packages/@wterm/core/src/__tests__/wasm-bridge.test.ts#<module>",
+      "reachedBy": [
+        "TerminalCore",
+        "WasmBridge",
+        "WasmExports"
+      ],
+      "confidence": 0.78
+    }
+  ],
+  "topImpacted": [
+    {
+      "symbol": "packages/@wterm/dom/src/wterm.ts#WTerm",
+      "confidence": 1,
+      "path": "InputHandler -> WTerm via call"
+    },
+    {
+      "symbol": "packages/@wterm/dom/src/__tests__/input.test.ts#<module>",
+      "confidence": 0.9,
+      "path": "InputHandler -> input.test.ts via call"
+    },
+    {
+      "symbol": "packages/@wterm/dom/src/__tests__/wterm.test.ts#<module>",
+      "confidence": 0.81,
+      "path": "InputHandler -> WTerm -> wterm.test.ts via call"
+    },
+    {
+      "symbol": "packages/@wterm/ghostty/src/ghostty-core.ts#<module>",
+      "confidence": 0.24,
+      "path": "TerminalCore -> GhosttyCore via inferred cochange; no structural path"
+    }
+  ],
+  "visibilityBoundary": {
+    "unresolvedCalls": 2565,
+    "dynamicImports": 0
+  },
+  "stats": {
+    "filesIndexed": 119,
+    "symbols": 380,
+    "edges": 517,
+    "elapsedMs": 48
+  },
+  "coverageNote": "unresolvedCalls greatly exceed edges, and Radius does not model the TypeScript-to-Zig/WASM boundary; the map under-covers and was used only for orientation"
+}

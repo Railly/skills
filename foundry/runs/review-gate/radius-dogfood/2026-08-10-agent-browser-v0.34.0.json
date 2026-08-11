@@ -1,0 +1,124 @@
+{
+  "changed": [
+    {
+      "symbol": "packages/@agent-browser/sandbox/src/version.ts#AGENT_BROWSER_SANDBOX_VERSION",
+      "file": "packages/@agent-browser/sandbox/src/version.ts"
+    }
+  ],
+  "impacted": [
+    {
+      "symbol": "packages/@agent-browser/sandbox/src/shared.ts#DEFAULT_AGENT_BROWSER_INSTALL_SPEC",
+      "file": "packages/@agent-browser/sandbox/src/shared.ts",
+      "confidence": 0.85,
+      "depth": 1,
+      "reachedBy": [
+        "packages/@agent-browser/sandbox/src/version.ts#AGENT_BROWSER_SANDBOX_VERSION"
+      ],
+      "reasons": [
+        {
+          "via": "use",
+          "from": "packages/@agent-browser/sandbox/src/version.ts#AGENT_BROWSER_SANDBOX_VERSION",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/@agent-browser/sandbox/src/shared.ts#resolveAgentBrowserInstallSpec",
+      "file": "packages/@agent-browser/sandbox/src/shared.ts",
+      "confidence": 0.7224999999999999,
+      "depth": 2,
+      "reachedBy": [
+        "packages/@agent-browser/sandbox/src/version.ts#AGENT_BROWSER_SANDBOX_VERSION"
+      ],
+      "reasons": [
+        {
+          "via": "use",
+          "from": "packages/@agent-browser/sandbox/src/shared.ts#DEFAULT_AGENT_BROWSER_INSTALL_SPEC",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/@agent-browser/sandbox/src/vercel.ts#installAgentBrowserInVercelSandbox",
+      "file": "packages/@agent-browser/sandbox/src/vercel.ts",
+      "confidence": 0.65025,
+      "depth": 3,
+      "reachedBy": [
+        "packages/@agent-browser/sandbox/src/version.ts#AGENT_BROWSER_SANDBOX_VERSION"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/@agent-browser/sandbox/src/shared.ts#resolveAgentBrowserInstallSpec",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/@agent-browser/sandbox/src/vercel.ts#createAgentBrowserSandbox",
+      "file": "packages/@agent-browser/sandbox/src/vercel.ts",
+      "confidence": 0.585225,
+      "depth": 4,
+      "reachedBy": [
+        "packages/@agent-browser/sandbox/src/version.ts#AGENT_BROWSER_SANDBOX_VERSION"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/@agent-browser/sandbox/src/vercel.ts#installAgentBrowserInVercelSandbox",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/@agent-browser/sandbox/src/vercel.ts#createAgentBrowserSnapshot",
+      "file": "packages/@agent-browser/sandbox/src/vercel.ts",
+      "confidence": 0.585225,
+      "depth": 4,
+      "reachedBy": [
+        "packages/@agent-browser/sandbox/src/version.ts#AGENT_BROWSER_SANDBOX_VERSION"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/@agent-browser/sandbox/src/vercel.ts#installAgentBrowserInVercelSandbox",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/@agent-browser/sandbox/src/vercel.ts#withAgentBrowserSandbox",
+      "file": "packages/@agent-browser/sandbox/src/vercel.ts",
+      "confidence": 0.5267025,
+      "depth": 5,
+      "reachedBy": [
+        "packages/@agent-browser/sandbox/src/version.ts#AGENT_BROWSER_SANDBOX_VERSION"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/@agent-browser/sandbox/src/vercel.ts#createAgentBrowserSandbox",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    }
+  ],
+  "visibilityBoundary": {
+    "unresolvedCalls": 2402,
+    "dynamicImports": 0,
+    "macroBodies": 0,
+    "scipUnmapped": 74
+  },
+  "stats": {
+    "filesIndexed": 281,
+    "symbols": 4424,
+    "edges": 7887,
+    "reconciledFiles": 281,
+    "elapsedMs": 20279,
+    "scipReindexMs": 19399
+  },
+  "notes": [
+    "rust-analyzer reported duplicate SCIP symbols and unnamed enclosing definitions.",
+    "Use this map for orientation only. The release diff is mostly manifests and prose, which radius does not model."
+  ]
+}

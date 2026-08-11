@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-08",
+    "repo": "vercel-labs/wterm#106",
+    "base": "92976cd47e3a6764dfd7a1b114b6992560d6fa01",
+    "head": "01b7809282518c9d9f22d14ad0613840f3614a53",
+    "status": "complete",
+    "gaps": [
+      "No separate Issue Contract or Spec-review result was supplied."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "Tate's review feedback and the synchronized-output runtime contract were used as Standards inputs; no separate Spec pass was provided."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family",
+    "reviewer_model": "anthropic/claude-opus-5 and google/gemini-3.1-pro-preview",
+    "same_family": false
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, or lookup data source was replaced."},
+    {"name":"New-domain matrix","status":"run","reason":"Exercised first generation, ESU-to-BSU in one write, unchanged-generation payload, timeout recovery, later BSU, callback failure, queued RAF, resize, and destroy."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No ambiguous-input resolution rule changed."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell command construction changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No detached process or diagnostic latch exists in this path."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No shim or shadow executable was added."},
+    {"name":"Deliberate-default check","status":"skipped","reason":"No established default was removed."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Reconstructed parser, WASM bridge, generation signal, DOM scheduler, callback, and renderer ownership before reviewing the final delta."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No guard models an external shell or filesystem substrate."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Checked the fixed-per-BSU watchdog contract and rejected inactivity semantics that permit indefinite payload extension."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No public function gained a new declared failure outcome."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"Traced mode and generation from Zig through committed WASM and optional TerminalCore methods into WTerm."},
+    {"name":"Error-path forcing","status":"run","reason":"Callback failure, missing ESU, stale timeout, and recovery paths are directly tested."},
+    {"name":"Non-destructive recovery","status":"run","reason":"Timeout paints the held frame and a later generation can hold again."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Generation re-arm, stale callback rejection, queued RAF cancellation, and destroy cleanup were verified."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Real ESU-to-BSU bytes were sent through committed WASM instead of only changing a mock field."},
+    {"name":"Substrate verification","status":"run","reason":"Observed real committed-WASM generation and renderer clearDirty effects plus Chromium e2e."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Built workspace, committed WASM, and browser e2e were driven."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Both full behavior passages and both feature lists were checked against the real-WASM timing probes."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No behavior example was added."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists."},
+    {"name":"Complexity budget","status":"run","reason":"The fix adds constant work only on generation changes."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"pass","reason":"It failed before report creation; exact-head report 2026-08-08-wterm-01b7809.json now exists."},
+    {"check":"style","outcome":"acknowledged","reason":"The two em dashes match every sibling feature bullet and the repo conventions explicitly exempt this established style."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"All behavioral docs are updated; navigation and page titles are verified unaffected because no page was added or renamed."},
+    {"check":"siblings synchronized output","outcome":"pass","reason":"Every keyword-bearing behavior surface is in the diff with no stale untouched passage."},
+    {"check":"siblings 2026","outcome":"pass","reason":"Every keyword-bearing behavior surface is in the diff with no stale untouched passage."},
+    {"check":"callers _updateSynchronizedOutput","outcome":"pass","reason":"Every call site is in the reviewed WTerm file."},
+    {"check":"timings","outcome":"pass","reason":"No larger timing constant in the changed DOM source gates the 1000 ms recovery."},
+    {"check":"force-red generation re-arm","outcome":"pass","reason":"Restoring the generation-only assignment makes both generation regression tests fail while the ordinary-payload ceiling test stays green."},
+    {"check":"committed WASM drift","outcome":"pass","reason":"ReleaseSmall build matches committed WASM at SHA-256 2f2f3a5e19a0319de7697f0dd8dc58659f3240d9e575d9dd837351d6531de227."},
+    {"check":"workspace verification","outcome":"pass","reason":"Tests, build, lint, type-check, format, Zig, diff check, and 12 Chromium e2e tests pass."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"10 changed and 10 impacted items, but 2849 unresolved calls versus 516 edges means the map under-covers; no finding was attributed to it."}
+  ],
+  "findings": [
+    {
+      "id": "R1-tate-generation-deadline",
+      "state": "refuted",
+      "claim": "Generation 2 can inherit generation 1's remaining timeout.",
+      "evidence": "Real committed-WASM probe keeps generation 2 hidden through 999 ms after its BSU and paints after about 1001 ms; force-red fails when generation re-arming is removed.",
+      "layer": "parser/core generation to DOM watchdog",
+      "source": "lens",
+      "path": "ESU+BSU bytes → Zig generation 2 → WasmBridge → WTerm generation-bound timer"
+    },
+    {
+      "id": "R2-doc-inactivity",
+      "state": "refuted",
+      "claim": "Public docs promise one second of inactivity although payload does not reset the timer.",
+      "evidence": "Both public behavior passages now promise at most one second from the opening sequence and explicitly say ordinary payload does not extend the deadline; real-WASM payload probe matches.",
+      "layer": "public behavior contract",
+      "source": "lens",
+      "path": "DOM watchdog semantics → package README and API reference"
+    },
+    {
+      "id": "R3-independent-review",
+      "state": "refuted",
+      "claim": "The exact final head lacks an independent reviewer result.",
+      "evidence": "Vercel Agent Review completed successfully on exact head 01b7809 after the push.",
+      "layer": "independent judgment review",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "E1-style",
+      "state": "exempted",
+      "claim": "The two added em dashes violate project style.",
+      "evidence": "Every sibling feature bullet in both files uses the same punctuation and the compiled project convention explicitly permits it.",
+      "layer": "repository prose style",
+      "source": "gate",
+      "path": ""
+    },
+    {
+      "id": "E2-navigation",
+      "state": "exempted",
+      "claim": "Editing api-reference/page.mdx requires navigation and page-title changes.",
+      "evidence": "The page path and title already exist and were not added or renamed.",
+      "layer": "documentation metadata",
+      "source": "gate",
+      "path": ""
+    }
+  ],
+  "exemptions": [
+    {"claim":"The two added em dashes violate project style.","evidence":"Every sibling feature bullet uses the same punctuation and the project convention explicitly permits it."},
+    {"claim":"Navigation and page-title registries require updates.","evidence":"No page was added or renamed; existing registrations remain correct."},
+    {"claim":"Alternative cores require a new mandatory method.","evidence":"The synchronized-output capability remains optional and source-compatible."},
+    {"claim":"Release or dependency surfaces require changes.","evidence":"No version, dependency, package, release, changelog, or dev-server contract changed."}
+  ],
+  "issue_candidates": [
+    {
+      "title": "Reviewer runtimes return empty or truncated long-review responses",
+      "evidence": "Direct Opus 5 returned an empty completion and direct Gemini returned only a reasoning fragment; Vercel Agent Review independently completed successfully.",
+      "why_out_of_scope": "This is reviewer infrastructure behavior, not a defect in wterm PR #106."
+    }
+  ]
+}

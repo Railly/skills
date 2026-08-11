@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solution gate: agent-browser #1677</title>
+<style>
+:root{color-scheme:dark;--bg:#0a0a0a;--panel:#141414;--line:#303030;--text:#ededed;--muted:#a1a1aa;--red:#f87171;--green:#4ade80;--amber:#fbbf24;--blue:#60a5fa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1180px;margin:auto;padding:32px 20px 56px}h1{font-size:28px;margin:0 0 6px}h2{font-size:20px;margin:36px 0 14px}h3{font-size:15px;margin:0 0 10px}.sub{color:var(--muted);margin:0 0 24px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}.wide{grid-column:1/-1}
+.flow{display:flex;align-items:stretch;gap:10px;overflow:auto;padding-bottom:4px}.node{min-width:160px;border:1px solid var(--line);border-radius:9px;padding:11px;background:#101010}.arrow{align-self:center;color:var(--muted);font-size:20px}.bad{border-color:#7f1d1d}.good{border-color:#166534}.gap{border-style:dashed;border-color:#92400e}
+.tag{display:inline-block;border-radius:999px;padding:2px 8px;font-size:11px;margin:0 4px 4px 0}.observed{background:#14532d;color:#bbf7d0}.inferred{background:#1e3a8a;color:#bfdbfe}.guessed{background:#78350f;color:#fde68a}
+code{color:#d8b4fe}ul{padding-left:19px;margin:8px 0}.evidence{font-size:12px;color:var(--muted);border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px;vertical-align:top}th{color:var(--muted);font-weight:600}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
+</style>
+</head>
+<body>
+<main>
+<h1>Solution gate: agent-browser #1677</h1>
+<p class="sub">Reviewed head <code>548b159b</code>, August 10, 2026. Evidence and proposals are deliberately separated.</p>
+
+<h2>Observed behavior</h2>
+<div class="grid">
+  <section class="card wide">
+    <h3>Current main-frame same-document navigation</h3>
+    <div class="flow">
+      <div class="node">Active page calls<br><code>history.pushState</code><br>or changes fragment</div>
+      <div class="arrow">→</div>
+      <div class="node">Chrome emits<br><code>Page.navigatedWithinDocument</code></div>
+      <div class="arrow">→</div>
+      <div class="node bad"><code>cdp_loop</code> has no handler</div>
+      <div class="arrow">→</div>
+      <div class="node bad">Stream emits no URL<br>while <code>get url</code> changes</div>
+    </div>
+    <p class="evidence"><span class="tag observed">observed</span> Built current main, attached a WebSocket stream, ran History API and fragment navigation, then compared zero stream URL messages with the changed browser URL.</p>
+  </section>
+
+  <section class="card wide">
+    <h3>Current background-tab full navigation</h3>
+    <div class="flow">
+      <div class="node">Tab <code>t1</code> remains active</div>
+      <div class="arrow">→</div>
+      <div class="node">Background <code>t2</code> receives <code>Page.navigate</code></div>
+      <div class="arrow">→</div>
+      <div class="node bad">Shared receiver accepts its <code>frameNavigated</code></div>
+      <div class="arrow">→</div>
+      <div class="node bad">Stream publishes <code>t2</code> URL as active</div>
+    </div>
+    <p class="evidence"><span class="tag observed">observed</span> Live two-tab Chrome probe emitted the background URL and overwrote the cached active URL.</p>
+  </section>
+
+  <section class="card">
+    <h3>CDP identity trace</h3>
+    <table>
+      <tr><th>Event</th><th>Session</th><th>Frame</th></tr>
+      <tr><td>Main History API</td><td>active page</td><td>top frame</td></tr>
+      <tr><td>Main fragment</td><td>active page</td><td>top frame</td></tr>
+      <tr><td>Child History API</td><td>same active page</td><td>child frame</td></tr>
+    </table>
+    <p class="evidence"><span class="tag observed">observed</span> Session filtering cannot distinguish a same-process child. Frame identity can.</p>
+  </section>
+
+  <section class="card">
+    <h3>Direct-page identity trace</h3>
+    <div class="flow">
+      <div class="node">Stored session<br><code>""</code></div>
+      <div class="arrow">↔</div>
+      <div class="node">Event session<br>absent</div>
+    </div>
+    <p class="evidence"><span class="tag observed">observed</span> Direct page-target connection returned a top frame and emitted same-document events without <code>sessionId</code>.</p>
+  </section>
+
+  <section class="card wide gap">
+    <h3>Post-fix observation gap</h3>
+    <p>No implementation exists in this gate run. The after-state remains unobserved and must be established by the force-red tests listed in the decision record.</p>
+  </section>
+</div>
+
+<h2>Proposed shapes</h2>
+<div class="grid">
+  <section class="card">
+    <h3>Proposal A: local main-frame identity</h3>
+    <div class="flow">
+      <div class="node"><span class="tag observed">observed</span><code>getFrameTree</code> returns top frame</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="tag inferred">inferred</span>Store ID for one bind generation</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="tag inferred">inferred</span>Accept same-document event only on ID match</div>
+    </div>
+    <ul>
+      <li><span class="tag inferred">inferred</span> Refresh on active main-frame full navigation.</li>
+      <li><span class="tag inferred">inferred</span> Seed failure conservatively drops same-document events.</li>
+      <li><span class="tag guessed">guessed</span> Frequent fragments may increase ordered-channel lag.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h3>Proposal B: active session plus main frame</h3>
+    <div class="flow">
+      <div class="node"><span class="tag observed">observed</span>Normalize active session</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="tag observed">observed</span>Require top frame identity</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="tag inferred">inferred</span>One shared URL publisher</div>
+    </div>
+    <ul>
+      <li><span class="tag observed">observed</span> Other sessions currently corrupt active URL.</li>
+      <li><span class="tag observed">observed</span> Empty stored session must equal absent event session.</li>
+      <li><span class="tag inferred">inferred</span> Stale session state would suppress valid events.</li>
+    </ul>
+  </section>
+
+  <section class="card wide good">
+    <h3>Chosen graft</h3>
+    <div class="flow">
+      <div class="node">Bound Chrome generation</div>
+      <div class="arrow">→</div>
+      <div class="node"><code>getFrameTree</code><br>transient top-frame ID</div>
+      <div class="arrow">→</div>
+      <div class="node">Normalized active-session filter</div>
+      <div class="arrow">→</div>
+      <div class="node">Main-frame filter for both navigation event types</div>
+      <div class="arrow">→</div>
+      <div class="node">Existing cache update and <code>url</code> message</div>
+    </div>
+    <p class="evidence"><span class="tag inferred">proposed</span> No new wire field, persistence, polling, injected page code, dashboard migration, or MCP change.</p>
+  </section>
+</div>
+</main>
+</body>
+</html>

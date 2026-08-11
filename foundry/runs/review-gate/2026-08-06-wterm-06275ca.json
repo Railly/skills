@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-06",
+    "repo": "vercel-labs/wterm#107",
+    "base": "a1e12a10f10eeffae1e803aea7ede0ed030374ae",
+    "head": "06275ca16b283cbd1bcaf12caaf7c396aa71571d",
+    "status": "incomplete",
+    "gaps": [
+      "No connected browser was available, so the deployed preview and native browser selection/capture behavior could not be freshly driven in Chromium, WebKit, or Firefox.",
+      "No Issue Contract or separate Spec-review result was provided."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["Standards review cannot infer a Spec pass without an Issue Contract or Spec-review result."]
+  },
+  "provenance": {
+    "author_model": "same model family; exact variant not provided",
+    "reviewer_model": "same model family; exact variant omitted",
+    "same_family": true
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"The geometry repair moved from history-grid to root-content geometry; fixed-grid spare width exposed the inverse scale error."},
+    {"name":"New-domain matrix","status":"run","reason":"Mouse/focus input widened the browser-event domain; geometry, focus ordering, supported/unsupported buttons, selection modifiers, capture, wheel, core, and reset cells were exercised."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No hostname, key, or discovery precedence rule changed."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell-parsed input is rewritten."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No background diagnostic or one-shot latch was added."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No test binary shim was added."},
+    {"name":"Deliberate-default check","status":"skipped","reason":"Mouse and focus behavior remains disabled unless the terminal application opts into the DEC modes."},
+    {"name":"Fresh-seam scan","status":"skipped","reason":"The diff does not patch an external runtime or framework to expose a signal."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Browser MouseEvent/WheelEvent semantics were forced for auxiliary buttons, Shift selection, focus ordering, owner-window capture, and fixed-grid geometry; real-engine execution is a named gap."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Current xterm mouse focus, selection, button validation, coordinate, and capture behavior was inspected."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No existing call gains a new failure outcome."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"DEC modes were traced through built-in and Ghostty WASM, TerminalCore, InputHandler, WTerm, and onData."},
+    {"name":"Error-path forcing","status":"run","reason":"Unsupported buttons, fixed-grid spare space, disabled modes, invalid geometry, outside capture, reset, and prior-fix reversions were forced."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action was added."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No asynchronous wait, cancellation, or timeout was added."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"DOM event to InputHandler to WTerm/onData and TypeScript to Zig/WASM boundaries were traced for both cores."},
+    {"name":"Substrate verification","status":"run","reason":"Compiled exact-HEAD DOM output and committed WASM state were observed; a real browser remains unavailable."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Exact-HEAD built InputHandler/WTerm and both committed core contracts were driven from an isolated git archive."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"The new docs claim mouse/focus reporting and the existing native-selection promise were checked against every mouse/focus event writer; selection and focus ordering fail."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Root, package, and web documentation was compared with exact-HEAD mode behavior; the duplicate paragraph is gone and required surfaces are present."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example was added."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail was provided."},
+    {"name":"Complexity budget","status":"skipped","reason":"No per-element loop, membership check, or lookup was added."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"finding-fixed","reason":"No exact-HEAD report existed before this run; this prose/JSON pair covers 06275ca."},
+    {"check":"style","outcome":"acknowledged","reason":"The generic check flags the new root feature bullet's em dash, but every neighboring feature bullet uses the same established prose style."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"Required root, package, and docs-app surfaces are present; navigation and page-title hits are exempt because no page was added or renamed."},
+    {"check":"stale","outcome":"pass","reason":"No duplicated contract value was renamed or retired."},
+    {"check":"siblings mouse","outcome":"pass","reason":"Every mouse keyword sibling is in the diff and no untouched matching passage remains."},
+    {"check":"siblings focus","outcome":"acknowledged","reason":"Broad keyword hits concerning UI focus styles, imperative focus, dependencies, and history were read and do not describe DEC 1004; the contract-carrying docs are updated."},
+    {"check":"callers mouseTracking/mouseSgr/focusEvents","outcome":"pass","reason":"All mechanically enumerated call sites are in diffed files and were traced across both first-party cores."},
+    {"check":"timings","outcome":"pass","reason":"No wait ceiling was added."},
+    {"check":"shellmeta","outcome":"pass","reason":"No shell-metacharacter detector was added."},
+    {"check":"force-red prior regressions","outcome":"pass","reason":"Prior DOM/Zig, drag/wheel, capture/geometry, and Ghostty artifact guards still cover their defects; the only post-fd90ba1 delta deletes duplicate prose."},
+    {"check":"WASM reproducibility","outcome":"pass","reason":"The built-in ReleaseSmall rebuild is byte-identical at 2918ce5b; Ghostty is unchanged from the prior byte-identical Docker verification at 33a4cb2a."},
+    {"check":"artifacts/rawinput/producers","outcome":"pass","reason":"Their triggers are absent: no persistent writer, deepened raw-input resolver, or narrowed error classifier."}
+  ],
+  "findings": [
+    {
+      "id":"P1-NATIVE-SELECTION",
+      "state":"confirmed",
+      "claim":"Enabling SGR mouse tracking removes wterm's documented native text-selection path.",
+      "evidence":"Exact-HEAD built InputHandler with modes 1000/1006 emitted ESC[<4;1;1M and prevented a cancelable Shift+left mousedown; current xterm reserves Shift for forced selection while mouse reporting is active.",
+      "layer":"built DOM event and browser-selection contract",
+      "source":"lens",
+      "path":"MouseEvent mousedown -> InputHandler.handleMouse -> preventDefault/onData versus native DOM selection"
+    },
+    {
+      "id":"P1-FOCUS-ORDER",
+      "state":"confirmed",
+      "claim":"A click that refocuses a mode-1004 terminal reports mouse press/release before focus.",
+      "evidence":"A blurred exact-HEAD built WTerm drive observed ESC[<0;1;1M, ESC[<0;1;1m, then ESC[I because mouse emits on mousedown/up while the hidden textarea is focused only by the later click handler.",
+      "layer":"built WTerm event ordering",
+      "source":"lens",
+      "path":"element mousedown/mouseup -> InputHandler.onData; element click -> textarea focus -> mode-1004 onData"
+    },
+    {
+      "id":"P1-FIXED-GRID-GEOMETRY",
+      "state":"confirmed",
+      "claim":"A fixed-column terminal inside a wider CSS root reports a smaller column than the rendered cell under the pointer.",
+      "evidence":"With 80 rendered columns spanning 800px inside a 1000px root, exact-HEAD built InputHandler mapped x=395 to column 32 instead of rendered column 40 because it divides root content width by getCols().",
+      "layer":"built DOM coordinate mapping",
+      "source":"lens",
+      "path":"root content-box geometry -> InputHandler.handleMouse -> SGR column"
+    },
+    {
+      "id":"P2-AUX-BUTTON",
+      "state":"confirmed",
+      "claim":"Browser Back/Forward mouse buttons are encoded and captured as left clicks.",
+      "evidence":"Exact-HEAD built InputHandler received MouseEvent button=3/buttons=8 and emitted ESC[<0;1;1M because the button classifier falls through to zero; current xterm rejects buttons beyond the supported set.",
+      "layer":"built DOM button-classification path",
+      "source":"lens",
+      "path":"MouseEvent.button -> InputHandler ternary classifier -> SGR button code/capture"
+    },
+    {
+      "id":"PRIOR-FD90BA1",
+      "state":"refuted",
+      "claim":"The fd90ba1 padding, iframe capture, multi-button capture, invalid-press, Ghostty parity, or documentation findings remain at exact HEAD.",
+      "evidence":"All ten committed input-mouse tests, Ghostty real-WASM tests, documentation surfaces, and exact fd90ba1-to-HEAD diff were rechecked; the only later change deletes the duplicated DOM README paragraph.",
+      "layer":"prior finding layers",
+      "source":"lens",
+      "path":""
+    },
+    {
+      "id":"EX-REACT-VUE",
+      "state":"exempted",
+      "claim":"React and Vue source files require independent mouse/focus changes.",
+      "evidence":"Both wrappers delegate to WTerm/TerminalCore without a separate input encoder, and their tests/type-checks pass.",
+      "layer":"framework wrapper dispatch",
+      "source":"gate",
+      "path":""
+    },
+    {
+      "id":"ISSUE-1003",
+      "state":"issue_candidate",
+      "claim":"The remaining DEC mouse protocol subset needs explicit follow-up.",
+      "evidence":"The PR body explicitly leaves 1003, 1005, and 1015 unsupported; issue #55 remains open and Ghostty internally parses a wider set than the public adapter exposes.",
+      "layer":"xterm protocol support scope",
+      "source":"lens",
+      "path":""
+    },
+    {
+      "id":"ISSUE-BROWSER-E2E",
+      "state":"issue_candidate",
+      "claim":"Mouse/focus behavior lacks real-browser E2E coverage.",
+      "evidence":"Existing E2E tests cover rendering, keyboard, focus, cursor, scrollback, and resize but no DEC mouse reporting; no connected browser was available for this run.",
+      "layer":"browser integration coverage",
+      "source":"lens",
+      "path":""
+    }
+  ],
+  "exemptions": [
+    {"claim":"The root feature bullet may retain its em dash.","evidence":"Every neighboring root README feature bullet uses the same punctuation, establishing repository prose style."},
+    {"claim":"Docs navigation and page-title maps need no change.","evidence":"No documentation page was added or renamed; existing pages were edited in place."},
+    {"claim":"React and Vue need no independent implementation change.","evidence":"Both wrappers delegate input and core behavior directly to WTerm and add no event translation."},
+    {"claim":"Release changelog and versions are not required.","evidence":"Repository policy makes releases maintainer-controlled and this PR does not prepare a release."},
+    {"claim":"Third-party TerminalCore mode accessors may remain optional.","evidence":"Optionality preserves source compatibility, absence safely disables the feature, and both first-party cores implement the accessors."}
+  ],
+  "issue_candidates": [
+    {"title":"Support DEC 1003/1005/1015/1016 or maintain an explicit subset contract","evidence":"The PR explicitly leaves 1003/1005/1015 unsupported; issue #55 remains open and Ghostty parses a wider set than the public adapter exposes.","why_out_of_scope":"The PR declares a limited 1000/1002/1004/1006 subset."},
+    {"title":"Add real-browser DEC mouse/focus E2E coverage","evidence":"Current E2E tests have no DEC mouse reporting and jsdom cannot fully validate native selection, capture, CSS geometry, or wheel behavior.","why_out_of_scope":"This is durable cross-browser coverage beyond the four concrete source fixes required in PR #107."}
+  ],
+  "subsystemModel": {
+    "topology":"Browser textarea focus/blur and terminal-element mouse/wheel events feed InputHandler; InputHandler queries TerminalCore mode accessors and calls WTerm.onData; built-in and Ghostty mode state crosses committed WASM exports.",
+    "consumers":["InputHandler focus callbacks","InputHandler mouse/wheel encoder","WasmBridge and GhosttyCore mode accessors","WTerm click-to-focus path","Native DOM text selection and auxiliary-button actions","Root/package/web documentation"],
+    "adjacentLayers":["focus-before-mouse ordering","native-selection escape hatch","rendered-cell geometry versus root content width","supported versus auxiliary button classification","owner-window capture and full pressed-button set","committed WASM parity"]
+  },
+  "impactMap": {
+    "changed": 9,
+    "impacted": 54,
+    "edges": 517,
+    "unresolvedCalls": 2652,
+    "convergence_inspected": 10,
+    "findings_attributed": 0,
+    "outside_map": 4,
+    "under_covering": true
+  },
+  "dogfood": [
+    "Installed the exact git archive with the frozen lockfile and ran its compiled packages and committed WASM artifacts.",
+    "Forced fixed-grid spare width, auxiliary mouse buttons, Shift selection, and focus/mouse ordering through built InputHandler/WTerm and read exact PTY strings.",
+    "Rechecked padding, iframe owner window, multi-button capture, invalid geometry, scrollback, wheel axes, and Ghostty parity from prior runs.",
+    "Attempted connected-browser control; no browser was available."
+  ]
+}

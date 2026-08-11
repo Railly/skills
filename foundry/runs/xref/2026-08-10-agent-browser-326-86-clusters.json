@@ -1,0 +1,70 @@
+{
+  "clusters": [
+    {
+      "label": "Resolved umbrella reports",
+      "root_cause": "Broad reports combine already-supported named sessions with mechanisms now fixed or tracked separately.",
+      "members": [
+        {
+          "key": "vercel-labs/agent-browser#326",
+          "verdict": "Close as resolved/split; point to #896, #1068, #1211, and #1272."
+        },
+        {
+          "key": "vercel-labs/agent-browser#86",
+          "verdict": "Close as resolved/answered; clarify --session versus --session-name."
+        }
+      ]
+    },
+    {
+      "label": "Shared profile Chrome singleton",
+      "root_cause": "Multiple daemons launch Chrome with the same user-data-dir.",
+      "members": [
+        {
+          "key": "vercel-labs/agent-browser#896",
+          "verdict": "Keep open; absorb and update #899 with credit to @ctate."
+        }
+      ]
+    },
+    {
+      "label": "BrowserContext storage isolation",
+      "root_cause": "Named sessions sharing one Chrome still use the default cookie and storage context.",
+      "members": [
+        {
+          "key": "vercel-labs/agent-browser#1068",
+          "verdict": "Keep open; shape before choosing between #1117 and #1340."
+        },
+        {
+          "key": "vercel-labs/agent-browser#1352",
+          "verdict": "Keep separate; this asks for deliberate shared-cookie behavior."
+        },
+        {
+          "key": "vercel-labs/agent-browser#1624",
+          "verdict": "Keep separate; define current-context window semantics."
+        }
+      ]
+    },
+    {
+      "label": "Remaining attachment and lifecycle defects",
+      "root_cause": "Active-page and CDP connection state can become stale across later commands or browser restarts.",
+      "members": [
+        {
+          "key": "vercel-labs/agent-browser#1211",
+          "verdict": "Keep open; re-reproduce after #1589 and isolate the remaining sticky-launch defect."
+        },
+        {
+          "key": "vercel-labs/agent-browser#1272",
+          "verdict": "Keep open; absorb the bounded reconnect fix from #1274."
+        }
+      ]
+    }
+  ],
+  "cleanup": [
+    {
+      "key": "vercel-labs/agent-browser#86",
+      "text": "Close as resolved/answered; clarify --session versus --session-name."
+    },
+    {
+      "key": "vercel-labs/agent-browser#326",
+      "text": "Close as resolved/split; link the four canonical remaining issues."
+    }
+  ]
+}

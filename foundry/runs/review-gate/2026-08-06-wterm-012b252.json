@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-06",
+    "repo": "vercel-labs/wterm#105",
+    "base": "a1e12a10f10eeffae1e803aea7ede0ed030374ae",
+    "head": "012b252bf7d176ea43573fcda15e36f3f8059c2d",
+    "status": "incomplete",
+    "gaps": [
+      "The designated browser backend exposed no available browser after discovery and troubleshooting; the built artifact was driven in installed Playwright Chromium instead.",
+      "No Issue Contract or independent Spec review was supplied.",
+      "The impact map cannot trace Zig/WASM/TypeScript edges and reported 2537 unresolved calls versus 515 edges."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No Issue Contract or separate Spec review result was supplied."]
+  },
+  "provenance": {
+    "author_model": "GPT-family per prior handoff; exact author model not provided",
+    "reviewer_model": "GPT-5",
+    "same_family": true
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, or lookup data source was replaced."},
+    {"name":"New-domain matrix","status":"skipped","reason":"No validator or trigger domain was widened."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No user-input resolution or discovery rule changed."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell-parsed command was rewritten."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No detached process, warning channel, or one-shot latch exists in this path."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"The diff adds no external-binary shim."},
+    {"name":"Deliberate-default check","status":"skipped","reason":"No asserted default was reversed."},
+    {"name":"Fresh-seam scan","status":"skipped","reason":"The diff does not patch a runtime or framework to expose an event."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No repeatedly failing guard models an external substrate."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"No normative reference implementation was cited or locally supplied."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"The fix changes how application callback exceptions propagate through WTerm.write."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No flag, mode, or config bit was added."},
+    {"name":"Error-path forcing","status":"run","reason":"Forced ordinary Error, throw undefined, removed isolation, removed render scheduling, queue-full, single-pop, and missing per-chunk callback paths."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action was added."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No async wait, timeout, or cancellable request was added."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced PTY bytes through WTerm, 8192-byte bridge chunks, Zig parser/FIFO, WASM exports, dequeue, callback, and render scheduling."},
+    {"name":"Substrate verification","status":"run","reason":"Observed built packages and committed WASM in Chromium, including grid cells and cursor state."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Drove two-response ordering, 10000 responses, throwing callbacks, and reentrant writes through the shipped surface."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"Enumerated the FIFO writer and consumer paths behind the newly asserted accepted-response ordering invariant."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Compared both public method tables with TerminalCore/WasmBridge signatures and drove the documented per-chunk callback behavior."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example was added or edited."},
+    {"name":"Choice audit","status":"skipped","reason":"No .decisions.tsv trail exists."},
+    {"name":"Complexity budget","status":"run","reason":"Enqueue/pop are O(1), draining is O(responses), and a 10000-response stress drive completed without loss."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"pass","reason":"The initial invocation correctly failed; this exact-HEAD prose/JSON pair now covers 012b252."},
+    {"check":"style","outcome":"pass","reason":"gate.sh style origin/main passed."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"The root README has no low-level response contract, and the existing API page needs no navigation or page-title registry edit; relevant package and web API docs are changed."},
+    {"check":"siblings terminal response","outcome":"pass","reason":"Every matching file was in the diff with no untouched matching passage."},
+    {"check":"siblings getResponse","outcome":"acknowledged","reason":"Every flagged passage was read; the web reference now states dequeue semantics, the concise core row remains true, and Ghostty has independent no-response behavior."},
+    {"check":"callers writeString/writeRaw/getResponse","outcome":"acknowledged","reason":"All enumerated callers were read; optional callback parameters preserve one-argument calls and Ghostty remains structurally compatible."},
+    {"check":"timings","outcome":"pass","reason":"The diff adds no wait ceiling."},
+    {"check":"shellmeta","outcome":"pass","reason":"The diff adds no shell-metacharacter detector."},
+    {"check":"git diff --check","outcome":"pass","reason":"No whitespace errors."},
+    {"check":"force-red queue capacity","outcome":"pass","reason":"Changing RESPONSE_QUEUE_MAX to one made two Zig queue tests fail; exact HEAD and snapshot restore were green."},
+    {"check":"force-red per-chunk drain","outcome":"pass","reason":"Removing afterChunk invocation made the 2049-response core test fail 0/2049; exact HEAD and restore were green."},
+    {"check":"force-red DOM drain","outcome":"pass","reason":"Reducing the response loop to one pop made two focused DOM tests fail; exact HEAD and restore were green."},
+    {"check":"force-red handler-error isolation","outcome":"pass","reason":"Removing the catch made the new focused test fail because response-b was never delivered; exact HEAD and restore were green."},
+    {"check":"force-red render scheduling","outcome":"acknowledged","reason":"Removing _scheduleRender from the handler-error path left all 34 focused DOM tests green; reported as F2."},
+    {"check":"reproducible WASM","outcome":"pass","reason":"ReleaseSmall rebuild and committed packages/@wterm/core/wasm/wterm.wasm had identical SHA-256 f0076e2d0554467230a2b38854d6ee56b2b1c26f875d96288f60123776f00b5b."},
+    {"check":"repository build/test/lint/type/e2e","outcome":"pass","reason":"Zig tests, format, build, all package tests, lint, type checks, and 12 Chromium E2E tests passed."},
+    {"check":"pnpm outdated","outcome":"acknowledged","reason":"Five pre-existing development-package updates are available; mirrored as an out-of-scope issue candidate."},
+    {"check":"impact map","outcome":"acknowledged","reason":"Map saved with 5 changed and 11 impacted TypeScript items; 2537 unresolved calls versus 515 edges and no cross-language edges make it under-covering."}
+  ],
+  "findings": [
+    {
+      "id":"F1",
+      "state":"confirmed",
+      "severity":"medium",
+      "claim":"An onData callback that throws undefined is silently swallowed instead of being rethrown after draining and scheduling.",
+      "evidence":"Built DOM plus committed WASM in Chromium: the callback ran and executed throw undefined, but WTerm.write returned normally; the code uses undefined as both the absence sentinel and caught value.",
+      "layer":"end-to-end application callback error propagation",
+      "source":"lens",
+      "path":"WTerm.write -> drain -> _drainResponses catches undefined -> firstError/deliveryError absence checks -> normal return"
+    },
+    {
+      "id":"F2",
+      "state":"confirmed",
+      "severity":"medium",
+      "claim":"The new test named as covering render scheduling remains green when _scheduleRender is removed from the throwing-handler path.",
+      "evidence":"In an isolated snapshot-restored clone, removing only the _scheduleRender call left packages/@wterm/dom/src/__tests__/wterm.test.ts at 34/34 green.",
+      "layer":"regression-test contract for visible render completion",
+      "source":"gate",
+      "path":"handler-error fix -> schedules-rendering test -> missing render assertion"
+    },
+    {
+      "id":"R1",
+      "state":"refuted",
+      "claim":"A normal Error thrown by onData still truncates later chunks of the same terminal write.",
+      "evidence":"Built Chromium drive parsed the second chunk after consumer failed, rendered Z at cell 0,0, reached cursor 0,1, then rethrew; removing isolation made the focused test red.",
+      "layer":"end-to-end PTY write and application callback path",
+      "source":"lens",
+      "path":"WTerm.write -> chunk one response -> onData Error -> chunk two parse -> render schedule -> rethrow"
+    },
+    {
+      "id":"R2",
+      "state":"refuted",
+      "claim":"The public afterChunk callback remains absent from required public API tables.",
+      "evidence":"Both packages/@wterm/core/README.md and apps/docs/src/app/api-reference/page.mdx show writeString(str, afterChunk?) and writeRaw(data, afterChunk?) with per-chunk descriptions matching TerminalCore/WasmBridge.",
+      "layer":"public API documentation contract",
+      "source":"lens",
+      "path":"TerminalCore/WasmBridge signatures -> package README and web API reference"
+    },
+    {
+      "id":"R3",
+      "state":"refuted",
+      "claim":"The 2048-capacity loss remains reachable through WTerm.",
+      "evidence":"Built Chromium drive delivered all 10000 CPR replies; removing per-chunk callback invocation made the dedicated test fail 0/2049.",
+      "layer":"end-to-end response delivery",
+      "source":"lens",
+      "path":"WTerm.write -> per-chunk drain -> onData"
+    },
+    {
+      "id":"R4",
+      "state":"refuted",
+      "claim":"The DOM response-drain test remains green when the loop is reduced to one dequeue.",
+      "evidence":"The single-pop mutation made two focused DOM tests fail; the built browser drive delivered two replies in order.",
+      "layer":"regression-test contract for multiple response delivery",
+      "source":"gate",
+      "path":"temporary snapshot-restored force-red clone"
+    },
+    {
+      "id":"R5",
+      "state":"refuted",
+      "claim":"The API reference still says getResponse clears the whole response buffer.",
+      "evidence":"The exact-head web API row says Dequeue one pending host response and repo-wide passage inspection found no remaining whole-buffer claim.",
+      "layer":"documentation contract",
+      "source":"gate",
+      "path":"apps/docs API reference"
+    },
+    {
+      "id":"E1",
+      "state":"exempted",
+      "claim":"The root README requires low-level response queue documentation.",
+      "evidence":"It carries no response-buffer or WasmBridge method contract; the relevant core package README and web API reference are updated.",
+      "layer":"repository documentation surface",
+      "source":"gate",
+      "path":"src change -> root README surface rule"
+    },
+    {
+      "id":"E2",
+      "state":"exempted",
+      "claim":"Ghostty must invoke the new per-chunk callback or implement the built-in response FIFO.",
+      "evidence":"Ghostty produces no terminal responses, has independent readonly-stream behavior, and one-argument methods remain TypeScript-compatible because the new callback is optional.",
+      "layer":"alternate TerminalCore implementation",
+      "source":"gate",
+      "path":"TerminalCore optional callback -> GhosttyCore"
+    },
+    {
+      "id":"I1",
+      "state":"issue_candidate",
+      "claim":"Five development dependencies are behind current stable releases.",
+      "evidence":"pnpm outdated listed Vitest/coverage 4.1.4->4.1.10, Playwright 1.59.1->1.62.1, Prettier 3.8.2->3.9.6, and Turbo 2.9.6->2.10.8.",
+      "layer":"repository dependency maintenance",
+      "source":"gate",
+      "path":"package manifest and lockfile"
+    }
+  ],
+  "exemptions": [
+    {"claim":"Root README needs no response-queue detail.","evidence":"It contains no low-level response-buffer or WasmBridge method contract; relevant package and web API references are updated."},
+    {"claim":"Navigation and page-title registries need no edit.","evidence":"The existing API reference page was neither added nor renamed."},
+    {"claim":"Ghostty code and docs need no queue or callback change.","evidence":"It has independent no-response behavior, and its one-argument methods remain structurally compatible with optional callback parameters."},
+    {"claim":"Release files, versions, dependencies, portless scripts, examples, and framework READMEs are unaffected.","evidence":"The PR adds no package, page, release, dependency, dev-server, example, or framework-level option surface."},
+    {"claim":"The concise core README getResponse row needs no rewrite.","evidence":"It claims only that one pending response is returned and does not claim whole-buffer clearing."}
+  ],
+  "issue_candidates": [
+    {"title":"Update pre-existing outdated development dependencies","evidence":"pnpm outdated lists Vitest/coverage, Playwright, Prettier, and Turbo behind current stable releases.","why_out_of_scope":"PR #105 changes no dependency and is scoped to terminal response delivery."}
+  ]
+}

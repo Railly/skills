@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solution gate: agent-browser PR #1589</title>
+<style>
+  :root { color-scheme: dark; --bg:#0b1020; --panel:#131a2d; --line:#2b3857; --text:#eef2ff; --muted:#aeb9d3; --red:#ff7b88; --green:#73d9a0; --blue:#7ab8ff; --amber:#ffd080; }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif }
+  main { max-width:1180px; margin:auto; padding:32px 20px 56px }
+  h1 { margin:0 0 8px; font-size:30px }
+  h2 { margin:36px 0 14px; font-size:22px }
+  h3 { margin:0 0 10px; font-size:17px }
+  p { color:var(--muted) }
+  .meta,.card { border:1px solid var(--line); background:var(--panel); border-radius:14px }
+  .meta { padding:14px 18px }
+  .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px }
+  .card { padding:18px }
+  .wide { grid-column:1/-1 }
+  .flow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px }
+  .node { padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#0e1528; min-width:130px }
+  .arrow { color:var(--muted); font-size:20px }
+  .bad { border-color:#743744 }
+  .good { border-color:#276044 }
+  .arg { border-style:dashed }
+  .tag { display:inline-block; padding:2px 7px; margin-left:4px; border-radius:999px; font-size:11px; font-weight:700 }
+  .observed { background:#214d38; color:#aaf0c5 }
+  .inferred { background:#203e66; color:#b8d8ff }
+  .guessed { background:#604a20; color:#ffe0a4 }
+  .decision { border-color:#3674b8; background:#111f38 }
+  code { color:#c7dcff }
+  ul { padding-left:20px }
+  li { margin:7px 0; color:var(--muted) }
+  strong { color:var(--text) }
+  .source { font-size:12px; color:#8895b3; margin-top:10px }
+  @media (max-width:760px) { .grid { grid-template-columns:1fr } .wide { grid-column:auto } .arrow { transform:rotate(90deg) } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Solution gate: agent-browser PR #1589</h1>
+  <div class="meta">Reviewed head <code>fb377490</code> · August 10, 2026 · Decision: <strong>graft, dominated by the minimal envelope shape</strong></div>
+
+  <h2>Observed behavior</h2>
+  <p>This half contains only behavior or file state that was directly run or inspected.</p>
+  <div class="grid">
+    <section class="card bad">
+      <h3>Before: preliminary CDP attach</h3>
+      <div class="flow">
+        <div class="node">CLI parses<br><code>--pin-tab</code></div><div class="arrow">→</div>
+        <div class="node bad">launch envelope<br>has no <code>pinTab</code></div><div class="arrow">→</div>
+        <div class="node bad">daemon attaches<br>legacy target</div><div class="arrow">→</div>
+        <div class="node bad">shared target<br>is navigated</div>
+      </div>
+      <div class="source">Probe: daemon PID 10260, no binding, one shared HTTP target. PID remained 10260, but the shared target was navigated and persisted as pinned.</div>
+    </section>
+
+    <section class="card good">
+      <h3>Existing mechanism when pin arrives early</h3>
+      <div class="flow">
+        <div class="node">launch contains<br><code>pinTab:true</code></div><div class="arrow">→</div>
+        <div class="node">early daemon handler<br>sets strict state</div><div class="arrow">→</div>
+        <div class="node">attach sees<br>no binding</div><div class="arrow">→</div>
+        <div class="node good">fresh bound tab</div>
+      </div>
+      <div class="source">Probe: <code>e2e_pin_tab_rebinds_after_daemon_restart</code> passed and created distinct pinned targets through direct launch envelopes.</div>
+    </section>
+
+    <section class="card bad">
+      <h3>Before: opaque diagnostic URL</h3>
+      <div class="flow">
+        <div class="node bad"><code>data:text/html,secret</code></div><div class="arrow">→</div>
+        <div class="node bad"><code>.target</code> stores payload</div><div class="arrow">→</div>
+        <div class="node bad"><code>tab_gone</code> repeats payload</div>
+      </div>
+      <div class="source">Probe: the exact secret appeared in both the persisted binding and the later JSON error.</div>
+    </section>
+
+    <section class="card bad">
+      <h3>Before: published schemas</h3>
+      <ul>
+        <li><code>agent-browser.schema.json</code>: <code>pinTab</code> missing.</li>
+        <li><code>docs/public/schema.json</code>: <code>pinTab</code> missing.</li>
+        <li>Whole files already differ in two unrelated descriptions.</li>
+      </ul>
+      <div class="source">Probe: both property lookups printed <code>missing</code>; <code>cmp</code> exited 1.</div>
+    </section>
+  </div>
+
+  <h2>Proposed shapes, argument only</h2>
+  <p>Evidence marks describe each link. Dashed cards are proposals, not observations.</p>
+  <div class="grid">
+    <section class="card arg">
+      <h3>Proposal A: reuse existing ordering</h3>
+      <div class="flow">
+        <div class="node">stamp pin on preliminary envelope <span class="tag observed">observed gap</span></div><div class="arrow">→</div>
+        <div class="node">early handler runs before launch <span class="tag observed">observed</span></div><div class="arrow">→</div>
+        <div class="node">existing attach creates fresh tab <span class="tag observed">observed</span></div><div class="arrow">→</div>
+        <div class="node">exact CLI repro passes <span class="tag inferred">inferred</span></div>
+      </div>
+      <ul>
+        <li>Low contract expansion.</li>
+        <li>No new round trip or compatibility-hash input.</li>
+        <li>Must trim provider/local timing, broad <code>about:</code>, and global schema equality.</li>
+      </ul>
+    </section>
+
+    <section class="card arg">
+      <h3>Proposal B: attachment plan and migration</h3>
+      <div class="flow">
+        <div class="node">new tri-state and plan <span class="tag guessed">proposed</span></div><div class="arrow">→</div>
+        <div class="node">all browser constructors change <span class="tag inferred">inferred</span></div><div class="arrow">→</div>
+        <div class="node">explicit attach invariant <span class="tag inferred">inferred</span></div>
+      </div>
+      <div class="flow">
+        <div class="node">load unsafe binding <span class="tag guessed">proposed</span></div><div class="arrow">→</div>
+        <div class="node">mandatory rewrite <span class="tag inferred">inferred</span></div><div class="arrow">→</div>
+        <div class="node bad">read-only directory blocks attach <span class="tag inferred">inferred</span></div>
+      </div>
+      <ul>
+        <li>Strongest explicit API boundary.</li>
+        <li>Refuted as necessary by the direct-launch E2E.</li>
+        <li>Expands this review fix into migration and schema reconciliation.</li>
+      </ul>
+    </section>
+
+    <section class="card wide decision">
+      <h3>Chosen graft</h3>
+      <ul>
+        <li>Proposal A's minimal transport shape for preliminary CDP and auto-connect envelopes.</li>
+        <li>Proposal B's exact diagnostic policy: HTTP(S), exact <code>about:blank</code>, otherwise empty.</li>
+        <li>Sanitize persistence plus both live <code>tab_gone</code> capture paths.</li>
+        <li>Add matching boolean <code>pinTab</code> properties to both schemas with focused assertions.</li>
+        <li>No attachment-plan redesign, flag semantic redesign, disk migration, or global schema parity gate.</li>
+      </ul>
+    </section>
+  </div>
+</main>
+</body>
+</html>

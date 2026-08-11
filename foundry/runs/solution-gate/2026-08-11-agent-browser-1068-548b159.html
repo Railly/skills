@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solution gate: agent-browser issue #1068</title>
+<style>
+  :root { color-scheme:dark; --bg:#0b1020; --panel:#131a2d; --line:#2b3857; --text:#eef2ff; --muted:#aeb9d3; --red:#ff7b88; --green:#73d9a0; --blue:#7ab8ff; --amber:#ffd080; }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif }
+  main { max-width:1180px; margin:auto; padding:32px 20px 56px }
+  h1 { margin:0 0 8px; font-size:30px }
+  h2 { margin:36px 0 14px; font-size:22px }
+  h3 { margin:0 0 10px; font-size:17px }
+  p,li { color:var(--muted) }
+  .meta,.card { border:1px solid var(--line); background:var(--panel); border-radius:14px }
+  .meta { padding:14px 18px }
+  .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px }
+  .card { padding:18px }
+  .wide { grid-column:1/-1 }
+  .flow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px }
+  .node { padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#0e1528; min-width:130px }
+  .arrow { color:var(--muted); font-size:20px }
+  .bad { border-color:#743744 }
+  .good { border-color:#276044 }
+  .arg { border-style:dashed }
+  .decision { border-color:#3674b8; background:#111f38 }
+  .tag { display:inline-block; padding:2px 7px; margin-left:4px; border-radius:999px; font-size:11px; font-weight:700 }
+  .observed { background:#214d38; color:#aaf0c5 }
+  .inferred { background:#203e66; color:#b8d8ff }
+  .guessed { background:#604a20; color:#ffe0a4 }
+  code { color:#c7dcff }
+  ul { padding-left:20px }
+  li { margin:7px 0 }
+  strong { color:var(--text) }
+  .source { font-size:12px; color:#8895b3; margin-top:10px }
+  @media (max-width:760px) { .grid { grid-template-columns:1fr } .wide { grid-column:auto } .arrow { transform:rotate(90deg) } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Solution gate: agent-browser issue #1068</h1>
+  <div class="meta">Main <code>548b159</code> · August 11, 2026 · Decision: <strong>one opt-in BrowserContext boundary per named session</strong></div>
+
+  <h2>Observed behavior</h2>
+  <p>This half contains only behavior and code paths that were executed or inspected.</p>
+  <div class="grid">
+    <section class="card bad">
+      <h3>Current shared Chrome</h3>
+      <div class="flow">
+        <div class="node">session A</div><div class="arrow">→</div>
+        <div class="node bad">default BrowserContext</div><div class="arrow">←</div>
+        <div class="node">session B</div>
+      </div>
+      <ul>
+        <li>all page targets are discovered browser-wide</li>
+        <li><code>--pin-tab</code> separates one active target, not storage</li>
+        <li>same-origin cookies and storage share one partition</li>
+      </ul>
+      <div class="source">Source: <code>discover_and_attach_targets</code>, current session and pin binding paths.</div>
+    </section>
+
+    <section class="card good">
+      <h3>Chrome BrowserContext probe</h3>
+      <div class="flow">
+        <div class="node">context A<br>cookie/storage A</div><div class="arrow">|</div>
+        <div class="node">one Chrome</div><div class="arrow">|</div>
+        <div class="node">context B<br>cookie/storage B</div>
+      </div>
+      <ul>
+        <li>same origin remained isolated</li>
+        <li>normal contexts survived CDP socket disconnect</li>
+        <li>disposing A removed A and preserved B</li>
+      </ul>
+      <div class="source">Probe: <code>bun /tmp/agent-browser-1068-cdp-probe.mjs</code>.</div>
+    </section>
+
+    <section class="card bad">
+      <h3>Global discovery still crosses boundaries</h3>
+      <div class="flow">
+        <div class="node">context B creates target</div><div class="arrow">→</div>
+        <div class="node bad">session A browser-level auto-attach</div><div class="arrow">→</div>
+        <div class="node bad">foreign target paused</div>
+      </div>
+      <div class="source">Probe observed <code>observerReceivedForeignAttachment:true</code> and <code>waitingForDebugger:true</code>.</div>
+    </section>
+
+    <section class="card bad">
+      <h3>Lifecycle and state seams</h3>
+      <ul>
+        <li>internal daemon shutdown and explicit close share teardown helpers</li>
+        <li>state-save temp targets omit <code>browserContextId</code></li>
+        <li>recording already creates a secondary context</li>
+        <li>legacy binding files ignore unknown fields</li>
+      </ul>
+      <div class="source">Source traces in <code>daemon.rs</code>, <code>actions.rs</code>, <code>state.rs</code>, and <code>tab_binding.rs</code>.</div>
+    </section>
+  </div>
+
+  <h2>Proposed shapes, argument only</h2>
+  <p>Dashed cards are proposals. Evidence marks describe each link.</p>
+  <div class="grid">
+    <section class="card arg">
+      <h3>Proposal A: one context per session</h3>
+      <div class="flow">
+        <div class="node">opt-in flag <span class="tag guessed">proposed</span></div><div class="arrow">→</div>
+        <div class="node">persist context id <span class="tag inferred">inferred</span></div><div class="arrow">→</div>
+        <div class="node">filter targets <span class="tag inferred">inferred</span></div><div class="arrow">→</div>
+        <div class="node">dispose on close <span class="tag observed">CDP observed</span></div>
+      </div>
+      <ul>
+        <li>smallest user-facing contract</li>
+        <li>missed secondary contexts and the daemon-detach seam</li>
+        <li>hard failure after Chrome restart was not required</li>
+      </ul>
+    </section>
+
+    <section class="card arg">
+      <h3>Proposal B: primary plus owned contexts</h3>
+      <div class="flow">
+        <div class="node">primary context <span class="tag guessed">proposed</span></div><div class="arrow">→</div>
+        <div class="node">owned context registry <span class="tag inferred">inferred</span></div><div class="arrow">→</div>
+        <div class="node">all consumers filter <span class="tag inferred">inferred</span></div>
+      </div>
+      <ul>
+        <li>named recording and state temp-target consumers</li>
+        <li>browser fingerprint and general context set expand scope</li>
+        <li>still missed internal shutdown versus explicit close</li>
+      </ul>
+    </section>
+
+    <section class="card wide decision">
+      <h3>Chosen graft</h3>
+      <div class="flow">
+        <div class="node good">named session</div><div class="arrow">→</div>
+        <div class="node good">primary BrowserContext</div><div class="arrow">→</div>
+        <div class="node good">owned targets and storage</div>
+      </div>
+      <ul>
+        <li>explicit <code>--isolate-context</code>, never default</li>
+        <li>daemon restart detaches; explicit close disposes</li>
+        <li>Chrome restart creates a clean context and reports recreation</li>
+        <li>one ownership predicate covers discovery, events, auto-attach, commands, state, and teardown</li>
+        <li>versioned isolated binding fails closed on old binaries</li>
+        <li>no user-managed <code>context new/list/close</code> in this issue</li>
+      </ul>
+    </section>
+  </div>
+</main>
+</body>
+</html>

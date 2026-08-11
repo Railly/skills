@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 0,
+  "run": {"date":"2026-08-10","repo":"vercel-labs/wterm","base":"origin/main@4e353e7dee49dbd43dec69a6a37c37a3e3ba902c","head":"81e1f282a3a8739499d515436fe07df64ebc8d4f","status":"complete","gaps":[]},
+  "contract": {"path":"","spec_status":"not_provided","acceptance_reviewed":[],"gaps":["No separate Issue Contract or Spec review was supplied."]},
+  "provenance": {"author_model":"GPT-5 Codex","reviewer_model":"GPT-5 Codex focused independent pass","same_family":true},
+  "lenses": [
+    {"name":"Subsystem reconstruction","status":"run","reason":"Modeled write, response delivery, synchronized-output hold/recovery, RAF ownership, cancellation, and destroy cleanup."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Direct RAF cancellation was checked at synchronized-output entry and destroy; the existing recovery timeout remains unchanged."},
+    {"name":"Performance proof","status":"run","reason":"Chromium input-to-DOM distributions were collected before and after across six frame phases."},
+    {"name":"Error-path forcing","status":"run","reason":"Response callback failures, including throw undefined, still schedule the closing frame and preserve parser progress."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Root, package, and API docs state direct RAF scheduling and per-frame coalescing without claiming measured latency gains."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Keyboard input through write, core response drain, RAF scheduling, renderer, and DOM mutation was exercised."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail was provided."}
+  ],
+  "deterministic": [
+    {"check":"xref final","outcome":"pass","reason":"No competing latency or scheduler work appeared."},
+    {"check":"format/type-check/test/build","outcome":"pass","reason":"Prettier, all 22 type-check tasks, all 14 test tasks, and all 15 build tasks passed."},
+    {"check":"DOM tests","outcome":"pass","reason":"@wterm/dom passed 113/113 tests."},
+    {"check":"force-red","outcome":"pass","reason":"Restoring the timer while retaining the new test fails because requestAnimationFrame is not requested synchronously."},
+    {"check":"performance measurement","outcome":"acknowledged","reason":"Median input-to-DOM latency was unchanged within noise across measured frame phases; the PR claims scheduler simplification and removal of a task boundary, not a proven numeric latency reduction."},
+    {"check":"style","outcome":"acknowledged","reason":"gate.sh flags the README em dash, but wterm conventions explicitly exempt established feature-bullet punctuation."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"Core README, docs navigation, and page titles do not carry this DOM-internal behavior or add routes; relevant root/package/API passages were updated."},
+    {"check":"callers _scheduleRender","outcome":"pass","reason":"Every call site is in the diffed WTerm file."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"The map under-covers with 3115 unresolved calls and no useful edges, so full subsystem inspection was used."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {"claim":"No numeric latency claim is made.","evidence":"Chromium distributions were within noise, so docs and PR wording describe direct scheduling and coalescing only."},
+    {"claim":"Core README and docs navigation/title files need no edit.","evidence":"The public TerminalCore contract and docs routes are unchanged."}
+  ],
+  "issue_candidates": []
+}
