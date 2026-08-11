@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-11",
+    "repo": "vercel-labs/agent-browser",
+    "base": "548b159b30eef119ccf6846c8bc807d0eaa3f6f8",
+    "head": "ee68b3c88072559fb6be7737f7a8ddaa5da9f948",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/vercel-labs/agent-browser/issues/1068",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "separate-storage-for-two-sessions-sharing-one-chrome",
+      "context-scoped-target-discovery-and-operations",
+      "daemon-restart-preserves-primary-context",
+      "chrome-restart-recreates-context-and-restores-state",
+      "explicit-close-disposes-only-owned-contexts",
+      "internal-shutdown-cleans-non-persisted-child-contexts",
+      "legacy-bindings-remain-readable-and-isolated-bindings-fail-closed-on-downgrade",
+      "non-isolated-behavior-remains-unchanged"
+    ],
+    "gaps": [
+      "No separate Spec review result was supplied; the Solution Gate contract was used as the implementation oracle."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher, parser, lookup, or semantic data source was replaced."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Covered default and isolated contexts, two isolated sessions, foreign targets, daemon restart, Chrome restart, state save and restore, recording child contexts, explicit close, and late isolation enablement."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No value-resolution rule from ambiguous user input changed; BrowserContext ownership was reviewed through the boundary and flag-propagation lenses."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command parsing or flag injection into shell text changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No warning channel or one-shot latch was added."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No external binary shim was added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Verified isolation remains opt-in and ordinary shared-Chrome behavior remains unchanged without the flag."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No runtime or framework patch introduced a new application signal."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "The ownership guard had not failed two prior review rounds on the same class."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "The implementation delegates isolation to Chrome BrowserContexts instead of reimplementing an external semantic contract."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "A late isolateContext request on an existing non-isolated connection now returns a reconnect-required error; the caller path was verified to leave sticky state unchanged."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "Traced --isolate-context and AGENT_BROWSER_ISOLATE_CONTEXT through parsing, config, launch envelopes, daemon options, connect, MCP, schema, help, docs, and skill surfaces."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Forced late isolation enablement, missing context after Chrome restart, unpersisted-context rollback, foreign auto-attach, internal shutdown, and explicit close."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "Verified a missing persisted Chrome context creates a clean owned replacement, reapplies configured state, and never falls back to or damages the default context."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "The change adds no new timeout, polling ceiling, or cancellable request contract."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced context ownership through CLI and MCP input, daemon state, CDP discovery and events, target producers, state operations, persistence, recording, shutdown, and close."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Observed distinct cookies, localStorage, sessionStorage, targets, context IDs, restart survival, context recreation, child cleanup, and owned-context disposal in real Chrome."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Drove three real-Chrome E2Es covering parallel isolated sessions, restart and close, Chrome restart and restore, plus recording-child shutdown cleanup."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Checked README, CLI help, commands docs, configuration, CDP mode, sessions docs, schema, MCP, and skill prose against the implemented scope and lifecycle."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "The two-session shared-Chrome examples require isolated contexts to preserve distinct login state and match the driven Chrome workflow."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": "Audited every .decisions.tsv row, including fail-closed binding versioning, explicit-close ownership, rollback transfer, and shutdown cleanup ordering."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Owned-context membership uses bounded context sets and linear filtering over browser targets; no nested per-target scan or unbounded structure was introduced."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "This report fingerprints committed HEAD ee68b3c."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "surfaces",
+      "outcome": "finding-fixed",
+      "reason": "The commands documentation surface initially omitted --isolate-context and was updated."
+    },
+    {
+      "check": "siblings isolate-context",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo fmt",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo clippy",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo test serial",
+      "outcome": "pass",
+      "reason": "1117 passed, 0 failed, 104 ignored."
+    },
+    {
+      "check": "doctor tests",
+      "outcome": "pass",
+      "reason": "2 passed."
+    },
+    {
+      "check": "isolated Chrome E2Es",
+      "outcome": "pass",
+      "reason": "All three isolation E2Es passed together."
+    },
+    {
+      "check": "late-isolation force-red",
+      "outcome": "pass",
+      "reason": "Moving the sticky isolate_context mutation before validation made the E2E fail; restoring validation-before-mutation passed."
+    },
+    {
+      "check": "child-context shutdown force-red",
+      "outcome": "pass",
+      "reason": "Removing child-context disposal made the shutdown E2E fail; restoring cleanup passed."
+    },
+    {
+      "check": "test-strength mutations",
+      "outcome": "pass",
+      "reason": "Seven earlier independent mutations failed as intended."
+    },
+    {
+      "check": "docs build",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "127 changed symbols, top 200 impacted items, and 8019 edges; 2402 unresolved calls, 74 unmapped SCIP entries, and rust-analyzer duplicate-symbol errors mean the map under-covers."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": ""
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The canonical commands page omitted the new --isolate-context flag.",
+      "evidence": "The surface sweep found no entry in docs/src/app/commands/page.mdx. The page now lists the flag and the docs build passes.",
+      "layer": "public documentation surface",
+      "source": "gate",
+      "path": ""
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Signal and idle shutdown could orphan a recording child BrowserContext and autosave from the child instead of the persisted primary context.",
+      "evidence": "Those daemon exits bypassed the internal shutdown command. prepare_internal_daemon_shutdown now stops recording, disposes registered child contexts, preserves the primary context, and runs before autosave on every internal exit. Removing disposal makes the real-Chrome shutdown E2E fail.",
+      "layer": "daemon lifecycle ordering and BrowserContext ownership",
+      "source": "lens",
+      "path": "daemon shutdown branch -> prepare_internal_daemon_shutdown -> dispose_child_contexts -> auto_save_restore_state -> close_all_browser_backends"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "A late isolateContext request on an already-open non-isolated connection could set sticky isolation state without reconnecting.",
+      "evidence": "The command path mutated state.isolate_context before proving the current BrowserManager was isolated. It now returns a reconnect-required error first and leaves state false; moving the mutation before validation makes the E2E fail.",
+      "layer": "daemon command validation and sticky state mutation",
+      "source": "lens",
+      "path": "command isolateContext -> existing BrowserManager isolation check -> state.isolate_context mutation"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "The changelog is intentionally unchanged.",
+      "evidence": "This repository's release PR owns changelog entries; the feature surfaces are documented in README, CLI help, web docs, schema, MCP, and skill data."
+    }
+  ],
+  "issue_candidates": []
+}

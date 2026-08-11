@@ -54,6 +54,10 @@ Provenance: round-1 misses on #1552 (CLI help and MCP descriptions not updated f
 - A liveness heuristic that infers death from non-response is checked against every renderer-blocking state the product itself supports before it ships: JS modal dialogs (`alert`/`confirm`/`prompt`, `beforeunload`), debugger pauses, and attach-time pauses (`waitForDebuggerOnStart: true` since #1546). Each of these blocks `Runtime.evaluate` on a live tab. The enumeration source is the repo's own command surface (`dialog accept/dismiss` exists, so dialog-blocked is an input class). Provenance: #1532 round 2, probe misclassified dialog-blocked live tabs as discarded, reproduced in Chrome by the maintainer.
 - A fix that turns a hang into a returnable error re-verifies every caller of the failable function at the daemon dispatch layer, not only the `BrowserManager` layer: handlers in `actions.rs` mutate `DaemonState` (ref map, iframe sessions, active frame) before delegating, and those mutations execute even when the delegate now fails. Provenance: #1532 round 2, failed switch preserved the old tab but wiped its refs and frame context.
 
+## BrowserContext lifecycle norms
+
+- Internal daemon exits dispose every registered non-persisted child BrowserContext before autosave, while preserving the persisted primary BrowserContext. The opposite direction matters too: explicit user `close` disposes both child and primary contexts after saving configured state. A child context belongs to work the replacement daemon cannot resume; the primary context belongs to the durable session binding. Provenance: #1068 Review Gate, which found signal and idle shutdown could orphan a recording context and then autosave from that child instead of the primary context.
+
 ## Verification norms
 
 - One machine-wide daemon: isolate every verification run with its own `AGENT_BROWSER_NAMESPACE`, or the daemon answers for whichever build started it. Provenance: [shared-daemon case](shared-daemon-cross-worktree-contamination.md).
