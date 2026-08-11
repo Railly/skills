@@ -42,6 +42,10 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Solution Gate](skills/.experimental/solution-gate) gates the shape of a fix before it is written. Two proposers on different model families work from the same symptom-free brief and declare falsifiable predictions; the cheapest refuting probe runs before any synthesis; proposals are scored against a catalog of recorded fix-failure shapes. It sits on the arrow between a reproduced defect and the change that answers it.
 
+### Handoff
+
+[Handoff](skills/.experimental/handoff) closes a working cycle so the next session resumes without rereading the transcript. It verifies state against git before asserting it, keeps delivery, verification, and human judgment independent, and stacks each session onto the prior document instead of overwriting it. Closed work with a transferable lesson goes to Record a Case instead.
+
 ### Quality Baseline
 
 [Quality Baseline](skills/.experimental/quality-baseline) identifies repository-wide quality gaps before changes, rejects unsupported findings, and ranks one measurable pilot.
@@ -75,13 +79,17 @@ flowchart LR
   Spec --> Review[review-gate]
   Review --> Case[record-a-case]
   Case --> Result[Evidence-backed result]
+  Change -.cycle ends open.-> Handoff[handoff]
+  Handoff -.next session.-> Change
 ```
 
 Enter at the earliest incomplete state. A reproduced issue can begin at implementation, and an existing diff can begin at proof or review.
 
+Not every cycle reaches a case. When work stops with the cycle still open, `handoff` carries state to the next session; `record-a-case` takes over once the work closes and leaves a transferable lesson.
+
 ## Maturity
 
-Distribution channel and evidence maturity are separate. Stable currently contains two dogfooded skills and the evaluated Review Gate. Candidate and Experimental skills remain installable without implying validation.
+Distribution channel and evidence maturity are separate. Stable currently contains two dogfooded skills and the evaluated Review Gate; Solution Gate is dogfooded once but stays in Experimental until a baseline round exists. Candidate and Experimental skills remain installable without implying validation.
 
 The source of truth is [foundry/maturity.json](foundry/maturity.json).
 
