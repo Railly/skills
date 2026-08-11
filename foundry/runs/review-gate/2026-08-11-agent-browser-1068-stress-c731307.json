@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-11",
+    "repo": "vercel-labs/agent-browser",
+    "base": "548b159b30eef119ccf6846c8bc807d0eaa3f6f8",
+    "head": "c731307100e2d488d1911ffe1a21fd339b531664",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/vercel-labs/agent-browser/issues/1068",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "two-real-cli-daemons-share-one-chrome-with-disjoint-contexts",
+      "cookies-localstorage-sessionstorage-indexeddb-and-cache-remain-isolated",
+      "tab-new-window-new-and-page-popups-stay-context-scoped",
+      "parallel-state-save-includes-owned-origins-and-excludes-foreign-values",
+      "one-daemon-restart-does-not-interrupt-the-neighbor",
+      "explicit-close-removes-owned-targets-and-binding-without-harming-the-neighbor"
+    ],
+    "gaps": [
+      "No separate Spec review result was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "The diff adds a test and replaces no matcher, parser, lookup, or data source."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The harness crosses tabs, windows, page-created popups, two origins, five storage substrates, state save, daemon restart, and explicit close."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No input resolution rule changes."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell parsing or injection logic changes."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No diagnostic channel or latch changes."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No external binary shim is introduced."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "No default changes."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No runtime or framework signal changes."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "The ownership guard has not failed two prior rounds on the same class."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "The test observes Chrome BrowserContext behavior directly."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No production failure outcome changes."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "The real CLI launches two daemons with --cdp, --isolate-context, and --pin-tab, then verifies sticky reconnect behavior after SIGTERM."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Three production mutations independently forced wrong tab creation, foreign-target adoption, and missing close disposal."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "Restarting agent A preserves its context while agent B continues mutating and reading its own storage."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Every poll has a five- or ten-second ceiling and reports the exact lifecycle state that failed to settle."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "The test crosses CLI processes, daemon sockets, CDP, Chrome targets, browser storage, persisted state JSON, PID files, and binding files."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Assertions read real DOM storage, state files, target IDs, Chrome-visible URLs, daemon PIDs, and binding-file removal."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "The integration test spawns CARGO_BIN_EXE_agent-browser and drives separate real daemons against one real Chrome."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "skipped",
+      "reason": "The diff adds no behavior prose or public surface."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No documentation example changes."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": "Audited the choice of CLI-process testing, bounded polling, configurable rounds, ignored-by-default placement, and three independent substrate assertions."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "The default six-round campaign finishes in about ten seconds; the ignored test has configurable cost and does not run in the normal suite."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "This report fingerprints committed HEAD c731307."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "siblings isolate-context",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo fmt",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo clippy",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo test serial",
+      "outcome": "pass",
+      "reason": "1117 passed, 0 failed, 104 ignored; doctor integration tests also passed 2 of 2."
+    },
+    {
+      "check": "real-world stress campaign",
+      "outcome": "pass",
+      "reason": "144 total rounds passed across the initial, repeated, reinforced, cleanup-aware, restored, and final campaigns."
+    },
+    {
+      "check": "force-red tab creation scope",
+      "outcome": "pass",
+      "reason": "Removing browserContextId from tab new failed in round 0 because the session could not discover its popup."
+    },
+    {
+      "check": "force-red target ownership",
+      "outcome": "pass",
+      "reason": "Accepting every target failed in round 0 when both sessions shared a targetId."
+    },
+    {
+      "check": "force-red close disposal",
+      "outcome": "pass",
+      "reason": "Omitting dispose_owned_contexts failed because agent A targets remained visible after close."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "128 changed symbols, 1146 impacted items, and 8020 edges; 2460 unresolved calls, 138 unmapped SCIP entries, and rust-analyzer duplicate-symbol errors mean the map under-covers."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": ""
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "The new stress test remains ignored in the normal suite.",
+      "evidence": "It launches real Chrome and multiple daemons; its configurable six-round default is suitable for explicit PR or scheduled execution, while the normal serial suite confirms it is discovered and ignored."
+    },
+    {
+      "claim": "No documentation update is required.",
+      "evidence": "The commit adds regression coverage only and changes no user-facing behavior, flag, schema, or prose."
+    }
+  ],
+  "issue_candidates": []
+}
