@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-06",
+    "repo": "vercel-labs/wterm#107",
+    "base": "a1e12a10f10eeffae1e803aea7ede0ed030374ae",
+    "head": "e70b7714f66b755bd9eaeb52278d1e0d39c3be4a",
+    "status": "incomplete",
+    "gaps": [
+      "No connected browser was available, so real-engine and deployed-preview pointer dogfood could not run.",
+      "No Issue Contract or separate Spec-review result was provided."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["Standards review cannot infer a Spec pass without an Issue Contract or Spec-review result."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family (same_family supplied; exact variant not provided)",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"The scrollback repair replaced .term-grid geometry with root-element geometry; the inverse padding regression was confirmed."},
+    {"name":"New-domain matrix","status":"run","reason":"Mouse/focus input widened the reachable DOM-event domain; button, wheel, geometry, capture, core, and reset cells were exercised."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No hostname/key/discovery precedence rule changed."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell-parsed argument string is rewritten."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No daemon/CLI warning or one-shot latch was added."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No external-binary shim was added."},
+    {"name":"Deliberate-default check","status":"skipped","reason":"The new behavior is gated by opt-in DEC modes and does not alter the disabled-mode default."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Recent repo history/changelog was scanned; no existing DOM mouse/focus seam already delivered the feature."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Browser-event topology cells were compared with jsdom behavior and current xterm.js; real-engine execution is a named gap."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Current xterm.js mouse coordinate and capture contracts were inspected and forced."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No existing function gained a new failure outcome."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"DEC modes were traced through built-in/Ghostty WASM, TerminalCore, InputHandler, WTerm, and onData."},
+    {"name":"Error-path forcing","status":"run","reason":"Invalid geometry, disabled modes, outside-start, zero wheel, reset, and prior-fix reversion paths were forced."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action was added."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No async wait, cancellation, or timeout was added."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"DOM event -> InputHandler -> WTerm/onData -> PTY and TS -> Zig/WASM core boundaries were traced for both cores."},
+    {"name":"Substrate verification","status":"run","reason":"Committed WASM exports/state and emitted escape strings were observed; real browser substrate remained unavailable."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Built WTerm was driven with both committed WASM cores; real-browser drive is a named gap."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Package, root, web, API, vanilla, and Ghostty documentation passages were compared with observed behavior."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example was added."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail was provided."},
+    {"name":"Complexity budget","status":"skipped","reason":"No per-element loop, membership check, or lookup was added."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"finding-fixed","reason":"Initially no exact-HEAD report existed; this prose/JSON pair covers e70b771."},
+    {"check":"style","outcome":"pass","reason":"No forbidden added-line punctuation."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"After correcting the canonical map syntax/globs, missing apps-docs and root README surfaces are reported as DOC-01."},
+    {"check":"stale","outcome":"pass","reason":"No duplicated contract value was renamed or retired."},
+    {"check":"siblings mouse","outcome":"pass","reason":"Every mouse keyword sibling is in the diff and no untouched matching passage remains."},
+    {"check":"siblings focus","outcome":"acknowledged","reason":"Unrelated UI-focus hits were read/exempted; contract-carrying API/vanilla/Ghostty omissions are DOC-01."},
+    {"check":"callers mouseTracking/mouseSgr/focusEvents and WASM exports","outcome":"pass","reason":"All mechanically enumerated call sites are in diffed files and were traced across both cores."},
+    {"check":"timings","outcome":"pass","reason":"No wait ceiling was added."},
+    {"check":"shellmeta","outcome":"pass","reason":"No shell-metacharacter detector was added."},
+    {"check":"force-red","outcome":"pass","reason":"Initial DOM/Zig, drag-wheel, capture-geometry, and Ghostty binary regression guards all fail against their defects and pass at HEAD."},
+    {"check":"WASM reproducibility","outcome":"pass","reason":"Built-in host and Ghostty Docker rebuilds are byte-identical to committed artifacts."},
+    {"check":"artifacts/rawinput/producers","outcome":"pass","reason":"Their triggers are absent: no persistent file writer, deepened raw-input resolver, or narrowed error classifier."}
+  ],
+  "findings": [
+    {
+      "id":"P1-COORD-PADDING",
+      "state":"confirmed",
+      "claim":"Default root padding shifts SGR mouse coordinates away from the clicked content cell.",
+      "evidence":"Built WTerm plus committed core WASM: a click centered in default content cell 1,1 of an 824x424 padded root emitted ESC[<0;2;2M/m. Current xterm.js subtracts root padding before cell division.",
+      "layer":"built end-to-end DOM/WASM input path",
+      "source":"lens",
+      "path":"InputHandler.handleMouse -> WTerm.onData via root border-box coordinate scaling"
+    },
+    {
+      "id":"P2-CAPTURE-LIFECYCLE",
+      "state":"confirmed",
+      "claim":"Capture is bound to global window and a single boolean, losing valid iframe and multi-button releases and permitting an orphan release after an invalid press.",
+      "evidence":"Forced iframe owner-window mouseup emitted no release; left+right chord lost the second release after the first mouseup with buttons=1; zero-rect mousedown followed by valid-rect mouseup emitted release without press.",
+      "layer":"DOM event topology",
+      "source":"lens",
+      "path":"mousedown -> global window listeners/mousePressed -> mouseup"
+    },
+    {
+      "id":"P2-DOCS",
+      "state":"confirmed",
+      "claim":"Required root, docs-app, and Ghostty package documentation remains missing.",
+      "evidence":"No root/apps-docs/Ghostty README file is in the diff; API reference ends its mode table at usingAltScreen and vanilla docs omit mouse/focus onData behavior. Corrected surfaces gate flags apps docs and root README.",
+      "layer":"user-facing contract surfaces",
+      "source":"gate",
+      "path":"packages core/dom/ghostty source -> package docs, root features, docs app"
+    },
+    {
+      "id":"PRIOR-MAIN-CAPTURE",
+      "state":"refuted",
+      "claim":"The prior ordinary main-window outside-release bug remains.",
+      "evidence":"HEAD emits press, clamped outside drag, and outside release; reverting only input.ts to f2a4752 makes the capture test red.",
+      "layer":"main-window one-button event topology",
+      "source":"lens",
+      "path":""
+    },
+    {
+      "id":"PRIOR-GHOSTTY",
+      "state":"refuted",
+      "claim":"Ghostty-backed WTerm still silently disables mouse/focus.",
+      "evidence":"Committed Ghostty WASM exports/readback and WTerm input drive pass; replacing only the binary with f2a4752 fails on missing mouse_tracking.",
+      "layer":"alternative-core end-to-end path",
+      "source":"lens",
+      "path":"Ghostty WASM -> GhosttyCore -> TerminalCore -> InputHandler"
+    },
+    {
+      "id":"PRIOR-SCROLLBACK",
+      "state":"refuted",
+      "claim":"Scrollback rows still directly distort active viewport row mapping.",
+      "evidence":"HEAD maps against the visible root instead of the history-height grid and the prior forced cell passes; the separate padded-root inverse regression is P1-COORD-PADDING.",
+      "layer":"scrollback-relative coordinate mapping",
+      "source":"lens",
+      "path":""
+    },
+    {
+      "id":"PRIOR-DRAG-WHEEL",
+      "state":"refuted",
+      "claim":"Middle/right drag and horizontal/zero wheel findings remain.",
+      "evidence":"HEAD matrix passes; reverting only input.ts to 0394c2f encodes both drags as left and horizontal/zero ticks as vertical-down, turning the guard red.",
+      "layer":"DOM mouse encoding",
+      "source":"lens",
+      "path":""
+    },
+    {
+      "id":"EX-REACT-VUE",
+      "state":"exempted",
+      "claim":"React and Vue source files need independent mouse/focus changes.",
+      "evidence":"Both wrappers pass through WTerm/TerminalCore and contain no separate input encoder; their tests and type-checks pass.",
+      "layer":"framework wrapper dispatch",
+      "source":"gate",
+      "path":""
+    },
+    {
+      "id":"ISSUE-1003",
+      "state":"issue_candidate",
+      "claim":"The remaining DEC mouse protocol subset needs an explicit follow-up.",
+      "evidence":"PR body leaves 1003/1005/1015 unsupported; built-in and adapter public unions expose only 0/1000/1002 and SGR 1006 while Ghostty parses more modes.",
+      "layer":"out-of-scope protocol coverage",
+      "source":"lens",
+      "path":""
+    },
+    {
+      "id":"ISSUE-BROWSER-E2E",
+      "state":"issue_candidate",
+      "claim":"Mouse/focus behavior lacks real-browser E2E coverage.",
+      "evidence":"Existing e2e terminal tests cover rendering, keyboard, focus, cursor, scrollback, and resize but no DEC mouse report path; browser runtime was unavailable in this run.",
+      "layer":"browser integration coverage",
+      "source":"lens",
+      "path":""
+    }
+  ],
+  "exemptions": [
+    {"claim":"Release changelog and versions are not required for this feature PR.","evidence":"Repository policy makes releases manual and maintainer-controlled; this is not a release-preparation branch."},
+    {"claim":"React and Vue need no independent implementation change.","evidence":"Both wrappers delegate WTerm/TerminalCore without translating input, and their full tests/type-checks pass."},
+    {"claim":"Unrelated focus keyword siblings need no update.","evidence":"The inspected CSS/components/examples/lockfile/history hits concern UI focus or dependency text, not DEC 1004; contract-carrying omissions are reported."},
+    {"claim":"Docs navigation and title maps need no update.","evidence":"No page is added or renamed; existing pages should be edited in place."},
+    {"claim":"Third-party TerminalCore mode methods may remain optional.","evidence":"Optionality preserves source compatibility, absence safely disables the feature, and both first-party cores implement the methods."}
+  ],
+  "issue_candidates": [
+    {"title":"Support DEC 1003/1005/1015/1016 or maintain an explicit subset contract","evidence":"PR body explicitly leaves 1003/1005/1015 unsupported; Ghostty parses a wider set than the public adapter exposes.","why_out_of_scope":"The PR declares a limited 1000/1002/1004/1006 subset and issue #55 remains open."},
+    {"title":"Add real-browser DEC mouse/focus E2E coverage","evidence":"Current E2E tests have no DEC mouse reporting; jsdom cannot validate capture, CSS geometry, or native wheel behavior.","why_out_of_scope":"This is durable coverage beyond the concrete source/doc fixes required in PR #107."}
+  ]
+}

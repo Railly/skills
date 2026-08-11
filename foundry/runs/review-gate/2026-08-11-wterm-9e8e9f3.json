@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-11",
+    "repo": "vercel-labs/wterm",
+    "base": "origin/main@77f2913b49560252fd060309dc87e78f2f534710",
+    "head": "9e8e9f3baf52973058ebcd58edcbf687ae1cec79",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Issue Contract or Spec review was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex focused integration pass",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "Subsystem reconstruction",
+      "status": "run",
+      "reason": "Rechecked write, response delivery, synchronized-output hold and recovery, RAF ownership, cancellation, and destroy cleanup after merging PR #111."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Direct RAF cancellation remains intact at synchronized-output entry and destroy, while the recovery timeout is unchanged."
+    },
+    {
+      "name": "Performance proof",
+      "status": "run",
+      "reason": "The prior exact-diff proof remains applicable because the effective PR diff is unchanged; it proves removal of the timer boundary but no numeric latency improvement."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "The merged DOM suite covers response callback failures and render scheduling, including the asynchronous RAF ordering seams."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "The conflict resolution retains both direct-RAF scheduling documentation and PR #111 grapheme documentation without broadening either claim."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "The merged build and DOM suite exercise input through write, core response drain, RAF scheduling, renderer, and DOM mutation."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "The built packages and real committed WASM were exercised by the full package test suite; no visual claim is made."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "skipped",
+      "reason": "The conflict resolution changes documentation only and the scheduler intentionally produces the same final frame; built-package tests are the relevant substrate."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was provided."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "xref",
+      "outcome": "pass",
+      "reason": "PR #112 is the only node; no competing or related open work was found."
+    },
+    {
+      "check": "merge resolution",
+      "outcome": "pass",
+      "reason": "The sole conflict was packages/@wterm/dom/README.md, resolved by retaining both independent paragraphs."
+    },
+    {
+      "check": "effective diff",
+      "outcome": "pass",
+      "reason": "Against current main, the PR still changes only the original five files with 48 additions and 18 deletions."
+    },
+    {
+      "check": "format",
+      "outcome": "pass",
+      "reason": "pnpm format:check passed."
+    },
+    {
+      "check": "build",
+      "outcome": "pass",
+      "reason": "All 15 build tasks passed."
+    },
+    {
+      "check": "test",
+      "outcome": "pass",
+      "reason": "All 14 package test tasks passed; @wterm/dom passed 115 tests."
+    },
+    {
+      "check": "lint",
+      "outcome": "pass",
+      "reason": "All lint tasks passed with one pre-existing warning in apps/docs/postcss.config.mjs."
+    },
+    {
+      "check": "type-check",
+      "outcome": "pass",
+      "reason": "All 22 type-check tasks passed after rebuilding @wterm/core declarations from merged main."
+    },
+    {
+      "check": "zig and wasm drift",
+      "outcome": "pass",
+      "reason": "zig build test and the release-small WASM drift comparison passed."
+    },
+    {
+      "check": "style",
+      "outcome": "acknowledged",
+      "reason": "gate.sh flags the README em dash, but wterm conventions explicitly exempt established feature-bullet punctuation."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "The core package contract and docs routes are unchanged, so core README, docs navigation, and page titles require no edit."
+    },
+    {
+      "check": "doc siblings",
+      "outcome": "acknowledged",
+      "reason": "Other requestAnimationFrame hits are test shims, unrelated search UI animation, or existing synchronized-output tests; the API reference carries the scheduler contract."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "The map found two changed symbols and 14 impacted symbols, but 3157 unresolved calls substantially under-cover the graph; full subsystem inspection and the complete suite were used."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "No numeric latency claim is made.",
+      "evidence": "The retained docs describe direct frame scheduling and coalescing only; the prior Chromium benchmark was neutral."
+    },
+    {
+      "claim": "No extra package or docs-navigation updates are needed.",
+      "evidence": "The merge adds no package, route, page, or public TerminalCore contract."
+    },
+    {
+      "claim": "No screenshot or visual E2E proof is needed for the conflict resolution.",
+      "evidence": "The scheduler ordering and README merge do not change intended final pixels."
+    }
+  ],
+  "issue_candidates": []
+}

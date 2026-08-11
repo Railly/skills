@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-10",
+    "repo": "vercel-labs/wterm",
+    "base": "origin/main@4e353e7dee49dbd43dec69a6a37c37a3e3ba902c",
+    "head": "cdb41c98be3a911121ced5b57eeeb671134c4c6e",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Issue Contract or Spec review was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex focused exact-head pass after Vercel Agent Review",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "Subsystem reconstruction",
+      "status": "run",
+      "reason": "Traced cached viewport and scrollback DataViews, grapheme accessor calls, WASM memory growth, and renderer cell access."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "The finding crosses committed Ghostty WASM, WebAssembly.Memory, TypeScript DataView caching, CellData, and renderer reads."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Forced memory.grow inside get_viewport_grapheme between two viewport cell reads."
+    },
+    {
+      "name": "Force-red",
+      "status": "run",
+      "reason": "The new real-WASM test failed on the prior implementation with a detached ArrayBuffer TypeError and passed after the fix."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Cache hits compare buffer identity and reconstruct only the DataView; they do not re-run viewport decoding."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "The review fix changes internal memory-view lifetime only; existing public grapheme behavior documentation remains accurate."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "The regression loads the committed Ghostty WASM and forces the exact browser runtime boundary named by the review."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No asynchronous wait, timer, cancellation, or cleanup path changed."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was provided."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "xref final",
+      "outcome": "pass",
+      "reason": "No competing or overlapping grapheme PR appeared; issue #103 remains separate built-in-core work."
+    },
+    {
+      "check": "format/build/test/lint/type-check/e2e",
+      "outcome": "pass",
+      "reason": "Prettier, 15 builds, 14 test tasks, lint, 22 type-check tasks, and 12 Playwright tests passed."
+    },
+    {
+      "check": "real-WASM regression",
+      "outcome": "pass",
+      "reason": "@wterm/ghostty passed 38/38, including memory growth inside get_viewport_grapheme followed by another getCell."
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "Before the production fix, the new assertion failed at parseCell with Cannot perform DataView.prototype.getUint32 on a detached ArrayBuffer."
+    },
+    {
+      "check": "style",
+      "outcome": "acknowledged",
+      "reason": "The only flagged em dash is an established root README feature-bullet form explicitly allowed by wterm conventions."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "Navigation and page-title files are unaffected because no docs page was added or renamed."
+    },
+    {
+      "check": "siblings",
+      "outcome": "acknowledged",
+      "reason": "Untouched grapheme passages describe the existing capability and do not make claims about cached DataView lifetime."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "The final map found 10 changed and 71 impacted symbols but 3138 unresolved calls, so it under-covers the TS/Zig/WASM boundary."
+    }
+  ],
+  "findings": [
+    {
+      "id": "vercel-review-detached-viewport-view",
+      "state": "confirmed",
+      "claim": "A grapheme read can grow WASM memory and detach the cached viewport DataView before the next getCell call.",
+      "evidence": "Forced memory.grow inside get_viewport_grapheme reproduced the exact detached ArrayBuffer exception on the prior implementation.",
+      "layer": "real WASM memory and TypeScript DataView cache boundary",
+      "source": "lens",
+      "path": "getCell -> _readGrapheme -> get_viewport_grapheme -> memory.grow -> next getCell -> parseCell"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Docs navigation and page titles need no edit.",
+      "evidence": "The existing API, core, and Ghostty pages keep the same routes and titles."
+    },
+    {
+      "claim": "The root README em dash is allowed.",
+      "evidence": "wterm conventions explicitly preserve the established feature-bullet style."
+    },
+    {
+      "claim": "No additional grapheme documentation is required for the review fix.",
+      "evidence": "The fix changes cached DataView lifetime without changing the documented CellData or renderer contract."
+    }
+  ],
+  "issue_candidates": []
+}

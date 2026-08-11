@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-09",
+    "repo": "vercel-labs/wterm#107",
+    "base": "9bc197a5f4bd8781ac6e301b67035f91f9980a43",
+    "head": "9170742fa0c03184323d15e0a38ce18f1cb6efc9",
+    "status": "complete",
+    "gaps": ["No separate Issue Contract or Spec-review result was supplied."]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/kai/05_Areas/vercel/wterm-parity-handoff-2026-08-07.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["The handoff and merged PR behavior were used as Standards inputs; no separate Spec pass was provided."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family and prior contributors",
+    "reviewer_model": "Claude Opus 5 plus GPT-5.6 Codex verification",
+    "same_family": false
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"Checked that adding synchronized-output state did not erase mouse/focus state and vice versa across both merge parents."},
+    {"name":"New-domain matrix","status":"run","reason":"Exercised mouse buttons, modifiers, focus ordering, owner-window capture, synchronized generations, payload timing, callback failure, resize, reset, and destroy."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No ambiguous-input resolution rule changed."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell command construction changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No detached process or diagnostic latch changed."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No shim or shadow executable was added."},
+    {"name":"Deliberate-default check","status":"run","reason":"Mouse/focus remain opt-in and optional core methods still default unsupported third-party cores to disabled."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Reviewed both merge-parent deltas and the combined parser, WASM, bridge, scheduler, renderer, and input pipeline."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Compared committed built-in and Ghostty WASM export contracts and exercised DOM event classes."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Rechecked the established focus-before-mouse, Shift-selection, supported-button, and fixed-per-BSU contracts."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Verified response callback failures are deferred until parsing and render/recovery bookkeeping finish."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"Traced mouse, SGR, focus, synchronized mode, and generation from both cores into the DOM."},
+    {"name":"Error-path forcing","status":"run","reason":"Forced thrown callback values, missing ESU recovery, invalid geometry, unsupported buttons, and stale timing paths."},
+    {"name":"Non-destructive recovery","status":"run","reason":"Timeout paints the held frame, later writes continue painting, and a fresh generation can hold again."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Generation re-arm, payload non-extension, queued RAF cancellation, stale timer guard, and destroy cleanup passed."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Real ESU-to-BSU bytes crossed the committed WASM boundary and both core implementations exposed the required mouse/focus modes."},
+    {"name":"Substrate verification","status":"run","reason":"Built artifacts, committed WASM, DOM event pipeline, and Chromium e2e were driven."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Production build, committed binaries, focused real-WASM tests, and repository Chromium e2e passed."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"The combined TerminalCore contract, Zig reset ownership, WTerm scheduler, and InputHandler ownership were all inspected."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Mouse/focus and synchronized-output API and behavior passages match the combined implementation."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No new example was added."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail was supplied for this merge resolution."},
+    {"name":"Complexity budget","status":"run","reason":"The integration adds constant-time mode reads and timer bookkeeping; no per-cell complexity changed."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"pass","reason":"It failed before report creation; this exact-head report now exists."},
+    {"check":"style","outcome":"acknowledged","reason":"The root feature bullet's em dash matches every sibling bullet and the repo convention explicitly exempts it."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"Required docs are present; navigation and page titles are unaffected because no page was added or renamed."},
+    {"check":"siblings mouse","outcome":"pass","reason":"Every mouse behavior surface is in the diff."},
+    {"check":"siblings focus","outcome":"acknowledged","reason":"Remaining hits describe generic UI focus, historical changelog text, or wrapper focus APIs, not DEC mode 1004."},
+    {"check":"siblings synchronized","outcome":"acknowledged","reason":"Untouched hits are the already-reviewed #106 implementation and tests merged unchanged into this exact head."},
+    {"check":"callers mouse/focus","outcome":"pass","reason":"Every mode consumer is in a reviewed diff file."},
+    {"check":"callers synchronized/write","outcome":"acknowledged","reason":"Enumerated external hits are tests and unchanged core calls whose assumptions remain valid; the combined WTerm caller is reviewed directly."},
+    {"check":"timings","outcome":"pass","reason":"The PR diff adds no competing wait ceiling."},
+    {"check":"committed WASM drift","outcome":"pass","reason":"ReleaseSmall output byte-compares equal to packages/@wterm/core/wasm/wterm.wasm."},
+    {"check":"workspace verification","outcome":"pass","reason":"Build, tests, lint, type-check, format, Zig, diff checks, and 12 Chromium e2e tests pass."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"10 changed symbols and 31 impacted items were reported, but 3064 unresolved calls versus 518 edges means the map under-covers cross-language and DOM boundaries."}
+  ],
+  "findings": [
+    {
+      "id": "R1-scrollback-selector",
+      "state": "refuted",
+      "claim": "Mouse geometry can select a scrollback row because historical rows lack the exclusion class.",
+      "evidence": "Renderer._buildScrollbackRowEl assigns `term-row term-scrollback-row` at renderer.ts:432, and the mouse test for visible viewport geometry passes.",
+      "layer": "DOM geometry pipeline",
+      "source": "lens",
+      "path": "Renderer scrollback row class → InputHandler active-row selector"
+    },
+    {
+      "id": "R2-inline-wasm",
+      "state": "refuted",
+      "claim": "The combined committed WASM is stale because wasm-inline.ts is absent from the diff.",
+      "evidence": "wasm-inline.ts is gitignored and generated by the package prebuild; production build regenerated it from the committed combined WASM and all core tests passed.",
+      "layer": "packaged artifact generation",
+      "source": "lens",
+      "path": "committed wterm.wasm → prebuild inline-wasm.js → generated wasm-inline.ts"
+    },
+    {
+      "id": "E1-style",
+      "state": "exempted",
+      "claim": "The added em dash violates project style.",
+      "evidence": "Every sibling root feature bullet uses the same punctuation and the compiled wterm convention explicitly permits it.",
+      "layer": "repository prose style",
+      "source": "gate",
+      "path": ""
+    },
+    {
+      "id": "E2-navigation",
+      "state": "exempted",
+      "claim": "Editing api-reference/page.mdx requires navigation and page-title edits.",
+      "evidence": "The page path and title already exist and were not added or renamed.",
+      "layer": "documentation metadata",
+      "source": "gate",
+      "path": ""
+    }
+  ],
+  "exemptions": [
+    {"claim":"The added em dash violates project style.","evidence":"Every sibling feature bullet uses the same punctuation and the project convention explicitly permits it."},
+    {"claim":"Navigation and page-title registries require updates.","evidence":"No page was added or renamed; existing registrations remain correct."},
+    {"claim":"Generic focus sibling hits require edits.","evidence":"They describe UI focus styling, wrapper focus methods, historical text, or form controls rather than DEC focus reporting."},
+    {"claim":"Release or dependency surfaces require changes.","evidence":"No version, dependency, package, changelog, or dev-server contract changed."}
+  ],
+  "issue_candidates": [
+    {
+      "title": "Add real-browser DEC mouse/focus E2E coverage",
+      "evidence": "The Chromium suite covers focus, keyboard, rendering, resize, and scrollback, while mouse protocol assertions remain in jsdom.",
+      "why_out_of_scope": "The merge integration is already covered at DOM-event and committed-WASM layers; adding a new browser fixture is broader test-infrastructure work."
+    },
+    {
+      "title": "Radius under-covers TS-to-Zig/WASM and DOM event boundaries",
+      "evidence": "The map reports 3064 unresolved calls against 518 edges and cannot represent the key cross-language paths.",
+      "why_out_of_scope": "This is Review Gate tooling coverage, not a defect in wterm PR #107."
+    }
+  ]
+}

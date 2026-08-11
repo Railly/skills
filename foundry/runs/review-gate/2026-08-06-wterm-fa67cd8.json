@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-06",
+    "repo": "vercel-labs/wterm#105",
+    "base": "a1e12a10f10eeffae1e803aea7ede0ed030374ae",
+    "head": "fa67cd831132bf632307c7fc9450e74b38750266",
+    "status": "incomplete",
+    "gaps": [
+      "The live GitHub PR/xref graph and PR description could not be fetched because api.github.com was unavailable under restricted network access."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No Issue Contract or separate Spec review result was provided."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5/Codex family (per same_family handoff; exact model not provided)",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "skipped", "reason": "No matcher/parser/lookup data source was replaced." },
+    { "name": "New-domain matrix", "status": "run", "reason": "The response accumulation domain widened from one slot to a bounded FIFO; empty, consecutive, reset, wrap, full, and over-capacity cells were inspected." },
+    { "name": "Resolution-rule consistency across consumers", "status": "run", "reason": "The meaning of clearResponse/getResponse changed from clear-buffer to pop-one, so WASM, bridge, DOM, docs, and alternate-core consumers were enumerated." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "The diff does not construct shell commands." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "There is no background process, user warning, or one-shot latch." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No test binary shim was added." },
+    { "name": "Deliberate-default check", "status": "skipped", "reason": "The diff preserves formerly overwritten replies rather than removing a tested default." },
+    { "name": "Fresh-seam scan", "status": "skipped", "reason": "The diff does not patch a runtime/framework to expose a new signal." },
+    { "name": "Substrate differential corpus", "status": "skipped", "reason": "No guard models an external substrate." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "The diff does not cite or reimplement a reference contract requiring an enumerable oracle pass." },
+    { "name": "New-failure-outcome propagation", "status": "skipped", "reason": "No existing call gains a new error/outcome class." },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag, mode, or config bit was added." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Empty pop, reset, full queue, drop-newest, over-capacity input, and force-red behavior were forced." },
+    { "name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action was added." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No async wait, timeout, or cancellation path was added." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "The full Zig producer → WASM dequeue API → WasmBridge → WTerm → onData path was traced and driven." },
+    { "name": "Substrate verification", "status": "run", "reason": "Observed callback counts and committed-WASM bytes, not command self-report, established behavior." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "Built WTerm with real committed WASM was driven through two-response and 2,049-response scenarios." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "Every getResponse/onData documentation passage was compared with the driven dequeue behavior." },
+    { "name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added or edited." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No .decisions.tsv trail exists." },
+    { "name": "Complexity budget", "status": "run", "reason": "The new per-write drain loop and fixed 2,048 × 64-byte queue were assessed at capacity; the boundary exposed reply loss." }
+  ],
+  "deterministic": [
+    { "check": "covered", "outcome": "pass", "reason": "It correctly failed before report creation and passed after the exact-HEAD report existed." },
+    { "check": "style", "outcome": "pass", "reason": "No forbidden punctuation was added." },
+    { "check": "surfaces", "outcome": "pass", "reason": "The compiled wterm surface map passed; semantic doc parity was handled separately." },
+    { "check": "stale response_buf", "outcome": "pass", "reason": "Zero hits." },
+    { "check": "stale response_len", "outcome": "pass", "reason": "Zero hits for the retired field." },
+    { "check": "siblings terminal response", "outcome": "pass", "reason": "No absent sibling file was reported for the behavior keyword." },
+    { "check": "siblings getResponse", "outcome": "acknowledged", "reason": "The sweep produced reading obligations; API-reference wording is confirmed stale, while the core README, interface, bridge, and Ghostty sites are cleared or exempted." },
+    { "check": "callers getResponse", "outcome": "acknowledged", "reason": "All enumerated sites were read; the API-reference finding is confirmed and implementation/signature sites remain compatible." },
+    { "check": "timings", "outcome": "pass", "reason": "No wait ceiling was added." },
+    { "check": "shellmeta", "outcome": "pass", "reason": "No shell-metacharacter detector was added." },
+    { "check": "force-red core FIFO", "outcome": "pass", "reason": "Against origin/main WASM the two-response test observes only the overwritten second response, so the regression test goes red." },
+    { "check": "force-red DOM drain", "outcome": "acknowledged", "reason": "The current one-response test stays green without the drain loop; the missing multi-response delivery assertion is a confirmed finding." },
+    { "check": "committed WASM drift", "outcome": "pass", "reason": "A ReleaseSmall build from a clean git archive with isolated Zig caches byte-compared equal to the committed WASM." }
+  ],
+  "findings": [
+    {
+      "id": "P1-capacity-loss",
+      "state": "confirmed",
+      "claim": "A single valid WTerm write producing more than 2,048 responses silently loses replies because draining happens only after all WasmBridge chunks complete.",
+      "evidence": "Built WTerm plus committed PR WASM received 2,049 CPR queries (8,196 bytes) in one write and emitted only 2,048 onData callbacks.",
+      "layer": "end-to-end Zig producer through built WTerm callback",
+      "source": "lens",
+      "path": "WTerm.write → WasmBridge.writeRaw chunks → Terminal.enqueueResponse drop-newest → WTerm._drainResponses"
+    },
+    {
+      "id": "P1-dom-force-red",
+      "state": "confirmed",
+      "claim": "The DOM drain-loop fix has no regression test that fails when the fix is reverted.",
+      "evidence": "The changed DOM test supplies one response only; origin/main's pre-fix WTerm delivered the same one response while a two-response force-red drive left response-b queued.",
+      "layer": "WTerm delivery contract and regression-test sensitivity",
+      "source": "lens",
+      "path": "WTerm._doRender/getResponse → onData"
+    },
+    {
+      "id": "P2-getresponse-docs",
+      "state": "confirmed",
+      "claim": "The API reference still says getResponse clears the buffer although it now dequeues only one pending response.",
+      "evidence": "apps/docs/src/app/api-reference/page.mdx:484 says 'Reading clears the buffer'; two calls at HEAD return two queued responses because clearResponse now delegates to popResponse.",
+      "layer": "public API documentation contract",
+      "source": "gate",
+      "path": "getResponse docs → WasmBridge.getResponse → clearResponse → Terminal.popResponse"
+    },
+    {
+      "id": "X1-core-readme",
+      "state": "exempted",
+      "claim": "The concise @wterm/core README getResponse row need not change.",
+      "evidence": "It says only 'Get pending host response (or null)', which remains accurate and makes no clear-entire-buffer claim.",
+      "layer": "documentation surface semantics",
+      "source": "gate",
+      "path": ""
+    },
+    {
+      "id": "X2-terminalcore-ghostty",
+      "state": "exempted",
+      "claim": "TerminalCore's signature and GhosttyCore's unchanged implementation require no PR change.",
+      "evidence": "The signature still returns one string or null; Ghostty intentionally returns null because its readonly stream cannot generate replies.",
+      "layer": "interface compatibility",
+      "source": "gate",
+      "path": ""
+    },
+    {
+      "id": "I1-ghostty-docs",
+      "state": "issue_candidate",
+      "claim": "Ghostty documentation does not disclose unsupported title and terminal-response side outputs.",
+      "evidence": "GhosttyCore.getTitle and getResponse always return null, while the Ghostty docs present TerminalCore interchangeability without naming these limitations.",
+      "layer": "pre-existing alternate-core documentation",
+      "source": "lens",
+      "path": "GhosttyCore side outputs → Ghostty package/docs"
+    }
+  ],
+  "exemptions": [
+    { "claim": "The @wterm/core README getResponse row is unaffected.", "evidence": "Its concise pending-response description remains true and does not describe buffer-clearing semantics." },
+    { "claim": "TerminalCore and GhosttyCore need no change in PR #105.", "evidence": "The one-item return signature remains valid and Ghostty's deliberate no-response behavior is unchanged." },
+    { "claim": "Other onData docs are unaffected.", "evidence": "They promise delivery of user input or host responses but do not specify queue capacity or buffer-clearing behavior." },
+    { "claim": "Navigation, page titles, related-package links, release files, dependencies, and portless rules are unaffected.", "evidence": "The PR adds no page, package, release, dependency, or dev-server surface." }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Document unsupported Ghostty title and host-response side outputs",
+      "evidence": "GhosttyCore.getTitle() and getResponse() always return null, but the Ghostty docs do not name these limitations.",
+      "why_out_of_scope": "This is pre-existing alternate-core behavior; PR #105 changes only the built-in core's response queue and DOM draining."
+    }
+  ]
+}
+

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>agent-browser #1589: structured tab_gone data</title>
+  <style>
+    body { margin: 0; padding: 32px; color: #18181b; background: #fafafa; font: 15px/1.5 system-ui, sans-serif; }
+    main { max-width: 1100px; margin: auto; }
+    h1, h2 { line-height: 1.2; }
+    section { margin: 24px 0; padding: 20px; border: 1px solid #d4d4d8; border-radius: 12px; background: white; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .card { padding: 16px; border: 1px solid #e4e4e7; border-radius: 10px; }
+    .observed { border-left: 5px solid #16a34a; }
+    .proposed { border-left: 5px solid #2563eb; }
+    .chosen { border-left: 5px solid #9333ea; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    pre { overflow: auto; padding: 12px; background: #f4f4f5; border-radius: 8px; }
+    .tag { display: inline-block; margin-right: 6px; padding: 2px 7px; border-radius: 999px; font-size: 12px; background: #e4e4e7; }
+    .observed-tag { background: #dcfce7; }
+    .inferred-tag { background: #dbeafe; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>agent-browser #1589: structured <code>tab_gone</code> data</h1>
+
+  <section class="observed">
+    <h2>Observed behavior</h2>
+    <div class="grid">
+      <div class="card">
+        <span class="tag observed-tag">observed</span>
+        <h3>Single command</h3>
+        <pre>code: "tab_gone"
+data: null
+error: "... target TARGET, last url SAFE_URL ..."</pre>
+        <p>Driven by externally closing a pinned tab and running <code>get url --json</code>.</p>
+      </div>
+      <div class="card">
+        <span class="tag observed-tag">observed</span>
+        <h3>Batch</h3>
+        <p><code>run_batch</code> maps <code>Response.data</code> to each item's <code>result</code>.</p>
+      </div>
+      <div class="card">
+        <span class="tag observed-tag">observed</span>
+        <h3>MCP</h3>
+        <p><code>tool_result_from_run</code> embeds parsed CLI JSON at <code>structuredContent.response</code>.</p>
+      </div>
+      <div class="card">
+        <span class="tag observed-tag">observed</span>
+        <h3>Safe source</h3>
+        <p><code>bound_target_gone</code> already holds the target id and the output of <code>sanitize_url</code>. Opaque URL payloads are empty.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="proposed">
+    <h2>Proposed shapes, argument only</h2>
+    <div class="grid">
+      <div class="card">
+        <span class="tag inferred-tag">inferred</span>
+        <h3>Fable</h3>
+        <pre>details: {
+  targetId,
+  lastUrl?
+}</pre>
+        <p>Cost: a new top-level namespace and explicit adapter propagation.</p>
+      </div>
+      <div class="card">
+        <span class="tag inferred-tag">inferred</span>
+        <h3>GPT-5.6-sol</h3>
+        <pre>targetId: "..."
+lastUrl: "..."</pre>
+        <p>Cost: error-specific fields enter the global response namespace.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="chosen">
+    <h2>Chosen synthesis</h2>
+    <span class="tag inferred-tag">proposed, then implementation-tested</span>
+    <pre>{
+  "success": false,
+  "data": {
+    "targetId": "TARGET",
+    "lastUrl": "https://example.com/path"
+  },
+  "error": "tab_gone: ...",
+  "code": "tab_gone"
+}</pre>
+    <p>The existing <code>data</code> slot avoids a new top-level contract. Unsafe URLs omit <code>lastUrl</code>. Batch receives the object as <code>result</code>; MCP retains it under <code>structuredContent.response.data</code>.</p>
+  </section>
+</main>
+</body>
+</html>

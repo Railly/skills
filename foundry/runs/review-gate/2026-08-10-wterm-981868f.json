@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 0,
+  "run": {"date":"2026-08-10","repo":"vercel-labs/wterm","base":"origin/main@4e353e7dee49dbd43dec69a6a37c37a3e3ba902c","head":"981868f0cd618047361a7a58a3cb6c67deb2f0c3","status":"complete","gaps":[]},
+  "contract": {"path":"","spec_status":"not_provided","acceptance_reviewed":[],"gaps":["No separate Issue Contract or Spec review was supplied."]},
+  "provenance": {"author_model":"GPT-5 Codex","reviewer_model":"GPT-5 Codex focused independent pass","same_family":true},
+  "lenses": [
+    {"name":"Subsystem reconstruction","status":"run","reason":"Traced active RenderState cells and direct page-list scrollback cells through the WASM boundary into CellData and the DOM renderer."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"The change crosses Ghostty page memory, RenderState, wasm32 exports, TypeScript decoding, renderer runs, cursor placement, and debug inspection."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Ghostty's RenderState.Cell.grapheme and Pin.grapheme contracts were used as the source of truth."},
+    {"name":"Error-path forcing","status":"run","reason":"Out-of-range cells, absent optional exports in mocks, buffer growth, and scrollback access were exercised."},
+    {"name":"Complexity budget","status":"run","reason":"Normal cells avoid extra WASM calls through the content flag; only grapheme cells cross the secondary accessor."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No asynchronous wait, timeout, or cancellation path changed."},
+    {"name":"Docs-behavior parity","status":"run","reason":"CellData, core, DOM, Ghostty, root, and docs-app passages now describe complete grapheme strings."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The committed Ghostty WASM was rebuilt reproducibly and driven by real-WASM tests for combining marks, ZWJ emoji, active cells, and scrollback."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail was provided."}
+  ],
+  "deterministic": [
+    {"check":"xref final","outcome":"pass","reason":"No competing grapheme implementation appeared; #103 remains a separate built-in-core invariant issue."},
+    {"check":"format/type-check/test/build","outcome":"pass","reason":"Prettier, all 22 type-check tasks, all 14 test tasks, and all 15 build tasks passed."},
+    {"check":"real WASM regression coverage","outcome":"pass","reason":"@wterm/ghostty 37/37 and @wterm/dom 114/114 passed against the committed binary."},
+    {"check":"force-red","outcome":"pass","reason":"Disabling Ghostty grapheme-cluster mode with the new tests retained fails the ZWJ assertion, receiving only woman plus ZWJ instead of the complete sequence."},
+    {"check":"WASM reproducibility","outcome":"pass","reason":"Two Docker rebuild hashes matched: f67b1e3cc3036d6b88c3caa3d584afd06e7baa4581484e96f45c58383bf0f066."},
+    {"check":"style","outcome":"acknowledged","reason":"gate.sh flags the new README em dash, but the loaded wterm conventions explicitly exempt established feature-bullet punctuation."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"Navigation and page-title files are unaffected because no docs page was added or renamed; all behavior-carrying docs surfaces were updated."},
+    {"check":"siblings/callers","outcome":"acknowledged","reason":"All enumerated getCell/getScrollbackCell consumers were read; built-in core callers remain compatible with optional chars, and debug output was updated to prefer chars."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"The map under-covers this TS/Zig/WASM diff: 3129 unresolved calls and no cross-language edges, so it was used only for orientation."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {"claim":"Docs navigation and page titles need no edit.","evidence":"The existing API, core, and Ghostty pages keep the same routes and titles."},
+    {"claim":"The root README em dash is allowed.","evidence":"wterm conventions explicitly preserve the established feature-bullet style."}
+  ],
+  "issue_candidates": []
+}

@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-10",
+    "repo": "vercel-labs/agent-browser",
+    "base": "21667e987212ae9a601b39974d768c2537eb4080",
+    "head": "uncommitted-tab-gone-data-follow-up",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "PR #1589 Nathan feedback",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "structured targetId",
+      "optional sanitized lastUrl",
+      "CLI, batch, and MCP propagation",
+      "documentation parity"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "Codex",
+    "reviewer_model": "Codex with solution-gate proposals from fable-5 and gpt-5.6-sol",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "error-path forcing",
+      "status": "run",
+      "reason": "Externally closed pinned tabs were driven through real CLI, batch, and E2E paths."
+    },
+    {
+      "name": "new failure outcome propagation",
+      "status": "run",
+      "reason": "Both response construction paths and downstream adapters were traced."
+    },
+    {
+      "name": "docs-behavior parity",
+      "status": "run",
+      "reason": "All required public surfaces were aligned with observed output."
+    },
+    {
+      "name": "boundary pipeline trace",
+      "status": "run",
+      "reason": "Daemon response, client response, batch result, and MCP wrapper were verified."
+    },
+    {
+      "name": "substrate verification",
+      "status": "run",
+      "reason": "The built binary was driven against real Chrome."
+    },
+    {
+      "name": "test strength",
+      "status": "run",
+      "reason": "Removing enrichment made the intended CLI and E2E assertions fail."
+    },
+    {
+      "name": "security and privacy",
+      "status": "run",
+      "reason": "Safe and opaque URL classes were exercised."
+    },
+    {
+      "name": "complexity budget",
+      "status": "skipped",
+      "reason": "No loop, lookup, or per-element path changed."
+    },
+    {
+      "name": "timing dominance",
+      "status": "skipped",
+      "reason": "No timeout or timing constant changed."
+    },
+    {
+      "name": "persistent artifact lifecycle",
+      "status": "skipped",
+      "reason": "No new persistent artifact was introduced."
+    },
+    {
+      "name": "concurrency",
+      "status": "skipped",
+      "reason": "No scheduling or ownership behavior changed."
+    },
+    {
+      "name": "migration",
+      "status": "skipped",
+      "reason": "No persisted schema changed."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "callers bound_target_gone_details",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "siblings tab_gone",
+      "outcome": "acknowledged",
+      "reason": "Untouched mentions describe unchanged semantics or terse listings; canonical contract passages were updated."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "SCIP duplicate-symbol errors yielded 0 changed symbols and 2384 unresolved calls, so the map was treated as under-covering."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": ""
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "refuted",
+      "claim": "The structured recovery data may fail to reach batch or MCP.",
+      "evidence": "Real CLI batch output exposes result.targetId and result.lastUrl; MCP unit output exposes structuredContent.response.data.",
+      "layer": "cross-process output pipeline",
+      "source": "lens",
+      "path": "BrowserManager -> execute_command -> Response.data -> batch result / MCP response"
+    },
+    {
+      "id": "F2",
+      "state": "refuted",
+      "claim": "Structured output may leak opaque URL payloads.",
+      "evidence": "The data URL E2E exposes targetId and omits lastUrl; both bound-gone writers call sanitize_url.",
+      "layer": "privacy boundary",
+      "source": "lens",
+      "path": "bound_target_gone -> attach_tab_gone_data"
+    },
+    {
+      "id": "F3",
+      "state": "issue_candidate",
+      "claim": "The full action parity test times out on screenshot.",
+      "evidence": "It fails identically on the patch and exact base commit 21667e9.",
+      "layer": "test reliability",
+      "source": "gate",
+      "path": "native::parity_tests::test_all_documented_actions_are_handled"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "The screenshot parity timeout does not block this response-contract patch.",
+      "evidence": "The exact base commit fails on the same action with the same timeout."
+    },
+    {
+      "claim": "Untouched tab_gone mentions do not all require edits.",
+      "evidence": "They describe unchanged state semantics, sanitization, batch code propagation, or terse option listings."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Stabilize the documented-actions screenshot parity test",
+      "evidence": "The 10-second screenshot action timeout reproduces on base 21667e9 and the patch.",
+      "why_out_of_scope": "The patch only enriches an existing error response and does not touch screenshot or action iteration."
+    }
+  ]
+}
