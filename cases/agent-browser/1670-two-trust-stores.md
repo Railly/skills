@@ -1,13 +1,24 @@
 # 1669/1670 — two trust stores, and the flag that read three ways
 
+Status: observed
+Validation: contributor-validated
+Human review: pending
+Maintainer acceptance: pending
+Delivery: PRs open
+Upstream status checked: 2026-08-13
+Visibility: public
+Repository: vercel-labs/agent-browser
+Role: contributor
+Source: https://github.com/vercel-labs/agent-browser/pull/1669 and https://github.com/vercel-labs/agent-browser/pull/1670
+
 **Date:** 2026-08-08
 **Repo:** vercel-labs/agent-browser
 **PRs:** [#1669](https://github.com/vercel-labs/agent-browser/pull/1669) (browser-side CA), [#1670](https://github.com/vercel-labs/agent-browser/pull/1670) (CLI-side CA), stacked
-**Origin:** Notion could not run agent-browser inside a Vercel Sandbox. Relayed through Slack with a suggested fix attached.
+**Origin:** A public-safe report described agent-browser failing behind an HTTPS interception proxy and included a suggested fix.
 
 ## What happened
 
-A customer report arrived with a diagnosis already in it: "PR #1026 might be the right solution." Reading the code first said otherwise. #1026 makes Chromium trust a CA at page-navigation time. The reported failure was the Rust CLI rejecting its own outbound peer, in a different process, before the browser exists. Merging the suggested PR would not have unblocked anyone.
+A report arrived with a diagnosis already in it: "PR #1026 might be the right solution." Reading the code first said otherwise. #1026 makes Chromium trust a CA at page-navigation time. The reported failure was the Rust CLI rejecting its own outbound peer, in a different process, before the browser exists. Merging the suggested PR would not have unblocked anyone.
 
 Both problems were real, so both got a PR. What followed was five rounds of findings on the fix, four of them corrections to work I had already called done.
 
@@ -81,4 +92,7 @@ CA removed, --use-system-ca  → UnknownIssuer
 ## Records
 
 - Solution gate run: `foundry/runs/solution-gate/2026-08-08-agent-browser-1670-ba519cf.md`, both proposals verbatim beside it.
-- Vault handoff: `05_Areas/vercel/agent-browser-ca-trust-handoff-2026-08-08.md`.
+
+## Confidentiality review
+
+Public repository, public PRs, public tool behavior, and generated certificate fixtures only. No private discussion, identity, secret, local path, or internal environment detail is included.

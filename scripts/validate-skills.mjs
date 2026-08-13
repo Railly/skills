@@ -2,6 +2,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { validateIssueContracts } from "./lib/issue-contracts.mjs";
+import { markdownLinkTargets } from "./lib/markdown-links.mjs";
 
 const SKILLS_DIR = "skills";
 const MARKETPLACE_PATH = join(".claude-plugin", "marketplace.json");
@@ -75,8 +76,7 @@ function discoverSkills() {
 
 function validateLinks(file) {
 	const text = readFileSync(file, "utf8");
-	const links = text.matchAll(/\[[^\]]+\]\(([^)]+)\)/g);
-	for (const [, target] of links) {
+	for (const target of markdownLinkTargets(text)) {
 		if (/^(https?:|mailto:|#)/.test(target)) continue;
 		const path = resolve(dirname(file), target.split("#")[0]);
 		if (!existsSync(path))
