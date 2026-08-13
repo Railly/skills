@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Candidate-audit mode for `solution-gate`, which reconstructs the contract and solution shapes before revealing an existing PR or patch
+- Primitive-contract mismatch as failure shape S12, harvested from agent-browser #1669
+
+### Fixed
+
+- Markdown link validation no longer treats code spans or fenced code as links
+- Published case validation for the agent-browser #1669/#1670 trust-store record
+
 ## 0.0.2 - 2026-08-08
 
 Unfold was one protocol with four modes. It is now nine skills with their own trigger boundaries, a maturity ladder that separates distribution from evidence, and 56 recorded cases behind them.

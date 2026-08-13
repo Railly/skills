@@ -40,7 +40,7 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 ### Solution Gate
 
-[Solution Gate](skills/.experimental/solution-gate) gates the shape of a fix before it is written. Two proposers on different model families work from the same symptom-free brief and declare falsifiable predictions; the cheapest refuting probe runs before any synthesis; proposals are scored against a catalog of recorded fix-failure shapes. It sits on the arrow between a reproduced defect and the change that answers it.
+[Solution Gate](skills/.experimental/solution-gate) gates the shape of a fix before it is written or adopted. For existing PRs and patches, candidate-audit mode seals the implementation, reconstructs the contract and solution shapes blind, probes discriminating cases, then reveals the candidate as a third proposal. This prevents a green happy path or inherited mechanism from defining the contract.
 
 ### Handoff
 

@@ -1,13 +1,11 @@
 ---
 name: solution-gate
-description: "Experimental: Gate the shape of a fix before it is written. Two reviewer runtimes on different model families propose independently, each declaring falsifiable predictions; the cheapest refuting probe runs before any synthesis; proposals are scored against a catalog of recorded fix-failure shapes. Use when a diagnosed defect has more than one plausible solution shape, when the change alters a contract between components, or when it is the fix for a previous review round. Skip for mechanical changes. Awaiting real-work cases."
-compatibility: Requires two reviewer runtimes on different model families, neither of them the runtime that will implement. Probes need the target repo buildable and runnable. Writes to a canonical Railly Skills checkout.
+description: "Experimental: Gate whether a fix or existing contributor PR is the right thing to build. Use before implementation when a defect has multiple solution shapes or changes a contract, for fixes to prior review findings, and before adopting, absorbing, recreating, or substantially amending an existing PR or patch. In candidate-audit mode, reconstruct the contract and propose solutions without seeing the candidate, probe discriminating cases, then reveal and compare it. Skip mechanical changes."
 ---
 
 # Solution gate
 
-[Review Gate](../../review-gate/SKILL.md) asks whether a diff is correct. Nothing asks whether it was the right thing to build. This gate sits on the arrow between a reproduced defect and the change that answers it, which the workflow leaves empty.
-
+[Review Gate](../../review-gate/SKILL.md) asks whether a diff is correct. Nothing asks whether it was the right thing to build. This gate sits on the arrow between a reproduced defect and the change that answers it, which the workflow leaves empty. Requires two reviewer runtimes on different model families, neither of them the implementer. Probes need the target repo buildable and runnable. Records go to the canonical Railly Skills checkout.
 That arrow is where the evidence says defects concentrate: the portless gate-miss ledger records five rounds where the *fix* was the defective artifact, each recorded in [references/runs.md](references/runs.md). The fix commit is the least-reviewed commit on any branch, and reviewing its lines was never the missing part.
 
 **The failure mode this gate must not become.** Two models arguing about a design, with no contact with the substrate, is imagination sampling with two samplers, the thing Review Gate opens by rejecting. In the round that motivated this skill every real finding came from driving the artifact and none from argument: the blind reviewer found the worst defect by building the *previous* release, starting that daemon, and measuring. Argument decides which proposal is better written; only a probe decides which is true. Every step below exists to keep the debate anchored.
@@ -19,10 +17,12 @@ Run it when any of these hold:
 - The defect admits more than one solution shape, and the shapes differ in where state lives, which component owns a decision, or what a contract promises.
 - The change alters a contract between components: a new field two processes must agree on, a changed return, a new failure outcome, a new persistent artifact.
 - It is the fix for a finding from a previous review round. This is the empirically highest-risk commit class and gets the gate regardless of how small it looks.
+- A PR, patch, or contributor shape already exists and the decision is whether to adopt, absorb, recreate, amend, or reject it.
 
 Skip it for mechanical work: a wording correction, a missing allowlist entry, a rename, a fix whose shape the defect fully determines. A gate that runs on everything becomes ceremony, and ceremony gets skipped exactly when it was needed. Record the skip and its reason, which is what makes the trigger tunable later.
 
-**Complete when:** the trigger is answered yes with which clause fired, or no with a reason, in one line.
+Choose one mode. Use the workflow below for a greenfield fix. When a candidate already exists, read and follow [candidate-audit.md](references/candidate-audit.md); it replaces steps 1–2, delays candidate inspection until after step 5, then rejoins at synthesis.
+**Complete when:** the trigger and mode are named, or the skip has a reason, in one line.
 
 ## 1. State the defect as a contract, not a symptom
 

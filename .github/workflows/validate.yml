@@ -9,11 +9,13 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
       - name: Validate skills
         run: bun scripts/validate-skills.mjs
+      - name: Test validators
+        run: bun test scripts/lib/*.test.mjs
       - name: Verify behavior fixtures
         run: bun scripts/verify-eval-fixtures.mjs
