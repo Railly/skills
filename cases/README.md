@@ -10,6 +10,7 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 - [Portless #355: test the changed caller](portless/0355-changed-caller-coverage.md)
 - [agent-browser #1532: revive a discarded tab without losing live-tab state](agent-browser/1532-discarded-tab-revival.md)
 - [agent-browser #1461: a red job nobody runs hides the bug it was built to catch](agent-browser/1461-doctor-version-query-hang.md)
+- [agent-browser #1669: an SPKI error bypass is not CA trust](agent-browser/1669-spki-bypass-is-not-ca-trust.md)
 - [wterm #86: read the dependency's contract for the field, not just its type](wterm/0086-style-id-stale-across-screens.md)
 - [wterm #67: check who calls the function before accepting a reset](wterm/0067-reconnect-reset-breaks-backoff.md)
 - [wterm #65: keep the diagnosis, change the placement in a hot path](wterm/0065-hot-path-invalidation.md)
@@ -86,6 +87,7 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 | [agent-browser session observations](agent-browser/session-observations.md) | public case cluster | unvalidated | local | cross-case operational and diagnostic patterns | candidate generator only |
 | [agent-browser PR #1594](agent-browser/1594-latest-frame-below-the-socket.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1594) | contributor-validated | PR open | a latest-wins guarantee holds only to the first hand-off; enforce it where the consumer's progress is known | review reference-rule candidate |
 | [agent-browser PR #1594 round 2](agent-browser/1594-a-test-that-hangs-reports-nothing.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1594) | contributor-validated | PR open | force-red must distinguish no-output from passed; a wedging defect needs a deadline outside the process | review reference-rule candidate |
+| [agent-browser PR #1669](agent-browser/1669-spki-bypass-is-not-ca-trust.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1669) | independently-validated | PR open | compare the primitive's accept/reject semantics with the product contract before adopting a candidate | solution-gate candidate-audit regression case |
 | [agent-browser PR #1552](agent-browser/1552-getbyrole-implicit-roles-regression.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1552) | independently-validated | PR open | a same-day merge on the same file is a checkable revert signature | review reference-rule candidate |
 | [agent-browser PR #1553](agent-browser/1553-error-detail-and-help-drift.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1553) | independently-validated | PR open | force a "can't happen" fallback once against a live instance before trusting it | review reference-rule candidate |
 | [agent-browser shared daemon](agent-browser/shared-daemon-cross-worktree-contamination.md) | PRs [#1552](https://github.com/vercel-labs/agent-browser/pull/1552) · [#1553](https://github.com/vercel-labs/agent-browser/pull/1553) | independently-validated | local | check who actually answered before trusting a live verification result | review reference-rule candidate |
