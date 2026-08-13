@@ -1,0 +1,44 @@
+{
+	"skill_name": "solution-gate",
+	"evals": [
+		{
+			"id": 1,
+			"name": "candidate-ca-trust-vs-bypass",
+			"prompt": "Audit an existing contributor PR that adds a --ca-cert option so Chromium can work behind an HTTPS interception proxy. The PR demonstrates that a page loads through mitmproxy. Decide whether we should adopt its solution shape.",
+			"expected_output": "The audit seals the candidate, reconstructs CA trust independently, derives negative discriminator cases before reading the PR, then compares the revealed mechanism against that contract.",
+			"assertions": [
+				"Does not inspect or summarize the candidate before the blind contract and proposals exist",
+				"Distinguishes adding a trust anchor from bypassing certificate errors",
+				"Requires wrong-hostname and CA-omitted-chain probes",
+				"Produces an adopt, amend, absorb, reject, or return-to-contract verdict with credit preserved"
+			],
+			"files": ["evals/fixtures/1669-candidate-audit.md"]
+		},
+		{
+			"id": 2,
+			"name": "candidate-happy-path-is-nondiscriminating",
+			"prompt": "A patch fixes the reported example and its tests are green. Two different underlying mechanisms would both pass that example. Compare the patch with the right solution before we merge it.",
+			"expected_output": "The audit derives cases where the plausible mechanisms diverge and runs those before treating the patch's green happy path as evidence.",
+			"assertions": [
+				"Builds a discriminator matrix from the product contract",
+				"Does not count a shared happy path as mechanism proof",
+				"Applies the same probes and failure-shape scoring to the revealed candidate",
+				"Records material deltas rather than favoring sunk work"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "greenfield-mode-remains-available",
+			"prompt": "We reproduced a cross-process state bug and no patch or proposed solution exists. Choose the right fix shape before implementation.",
+			"expected_output": "The normal greenfield Solution Gate runs without inventing a candidate reveal phase.",
+			"assertions": [
+				"Names greenfield mode",
+				"States the contract before proposals",
+				"Uses two independent proposer families",
+				"Runs refuting probes before synthesis"
+			],
+			"files": []
+		}
+	]
+}
