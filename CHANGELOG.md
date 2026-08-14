@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.0.4 - 2026-08-14
+
+The contributor-side selection gate is now named for the lifecycle phase it owns: Issue Intake.
+
+### Added
+
+- `issue-intake` as the canonical `backlog -> qualify -> human choice -> Issue Contract seed` skill
+- Optional `xref` graph evidence for prioritization and clustering without making it a required dependency or selection authority
+
+### Changed
+
+- Active documentation, workflow diagrams, evals, maturity metadata, and installer references now use `issue-intake`
+
+### Deprecated
+
+- `pick-an-issue`, retained as a self-contained compatibility alias for one release
+
 ## 0.0.3 - 2026-08-14
 
 Solution Gate can now audit existing work without letting it define the contract, and renders each decision in the smallest auditable visual instead of defaulting to HTML.
