@@ -9,7 +9,8 @@ Foundry governance, maturity registry, and validation script.
 .claude-plugin/marketplace.json -> README.md foundry/maturity.json scripts/validate-skills.mjs
 foundry/maturity.json -> README.md .claude-plugin/marketplace.json foundry/governance.md
 skills/.experimental/ -> README.md .claude-plugin/marketplace.json foundry/maturity.json
-skills/pick-an-issue/ -> README.md foundry/missions foundry/maturity.json
+skills/issue-intake/ -> README.md foundry/missions foundry/maturity.json
+skills/pick-an-issue/ -> skills/issue-intake README.md foundry/maturity.json
 skills/review-gate/ -> README.md .claude-plugin/marketplace.json foundry/maturity.json
 skills/record-a-case/ -> README.md .claude-plugin/marketplace.json foundry/maturity.json
 foundry/missions/ -> README.md scripts/validate-issue-contracts.mjs foundry/source-of-truth.md
@@ -23,7 +24,7 @@ foundry/missions/ -> README.md scripts/validate-issue-contracts.mjs foundry/sour
 - The target repository receives implementation artifacts only, not Railly Foundry cases, evals, or logs.
 - Stable skills live at `skills/<name>`.
 - Candidate and Experimental skills live at `skills/.experimental/<name>`.
-- Deprecated skill sources live under `foundry/deprecated/` and never appear in the marketplace or active maturity registry.
+- Retired skill sources live under `foundry/deprecated/` and never appear in the marketplace or active maturity registry. A deprecated compatibility alias may remain installable for one release when a rename would otherwise break existing invocations.
 - Distribution channel and evidence maturity remain independent fields.
 - Every installable skill appears exactly once in the marketplace and maturity registry.
 - New skills include trigger evals and method evals.

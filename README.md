@@ -6,9 +6,9 @@ These skills turn real engineering work into portable agent protocols. They favo
 
 ## Skills
 
-### Pick an Issue
+### Issue Intake
 
-[Pick an Issue](skills/pick-an-issue) surveys an external backlog, qualifies three to five candidates, presents an evidence-backed comparison matrix, recommends one, and lets the user make the final choice. It ends at selection and creates the canonical Issue Contract seed.
+[Issue Intake](skills/issue-intake) surveys an external backlog, qualifies three to five candidates, presents an evidence-backed comparison matrix, recommends one, and lets the user make the final choice. It can use `xref` as an optional graph backend, but keeps qualification and selection at the skill boundary. It ends at selection and creates the canonical Issue Contract seed.
 
 ### Record a Case
 
@@ -67,8 +67,8 @@ Experimental skills have coherent trigger and method contracts, but still need r
 ```mermaid
 flowchart LR
   Baseline[quality-baseline] --> Gap[Verified gap]
-  Backlog[Issue backlog] --> Pick[pick-an-issue]
-  Pick --> Choice{User chooses}
+  Backlog[Issue backlog] --> Intake[issue-intake]
+  Intake --> Choice{User chooses}
   Gap --> Choice
   Choice --> Contract[Issue Contract]
   Contract --> Reproduce[Reproduce and map]
@@ -89,7 +89,7 @@ Not every cycle reaches a case. When work stops with the cycle still open, `hand
 
 ## Maturity
 
-Distribution channel and evidence maturity are separate. Stable currently contains two dogfooded skills and the evaluated Review Gate; Solution Gate has greenfield and candidate-audit dogfood but stays in Experimental until a baseline round exists. Candidate and Experimental skills remain installable without implying validation.
+Distribution channel and evidence maturity are separate. Stable contains three canonical skills plus the temporary `pick-an-issue` compatibility alias; Solution Gate has greenfield and candidate-audit dogfood but stays in Experimental until a baseline round exists. Candidate and Experimental skills remain installable without implying validation.
 
 The source of truth is [foundry/maturity.json](foundry/maturity.json).
 
@@ -112,8 +112,10 @@ bunx skills add Railly/skills
 The interactive installer exposes three distinct groups: `Stable`, `Candidates`, and `Experimental`. Install only the stable surface with:
 
 ```bash
-bunx skills add Railly/skills --skill pick-an-issue --skill record-a-case --skill review-gate
+bunx skills add Railly/skills --skill issue-intake --skill record-a-case --skill review-gate
 ```
+
+`pick-an-issue` is a deprecated compatibility alias for `issue-intake` during the v0.0.4 migration window. New installations and workflow references should use `issue-intake`.
 
 Install a candidate explicitly with:
 

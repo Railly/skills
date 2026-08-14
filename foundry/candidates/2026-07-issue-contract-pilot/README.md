@@ -90,7 +90,7 @@ Do not create an `issue-contract` skill and do not assign the artifact to Unfold
 
 The lifecycle audit found no explicit Unfold invocation in 34 Vercel-related Claude sessions. The contract should remain phase-neutral:
 
-- `pick-an-issue` ends after selection.
+- `issue-intake` ends after selection.
 - Reproduction establishes Observed, Expected, red signal, and Change Surface.
 - Implementation consumes acceptance IDs, invariants, and non-goals.
 - Behavioral proof maps exact commands to acceptance claims.
