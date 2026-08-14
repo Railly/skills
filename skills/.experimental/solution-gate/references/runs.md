@@ -12,15 +12,29 @@ Provenance for the gate: which runs happened, and which runtimes produced them. 
 
 The proposer and synthesizer runtimes are not fixed. The first Portless run used `fable-5` and `gpt-5.6-sol` as proposers with `claude-opus-5` synthesizing. The 2026-08-11 run used Fable 5 and OpenAI GPT-5.5 as proposers with the Codex root runtime synthesizing. What the method requires is two proposers from different model families and a synthesizer that proposed neither candidate. Record all three runtimes in each decision record so a later reader can separate a method result from a model result.
 
-## Drawing the run (step 7 in full)
+## Rendering the run (step 7 in full)
 
-Prose is the wrong medium for behavior that is temporal, cross-process, or ordered, which is most of what this gate looks at. A sequence you can see is a sequence you can argue with. Produce one self-contained HTML page per run (no build step, no network, Mermaid inline or hand-drawn SVG) holding two clearly separated halves.
+The visual is an audit surface, not evidence and not decoration. Pick the smallest representation that exposes the disputed ownership, order, state, or contract without making the reader decode a larger artifact.
 
-**Observed behavior, before and after.** This half is evidence. Every element traces to something that was run: a real terminal transcript, a measured duration, the actual contents of a file at a moment in time. Timelines and sequence diagrams beat paragraphs here because the defects are ordering defects. Nothing enters this half that was not observed, and anything that could not be driven is drawn as an explicit gap rather than a guess.
+| Question | Smallest useful view |
+|---|---|
+| Where does state or responsibility live? | Shallow file or component tree |
+| Which calls and boundaries execute? | Call tree or compact pseudocode |
+| What contract changes? | Types and signatures |
+| What changes while most structure remains? | Diff-shaped tree, pseudocode, or signatures |
+| Which process acts first, or which message crosses a boundary? | Mermaid sequence diagram |
+| Which states and transitions matter? | Mermaid state diagram |
+| Do several coordinated views or spatial UI need one surface? | Self-contained HTML, no build step or network |
 
-**Proposed shapes, side by side.** This half is argument, and it is labelled that way on the page. A clean diagram of a wrong design is more persuasive than a muddled diagram of a right one, so the visual carries no weight the probes did not give it: mark each proposed link with the same `observed` / `inferred` / `guessed` marks from step 3, in the drawing, where a reader cannot skip them.
+Default to an inline Markdown visual in the decision record. Escalate to HTML only when a single text or Mermaid view would hide a material relationship. Record the format choice in one line so repeated HTML is visible as a method cost rather than accepted ceremony.
 
-Never merge the halves into one diagram. Merged, a proposal inherits the credibility of the measurements next to it, which is exactly the mistake a picture makes easy.
+**Observed behavior, before and after.** This is evidence. Every node or transition cites a probe ID whose log contains the command and output. Nothing enters this visual unless it was observed. Undriven behavior appears as an explicit gap, never as a plausible arrow.
+
+**Proposed shapes, side by side.** This is argument and is labelled that way. Mark every proposed node or link `observed`, `inferred`, or `guessed`. A clean picture of a wrong design carries no weight beyond the probes behind those marks.
+
+Never merge evidence and proposal into one visual. They may share an artifact only as separately titled panels with no shared arrows or unlabeled transitions. Merged, a proposal inherits the credibility of the measurements next to it.
+
+Keep only the calls, files, states, signatures, and boundaries needed to distinguish the surviving shapes. A visual that restates the whole run makes the decision harder to audit.
 
 ## The three rules of the forward chain (step 3 in full)
 
