@@ -40,7 +40,7 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 ### Solution Gate
 
-[Solution Gate](skills/.experimental/solution-gate) gates the shape of a fix before it is written or adopted. For existing PRs and patches, candidate-audit mode seals the implementation, reconstructs the contract and solution shapes blind, probes discriminating cases, then reveals the candidate as a third proposal. This prevents a green happy path or inherited mechanism from defining the contract.
+[Solution Gate](skills/.experimental/solution-gate) gates the shape of a fix before it is written or adopted. For existing PRs and patches, candidate-audit mode seals the implementation, reconstructs the contract and solution shapes blind, probes discriminating cases, then reveals the candidate as a third proposal. Each decision ends in the smallest auditable visual that exposes the disputed contract or control flow while keeping observed evidence separate from proposed shapes.
 
 ### Handoff
 
@@ -89,7 +89,7 @@ Not every cycle reaches a case. When work stops with the cycle still open, `hand
 
 ## Maturity
 
-Distribution channel and evidence maturity are separate. Stable currently contains two dogfooded skills and the evaluated Review Gate; Solution Gate is dogfooded once but stays in Experimental until a baseline round exists. Candidate and Experimental skills remain installable without implying validation.
+Distribution channel and evidence maturity are separate. Stable currently contains two dogfooded skills and the evaluated Review Gate; Solution Gate has greenfield and candidate-audit dogfood but stays in Experimental until a baseline round exists. Candidate and Experimental skills remain installable without implying validation.
 
 The source of truth is [foundry/maturity.json](foundry/maturity.json).
 

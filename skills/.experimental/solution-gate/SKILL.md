@@ -102,15 +102,15 @@ Take proposals with tongs: both proposers are confident by construction and neit
 
 **Complete when:** the chosen shape is written down with its synthesis kind, the losing material is accounted for, and every carried assumption is listed.
 
-## 7. Draw it, and keep evidence separate from proposal
+## 7. Render the smallest auditable visual
 
-Prose is the wrong medium for behavior that is temporal, cross-process, or ordered, which is most of what this gate looks at. Produce one self-contained HTML page per run (no build step, no network) holding two halves that are never merged: **observed behavior** before and after, where every element traces to something that was run, and **proposed shapes** side by side, labelled as argument and carrying the same `observed` / `inferred` / `guessed` marks from step 3. Merged into one diagram, a proposal inherits the credibility of the measurements next to it. Full guidance in [references/runs.md](references/runs.md).
+Prose hides shape, but a heavy artifact can hide it too. Use the smallest view that makes the decision auditable: a text tree, pseudocode, types, or diff for code shape; Mermaid for sequence or state; self-contained HTML only when several views or spatial UI need one surface. Keep **observed behavior** and **proposed shapes** in separate visuals so argument cannot inherit evidence's credibility. Every observed element cites a probe ID; every proposed link carries its `observed` / `inferred` / `guessed` mark. Full routing and evidence rules are in [references/runs.md](references/runs.md).
 
-**Complete when:** one HTML page opens with no build step, its observed half traces every element to a command that was run, and its proposal half is labelled as argument with evidence marks visible in the drawing.
+**Complete when:** separate evidence and proposal visuals exist in the smallest adequate format, observed elements trace to probes, and proposal evidence marks remain visible.
 
 ## 8. Record and hand off
 
-Write the decision to the canonical `Railly/skills` checkout, resolved through `RAILLY_SKILLS_REPO`, `~/Programming/railly/skills`, or `~/railly-skills` (`scripts/resolve-source-root.mjs`). Never into the target repo or an installed copy. The record holds both proposals verbatim, the forward chains, the probe log, the shape scoring, the synthesis, and the HTML page from step 7 — a decision whose losing alternatives are not preserved cannot be re-examined when the fix turns out wrong.
+Write the decision to the canonical `Railly/skills` checkout, resolved through `RAILLY_SKILLS_REPO`, `~/Programming/railly/skills`, or `~/railly-skills` (`scripts/resolve-source-root.mjs`). Never into the target repo or an installed copy. The record holds both proposals verbatim, the forward chains, the probe log, the shape scoring, the synthesis, and the visual output from step 7. A decision whose losing alternatives are not preserved cannot be re-examined when the fix turns out wrong.
 
 Then hand off. The carried assumptions become verification targets for the implementation, and belong in [trail-decisions](../trail-decisions/SKILL.md) as rows with their predicates. The must-not-change list from step 1 becomes a checklist for Review Gate step 5, where each entry is driven rather than reasoned about. A probe that refuted a proposal by exposing a defect outside the current scope is an issue candidate, not a footnote.
 

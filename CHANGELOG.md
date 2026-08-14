@@ -1,11 +1,19 @@
 # Changelog
 
-## Unreleased
+## 0.0.3 - 2026-08-14
+
+Solution Gate can now audit existing work without letting it define the contract, and renders each decision in the smallest auditable visual instead of defaulting to HTML.
 
 ### Added
 
 - Candidate-audit mode for `solution-gate`, which reconstructs the contract and solution shapes before revealing an existing PR or patch
 - Primitive-contract mismatch as failure shape S12, harvested from agent-browser #1669
+- Additional public case and gate-run evidence from agent-browser, Portless, wterm, gateway-spend, and Vercel Labs Emulate
+
+### Changed
+
+- Solution Gate adapts the smallest-view principle from [HumanLayer's `show-me` skill](https://github.com/humanlayer/skills/tree/main/plugins/show-me/skills/show-me), routing ownership, call flow, contract, state, and diff questions to compact text or Mermaid views while reserving HTML for dense multi-view artifacts
+- Visual outputs keep observed evidence and proposed shapes separate, trace observations to probe IDs, and preserve `observed`, `inferred`, and `guessed` marks
 
 ### Fixed
 
