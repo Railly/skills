@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-13",
+    "repo": "vercel-labs/wterm",
+    "base": "4a73024d9f9003972f9efa6fe1a9086d1c90417b",
+    "head": "working-tree:43d8343a65706496f647a2993a608aec299a78b0354fcd6b5b24bb36ef141826",
+    "status": "incomplete",
+    "gaps": [
+      "The reviewed artifact is uncommitted, so exact-head coverage cannot run against a final SHA.",
+      "Electron 43.4.0 on Linux/Wayland at fractional DPR is unavailable on this Mac.",
+      "Three independent Claude CLI review attempts returned no output and were terminated.",
+      "The Playwright configuration defines Chromium only, so Firefox and WebKit were unavailable."
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-13-wterm-118-fractional-scroll-4a73024.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "programmatic re-clamp remains following",
+      "real movement larger than one pixel disables following",
+      "single-use ownership token",
+      "no-op preserves pending moving assignment",
+      "latest accepted position wins",
+      "resize and rollover remain green"
+    ],
+    "gaps": [
+      "Packaged Linux/Wayland acceptance remains pending."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family",
+    "reviewer_model": "Claude CLI unavailable; local Review Gate only",
+    "same_family": true
+  },
+  "lenses": [
+    {"name":"inverse regression surface","status":"skipped","reason":"No matcher, parser, lookup, or data source was replaced."},
+    {"name":"new-domain matrix","status":"run","reason":"No-op, latest assignment, second clamp, single-use token, larger delta, resize, and rollover cells were exercised."},
+    {"name":"resolution-rule consistency across consumers","status":"skipped","reason":"No user-input resolution rule changed."},
+    {"name":"shell re-parse append domain","status":"skipped","reason":"No shell parsing or argument injection changed."},
+    {"name":"emission channel and one-shot latch reachability","status":"run","reason":"Every token producer, replacement, preservation, consumption, and clearing path was inspected and tested."},
+    {"name":"shim hermeticity","status":"skipped","reason":"No compatibility shim changed."},
+    {"name":"deliberate-default check","status":"skipped","reason":"No default value or fallback changed."},
+    {"name":"fresh-seam scan","status":"run","reason":"All producers and consumers of programmatic, follow, and resize scroll state were reconstructed."},
+    {"name":"substrate differential corpus","status":"skipped","reason":"This guard has not failed two review rounds on the same class."},
+    {"name":"reference-implementation oracle","status":"skipped","reason":"The issue supplies direct browser measurements and no reference implementation is required."},
+    {"name":"new-failure-outcome propagation","status":"skipped","reason":"No new failure outcome was introduced."},
+    {"name":"flag-propagation dispatch sweep","status":"skipped","reason":"No flag or dispatch path changed."},
+    {"name":"error-path forcing","status":"skipped","reason":"No error path changed."},
+    {"name":"non-destructive recovery","status":"skipped","reason":"No recovery contract changed."},
+    {"name":"cancellation and timeout hygiene","status":"skipped","reason":"No timer, cancellation, or async cleanup changed."},
+    {"name":"boundary pipeline trace","status":"skipped","reason":"No serialized, WASM, IPC, or adapter contract changed."},
+    {"name":"substrate verification","status":"run","reason":"Chromium macOS and deterministic clamp fixtures passed; Linux/Wayland remains an explicit gap."},
+    {"name":"dogfood the built artifact","status":"run","reason":"The production-built Vite fixture passed Chromium 51/51 across three runs."},
+    {"name":"docs-behavior parity","status":"run","reason":"Existing DOM and vanilla docs already state the behavior restored by the fix."},
+    {"name":"demonstrative example","status":"skipped","reason":"No example was added or changed."},
+    {"name":"choice audit","status":"run","reason":"The decision trail was audited locally; independent Claude attempts returned no output, leaving the pass incomplete."},
+    {"name":"complexity budget","status":"skipped","reason":"The change adds constant-time arithmetic and no per-element work."}
+  ],
+  "deterministic": [
+    {"check":"exact-head coverage","outcome":"acknowledged","reason":"Blocked until the working tree is committed."},
+    {"check":"git diff --check","outcome":"pass","reason":""},
+    {"check":"style","outcome":"pass","reason":""},
+    {"check":"surfaces","outcome":"acknowledged","reason":"Existing public docs already describe the restored behavior; no API, option, route, or promise changed."},
+    {"check":"callers _setScrollTop","outcome":"pass","reason":""},
+    {"check":"callers _scrollToBottom","outcome":"pass","reason":""},
+    {"check":"tests build types lint format","outcome":"pass","reason":"Lint contains one pre-existing PostCSS warning."},
+    {"check":"browser E2E","outcome":"pass","reason":"Chromium passed 17/17 three times."},
+    {"check":"force-red strict equality","outcome":"pass","reason":"The second-clamp regression fails when event comparison is strict."},
+    {"check":"force-red requested target","outcome":"pass","reason":"The accepted-position regression fails when the requested target is stored."}
+  ],
+  "findings": [
+    {
+      "id": "linux-wayland-acceptance",
+      "state": "unverified",
+      "claim": "The packaged fix closes the original Electron Linux/Wayland failure at DPR 1.25 and 1.6.",
+      "evidence": "The required substrate is unavailable on this Mac; deterministic fixtures and Chromium macOS pass.",
+      "layer": "packaged Electron browser compositor",
+      "source": "lens",
+      "path": "scrollHeight assignment -> compositor clamp -> later scroll event"
+    },
+    {
+      "id": "cross-family-choice-audit",
+      "state": "unverified",
+      "claim": "A different model family finds no unsupported decision in .decisions.tsv.",
+      "evidence": "Three Claude CLI attempts returned no output and were terminated.",
+      "layer": "decision audit",
+      "source": "lens",
+      "path": ".decisions.tsv -> cross-family reviewer"
+    },
+    {
+      "id": "docs-surface-absence",
+      "state": "exempted",
+      "claim": "No documentation edit is required.",
+      "evidence": "packages/@wterm/dom/README.md and apps/docs/src/app/vanilla/page.mdx already state bottom-follow, history hold, and input-to-bottom semantics.",
+      "layer": "public behavior contract",
+      "source": "gate",
+      "path": "DOM behavior -> existing package and web docs"
+    }
+  ],
+  "exemptions": [
+    {"claim":"No documentation edit is required.","evidence":"The DOM README and vanilla docs already describe the exact behavior restored on fractional layouts."},
+    {"claim":"No changelog or version edit is required.","evidence":"Releases are manual and maintainer-controlled."},
+    {"claim":"No core README edit is required.","evidence":"No core contract or package relationship changed."}
+  ],
+  "issue_candidates": [
+    {
+      "title": "Validate fractional autoscroll in packaged Electron on Linux/Wayland",
+      "evidence": "The original issue reproduces on Electron 43.4.0, Chromium 150 at DPR 1.25 and 1.6; this Mac cannot run that compositor.",
+      "why_out_of_scope": "Requires the reporter or Linux infrastructure."
+    },
+    {
+      "title": "Add Firefox and WebKit Playwright projects",
+      "evidence": "The current Playwright configuration exposes only the Chromium project.",
+      "why_out_of_scope": "Cross-browser CI expansion is not required to fix the reported Chromium compositor regression."
+    }
+  ]
+}

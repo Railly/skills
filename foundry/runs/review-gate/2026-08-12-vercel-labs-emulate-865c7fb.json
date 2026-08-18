@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-12",
+    "repo": "vercel-labs/emulate",
+    "base": "7aea54ad7c0b4a16b0208846e3d6fd4f2b7a2cf9",
+    "head": "865c7fb433f0a1b919ed1d7a33f10ad492e8709c",
+    "status": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-12-emulate-github-app-keypair-a72de43.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "A Solution Gate artifact was provided, but no separate Issue Contract or Spec review status was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "OpenAI GPT-5 Codex",
+    "reviewer_model": "Anthropic Claude Sonnet",
+    "same_family": false
+  },
+  "impactMap": {
+    "path": "radius-dogfood/2026-08-12-vercel-labs-emulate-865c7fb.json",
+    "changed": 19,
+    "impacted": 70,
+    "convergenceInspected": 31,
+    "edges": 4832,
+    "unresolvedCalls": 20452,
+    "assessment": "under-covering; used for orientation only"
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher, parser, lookup, or data source was replaced."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The seed contract accepts omitted keys and now rejects duplicate App identities."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No input resolution or precedence rule changed."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Seed preparation changed from synchronous to asynchronous."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Duplicate App IDs and slugs now reject before startup."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Both duplicate guards and async timer progress were force-red."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "The diff adds asynchronous RSA generation."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Generated keys were exercised through the installation-token HTTP flow."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "The compiled programmatic API was driven with real HTTP requests."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "The public materializer is now asynchronous."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "The package README example now awaits the asynchronous materializer."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": "The local decision trail records sequential async generation and pre-generation validation."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Duplicate validation and multi-App key generation add loops over App seeds."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "packages/emulate/src/index.ts is intentionally unchanged because CLI key delivery is outside scope and direct CLI seeding still requires private_key."
+    },
+    {
+      "check": "siblings generatedSecrets",
+      "outcome": "pass",
+      "reason": "Scoped to repository product and documentation surfaces; the local untracked decision trail is not a product surface."
+    },
+    {
+      "check": "callers materializeGitHubSeedConfig",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "callers prepareSeed",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "workspace type-check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "workspace tests",
+      "outcome": "pass",
+      "reason": "GitHub 86 tests; emulate 11 tests; all workspace tests pass."
+    },
+    {
+      "check": "workspace build",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "workspace lint",
+      "outcome": "pass",
+      "reason": "Existing warnings only; no lint errors."
+    },
+    {
+      "check": "format",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "Removing duplicate validation made both duplicate tests resolve; restoring synchronous RSA generation failed timer progress."
+    },
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "This report covers exact HEAD 865c7fb."
+    }
+  ],
+  "findings": [
+    {
+      "id": "RG-1",
+      "state": "exempted",
+      "claim": "CLI help and implementation do not need generated-key changes in this slice.",
+      "evidence": "The CLI calls seedFromConfig directly, which throws an actionable error when private_key is omitted.",
+      "layer": "public CLI contract",
+      "source": "gate",
+      "path": "packages/emulate/src/index.ts"
+    },
+    {
+      "id": "RG-2",
+      "state": "refuted",
+      "claim": "Async key generation may create unbounded crypto concurrency.",
+      "evidence": "The implementation awaits one generateKeyPair call inside a for-of loop, and review confirmed no Promise.all fan-out.",
+      "layer": "crypto concurrency",
+      "source": "lens",
+      "path": "packages/@emulators/github/src/index.ts"
+    },
+    {
+      "id": "RG-3",
+      "state": "refuted",
+      "claim": "Generated and explicit Apps may reorder generated secrets.",
+      "evidence": "An interleaved three-App regression test verifies config order and generated-key descriptor order.",
+      "layer": "seed materialization order",
+      "source": "external_review",
+      "path": "packages/@emulators/github/src/__tests__/webhook-installation.test.ts"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "packages/emulate/src/index.ts remains unchanged.",
+      "evidence": "CLI key generation and delivery are outside scope, and direct CLI seeding fails explicitly when a key is omitted."
+    },
+    {
+      "claim": "Next and Nuxt adapters remain unchanged.",
+      "evidence": "Their direct seed paths require explicit key material; persistence-aware key delivery is a separate contract."
+    },
+    {
+      "claim": ".decisions.tsv remains uncommitted.",
+      "evidence": "It is local review evidence and is not part of the product diff."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Reset all mutable createEmulator runtime state",
+      "evidence": "The resilience audit reproduced retained installation tokens and zombie webhook subscriptions after reset.",
+      "why_out_of_scope": "These lifecycle defects predate generated-key materialization."
+    },
+    {
+      "title": "Await server listening and reject port collisions",
+      "evidence": "The resilience audit reproduced a resolved createEmulator followed by uncaught EADDRINUSE.",
+      "why_out_of_scope": "Server lifecycle is independent of GitHub App key generation."
+    },
+    {
+      "title": "Retain an owned deep seed snapshot",
+      "evidence": "Nested caller mutations changed later resets.",
+      "why_out_of_scope": "The seed ownership behavior predates this slice."
+    },
+    {
+      "title": "Make Emulator.close idempotent",
+      "evidence": "Repeated close calls reject with ERR_SERVER_NOT_RUNNING.",
+      "why_out_of_scope": "Cleanup lifecycle behavior predates this slice."
+    }
+  ]
+}

@@ -1,0 +1,274 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-14",
+    "repo": "vercel-labs/agent-browser#1670",
+    "base": "0329596e6dda233a2f0c7711fff7bdfca31ed163",
+    "head": "95ca0b2607d012976b81390c17967c4309009a30",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "05_Areas/vercel/agent-browser-ca-trust-handoff-2026-08-08.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "ca-cert-always-configures-cli-tls",
+      "local-linux-chromium-also-receives-private-nss-trust",
+      "remote-attach-and-provider-modes-do-not-reject-cli-ca-trust",
+      "use-system-ca-is-cli-only",
+      "cli-only-actions-do-not-launch-a-browser",
+      "macos-and-windows-local-browser-ca-trust-remains-rejected",
+      "mcp-eve-schema-help-and-doc-parity"
+    ],
+    "gaps": [
+      "No separate Issue Contract or Spec review result was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Checked both halves of the split contract: browser-side restrictions remain while CLI TLS gains the CA in remote and CLI-only modes."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Covered local launch, CDP, auto-connect, provider, CLI-only action, platform, explicit CA, ambient SSL_CERT_FILE, and system-root classes."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Audited the shared trust options, CA loader, skip-launch classifier, and every CLI, daemon, HTTP, MCP, Eve, schema, and documentation consumer."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell detector or shell argument injection changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "Trust-source warnings are emitted by the attached CLI process before daemon work; no one-shot latch was added."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "The #1670 diff does not add a command shim; certutil behavior belongs to the reviewed #1669 base."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Without either opt-in, the CLI retains built-in Mozilla roots and browser behavior remains unchanged."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Inspected the CLI-to-daemon environment seam and the split between daemon-owned TLS and browser launch validation."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No repeatedly failing guard class required a new differential corpus in this follow-up diff."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "Used rustls, reqwest, and tokio-tungstenite connector behavior as the TLS client oracle."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Forced invalid CA, CDP refusal, provider credentials, and unsupported local-browser platform outcomes through their callers."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "Traced caCert and useSystemCa through CLI parsing, config, environment, daemon options, MCP, Eve, schemas, and all outbound clients."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Forced remote attach, provider, CLI-only, invalid trust source, and local macOS rejection paths."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "This diff adds no recovery action."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "This diff adds no timeout, cancellation path, or new wait."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced trust configuration across CLI-to-daemon, daemon-to-CDP, provider HTTP, and local-browser boundaries."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Observed the built CLI's browserLaunched field and the actual remote-mode and platform errors."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Drove read, CDP, provider, and local macOS launch modes with the real binary."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Compared CLI help, README, web docs, skill docs, MCP, Eve, and schemas with the driven split trust contract."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Proxy examples distinguish CLI TLS trust from local Linux Chromium trust."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was supplied for this diff."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Trust-store construction is cached per client path and no per-element nested scan was added."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "This report records exact signed HEAD 95ca0b2607d012976b81390c17967c4309009a30."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "The only flagged surface is streaming documentation; native/stream/chat.rs changes the internal HTTP client but not the streaming protocol or documented behavior."
+    },
+    {
+      "check": "flagsweep --use-system-ca --ignore-https-errors",
+      "outcome": "acknowledged",
+      "reason": "Changelog hits are historical; main.rs, native/actions.rs, and native/browser.rs carry browser-side ca-cert validation rather than CLI system-root semantics."
+    },
+    {
+      "check": "siblings ca-cert",
+      "outcome": "acknowledged",
+      "reason": "Every passage was read; remaining unstaged hits are browser-side CA implementation or the unrelated ca-certificates package name, and staged passages match the split contract."
+    },
+    {
+      "check": "callers apply_to_reqwest",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "callers validate_ca_cert_launch_mode",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "callers skip_launch_action",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo fmt -- --check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo clippy -- -D warnings",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo clippy --all-targets --all-features -- -D warnings",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo test serial",
+      "outcome": "pass",
+      "reason": "1,148 passed, 101 ignored, 0 failed; doctor integration 2 passed."
+    },
+    {
+      "check": "Eve typecheck and tests",
+      "outcome": "pass",
+      "reason": "Typecheck passed and 40 tests passed."
+    },
+    {
+      "check": "built artifact dogfood",
+      "outcome": "pass",
+      "reason": "read avoided launch, remote modes reached their expected external errors, and local macOS browser trust was rejected."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "82 changed, 786 impacted, 7,988 edges, 2,446 unresolved calls, and 80 SCIP-unmapped entries make the map strongly under-covering."
+    },
+    {
+      "check": "git diff --cached --check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "SPKI and conflict-marker sweep",
+      "outcome": "pass",
+      "reason": "Zero hits in the staged diff."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The daemon rejected --ca-cert in remote attach and provider modes even though the CA still configures daemon-owned CLI TLS.",
+      "evidence": "Before the fix, validate_ca_cert_launch_mode rejected external_launch. It now permits the mode and strips ca_cert only before local-browser validation; built CDP and provider commands progress to connection refusal and missing credentials.",
+      "layer": "CLI-to-daemon dispatch and browser-validation boundary",
+      "source": "lens",
+      "path": "main -> daemon environment -> handle_launch -> validate_ca_cert_launch_mode -> browser validation"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "--ca-cert caused CLI-only actions to request an accidental local browser launch.",
+      "evidence": "Before the fix, should_send_local_launch_config treated any ca_cert as launch configuration. It now consults skip_launch_action; built read succeeds with browserLaunched:false and a focused test distinguishes read from navigate.",
+      "layer": "CLI dispatch ordering and launch selection",
+      "source": "lens",
+      "path": "main -> skip_launch_action -> should_send_local_launch_config -> launch dispatch"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Streaming documentation is unaffected.",
+      "evidence": "native/stream/chat.rs only replaces reqwest::Client::new with the shared trust-aware HTTP client; protocol, payloads, and user-visible streaming behavior are unchanged."
+    },
+    {
+      "claim": "Browser-side CA implementation files need not document --use-system-ca.",
+      "evidence": "ca_bundle.rs, native/browser.rs, and the relevant native/actions.rs passages exclusively load or validate local Chromium CA trust; use-system-ca affects CLI TLS only."
+    },
+    {
+      "claim": "Historical changelogs need not add the new option.",
+      "evidence": "CHANGELOG.md and the changelog page record prior releases and are not current global-option inventories."
+    },
+    {
+      "claim": "WebGPU ca-certificates hits are unrelated.",
+      "evidence": "They name the Debian ca-certificates package."
+    },
+    {
+      "claim": "cli/src/chat.rs needs no direct change.",
+      "evidence": "It consumes the wrapper from native/stream/chat.rs, which now constructs the shared trust-aware client."
+    }
+  ],
+  "issue_candidates": []
+}

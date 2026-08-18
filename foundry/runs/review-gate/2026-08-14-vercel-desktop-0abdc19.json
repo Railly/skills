@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-14",
+    "repo": "vercel-labs/vercel-desktop",
+    "base": "62d05211615394c771433b85e31eb07987f358b4",
+    "head": "0abdc19fc520ca254b0fda64c7a3de10aec48b6c",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-5",
+    "reviewer_model": "GPT-5",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "The release preparation changes only version metadata and current release notes."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "No runtime input domain changed in the release commit."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No resolution rule changed."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No process communication changed."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No shim or fake executable changed."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "The next stable patch version is 0.0.10 after v0.0.9, with one merged bug-fix PR."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Reviewed package version, app manifest version, changelog markers, prior release PR, and release workflow together."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No classifier or guard changed in the release commit."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "The commit changes the same three files and follows the same marker and validation flow as PR #6 for v0.0.9."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No function contract changed."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No flag changed."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Version synchronization, marked release-note validation, signing verification, and DMG verification were run on the final metadata."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No recovery behavior changed in the release commit."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No asynchronous behavior changed."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced package.json 0.0.10 through app.zon, release-note extraction, app bundle metadata, DMG naming, and GitHub Release tagging."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Verified the ad-hoc signed arm64 app bundle, 0.0.10 Info.plist value, valid DMG, and SHA-256 checksum."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "pnpm release:check built and packaged the actual v0.0.10 ReleaseFast macOS artifact."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "The release workflow owns version-change detection and the release scripts own synchronization and marker validation."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "The v0.0.10 notes were checked against the sole merged change since v0.0.9, PR #7."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No example changed."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "The release commit adds no decision trail or runtime choice."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No runtime code changed in the release commit."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "pnpm release:check",
+      "outcome": "pass",
+      "reason": "Strict check, 157 tests, release notes, ReleaseFast build, ad-hoc signing, and DMG packaging completed."
+    },
+    {
+      "check": "pnpm version:check",
+      "outcome": "pass",
+      "reason": "package.json and app.zon are synchronized at 0.0.10."
+    },
+    {
+      "check": "node scripts/release-notes.mjs",
+      "outcome": "pass",
+      "reason": "Exactly one marker pair identifies the 0.0.10 notes."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "gate.sh style",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "gate.sh surfaces",
+      "outcome": "pass",
+      "reason": "The version change includes package.json, app.zon, and CHANGELOG.md."
+    },
+    {
+      "check": "release workflow artifact checks",
+      "outcome": "pass",
+      "reason": "The app signature is ad-hoc, the executable is arm64, bundle version is 0.0.10, and hdiutil verified the DMG."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "Historical 0.0.9 release notes remain unchanged.",
+      "evidence": "Only the release marker pair moved; the previous release text is preserved."
+    }
+  ],
+  "issue_candidates": []
+}
