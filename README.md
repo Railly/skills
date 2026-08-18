@@ -38,6 +38,10 @@ Candidate skills are installable methods ready for focused dogfooding.
 
 Experimental skills have coherent trigger and method contracts, but still need real-work cases and baseline comparison.
 
+### Before After
+
+[Before After](skills/.experimental/before-after) turns a bug fix, feature, benchmark, or migration into a minimal browser-openable comparison. It puts old and new behavior on one shared basis, supports screenshotable visual repros, exact benchmark tables, and small feature simulators, and uses the official Vercel report foundation.
+
 ### Solution Gate
 
 [Solution Gate](skills/.experimental/solution-gate) gates the shape of a fix before it is written or adopted. For existing PRs and patches, candidate-audit mode seals the implementation, reconstructs the contract and solution shapes blind, probes discriminating cases, then reveals the candidate as a third proposal. Each decision ends in the smallest auditable visual that exposes the disputed contract or control flow while keeping observed evidence separate from proposed shapes.
