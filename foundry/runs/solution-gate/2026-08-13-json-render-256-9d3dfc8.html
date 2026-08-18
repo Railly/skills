@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Solution Gate: json-render #256</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; background: #0b1020; color: #e7ecf7; }
+    body { margin: 0; padding: 32px; }
+    main { max-width: 1180px; margin: auto; }
+    h1, h2, h3 { line-height: 1.15; }
+    h1 { margin: 0 0 8px; }
+    h2 { margin-top: 38px; border-bottom: 1px solid #33415f; padding-bottom: 8px; }
+    .meta, .card, .probe { background: #121a2e; border: 1px solid #2a3859; border-radius: 12px; padding: 18px; }
+    .meta { color: #b9c5dc; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .flow { display: grid; gap: 10px; }
+    .node { border: 1px solid #44577d; background: #17223a; border-radius: 9px; padding: 12px; }
+    .arrow { text-align: center; color: #88a8e8; font-weight: 700; }
+    .observed { border-left: 5px solid #42d392; }
+    .inferred { border-left: 5px solid #f3b83f; }
+    .guessed { border-left: 5px solid #d980fa; }
+    .refuted { border-left: 5px solid #ff6b7a; }
+    .accepted { border-color: #42d392; }
+    .rejected { border-color: #ff6b7a; }
+    code { background: #080d18; padding: 2px 5px; border-radius: 5px; color: #b9d5ff; }
+    pre { background: #080d18; border-radius: 8px; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; color: #c8d5ea; }
+    .tag { display: inline-block; border-radius: 999px; padding: 3px 8px; font-size: 12px; font-weight: 700; margin-right: 6px; }
+    .tag.observed { background: #174b3a; border: 0; }
+    .tag.inferred { background: #5a4312; border: 0; }
+    .tag.guessed { background: #4a285c; border: 0; }
+    .tag.refuted { background: #5c2630; border: 0; }
+    ul { padding-left: 20px; }
+    @media (max-width: 820px) { body { padding: 18px; } .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Solution Gate: json-render #256</h1>
+  <div class="meta">
+    <div>Baseline: <code>origin/main@9d3dfc8</code></div>
+    <div>Proposers: Claude Fable 5 and Gemini 3.1 Pro</div>
+    <div>Implementer: Codex, excluded from proposing</div>
+    <div>Decision: explicit <code>{ "$item": string }</code> path form with a shared core resolver</div>
+  </div>
+
+  <h2>Observed behavior</h2>
+  <p>This half contains only behavior traced to commands or prior reproductions.</p>
+  <div class="flow">
+    <div class="node observed"><span class="tag observed">observed</span><code>repeat.statePath</code> is a string on main.</div>
+    <div class="arrow">↓</div>
+    <div class="node observed"><span class="tag observed">observed</span>Validator calls <code>getByPath(spec.state, element.repeat.statePath)</code> against root state.</div>
+    <div class="arrow">↓</div>
+    <div class="node observed"><span class="tag observed">observed</span>Renderers read root state and derive item base paths directly from raw <code>statePath</code>.</div>
+    <div class="arrow">↓</div>
+    <div class="node observed"><span class="tag observed">observed</span>Prompts teach only absolute repeat paths such as <code>/todos</code>.</div>
+  </div>
+  <div class="grid" style="margin-top:18px">
+    <div class="probe observed">
+      <h3>Compatibility probe</h3>
+      <pre>pnpm exec vitest run packages/core/src/types.test.ts \
+  -t 'handles paths without leading slash'</pre>
+      <p>Result: passed. Slashless strings already resolve from root.</p>
+    </div>
+    <div class="probe refuted">
+      <h3>PR #256 review evidence</h3>
+      <ul>
+        <li>Core build fails at validator string assumptions.</li>
+        <li>Svelte is omitted and its type-check fails.</li>
+        <li>Outside scope falls back to root state.</li>
+        <li><code>$item: "/subitems"</code> creates a double slash.</li>
+        <li>Prompts and docs remain absolute-only.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Proposed shapes</h2>
+  <p>This half is argument. Evidence marks remain visible.</p>
+  <div class="grid">
+    <section class="card accepted">
+      <h3>Proposal A: explicit object form</h3>
+      <div class="flow">
+        <div class="node inferred"><span class="tag inferred">inferred</span>Strings retain exact historical root semantics.</div>
+        <div class="arrow">↓</div>
+        <div class="node inferred"><span class="tag inferred">inferred</span><code>{ "$item": "tasks" }</code> opts into relative resolution.</div>
+        <div class="arrow">↓</div>
+        <div class="node inferred"><span class="tag inferred">inferred</span>One core resolver combines the enclosing absolute base path and relative JSON Pointer body.</div>
+        <div class="arrow">↓</div>
+        <div class="node inferred"><span class="tag inferred">inferred</span>Every renderer and validator consumes the same resolved absolute path.</div>
+        <div class="arrow">↓</div>
+        <div class="node guessed"><span class="tag guessed">guessed</span>Static validation remains best-effort when sample outer arrays are empty.</div>
+      </div>
+      <p><strong>Accepted with refinements:</strong> normalize leading slash, return no path outside scope, cover Svelte and static render functions, update prompt and docs.</p>
+    </section>
+
+    <section class="card rejected">
+      <h3>Proposal B: slashless string means relative</h3>
+      <div class="flow">
+        <div class="node inferred"><span class="tag inferred">inferred</span>Leading slash classifies absolute versus relative.</div>
+        <div class="arrow">↓</div>
+        <div class="node refuted"><span class="tag refuted">refuted</span>Existing <code>"tasks"</code> root paths would change meaning.</div>
+        <div class="arrow">↓</div>
+        <div class="node refuted"><span class="tag refuted">refuted</span>The existing slashless path test proves the collision.</div>
+        <div class="arrow">↓</div>
+        <div class="node refuted"><span class="tag refuted">refuted</span>A proposed test would pin the regression as expected behavior.</div>
+      </div>
+      <p><strong>Rejected:</strong> smaller public type surface cannot compensate for breaking tested string semantics.</p>
+    </section>
+  </div>
+
+  <h2>Failure-shape score</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Proposal A</h3>
+      <ul>
+        <li>S1 designed out by preserving all strings.</li>
+        <li>S2 designed out through all renderers, validator, prompts, leading slash, and outside-scope cells.</li>
+        <li>S5 partial cost from public union and unregistered consumers.</li>
+        <li>S8 and S9 require domain-derived, force-red tests.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Proposal B</h3>
+      <ul>
+        <li>S1 fatal compatibility regression.</li>
+        <li>S4 leading slash is a proxy for intent that the existing contract does not promise.</li>
+        <li>S8 omits the historically valid slashless root cell.</li>
+        <li>S9 proposed validation test asserts the regression.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Accepted contract</h2>
+  <div class="card accepted">
+    <ul>
+      <li><code>string</code> remains an existing root path.</li>
+      <li><code>{ "$item": string }</code> is relative only inside repeat scope.</li>
+      <li>Relative bodies <code>"subitems"</code> and <code>"/subitems"</code> resolve identically.</li>
+      <li>Outside scope returns no path, warns, validates as an error, and never reads root state.</li>
+      <li>The resolved path remains absolute for nested bindings, actions, filters, and indices.</li>
+      <li>Core validation, prompts, docs, Svelte, all framework renderers, and static render functions ship together.</li>
+    </ul>
+  </div>
+</main>
+</body>
+</html>

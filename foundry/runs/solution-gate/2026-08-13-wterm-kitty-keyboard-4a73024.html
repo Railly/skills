@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>wterm Kitty keyboard solution gate</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; background: #0b0d10; color: #e8edf2; }
+    body { max-width: 1100px; margin: 0 auto; padding: 32px 20px 56px; }
+    h1, h2, h3 { line-height: 1.15; }
+    .muted { color: #9ca8b5; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+    .card { border: 1px solid #29313a; border-radius: 14px; padding: 18px; background: #11151a; }
+    .observed { border-color: #238b67; }
+    .proposal { border-color: #7659d6; }
+    .accepted { border-color: #3c8cdd; }
+    .rejected { border-color: #b84a55; }
+    code { background: #1c2229; padding: 2px 6px; border-radius: 5px; }
+    .tag { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 12px; margin-right: 5px; }
+    .obs { background: #153e32; color: #8ce2c0; }
+    .inf { background: #30304a; color: #c9c5ff; }
+    .guess { background: #4a3921; color: #f1cc86; }
+    .arrow { color: #697887; padding: 0 4px; }
+    li { margin: 7px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; vertical-align: top; border-bottom: 1px solid #29313a; padding: 10px 8px; }
+  </style>
+</head>
+<body>
+  <h1>wterm Kitty keyboard protocol</h1>
+  <p class="muted">Solution Gate on <code>4a73024</code>, August 13, 2026.</p>
+
+  <h2>Observed behavior</h2>
+  <div class="grid">
+    <section class="card observed">
+      <h3>Current built-in core</h3>
+      <p><span class="tag obs">observed</span> <code>CSI ? u</code> produces no reply. Push is unhandled. Set and pop cannot establish Kitty state.</p>
+      <p>Plain <code>CSI u</code> is already cursor restore and must remain so.</p>
+    </section>
+    <section class="card observed">
+      <h3>Current Ghostty wrapper</h3>
+      <p><span class="tag obs">observed</span> Native Ghostty parses and mutates Kitty state, but the readonly wrapper drops the query.</p>
+      <p>The observable defect is missing export and response, not missing native state.</p>
+    </section>
+    <section class="card observed">
+      <h3>Real Ghostty state</h3>
+      <p><span class="tag obs">observed</span> Temporary real-WASM export measured <code>0 → 5 → 7 → 6</code> for push, OR, and NOT.</p>
+      <p>Primary and alternate screens hold independent stacks. DECSTR preserves them. RIS clears them.</p>
+    </section>
+    <section class="card observed">
+      <h3>Exact query seam</h3>
+      <p><span class="tag obs">observed</span> A temporary Zig handler reading the active native stack returned exact replies such as <code>CSI ?6u</code> and alternate <code>CSI ?9u</code>.</p>
+      <p>No TypeScript state copy was required.</p>
+    </section>
+    <section class="card observed">
+      <h3>Browser substrate</h3>
+      <p><span class="tag obs">observed</span> Chromium exposes key, code, location, repeat, modifiers, composition state, keydown, and keyup.</p>
+      <p>It does not synchronously provide a reliable base-layout mapping or events that the platform never delivers.</p>
+    </section>
+    <section class="card observed">
+      <h3>Green baseline</h3>
+      <p><span class="tag obs">observed</span> DOM 145/145, Ghostty 49/49, and Zig tests passed before implementation.</p>
+      <p>Those legacy behaviors form the regression tripwire.</p>
+    </section>
+  </div>
+
+  <h2>Proposed shapes</h2>
+  <p class="muted">This half is argument. Evidence marks remain visible so proposals do not inherit the status of the observations above.</p>
+  <div class="grid">
+    <section class="card proposal accepted">
+      <h3>Fable: native state, shared DOM encoder</h3>
+      <p><span class="tag obs">observed</span> core parses output and owns active-screen state</p>
+      <p><span class="arrow">↓</span></p>
+      <p><span class="tag inf">inferred</span> optional flag export exposes current state</p>
+      <p><span class="arrow">↓</span></p>
+      <p><span class="tag inf">inferred</span> one pure DOM encoder maps supported browser events</p>
+      <p><span class="arrow">↓</span></p>
+      <p><span class="tag inf">inferred</span> identical supported events yield identical bytes across cores</p>
+      <p><strong>Accepted cost:</strong> one new protocol encoder and a per-key core-state read.</p>
+    </section>
+    <section class="card proposal rejected">
+      <h3>Gemini: TypeScript Ghostty polyfill</h3>
+      <p><span class="tag obs">observed</span> native Ghostty mutates its own state</p>
+      <p><span class="arrow">↓</span></p>
+      <p><span class="tag inf">inferred</span> wrapper duplicates state to answer query</p>
+      <p><span class="arrow">↓</span></p>
+      <p><span class="tag guess">harmful branch</span> screen, reset, or stack semantics drift</p>
+      <p><span class="arrow">↓</span></p>
+      <p><span class="tag guess">harmful endpoint</span> application negotiates against different state than DOM encodes</p>
+      <p><strong>Refuted:</strong> the existing Zig response seam can read native state directly.</p>
+    </section>
+  </div>
+
+  <h2>Accepted contract</h2>
+  <div class="card accepted">
+    <ol>
+      <li>Each core owns an eight-entry Kitty stack per screen.</li>
+      <li>The built-in core matches Ghostty push, pop, set, OR, NOT, DECSTR, RIS, and alternate-screen semantics.</li>
+      <li><code>kittyKeyboardFlags?(): number</code> is optional. Absence or zero means legacy behavior.</li>
+      <li>Ghostty answers query inside Zig from <code>screens.active.kitty_keyboard</code>.</li>
+      <li>One pure TypeScript module encodes Kitty events for both cores.</li>
+      <li>Plain <code>CSI u</code>, IME, shortcuts, paste, focus, mouse, and all legacy bytes remain unchanged.</li>
+      <li>Unsupported browser information is omitted and tested, never invented.</li>
+    </ol>
+  </div>
+
+  <h2>Required proof during implementation</h2>
+  <table>
+    <thead><tr><th>Core state</th><th>Input bytes</th><th>Regression gates</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Query, push, set, OR, NOT, pop, depth overflow, alternate screen, DECSTR, RIS.</td>
+        <td>Printable, control, navigation, function, modifier-only, Enter/Tab/Backspace, repeat, release, alternates, associated text.</td>
+        <td>Existing DOM expectations unchanged, third-party fallback, both WASM artifacts rebuilt, Review Gate.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Verdict</h2>
+  <div class="card accepted">
+    <p><strong>Accepted for implementation.</strong> Take Fable's shape whole. Carry Gemini's maintenance warning, but reject its TypeScript shadow-state query polyfill.</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>agent-browser #1669: true CA trust replacement</title>
+<style>
+:root{color-scheme:dark;--bg:#090c11;--panel:#111720;--line:#2b3442;--text:#f3f5f8;--muted:#aab3c0;--green:#64d8a1;--blue:#79b8ff;--amber:#efc46c;--red:#ff858e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 ui-sans-serif,system-ui,sans-serif}main{max-width:1180px;margin:auto;padding:32px 20px 56px}h1{margin:0 0 8px;font-size:30px}h2{margin:34px 0 14px;font-size:22px}h3{margin:0 0 10px;font-size:17px}p,li{color:var(--muted)}.meta,.card{border:1px solid var(--line);background:var(--panel);border-radius:14px}.meta{padding:14px 18px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{padding:18px}.wide{grid-column:1/-1}.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px}.node{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#0c121a}.arrow{font-size:20px;color:var(--muted)}.bad{border-color:#743743}.good{border-color:#286246}.arg{border-style:dashed}.decision{border-color:#3a78ba;background:#101d30}.tag{display:inline-block;padding:2px 7px;border-radius:999px;font-size:11px;font-weight:700}.observed{background:#204c38;color:#aaf0c5}.inferred{background:#203d64;color:#bedcff}.guessed{background:#59451d;color:#ffe1a5}code{color:#c8dcff}.source{font-size:12px;color:#8792a4;margin-top:10px}ul{padding-left:20px}li{margin:7px 0}@media(max-width:760px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
+</style>
+</head>
+<body>
+<main>
+<h1>agent-browser #1669: true CA trust replacement</h1>
+<div class="meta">Base <code>548b159</code> · Candidate <code>79feeaa</code> · August 13, 2026 · Verdict: <strong>absorb and recreate</strong></div>
+
+<h2>Observed behavior</h2>
+<p>This half contains only behavior driven in Chromium 151 or read from the base lifecycle.</p>
+<div class="grid">
+<section class="card good">
+<h3>Private NSS HOME</h3>
+<div class="flow"><div class="node">CA A + good hostname</div><div class="arrow">→</div><div class="node good">loaded</div></div>
+<div class="flow"><div class="node">CA A + wrong hostname</div><div class="arrow">→</div><div class="node bad">privacy error</div></div>
+<div class="flow"><div class="node">CA B + CA A leaf</div><div class="arrow">→</div><div class="node bad">privacy error</div></div>
+<div class="source">Debian Chromium 151 container probe.</div>
+</section>
+<section class="card">
+<h3>NSS selection</h3>
+<div class="flow"><div class="node"><code>$HOME/.pki/nssdb</code></div><div class="arrow">→</div><div class="node">shadows XDG</div></div>
+<div class="flow"><div class="node"><code>.pki → XDG/pki</code></div><div class="arrow">→</div><div class="node good">one database</div></div>
+<div class="flow"><div class="node">private HOME</div><div class="arrow">→</div><div class="node good">public roots still load</div></div>
+<div class="source">Path-precedence and public-root probe.</div>
+</section>
+<section class="card bad">
+<h3>Candidate mechanism</h3>
+<div class="flow"><div class="node">presented key matches</div><div class="arrow">→</div><div class="node bad">all certificate errors suppressed</div></div>
+<div class="flow"><div class="node">CA omitted from chain</div><div class="arrow">→</div><div class="node bad">cannot build trust</div></div>
+<div class="source">Recorded SPKI discriminator matrix.</div>
+</section>
+<section class="card">
+<h3>Existing ownership</h3>
+<div class="flow"><div class="node">ChromeProcess</div><div class="arrow">→</div><div class="node">kill process group</div><div class="arrow">→</div><div class="node">reap</div><div class="arrow">→</div><div class="node">delete temp profile</div></div>
+<div class="source">Base <code>cli/src/native/cdp/chrome.rs</code>.</div>
+</section>
+</div>
+
+<h2>Proposed shapes, argument only</h2>
+<div class="grid">
+<section class="card arg">
+<h3>Proposal A: private HOME, bounded scope</h3>
+<div class="flow"><div class="node">UUID NSS HOME <span class="tag inferred">inferred</span></div><div class="arrow">→</div><div class="node">certutil import <span class="tag observed">primitives probed</span></div><div class="arrow">→</div><div class="node">Chrome env only <span class="tag observed">selection probed</span></div></div>
+<div class="flow"><div class="node">profile combination</div><div class="arrow">→</div><div class="node bad">reject v1 <span class="tag inferred">bounded</span></div></div>
+</section>
+<section class="card arg">
+<h3>Proposal B: private HOME with profiles</h3>
+<div class="flow"><div class="node">keep user-data-dir</div><div class="arrow">→</div><div class="node">change HOME</div><div class="arrow">→</div><div class="node bad">different NSS database <span class="tag observed">refuted</span></div></div>
+</section>
+<section class="card wide decision">
+<h3>Chosen replacement</h3>
+<div class="flow"><div class="node">validated PEM/DER bundle</div><div class="arrow">→</div><div class="node">private NSS HOME</div><div class="arrow">→</div><div class="node"><code>.pki</code> and XDG share DB</div><div class="arrow">→</div><div class="node good">Chromium verifies normally</div></div>
+<div class="flow"><div class="node">ChromeProcess owns store</div><div class="arrow">→</div><div class="node">kill and reap</div><div class="arrow">→</div><div class="node good">delete store</div></div>
+<ul>
+<li>Linux local Chromium only.</li>
+<li>Profiles, attached browsers, providers, and non-Linux platforms reject explicitly.</li>
+<li>Changing or removing CA configuration restarts the session.</li>
+<li>SPKI hashing and every bypass claim are removed.</li>
+<li>Flag plumbing, validated loader, docs surfaces, and contributor credit are preserved.</li>
+</ul>
+</section>
+</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>wterm #118 fractional scroll solution gate</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; background: #0b0d10; color: #e8edf2; }
+    body { max-width: 1080px; margin: 0 auto; padding: 32px 20px 56px; }
+    h1, h2, h3 { line-height: 1.15; }
+    .muted { color: #9ca8b5; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+    .card { border: 1px solid #29313a; border-radius: 14px; padding: 18px; background: #11151a; }
+    .observed { border-color: #238b67; }
+    .proposal { border-color: #7659d6; }
+    .accepted { border-color: #3c8cdd; }
+    .rejected { border-color: #b84a55; }
+    code { background: #1c2229; padding: 2px 6px; border-radius: 5px; }
+    .tag { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 12px; margin-right: 5px; }
+    .obs { background: #153e32; color: #8ce2c0; }
+    .inf { background: #30304a; color: #c9c5ff; }
+    .guess { background: #4a3921; color: #f1cc86; }
+    .arrow { color: #697887; padding: 0 4px; }
+    li { margin: 7px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; vertical-align: top; border-bottom: 1px solid #29313a; padding: 10px 8px; }
+  </style>
+</head>
+<body>
+  <h1>wterm #118 fractional scroll ownership</h1>
+  <p class="muted">Solution Gate on main at <code>4a73024</code>, August 13, 2026.</p>
+
+  <h2>Observed behavior</h2>
+  <div class="grid">
+    <section class="card observed">
+      <h3>Current ownership failure</h3>
+      <p><span class="tag obs">external observation</span> Electron/Linux requested bottom <code>7556</code> and landed near <code>7555</code>.</p>
+      <p>Exact equality classified wterm's own scroll as user movement and disabled following.</p>
+    </section>
+    <section class="card observed">
+      <h3>Browser assignments</h3>
+      <p><span class="tag obs">observed</span> At DPR 1.25, targets <code>100.25</code> and <code>100.5</code> were accepted as <code>100</code> and <code>101</code>.</p>
+      <p>Requested values are not stable ownership tokens.</p>
+    </section>
+    <section class="card observed">
+      <h3>Second clamp</h3>
+      <p><span class="tag obs">observed</span> Assignment landed at <code>900</code>, layout changed, then the event arrived at <code>899</code>.</p>
+      <p>This refutes read-back plus strict event equality.</p>
+    </section>
+    <section class="card observed">
+      <h3>Event semantics</h3>
+      <p><span class="tag obs">observed</span> No-op assignments emit no event. Three writes coalesced into one event. Programmatic events were trusted.</p>
+      <p>Boolean, counter, and <code>isTrusted</code> designs do not identify ownership.</p>
+    </section>
+  </div>
+
+  <h2>Proposed shapes</h2>
+  <p class="muted">This half is argument. Evidence marks do not turn proposals into observations.</p>
+  <div class="grid">
+    <section class="card proposal rejected">
+      <h3>Fable: accepted value, strict event</h3>
+      <p><span class="tag inf">inferred</span> assign <span class="arrow">→</span> read accepted value <span class="arrow">→</span> exact event match</p>
+      <p><span class="tag obs">refuted</span> Layout can re-clamp before event delivery.</p>
+      <p><strong>Useful contribution:</strong> one helper owns every product scroll write.</p>
+    </section>
+    <section class="card proposal rejected">
+      <h3>Gemini: tolerant write, strict event</h3>
+      <p><span class="tag inf">inferred</span> skip near-target write <span class="arrow">→</span> avoid repeat work</p>
+      <p><span class="tag obs">refuted</span> Strict event comparison still misses a second clamp.</p>
+      <p><strong>Useful contribution:</strong> browser rounding needs an explicit tolerance contract.</p>
+    </section>
+    <section class="card proposal accepted">
+      <h3>Graft: accepted token plus bounded event distance</h3>
+      <p><span class="tag inf">inferred</span> request past end <span class="arrow">→</span> browser chooses true maximum</p>
+      <p><span class="tag inf">inferred</span> record accepted position <span class="arrow">→</span> consume event within one CSS pixel</p>
+      <p><span class="tag inf">inferred</span> single-use token <span class="arrow">→</span> bounded attribution</p>
+      <p><strong>Accepted cost:</strong> a one-pixel concurrent user movement may be consumed. Existing bottom semantics already use a five-pixel following band.</p>
+    </section>
+  </div>
+
+  <h2>Implementation contract</h2>
+  <div class="card accepted">
+    <ol>
+      <li><code>_scrollToBottom</code> assigns <code>scrollHeight</code> and lets the browser clamp.</li>
+      <li><code>_setScrollTop</code> records the accepted value only when the position moves.</li>
+      <li><code>_onScroll</code> consumes one event within one CSS pixel of the token.</li>
+      <li>A non-match clears the token, disables following, and schedules rendering.</li>
+      <li>Every product <code>scrollTop</code> write uses the helper.</li>
+      <li>Resize-pending ownership remains higher priority.</li>
+    </ol>
+  </div>
+
+  <h2>Required proof</h2>
+  <table>
+    <thead><tr><th>Deterministic tests</th><th>Browser gates</th><th>Release acceptance</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Initial clamp, second clamp, no-op, coalescing, single-use token, non-match.</td>
+        <td>DPR 1/1.25/1.6, bottom follow, history hold, keyboard return, resize and rollover.</td>
+        <td>Electron 43.4.0 on Linux/Wayland with fractional scaling, matching issue #118.</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

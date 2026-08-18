@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vercel Desktop onboarding re-entry solution gate</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; background: #0b0d10; color: #e8edf2; }
+    body { max-width: 1120px; margin: 0 auto; padding: 32px 20px 56px; }
+    h1, h2, h3 { line-height: 1.15; }
+    h1 { margin-bottom: 8px; }
+    .muted { color: #9ca8b5; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+    .card { border: 1px solid #29313a; border-radius: 14px; padding: 18px; background: #11151a; }
+    .observed { border-color: #238b67; }
+    .proposal { border-color: #7659d6; }
+    .accepted { border-color: #3c8cdd; }
+    .rejected { border-color: #b84a55; }
+    code { background: #1c2229; padding: 2px 6px; border-radius: 5px; }
+    .tag { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 12px; margin-right: 5px; }
+    .obs { background: #153e32; color: #8ce2c0; }
+    .inf { background: #30304a; color: #c9c5ff; }
+    .guess { background: #4a3921; color: #f1cc86; }
+    .arrow { color: #697887; padding: 0 4px; }
+    li { margin: 7px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; vertical-align: top; border-bottom: 1px solid #29313a; padding: 10px 8px; }
+  </style>
+</head>
+<body>
+  <h1>Vercel Desktop onboarding re-entry</h1>
+  <p class="muted">Solution Gate on v0.0.9 at 5c13266, August 14, 2026.</p>
+
+  <h2>Observed behavior</h2>
+  <p class="muted">Every element in this section traces to source inspection or an isolated model test run.</p>
+  <div class="grid">
+    <section class="card observed">
+      <h3>Picker survives reopen</h3>
+      <p><span class="tag obs">observed</span> <code>phase = selecting_team</code> survives dismiss and reopen.</p>
+      <p>The shared markup continues rendering account selection.</p>
+    </section>
+    <section class="card observed">
+      <h3>Agents are destroyed</h3>
+      <p><span class="tag obs">observed</span> reopen calls the signed-out helper.</p>
+      <p><code>onboarding_agents_step = false</code> removes the declared next step.</p>
+    </section>
+    <section class="card observed">
+      <h3>Draft is destroyed</h3>
+      <p><span class="tag obs">observed</span> <code>cancelCreateKeyDraft</code> sets the phase hidden and clears scope and name.</p>
+      <p>Spend Management reads false because draft defaults never ran.</p>
+    </section>
+    <section class="card observed">
+      <h3>View falls into create-key</h3>
+      <p><span class="tag obs">observed</span> not picker + not agents + onboarding open <span class="arrow">→</span> create-key markup.</p>
+      <p><span class="tag obs">observed</span> hidden draft <span class="arrow">→</span> disabled primary action.</p>
+    </section>
+  </div>
+
+  <h2>Proposed shapes</h2>
+  <p class="muted">This section is argument. Evidence marks apply to each link.</p>
+  <div class="grid">
+    <section class="card proposal accepted">
+      <h3>Proposal A: re-entry reconciler</h3>
+      <p><span class="tag obs">observed</span> existing fields describe picker, agents, and draft</p>
+      <p><span class="tag inf">inferred</span> one incomplete-onboarding opener <span class="arrow">→</span> preserve valid progress or repair absent state</p>
+      <p><span class="tag inf">inferred</span> current-scope check <span class="arrow">→</span> no stale-team draft</p>
+      <p><span class="tag inf">inferred</span> render guard <span class="arrow">→</span> future invalid state cannot display a dead form</p>
+      <p><strong>Harmful branch:</strong> progress now survives window close. Accepted as the intended behavior.</p>
+    </section>
+    <section class="card proposal">
+      <h3>Proposal B: explicit step machine</h3>
+      <p><span class="tag inf">inferred</span> named onboarding step <span class="arrow">→</span> view no longer infers by absence</p>
+      <p><span class="tag guess">guessed</span> future steps become easier to add</p>
+      <p><span class="tag inf">inferred</span> new step plus old <code>phase</code>, agent flag, and draft phase <span class="arrow">→</span> overlapping truth unless broadly refactored</p>
+      <p><strong>Harmful branch:</strong> larger S1 surface across working sign-in and Settings paths.</p>
+    </section>
+  </div>
+
+  <h2>Chosen graft</h2>
+  <div class="card accepted">
+    <ol>
+      <li>Use one runtime-only reconciler for authenticated incomplete onboarding.</li>
+      <li>Keep the existing picker state and preserve agent selection across window close.</li>
+      <li>Preserve an edited draft only when its scope still matches the selected account.</li>
+      <li>Initialize absent or stale drafts with the existing default-draft transition.</li>
+      <li>Keep true signed-out reset separate.</li>
+      <li>Render create-key only when a form exists. Never initialize from the view.</li>
+      <li>Do not add persistence or relax button validation.</li>
+    </ol>
+  </div>
+
+  <h2>Verification matrix</h2>
+  <table>
+    <thead><tr><th>Entry state</th><th>Expected reopen</th><th>Risk checked</th></tr></thead>
+    <tbody>
+      <tr><td>Team picker</td><td>Same picker</td><td>Do not restart or skip scope</td></tr>
+      <tr><td>Agent selection</td><td>Same selections</td><td>Do not destroy progress</td></tr>
+      <tr><td>Valid current-scope draft</td><td>Same editable draft</td><td>Do not reset user input</td></tr>
+      <tr><td>Hidden or stale-scope draft</td><td>Rebuilt defaults</td><td>No dead form or wrong account</td></tr>
+      <tr><td>Signed out</td><td>Sign-in surface, stale state cleared</td><td>Do not preserve invalid authenticated progress</td></tr>
+    </tbody>
+  </table>
+</body>
+</html>

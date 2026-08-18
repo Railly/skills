@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>wterm #116 resilience solution gate</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;margin:0;background:#0b1020;color:#e7ecf5}
+main{max-width:1100px;margin:auto;padding:32px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+section{background:#131a2d;border:1px solid #2a3655;border-radius:12px;padding:20px}
+h1,h2,h3{line-height:1.2}.observed{border-color:#3b82f6}.proposed{border-color:#a78bfa}
+.row{display:flex;gap:10px;align-items:center;margin:12px 0}.box{padding:10px 12px;border-radius:8px;background:#1d2943;flex:1}
+.arrow{color:#8da2c8}.tag{font-size:12px;padding:2px 7px;border-radius:99px;background:#263655}
+.observed-tag{background:#164e63}.inferred-tag{background:#4c1d95}.refuted{background:#7f1d1d}.accepted{background:#14532d}
+code{color:#bfdbfe}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #2a3655;text-align:left;padding:8px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<h1>wterm PR #116 resilience solution gate</h1>
+<p>Target <code>4852dde</code>. Observed evidence and proposed shapes remain visually separate.</p>
+
+<div class="grid">
+<section class="observed">
+<h2>Observed behavior</h2>
+<h3>D1 scroll anchoring</h3>
+<div class="row"><div class="box">Start: <code>scrollTop 6000</code><br>first row <code>history 0354</code></div><span class="arrow">→</span><div class="box">40 frame-separated discards</div></div>
+<div class="row"><div class="box refuted">Observed: <code>4640</code><br><code>history 0314</code></div><span class="tag observed-tag">observed</span></div>
+<div class="row"><div class="box accepted">Injected <code>overflow-anchor:none</code>: <code>5320</code>, same row</div><span class="tag observed-tag">observed</span></div>
+
+<h3>D2 built-in capacity</h3>
+<div class="row"><div class="box"><code>MAX_LINKS=1024</code></div><span class="arrow">→</span><div class="box">1025th open returns index 0</div><span class="arrow">→</span><div class="box refuted">plain text, no host signal</div></div>
+
+<h3>D3 Ghostty retention</h3>
+<table><tr><th>Identities read</th><th>Map size</th></tr><tr><td>800</td><td>800</td></tr><tr><td>1024</td><td>1024</td></tr><tr><td>1200</td><td>1200</td></tr><tr><td>1600</td><td>1600</td></tr></table>
+<p><span class="tag observed-tag">observed</span> WASM lookup and decode happen before the map lookup.</p>
+</section>
+
+<section class="proposed">
+<h2>Proposed shapes</h2>
+<h3>Round 1, refuted</h3>
+<div class="row"><div class="box refuted">D1: relocate or rewrite JavaScript compensation</div><span class="tag inferred-tag">inferred</span></div>
+<p>Refuted because Chromium remains a second effective owner.</p>
+<div class="row"><div class="box refuted">D3: bounded LRU</div><span class="tag inferred-tag">inferred</span></div>
+<p>Refuted rationale: the cache avoids no WASM lookup or decode.</p>
+
+<h3>Accepted graft</h3>
+<div class="row"><div class="box accepted">D1: canonical <code>.wterm { overflow-anchor:none }</code></div><span class="tag observed-tag">probe-supported</span></div>
+<div class="row"><div class="box accepted">D2: allocator-owned rejection counter plus optional core resource state</div><span class="tag inferred-tag">inferred, to verify</span></div>
+<div class="row"><div class="box accepted">D3: delete unbounded JS map; page metadata remains truth</div><span class="tag inferred-tag">inferred, to verify</span></div>
+
+<h3>Rejected seam</h3>
+<div class="row"><div class="box refuted">Inline anchoring style in constructor</div><span class="tag inferred-tag">S1 over-reach</span></div>
+<p>The supported integration already requires canonical CSS. Imperative styling would unnecessarily override consumers.</p>
+</section>
+</div>
+
+<section style="margin-top:18px">
+<h2>Verification targets</h2>
+<ol>
+<li>Chromium batched and frame-separated rollover both end at 5320 with the same logical row.</li>
+<li>Firefox and WebKit execute the same oracle.</li>
+<li>Built-in saturation is observable without changing cell semantics or RIS identity stability.</li>
+<li>Ghostty retained JavaScript state is constant and hyperlink values remain exact.</li>
+<li>Before/after hyperlink-heavy timing does not materially regress.</li>
+</ol>
+</section>
+</main></body></html>
