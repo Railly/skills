@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solution gate: emulate GitHub App keypair</title>
+<style>
+  :root { color-scheme: dark; --bg:#080b10; --panel:#111720; --line:#293342; --text:#f2f4f8; --muted:#a7b0bf; --green:#63d7a1; --blue:#7ab8ff; --amber:#f2c66d; --red:#ff818a; }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif }
+  main { max-width:1180px; margin:auto; padding:32px 20px 56px }
+  h1 { margin:0 0 8px; font-size:30px }
+  h2 { margin:36px 0 14px; font-size:22px }
+  h3 { margin:0 0 10px; font-size:17px }
+  p,li { color:var(--muted) }
+  .meta,.card { border:1px solid var(--line); background:var(--panel); border-radius:14px }
+  .meta { padding:14px 18px }
+  .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px }
+  .card { padding:18px }
+  .wide { grid-column:1/-1 }
+  .flow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px }
+  .node { padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#0c121a; min-width:135px }
+  .arrow { color:var(--muted); font-size:20px }
+  .bad { border-color:#743744 }
+  .good { border-color:#286246 }
+  .arg { border-style:dashed }
+  .decision { border-color:#3979bd; background:#101d30 }
+  .tag { display:inline-block; padding:2px 7px; margin-left:4px; border-radius:999px; font-size:11px; font-weight:700 }
+  .observed { background:#204c38; color:#aaf0c5 }
+  .inferred { background:#203d64; color:#bedcff }
+  .guessed { background:#5a451e; color:#ffe1a5 }
+  code { color:#c7dcff }
+  ul { padding-left:20px; margin-bottom:0 }
+  li { margin:7px 0 }
+  strong { color:var(--text) }
+  .source { font-size:12px; color:#8792a4; margin-top:10px }
+  @media (max-width:760px) { .grid { grid-template-columns:1fr } .wide { grid-column:auto } .arrow { transform:rotate(90deg) } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Solution gate: GitHub App keypair ergonomics</h1>
+  <div class="meta">Target <code>a72de43</code> · August 12, 2026 · Decision: <strong>reduced graft, programmatic API first</strong></div>
+
+  <h2>Observed behavior</h2>
+  <p>This half contains only source state or measurements that were directly inspected or run.</p>
+  <div class="grid">
+    <section class="card bad">
+      <h3>Current required-key path</h3>
+      <div class="flow">
+        <div class="node">seed requires<br><code>private_key</code></div><div class="arrow">→</div>
+        <div class="node">store app row</div><div class="arrow">→</div>
+        <div class="node">resolver derives<br>public key</div><div class="arrow">→</div>
+        <div class="node">RS256 verify</div>
+      </div>
+      <div class="source">Inspected: github index and core auth middleware at a72de43.</div>
+    </section>
+
+    <section class="card bad">
+      <h3>Reset identity boundary</h3>
+      <div class="flow">
+        <div class="node">capture signing key</div><div class="arrow">→</div>
+        <div class="node bad"><code>store.reset()</code></div><div class="arrow">→</div>
+        <div class="node bad">seed runs again</div><div class="arrow">→</div>
+        <div class="node bad">naive generation rotates</div>
+      </div>
+      <div class="source">Inspected: packages/emulate/src/api.ts lines 61–76.</div>
+    </section>
+
+    <section class="card">
+      <h3>Embedded adapter boundary</h3>
+      <div class="flow">
+        <div class="node">load persisted snapshot</div><div class="arrow">→</div>
+        <div class="node">restore store</div><div class="arrow">→</div>
+        <div class="node">skip seed</div>
+      </div>
+      <div class="flow">
+        <div class="node">no snapshot</div><div class="arrow">→</div>
+        <div class="node">direct <code>seedFromConfig</code></div><div class="arrow">→</div>
+        <div class="node">persist entity</div>
+      </div>
+      <div class="source">Inspected: adapter-next and adapter-nuxt initialization paths.</div>
+    </section>
+
+    <section class="card good">
+      <h3>RSA compatibility and cost</h3>
+      <ul>
+        <li>PKCS#1 PEM signed and verified through <code>createPublicKey()</code>.</li>
+        <li>Measured five RSA-2048 generations: 4.68–24.53 ms.</li>
+        <li>Measured PEM size: 1675–1679 bytes.</li>
+      </ul>
+      <div class="source">Probe: Node crypto on the Vercel MacBook Pro.</div>
+    </section>
+  </div>
+
+  <h2>Proposed shapes, argument only</h2>
+  <p>Dashed cards are proposals. Evidence marks apply to each link and do not turn the proposal into observation.</p>
+  <div class="grid">
+    <section class="card arg">
+      <h3>Proposal A: normalize before runners</h3>
+      <div class="flow">
+        <div class="node">materialize cloned seed <span class="tag inferred">inferred</span></div><div class="arrow">→</div>
+        <div class="node">reuse for reset <span class="tag observed">source-backed</span></div><div class="arrow">→</div>
+        <div class="node">return generated secrets <span class="tag guessed">proposed</span></div>
+      </div>
+      <div class="flow">
+        <div class="node bad">print PEM by default <span class="tag guessed">proposed</span></div><div class="arrow">→</div>
+        <div class="node bad">CI logs retain key <span class="tag inferred">inferred</span></div>
+      </div>
+      <ul>
+        <li>Strong reset ownership and no entity change.</li>
+        <li>Incomplete for adapters if the hook exists only in packages/emulate.</li>
+      </ul>
+    </section>
+
+    <section class="card arg">
+      <h3>Proposal B: mutate seed and expose by HTTP</h3>
+      <div class="flow">
+        <div class="node">generate in seed <span class="tag guessed">proposed</span></div><div class="arrow">→</div>
+        <div class="node">mutate caller config <span class="tag inferred">inferred</span></div><div class="arrow">→</div>
+        <div class="node">same-process reset reuses key <span class="tag inferred">inferred</span></div>
+      </div>
+      <div class="flow">
+        <div class="node bad"><code>GET /apps/:slug</code> <span class="tag guessed">proposed</span></div><div class="arrow">→</div>
+        <div class="node bad">reachable client gets signing key <span class="tag inferred">inferred</span></div>
+      </div>
+      <ul>
+        <li>Small source diff.</li>
+        <li>Creates a misleading GitHub-shaped route and an implicit config side effect.</li>
+      </ul>
+    </section>
+
+    <section class="card wide decision">
+      <h3>Chosen first slice</h3>
+      <div class="flow">
+        <div class="node">optional seed key</div><div class="arrow">→</div>
+        <div class="node">pure materializer</div><div class="arrow">→</div>
+        <div class="node">normalize once in <code>createEmulator</code></div><div class="arrow">→</div>
+        <div class="node good">readonly <code>generatedSecrets</code></div>
+      </div>
+      <ul>
+        <li>Existing entity, resolver, auth middleware, routes, and store format stay unchanged.</li>
+        <li>Only generated keys are returned; explicit keys are never re-exposed.</li>
+        <li>No HTTP route, stdout PEM, automatic disk write, or adapter parity claim.</li>
+        <li>CLI delivery and embedded adapter access become separate follow-up gates.</li>
+      </ul>
+    </section>
+  </div>
+</main>
+</body>
+</html>
