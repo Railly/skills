@@ -47,23 +47,23 @@
   "signature-repro": {
    "type": "triage",
    "channel": "candidate",
-   "maturity": "experimental",
-   "summary": "Niche triage for bugs that require unavailable hardware or platforms, using structural or visual signatures on available machines. Retained as Candidate only for that boundary and awaiting a baseline eval round.",
-   "decision": "rounds/004-skill-lifecycle-audit/README.md"
+   "maturity": "dogfooded",
+   "summary": "Niche triage for bugs that require unavailable hardware or platforms, using structural or visual signatures on available machines. Applied as written on agent-browser #1461 and needed no revision. Baseline eval round still pending.",
+   "decision": "rounds/006-usage-based-reclassification/README.md"
   },
   "handoff": {
    "type": "foundry",
    "channel": "experimental",
-   "maturity": "experimental",
-   "summary": "End-of-cycle handoff derived from twelve hand-written handoffs across vcut, petdex, portless, wterm, gateway-spend, and agent-browser. Three required sections, read-only state verification, and stacked sessions. Supersedes the retired session-handoff template and awaits its first dogfood run.",
-   "decision": "rounds/004-skill-lifecycle-audit/README.md"
+   "maturity": "dogfooded",
+   "summary": "End-of-cycle handoff derived from twelve hand-written handoffs across vcut, petdex, portless, wterm, gateway-spend, and agent-browser. Promoted on Hunter's direct call after heavy personal dogfooding; a dedicated repository case is still owed.",
+   "decision": "rounds/007-human-override-promotions/README.md"
   },
   "quality-baseline": {
    "type": "audit",
    "channel": "experimental",
-   "maturity": "experimental",
-   "summary": "Read-only repository quality baseline. Frozen outside the default issue workflow until a real quality-baseline request supplies dogfood evidence.",
-   "decision": "rounds/004-skill-lifecycle-audit/README.md"
+   "maturity": "dogfooded",
+   "summary": "Read-only repository quality baseline. Ran on portless #369 and surfaced the untested write paths that led directly to the fix. Baseline comparison remains pending.",
+   "decision": "rounds/006-usage-based-reclassification/README.md"
   },
   "performance-proof": {
    "type": "optimization",
@@ -75,9 +75,9 @@
   "test-strength": {
    "type": "verification",
    "channel": "experimental",
-   "maturity": "experimental",
-   "summary": "Test effectiveness workflow using falsification, mutation, properties, real boundaries, and artifact checks. Retained as the proof-successor candidate and awaiting comparison against archived Unfold Review and no-skill baselines.",
-   "decision": "rounds/004-skill-lifecycle-audit/README.md"
+   "maturity": "dogfooded",
+   "summary": "Test effectiveness workflow using falsification, mutation, properties, real boundaries, and artifact checks. Applied inside real Review Gate runs on portless #366 and #374. Baseline comparison remains pending.",
+   "decision": "rounds/006-usage-based-reclassification/README.md"
   },
   "resilience-audit": {
    "type": "audit",
@@ -88,10 +88,17 @@
   },
   "solution-gate": {
    "type": "gate",
+   "channel": "stable",
+   "maturity": "dogfooded",
+   "summary": "Orchestrates Shaping before implementation: freezes the evidence-backed contract, runs isolated Shaping passes, probes weak assumptions, feeds evidence back into fit checks, and gates the surviving shape before detailing. Promoted to stable on Hunter's direct call; formal baseline comparison remains pending.",
+   "decision": "rounds/007-human-override-promotions/README.md"
+  },
+  "xref": {
+   "type": "intake",
    "channel": "experimental",
    "maturity": "dogfooded",
-   "summary": "Gates the shape of a fix before it is written or adopted: blind cross-family proposals, discriminating probes, failure-shape scoring, candidate audit, and compact evidence-preserving visuals. Dogfooded on greenfield fixes and one retrospective candidate audit; no baseline comparison yet.",
-   "decision": "runs/solution-gate/2026-07-29-portless-367-c0862b9.md"
+   "summary": "Snapshots the reference graph of a GitHub pull request or issue to surface orphans, competing work, structural links, and file-overlap risks. Registered after repeated real use; no baseline comparison yet.",
+   "decision": "rounds/005-register-xref/README.md"
   }
  }
 }
