@@ -85,12 +85,19 @@ Two consumers read the same user-supplied input, and the one holding more author
 - **Ask:** list every consumer of this input, rank them by what a wrong value buys an attacker or a mistake, and check that validation strength runs in the same order. Where it does not, the weaker check is the real contract.
 - **Provenance:** agent-browser #1669 (2026-08-08) — `--ca-cert` fed both a rustls root store, which validated the certificate, and Chromium's `--ignore-certificate-errors-spki-list`, which suppresses every certificate error for a chain carrying the key and reached the file through a positional ASN.1 walk with no OID, signature, or structure check. A 37-byte file that openssl refuses to load produced a hash and Chromium received it. The stronger grant had the weaker validator. Closed by one shared loader whose discriminator is a certificate parser's verdict.
 
-## S12. Primitive-contract mismatch: the mechanism succeeds by violating the promise
+## S12. Primitive-contract mismatch — the mechanism succeeds by violating the promise
 
 The feature promises one contract, but the chosen primitive has different acceptance semantics. The reported happy path passes, so implementation and tests look correct while negative cases reveal that the product built a bypass, approximation, or adjacent capability.
 
 - **Ask:** write the feature contract and primitive semantics as separate accept/reject rules. Which input must the contract accept while the primitive rejects, and which must the contract reject while the primitive accepts?
-- **Provenance:** [agent-browser #1669](../../../../cases/agent-browser/1669-spki-bypass-is-not-ca-trust.md) (2026-08-13). `--ca-cert` promised to trust a supplied interception CA while retaining certificate and hostname verification. The implementation used Chromium's SPKI error bypass. It accepted a wrong-hostname leaf when a presented key matched, and rejected a valid separately keyed leaf when the supplied CA was omitted from the presented chain. The process knew the flag was stronger than adding a root but gated only certificate parsing, not trust semantics.
+- **Provenance:** [agent-browser #1669](../../../cases/agent-browser/1669-spki-bypass-is-not-ca-trust.md) (2026-08-13) — `--ca-cert` promised to trust a supplied interception CA while retaining certificate and hostname verification. The implementation used Chromium's SPKI error bypass. It accepted a wrong-hostname leaf when a presented key matched, and rejected a valid separately keyed leaf when the supplied CA was omitted from the presented chain. The process knew the flag was stronger than adding a root but gated only certificate parsing, not trust semantics.
+
+## S13. Invocation-state collapse — omission becomes removal
+
+A command controls a long-lived session, but the implementation treats an input absent from the current invocation as an instruction to erase previously effective state. Single-command cells and unit fingerprints pass while the next ordinary command restarts the process, loses continuity, or silently reverts configuration.
+
+- **Ask:** for every persistent input, what do `set → omitted`, `set → same`, `set → changed`, and `set → explicit clear` mean? Which syntax represents clear? Drive at least two commands in one live session and compare process, target, URL, application state, and other continuity observables before and after.
+- **Provenance:** [agent-browser #1669 escape autopsy](../../../foundry/runs/review-gate/2026-08-17-agent-browser-1669-daemon-ca-stickiness-0329596.md) (2026-08-17) — the gated shape required adding, changing, or removing `--ca-cert` to restart Chromium. Its fingerprint test therefore asserted `Some → None` was different, and the Linux matrix ran each cell in a separate session. In the real workflow, `open` supplied the CA and the following `snapshot` omitted the flag; omission restarted the daemon, closed the browser, lost the target and URL, and relaunched at `about:blank`. Repeating the flag preserved all four observables.
 
 ---
 

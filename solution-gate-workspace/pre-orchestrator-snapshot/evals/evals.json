@@ -1,0 +1,84 @@
+{
+	"skill_name": "solution-gate",
+	"evals": [
+		{
+			"id": 1,
+			"name": "candidate-ca-trust-vs-bypass",
+			"prompt": "Audit an existing contributor PR that adds a --ca-cert option so Chromium can work behind an HTTPS interception proxy. The PR demonstrates that a page loads through mitmproxy. Decide whether we should adopt its solution shape.",
+			"expected_output": "The audit seals the candidate, reconstructs CA trust independently, derives negative discriminator cases before reading the PR, then compares the revealed mechanism against that contract.",
+			"assertions": [
+				"Does not inspect or summarize the candidate before the blind contract and proposals exist",
+				"Distinguishes adding a trust anchor from bypassing certificate errors",
+				"Requires wrong-hostname and CA-omitted-chain probes",
+				"Produces an adopt, amend, absorb, reject, or return-to-contract verdict with credit preserved"
+			],
+			"files": [
+				"evals/fixtures/1669-candidate-audit.md"
+			]
+		},
+		{
+			"id": 2,
+			"name": "candidate-happy-path-is-nondiscriminating",
+			"prompt": "A patch fixes the reported example and its tests are green. Two different underlying mechanisms would both pass that example. Compare the patch with the right solution before we merge it.",
+			"expected_output": "The audit derives cases where the plausible mechanisms diverge and runs those before treating the patch's green happy path as evidence.",
+			"assertions": [
+				"Builds a discriminator matrix from the product contract",
+				"Does not count a shared happy path as mechanism proof",
+				"Applies the same probes and failure-shape scoring to the revealed candidate",
+				"Records material deltas rather than favoring sunk work"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "greenfield-mode-remains-available",
+			"prompt": "We reproduced a cross-process state bug and no patch or proposed solution exists. Choose the right fix shape before implementation.",
+			"expected_output": "The normal greenfield Solution Gate runs without inventing a candidate reveal phase.",
+			"assertions": [
+				"Names greenfield mode",
+				"States the contract before proposals",
+				"Uses two independent proposer families",
+				"Runs refuting probes before synthesis"
+			],
+			"files": []
+		},
+		{
+			"id": 4,
+			"name": "session-option-omission-is-not-clear",
+			"prompt": "Gate a proposed fix for a CLI with a long-lived browser daemon. The first command is `tool --ca-cert corp.pem open https://internal`; the ordinary next command is `tool snapshot` and does not repeat launch options. The proposal hashes every parsed option into daemon identity and restarts whenever that hash changes. Decide the correct solution contract before implementation.",
+			"expected_output": "The gate models effective session state across invocations, separates omission from explicit removal, and requires a same-session continuity probe before accepting restart semantics.",
+			"assertions": [
+				"Produces a transition table covering initial default, unset to set, set to omitted, set to same, set to changed, and explicit clear",
+				"Does not equate omission with removal unless an external contract proves that equivalence",
+				"Requires a multi-command probe against one live session and measures continuity beyond exit code",
+				"Checks both restart-on-change and reuse-on-no-change, without treating a fingerprint unit test as the contract"
+			],
+			"files": []
+		},
+		{
+			"id": 5,
+			"name": "transfer-device-profile-session-state",
+			"prompt": "A CLI starts a reusable emulator with `runner --device-profile tablet start app`. Later `runner inspect` and `runner screenshot` commands normally omit the launch-only flag. A defect requires changing profiles safely, and one proposed shape restarts whenever the current command's parsed profile differs from the daemon's profile. Run Solution Gate before implementation.",
+			"expected_output": "The gate generalizes temporal semantics outside certificate trust, defines an explicit clear or replacement operation, and probes reuse and restart in one continuing workflow.",
+			"assertions": [
+				"Classifies the profile's scope, owner, initial default, and effective lifetime",
+				"Separates omitted, same, changed, and explicitly cleared transitions",
+				"Names continuity observables such as process or logical session, target application, and current state",
+				"Proposes same-session sequences that prove both preservation and deliberate replacement"
+			],
+			"files": []
+		},
+		{
+			"id": 6,
+			"name": "mechanical-rename-does-not-grow-a-gate",
+			"prompt": "Rename the documented flag `--ca-file` to `--ca-cert` in CLI help and snapshots. Parser behavior, daemon configuration, and session semantics do not change. Decide whether Solution Gate should run.",
+			"expected_output": "The method records a mechanical-work skip instead of imposing temporal design ceremony on a rename.",
+			"assertions": [
+				"Classifies the task as mechanical and skips Solution Gate with a reason",
+				"Does not invent persistent-state ambiguity when behavior is explicitly unchanged",
+				"Does not request two proposers or runtime probes for the rename"
+			],
+			"files": []
+		}
+	]
+}
