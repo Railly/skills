@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-12",
+    "repo": "vercel-labs/emulate",
+    "base": "7aea54a",
+    "head": "6c1c9306d906f3f372e011eb7566e7cf2acc6464",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-12-emulate-github-app-keypair-a72de43.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Issue Contract or Spec review status was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "OpenAI GPT-5 Codex",
+    "reviewer_model": "Anthropic Claude Sonnet",
+    "same_family": false
+  },
+  "lenses": [
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The seed contract accepts omitted private keys."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Direct seed callers reject omitted private keys."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Invalid keys, wrong JWTs, duplicate identities, and lifecycle failures were forced."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "The compiled programmatic API was driven through real HTTP flows."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Installation tokens were minted before and after reset."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Public seed and generated-secret behavior changed."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": "The decision trail was audited by Claude Sonnet."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Synchronous per-App key generation was measured under load."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "CLI key generation and delivery remain outside scope; direct CLI seeding fails explicitly."
+    },
+    {
+      "check": "siblings generatedSecrets",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "callers materializeGitHubSeedConfig",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "focused type-check, test, and build",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "workspace checks",
+      "outcome": "pass",
+      "reason": "Type-check, tests, build, lint, formatting, and diff checks passed."
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "Generation, reset rotation, and removed exposure each failed at the intended assertion."
+    }
+  ],
+  "findings": [
+    {
+      "id": "RG-RA-4",
+      "state": "confirmed",
+      "claim": "Duplicate App IDs or slugs can expose generated secrets for Apps that seeding discards.",
+      "evidence": "Duplicate-slug and duplicate-app_id fault injections returned one working secret with 201 and one unusable secret with 401.",
+      "layer": "generated-secret contract",
+      "source": "lens",
+      "path": "materializeGitHubSeedConfig -> seedFromConfig"
+    },
+    {
+      "id": "RG-RA-6",
+      "state": "confirmed",
+      "claim": "Synchronous RSA generation blocks the event loop linearly.",
+      "evidence": "A zero-delay timer was blocked for about 44, 221, 515, and 1276 ms while generating 1, 10, 25, and 50 keys.",
+      "layer": "initialization latency and overload",
+      "source": "lens",
+      "path": "createEmulator -> prepareSeed -> generateKeyPairSync"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "The CLI remains unchanged.",
+      "evidence": "This slice has no secure CLI key-delivery contract and omitted keys fail explicitly."
+    },
+    {
+      "claim": "Next and Nuxt adapters remain unchanged.",
+      "evidence": "They lack a persistence and exposure contract and omitted keys fail explicitly."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Reset all createEmulator runtime state",
+      "evidence": "Installation tokens and webhook dispatcher subscriptions survive reset.",
+      "why_out_of_scope": "The defects predate generated-key support and affect the general lifecycle contract."
+    },
+    {
+      "title": "Make createEmulator startup and close lifecycle deterministic",
+      "evidence": "Port collisions resolve before uncaught EADDRINUSE and repeated close rejects.",
+      "why_out_of_scope": "The defects predate this feature and belong to server lifecycle ownership."
+    },
+    {
+      "title": "Own a deep seed snapshot for reset",
+      "evidence": "Caller mutation of nested seed objects changes later resets.",
+      "why_out_of_scope": "This is a general seed replay contract beyond GitHub App key generation."
+    }
+  ]
+}

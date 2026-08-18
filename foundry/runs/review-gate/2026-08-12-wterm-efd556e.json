@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-12",
+    "repo": "vercel-labs/wterm",
+    "base": "e997417795e71a674589228ef6672e0a4d474dcb",
+    "head": "efd556e90217f78d8c8df88849558eaa5ba59be6",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No separate Issue Contract or Spec review was provided."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family",
+    "reviewer_model": "GPT-5 family",
+    "same_family": true
+  },
+  "lenses": [
+    {"name": "inverse regression surface", "status": "skipped", "reason": "No matcher or lookup data source was replaced."},
+    {"name": "new-domain matrix", "status": "run", "reason": "OSC 8 was crossed with bounded scrollback virtualization."},
+    {"name": "resolution-rule consistency across consumers", "status": "skipped", "reason": "No resolution or precedence rule changed."},
+    {"name": "cancellation and timeout", "status": "skipped", "reason": "No wait, retry, timer, or cancellation contract changed."},
+    {"name": "boundary pipeline trace", "status": "run", "reason": "The finding crossed Ghostty page cells, scrollback encoding, WASM, CellData, renderer, and browser DOM."},
+    {"name": "substrate verification", "status": "run", "reason": "Ghostty WASM was rebuilt from current source and the rendered browser DOM was driven."},
+    {"name": "dogfood the built artifact", "status": "run", "reason": "The integrated branch rendered OSC 8 links inside virtualized scrollback."},
+    {"name": "docs-behavior parity", "status": "run", "reason": "Public mounted-window and OSC 8 claims matched the built artifact."},
+    {"name": "demonstrative example", "status": "skipped", "reason": "No repository example was added."},
+    {"name": "choice audit", "status": "skipped", "reason": "No new decision trail was emitted for the merge resolution."},
+    {"name": "complexity budget", "status": "run", "reason": "Mounted history remained bounded while hyperlinks rendered inside the window."}
+  ],
+  "deterministic": [
+    {"check": "git diff --check", "outcome": "pass", "reason": ""},
+    {"check": "style", "outcome": "acknowledged", "reason": "README feature bullets follow the repository's established em-dash style."},
+    {"check": "surfaces", "outcome": "acknowledged", "reason": "Semantic docs were updated; navigation and titles are unaffected because no route was added or renamed."},
+    {"check": "siblings hyperlink", "outcome": "pass", "reason": ""},
+    {"check": "siblings scrollback", "outcome": "acknowledged", "reason": "Untouched hits describe stable APIs or PR #115 behavior; changelog changes are maintainer-controlled."},
+    {"check": "callers getCell", "outcome": "acknowledged", "reason": "Optional metadata leaves existing scalar fields and caller ordering unchanged."},
+    {"check": "callers getScrollbackCell", "outcome": "acknowledged", "reason": "Optional metadata leaves existing scalar fields and caller ordering unchanged."},
+    {"check": "Ghostty WASM rebuild and force-red", "outcome": "finding-fixed", "reason": "Rebuilt defective source failed the linked-scrollback regression; restored source rebuilt and passed."},
+    {"check": "tests builds types lint format", "outcome": "pass", "reason": ""},
+    {"check": "browser E2E", "outcome": "acknowledged", "reason": "13/14 passed; the sole failure reproduced on origin/main 2/3 times."}
+  ],
+  "findings": [
+    {
+      "id": "ghostty-scrollback-hyperlink-bit",
+      "state": "confirmed",
+      "claim": "The Ghostty scrollback encoder omitted the OSC 8 content bit while the viewport encoder set it.",
+      "evidence": "With the bit disabled and WASM rebuilt from source, the real-WASM linked-scrollback test received undefined; restoring the bit rebuilt green.",
+      "layer": "source-to-WASM scrollback encoding",
+      "source": "lens",
+      "path": "encodeCell -> get_scrollback_line -> GhosttyCore.getScrollbackCell"
+    },
+    {
+      "id": "resize-anchoring-e2e-flake",
+      "state": "issue_candidate",
+      "claim": "PR #115's resize-anchoring E2E intermittently jumps to the first history row.",
+      "evidence": "The isolated test failed on origin/main 2/3 times and on the integrated branch while all OSC 8-specific checks passed.",
+      "layer": "test harness and pre-existing scroll anchoring",
+      "source": "lens",
+      "path": "viewport resize -> ResizeObserver -> scrollback window"
+    },
+    {
+      "id": "ghostty-link-cache-growth",
+      "state": "issue_candidate",
+      "claim": "Ghostty hyperlink metadata cache is not pruned with scrollback rollover.",
+      "evidence": "Cache entries persist until init.",
+      "layer": "session memory lifecycle",
+      "source": "lens",
+      "path": "GhosttyCore._readHyperlink -> _hyperlinkCache"
+    }
+  ],
+  "exemptions": [
+    {"claim": "No navigation or page-title updates are required.", "evidence": "No documentation route was added or renamed."},
+    {"claim": "No changelog or version update is required.", "evidence": "Releases and changelog voice are maintainer-controlled."},
+    {"claim": "Existing cell callers need no edits.", "evidence": "All link fields are optional and existing fields retain their contracts."},
+    {"claim": "Added README em dashes are acceptable.", "evidence": "The repository's feature bullets consistently use the same punctuation."}
+  ],
+  "issue_candidates": [
+    {"title": "Stabilize scrollback anchoring across resize", "evidence": "The PR #115 E2E failed on origin/main 2/3 isolated runs.", "why_out_of_scope": "The failure predates and does not exercise OSC 8."},
+    {"title": "Bound or prune Ghostty hyperlink metadata cache", "evidence": "Cache entries persist until init even after scrollback rollover.", "why_out_of_scope": "Residual memory optimization, not retained-cell correctness."}
+  ]
+}

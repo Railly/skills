@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-13",
+    "repo": "vercel-labs/wterm",
+    "base": "4852dde5481439883eecf7f61f32f6091be5b468",
+    "head": "b7fe9621139e25e7dd7641198a9399e0ce537b7c",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Issue Contract or Spec review was provided."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family",
+    "reviewer_model": "Claude Sonnet final review plus Claude Sonnet and Gemini Flash-Lite Solution Gate",
+    "same_family": false
+  },
+  "lenses": [
+    {"name":"inverse regression surface","status":"skipped","reason":"No matcher, parser, or lookup data source was replaced."},
+    {"name":"new-domain matrix","status":"run","reason":"Frame-separated rollover, RIS/init, older WASM, counter overflow, and 1600 Ghostty identities were forced."},
+    {"name":"resolution-rule consistency across consumers","status":"skipped","reason":"No value-resolution or precedence rule changed."},
+    {"name":"shell re-parse append domain","status":"skipped","reason":"No shell command detector or argument injection changed."},
+    {"name":"emission channel and one-shot latch reachability","status":"skipped","reason":"No cross-process emission channel or one-shot delivery latch changed."},
+    {"name":"shim hermeticity","status":"skipped","reason":"No compatibility shim or fallback executable changed."},
+    {"name":"deliberate-default check","status":"skipped","reason":"No new behavior-selecting default was introduced."},
+    {"name":"fresh-seam scan","status":"run","reason":"The optional TerminalCore resource-state seam and the Vite debug exposure were checked against all implementations and consumers."},
+    {"name":"substrate differential corpus","status":"skipped","reason":"No guard has failed review twice on the same input class."},
+    {"name":"reference-implementation oracle","status":"skipped","reason":"The change does not claim parity with a separate reference implementation."},
+    {"name":"new-failure-outcome propagation","status":"run","reason":"Built-in saturation and optional older-WASM degradation were traced through Zig, WASM, TypeScript, and docs."},
+    {"name":"flag-propagation dispatch sweep","status":"skipped","reason":"No user-facing flag was added."},
+    {"name":"error-path forcing","status":"run","reason":"Capacity exhaustion, u32 overflow, missing exports, and retained-map pressure were forced."},
+    {"name":"non-destructive recovery","status":"run","reason":"RIS preserves host-lifetime identity state and init resets it."},
+    {"name":"cancellation and timeout hygiene","status":"skipped","reason":"No timeout, retry, cancellation, or cleanup clock changed."},
+    {"name":"boundary pipeline trace","status":"run","reason":"Resource state was traced from Zig storage through WASM exports, bridge types, public API, and docs."},
+    {"name":"substrate verification","status":"run","reason":"ReleaseSmall WASM matched byte-for-byte and Chromium exercised the shipped DOM surface."},
+    {"name":"dogfood the built artifact","status":"run","reason":"The built Vite fixture exposed a readiness race; after the oracle fix the full serial suite passed."},
+    {"name":"docs-behavior parity","status":"run","reason":"Scroll ownership and saturation prose match the driven behavior and recovery boundaries."},
+    {"name":"demonstrative example","status":"skipped","reason":"No documentation example was added or changed to prove a capability."},
+    {"name":"choice audit","status":"run","reason":"The decision trail and cross-family reviews cleared cache removal, optional exports, lifecycle boundaries, and the measured-row oracle."},
+    {"name":"complexity budget","status":"run","reason":"The change adds constant-time counters and removes an unbounded JavaScript Map."}
+  ],
+  "deterministic": [
+    {"check":"head coverage","outcome":"pass","reason":"Canonical Markdown and JSON reports cover exact head b7fe9621139e25e7dd7641198a9399e0ce537b7c."},
+    {"check":"git diff --check","outcome":"pass","reason":""},
+    {"check":"style","outcome":"pass","reason":""},
+    {"check":"surfaces","outcome":"acknowledged","reason":"Root README behavior remains true; no docs route changed; the Vite query parameter is E2E-only debug plumbing."},
+    {"check":"siblings hyperlink","outcome":"acknowledged","reason":"Untouched public passages describe stable OSC 8 rendering; untracked audit and decision files are evidence, not contract surfaces."},
+    {"check":"siblings scroll anchoring","outcome":"acknowledged","reason":"The only public contract surface requiring the ownership detail is the DOM README; other hits are local evidence artifacts."},
+    {"check":"callers getResourceState","outcome":"acknowledged","reason":"The accessor is newly optional and has no production caller; the only outside-diff hit is an untracked audit report documenting compatibility."},
+    {"check":"WASM source artifact drift","outcome":"pass","reason":"ReleaseSmall output matched packages/@wterm/core/wasm/wterm.wasm byte-for-byte."},
+    {"check":"tests builds types lint format","outcome":"pass","reason":"Core 72, DOM 134, Ghostty 49; build, type-check and format passed; lint has one pre-existing PostCSS warning."},
+    {"check":"browser E2E","outcome":"finding-fixed","reason":"The first exact-head run found a fixture-readiness race; after waiting for the greeting, Chromium passed 15/15 serial, rollover 10/10, and resize 10/10."},
+    {"check":"cross-family final review","outcome":"pass","reason":"Claude Sonnet reviewed b7fe962 against 4852dde read-only and reported PASS with no confirmed defect."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"13 changed symbols, 52 impacted items, 557 edges, and 3674 unresolved calls; the map under-covers and was used only for orientation."}
+  ],
+  "findings": [
+    {
+      "id": "e2e-hardcoded-row-height",
+      "state": "confirmed",
+      "claim": "The initial rollover regression hardcoded a 17px row height instead of measuring the browser substrate.",
+      "evidence": "The cross-family choice audit found the environment-sensitive oracle; the committed test measures getBoundingClientRect().height and passes 10/10.",
+      "layer": "browser E2E oracle",
+      "source": "lens",
+      "path": "rendered scrollback row -> measured height -> expected scroll delta"
+    },
+    {
+      "id": "e2e-fixture-readiness-race",
+      "state": "confirmed",
+      "claim": "Waiting only for a rendered terminal row allowed the fixture greeting to race direct core mutation and add one unrelated discarded row.",
+      "evidence": "Exact head a2b2de1 failed 5303 versus 5320, exactly one row; __wterm is exposed before shell attach and greeting. Waiting for the greeting produced 15/15 serial and 10/10 focused rollover.",
+      "layer": "built browser fixture readiness",
+      "source": "lens",
+      "path": "WTerm.init debug exposure -> shell attach -> greeting write -> direct E2E mutation"
+    },
+    {
+      "id": "resize-pre-raf-oracle",
+      "state": "refuted",
+      "claim": "Disabling native browser anchoring breaks resize anchoring.",
+      "evidence": "The test had captured the old virtualized window before its scheduled RAF. Waiting for the render preserved the logical row and passed 10/10 focused plus 15/15 serial.",
+      "layer": "browser virtualized DOM timing",
+      "source": "lens",
+      "path": "scrollTop assignment -> scroll event -> scheduled render -> first-visible observation"
+    }
+  ],
+  "exemptions": [
+    {"claim":"No root README update is required for internal resource telemetry.","evidence":"Its OSC 8 feature statement remains true; the detailed API contract is in the core README and API reference."},
+    {"claim":"No navigation or page-title update is required.","evidence":"No documentation page was added or renamed."},
+    {"claim":"No Vite README update is required.","evidence":"The query parameter only enables the existing debug adapter for E2E and is not a supported example capability."},
+    {"claim":"No Ghostty README update is required for cache removal.","evidence":"The existing page-owned metadata contract remains unchanged; only redundant JavaScript retention was removed."},
+    {"claim":"No changelog or version change is required.","evidence":"Releases and changelog voice are maintainer-controlled."}
+  ],
+  "issue_candidates": [
+    {
+      "title": "Run long-duration RSS and forced-GC hyperlink pressure",
+      "evidence": "The retaining Map is removed and bounded tests pass, but no hours-long heap campaign was run.",
+      "why_out_of_scope": "Operational endurance evidence beyond the reproduced retention mechanism."
+    },
+    {
+      "title": "Exercise transport disconnect and reconnect during OSC 8 pressure",
+      "evidence": "The direct-core fixture covers parser, renderer, saturation and recovery boundaries but not transport lifecycle.",
+      "why_out_of_scope": "Transport behavior was not changed by this resilience fix."
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-13",
+    "repo": "vercel-labs/agent-browser",
+    "base": "548b159b30eef119ccf6846c8bc807d0eaa3f6f8",
+    "head": "working-tree",
+    "status": "complete",
+    "gaps": [
+      "Two Claude CLI cross-family review attempts produced no output; the final reviewer is from the author model family."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "linux-local-chromium-only",
+      "real-ca-trust-with-normal-tls-verification",
+      "concurrent-private-nss-homes",
+      "launch-and-daemon-identity",
+      "error-path-cleanup",
+      "cli-config-mcp-eve-doc-parity"
+    ],
+    "gaps": [
+      "No separate Issue Contract or Spec review result was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"Compared the removed SPKI bypass with NSS trust in both directions: CA trust gained while hostname, validity, and unrelated-authority checks remain enforced."},
+    {"name":"New-domain matrix","status":"run","reason":"Covered PEM bundle, DER, invalid input, platform, launch mode, TLS error class, concurrency, and cleanup domains."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Audited the shared CA loader and every flag, config, MCP, daemon, launch, and Eve consumer."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell string detector or shell-argument injection logic changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No one-shot diagnostic latch was added; launch errors return through the attached CLI path."},
+    {"name":"Shim hermeticity","status":"run","reason":"Forced missing and failing certutil shims and verified rejection plus profile cleanup."},
+    {"name":"Deliberate-default check","status":"run","reason":"The default remains no custom CA and normal verification; broad ignore-HTTPS behavior remains a separate explicit option."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Inspected NSS database selection through HOME, XDG_DATA_HOME, and legacy .pki."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Compared correct NSS trust with the reversible C,, to ,, mutation."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Used Chromium NSS behavior and certutil trust flags as the substrate oracle."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Forced CA parsing, certutil initialization, cert import, Chrome spawn, and pre-CDP startup failures through their callers."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"Traced caCert through CLI, config, schemas, MCP, daemon env, launch commands, hashes, fingerprints, and Eve."},
+    {"name":"Error-path forcing","status":"run","reason":"Forced invalid CA files, unsupported modes, missing and failing certutil, and Chrome startup failure cleanup."},
+    {"name":"Non-destructive recovery","status":"run","reason":"Verified failure cleanup only removes launch-owned UUID directories and does not sweep other sessions."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Verified child termination, process-group kill, wait, and directory removal ordering."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced the CA path across CLI-to-daemon and daemon-to-Chromium process boundaries."},
+    {"name":"Substrate verification","status":"run","reason":"Observed Chromium accept and reject the required TLS matrix on Linux."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Built the Linux release binary and drove real Chromium 151 against generated HTTPS endpoints."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Compared help, README, schemas, web docs, skill docs, and Eve documentation with the driven behavior and rejection set."},
+    {"name":"Demonstrative example","status":"run","reason":"The proxy examples require the supplied CA to pass the positive TLS cell."},
+    {"name":"Choice audit","status":"run","reason":"Audited all append-only decision rows; the startup cleanup seam produced a confirmed finding."},
+    {"name":"Complexity budget","status":"run","reason":"CA import is linear in bundle certificate count and occurs once per Chromium launch."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"acknowledged","reason":"A commit did not yet exist; an exact-HEAD report and covered check are required after commit."},
+    {"check":"style","outcome":"pass","reason":""},
+    {"check":"surfaces","outcome":"pass","reason":""},
+    {"check":"stale ignore-certificate-errors-spki-list","outcome":"pass","reason":"Zero hits."},
+    {"check":"flagsweep --ca-cert --proxy","outcome":"finding-fixed","reason":"Commands docs, proxy docs, core skill, and Eve omissions were fixed; historical and unsupported-mode hits were exempted."},
+    {"check":"siblings ca-cert","outcome":"acknowledged","reason":"Remaining hits are review artifacts or the unrelated ca-certificates package name."},
+    {"check":"callers validate_launch_options","outcome":"pass","reason":""},
+    {"check":"callers load","outcome":"acknowledged","reason":"The symbol is too generic; relevant ca_bundle::load consumers were inspected directly."},
+    {"check":"cargo fmt stable","outcome":"pass","reason":""},
+    {"check":"cargo clippy stable -D warnings","outcome":"pass","reason":""},
+    {"check":"cargo clippy all-targets all-features","outcome":"pass","reason":""},
+    {"check":"cargo test serial","outcome":"pass","reason":"1127 passed, 101 ignored, 0 failed; doctor integration 2 passed."},
+    {"check":"Eve typecheck and tests","outcome":"pass","reason":"Typecheck passed and 40 tests passed."},
+    {"check":"Linux Chromium TLS matrix","outcome":"pass","reason":"All required positive, negative, concurrency, dependency, and cleanup cells passed."},
+    {"check":"NSS trust mutation","outcome":"pass","reason":"Changing C,, to ,, broke the positive and concurrency cases; restoring it returned the matrix to green."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"7920 edges, 2446 unresolved calls, 83 SCIP unmapped, duplicate symbols, and empty changed/impact sets make the map strongly under-covering."},
+    {"check":"git diff --check","outcome":"pass","reason":""}
+  ],
+  "findings": [
+    {"id":"F1","state":"confirmed","claim":"A certutil preparation failure leaked the temporary Chromium profile.","evidence":"Forced missing and failing certutil paths left a profile before the fix; try_launch_chrome now removes temp_user_data_dir when prepare_nss_home fails, and the Linux matrix observes no profile increase.","layer":"launch error cleanup","source":"lens","path":"try_launch_chrome -> prepare_nss_home -> cleanup_temp_dir"},
+    {"id":"F2","state":"confirmed","claim":"Local state commands incorrectly loaded and validated browser CA configuration.","evidence":"Before the fix, --ca-cert /missing state list failed before the local state dispatch; validation now occurs after dispatch_state_command and the command succeeds.","layer":"CLI dispatch ordering","source":"lens","path":"main -> dispatch_state_command -> incompatible launch and CA validation"},
+    {"id":"F3","state":"confirmed","claim":"The new flag was absent from required commands and proxy documentation.","evidence":"The deterministic surface and new-flag sweeps identified the omissions; both pages now describe the Linux Chromium scope and limitations.","layer":"documentation surface","source":"gate","path":"ca_bundle and CLI flag -> commands/proxy docs"},
+    {"id":"F4","state":"confirmed","claim":"The core skill option list and Eve proxy configuration did not propagate caCert.","evidence":"flagsweep found the skill omission, and Eve exposed proxy without the matching CA path. The skill, Eve schema, argument translation, README, and tests now cover it.","layer":"flag propagation","source":"gate","path":"Eve config -> configArgs -> agent-browser --ca-cert"},
+    {"id":"F5","state":"confirmed","claim":"Chrome startup failures before DevTools publication could delete the private NSS HOME without killing and reaping the whole Chrome process group.","evidence":"The error branches called child.kill without the process-group kill and wait used by ChromeProcess. terminate_launched_chrome now kills the group, waits, then cleanup removes the directories; focused tests compile and the full Linux matrix remains green.","layer":"process lifecycle cleanup","source":"lens","path":"try_launch_chrome -> wait_for_devtools_active_port failure -> terminate_launched_chrome -> cleanup_nss_home"}
+  ],
+  "exemptions": [
+    {"claim":"Historical changelog entries need not mention --ca-cert.","evidence":"They describe prior releases and are not current option inventories."},
+    {"claim":"The CDP mode page need not advertise --ca-cert.","evidence":"The implementation rejects CA trust with CDP attach because it cannot modify an already-running browser's NSS environment."},
+    {"claim":"The chrome.rs proxy hit is not a missing public flag surface.","evidence":"It is Chromium's internal --proxy-bypass-list argument construction."},
+    {"claim":"WebGPU ca-certificates hits are unrelated.","evidence":"They name the Debian system package, not the --ca-cert option."}
+  ],
+  "issue_candidates": [
+    {"title":"Parallel Rust test environment interference","evidence":"One parallel suite run failed a restore-state unit test; the test passed isolated and the entire serial suite passed.","why_out_of_scope":"The failing test and state logic are unchanged by the CA diff and indicate a pre-existing environment-mutating test race."},
+    {"title":"SIGKILL leaves an NSS HOME orphan","evidence":"The Linux matrix observes one additional private NSS directory after killing the daemon with SIGKILL.","why_out_of_scope":"No destructor can run after SIGKILL, and PID-based sweeping could delete a live concurrent session after PID reuse."}
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-12",
+    "repo": "vercel-labs/wterm",
+    "base": "a360d2138b09e58830e69e50619f2aad54e5b01f",
+    "head": "19e62cb",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No separate Issue Contract or Spec review was provided."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family",
+    "reviewer_model": "Claude Fable",
+    "same_family": false
+  },
+  "lenses": [
+    {"name": "inverse regression surface", "status": "skipped", "reason": "No matcher or lookup data source was replaced."},
+    {"name": "new-domain matrix", "status": "run", "reason": "OSC 8 extends the cell and DOM input domain."},
+    {"name": "resolution-rule consistency across consumers", "status": "skipped", "reason": "No resolution or precedence rule changed."},
+    {"name": "cancellation and timeout", "status": "skipped", "reason": "No wait, retry, timer, or cancellation mechanism changed."},
+    {"name": "boundary pipeline trace", "status": "run", "reason": "The feature crosses parser, WASM, core, DOM, browser, and Ghostty page boundaries."},
+    {"name": "substrate verification", "status": "run", "reason": "Committed WASM and rendered browser DOM were driven directly."},
+    {"name": "dogfood the built artifact", "status": "run", "reason": "Independent baseline and feature builds received the same OSC 8 stream."},
+    {"name": "docs-behavior parity", "status": "run", "reason": "Public hyperlink, scheme, scrollback, and activation claims were driven."},
+    {"name": "demonstrative example", "status": "skipped", "reason": "No repository example was added."},
+    {"name": "choice audit", "status": "run", "reason": "The decision trail exposed reset-lifetime and activation-ownership gaps."},
+    {"name": "complexity budget", "status": "run", "reason": "Built-in table and Ghostty cache growth were inspected."}
+  ],
+  "deterministic": [
+    {"check": "git diff --check", "outcome": "pass", "reason": ""},
+    {"check": "style", "outcome": "acknowledged", "reason": "README feature bullets follow the repository's established em-dash style."},
+    {"check": "surfaces", "outcome": "acknowledged", "reason": "All semantic docs were updated; navigation and titles are unaffected because no page was added or renamed."},
+    {"check": "siblings OSC 8", "outcome": "pass", "reason": ""},
+    {"check": "callers getCell", "outcome": "acknowledged", "reason": "New metadata is optional and existing structural fields are unchanged."},
+    {"check": "callers getScrollbackCell", "outcome": "acknowledged", "reason": "New metadata is optional and existing structural fields are unchanged."},
+    {"check": "force-red eight mechanisms", "outcome": "pass", "reason": ""},
+    {"check": "tests builds types lint format e2e", "outcome": "pass", "reason": ""}
+  ],
+  "findings": [
+    {
+      "id": "osc8-ris-index-alias",
+      "state": "confirmed",
+      "claim": "Pre-commit review found hyperlink index reuse after RIS could alias old cells and cache entries to new destinations; exact head fixes it.",
+      "evidence": "Table reset moved to host init and a real-WASM RIS regression passes.",
+      "layer": "end-to-end identity lifecycle",
+      "source": "lens",
+      "path": "Terminal.reset -> hyperlink table -> WasmBridge link cache and scrollback"
+    },
+    {
+      "id": "osc8-truncation-fail-open",
+      "state": "confirmed",
+      "claim": "Pre-commit review found malformed or truncated OSC 8 input preserved a previous active link; exact head clears it.",
+      "evidence": "Active-link malformed and oversized payload regressions pass and parser force-red fails.",
+      "layer": "parser error path",
+      "source": "lens",
+      "path": "Parser.osc_truncated -> Terminal.handleOsc -> current_link"
+    },
+    {
+      "id": "osc8-mouse-double-action",
+      "state": "confirmed",
+      "claim": "Pre-commit review found plain clicks could both emit SGR mouse input and navigate; exact head suppresses navigation while tracking.",
+      "evidence": "DOM event regressions prove plain click is prevented and Shift-click remains available.",
+      "layer": "browser and terminal event ownership",
+      "source": "lens",
+      "path": "InputHandler mouse tracking -> WTerm click handler -> anchor default action"
+    },
+    {
+      "id": "ghostty-zero-pointer-decode",
+      "state": "confirmed",
+      "claim": "Pre-commit review found failed hyperlink-buffer growth could decode from WASM address zero; exact head returns undefined.",
+      "evidence": "Post-growth zero-pointer guard is present and the complete Ghostty suite passes.",
+      "layer": "WASM memory failure path",
+      "source": "lens",
+      "path": "GhosttyCore._ensureHyperlinkBuffer -> alloc_buffer -> _readHyperlink"
+    },
+    {
+      "id": "playwright-cursor-flake",
+      "state": "issue_candidate",
+      "claim": "The parallel cursor E2E can return a null bounding box immediately after visibility succeeds.",
+      "evidence": "The failure occurs before typing; full E2E passes 12/12 with one worker.",
+      "layer": "test harness timing",
+      "source": "lens",
+      "path": "terminal.spec.ts visibility assertion -> boundingBox"
+    },
+    {
+      "id": "ghostty-link-cache-growth",
+      "state": "issue_candidate",
+      "claim": "Ghostty hyperlink metadata cache is not pruned with scrollback rollover.",
+      "evidence": "The cache is keyed per semantic link and only cleared on init.",
+      "layer": "session memory lifecycle",
+      "source": "lens",
+      "path": "GhosttyCore._readHyperlink -> _hyperlinkCache"
+    }
+  ],
+  "exemptions": [
+    {"claim": "No navigation or page-title updates are required.", "evidence": "No documentation page was added or renamed."},
+    {"claim": "Existing cell callers need no edits.", "evidence": "All new CellData fields are optional and existing fields retain their contracts."},
+    {"claim": "Added README em dashes are acceptable.", "evidence": "The repository's feature bullets consistently use the same punctuation."}
+  ],
+  "issue_candidates": [
+    {"title": "Stabilize cursor E2E bounding-box measurement", "evidence": "Parallel runs can return null immediately after visibility; serial suite passes 12/12.", "why_out_of_scope": "Pre-existing test-harness timing unrelated to OSC 8."},
+    {"title": "Bound or prune Ghostty hyperlink metadata cache", "evidence": "Cache entries persist until init even after scrollback rollover.", "why_out_of_scope": "Residual memory optimization, not hyperlink correctness for retained cells."}
+  ]
+}

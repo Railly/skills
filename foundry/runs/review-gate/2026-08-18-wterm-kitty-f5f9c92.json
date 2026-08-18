@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-18",
+    "repo": "vercel-labs/wterm",
+    "base": "cdff1c07890ab2c5ba2efbcc1091f790dfb8f931",
+    "head": "f5f9c925e4a5e39585a8822c6b6ba1057e2ae909",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No Issue Contract was provided; the accepted Solution Gate contract and Kitty protocol reference were used."
+    ]
+  },
+  "provenance": {
+    "author_model": "OpenAI GPT-5 Codex",
+    "reviewer_model": "Vercel Agent Review and OpenAI GPT-5 Codex",
+    "same_family": false
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher, parser, or lookup data source was replaced."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The independent state report-events without report-all was added beside report-all and modified-text counterexamples."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Plain-text classification remains centralized in printableEntry and is consumed by both press and release encoding."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "The DOM InputHandler regression drove keydown and keyup through the real emitted-data callback."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Zero flags and legacy fallback remain unchanged; report-events without report-all is now explicit."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "The changed release guard and its only DOM consumer were reviewed together."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Plain text, modified text, recovery keys, report-all, and no-report-all states passed."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "The Vercel review finding was checked against the Kitty keyboard protocol semantics."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "Flag value 2 was driven through InputHandler instead of only calling the encoder."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "The new suppression branch was forced red before the fix and green after it."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Negotiated flags, DOM keyboard events, encoder output, and onData emission were exercised end to end."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "The DOM event substrate observed exactly one plain-text byte and no release escape."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "The built DOM package and browser E2E suite passed after the fix."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Independent Kitty flag combinations are now a recorded wterm subsystem invariant."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Public docs already describe negotiated independent flags without claiming releases for plain text."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No new decision trail row was created for this focused external-review fix."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "The added predicate is bounded O(1)."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell parsing changed."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No shim was introduced."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No new thrown or returned failure outcome was introduced."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No recovery action was added."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No timer, async wait, or cancellation path changed."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No documentation example changed."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "Encoder and DOM tests failed on the exact spurious CSI 97;1:3u release before the production fix."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "No prohibited punctuation or whitespace errors."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "No user-facing contract or documentation surface changed; prior navigation findings remain unrelated because no page was added or renamed."
+    },
+    {
+      "check": "callers encodeKittyKey",
+      "outcome": "pass",
+      "reason": "Every call site is in a reviewed diff file."
+    },
+    {
+      "check": "pnpm matrix",
+      "outcome": "pass",
+      "reason": "Format, type-check, lint, tests, build, and 17 browser E2E tests passed."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "No whitespace errors."
+    }
+  ],
+  "findings": [
+    {
+      "id": "WTERM-KITTY-RELEASE-001",
+      "state": "confirmed",
+      "claim": "Plain unmodified text emitted a Kitty release escape when report-events was enabled without report-all.",
+      "evidence": "Before the fix, both the encoder and DOM regressions received CSI 97;1:3u after keyup for a; on f5f9c92 they receive null and [\"a\"] respectively, while Ctrl+a still emits CSI 97;5:3u.",
+      "layer": "DOM keyboard protocol emission",
+      "source": "lens",
+      "path": "InputHandler.handleKeyUp -> encodeKittyKey -> onData"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No documentation update is required for the focused fix.",
+      "evidence": "Existing docs describe negotiated Kitty flags generally and contain no claim that plain text releases are emitted without report-all."
+    }
+  ],
+  "issue_candidates": []
+}

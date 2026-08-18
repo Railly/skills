@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-11",
+    "repo": "vercel-labs/portless#374",
+    "base": "15ef06434c81523b1b24db2d52a17caf31edecf1",
+    "head": "ad974fc694b2ee55a9fdb40a60b4d48a1ffbb1f6",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No separate Issue Contract or Spec review was provided."]
+  },
+  "provenance": {
+    "author_model": "gpt-5.6-sol",
+    "reviewer_model": "claude-opus",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "inverse regression surface", "status": "run", "reason": "Current, old, absent, disabled, LAN, and custom .local paths were checked." },
+    { "name": "new-domain matrix", "status": "run", "reason": "Authority, peer address, producer capability, TLD mode, and hosts aliases were varied." },
+    { "name": "resolution-rule consistency across consumers", "status": "run", "reason": "LAN mode was traced through persisted state, startup, alias, single app, Turbo, and direct paths." },
+    { "name": "shell re-parse append domain", "status": "skipped", "reason": "No package-script parsing changed." },
+    { "name": "emission channel and one-shot latch reachability", "status": "run", "reason": "The daemon performs sync while the attached CLI emits the warning." },
+    { "name": "shim hermeticity", "status": "run", "reason": "CLI mock proxies run in child processes and DNS behavior is explicitly preloaded." },
+    { "name": "deliberate-default check", "status": "run", "reason": "Only a real LAN marker activates .local skipping." },
+    { "name": "fresh-seam scan", "status": "run", "reason": "CLI-to-daemon capability, request authority, and filesystem observation seams were inspected." },
+    { "name": "substrate differential corpus", "status": "skipped", "reason": "No reusable external parser substrate applies." },
+    { "name": "reference-implementation oracle", "status": "skipped", "reason": "No external implementation defines the internal sync contract." },
+    { "name": "new-failure-outcome propagation", "status": "run", "reason": "acted, absent, disabled, and mute outcomes were traced to reportHostsSync." },
+    { "name": "flag-propagation dispatch sweep", "status": "skipped", "reason": "No user flag propagation changed." },
+    { "name": "error-path forcing", "status": "run", "reason": "Absent daemon, disabled daemon, mute old daemon, non-loopback peer, and malformed authority were forced." },
+    { "name": "non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action changed." },
+    { "name": "cancellation and timeout hygiene", "status": "run", "reason": "Only old mute daemons pay the 3.5-second compatibility window; other outcomes settle immediately." },
+    { "name": "boundary pipeline trace", "status": "run", "reason": "Route registration, daemon trigger, hosts-file write, and CLI resolution warning were traced." },
+    { "name": "substrate verification", "status": "run", "reason": "Hosts-file alias parsing and child-process CLI behavior were exercised." },
+    { "name": "dogfood the built artifact", "status": "run", "reason": "The built CLI custom .local path completed in about 0.5 seconds." },
+    { "name": "newly-asserted invariant ownership", "status": "run", "reason": "Producer capability is owned by the daemon response, not inferred from CLI state." },
+    { "name": "docs-behavior parity", "status": "run", "reason": "The branch's existing warning documentation remains accurate." },
+    { "name": "demonstrative example", "status": "skipped", "reason": "No documentation example changed." },
+    { "name": "choice audit", "status": "run", "reason": "All seven rows in .decisions.tsv were challenged, including the superseded endpoint-removal choice." },
+    { "name": "complexity budget", "status": "run", "reason": "Hosts alias exactness remains linear in managed aliases." }
+  ],
+  "deterministic": [
+    { "check": "build", "outcome": "pass", "reason": "" },
+    { "check": "module tests", "outcome": "pass", "reason": "246 passed." },
+    { "check": "custom .local CLI integration", "outcome": "pass", "reason": "1 passed in about 0.5 seconds." },
+    { "check": "lint", "outcome": "pass", "reason": "" },
+    { "check": "typecheck", "outcome": "pass", "reason": "" },
+    { "check": "diff-check", "outcome": "pass", "reason": "" },
+    { "check": "style", "outcome": "pass", "reason": "" },
+    { "check": "siblings", "outcome": "pass", "reason": "Every hosts-sync passage is in the diff with no untouched sibling line." },
+    { "check": "callers", "outcome": "pass", "reason": "All reportHostsSync and createProxyServer callers are in changed files." },
+    { "check": "artifacts", "outcome": "pass", "reason": "No unregistered persistent artifact is introduced." },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "cli-utils.ts writes no new state artifact, so clean-utils.ts is unaffected." },
+    { "check": "timings", "outcome": "acknowledged", "reason": "500ms bounds only the HTTP capability response; 3.5s intentionally clears the daemon's 3s watcher fallback; process-management timeouts cannot delay hosts sync." },
+    { "check": "rawinput", "outcome": "acknowledged", "reason": "The tlds accessor is too broad for LAN inference; every actual tlds.includes(\"local\") inference was removed and verified by search." },
+    { "check": "test-strength mutations", "outcome": "finding-fixed", "reason": "Six independent mutations for authority matching, later aliases, .local skipping, absent handling, LAN inference, and disabled mapping each failed the intended assertion and were restored green." }
+  ],
+  "findings": [],
+  "exemptions": [
+    { "claim": "clean-utils.ts need not change", "evidence": "The guarded endpoint and hosts-file observation create no persistent state artifact." },
+    { "claim": "Larger process-management timeouts do not invalidate the hosts-sync ceilings", "evidence": "They are not on the producer path for the endpoint response or route-watcher write." }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Worktree-prefixed CLI URL expectations fail in unrelated focused tests",
+      "evidence": "Expo, Rsbuild, and multi-TLD tests expect unprefixed hostnames while linked worktrees intentionally prefix them.",
+      "why_out_of_scope": "The failures predate and do not exercise hosts sync."
+    },
+    {
+      "title": "Environment-dependent HTTPS CLI test",
+      "evidence": "An earlier full CLI run exposed a local HTTPS environment failure outside the focused hosts-sync path.",
+      "why_out_of_scope": "It is unrelated to the changed sync protocol."
+    }
+  ]
+}

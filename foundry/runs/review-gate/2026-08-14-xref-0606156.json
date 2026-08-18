@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-14",
+    "repo": "vercel-labs/xref",
+    "base": "9c9695060ccb9d5e9165c9eb582ac0320696af80",
+    "head": "0606156",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No separate Issue Contract or Spec review was supplied."]
+  },
+  "provenance": {
+    "author_model": "gpt-5",
+    "reviewer_model": "gpt-5",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "The vendor-wide URL noise rule was removed; public deployment and documentation URLs were added as inverse regression cells."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The widened external URL domain was tested with local, fixture, static-asset, deployment, documentation, and unrelated public hosts."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No input resolution or precedence rule changed."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command parsing or flag injection changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No cross-process emission or latch behavior changed."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No shim or wrapper was added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Source-only installation and npm publishing disabled were explicit release decisions, reflected in package metadata and README."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "The combined public-release, reconcile, HTML, and URL-filter seams were inspected after rebasing onto the latest remote."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No repeatedly failing heuristic detector was changed."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "Public Vercel Labs repositories were inspected for README and license expectations."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No new failure outcome was introduced by the release diff."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No new CLI flag was introduced by the release diff."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Unknown flags, invalid crawl limits, transport failures, and empty reconciliation remain covered by the combined suite."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No heuristic recovery action was added."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "The release diff added no async wait, cancellation, or timeout behavior."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Source install, CLI graph mode, reconciliation, schema output, JSON, and HTML were exercised across their real boundaries."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Fresh install and live GitHub runs produced actual Markdown, JSON, schema, and HTML artifacts."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "A real public issue crawl and an empty repository reconciliation were run from the combined branch."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "README source install, graph mode, reconcile auto-format, schema, no-snapshot, library build, and HTML claims were checked against the CLI."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "The documented issue, repository reconciliation, JSON, and HTML examples invoke the capabilities they claim to demonstrate."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was present."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "The Impact view recomputes local graph projections over bounded snapshot data; repository scale work already bounds network concurrency and node count."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "bun run check",
+      "outcome": "pass",
+      "reason": "Lint, typecheck, 123 tests, and build passed."
+    },
+    {
+      "check": "gate.sh style",
+      "outcome": "pass",
+      "reason": "No prohibited prose punctuation was added."
+    },
+    {
+      "check": "gate.sh surfaces",
+      "outcome": "pass",
+      "reason": "All required public and test surfaces were updated."
+    },
+    {
+      "check": "history and secret scan",
+      "outcome": "pass",
+      "reason": "No credentials, private filesystem paths, or private project references were found."
+    },
+    {
+      "check": "fresh source install",
+      "outcome": "pass",
+      "reason": "Frozen Bun install, link registration, full check, and CLI help passed in an isolated directory."
+    },
+    {
+      "check": "live CLI dogfood",
+      "outcome": "pass",
+      "reason": "Graph, reconcile, schema, JSON, and HTML outputs were generated against public GitHub repositories."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "The map found 28 impacted symbols but reported 992 unresolved calls and zero edges, so it was used for orientation only."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The bundled skill described the repository as internal to Vercel.",
+      "evidence": "The compatibility frontmatter contained the internal-only sentence; the release commit removes it and documents public source installation.",
+      "layer": "public documentation",
+      "source": "lens",
+      "path": ""
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The generic external-link filter discarded all Vercel deployment and documentation URLs.",
+      "evidence": "isNoiseUrl matched every vercel.com, vercel.app, vercel.dev, vercel.live, and vercel.link host; the vendor-wide rule was removed and regression cases now keep project.vercel.app and vercel.com/docs.",
+      "layer": "runtime URL classification",
+      "source": "lens",
+      "path": "src/refs.ts#isNoiseUrl → src/refs.ts#extractRefs → src/github.ts#parseNodeResponse"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "bun.lock did not change with package.json.",
+      "evidence": "Only package metadata, scripts, and publishing policy changed; no dependency version or resolution changed."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Radius under-covers xref's generated HTML client",
+      "evidence": "The final map reported zero edges and 992 unresolved calls despite 28 impacted symbols.",
+      "why_out_of_scope": "This is a limitation of the impact-analysis tooling, not the xref release."
+    }
+  ]
+}

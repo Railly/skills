@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-13",
+    "repo": "vercel-labs/ai-cli",
+    "base": "b4f38bf4513076e16b5c58729549e374ce206223",
+    "head": "working-tree:093a36234f1cdd1b89a9732c4c565c4370d77ab6",
+    "status": "complete",
+    "gaps": [
+      "The reviewed artifact is not committed, so exact-head coverage cannot run against a final SHA."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No Issue Contract or Spec review was provided."
+    ]
+  },
+  "provenance": {
+    "author_model": "Cursor Grok 4.6",
+    "reviewer_model": "Claude Opus 5 occam",
+    "same_family": false
+  },
+  "lenses": [
+    {"name": "inverse regression surface", "status": "skipped", "reason": "No matcher or lookup data source was replaced."},
+    {"name": "new-domain matrix", "status": "run", "reason": "UA classes including Slackbot, Discordbot, ClaudeBot, and /og were driven."},
+    {"name": "resolution-rule consistency across consumers", "status": "run", "reason": "Middleware, .md rewrite, markdownForPathname, metadata, llms.txt, and sitemap were enumerated."},
+    {"name": "shell re-parse append domain", "status": "skipped", "reason": "No shell argv rewrite."},
+    {"name": "emission channel and one-shot latch reachability", "status": "skipped", "reason": "No daemon or warn-once latch."},
+    {"name": "shim hermeticity", "status": "skipped", "reason": "No test shims."},
+    {"name": "deliberate-default check", "status": "run", "reason": "OG metadata and agent HTML defaults were checked against shipped commits."},
+    {"name": "fresh-seam scan", "status": "run", "reason": "fromsrc generateLlmsIndex exists; hand-rolled llms.txt is closer to llmstxt.org."},
+    {"name": "substrate differential corpus", "status": "skipped", "reason": "The UA detector is the dependency; app use was covered by the new-domain matrix."},
+    {"name": "reference-implementation oracle", "status": "run", "reason": "agent-readability 0.5.0 checks were enumerated against next start."},
+    {"name": "new-failure-outcome propagation", "status": "skipped", "reason": "No existing call gained a new failure class."},
+    {"name": "flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag added."},
+    {"name": "error-path forcing", "status": "run", "reason": "Missing pages, getDoc null, lastModified ENOENT, and /og were forced."},
+    {"name": "non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery."},
+    {"name": "cancellation and timeout hygiene", "status": "skipped", "reason": "No new wait."},
+    {"name": "boundary pipeline trace", "status": "run", "reason": "HTML vs markdown canonical and metadata stages were traced."},
+    {"name": "substrate verification", "status": "run", "reason": "Production next start on :3222 after the fix round."},
+    {"name": "dogfood the built artifact", "status": "run", "reason": "Author dogfooded localhost:3000; occam dogfooded next start; fixes re-driven on :3222."},
+    {"name": "docs-behavior parity", "status": "run", "reason": "AGENTS.md user-facing surfaces were checked; CLI README/CHANGELOG exempted."},
+    {"name": "demonstrative example", "status": "skipped", "reason": "No documentation example added."},
+    {"name": "choice audit", "status": "skipped", "reason": "No decision trail."},
+    {"name": "complexity budget", "status": "skipped", "reason": "Per-request work is a bounded scan of eight docs."}
+  ],
+  "deterministic": [
+    {"check": "exact-head coverage", "outcome": "acknowledged", "reason": "Working tree, not a commit."},
+    {"check": "style", "outcome": "pass", "reason": ""},
+    {"check": "surfaces", "outcome": "pass", "reason": "conventions.md compiled to :: form and discovery surfaces added."},
+    {"check": "siblings llms.txt", "outcome": "pass", "reason": ""},
+    {"check": "siblings canonical", "outcome": "acknowledged", "reason": "packages/ai-cli/src/lib/command.ts uses canonical as the long CLI flag name."},
+    {"check": "siblings agent-readability", "outcome": "pass", "reason": ""},
+    {"check": "callers markdownForPathname", "outcome": "pass", "reason": ""},
+    {"check": "callers canonicalUrlFor", "outcome": "pass", "reason": ""},
+    {"check": "git diff --check", "outcome": "pass", "reason": ""},
+    {"check": "next build", "outcome": "pass", "reason": "TypeScript finished; middleware deprecation is a warning."}
+  ],
+  "findings": [
+    {
+      "id": "lockfile-internal-registry",
+      "state": "confirmed",
+      "claim": "bun add rewrote the public lockfile to registry.k8s.vercel-security.com.",
+      "evidence": "407 added tarball URLs on the first install; after restoring origin/main lockfile and re-adding from npmjs, zero internal URLs and a +3 line lockfile diff.",
+      "layer": "supply chain / lockfile",
+      "source": "lens",
+      "path": "bun add on Vercel laptop -> bun.lock tarball URLs"
+    },
+    {
+      "id": "docs-og-replaced",
+      "state": "confirmed",
+      "claim": "Page-level openGraph replaced layout OG images on docs pages.",
+      "evidence": "Occam measured missing og:image on /docs/installation. After merge of images/type/siteName, /docs/installation emits og:image https://ai-cli.dev/og and og:type website.",
+      "layer": "rendered HTML metadata",
+      "source": "map",
+      "path": "generateMetadata openGraph -> Next replace (not merge) -> layout images dropped; radius cochange app/og/og-image.tsx"
+    },
+    {
+      "id": "preview-bots-markdown",
+      "state": "confirmed",
+      "claim": "Slackbot and Discordbot received markdown on / so link previews lost OG tags.",
+      "evidence": "Occam matrix: Slackbot-LinkExpanding and Discordbot/2.0 returned text/markdown. After UA skip, both return text/html with og:image. ClaudeBot still text/markdown.",
+      "layer": "UA negotiation",
+      "source": "lens",
+      "path": "docsPrefix / -> layer-3 BOT_LIKE_REGEX -> slackbot/discordbot"
+    },
+    {
+      "id": "dual-canonical",
+      "state": "confirmed",
+      "claim": "Middleware raw pathname and route resolved slug both set Link canonical and disagreed on /docs/index.",
+      "evidence": "Occam: header /docs/index vs body /docs. After canonicalUrl null on middleware, both say https://ai-cli.dev/docs.",
+      "layer": "HTTP headers + response body",
+      "source": "lens",
+      "path": "withAgentReadability canonicalUrl -> applyMarkdownHeaders vs route applyMarkdownHeaders"
+    },
+    {
+      "id": "home-lastmod-trace",
+      "state": "confirmed",
+      "claim": "Production markdown for / could not stat app/page.tsx and fell back to 2026-08-13.",
+      "evidence": "Occam nft.json lacked page.tsx. After outputFileTracingIncludes, nft.json lists app/page.tsx; ClaudeBot / reports last_updated 2026-07-27.",
+      "layer": "production filesystem trace",
+      "source": "lens",
+      "path": "markdownForPathname lastModifiedFor(app/page.tsx) -> serverless trace"
+    },
+    {
+      "id": "matcher-prefix",
+      "state": "confirmed",
+      "claim": "Matcher negatives are prefix-anchored, so /ogre would skip markdown.",
+      "evidence": "Occam forced /ogre HTML 404 under ClaudeBot. No current route collides. Acknowledged as latent.",
+      "layer": "middleware config",
+      "source": "lens",
+      "path": "config.matcher negative lookahead"
+    },
+    {
+      "id": "html-vary-unverified",
+      "state": "unverified",
+      "claim": "Prerendered HTML lacks Vary: Accept and Vary: User-Agent; CDN may mix HTML and markdown.",
+      "evidence": "Local next start HTML has s-maxage=31536000 without Accept. Gap: Vercel cache key after middleware rewrite was not observed.",
+      "layer": "HTTP caching",
+      "source": "lens",
+      "path": "static / HTML cache -> middleware rewrite"
+    },
+    {
+      "id": "json-ld-deferred",
+      "state": "exempted",
+      "claim": "No JSON-LD; structured-data audit check still fails.",
+      "evidence": "Owner deferred JSON-LD from Wave 0. rg ld+json apps/web is empty.",
+      "layer": "HTML",
+      "source": "lens",
+      "path": ""
+    }
+  ],
+  "exemptions": [
+    {"claim": "No CLI README, landing, or CHANGELOG update.", "evidence": "AGENTS.md user-facing rule is CLI behavior and website copy; CHANGELOG is release-prep only; this PR adds discovery routes."},
+    {"claim": "JSON-LD is out of this PR.", "evidence": "Wave 0 owner decision; structured-data remains the leftover recommended check."},
+    {"claim": "Matcher prefix anchoring is acceptable until a colliding route exists.", "evidence": "No /ogre, /statusboard, or /apidocs route in the build table."},
+    {"claim": "command.ts canonical sibling is unrelated.", "evidence": "The identifier is the long CLI flag name, not SEO canonical."}
+  ],
+  "issue_candidates": [
+    {"title": "Next 16.2.1 deprecates middleware.ts in favor of proxy", "evidence": "Build warning; adapter 0.5.0 still exports withAgentReadability as middleware.", "why_out_of_scope": "Upstream adapter contract."},
+    {"title": "/og/[...slug] is unreferenced", "evidence": "Only /og is linked from layout metadata.", "why_out_of_scope": "Predates this branch."},
+    {"title": "PAGE_TITLES omits troubleshooting", "evidence": "/og/troubleshooting 404s while other docs render.", "why_out_of_scope": "Pre-existing OG helper, unused by the new generateMetadata path."},
+    {"title": "fromsrc resolveSource joins URL slugs into .mdx paths without normalization", "evidence": "content.js resolveSource; bounded to .mdx.", "why_out_of_scope": "Pre-existing fromsrc behavior; .md widens who can hit it, not what it exposes."}
+  ]
+}

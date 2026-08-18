@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-17",
+    "repo": "vercel-labs/agent-browser#1669",
+    "base": "548b159b30eef119ccf6846c8bc807d0eaa3f6f8",
+    "head": "cc2a7d52c77b58ae01ad5e85a2d3a621636b2b75",
+    "status": "complete",
+    "gaps": [
+      "The exact-head NSS Linux end-to-end matrix could not be rerun on the current macOS machine; prior Linux ARM64 evidence remains recorded."
+    ]
+  },
+  "contract": {
+    "path": "foundry/runs/solution-gate/2026-08-17-agent-browser-1669-ca-trust-stickiness/",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "omission-preserves-effective-ca-and-session",
+      "same-normalized-ca-content-reuses-chromium",
+      "different-ca-content-replaces-only-chromium",
+      "explicit-clear-replaces-only-chromium",
+      "replacement-nss-prepared-before-browser-close",
+      "sticky-state-committed-after-successful-launch",
+      "set-clear-precedence-is-consistent",
+      "cli-mcp-eve-schema-doc-parity"
+    ],
+    "gaps": [
+      "No separate Issue Contract or Spec review result was supplied; the completed Solution Gate was used as the implementation oracle."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family",
+    "reviewer_model": "GPT-5 family with prior blind GPT-5 and Claude Solution Gate proposals",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher, parser, lookup, or source API was replaced."
+    },
+    {
+      "name": "new-domain matrix",
+      "status": "run",
+      "reason": "The transition domain includes unset, set, omitted, same content at another path, changed content, explicit clear, duplicate certificates, and reordered bundles."
+    },
+    {
+      "name": "resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Set, omit, and clear precedence was checked across CLI, config, environment, MCP, Eve, launch hashing, and daemon state."
+    },
+    {
+      "name": "shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No user-controlled shell command is parsed or appended."
+    },
+    {
+      "name": "emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No diagnostic channel or one-shot delivery latch changed."
+    },
+    {
+      "name": "shim hermeticity",
+      "status": "skipped",
+      "reason": "No test shim or fake executable was added by this exact-head fix."
+    },
+    {
+      "name": "deliberate-default check",
+      "status": "run",
+      "reason": "Omission was verified as preservation, while removal requires the explicit clear representation."
+    },
+    {
+      "name": "fresh-seam scan",
+      "status": "run",
+      "reason": "DaemonState became the owner of effective CA state and was checked at resolution, launch, replacement, and commit seams."
+    },
+    {
+      "name": "substrate differential corpus",
+      "status": "skipped",
+      "reason": "The exact-head fix does not introduce a detector that has failed twice on the same input class."
+    },
+    {
+      "name": "reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No external reference implementation or protocol was reimplemented."
+    },
+    {
+      "name": "new-failure-outcome propagation",
+      "status": "run",
+      "reason": "Replacement NSS preparation and browser launch can fail; callers were checked so old browser and sticky state survive failure."
+    },
+    {
+      "name": "flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "--no-ca-cert and clearCaCert were traced across CLI, config, environment, MCP, Eve, schemas, help, and docs."
+    },
+    {
+      "name": "error-path forcing",
+      "status": "run",
+      "reason": "Preparation ordering and state commit were inspected and covered so failure does not destroy the active browser or record unlaunched trust."
+    },
+    {
+      "name": "non-destructive recovery",
+      "status": "run",
+      "reason": "Changed CA and clear prepare replacement state before closing the active browser."
+    },
+    {
+      "name": "cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Prepared NSS ownership and launch failure cleanup were checked across replacement paths."
+    },
+    {
+      "name": "boundary pipeline trace",
+      "status": "skipped",
+      "reason": "The feature stays within the existing CLI, daemon, and Chromium launch boundary."
+    },
+    {
+      "name": "substrate verification",
+      "status": "run",
+      "reason": "Daemon identity, launch identity, effective CA state, and NSS ownership were verified; Linux Chromium exact-head execution remains named as a platform gap."
+    },
+    {
+      "name": "dogfood the built artifact",
+      "status": "run",
+      "reason": "The multi-command lifecycle is covered by exact-head regression tests; prior Linux binary reproduction and NSS matrix remain the substrate evidence."
+    },
+    {
+      "name": "newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "The claim that effective CA is sticky was checked against every writer in DaemonState and every set-clear input channel."
+    },
+    {
+      "name": "docs-behavior parity",
+      "status": "run",
+      "reason": "README, help, web docs, skill docs, schemas, MCP, and Eve now state or carry the same omission and explicit-clear contract."
+    },
+    {
+      "name": "demonstrative example",
+      "status": "skipped",
+      "reason": "No new documentation example was added."
+    },
+    {
+      "name": "choice audit",
+      "status": "skipped",
+      "reason": "The untracked .decisions.tsv is unrelated to this exact-head fix and was not used or modified."
+    },
+    {
+      "name": "complexity budget",
+      "status": "run",
+      "reason": "Bundle normalization sorts and deduplicates the small user-supplied certificate set; no per-page or per-element hot path changed."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "head coverage",
+      "outcome": "pass",
+      "reason": "This report records exact head cc2a7d52c77b58ae01ad5e85a2d3a621636b2b75."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "stale ignore-certificate-errors-spki-list",
+      "outcome": "pass",
+      "reason": "Zero repository hits."
+    },
+    {
+      "check": "flagsweep --no-ca-cert --ca-cert",
+      "outcome": "acknowledged",
+      "reason": ".decisions.tsv is unrelated and untouched; ca_bundle.rs, native/browser.rs, and native/cdp/chrome.rs are internal implementation comments rather than public flag inventories."
+    },
+    {
+      "check": "siblings ca-cert",
+      "outcome": "acknowledged",
+      "reason": ".decisions.tsv is unrelated; WebGPU docs mention the Debian ca-certificates package."
+    },
+    {
+      "check": "callers prepare_nss_home",
+      "outcome": "pass",
+      "reason": "Every caller is in a diffed file and was reviewed."
+    },
+    {
+      "check": "callers resolve_effective_ca_cert",
+      "outcome": "pass",
+      "reason": "Every caller is in a diffed file and was reviewed."
+    },
+    {
+      "check": "callers apply_effective_ca_cert",
+      "outcome": "pass",
+      "reason": "Every caller is in a diffed file and was reviewed."
+    },
+    {
+      "check": "Rust tests",
+      "outcome": "pass",
+      "reason": "1,135 passed and 101 ignored."
+    },
+    {
+      "check": "Rust clippy and fmt",
+      "outcome": "pass",
+      "reason": "cargo clippy --all-targets -- -D warnings and cargo fmt passed."
+    },
+    {
+      "check": "Eve tests and typecheck",
+      "outcome": "pass",
+      "reason": "42 tests and typecheck passed."
+    },
+    {
+      "check": "force-red sticky omission",
+      "outcome": "pass",
+      "reason": "Removing the sticky fallback failed test_effective_ca_cert_transitions_distinguish_omission_and_clear; restoration passed."
+    },
+    {
+      "check": "force-red content identity",
+      "outcome": "pass",
+      "reason": "Returning launch identity to the path failed test_launch_hash_uses_ca_content_not_path; restoration passed."
+    },
+    {
+      "check": "set-clear precedence",
+      "outcome": "finding-fixed",
+      "reason": "Config, environment, MCP, Eve, and sequential CLI behavior now use one precedence contract."
+    },
+    {
+      "check": "bundle identity normalization",
+      "outcome": "finding-fixed",
+      "reason": "Certificate order and duplicates no longer change effective CA identity."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "The exact-head map returned empty changed and impacted sets with 2,456 unresolved calls, 81 SCIP-unmapped entries, and duplicate-symbol errors; it is orientation only."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Set and clear precedence was inconsistent across public input channels.",
+      "evidence": "Focused review found conflicting caCert and clearCaCert handling; the exact head gives CA selection priority for simultaneous inputs and uses last-flag-wins for sequential CLI input.",
+      "layer": "input resolution contract",
+      "source": "lens",
+      "path": "config/environment/MCP/Eve/CLI -> effective CA request"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Equivalent CA bundles could produce different browser identities when certificate order or duplicates changed.",
+      "evidence": "The exact head normalizes certificates to DER, sorts them, and removes duplicates before identity comparison.",
+      "layer": "browser reuse identity",
+      "source": "lens",
+      "path": "CA bundle -> normalized DER set -> launch hash"
+    },
+    {
+      "id": "F3",
+      "state": "unverified",
+      "claim": "The exact-head multi-command transition and replacement ordering work against Linux Chromium NSS.",
+      "evidence": "The current machine is macOS, so the exact-head Linux end-to-end matrix was not rerun. Prior Linux ARM64 NSS matrix and defect reproduction remain recorded, while exact-head transition and force-red tests pass.",
+      "layer": "Linux Chromium NSS end-to-end path",
+      "source": "lens",
+      "path": "CLI -> daemon state -> private NSS home -> Chromium TLS"
+    },
+    {
+      "id": "F4",
+      "state": "exempted",
+      "claim": "Internal CA implementation comments must also document --no-ca-cert.",
+      "evidence": "The flagged passages describe certificate parsing, platform validation, or NSS setup and are not public option inventories.",
+      "layer": "documentation surface",
+      "source": "gate",
+      "path": "cli/src/ca_bundle.rs; cli/src/native/browser.rs; cli/src/native/cdp/chrome.rs"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": ".decisions.tsv is excluded from the product diff.",
+      "evidence": "It is an unrelated untracked local review artifact and was neither read as the fix trail nor modified."
+    },
+    {
+      "claim": "Internal implementation comments need not enumerate --no-ca-cert.",
+      "evidence": "They describe parsing, validation, and NSS setup rather than the public option surface."
+    },
+    {
+      "claim": "WebGPU documentation needs no CA flag update.",
+      "evidence": "Its matching text names the Debian package ca-certificates, not --ca-cert."
+    }
+  ],
+  "issue_candidates": []
+}
