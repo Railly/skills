@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solution gate: Portless PRs #366 and #374</title>
+<style>
+  :root { color-scheme:dark; --bg:#09111f; --panel:#111c2e; --line:#2a3d59; --text:#eef5ff; --muted:#aabbd2; --red:#ff7b88; --green:#70d99b; --blue:#78b9ff; --amber:#ffd080; --purple:#c69cff }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif }
+  main { max-width:1240px; margin:auto; padding:32px 20px 60px }
+  h1 { margin:0 0 8px; font-size:30px }
+  h2 { margin:38px 0 12px; font-size:23px }
+  h3 { margin:0 0 10px; font-size:17px }
+  p,li { color:var(--muted) }
+  code { color:#cce1ff }
+  .meta,.card { border:1px solid var(--line); background:var(--panel); border-radius:14px }
+  .meta { padding:14px 18px }
+  .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px }
+  .card { padding:18px }
+  .wide { grid-column:1/-1 }
+  .bad { border-color:#743747 }
+  .good { border-color:#286346 }
+  .decision { border-color:#3b78ba; background:#10213b }
+  .arg { border-style:dashed }
+  .flow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:13px 0 }
+  .node { padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#0b1628; min-width:125px }
+  .arrow { color:var(--muted); font-size:20px }
+  .tag { display:inline-block; padding:2px 7px; margin-left:4px; border-radius:999px; font-size:11px; font-weight:700 }
+  .observed { background:#214f39; color:#a9f0c4 }
+  .inferred { background:#203f69; color:#b9d9ff }
+  .guessed { background:#604b20; color:#ffe1a5 }
+  .source { margin-top:10px; color:#879ab7; font-size:12px }
+  ul { padding-left:20px; margin-bottom:0 }
+  li { margin:6px 0 }
+  strong { color:var(--text) }
+  @media (max-width:800px) { .grid { grid-template-columns:1fr } .wide { grid-column:auto } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Solution gate: Portless PRs #366 and #374</h1>
+  <div class="meta">August 11, 2026 · #366 <code>60394ae</code> · #374 <code>10dc32d</code> · Decision: <strong>two grafts, no implementation</strong></div>
+
+  <h2>Observed behavior</h2>
+  <p>Every element in this half traces to an executed command, measured duration, or inspected code path.</p>
+  <div class="grid">
+    <section class="card bad">
+      <h3>#366: grammar and ownership failures</h3>
+      <div class="flow">
+        <div class="node"><code>vite ./app</code></div><div class="arrow">→</div>
+        <div class="node bad">root read as unknown command</div><div class="arrow">→</div>
+        <div class="node bad">no generated flags</div>
+      </div>
+      <div class="flow">
+        <div class="node"><code>npx -- vite dev</code></div><div class="arrow">→</div>
+        <div class="node bad">flags inserted before <code>--</code></div><div class="arrow">→</div>
+        <div class="node bad">npm consumes or rejects them</div>
+      </div>
+      <div class="flow">
+        <div class="node">Expo mode flag</div><div class="arrow">→</div>
+        <div class="node bad">generated <code>--host localhost</code></div><div class="arrow">→</div>
+        <div class="node bad">mutually exclusive mode error</div>
+      </div>
+      <div class="source">Probes: installed Vite and Expo CLIs, transformed argv, and actual npx execution.</div>
+    </section>
+
+    <section class="card bad">
+      <h3>#374: four semantic failures</h3>
+      <ul>
+        <li>Linux: one five-second timeout. Windows: six. Local multi-TLD: about 5.27 seconds.</li>
+        <li><code>custom.local</code> skips trigger, resolver, and warning.</li>
+        <li><code>127.evil.test</code> intercepts the internal path and returns 204.</li>
+        <li>An extra alias on the same hosts line is invisible to exactness.</li>
+      </ul>
+      <div class="source">Probes: focused CLI tests, trigger spies, live proxy request, and direct matcher call.</div>
+    </section>
+
+    <section class="card wide good">
+      <h3>Decisive timing observation</h3>
+      <div class="flow">
+        <div class="node">test parent owns HTTP mock</div><div class="arrow">→</div>
+        <div class="node"><code>spawnSync</code> blocks parent event loop</div><div class="arrow">→</div>
+        <div class="node bad">mock cannot acknowledge</div><div class="arrow">→</div>
+        <div class="node bad">child reaches fallback or timeout</div>
+      </div>
+      <div class="flow">
+        <div class="node">HTTP mock in another process</div><div class="arrow">→</div>
+        <div class="node good">event loop remains runnable</div><div class="arrow">→</div>
+        <div class="node good">request completes in 58 ms</div>
+      </div>
+      <div class="source">Same-process child timed out after 329 ms. Adding a 204 handler inside the blocked parent did not fix the integration test.</div>
+    </section>
+  </div>
+
+  <h2>Proposed shapes, argument only</h2>
+  <p>Dashed cards are proposals. Evidence marks show the status of each link.</p>
+  <div class="grid">
+    <section class="card arg">
+      <h3>#366 Proposal A: targeted parser additions</h3>
+      <div class="flow">
+        <div class="node">root rule + separator rule + Expo aliases <span class="tag guessed">proposed</span></div><div class="arrow">→</div>
+        <div class="node">three repros classify correctly <span class="tag inferred">inferred</span></div>
+      </div>
+      <ul>
+        <li>Best point: port and host suppression stay independent.</li>
+        <li>Risk: additions can remain coupled to global scans and repeat separator under-reach.</li>
+      </ul>
+    </section>
+
+    <section class="card arg">
+      <h3>#366 Proposal B: parsed invocation</h3>
+      <div class="flow">
+        <div class="node">framework slice + classification + insertion index <span class="tag guessed">proposed</span></div><div class="arrow">→</div>
+        <div class="node">runner and framework syntax separated <span class="tag inferred">inferred</span></div><div class="arrow">→</div>
+        <div class="node">one result reused across launch paths <span class="tag inferred">inferred</span></div>
+      </div>
+      <ul>
+        <li>Encodes the violated ownership property directly.</li>
+        <li>Cost: per-framework and per-runner grammar maintenance.</li>
+      </ul>
+    </section>
+
+    <section class="card arg bad">
+      <h3>#374 Proposal A: shorter fallback</h3>
+      <div class="flow">
+        <div class="node">reduce old-daemon window <span class="tag guessed">proposed</span></div><div class="arrow">→</div>
+        <div class="node">tests finish sooner <span class="tag inferred">inferred</span></div><div class="arrow">→</div>
+        <div class="node bad">real old daemons lose compatibility time <span class="tag inferred">inferred</span></div>
+      </div>
+      <p>Refuted as the primary solution by the process-boundary timing probe.</p>
+    </section>
+
+    <section class="card arg">
+      <h3>#374 Proposal B: preserve producer semantics</h3>
+      <div class="flow">
+        <div class="node"><code>acted / mute / absent</code> <span class="tag observed">observed</span></div><div class="arrow">→</div>
+        <div class="node">only <code>mute</code> pays fallback <span class="tag observed">observed</span></div><div class="arrow">→</div>
+        <div class="node">test producer moves out of blocked event loop <span class="tag observed">probe survived</span></div>
+      </div>
+      <ul>
+        <li>Mode-aware <code>.local</code>.</li>
+        <li>Canonical loopback authority, separate from peer address.</li>
+        <li>Complete hosts mapping before inline comments.</li>
+      </ul>
+    </section>
+
+    <section class="card wide decision">
+      <h3>Chosen grafts</h3>
+      <ul>
+        <li><strong>#366:</strong> Proposal B's parsed framework slice and insertion index, plus Proposal A's independent Expo host-mode suppression.</li>
+        <li><strong>#374:</strong> Proposal B's producer-state preservation and test-harness correction, plus the shared matching hardening.</li>
+        <li>Do not shorten the production old-daemon fallback to make CI green.</li>
+        <li>Do not use one broad loopback helper for both peer addresses and request authority.</li>
+        <li>Do not consider a hosts line exact until every alias token before <code>#</code> is compared.</li>
+      </ul>
+    </section>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>wterm OSC 8 Solution Gate</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0a0a0a; --card:#151515; --line:#303030; --text:#f5f5f5; --muted:#a3a3a3; --obs:#22c55e; --inf:#60a5fa; --guess:#f59e0b; --bad:#f87171; }
+    * { box-sizing:border-box }
+    body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif }
+    main { max-width:1180px; margin:auto; padding:40px 24px 64px }
+    h1 { font-size:30px; margin:0 0 6px }
+    h2 { margin:40px 0 14px; font-size:21px }
+    h3 { margin:0 0 12px; font-size:16px }
+    p { margin:8px 0 }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px }
+    .muted { color:var(--muted) }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px }
+    .wide { grid-column:1/-1 }
+    .tag { display:inline-block; border:1px solid var(--line); border-radius:999px; padding:2px 8px; margin:2px 4px 2px 0; font-size:12px }
+    .observed { color:var(--obs) }.inferred { color:var(--inf) }.guessed { color:var(--guess) }.refuted { color:var(--bad) }
+    .flow { display:flex; align-items:stretch; gap:8px; overflow:auto; padding-bottom:4px }
+    .node { min-width:160px; border:1px solid var(--line); border-radius:9px; padding:11px; background:#101010 }
+    .arrow { align-self:center; color:var(--muted); font-size:20px }
+    table { width:100%; border-collapse:collapse; margin-top:10px }
+    th,td { border-bottom:1px solid var(--line); padding:9px 8px; text-align:left; vertical-align:top }
+    th { color:var(--muted); font-weight:600 }
+    ul { padding-left:20px; margin:8px 0 }
+    .terminal { font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:#050505; border-radius:8px; padding:12px; white-space:pre-wrap }
+    .decision { border-color:#2563eb; box-shadow:0 0 0 1px #2563eb33 inset }
+    @media (max-width:760px) { .grid { grid-template-columns:1fr }.wide { grid-column:auto } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Native OSC 8 hyperlinks</h1>
+  <p class="muted">Solution Gate, August 12, 2026 · wterm at <code>a360d21</code></p>
+
+  <h2>Observed behavior</h2>
+  <p class="muted">Evidence only. Every box below traces to code inspection or an executed command.</p>
+  <div class="grid">
+    <section class="card">
+      <h3>Built-in core</h3>
+      <div class="flow">
+        <div class="node"><span class="tag observed">observed</span><br>OSC parser accepts BEL and ST</div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="tag observed">observed</span><br><code>handleOsc</code> handles only title</div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="tag observed">observed</span><br>cells contain text, no URI</div>
+      </div>
+      <p>Cell layout is 12 bytes. Bytes 10–11 are padding. The parser silently caps OSC data at 512 bytes.</p>
+    </section>
+    <section class="card">
+      <h3>Ghostty core</h3>
+      <div class="flow">
+        <div class="node"><span class="tag observed">observed</span><br>Ghostty 1.3.1 parses and stores OSC 8</div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="tag observed">observed</span><br>wterm adapter drops hyperlink metadata</div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="tag observed">observed</span><br>DOM receives no URI</div>
+      </div>
+      <p>Ghostty hyperlink IDs are page-local. Equality is resolved through each page's map and entry, not by comparing raw IDs.</p>
+    </section>
+    <section class="card wide">
+      <h3>Executed red baseline</h3>
+      <div class="terminal">builtin active:   "LINK plain" · cell fields: bg,char,fg,flags,width
+builtin scrollback:"LINK plain" · URI absent
+builtin DOM:       anchors=0 · URI absent
+ghostty active:    "LINK plain" · cell fields: bg,char,fg,flags,width
+ghostty scrollback:"LINK plain" · URI absent
+ghostty DOM:       anchors=0 · URI absent</div>
+      <p><span class="tag observed">observed</span> BEL and ST twins both rendered <code>XY</code>. <span class="tag observed">observed</span> Built-in Zig baseline: 30 terminal tests passed.</p>
+    </section>
+  </div>
+
+  <h2>Proposed shapes</h2>
+  <p class="muted">Argument, not evidence. Marks describe the support for each link.</p>
+  <div class="grid">
+    <section class="card">
+      <h3>Fable: resolved per-cell metadata</h3>
+      <div class="flow">
+        <div class="node">core-owned table<br><span class="tag observed">layout observed</span></div>
+        <div class="arrow">→</div>
+        <div class="node">cell index / native page metadata<br><span class="tag inferred">inferred</span></div>
+        <div class="arrow">→</div>
+        <div class="node">optional resolved URI + identity<br><span class="tag inferred">inferred</span></div>
+        <div class="arrow">→</div>
+        <div class="node">safe anchor runs<br><span class="tag guessed">verify</span></div>
+      </div>
+      <ul>
+        <li>Uses built-in padding, so cell stride stays 12 bytes.</li>
+        <li>Translates Ghostty page-private state before crossing the public contract.</li>
+        <li>Keeps third-party cores compatible through optional fields.</li>
+      </ul>
+      <p class="guessed">Risk: bounded table, URI truncation, WASM lookup amplification, anchor DOM shape.</p>
+    </section>
+    <section class="card">
+      <h3>Gemini: public numeric resolver</h3>
+      <div class="flow">
+        <div class="node">numeric cell ID<br><span class="tag guessed">guessed</span></div>
+        <div class="arrow">→</div>
+        <div class="node">required <code>getLinkUri(id)</code><br><span class="tag guessed">guessed</span></div>
+        <div class="arrow">→</div>
+        <div class="node">renderer cache<br><span class="tag inferred">inferred</span></div>
+        <div class="arrow">→</div>
+        <div class="node">anchor runs<br><span class="tag inferred">inferred</span></div>
+      </div>
+      <ul>
+        <li class="refuted">Refuted: Ghostty IDs are page-local.</li>
+        <li class="refuted">Refuted: required resolver breaks structural compatibility.</li>
+        <li class="refuted">Under-tested: no full active/scrollback or BEL/ST parity matrix.</li>
+      </ul>
+    </section>
+  </div>
+
+  <h2>Refuting probes</h2>
+  <section class="card">
+    <table>
+      <thead><tr><th>Weak link</th><th>Probe</th><th>Outcome</th></tr></thead>
+      <tbody>
+        <tr><td>Ghostty raw IDs are global</td><td>Installed 1.3.1 page map, equality, and page-split source</td><td class="refuted">Refuted</td></tr>
+        <tr><td>Required resolver is source-compatible</td><td>TypeScript structural assignment</td><td class="refuted">Refuted</td></tr>
+        <tr><td>Optional cell fields are source-compatible</td><td>TypeScript structural assignment</td><td class="observed">Survived</td></tr>
+        <tr><td>No parser change is needed for long URI safety</td><td>Read cap logic and write 600-byte URI</td><td class="refuted">Refuted: add truncation state</td></tr>
+        <tr><td>Cell index fits without stride growth</td><td>Built-in cell layout and exported cell size</td><td class="observed">Survived</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <h2>Decision</h2>
+  <section class="card decision">
+    <h3>Graft: Fable's ownership, Gemini's separate identity concept, corrected by probes</h3>
+    <p>Each core owns parsing and cell membership. Adapters flatten private state into optional <code>linkUri</code>, explicit <code>linkId</code>, and an opaque <code>linkKey</code>. The renderer never resolves private numeric IDs.</p>
+    <div class="flow">
+      <div class="node">OSC 8 parser<br><span class="tag">fail closed on truncation</span></div>
+      <div class="arrow">→</div>
+      <div class="node">core cell semantics<br><span class="tag">active + scrollback</span></div>
+      <div class="arrow">→</div>
+      <div class="node">resolved optional metadata<br><span class="tag">source-compatible</span></div>
+      <div class="arrow">→</div>
+      <div class="node">safe DOM anchors<br><span class="tag">scheme policy</span></div>
+    </div>
+    <p class="muted">Implementation targets: saturation, BEL/ST, explicit and implicit identity, overwrite, erase, reflow, alternate screen, rollover, wide/grapheme cells, scrollback virtualization, unsafe URI, and mechanism-deletion tests.</p>
+  </section>
+</main>
+</body>
+</html>

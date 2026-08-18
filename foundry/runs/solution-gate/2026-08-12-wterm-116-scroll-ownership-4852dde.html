@@ -1,0 +1,25 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>wterm #116 scroll ownership Solution Gate</title>
+<style>
+body{font:15px/1.5 system-ui;margin:32px;max-width:1100px;color:#1d1d1f}h1,h2{line-height:1.2}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.card{border:1px solid #ccc;border-radius:10px;padding:18px}.observed{background:#eef8ee}.argument{background:#f7f4ff}.mark{font:12px ui-monospace;background:#fff;padding:2px 5px;border-radius:4px}code{background:#eee;padding:2px 4px}li{margin:.45em 0}
+</style>
+<h1>wterm #116 scroll ownership</h1>
+<section class="card observed">
+<h2>Observed behavior</h2>
+<ol>
+<li>Frame-separated rollover without suppression: <code>6000 → 4640</code>, logical row changed.</li>
+<li>With <code>overflow-anchor: none</code>: one measured-row-height adjustment per discarded row, logical row preserved.</li>
+<li>The serial resize failure captured row 349 before the RAF moved the virtualized window to <code>scrollTop 600</code>.</li>
+<li>Waiting two RAFs before capture produced 5/5 focused resize passes and 15/15 full-suite passes.</li>
+</ol>
+</section>
+<h2>Proposed shapes, argument only</h2>
+<div class="grid">
+<section class="card argument"><h3>Claude</h3><p>Permanent suppression plus logical-row identity for every DOM mutation.</p><p><span class="mark">inferred</span> General ownership model.</p><p><span class="mark">guessed harm</span> Unmodeled layout changes lose native correction.</p></section>
+<section class="card argument"><h3>Gemini</h3><p>Transition arbiter: explicit ownership for rollover, layout ownership for resize.</p><p><span class="mark">inferred</span> Resize needs a different owner.</p><p><span class="mark">guessed harm</span> Misclassification recreates double or missing adjustment.</p></section>
+</div>
+<section class="card observed">
+<h2>Synthesis</h2>
+<p><strong>Neither expansion.</strong> The cheapest probe refuted the resize premise. Keep the scoped CSS fix and synchronize the E2E oracle with the scheduled virtual-window render.</p>
+</section>

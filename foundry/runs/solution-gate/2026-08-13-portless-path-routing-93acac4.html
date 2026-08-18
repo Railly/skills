@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portless path routing solution gate</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; background: #0b0d10; color: #e8edf2; }
+    body { max-width: 1120px; margin: 0 auto; padding: 32px 20px 56px; }
+    h1, h2, h3 { line-height: 1.15; }
+    h1 { margin-bottom: 8px; }
+    .muted { color: #9ca8b5; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+    .card { border: 1px solid #29313a; border-radius: 14px; padding: 18px; background: #11151a; }
+    .observed { border-color: #238b67; }
+    .proposal { border-color: #7659d6; }
+    .rejected { border-color: #b84a55; }
+    .accepted { border-color: #3c8cdd; }
+    code { background: #1c2229; padding: 2px 6px; border-radius: 5px; }
+    .tag { display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 12px; margin-right: 5px; }
+    .obs { background: #153e32; color: #8ce2c0; }
+    .inf { background: #30304a; color: #c9c5ff; }
+    .guess { background: #4a3921; color: #f1cc86; }
+    .arrow { color: #697887; padding: 0 4px; }
+    li { margin: 7px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; vertical-align: top; border-bottom: 1px solid #29313a; padding: 10px 8px; }
+  </style>
+</head>
+<body>
+  <h1>Portless path routing</h1>
+  <p class="muted">Solution Gate on isolated origin/main at 93acac4, August 13, 2026.</p>
+
+  <h2>Observed behavior</h2>
+  <div class="grid">
+    <section class="card observed">
+      <h3>Current name grammar</h3>
+      <p><span class="tag obs">observed</span> <code>parseHostname("app/api")</code> returns <code>app.localhost</code>.</p>
+      <p>Slash suffixes are already discarded. Reusing them as route syntax changes an existing input.</p>
+    </section>
+    <section class="card observed">
+      <h3>Current authority precedence</h3>
+      <p><span class="tag obs">observed</span> exact hostname <span class="arrow">→</span> Tailscale authority <span class="arrow">→</span> Tailscale hostname <span class="arrow">→</span> wildcard.</p>
+      <p>A path match cannot be allowed to skip to a weaker tier.</p>
+    </section>
+    <section class="card observed">
+      <h3>Current state downgrade</h3>
+      <p><span class="tag obs">observed</span> An old proxy first-matches duplicate hostnames and ignores extra path fields.</p>
+      <p><span class="tag obs">observed</span> Old add/force filters every row with that hostname, then writes one pathless row.</p>
+    </section>
+    <section class="card observed">
+      <h3>Current data plane</h3>
+      <p><span class="tag obs">observed</span> HTTP, upgrade, and extended CONNECT all resolve a route and forward raw <code>req.url</code>.</p>
+      <p>The new matcher can preserve full-path forwarding.</p>
+    </section>
+  </div>
+
+  <h2>Proposed shapes</h2>
+  <p class="muted">This section is argument. Evidence labels apply to each link.</p>
+  <div class="grid">
+    <section class="card proposal accepted">
+      <h3>Proposal A: dedicated path contract</h3>
+      <p><span class="tag inf">inferred</span> <code>--path</code>/config <span class="arrow">→</span> canonical stored prefix</p>
+      <p><span class="tag obs">observed</span> existing authority tier <span class="arrow">→</span> <span class="tag inf">inferred</span> longest prefix inside that tier</p>
+      <p><span class="tag inf">inferred</span> tuple lifecycle <span class="arrow">→</span> isolated force/remove</p>
+      <p><span class="tag inf">inferred</span> hostname set projection <span class="arrow">→</span> stable hosts/mDNS</p>
+      <p><strong>Harmful branch:</strong> old proxies cannot safely serve new duplicate-hostname state. Accepted and documented.</p>
+    </section>
+    <section class="card proposal rejected">
+      <h3>Proposal B: positional app/api</h3>
+      <p><span class="tag obs">observed</span> slash currently discarded <span class="arrow">→</span> <span class="tag inf">inferred</span> mixed versions assign different meanings</p>
+      <p><span class="tag guess">guessed</span> tier with any path match <span class="arrow">→</span> <span class="tag inf">inferred</span> exact hostname can lose to Tailscale/wildcard</p>
+      <p><span class="tag guess">guessed</span> old CLI fails safely <span class="arrow">→</span> <span class="tag obs">observed refutation</span> old proxy first-wins and force wipes siblings</p>
+      <p><strong>Verdict:</strong> rejected. It breaks grammar, precedence, and downgrade behavior.</p>
+    </section>
+  </div>
+
+  <h2>Accepted contract</h2>
+  <div class="card accepted">
+    <ol>
+      <li>Identity is <code>(hostname, canonicalPathPrefix)</code>; missing prefix is root.</li>
+      <li>Authority is resolved first. Path specificity is resolved only inside the winning hostname set.</li>
+      <li>No path match returns 404, never a weaker authority tier.</li>
+      <li>All three request transports share the matcher and forward the original path.</li>
+      <li>Add, update, force, remove, rollback, and cleanup use tuple identity.</li>
+      <li>Hostname consumers use set semantics and remain active while any sibling route exists.</li>
+      <li>New code reads old state. Old code serving new duplicate-host state is unsupported.</li>
+    </ol>
+  </div>
+
+  <h2>Staging</h2>
+  <table>
+    <thead><tr><th>PR 1</th><th>PR 2</th><th>Separate decision</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Canonical prefix, tuple store, authority-first resolver, HTTP and WebSockets, lifecycle tests.</td>
+        <td>CLI/config, explicit-root precedence, alias, multi-app/TLD, hostname projections, docs.</td>
+        <td>Tailscale/ngrok semantics. Do not infer them from local routing.</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>
