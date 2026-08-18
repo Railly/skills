@@ -388,7 +388,7 @@ check_surfaces() {
 # there, because that is the class the report named. The classes that survive are the
 # ones that change parsing without starting a command: `#` (everything after it is a
 # comment, so appended arguments are silently discarded), `(`/`)` (subshell), and
-# `` ` ``/`$(` (command substitution). Provenance: portless #366 round 4 — the
+# `` ` ``/`$(` (command substitution). Provenance: portless #366 round 4: the
 # quote-aware isCompoundShellScript covers ; | & newline and quoting, and a script
 # ending in a comment swallowed every injected --port/--host, producing a 502.
 check_shellmeta() {
@@ -431,7 +431,7 @@ check_shellmeta() {
 # force-push rewrites shas, so the report that found round N's bugs describes a tree
 # that is no longer an ancestor of HEAD, and the commit that FIXES those findings is
 # by construction the least-reviewed commit on the branch. Provenance: portless #366
-# round 4 — the last report was cf596be, retired by a force-push; the fix commit
+# round 4: the last report was cf596be, retired by a force-push; the fix commit
 # 1aba57e was never gated and shipped three defects.
 # A new flag is documented wherever a comparable flag already is.
 #
@@ -566,7 +566,7 @@ check_report() {
 # that re-derives the same answer inline from the raw input still applies the shallow
 # rule. Those sites are invisible to `callers`, because they never call the resolver.
 # Line-level like `producers`: the sites live on untouched lines of files the diff also
-# changes. Provenance: portless #366 round 4 — a blind reviewer ran the
+# changes. Provenance: portless #366 round 4: a blind reviewer ran the
 # resolution-rule-consistency lens, opened both files, and still missed
 # `path.basename(commandArgs[0])` in the env binder. The lens said to grep the raw
 # input; judgment did not do it, so the sweep became a check.
@@ -616,7 +616,7 @@ check_rawinput() {
 # removes it. The two sides are joined by nothing but a hardcoded list, so they
 # drift silently: the writer works, the remover is simply unaware, and no test
 # fails. Dynamic names (a pid or timestamp spliced into the filename) are worse
-# than unregistered — a static allowlist cannot express them at all.
+# than unregistered: a static allowlist cannot express them at all.
 check_artifacts() {
 	local cleanup="${1:-}"
 	[[ -z "$cleanup" ]] && usage

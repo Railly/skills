@@ -6,7 +6,7 @@ Scope: three direct decisions from Hunter after reviewing the Round 006 snapshot
 
 ## Decision question
 
-Round 006 promoted only the skills with a verified applied case in `cases/` or `foundry/runs/`. Hunter reviewed that snapshot and made three calls that are not fully backed by a recorded case in this repository. `governance.md` requires "a human approves promotion" as the final step of every promotion — this round records that step explicitly, including where it runs ahead of the recorded evidence.
+Round 006 promoted only the skills with a verified applied case in `cases/` or `foundry/runs/`. Hunter reviewed that snapshot and made three calls that are not fully backed by a recorded case in this repository. `governance.md` requires "a human approves promotion" as the final step of every promotion: this round records that step explicitly, including where it runs ahead of the recorded evidence.
 
 ## Decisions
 
@@ -23,7 +23,7 @@ Hunter: "de ellos, diria que pick an issue ya no lo uso deprecar creo." SkillKit
 Hunter: "handoff muy dogfooded subelo." SkillKit shows 7 invocations in 90 days, the second-highest count in the registry.
 
 - **Evidence gap**: Round 006 checked `cases/` and `foundry/runs/` for `handoff` and found only filename-substring collisions (e.g. `agent-browser-ca-trust-handoff-2026-08-08.md` in an unrelated vault path), not a recorded application of the method. This promotion runs on Hunter's personal dogfooding experience, not on a case this repository can point to.
-- Maturity set to `dogfooded` in `foundry/maturity.json` on his explicit call. Channel unchanged (`experimental`) — he named it for a maturity bump, not a distribution change.
+- Maturity set to `dogfooded` in `foundry/maturity.json` on his explicit call. Channel unchanged (`experimental`): he named it for a maturity bump, not a distribution change.
 - Follow-up: file a case for the next real handoff so the registry has evidence of its own, not just a human's word for it.
 
 ### 3. Promote `solution-gate` and keep `review-gate` in the stable channel
@@ -33,7 +33,7 @@ Hunter: "para stable pondria review gate y solution gate muy buenos la verdad." 
 - Moved `skills/.experimental/solution-gate/` to `skills/solution-gate/`.
 - Updated `.claude-plugin/marketplace.json`: `solution-gate` moved from the `experimental` plugin's skill list to the `stable` plugin's skill list, alongside `record-a-case` and `review-gate`.
 - Updated `foundry/maturity.json` channel to `stable`.
-- Unlike `handoff`, this promotion has multiple recorded runs behind it (`runs/solution-gate/2026-07-29-portless-367-c0862b9.md` and the agent-browser cases surfaced in Round 006) — the channel change tracks evidence that already existed, not a pure override.
+- Unlike `handoff`, this promotion has multiple recorded runs behind it (`runs/solution-gate/2026-07-29-portless-367-c0862b9.md` and the agent-browser cases surfaced in Round 006): the channel change tracks evidence that already existed, not a pure override.
 
 ## Net effect on the registry
 

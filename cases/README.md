@@ -54,7 +54,7 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 - [#1552: trace a silent same-day revert before writing a new fix](agent-browser/1552-getbyrole-implicit-roles-regression.md)
 - [#1553: force a guard-and-match drift to see the real failure mode](agent-browser/1553-error-detail-and-help-drift.md)
 - [#1589: cover every writer to a shared sink; force-red the regression test against the production revert](agent-browser/1589-sibling-sink-and-guardless-regression-test.md)
-- [#1589 round 3: fix the class, not the instance — sweep every call site of the operation in the same commit](agent-browser/1589-fix-the-class-not-the-instance.md)
+- [#1589 round 3: fix the class, not the instance: sweep every call site of the operation in the same commit](agent-browser/1589-fix-the-class-not-the-instance.md)
 - [Shared daemon cross-worktree contamination](agent-browser/shared-daemon-cross-worktree-contamination.md)
 - [PR #1594: a drop-stale guarantee is void below the layer that enforces it](agent-browser/1594-latest-frame-below-the-socket.md)
 - [PR #1594 round 2: a regression test for a wedging defect reports nothing unless the deadline lives outside it](agent-browser/1594-a-test-that-hangs-reports-nothing.md)
