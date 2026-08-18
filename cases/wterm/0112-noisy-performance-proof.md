@@ -1,17 +1,17 @@
 # Case: A performance PR may prove only a simpler scheduler
 
-Status: evaluated
+Status: reviewed
 Validation: contributor-validated
-Human review: pending
-Maintainer acceptance: pending
-Delivery: PR open
-Upstream status checked: 2026-08-10
+Human review: independent-complete
+Maintainer acceptance: approved
+Delivery: merged
+Upstream status checked: 2026-08-11
 Visibility: public
 Repository: vercel-labs/wterm
 Role: contributor
 Source: https://github.com/vercel-labs/wterm/pull/112, commit `81e1f282a3a8739499d515436fe07df64ebc8d4f`
 
-> Technical validation and automated review are complete. Human review, maintainer approval, and merge remain pending.
+> Technical validation, human review, maintainer approval, and merge are complete. No release newer than 0.3.3 contains this change yet.
 
 ## Observed condition or claim
 
@@ -42,7 +42,7 @@ A screenshot comparison would also be non-evidence because both implementations 
 
 ## Outcome
 
-PR #112 remains open at head `81e1f28`.
+PR #112 merged on 2026-08-11 as `82d08f9`.
 
 - Ordinary writes request RAF directly.
 - Multiple writes before the frame still coalesce into one render.
@@ -64,7 +64,7 @@ Across six frame offsets, five median deltas were between -0.1 and 0 ms and one 
 - Source: PR #112 at `81e1f282a3a8739499d515436fe07df64ebc8d4f`.
 - Runtime: Headless Chromium 147 on macOS; raw measurements were saved for the review run.
 - Tests: restoring `setTimeout(0)` made the direct-RAF assertion fail with zero RAF calls; restored head passed `@wterm/dom` 113/113.
-- Review: exact-head Review Gate, CI, Vercel Agent Review, Vercel deployment, and Socket checks passed. Maintainer approval remains pending.
+- Review: exact-head Review Gate, CI, Vercel Agent Review, Vercel deployment, and Socket checks passed. The PR received human approval and merged.
 - Artifact: `foundry/runs/review-gate/2026-08-10-wterm-81e1f28.json` records the performance disposition. A visual screenshot pair was deliberately not produced because identical final frames cannot demonstrate scheduling order.
 
 ## Transferable lesson
