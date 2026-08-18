@@ -1,0 +1,127 @@
+{
+	"schemaVersion": 0,
+	"run": {
+		"date": "2026-08-18",
+		"repo": "example/artifact",
+		"base": "main",
+		"head": "abc1234",
+		"status": "complete",
+		"verdict": "pass",
+		"gaps": []
+	},
+	"contract": {
+		"path": "issue.md",
+		"spec_status": "pass",
+		"acceptance_reviewed": ["A1"],
+		"gaps": []
+	},
+	"provenance": {
+		"author_model": "model-a",
+		"reviewer_model": "model-b",
+		"same_family": false
+	},
+	"risk": {
+		"level": "high",
+		"triggers": ["durable artifact"],
+		"independent_challenge": {
+			"required": true,
+			"satisfied": true,
+			"method": "cross_family_review",
+			"artifact": "independent-challenge-example.txt",
+			"evidence": "A different model reviewed the frozen tree."
+		}
+	},
+	"claim_inventory": [
+		{
+			"source": "contract",
+			"location": "issue.md",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The command should be retryable."
+		},
+		{
+			"source": "design",
+			"location": "design.md",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The artifact is published before startup."
+		},
+		{
+			"source": "user_facing",
+			"location": "README.md",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The README documents a normal retry."
+		},
+		{
+			"source": "implementation",
+			"location": "src/start.ts",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The diff publishes before opening the listener."
+		}
+	],
+	"properties": [
+		{
+			"id": "P1",
+			"claim": "A failed startup can be retried immediately.",
+			"kind": "lifecycle",
+			"status": "verified",
+			"oracle": {
+				"observes": "the result of the second identical operation",
+				"layer": "end-to-end CLI",
+				"method": "force startup failure and retry",
+				"proxy_only": false
+			},
+			"proxy_challenge": {
+				"proxy": "the first invocation exits nonzero",
+				"counterexample": "the first invocation fails after leaving state that blocks the second",
+				"attempted": true,
+				"outcome": "separated",
+				"evidence": "The proxy is known to be insufficient."
+			},
+			"substrates": [
+				{
+					"name": "built CLI",
+					"status": "exercised",
+					"evidence": "Only the first invocation was exercised."
+				}
+			],
+			"evidence": "The first invocation failed."
+		}
+	],
+	"assumptions": [],
+	"side_effects": {
+		"assessment": "present",
+		"evidence": "The command publishes a durable artifact before startup.",
+		"commit_points": [
+			{
+				"id": "C1",
+				"effect": "published artifact",
+				"owner": "artifact writer",
+				"commit_event": "destination becomes visible",
+				"later_fallible_stages": ["portless setup", "listener startup"],
+				"failure_partitions": [
+					{
+						"ownership_region": "portless setup",
+						"covers": ["portless setup"],
+						"forced": true,
+						"residual_observed": "No temporary file remained.",
+						"cleanup_owner": "artifact writer",
+						"retry": {
+							"attempted": false,
+							"outcome": "failed",
+							"evidence": "No retry was run."
+						},
+						"evidence": "Portless refusal was forced."
+					}
+				]
+			}
+		]
+	},
+	"lenses": [],
+	"deterministic": [],
+	"findings": [],
+	"exemptions": [],
+	"issue_candidates": []
+}

@@ -34,9 +34,17 @@ Usage:
                                               A flag the diff introduces must appear on every doc surface that already
                                               documents a comparable sibling flag. The surface map is keyed on code paths,
                                               so a doc page reachable only by feature name is invisible to it
+  gate.sh execdeps <conventions.md> [<base-ref>]
+                                              Added external executables must have their provider package in every
+                                              first-party installer and sandbox bootstrap named by the execdeps map
   gate.sh covered <runs-dir> [<pr>]           A run report for the exact HEAD sha must exist; a rebase or force-push
                                               retires every earlier report, including the one that found the bugs
                                               this head claims to fix
+  gate.sh report <run-report.json> [--structural]
+                                              Validate that a complete report proves properties directly, verifies
+                                              assumptions, covers every post-commit failure stage and retry, and has
+                                              an independent challenge source when high risk. --structural skips
+                                              exact checkout HEAD and diff-signal checks for schema fixtures only
   gate.sh all <conventions.md> [<base-ref>]   style + surfaces
 
 <base-ref> defaults to the merge base with origin/HEAD (falls back to HEAD~1).
@@ -468,6 +476,53 @@ check_flagsweep() {
 	return "$findings"
 }
 
+check_execdeps() {
+	local conv="${1:-}"
+	[[ -z "$conv" || ! -f "$conv" ]] && { echo "execdeps: conventions file not found: ${conv:-<missing>}"; return 2; }
+	local base findings=0
+	base=$(base_ref "${2:-}")
+	local rules
+	rules=$(awk '/^```execdeps/{f=1;next}/^```/{f=0}f' "$conv" | grep -vE '^\s*(#|$)' || true)
+	[[ -z "$rules" ]] && { echo "PASS [execdeps] no executable dependency map in $conv"; return 0; }
+
+	while IFS= read -r rule; do
+		local executable source package installers source_added
+		executable="$(printf '%s' "$rule" | awk -F' :: ' '{print $1}')"
+		source="$(printf '%s' "$rule" | awk -F' :: ' '{print $2}')"
+		package="$(printf '%s' "$rule" | awk -F' :: ' '{print $3}')"
+		installers="$(printf '%s' "$rule" | awk -F' :: ' '{print $4}')"
+		if [[ -z "$executable" || -z "$source" || -z "$package" || -z "$installers" ]]; then
+			echo "ERROR [execdeps] malformed rule: $rule"
+			return 2
+		fi
+		source_added=$(git diff "$base" --unified=0 -- $source 2>/dev/null |
+			grep -E '^\+' | grep -vE '^\+\+\+' | grep -F -- "$executable" || true)
+		[[ -z "$source_added" ]] && continue
+
+		IFS=',' read -ra installer_patterns <<<"$installers"
+		for pattern in "${installer_patterns[@]}"; do
+			pattern="$(echo "$pattern" | xargs)"
+			local matches
+			matches=$(git ls-files -- "$pattern")
+			if [[ -z "$matches" ]]; then
+				echo "FINDING [execdeps] '$executable' is added under '$source' but installer '$pattern' does not exist"
+				findings=1
+				continue
+			fi
+			while IFS= read -r installer; do
+				[[ -z "$installer" ]] && continue
+				if ! grep -Eq -- "$package" "$installer"; then
+					echo "FINDING [execdeps] '$executable' is added under '$source' but '$installer' installs no package matching /$package/"
+					findings=1
+				fi
+			done <<<"$matches"
+		done
+	done <<<"$rules"
+
+	[[ $findings -eq 0 ]] && echo "PASS [execdeps] every added external executable is installed by each mapped first-party setup"
+	return $findings
+}
+
 check_covered() {
 	local runs="${1:-}"
 	[[ -z "$runs" ]] && usage
@@ -495,6 +550,15 @@ check_covered() {
 	done)
 	[[ -n "$prior" ]] && echo "$prior"
 	return 1
+}
+
+check_report() {
+	local report="${1:-}"
+	[[ -z "$report" ]] && usage
+	shift || true
+	local script_dir
+	script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+	node "$script_dir/validate-run-report.mjs" "$report" "$@"
 }
 
 # rawinput: when a diff deepens a resolution or discovery rule (the resolver now looks
@@ -651,7 +715,9 @@ case "$cmd" in
 	artifacts) check_artifacts "$@" ;;
 	rawinput) check_rawinput "$@" ;;
 	flagsweep) check_flagsweep "$@" ;;
+	execdeps) check_execdeps "$@" ;;
 	covered) check_covered "$@" ;;
+	report) check_report "$@" ;;
 	style) check_style "$@" ;;
 	stale) check_stale "$@" ;;
 	surfaces) check_surfaces "$@" ;;
