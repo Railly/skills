@@ -28,6 +28,10 @@ Select applicable faults:
 - concurrent check-then-act or conflicting transitions;
 - supported operating-system and filesystem differences.
 
+For every durable side effect, split the path at the commit point. Force failures before it and at each later fallible stage, then retry the same operation immediately. Writer-local cleanup is not evidence for caller-level rollback.
+
+For confidentiality properties, define the oracle in terms of effective access. Mode bits, ownership metadata, or an API success response are proxies unless the supported substrate has no additional access mechanism. Exercise ACLs, inherited permissions, alternate principals, and equivalent platform controls where applicable.
+
 Define expected state, observable signal, cleanup deadline, and safe retry outcome for each cell.
 
 **Complete when:** every selected fault has an oracle that can distinguish safe degradation from silent corruption.

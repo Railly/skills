@@ -1,0 +1,113 @@
+{
+	"schemaVersion": 0,
+	"run": {
+		"date": "2026-08-18",
+		"repo": "example/secrets",
+		"base": "main",
+		"head": "abc1234",
+		"status": "complete",
+		"verdict": "pass",
+		"gaps": []
+	},
+	"contract": {
+		"path": "issue.md",
+		"spec_status": "pass",
+		"acceptance_reviewed": ["A1"],
+		"gaps": []
+	},
+	"provenance": {
+		"author_model": "model-a",
+		"reviewer_model": "model-b",
+		"same_family": false
+	},
+	"risk": {
+		"level": "high",
+		"triggers": ["secret file"],
+		"independent_challenge": {
+			"required": true,
+			"satisfied": true,
+			"method": "cross_family_review",
+			"artifact": "independent-challenge-example.txt",
+			"evidence": "A different model reviewed the frozen tree."
+		}
+	},
+	"claim_inventory": [
+		{
+			"source": "contract",
+			"location": "issue.md",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The contract requires owner-only access."
+		},
+		{
+			"source": "design",
+			"location": "design.md",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The design selects mode 0600."
+		},
+		{
+			"source": "user_facing",
+			"location": "README.md",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The README promises an owner-only file."
+		},
+		{
+			"source": "implementation",
+			"location": "src/secrets.ts",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The writer calls chmod 0600."
+		}
+	],
+	"properties": [
+		{
+			"id": "P1",
+			"claim": "Only the owner can read the secret file.",
+			"kind": "confidentiality",
+			"status": "verified",
+			"oracle": {
+				"observes": "mode bits",
+				"layer": "filesystem metadata",
+				"method": "stat the file",
+				"proxy_only": true
+			},
+			"proxy_challenge": {
+				"proxy": "mode is 0600",
+				"counterexample": "an inherited ACL grants another principal read access",
+				"attempted": false,
+				"outcome": "not_separated",
+				"evidence": "No ACL fixture was created."
+			},
+			"substrates": [
+				{
+					"name": "macOS APFS",
+					"status": "exercised",
+					"evidence": "stat returned 0600."
+				}
+			],
+			"evidence": "stat returned 0600."
+		}
+	],
+	"assumptions": [],
+	"side_effects": {
+		"assessment": "present",
+		"evidence": "The command writes a secret file.",
+		"commit_points": [
+			{
+				"id": "C1",
+				"effect": "secret file",
+				"owner": "writer",
+				"commit_event": "file publication",
+				"later_fallible_stages": [],
+				"failure_partitions": []
+			}
+		]
+	},
+	"lenses": [],
+	"deterministic": [],
+	"findings": [],
+	"exemptions": [],
+	"issue_candidates": []
+}

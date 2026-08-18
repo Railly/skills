@@ -6,6 +6,7 @@
 		"base": "main",
 		"head": "abc1234",
 		"status": "complete",
+		"verdict": "pass",
 		"gaps": []
 	},
 	"contract": {
@@ -18,6 +19,126 @@
 		"author_model": "gpt-5.6-codex",
 		"reviewer_model": "claude-opus-4-8",
 		"same_family": false
+	},
+	"risk": {
+		"level": "high",
+		"triggers": ["durable authentication state"],
+		"independent_challenge": {
+			"required": true,
+			"satisfied": true,
+			"method": "cross_family_review",
+			"artifact": "independent-challenge-example.txt",
+			"evidence": "Claude reviewed the frozen tree and the built artifact was driven through failure and retry."
+		}
+	},
+	"claim_inventory": [
+		{
+			"source": "contract",
+			"location": "foundry/missions/example-repo/42.md",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "Acceptance A2 defines retry-budget preservation."
+		},
+		{
+			"source": "design",
+			"location": "design notes in the issue",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The design assigns retry restoration to the middleware owner."
+		},
+		{
+			"source": "user_facing",
+			"location": "PR body and CLI error text",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The PR promises an immediate retry without losing budget."
+		},
+		{
+			"source": "implementation",
+			"location": "src/auth.ts and src/middleware.ts",
+			"status": "reviewed",
+			"properties": ["P1"],
+			"evidence": "The diff changes ownership and restoration of retry state."
+		}
+	],
+	"properties": [
+		{
+			"id": "P1",
+			"claim": "Expired authentication state preserves the retry budget.",
+			"kind": "lifecycle",
+			"status": "verified",
+			"oracle": {
+				"observes": "the retry budget visible to the next authentication attempt",
+				"layer": "end-to-end caller state",
+				"method": "force expiration, inspect state, then perform the next attempt",
+				"proxy_only": false
+			},
+			"proxy_challenge": {
+				"proxy": "the first request returns the documented error",
+				"counterexample": "return the correct error after silently zeroing the retry budget",
+				"attempted": true,
+				"outcome": "separated",
+				"evidence": "The error text remained correct while the next attempt exposed the zeroed budget."
+			},
+			"substrates": [
+				{
+					"name": "built CLI with local authentication fixture",
+					"status": "exercised",
+					"evidence": "The next attempt retained the original retry budget."
+				}
+			],
+			"evidence": "The forced expired-token flow preserved the budget and completed the retry."
+		}
+	],
+	"assumptions": [
+		{
+			"id": "A1",
+			"source": "Issue Contract",
+			"claim": "The retry state has one owner.",
+			"status": "verified",
+			"evidence": "Caller enumeration found one writer and the failure drive observed that writer restoring state."
+		}
+	],
+	"side_effects": {
+		"assessment": "present",
+		"evidence": "The middleware commits an authentication-attempt record before downstream validation.",
+		"commit_points": [
+			{
+				"id": "C1",
+				"effect": "authentication attempt record",
+				"owner": "middleware handle",
+				"commit_event": "attempt record inserted",
+				"later_fallible_stages": ["token validation", "session publication"],
+				"failure_partitions": [
+					{
+						"ownership_region": "token validator",
+						"covers": ["token validation"],
+						"forced": true,
+						"residual_observed": "attempt record retained with retry budget restored",
+						"cleanup_owner": "middleware error path",
+						"retry": {
+							"attempted": true,
+							"outcome": "success",
+							"evidence": "Immediate retry validated a fresh token."
+						},
+						"evidence": "Forced expired-token validation after the record commit."
+					},
+					{
+						"ownership_region": "session publisher",
+						"covers": ["session publication"],
+						"forced": true,
+						"residual_observed": "attempt record retained without a partial session",
+						"cleanup_owner": "session publisher rollback",
+						"retry": {
+							"attempted": true,
+							"outcome": "success",
+							"evidence": "Immediate retry published one complete session."
+						},
+						"evidence": "Forced session-store refusal after token validation."
+					}
+				]
+			}
+		]
 	},
 	"lenses": [
 		{ "name": "contract-drift", "status": "run", "reason": "" },
@@ -48,16 +169,18 @@
 			"evidence": "forced the expired outcome in a scratch test; retry budget reset observed",
 			"layer": "caller ordering",
 			"source": "map",
-			"path": "src/auth.ts#validateToken → src/middleware.ts#handle via call"
+			"path": "src/auth.ts#validateToken → src/middleware.ts#handle via call",
+			"resolution": "fixed"
 		},
 		{
 			"id": "F2",
-			"state": "unverified",
+			"state": "refuted",
 			"claim": "browser flow re-prompts login on token refresh",
-			"evidence": "gap: no browser available in this environment to drive the flow",
+			"evidence": "The built browser fixture refreshed the token without rendering the login prompt.",
 			"layer": "end-to-end path",
 			"source": "lens",
-			"path": ""
+			"path": "",
+			"resolution": "not_applicable"
 		}
 	],
 	"exemptions": [
