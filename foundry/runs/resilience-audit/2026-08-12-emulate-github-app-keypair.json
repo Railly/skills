@@ -1,0 +1,70 @@
+{
+  "date": "2026-08-12",
+  "repo": "vercel-labs/emulate",
+  "branch": "feat/github-app-generated-keypair",
+  "mode": "read-only fault injection",
+  "verdict": "fail",
+  "findings": [
+    {
+      "id": "RA-1",
+      "severity": "high",
+      "classification": "stale authorization state and unbounded growth",
+      "claim": "reset preserves installation tokens and permits unbounded credential accumulation",
+      "introducedBySlice": false
+    },
+    {
+      "id": "RA-2",
+      "severity": "high",
+      "classification": "corrupted split state",
+      "claim": "reset removes webhook entities but leaves active dispatcher subscriptions",
+      "introducedBySlice": false
+    },
+    {
+      "id": "RA-3",
+      "severity": "high",
+      "classification": "false success and lifecycle error",
+      "claim": "port collision resolves createEmulator before uncaught EADDRINUSE",
+      "introducedBySlice": false
+    },
+    {
+      "id": "RA-4",
+      "severity": "medium",
+      "classification": "misleading output",
+      "claim": "duplicate App identities produce generated secrets that cannot authenticate",
+      "introducedBySlice": true
+    },
+    {
+      "id": "RA-5",
+      "severity": "medium",
+      "classification": "recovery drift",
+      "claim": "caller mutation of nested seed data changes later resets",
+      "introducedBySlice": false
+    },
+    {
+      "id": "RA-6",
+      "severity": "medium",
+      "classification": "overload and latency degradation",
+      "claim": "synchronous key generation blocks the event loop linearly",
+      "introducedBySlice": true
+    },
+    {
+      "id": "RA-7",
+      "severity": "low",
+      "classification": "lifecycle sharp edge",
+      "claim": "close is not idempotent",
+      "introducedBySlice": false
+    }
+  ],
+  "preserved": [
+    "invalid explicit key does not start a server",
+    "direct invalid seed leaves store untouched",
+    "generated key remains valid after 1000 resets",
+    "thirty create-close cycles leave no additional active handles",
+    "reset after close does not reopen the server"
+  ],
+  "gaps": [
+    "RSS growth was inconclusive without heap snapshots and a longer steady-state campaign",
+    "Windows lifecycle behavior was not executed",
+    "the programmatic API has no process-signal cancellation path"
+  ]
+}
