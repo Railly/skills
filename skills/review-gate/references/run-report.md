@@ -1,8 +1,8 @@
-# Run report — schema v0
+# Run report: schema v0
 
 Every gate run emits one JSON file to `foundry/runs/review-gate/<date>-<repo>-<shortsha>.json` under the canonical source root, alongside the prose report. Same content, two views: prose for the human, JSON for the ledger. The runs directory is the dataset that makes the step-6 decision review (n≈20) computable; without it, calibration questions stay unanswerable.
 
-While `schemaVersion` is 0 the schema mutates freely during dogfood — record friction inline here or in PAPERCUTS.md, change the shape, move on. CLI hardening (fail-closed validation, ledger append) waits until the schema survives 5 consecutive runs unchanged.
+While `schemaVersion` is 0 the schema mutates freely during dogfood: record friction inline here or in PAPERCUTS.md, change the shape, move on. CLI hardening (fail-closed validation, ledger append) waits until the schema survives 5 consecutive runs unchanged.
 
 ## Schema
 
@@ -144,31 +144,31 @@ While `schemaVersion` is 0 the schema mutates freely during dogfood — record f
 
 ## Field semantics
 
-These restate the SKILL.md rules as data constraints — a report violating them is malformed even if the JSON parses:
+These restate the SKILL.md rules as data constraints: a report violating them is malformed even if the JSON parses:
 
-- **`run.status: incomplete`** — set whenever a lens runtime dies, a deterministic check could not run, or any step's complete-when was not reached. Each cause goes in `run.gaps` as one sentence. An incomplete run is never presented as a pass; this is the run-level twin of "a verification gap is not a refutation".
+- **`run.status: incomplete`**: set whenever a lens runtime dies, a deterministic check could not run, or any step's complete-when was not reached. Each cause goes in `run.gaps` as one sentence. An incomplete run is never presented as a pass; this is the run-level twin of "a verification gap is not a refutation".
 - **`run.verdict`** separates execution completion from approval. `pass` requires `run.status: complete`, no gaps, every proof obligation resolved, and no open `confirmed` or `unverified` finding. A completed review may still have `verdict: findings`.
 - **`contract.spec_status`** records the state supplied by a separate Spec review. Review Gate never promotes it to `pass`. When no Issue Contract or Spec result was supplied, use `not_provided` or `not_applicable` and explain any delivery impact in `contract.gaps`.
-- **`provenance.same_family: true`** — author and reviewer share a model family. Recorded, not blocking, but the prose report must carry a visible warning: a same-family reviewer shares the author's priors and blind spots.
-- **`risk.level: high`** — use when the change handles secrets, auth, destructive operations, durable or externally visible state, concurrency, process lifecycle, cross-platform guarantees, or remote side effects. High risk requires `independent_challenge.satisfied: true`.
-- **`risk.independent_challenge.artifact`** — a non-empty local file containing the durable review output, trace, corpus, or report. Relative paths resolve from the run report. An unchecked URL or a claim that another reviewer was used is not auditable evidence.
-- **`claim_inventory`** — contains exactly the four source classes `contract`, `design`, `user_facing`, and `implementation`. Each is reviewed and maps its material claims to property IDs, or records `not_provided` or `not_applicable` with evidence. This makes omission visible before proof begins.
-- **`properties`** — the proof ledger. Every material changed property appears once. `oracle.observes` names the property, not the implementation signal used as a proxy. A complete run requires every property to be `verified`, `proxy_only: false`, and every listed substrate to be `exercised` with evidence.
-- **`properties[].proxy_challenge`** — names the convenient implementation observable, constructs a state where it could hold while the property fails, and executes that counterexample. `separated` means the proxy was falsified as an oracle and cannot be the property evidence. `not_separated` means this attempt did not distinguish them; the direct oracle is still required.
-- **`assumptions`** — every carried assumption from the design gate, issue contract, implementation trail, or subsystem model. A complete run contains no `unverified` or `refuted` assumption.
-- **`side_effects.assessment`** — always explicit. `none` requires evidence explaining why the diff creates no durable or externally visible commit point. `present` requires at least one commit point.
-- **`commit_points[].later_fallible_stages`** — enumerate every stage that can fail after the effect becomes durable or externally visible. `failure_partitions[].covers` must cover every stage at least once. Each partition names its ownership region, is forced, records residual state and cleanup ownership, and immediately retries the same user operation. A complete run accepts only `success` or an already documented recovery path.
+- **`provenance.same_family: true`**: author and reviewer share a model family. Recorded, not blocking, but the prose report must carry a visible warning: a same-family reviewer shares the author's priors and blind spots.
+- **`risk.level: high`**: use when the change handles secrets, auth, destructive operations, durable or externally visible state, concurrency, process lifecycle, cross-platform guarantees, or remote side effects. High risk requires `independent_challenge.satisfied: true`.
+- **`risk.independent_challenge.artifact`**: a non-empty local file containing the durable review output, trace, corpus, or report. Relative paths resolve from the run report. An unchecked URL or a claim that another reviewer was used is not auditable evidence.
+- **`claim_inventory`**: contains exactly the four source classes `contract`, `design`, `user_facing`, and `implementation`. Each is reviewed and maps its material claims to property IDs, or records `not_provided` or `not_applicable` with evidence. This makes omission visible before proof begins.
+- **`properties`**: the proof ledger. Every material changed property appears once. `oracle.observes` names the property, not the implementation signal used as a proxy. A complete run requires every property to be `verified`, `proxy_only: false`, and every listed substrate to be `exercised` with evidence.
+- **`properties[].proxy_challenge`**: names the convenient implementation observable, constructs a state where it could hold while the property fails, and executes that counterexample. `separated` means the proxy was falsified as an oracle and cannot be the property evidence. `not_separated` means this attempt did not distinguish them; the direct oracle is still required.
+- **`assumptions`**: every carried assumption from the design gate, issue contract, implementation trail, or subsystem model. A complete run contains no `unverified` or `refuted` assumption.
+- **`side_effects.assessment`**: always explicit. `none` requires evidence explaining why the diff creates no durable or externally visible commit point. `present` requires at least one commit point.
+- **`commit_points[].later_fallible_stages`**: enumerate every stage that can fail after the effect becomes durable or externally visible. `failure_partitions[].covers` must cover every stage at least once. Each partition names its ownership region, is forced, records residual state and cleanup ownership, and immediately retries the same user operation. A complete run accepts only `success` or an already documented recovery path.
 - **`findings[].state`**:
-  - `confirmed` — evidence attached, reproduced or forced at the layer of the claim.
-  - `unverified` — the empirical layer was unavailable; the gap is named in `evidence`. Never silently dropped.
-  - `refuted` — carries the refutation, at the claim's own layer (a unit test of a callee does not refute a caller-ordering claim).
-  - `exempted` — an absence or silence exonerated; its one-sentence evidence lives in `evidence` and is mirrored in `exemptions`. An exemption whose evidence cannot be stated in one sentence is a finding, not an exemption.
-  - `issue_candidate` — real defect outside the diff's scope; mirrored in `issue_candidates` with why it is out of scope.
-- **`findings[].resolution`** — `open` blocks a pass; `fixed` records a finding corrected before the final exact-head gate; `not_applicable` is only for exempted, refuted, or issue-candidate entries.
-- **`findings[].layer`** — the layer of the claim (caller ordering, end-to-end path, contract narrowing, unit seam...). This is what makes "refute at the layer of the claim" checkable after the fact.
-- **`findings[].source`** — `gate` (deterministic layer), `lens` (judgment pass), `map` (Impact Map convergence/confidence item). `path` carries the propagation path (`X → Y via call`) when the source is the map.
-- **`lenses[].status: skipped`** requires a `reason`. Every catalog lens appears in the array — the step-3 complete-when, as data.
-- **`deterministic[].outcome: acknowledged`** requires a `reason` — the step-2 rule that nothing is skipped silently.
+  - `confirmed`: evidence attached, reproduced or forced at the layer of the claim.
+  - `unverified`: the empirical layer was unavailable; the gap is named in `evidence`. Never silently dropped.
+  - `refuted`: carries the refutation, at the claim's own layer (a unit test of a callee does not refute a caller-ordering claim).
+  - `exempted`: an absence or silence exonerated; its one-sentence evidence lives in `evidence` and is mirrored in `exemptions`. An exemption whose evidence cannot be stated in one sentence is a finding, not an exemption.
+  - `issue_candidate`: real defect outside the diff's scope; mirrored in `issue_candidates` with why it is out of scope.
+- **`findings[].resolution`**: `open` blocks a pass; `fixed` records a finding corrected before the final exact-head gate; `not_applicable` is only for exempted, refuted, or issue-candidate entries.
+- **`findings[].layer`**: the layer of the claim (caller ordering, end-to-end path, contract narrowing, unit seam...). This is what makes "refute at the layer of the claim" checkable after the fact.
+- **`findings[].source`**: `gate` (deterministic layer), `lens` (judgment pass), `map` (Impact Map convergence/confidence item). `path` carries the propagation path (`X → Y via call`) when the source is the map.
+- **`lenses[].status: skipped`** requires a `reason`. Every catalog lens appears in the array: the step-3 complete-when, as data.
+- **`deterministic[].outcome: acknowledged`** requires a `reason`: the step-2 rule that nothing is skipped silently.
 
 ## Frozen until signal
 

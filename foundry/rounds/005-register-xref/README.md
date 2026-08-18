@@ -13,7 +13,7 @@ Scope: full Railly Skills catalog vs. installed skills and SkillKit 90-day usage
 - `foundry/runs/xref/`: 18 run artifacts (HTML/JSON/TXT/MD) dated 2026-08-10, covering agent-browser #1068 (post #1589), #1589 (post-merge), #326/#86 (triage + clustering), #896 (post #1589), and a session-isolation cross-check.
 - SkillKit 90-day invocation data: `xref` called 14 times, the fourth most-invoked skill in the corpus behind `deslop`, `review-gate`, and `record-a-case`.
 - The installed source: `~/.claude/skills/xref` (symlink) -> `~/.agents/skills/xref/SKILL.md`, not present anywhere in this repository before this round.
-- Cross-check against the four names retired in [Round 004](../004-skill-lifecycle-audit/README.md): `xref` is unrelated to any of them and does not overlap `pick-an-issue`, `gh-graph`, or `review-gate` in trigger surface — it answers "what does this PR/issue already connect to", not "what should I work on" or "does this diff pass review".
+- Cross-check against the four names retired in [Round 004](../004-skill-lifecycle-audit/README.md): `xref` is unrelated to any of them and does not overlap `pick-an-issue`, `gh-graph`, or `review-gate` in trigger surface: it answers "what does this PR/issue already connect to", not "what should I work on" or "does this diff pass review".
 
 ## Limits
 
@@ -32,7 +32,7 @@ Scope: full Railly Skills catalog vs. installed skills and SkillKit 90-day usage
 
 ## Recommendation
 
-Register `xref` at channel `experimental`, maturity `dogfooded` — the same bar applied to `pick-an-issue`, `record-a-case`, and `solution-gate` at their first registration: real use on real work with recorded evidence, no baseline yet.
+Register `xref` at channel `experimental`, maturity `dogfooded`: the same bar applied to `pick-an-issue`, `record-a-case`, and `solution-gate` at their first registration: real use on real work with recorded evidence, no baseline yet.
 
 ## Proposed changes (staged, not committed)
 
