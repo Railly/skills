@@ -1,0 +1,29 @@
+{
+  "date": "2026-08-13",
+  "repo": "vercel-labs/wterm",
+  "pullRequest": 119,
+  "head": "22247c6ebbc706af9ae7bd486f6f0f1aa00c2e80",
+  "trackedProductDiffFingerprint": "5af4005091c02c560c2b5c217ee0aa54e0f21acb41e9b9c8374290cdcf807c11",
+  "verdict": "pass",
+  "preserved": [
+    "Initial and late browser reclamps retain programmatic scroll ownership.",
+    "A DOM shrink that lands at the new current bottom retains follow state.",
+    "Duplicate events consume the programmatic token once and later user movement transfers ownership.",
+    "No-op assignments do not erase the latest moving assignment token.",
+    "Resize and history anchoring remain stable.",
+    "Shuffled execution exposed no listener, timer, or shared-state contamination."
+  ],
+  "evidence": [
+    "DOM 152/152",
+    "Shuffled DOM 152/152 with seeds 11801, 11802, and 11803",
+    "Exact-head CI run 31740307526 passed",
+    "Native Wayland run 31737555242 passed 4/4 on product-identical code",
+    "Force-red fails with following:false when current-bottom attribution is removed"
+  ],
+  "gaps": [
+    "Firefox and Safari were not executed.",
+    "Long-duration touchpad, wheel, and kinetic-scroll interaction was not run.",
+    "The native Wayland harness is not retained in the PR.",
+    "No memory or descriptor campaign was run because the change adds no growing resource owner."
+  ]
+}
