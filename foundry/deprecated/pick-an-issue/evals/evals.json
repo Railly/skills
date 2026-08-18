@@ -1,0 +1,44 @@
+{
+	"skill_name": "pick-an-issue",
+	"evals": [
+		{
+			"id": 1,
+			"name": "compare-public-backlog",
+			"prompt": "Find a worthwhile open bug in this public repository. I want to choose what to work on.",
+			"expected_output": "The skill states its inspection boundary, filters cheaply, presents three to five qualified candidates in an evidence-backed matrix, recommends one, and stops for the user's choice.",
+			"assertions": [
+				"States the inspected backlog window and truncation",
+				"Uses a matrix with uncertainty instead of fake scores",
+				"Explains one recommendation",
+				"Stops before reproduction or implementation"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "already-selected-near-miss",
+			"prompt": "Issue #88 is already selected and reproduced. Walk me through implementing it so I learn the codebase.",
+			"expected_output": "The skill does not repeat backlog selection and routes the reproduced mission to implementation through its canonical Issue Contract.",
+			"assertions": [
+				"Recognizes that selection is complete",
+				"Does not rescan the backlog",
+				"Hands off through the existing Issue Contract",
+				"Does not claim ownership of implementation"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "selection-to-contract",
+			"prompt": "I choose issue #42 from your matrix. Preserve the handoff, but do not reproduce it or create a branch yet.",
+			"expected_output": "The skill creates a selected-state Issue Contract under the canonical Railly Skills source root, carries the selection evidence and unknowns, names reproducing as the next phase, and stops before target-repository work.",
+			"assertions": [
+				"Writes under foundry/missions in the canonical source root",
+				"Does not write the contract into the target repository or an installed skill copy",
+				"Preserves the selected issue, evidence, unknowns, and risks",
+				"Stops before reproduction, branch creation, or implementation"
+			],
+			"files": []
+		}
+	]
+}
