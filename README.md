@@ -18,6 +18,10 @@ These skills turn real engineering work into portable agent protocols. They favo
 
 [Review Gate](skills/review-gate) runs a pre-review pass on a diff before pushing: deterministic checks first, then focused review lenses selected by what the diff changes. External review findings are harvested back into the catalog.
 
+### Solution Gate
+
+[Solution Gate](skills/solution-gate) orchestrates Shaping before implementation. It freezes an evidence-backed contract, runs isolated Shaping passes, probes their weakest assumptions, feeds evidence back into their fit checks, and gates the surviving shape before detailing, breadboarding, or slicing.
+
 ## Issue Contract
 
 The [Issue Contract](foundry/missions) is a phase-neutral state carrier, not an installable skill. It preserves outcome, observed and expected behavior, acceptance IDs, non-goals, invariants, change surface, verification claims, risk, promotion state, and the exact handoff command.
@@ -42,10 +46,6 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Before After](skills/.experimental/before-after) turns a bug fix, feature, benchmark, or migration into a minimal browser-openable comparison. It puts old and new behavior on one shared basis, supports screenshotable visual repros, exact benchmark tables, and small feature simulators, and uses the official Vercel report foundation.
 
-### Solution Gate
-
-[Solution Gate](skills/.experimental/solution-gate) gates the shape of a fix before it is written or adopted. For existing PRs and patches, candidate-audit mode seals the implementation, reconstructs the contract and solution shapes blind, probes discriminating cases, then reveals the candidate as a third proposal. Each decision ends in the smallest auditable visual that exposes the disputed contract or control flow while keeping observed evidence separate from proposed shapes.
-
 ### Handoff
 
 [Handoff](skills/.experimental/handoff) closes a working cycle so the next session resumes without rereading the transcript. It verifies state against git before asserting it, keeps delivery, verification, and human judgment independent, and stacks each session onto the prior document instead of overwriting it. Closed work with a transferable lesson goes to Record a Case instead.
@@ -66,6 +66,10 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Resilience Audit](skills/.experimental/resilience-audit) forces timeouts, cancellation, retries, partial state, overload, cleanup, dependency failure, and concurrency paths.
 
+### Xref
+
+[Xref](skills/.experimental/xref) snapshots the complete reference graph around a GitHub issue or pull request to surface competing work, orphans, structural links, and file-overlap risks before work begins.
+
 ## Workflow
 
 ```mermaid
@@ -76,7 +80,8 @@ flowchart LR
   Gap --> Choice
   Choice --> Contract[Issue Contract]
   Contract --> Reproduce[Reproduce and map]
-  Reproduce --> Shape[solution-gate]
+  Reproduce --> Gate[solution-gate]
+  Gate --> Shape[shaping]
   Shape --> Change[Implement acceptance IDs]
   Change --> Proof[Deterministic proof]
   Proof --> Spec[Spec review]
@@ -93,7 +98,7 @@ Not every cycle reaches a case. When work stops with the cycle still open, `hand
 
 ## Maturity
 
-Distribution channel and evidence maturity are separate. Stable contains three canonical skills plus the temporary `pick-an-issue` compatibility alias; Solution Gate has greenfield and candidate-audit dogfood but stays in Experimental until a baseline round exists. Candidate and Experimental skills remain installable without implying validation.
+Distribution channel and evidence maturity are separate. Stable contains four canonical skills plus the temporary `pick-an-issue` compatibility alias. Solution Gate is stable by explicit human promotion backed by multiple dogfood runs, while its orchestration redesign and formal baseline comparison remain unevaluated. Candidate and Experimental skills remain installable without implying validation.
 
 The source of truth is [foundry/maturity.json](foundry/maturity.json).
 
@@ -116,7 +121,7 @@ bunx skills add Railly/skills
 The interactive installer exposes three distinct groups: `Stable`, `Candidates`, and `Experimental`. Install only the stable surface with:
 
 ```bash
-bunx skills add Railly/skills --skill issue-intake --skill record-a-case --skill review-gate
+bunx skills add Railly/skills --skill issue-intake --skill record-a-case --skill review-gate --skill solution-gate
 ```
 
 `pick-an-issue` is a deprecated compatibility alias for `issue-intake` during the v0.0.4 migration window. New installations and workflow references should use `issue-intake`.
