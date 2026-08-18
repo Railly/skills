@@ -19,7 +19,7 @@ cli/src/ca_bundle.rs :: docs/src/app/proxy/page.mdx, skill-data/core/references/
 Provenance: round-1 misses on #1552 (CLI help and MCP descriptions not updated for new `--exact` semantics) and #1553 (README and eval harness advertising `find` actions the CLI rejects). The `browser.rs` line is from #1532 round 2 (reload risk and `revived` result needed full CLI, skill, and docs coverage; only README and skill-data were flagged). Most `browser.rs` changes are internal; "internal-only, no observable behavior delta" is the expected one-line acknowledgment, and a behavior delta makes the required surfaces load-bearing.
 
 ```execdeps
-certutil :: cli/src/native/cdp/chrome.rs :: libnss3-tools|nss-tools :: cli/src/install.rs, packages/@agent-browser/eve/extension/lib/sandbox.ts
+certutil :: cli/src/native/cdp/chrome.rs :: libnss3-tools|nss-tools :: cli/src/install.rs, packages/@agent-browser/eve/extension/lib/sandbox.ts, packages/@agent-browser/sandbox/src/vercel.ts, examples/environments/lib/agent-browser-sandbox.ts
 ```
 
 ## Oracles
