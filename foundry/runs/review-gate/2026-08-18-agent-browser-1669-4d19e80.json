@@ -1,0 +1,596 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-18",
+    "repo": "vercel-labs/agent-browser#1669",
+    "base": "548b159b30eef119ccf6846c8bc807d0eaa3f6f8",
+    "head": "4d19e80d3ec308b53978d829de669d13ed381f04",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "foundry/runs/solution-gate/2026-08-18-agent-browser-1669-ctate-followups/verdict.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "shared-ca-transition-stamping",
+      "all-first-party-certutil-owners",
+      "eve-bootstrap-revision",
+      "set-omit-clear-constructor-coverage",
+      "provider-prior-state-transitions",
+      "clean-debian-certutil",
+      "clean-amazon-linux-certutil"
+    ],
+    "gaps": [
+      "No separate Issue Contract or Spec review result was supplied; the completed Solution Gate is the design oracle."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5.6 family",
+    "reviewer_model": "Claude Fable 5 and Cursor Grok 4.6",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "cross-platform system dependency guarantee",
+      "browser process lifecycle",
+      "certificate trust state"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "2026-08-18-agent-browser-1669-4d19e80-independent-challenge.txt",
+      "evidence": "Fable 5 and Grok 4.6 independently inspected the frozen subsystem, converged on the connect-envelope and retained-state gaps, and their findings were fixed and retested."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "ctate feedback and PR #1669 review thread",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The reported failures require first-party certutil availability and explicit clear delivery when changing from retained local CA state to an external launch."
+    },
+    {
+      "source": "design",
+      "location": "foundry/runs/solution-gate/2026-08-18-agent-browser-1669-ctate-followups/verdict.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "Solution Gate selected an amendment with one transition helper, complete dependency ownership, Eve revision invalidation, and tests binding set, omit, and clear."
+    },
+    {
+      "source": "user_facing",
+      "location": "README, CLI help, docs configuration/proxy pages, skill references, MCP and Eve configuration",
+      "status": "reviewed",
+      "properties": ["P1", "P3", "P4"],
+      "evidence": "All contract-carrying surfaces now describe installer-provided certutil, sticky omission, explicit clear, and one invalid set-plus-clear state."
+    },
+    {
+      "source": "implementation",
+      "location": "cli/src/commands.rs, cli/src/main.rs, cli/src/native/actions.rs, cli/src/install.rs, sandbox owners, MCP and Eve",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "The exact base-to-head diff changes dependency maps, launch envelope construction, resolved daemon state, provider commits, error guidance, and configuration parity."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Every first-party Linux setup path that can run Chromium installs the package that provides certutil.",
+      "kind": "availability",
+      "status": "verified",
+      "oracle": {
+        "observes": "certutil resolving as an executable after setup on each supported Linux package family",
+        "layer": "clean Linux package substrate",
+        "method": "install the mapped package in clean Debian Bookworm and Amazon Linux 2023 images, then resolve and identify certutil",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the package name appears in one installer source",
+        "counterexample": "the CLI installer contains libnss3-tools while Eve or the published sandbox omits it",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The pre-fix owner tests and execdeps inventory failed for missing owners despite a correct package in other files."
+      },
+      "substrates": [
+        {
+          "name": "Debian Bookworm clean container",
+          "status": "exercised",
+          "evidence": "libnss3-tools installed successfully and /usr/bin/certutil resolved."
+        },
+        {
+          "name": "Amazon Linux 2023 clean container",
+          "status": "exercised",
+          "evidence": "nss-tools-3.112.0-8.amzn2023.0.2.aarch64 installed and /usr/bin/certutil resolved."
+        },
+        {
+          "name": "first-party owner inventory",
+          "status": "exercised",
+          "evidence": "gate.sh execdeps passed for CLI, Eve, published sandbox, and environments example; benchmark copy is aligned."
+        }
+      ],
+      "evidence": "Package probes, owner tests, and the deterministic dependency gate all passed."
+    },
+    {
+      "id": "P2",
+      "claim": "Every launch envelope preserves the caller's set, omit, or clear CA transition, including the parsed connect command.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the actual serialized launch JSON delivered to the daemon",
+        "layer": "CLI transport envelope",
+        "method": "construct provider, CDP, auto-connect, local, and parsed connect launches and inspect caCert and clearCaCert",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "a helper exists and appears four times in main.rs",
+        "counterexample": "connect constructs a fifth launch envelope without the helper while the source-count test stays green",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing parse_command stamping made test_connect_launch_command_preserves_ca_clear_transition fail with clearCaCert null; restoration passed."
+      },
+      "substrates": [
+        {
+          "name": "Rust command construction tests",
+          "status": "exercised",
+          "evidence": "Set, omit, clear, provider clear, parsed connect clear, and non-launch exclusion tests passed."
+        },
+        {
+          "name": "full Rust CI-profile suite",
+          "status": "exercised",
+          "evidence": "1,144 tests passed and 101 ignored at final pre-report verification."
+        }
+      ],
+      "evidence": "The serializer is shared by parsed and explicit launch constructors, and the regression mutation went red."
+    },
+    {
+      "id": "P3",
+      "claim": "Retained CA state blocks external launches on omission, clears on explicit clear, and commits the clear only after a successful launch.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "DaemonState.effective_ca_cert and launch compatibility after prior sticky CA state",
+        "layer": "daemon launch state machine",
+        "method": "seed prior CA state, resolve omission and clear, validate external launch compatibility, and inspect success-path state commits",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the parser accepts --no-ca-cert",
+        "counterexample": "the provider envelope drops clear or an early provider return never persists the resolved None",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Independent reviewers found both counterexamples; provider envelope construction and iOS/Safari success commits were fixed."
+      },
+      "substrates": [
+        {
+          "name": "daemon transition unit tests",
+          "status": "exercised",
+          "evidence": "Prior set plus omit rejects external launch; prior set plus clear passes and the error names --no-ca-cert."
+        },
+        {
+          "name": "cross-family subsystem review",
+          "status": "exercised",
+          "evidence": "Fable and Grok traced all state commit branches, including early iOS and Safari returns."
+        }
+      ],
+      "evidence": "Resolved state is applied before validation and persisted on every successful launch family."
+    },
+    {
+      "id": "P4",
+      "claim": "Simultaneous CA set and clear is rejected consistently by CLI, daemon, MCP, and Eve.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the externally returned validation error and absence of emitted conflicting argv",
+        "layer": "public configuration adapters",
+        "method": "submit caCert and clearCaCert together through CLI-compatible adapters and inspect the result",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CLI rejects --ca-cert with --no-ca-cert",
+        "counterexample": "MCP or Eve silently prefers caCert and emits only --ca-cert",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The previous MCP and Eve tests encoded silent preference; both adapters now reject and focused tests pass."
+      },
+      "substrates": [
+        {
+          "name": "MCP Rust test",
+          "status": "exercised",
+          "evidence": "common_global_args_reject_ca_cert_with_clear passed and emitted no argv."
+        },
+        {
+          "name": "Eve extension test and typecheck",
+          "status": "exercised",
+          "evidence": "The conflicting configuration test passed within the 42-test Eve suite and TypeScript typecheck passed."
+        }
+      ],
+      "evidence": "One invalid state now has one behavior across all public adapters."
+    },
+    {
+      "id": "P5",
+      "claim": "Changing Eve's system dependency bootstrap invalidates the reusable Eve installation key.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "the revalidation key consumed by Eve installation caching",
+        "layer": "sandbox bootstrap cache identity",
+        "method": "inspect the generated key and run the Eve revalidation-key regression",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "nss-tools appears in the Eve package list",
+        "counterexample": "an existing bootstrap-3 sandbox reuses its old cached setup and never installs the new package",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The pre-fix revision stayed at 3; the amendment bumps it to 4 and the key test pins the change."
+      },
+      "substrates": [
+        {
+          "name": "Eve package suite",
+          "status": "exercised",
+          "evidence": "42 tests passed, including bootstrap key and apt/dnf package assertions."
+        }
+      ],
+      "evidence": "EVE_BOOTSTRAP_REVISION is 4 and participates in the generated revalidation key."
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Solution Gate",
+      "claim": "libnss3-tools and nss-tools are the packages that provide certutil on the supported Linux families.",
+      "status": "verified",
+      "evidence": "Clean Debian Bookworm and Amazon Linux 2023 package probes resolved /usr/bin/certutil."
+    },
+    {
+      "id": "A2",
+      "source": "Solution Gate and conventions execdeps map",
+      "claim": "CLI, Eve, published sandbox, environments example, and benchmark copy are the first-party dependency owners in scope.",
+      "status": "verified",
+      "evidence": "Repository search, conventions inventory, and gate.sh execdeps found no additional Chromium runtime owner."
+    },
+    {
+      "id": "A3",
+      "source": "Daemon state model",
+      "claim": "Omission means retain and explicit clear means remove.",
+      "status": "verified",
+      "evidence": "Resolver tests seed prior state and distinguish omission from clear."
+    },
+    {
+      "id": "A4",
+      "source": "Independent review",
+      "claim": "Parsed connect is a launch constructor and must not trigger an additional local launch configuration.",
+      "status": "verified",
+      "evidence": "The parsed command carries cdpPort plus clearCaCert and should_send_local_launch_config returns false."
+    },
+    {
+      "id": "A5",
+      "source": "Public configuration contract",
+      "claim": "Set plus clear is invalid rather than precedence-based.",
+      "status": "verified",
+      "evidence": "CLI, daemon, MCP, and Eve all reject the combination in focused tests."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The change alters system package installation and commits effective CA state after browser or provider launch success.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "certutil provider package installed by a first-party setup path",
+        "owner": "platform package manager invoked by the setup owner",
+        "commit_event": "package manager reports successful installation",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      },
+      {
+        "id": "C2",
+        "effect": "effective CA transition committed to daemon session state",
+        "owner": "handle_launch success branch",
+        "commit_event": "browser or provider launch completes successfully and state.effective_ca_cert is assigned",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      }
+    ]
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher or lookup data source was replaced."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The transition matrix covers set, omit, clear, conflicting set-plus-clear, prior state, and each launch family."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "CLI, parsed connect, daemon, MCP, Eve, and all launch branches were checked against one set/omit/clear rule."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command string is rewritten."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No diagnostic delivery latch changed."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No test shim or fake executable was added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Omission remains sticky retention and no-CA sessions retain prior default behavior."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "The shared helper, parsed launch seam, provider builder, package owners, and bootstrap revision were inspected."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No twice-failed detector or parser changed."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No external semantic was reimplemented."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "External launches with retained CA now expose actionable clear guidance and all adapters propagate conflict errors."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "Every launch constructor, including parsed connect, was enumerated and behavior-tested."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Missing certutil, retained CA external launch, and conflicting set-plus-clear paths were forced or regression-tested."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No heuristic recovery action changed."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No wait, timeout, or cancellation path changed."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "The CA transition crosses CLI parsing, daemon transport, launch validation, provider/CDP boundaries, and session-state commit."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "certutil was resolved on clean Debian and Amazon Linux and the Linux build image completed."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "The built Linux substrate and real package installations were exercised; remote provider credentials were unnecessary for the transport and state claims."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "The claim that install --with-deps provides certutil was checked against every first-party setup owner."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "README, help, docs, skills, MCP descriptions, and runtime error guidance were compared with implementation behavior."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No new documentation example was added."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": "The read-only decision trail was checked; its stale path-identity row is historical and excluded from the product commit."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No scale-sensitive loop or lookup was added."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "head coverage",
+      "outcome": "pass",
+      "reason": "This report records exact head 4d19e80d3ec308b53978d829de669d13ed381f04."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "The base-to-head diff contains no prohibited punctuation under repository conventions."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "Required CLI, README, docs, skill, MCP, Eve, and package surfaces are present."
+    },
+    {
+      "check": "siblings ca-cert",
+      "outcome": "acknowledged",
+      "reason": ".decisions.tsv is untracked history; WebGPU pages mention the unrelated ca-certificates OS package and do not describe this feature."
+    },
+    {
+      "check": "siblings certutil",
+      "outcome": "pass",
+      "reason": "Every certutil behavior surface is in the diff with no untouched sibling passage."
+    },
+    {
+      "check": "callers attach_ca_cert_to_launch_command",
+      "outcome": "pass",
+      "reason": "Every call site is in reviewed files, including parse_command and the explicit launch constructors."
+    },
+    {
+      "check": "callers resolve_effective_ca_cert",
+      "outcome": "pass",
+      "reason": "Every call site is in the reviewed daemon state machine and tests."
+    },
+    {
+      "check": "execdeps",
+      "outcome": "pass",
+      "reason": "Every mapped first-party setup installs libnss3-tools or nss-tools."
+    },
+    {
+      "check": "Rust fmt, clippy, CI-profile tests",
+      "outcome": "pass",
+      "reason": "Fmt and clippy passed; final full suite passed 1,144 tests with 101 ignored."
+    },
+    {
+      "check": "Eve tests and typecheck",
+      "outcome": "pass",
+      "reason": "42 tests and TypeScript typecheck passed."
+    },
+    {
+      "check": "Sandbox tests",
+      "outcome": "pass",
+      "reason": "18 tests passed."
+    },
+    {
+      "check": "version sync",
+      "outcome": "pass",
+      "reason": "pnpm version:sync completed and produced no diff."
+    },
+    {
+      "check": "Linux build image",
+      "outcome": "pass",
+      "reason": "docker/Dockerfile.build completed successfully for linux/arm64."
+    },
+    {
+      "check": "force-red parsed connect clear",
+      "outcome": "pass",
+      "reason": "Removing parsed-launch stamping made the connect regression fail; restoring it returned green."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "The saved map is orientation-only: 2,444 unresolved calls, 81 SCIP-unmapped entries, duplicate-symbol errors, and it predates the final small amendments."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "First-party Linux setup paths omitted the certutil provider package.",
+      "evidence": "Fresh setup could reach run_certutil without libnss3-tools or nss-tools; all owners and their tests now include the package.",
+      "layer": "clean installation",
+      "source": "gate",
+      "path": "run_certutil -> execdeps owners",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The provider launch constructor dropped explicit clearCaCert.",
+      "evidence": "Provider clear serialized as omission before the amendment; the extracted builder now includes the shared transition helper.",
+      "layer": "CLI transport envelope",
+      "source": "lens",
+      "path": "flags.clear_ca_cert -> build_provider_launch_command -> handle_launch",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "The parsed connect launch envelope dropped clearCaCert and could trigger a separate local launch configuration.",
+      "evidence": "Both independent reviewers traced connect outside the four explicit builders; the new regression went red when parse_command stamping was removed.",
+      "layer": "end-to-end CLI dispatch",
+      "source": "lens",
+      "path": "parse_command(connect) -> should_send_local_launch_config -> send_command",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "Retained-CA rejection blamed a flag absent from the current invocation and omitted the clear remedy.",
+      "evidence": "The external-launch validation error now says CA trust is active for the session and instructs the user to pass --no-ca-cert.",
+      "layer": "user-visible error path",
+      "source": "lens",
+      "path": "resolve_effective_ca_cert -> validate_ca_cert_launch_mode",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F5",
+      "state": "confirmed",
+      "claim": "Successful iOS and Safari provider launches returned before committing the resolved CA clear.",
+      "evidence": "The early branches now assign effective_ca_cert only after launch success.",
+      "layer": "provider state commit",
+      "source": "lens",
+      "path": "handle_launch -> launch_ios/launch_safari -> DaemonState.effective_ca_cert",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F6",
+      "state": "confirmed",
+      "claim": "MCP and Eve silently preferred CA set over simultaneous clear.",
+      "evidence": "Both adapters now reject the conflict and focused MCP/Eve tests pass.",
+      "layer": "public configuration parity",
+      "source": "lens",
+      "path": "caCert + clearCaCert -> MCP/Eve argv construction",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F7",
+      "state": "confirmed",
+      "claim": "The launch-envelope source-count test could stay green when production wiring was removed.",
+      "evidence": "A mutation removing real parsed-launch stamping left the original style of test green; the replacement drives parse_command and failed on the mutation.",
+      "layer": "regression test strength",
+      "source": "lens",
+      "path": "test_all_launch_envelopes_use_ca_cert_transition_helper -> parsed connect omission",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F8",
+      "state": "issue_candidate",
+      "claim": "External user snapshots created before this change can still lack nss-tools.",
+      "evidence": "Vercel and environments helpers accept arbitrary snapshot IDs and skip bootstrap for those snapshots; no local revision can invalidate a user-owned external snapshot.",
+      "layer": "external snapshot lifecycle",
+      "source": "lens",
+      "path": "AGENT_BROWSER_SNAPSHOT_ID -> sandbox reuse",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": ".decisions.tsv is excluded from the product diff.",
+      "evidence": "It is an untracked historical decision trail, was reviewed read-only, and remains unstaged."
+    },
+    {
+      "claim": "The WebGPU sibling hits require no update.",
+      "evidence": "They mention the Debian ca-certificates package in Docker examples and make no statement about the --ca-cert feature."
+    },
+    {
+      "claim": "No GitHub comment is required.",
+      "evidence": "The user explicitly requested code and CI fixes without replying to comments."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Document rebuilding pre-existing sandbox snapshots for certutil",
+      "evidence": "Arbitrary user snapshot IDs bypass bootstrap and can predate nss-tools installation.",
+      "why_out_of_scope": "The repository cannot invalidate externally owned immutable snapshot IDs; rebuilding or documenting the snapshot is the available recovery."
+    }
+  ]
+}

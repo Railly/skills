@@ -1,0 +1,33 @@
+Independent challenge for vercel-labs/agent-browser PR #1669
+Date: 2026-08-18
+Frozen tree reviewed: uncommitted amendment on 2d4c797, later fixed and committed through 4d19e80d3ec308b53978d829de669d13ed381f04
+
+Reviewers
+
+- Claude Fable 5 Thinking High
+- Cursor Grok 4.6 High
+
+Shared confirmed findings
+
+1. The parsed `connect <port|url>` launch envelope did not carry `clearCaCert`. `--no-ca-cert connect 9222` could therefore send a local launch configuration before attaching and leave the actual CDP launch as omission.
+2. A retained CA rejected provider, CDP, and auto-connect launches with an error that blamed `--ca-cert` even when the current invocation omitted it. The error did not tell the user to pass `--no-ca-cert`.
+3. The helper-call-count test did not prove that each launch constructor carried the transition. Removing production wiring could leave the test green.
+4. Successful iOS and Safari provider launches returned before persisting the resolved CA clear.
+5. MCP and Eve silently preferred `caCert` when `clearCaCert` was also true, while CLI and daemon rejected the conflict.
+
+Independent issue candidate
+
+- User-supplied Vercel and environments snapshots created before this change can still lack `nss-tools`. They must be rebuilt; the code cannot invalidate arbitrary external snapshot IDs.
+
+Fix verification
+
+- Parsed launch commands are now stamped in `parse_command`; non-launch commands are left unchanged.
+- `should_send_local_launch_config` recognizes parsed external launch envelopes.
+- Removing the parsed-launch stamping made `test_connect_launch_command_preserves_ca_clear_transition` fail with `clearCaCert` null; restoring it returned green.
+- The retained-CA external-launch error names active session state and `--no-ca-cert`.
+- Successful iOS and Safari launches persist the resolved transition.
+- MCP and Eve now reject simultaneous set and clear, with focused tests.
+- Final Rust CI-profile suite: 1,144 passed, 101 ignored.
+- Eve: 42 passed plus typecheck.
+- Sandbox: 18 passed.
+- Fmt, clippy, version sync, deterministic gates, Debian package probe, Amazon Linux package probe, and Linux build passed.
