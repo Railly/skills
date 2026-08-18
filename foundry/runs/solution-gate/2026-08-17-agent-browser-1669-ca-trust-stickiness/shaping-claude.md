@@ -4,13 +4,13 @@ El artifact está escrito en `/Users/raillyhugo/.claude/plans/act-a-como-reviewe
 
 ---
 
-# Shaping review (blind) — scoped browser CA trust with session continuity
+# Shaping review (blind): scoped browser CA trust with session continuity
 
-Revisión Shaping ciega — confianza CA acotada con continuidad de sesión
+Revisión Shaping ciega: confianza CA acotada con continuidad de sesión
 
 Packet: `foundry/runs/solution-gate/2026-08-17-agent-browser-1669-ca-trust-stickiness/packet.md`
 Base: `vercel-labs/agent-browser` @ `548b159b30eef119ccf6846c8bc807d0eaa3f6f8`
-Mode: candidate audit — blind. No candidate, PR, or branch was inspected.
+Mode: candidate audit: blind. No candidate, PR, or branch was inspected.
 
 ---
 
@@ -32,7 +32,7 @@ Esto es lo que ya existe y determina qué shapes son baratas. / This is what alr
 
 | # | Existing mechanism | Handle | Why it matters |
 |---|---|---|---|
-| M1 | Daemon process config + fingerprint. Only 6 fields hash; a mismatch restarts the daemon. | `cli/src/connection.rs:433-471`, `:591-600`, `:609-625` | The F5 trap lives here. `proxy`, `headed`, `profile` are in `DaemonOptions` but **not** in the fingerprint — so "carried to the daemon as env" and "restarts the daemon" are already separable. |
+| M1 | Daemon process config + fingerprint. Only 6 fields hash; a mismatch restarts the daemon. | `cli/src/connection.rs:433-471`, `:591-600`, `:609-625` | The F5 trap lives here. `proxy`, `headed`, `profile` are in `DaemonOptions` but **not** in the fingerprint: so "carried to the daemon as env" and "restarts the daemon" are already separable. |
 | M2 | Browser launch hash decides reuse vs relaunch. | `cli/src/native/actions.rs:257-304`, `:4219-4261` | Reuse is decided on launch-time inputs only; `ignore_https_errors` is deliberately excluded from the hash. |
 | M3 | **Absent field → spawn-time env** fallback. | `actions.rs:4056-4063` (`headless`), `:3684-3729` (`launch_options_from_env`), `main.rs:1498-1506` | The in-tree comment states the exact R9 hazard: a follow-up command without `--headed` must not flip the session and relaunch onto `about:blank`. |
 | M4 | **Absent field → live daemon state** fallback. | `actions.rs:4094-4099` (`requested.unwrap_or(existing)`), `:2891` (`current_allowed_domains`) | The closest analogue to "effective CA": omission keeps the current effective value, and the *effective* value is what enters `launch_hash` (`:4223`). |
@@ -57,28 +57,28 @@ Los requisitos asentados se conservan. Las adiciones se etiquetan **derived** o 
 
 | Req | Requirement | Status | Note / Nota |
 |---|---|---|---|
-| R0 | A locally launched Chromium session on Linux can trust certificates issued by one user-supplied private CA without disabling ordinary verification. | Core goal (settled) | — |
+| R0 | A locally launched Chromium session on Linux can trust certificates issued by one user-supplied private CA without disabling ordinary verification. | Core goal (settled) |: |
 | R1 | A correct-hostname leaf signed by the selected CA is accepted even when the server omits the CA from the presented chain. | Must-have (settled) | This is the anchor test: it separates *trust anchor* from *chain repair* and from *error bypass*. |
-| R2 | A wrong-hostname leaf remains rejected. | Must-have (settled) | — |
-| R3 | A leaf signed by an unrelated CA remains rejected. | Must-have (settled) | — |
-| R4 | Expired and not-yet-valid leaves remain rejected. | Must-have (settled) | — |
-| R5 | A run without CA configuration retains current behavior. | Must-have (settled) | — |
-| R6 | Trust material and process state are isolated between concurrent sessions using different CAs. | Must-have (settled) | — |
-| R7 | A missing or failing external prerequisite produces an actionable error before Chromium launches and does not leak created state. | Must-have (settled) | — |
-| R8 | Normal close, browser crash, daemon shutdown, and unrecoverable termination have an explicit, observable lifecycle and cleanup contract. | Must-have (settled) | — |
-| R9 | After `open` sets a CA, a later `snapshot` that omits the option preserves the effective CA, daemon PID, browser target, URL, trust, and page state. | Must-have (settled) | — |
-| R10 | Repeating the same effective CA reuses the live session. | Must-have (settled) | — |
+| R2 | A wrong-hostname leaf remains rejected. | Must-have (settled) |: |
+| R3 | A leaf signed by an unrelated CA remains rejected. | Must-have (settled) |: |
+| R4 | Expired and not-yet-valid leaves remain rejected. | Must-have (settled) |: |
+| R5 | A run without CA configuration retains current behavior. | Must-have (settled) |: |
+| R6 | Trust material and process state are isolated between concurrent sessions using different CAs. | Must-have (settled) |: |
+| R7 | A missing or failing external prerequisite produces an actionable error before Chromium launches and does not leak created state. | Must-have (settled) |: |
+| R8 | Normal close, browser crash, daemon shutdown, and unrecoverable termination have an explicit, observable lifecycle and cleanup contract. | Must-have (settled) |: |
+| R9 | After `open` sets a CA, a later `snapshot` that omits the option preserves the effective CA, daemon PID, browser target, URL, trust, and page state. | Must-have (settled) |: |
+| R10 | Repeating the same effective CA reuses the live session. | Must-have (settled) |: |
 | R11 | Selecting a different CA changes effective trust deliberately and replaces the browser safely. | Must-have (settled) | Read strictly: *replaces the browser*, not the daemon. A daemon restart is out of contract (F5 shows it loses target/URL). |
 | R12 | Removing a previously effective CA requires an explicit clear representation, removes trust deliberately, and replaces the browser safely. | Must-have (settled) | Same strict reading as R11. |
-| R13 | `--ignore-https-errors` remains a separate explicit bypass and is not silently combined with selective CA trust. | Must-have (settled) | — |
-| R14 | Remote CDP, auto-connect, providers, non-Chromium engines, profiles, and unsupported operating systems either preserve their current behavior or reject the new option clearly before partial work. | Must-have (settled) | — |
+| R13 | `--ignore-https-errors` remains a separate explicit bypass and is not silently combined with selective CA trust. | Must-have (settled) |: |
+| R14 | Remote CDP, auto-connect, providers, non-Chromium engines, profiles, and unsupported operating systems either preserve their current behavior or reject the new option clearly before partial work. | Must-have (settled) |: |
 | R15 | CLI flag, env var, config field, MCP surface, help, README, docs, schemas, core skill, and tests describe one consistent contract. | Must-have (settled) | Concrete target set from `AGENTS.md:20-34`. |
-| R16 | The CLI's own outbound TLS trust is outside this change and remains a separate connection boundary. | Must-not-change (settled) | — |
-| R17 | Existing sessions without the new option and unrelated launch configuration continue to reuse or relaunch under their current contracts. | Must-not-change (settled) | — |
+| R16 | The CLI's own outbound TLS trust is outside this change and remains a separate connection boundary. | Must-not-change (settled) |: |
+| R17 | Existing sessions without the new option and unrelated launch configuration continue to reuse or relaunch under their current contracts. | Must-not-change (settled) |: |
 | R18 | The design preserves useful contributor work and attribution when compatible with the selected contract. | Must-have (settled) | Assessed blind: judged as *contract compatibility*, since no candidate was inspected. |
-| **D1** | Wherever browser reuse is decided, the **effective** CA identity must be what is hashed — never the *requested* value. | **derived** (R9 + R10 + M2/M4) | Without this, omission changes the hash and forces a relaunch. This is the mechanical core of the whole change. |
+| **D1** | Wherever browser reuse is decided, the **effective** CA identity must be what is hashed: never the *requested* value. | **derived** (R9 + R10 + M2/M4) | Without this, omission changes the hash and forces a relaunch. This is the mechanical core of the whole change. |
 | **D2** | CA identity for change detection must be content-derived (digest of the parsed certificate), not path-derived. | **derived** (R11 + R6) | A rewritten file at the same path is a different trust anchor; a path-only key silently keeps stale trust. |
-| **D3** | Trust material on disk must be owner-only and session-scoped; it must never be written into a shared or global store. | **derived** (R6 + `tab_binding` `0600` precedent, `tab_binding.rs:97-140`) | — |
+| **D3** | Trust material on disk must be owner-only and session-scoped; it must never be written into a shared or global store. | **derived** (R6 + `tab_binding` `0600` precedent, `tab_binding.rs:97-140`) |: |
 | **D4** | A CA supplied by env or config must not, by its mere presence, force a launch envelope that flips unrelated launch options on every command. | **derived** (R17 + the in-tree hazard note at `main.rs:1498-1506`) | Env/config CA makes `should_send_local_launch_config` true on *every* invocation; every other launch field must keep its absent→effective fallback. |
 | **D5** | The CA must be validated as a parseable CA certificate (`basicConstraints: CA`, usable validity) before any trust store or process is created. | **derived** (R7) | Distinguishes "bad input" from "prerequisite missing"; both must be pre-launch. |
 | **D6** | The clear representation must be expressible in all four input channels (CLI, env, config, MCP) without any channel making clear indistinguishable from omission. | **derived** (R12 + R15 + U3) | Note the trap: `env::var(...).ok()` yields `Some("")` for an exported-empty variable (`flags.rs:563-571` style), so empty-string must be normalized deliberately in each channel. |
@@ -106,7 +106,7 @@ Shapes are separated on two independent axes: **(i) Chromium trust mechanism** a
 
 ---
 
-### Shape A — Session-private trust anchor with sticky effective CA
+### Shape A: Session-private trust anchor with sticky effective CA
 **Anclaje de confianza privado por sesión con CA efectiva persistente**
 
 **ES.** La CA se convierte en una entrada *de lanzamiento del navegador*, nunca en configuración del proceso daemon. Chrome recibe un `HOME` acotado a la sesión que contiene un NSS DB privado con exactamente una raíz añadida. La CA efectiva vive en el daemon con fallback absent→efectivo, y se persiste en un sidecar por sesión como `tab_binding`.
@@ -121,18 +121,18 @@ Shapes are separated on two independent axes: **(i) Chromium trust mechanism** a
 | A2 | The option joins `should_send_local_launch_config` so the *first* command establishes trust, and every other launch field keeps its absent→effective fallback. | `main.rs:166-192`, hazard note `main.rs:1498-1506` |
 | A3 | Daemon resolves `effective_ca = requested.unwrap_or(current_effective)`; `Some(clear)` sets it to none. | Verbatim the `allowed_domains` pattern `actions.rs:4094-4099` + `:4210-4217` |
 | A4 | `launch_hash` hashes the **effective** CA digest (D1, D2), so omitted/same → reuse, changed/cleared → relaunch. | `actions.rs:257-304`, reuse decision `:4219-4261` |
-| A5 | The CA is carried to the daemon in `DaemonOptions`/env as a spawn-time default but is **excluded from `daemon_config_fingerprint`**. | `connection.rs:433-471` vs `:591-600` — `proxy`/`headed` already do exactly this |
+| A5 | The CA is carried to the daemon in `DaemonOptions`/env as a spawn-time default but is **excluded from `daemon_config_fingerprint`**. | `connection.rs:433-471` vs `:591-600`: `proxy`/`headed` already do exactly this |
 | A6 | Per-session sidecar for the effective CA (path + digest), atomic temp+rename, `0600`, fsync, failures returned not swallowed, written *before* live state flips. | `tab_binding.rs:68-140`; commit-order precedent `actions.rs:2226-2244` |
 | A7 | Trust material: session-scoped directory under the socket dir namespace containing an NSS DB with one root added at `C,,`; Chrome child launched with `HOME` pointing at it. | Injection site `chrome.rs:654-655`; private-resource-per-process doctrine `chrome.rs:99-107`; session paths `connection.rs:101-158` |
 | A8 | Prerequisite + input validation before any directory or process exists: `certutil` presence, then CA parse/CA-bit/validity (D5). | `which` detection `chrome.rs:896`; dep naming `install.rs:558`; validation layer `native/browser.rs:22-60` |
 | A9 | Lifecycle: trust dir owned by the Chrome process, removed in `Drop` with the 3-attempt + warn contract; orphans after `SIGKILL` swept by the existing stale-sidecar walk. | `chrome.rs:68-92`, `:635-680`; sweep `connection.rs:161-207`, `:265-350` |
-| A10 | Dual-layer refusal for `--cdp`, `--auto-connect`, `-p/--provider`, non-Chromium engine, non-Linux — before any work. | `main.rs:130-164`; `browser.rs:22-60`; `actions.rs:4116-4130` |
+| A10 | Dual-layer refusal for `--cdp`, `--auto-connect`, `-p/--provider`, non-Chromium engine, non-Linux: before any work. | `main.rs:130-164`; `browser.rs:22-60`; `actions.rs:4116-4130` |
 | A11 | `--ignore-https-errors` stays a separate axis; excluded from the CA path and from the launch hash as today. | `actions.rs:260-261`, `chrome.rs:489` |
 | A12 | Parity set: help, README options table, core skill + references, docs MDX (HTML tables), both schemas, MCP tool surface, and an alignment test in the style of the existing schema parity test. | `AGENTS.md:16-34`; `main.rs:2027-2045` |
 
 **Flagged unknowns / Incógnitas marcadas**
 
-- ⚠ **A-u1 (U1).** That an NSS root at `C,,` in a session-private DB makes Chromium accept a leaf whose served chain *omits* the CA — and still reject R2/R3/R4 — is asserted, not observed. It must be proven on the Chrome version this repo pins, because modern Chromium resolves user-added roots through the Chrome Root Store plus platform NSS, and the interaction is version-sensitive. **Spike S1.**
+- ⚠ **A-u1 (U1).** That an NSS root at `C,,` in a session-private DB makes Chromium accept a leaf whose served chain *omits* the CA: and still reject R2/R3/R4: is asserted, not observed. It must be proven on the Chrome version this repo pins, because modern Chromium resolves user-added roots through the Chrome Root Store plus platform NSS, and the interaction is version-sensitive. **Spike S1.**
 - ⚠ **A-u2.** Blast radius of a scoped `HOME`. `--user-data-dir` is always explicit (`chrome.rs:474-487`), which removes the biggest risk, but default download location, crashpad, and font/dconf caches are HOME-derived. **Spike S2.**
 - ⚠ **A-u3.** `--profile` interaction: profiles are copied to a temp user-data-dir (`chrome.rs:562-595`), but NSS roots do **not** live in the user-data-dir, so a scoped HOME hides the user's real `~/.pki/nssdb` from the session. Whether that is a feature (isolation) or a regression (profile users lose their own roots) is a contract decision. **Spike S2 / decision.**
 - ⚠ **A-u4 (U-a).** Whether A6 is required at all, or whether A3 alone satisfies R9. Also: must the sidecar survive daemon restart (like `.target`) while being removed on explicit close (unlike `.target`)?
@@ -140,7 +140,7 @@ Shapes are separated on two independent axes: **(i) Chromium trust mechanism** a
 
 ---
 
-### Shape B — Same trust anchor, env-default stickiness only
+### Shape B: Same trust anchor, env-default stickiness only
 **Mismo anclaje, persistencia solo por env de arranque**
 
 Parts A1, A2, A7–A12 unchanged. Ownership collapses to M3: absent field → daemon spawn-time env, no live-state fallback, no sidecar. No new persisted state at all.
@@ -150,12 +150,12 @@ Partes A1, A2, A7–A12 sin cambios. La propiedad se reduce a M3: campo ausente 
 **Flagged unknowns**
 
 - ⚠ **B-u1.** A daemon's env is fixed at spawn (`connection.rs:473-589`). Changing the CA mid-session cannot update it, so R11 either forces a daemon restart or leaves the env fallback disagreeing with the requested value.
-- ⚠ **B-u2.** After an idle-timeout or crash restart, the new daemon inherits the env of the *current* invocation — which, under R9, omits the CA. Trust drops silently.
+- ⚠ **B-u2.** After an idle-timeout or crash restart, the new daemon inherits the env of the *current* invocation: which, under R9, omits the CA. Trust drops silently.
 - Inherits A-u1, A-u2, A-u5.
 
 ---
 
-### Shape C — CA as daemon process configuration
+### Shape C: CA as daemon process configuration
 **CA como configuración del proceso daemon**
 
 The CA enters `DaemonOptions`, `apply_daemon_env`, **and** `daemon_config_fingerprint`. Trust is established once per daemon process; a change or omission is resolved by restarting the daemon.
@@ -166,11 +166,11 @@ Included because F5/F6 are direct observations of this shape's behavior, so it m
 
 **Flagged unknowns**
 
-- ⚠ **C-u1.** None material — the failure mode is already observed, not unknown. F5 is the measurement.
+- ⚠ **C-u1.** None material: the failure mode is already observed, not unknown. F5 is the measurement.
 
 ---
 
-### Shape D — SPKI allow-list bypass
+### Shape D: SPKI allow-list bypass
 **Bypass por lista SPKI**
 
 Trust mechanism is `--ignore-certificate-errors-spki-list`, a Chromium switch that suppresses certificate errors for certificates whose SubjectPublicKeyInfo hash is listed. Ownership axis is irrelevant to its outcome.
@@ -183,7 +183,7 @@ El mecanismo es `--ignore-certificate-errors-spki-list`, que suprime errores de 
 
 ---
 
-### Shape E — TLS terminated by `agent-browser`, fulfilled over CDP
+### Shape E: TLS terminated by `agent-browser`, fulfilled over CDP
 **TLS terminado por `agent-browser` y servido por CDP**
 
 Requests are intercepted at the CDP `Fetch` layer, performed from Rust with a TLS client whose only extra root is the user CA, and fulfilled back into the page. Portable across OSes, no external binary, exact control of R1–R4 semantics.
@@ -193,12 +193,12 @@ Las peticiones se interceptan en `Fetch`, se realizan desde Rust con un cliente 
 **Flagged unknowns**
 
 - ⚠ **E-u1.** `Fetch` interception is already owned by the proxy-auth and network-control path (`actions.rs:4276-4294`, `install_network_controls_or_close`). A full-traffic interceptor collides with an existing, shipped subsystem.
-- ⚠ **E-u2.** Non-`Fetch` traffic — WebSocket upgrades, downloads, h3 — has no fulfillment path, so the session is only partially covered.
+- ⚠ **E-u2.** Non-`Fetch` traffic: WebSocket upgrades, downloads, h3: has no fulfillment path, so the session is only partially covered.
 - ⚠ **E-u3.** Chromium's own verifier stops participating for intercepted traffic; the security model is substituted rather than scoped.
 
 ---
 
-### Shape F — System trust store or enterprise policy
+### Shape F: System trust store or enterprise policy
 **Almacén del sistema o política de empresa**
 
 The CA is installed into the machine trust store or declared in a Chrome managed-policy file so Chromium picks it up globally.
@@ -250,7 +250,7 @@ La CA se instala en el almacén del sistema o se declara en un fichero de polít
 
 ### Failure notes / Notas de fallo
 
-**R9/B.** Env is frozen at daemon spawn (`connection.rs:473-589`). After an idle-timeout or crash restart, the replacement daemon is spawned from the *current* invocation's env, which under R9 has no CA. Effective trust silently reverts to none while the user believes it is set — worse than F5, because F5 at least announces itself by restarting visibly.
+**R9/B.** Env is frozen at daemon spawn (`connection.rs:473-589`). After an idle-timeout or crash restart, the replacement daemon is spawned from the *current* invocation's env, which under R9 has no CA. Effective trust silently reverts to none while the user believes it is set: worse than F5, because F5 at least announces itself by restarting visibly.
 
 **R11/B, R12/B.** Changing or clearing the CA cannot mutate a live daemon's env. The only lever is a daemon restart, which exceeds R11/R12's "replaces the browser safely" and reproduces the F5 continuity loss.
 
@@ -260,7 +260,7 @@ La CA se instala en el almacén del sistema o se declara en un fichero de polít
 
 **R17/C.** Adding a field to `daemon_config_fingerprint` (`connection.rs:591-600`) makes daemon restart decisions depend on a launch-time input. That re-keys `daemon_config_status` for every session, including sessions that never use the option, changing the existing reuse/relaunch contract.
 
-**R0/D, R1/D.** The switch suppresses certificate *errors* for listed SPKI hashes; it does not install an anchor. Per F3 the server omits the CA from the presented chain, so the CA's SPKI is never observed on the wire and cannot match. Per F2 this is the same bypass family as `--ignore-https-errors`, only narrower — the packet states the requested capability is different in kind, not in width.
+**R0/D, R1/D.** The switch suppresses certificate *errors* for listed SPKI hashes; it does not install an anchor. Per F3 the server omits the CA from the presented chain, so the CA's SPKI is never observed on the wire and cannot match. Per F2 this is the same bypass family as `--ignore-https-errors`, only narrower: the packet states the requested capability is different in kind, not in width.
 
 **R2/D, R3/D, R4/D.** Error suppression is not selective by error type. A matching certificate is accepted despite hostname mismatch and despite expired or not-yet-valid periods, contradicting F4 and the four required Reject rows of the discriminator matrix.
 
@@ -284,11 +284,11 @@ La CA se instala en el almacén del sistema o se declara en un fichero de polít
 
 ## 4. Recommended survivor / Superviviente recomendado
 
-### Shape A — Session-private trust anchor with sticky effective CA
+### Shape A: Session-private trust anchor with sticky effective CA
 
-**ES.** Es el único shape que sobrevive al fit check, y sobrevive por una razón estructural, no por afinación: separa los dos ejes que el packet mide por separado. El eje de confianza queda dentro del proceso Chrome (`HOME` acotado + NSS DB privado), que es exactamente el patrón que la base ya usa para el Xvfb privado — recurso privado, inyectado por env, propiedad de un proceso, borrado en `Drop`. El eje de estado queda en el daemon con la semántica `requested.unwrap_or(existing)` que `allowedDomains` ya ejerce, más un sidecar por sesión con las invariantes de `tab_binding`. F5 desaparece no por un caso especial, sino porque la CA nunca toca `daemon_config_fingerprint`, igual que `proxy` y `headed` ya no lo tocan.
+**ES.** Es el único shape que sobrevive al fit check, y sobrevive por una razón estructural, no por afinación: separa los dos ejes que el packet mide por separado. El eje de confianza queda dentro del proceso Chrome (`HOME` acotado + NSS DB privado), que es exactamente el patrón que la base ya usa para el Xvfb privado: recurso privado, inyectado por env, propiedad de un proceso, borrado en `Drop`. El eje de estado queda en el daemon con la semántica `requested.unwrap_or(existing)` que `allowedDomains` ya ejerce, más un sidecar por sesión con las invariantes de `tab_binding`. F5 desaparece no por un caso especial, sino porque la CA nunca toca `daemon_config_fingerprint`, igual que `proxy` y `headed` ya no lo tocan.
 
-**EN.** It is the only shape that survives the fit check, and it survives structurally rather than by tuning: it separates the two axes the packet measures separately. The trust axis lives inside the Chrome process (scoped `HOME` + private NSS DB), which is precisely the pattern the base already uses for the private Xvfb — private resource, env-injected, owned by one process, removed on `Drop`. The state axis lives in the daemon with the `requested.unwrap_or(existing)` semantics `allowedDomains` already exercises, plus a per-session sidecar carrying `tab_binding`'s invariants. F5 disappears not through a special case but because the CA never touches `daemon_config_fingerprint`, exactly as `proxy` and `headed` already do not.
+**EN.** It is the only shape that survives the fit check, and it survives structurally rather than by tuning: it separates the two axes the packet measures separately. The trust axis lives inside the Chrome process (scoped `HOME` + private NSS DB), which is precisely the pattern the base already uses for the private Xvfb: private resource, env-injected, owned by one process, removed on `Drop`. The state axis lives in the daemon with the `requested.unwrap_or(existing)` semantics `allowedDomains` already exercises, plus a per-session sidecar carrying `tab_binding`'s invariants. F5 disappears not through a special case but because the CA never touches `daemon_config_fingerprint`, exactly as `proxy` and `headed` already do not.
 
 **Why it is the survivor / Por qué es el superviviente**
 
@@ -299,7 +299,7 @@ La CA se instala en el almacén del sistema o se declara en un fichero de polít
 
 **What the survivor still owes / Qué debe todavía**
 
-- S1 is load-bearing. If S1 fails, Shape A fails with it, and so do B and C, which would leave **no surviving shape in this problem's shape space** and force the packet back to the frame — that is the honest reading, and it should be said before any work starts.
+- S1 is load-bearing. If S1 fails, Shape A fails with it, and so do B and C, which would leave **no surviving shape in this problem's shape space** and force the packet back to the frame: that is the honest reading, and it should be said before any work starts.
 - U-a, U-b, U-c, U-d are open contract decisions, not implementation details. U-a decides whether part A6 exists at all.
 
 ---
@@ -310,11 +310,11 @@ La CA se instala en el almacén del sistema o se declara en un fichero de polít
 
 | Shape | Rejected on | One-line reason |
 |---|---|---|
-| B — env-default stickiness | R9, R11, R12, D1, D2, D4, D6 | A daemon's env is frozen at spawn, so stickiness survives exactly as long as the daemon does — and dies silently, not visibly, when it does not. |
-| C — daemon process configuration | R9, R11, R12, R17, D1, D2, D4 | This is the shape whose failure F5 records: omission reads as removal, and the escalation lever is a daemon restart rather than a browser replacement. |
-| D — SPKI allow-list | R0, R1, R2, R3, R4, R13, R18, D5 | Suppresses errors instead of adding an anchor; the CA's SPKI is never on the wire (F3) and hostname/validity checks go down with it (F4). |
-| E — CDP-side TLS termination | R0, R8, R14, R17, R18 | Portable and semantically precise, but it replaces Chromium's verifier wholesale, collides with the shipped `Fetch`/proxy-auth path, and leaves WebSocket and download traffic uncovered. |
-| F — system store / enterprise policy | R5, R6, R7, R8, R12, R16, R17, R18, D3 | Machine-global and privileged: it cannot isolate concurrent sessions, cannot avoid leaking state, and crosses the R16 boundary into the CLI's own trust. |
+| B: env-default stickiness | R9, R11, R12, D1, D2, D4, D6 | A daemon's env is frozen at spawn, so stickiness survives exactly as long as the daemon does: and dies silently, not visibly, when it does not. |
+| C: daemon process configuration | R9, R11, R12, R17, D1, D2, D4 | This is the shape whose failure F5 records: omission reads as removal, and the escalation lever is a daemon restart rather than a browser replacement. |
+| D: SPKI allow-list | R0, R1, R2, R3, R4, R13, R18, D5 | Suppresses errors instead of adding an anchor; the CA's SPKI is never on the wire (F3) and hostname/validity checks go down with it (F4). |
+| E: CDP-side TLS termination | R0, R8, R14, R17, R18 | Portable and semantically precise, but it replaces Chromium's verifier wholesale, collides with the shipped `Fetch`/proxy-auth path, and leaves WebSocket and download traffic uncovered. |
+| F: system store / enterprise policy | R5, R6, R7, R8, R12, R16, R17, R18, D3 | Machine-global and privileged: it cannot isolate concurrent sessions, cannot avoid leaking state, and crosses the R16 boundary into the CLI's own trust. |
 
 **Note on E / Nota sobre E.** E is the only rejected shape worth revisiting if F10 (portability to macOS and Windows) is later promoted from unknown to requirement. Its rejection here is about *this* contract, not about its ceiling. / E es el único shape rechazado que merece revisitarse si F10 pasa de incógnita a requisito.
 
@@ -327,9 +327,9 @@ Cada spike declara qué mata. Un spike que no puede fallar no es un spike. / Eac
 | **S1** | **Trust-anchor sufficiency.** With one root added at `C,,` to a session-private NSS DB and Chromium started under a scoped `HOME`, drive the five certificate rows of the discriminator matrix: correct-hostname leaf with the CA omitted from the served chain (Accept), wrong hostname, unrelated CA, expired, not-yet-valid (all Reject). Run headless and headed, on the Chrome version this repo pins. | U1, R0–R4 | If the Accept row fails, or any Reject row passes, Shapes A, B, and C all die and the problem returns to the frame. **Blocking: nothing else should start before this.** |
 | **S2** | **Scoped-`HOME` blast radius.** Enumerate what Chromium reads from `HOME` when `--user-data-dir` is explicit (`chrome.rs:474-487`): default download directory, crashpad, font/dconf caches. Then answer the `--profile` question: with a scoped `HOME`, a profile session loses the user's real `~/.pki/nssdb`. | A-u2, A-u3, R5, R14, R17 | If a HOME-derived path changes observable behavior that existing suites depend on, part A7's injection point must move or A7 needs pre-seeding, which changes the shape's cost. |
 | **S3** | **Prerequisite and rollback.** With `certutil` absent from `PATH`, and separately with it present but failing, confirm an actionable pre-launch error naming the installable package, with no trust directory and no Chrome process left behind. Then confirm the same for a malformed or non-CA input certificate (D5). | U4, R7, D5 | If any path creates a directory or a process before failing, R7 fails and the ordering inside A8 must be inverted. |
-| **S4** | **Continuity across restart.** `open` with a CA, then force an idle-timeout daemon restart, then `snapshot` with the option omitted. Observe daemon PID, target, URL, page state, trust result, and effective CA identity. Repeat with the sidecar deliberately corrupted. | U-a, U2, R8, R9 | If live state alone suffices, part A6 is unnecessary scope and should be cut. If the sidecar is required, the corrupt-file path must surface an error rather than silently degrade to no-trust — the invariant `tab_binding.rs:68-95` already documents for the same reason. |
+| **S4** | **Continuity across restart.** `open` with a CA, then force an idle-timeout daemon restart, then `snapshot` with the option omitted. Observe daemon PID, target, URL, page state, trust result, and effective CA identity. Repeat with the sidecar deliberately corrupted. | U-a, U2, R8, R9 | If live state alone suffices, part A6 is unnecessary scope and should be cut. If the sidecar is required, the corrupt-file path must surface an error rather than silently degrade to no-trust: the invariant `tab_binding.rs:68-95` already documents for the same reason. |
 | **S5** | **Concurrency and isolation.** Two sessions, two different CAs, overlapping in time; each must accept only its own CA's leaf. Then kill one daemon with `SIGKILL` and confirm the surviving session is unaffected and the dead session's trust directory is bounded by the existing stale sweep. | U3-adjacent, R6, R8, D3 | If trust material or sweep behavior crosses sessions, part A7's path scheme or part A9's sweep hook is wrong. |
-| **S6** | **Clear-representation reachability** *(decision spike).* Express set / omit / clear in all four channels and confirm none of them collapses clear into omission — in particular that an exported-empty env var and an absent env var are distinguishable by deliberate normalization, not by accident. | U3, U-b, D6, R12, R15 | If any channel cannot express clear, R12 is unreachable through that channel and R15's "one consistent contract" fails. |
+| **S6** | **Clear-representation reachability** *(decision spike).* Express set / omit / clear in all four channels and confirm none of them collapses clear into omission: in particular that an exported-empty env var and an absent env var are distinguishable by deliberate normalization, not by accident. | U3, U-b, D6, R12, R15 | If any channel cannot express clear, R12 is unreachable through that channel and R15's "one consistent contract" fails. |
 | **S7** | **`--ignore-https-errors` composition** *(decision spike).* Choose hard conflict error versus independent-and-documented, and state where the choice is enforced. | U-c, R13 | Not a kill risk; it is an unresolved contract that must be settled before the parity set in A12 can be written, since help, README, docs, and schema must all say the same thing. |
 
 **Sequencing / Secuencia.** S1 gates everything. S2 and S3 shape part A7/A8 and can run in parallel after S1. S4 decides whether A6 is in scope. S5 validates R6/R8. S6 and S7 are decisions that must land before A12's parity work, and they do not depend on S1.
@@ -352,10 +352,10 @@ Cada spike declara qué mata. Un spike que no puede fallar no es un spike. / Eac
 
 1. **El hallazgo más útil de la exploración no es un mecanismo nuevo, es que el problema ya está resuelto tres veces en la base.** `headless` (fallback a env), `allowedDomains` (fallback a estado vivo) y `pinTab`/`tab_binding` (sticky persistido con clear explícito) son tres soluciones distintas al mismo patrón "ausente ≠ eliminar". El comentario en `main.rs:1498-1506` describe literalmente el peligro de F5 para `--headed`. El shape superviviente es la composición de dos de esos tres patrones, no una invención.
 
-2. **S1 es la única incógnita real y es binaria.** Todo el resto de la revisión — propiedad del estado, hashing, limpieza, paridad — es cartografía sobre mecanismos existentes y se puede juzgar sin ejecutar nada. Pero la semántica de anclaje NSS bajo el verificador actual de Chromium no está establecida por ninguna evidencia del packet (F10 lo admite para macOS/Windows; para Linux nadie lo ha medido en este commit). Recomiendo no aprobar trabajo de implementación hasta que S1 tenga resultado.
+2. **S1 es la única incógnita real y es binaria.** Todo el resto de la revisión: propiedad del estado, hashing, limpieza, paridad: es cartografía sobre mecanismos existentes y se puede juzgar sin ejecutar nada. Pero la semántica de anclaje NSS bajo el verificador actual de Chromium no está establecida por ninguna evidencia del packet (F10 lo admite para macOS/Windows; para Linux nadie lo ha medido en este commit). Recomiendo no aprobar trabajo de implementación hasta que S1 tenga resultado.
 
 **EN.** Two observations I want to state plainly:
 
-1. **The most useful finding is not a new mechanism — it is that the base already solves this problem three times.** `headless` (env fallback), `allowedDomains` (live-state fallback), and `pinTab`/`tab_binding` (persisted sticky with explicit clear) are three different answers to the same "absent ≠ remove" pattern. The comment at `main.rs:1498-1506` literally describes the F5 hazard for `--headed`. The surviving shape composes two of those three; it invents nothing.
+1. **The most useful finding is not a new mechanism: it is that the base already solves this problem three times.** `headless` (env fallback), `allowedDomains` (live-state fallback), and `pinTab`/`tab_binding` (persisted sticky with explicit clear) are three different answers to the same "absent ≠ remove" pattern. The comment at `main.rs:1498-1506` literally describes the F5 hazard for `--headed`. The surviving shape composes two of those three; it invents nothing.
 
-2. **S1 is the only real unknown, and it is binary.** Everything else in this review is mapping onto existing mechanisms and can be judged without running anything. But NSS anchor semantics under Chromium's current verifier are not established by any packet evidence — F10 concedes this for macOS/Windows, and for Linux nobody has measured it at this commit. I recommend not approving implementation work until S1 has a result.
+2. **S1 is the only real unknown, and it is binary.** Everything else in this review is mapping onto existing mechanisms and can be judged without running anything. But NSS anchor semantics under Chromium's current verifier are not established by any packet evidence: F10 concedes this for macOS/Windows, and for Linux nobody has measured it at this commit. I recommend not approving implementation work until S1 has a result.

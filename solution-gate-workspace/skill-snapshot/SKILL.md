@@ -47,11 +47,11 @@ Isolate structurally, not by instruction: when a candidate shape already exists,
 
 Each returns, in this structure and no other:
 
-- **Shape** — where state lives, who owns each decision, what the contract becomes. Not code.
-- **Predictions** — at least two statements that are observably true if the shape is right and observably false if it is wrong, each naming the command or measurement that would show it. A prediction that cannot fail is not a prediction.
-- **Cost** — what it adds: files, fields, round trips, migration, a thing future changes must remember.
-- **What it makes worse** — mandatory, never "nothing". Every real design trades something. A proposal claiming no downside has not found its own.
-- **Rejected alternatives** — what else was considered and the fact that killed each.
+- **Shape**: where state lives, who owns each decision, what the contract becomes. Not code.
+- **Predictions**: at least two statements that are observably true if the shape is right and observably false if it is wrong, each naming the command or measurement that would show it. A prediction that cannot fail is not a prediction.
+- **Cost**: what it adds: files, fields, round trips, migration, a thing future changes must remember.
+- **What it makes worse**: mandatory, never "nothing". Every real design trades something. A proposal claiming no downside has not found its own.
+- **Rejected alternatives**: what else was considered and the fact that killed each.
 
 Run them concurrently and do not let either see the other's output. Record both verbatim before any judgment.
 
@@ -77,7 +77,7 @@ Each rule with its failure mode in [references/runs.md](references/runs.md).
 
 ## 4. Run the cheapest probe that could refute
 
-Collect every prediction from both proposals, and every link from step 3 marked `guessed` or `inferred`. Rank them by how much the proposal rests on them, then work down that list. **Probe the weakest load-bearing link before the endpoints:** an endpoint prediction is what a proposal claims about its result, and the link is where its reasoning is actually wrong. For each, ask what the *smallest* observation would refute it — not a spike, not an implementation. Usually one of: measure the current behavior, grep for a consumer nobody enumerated, build the previous release and run it, force the error path, read the installed tool's own option table.
+Collect every prediction from both proposals, and every link from step 3 marked `guessed` or `inferred`. Rank them by how much the proposal rests on them, then work down that list. **Probe the weakest load-bearing link before the endpoints:** an endpoint prediction is what a proposal claims about its result, and the link is where its reasoning is actually wrong. For each, ask what the *smallest* observation would refute it: not a spike, not an implementation. Usually one of: measure the current behavior, grep for a consumer nobody enumerated, build the previous release and run it, force the error path, read the installed tool's own option table.
 
 Run those probes now, before scoring, and record the command and its output. A probe is not proof that a shape is correct; it is a cheap chance to kill a wrong one before it is argued for. Predictions that survive stay predictions, and any that cannot be probed with the environment available is recorded as an unverified assumption attached to its proposal, never quietly upgraded to a fact.
 
@@ -111,7 +111,7 @@ Prose is the wrong medium for behavior that is temporal, cross-process, or order
 
 ## 8. Record and hand off
 
-Write the decision to the canonical `Railly/skills` checkout, resolved through `RAILLY_SKILLS_REPO`, `~/Programming/railly/skills`, or `~/railly-skills` (`scripts/resolve-source-root.mjs`). Never into the target repo or an installed copy. The record holds both proposals verbatim, the forward chains, the probe log, the shape scoring, the synthesis, and the HTML page from step 7 — a decision whose losing alternatives are not preserved cannot be re-examined when the fix turns out wrong.
+Write the decision to the canonical `Railly/skills` checkout, resolved through `RAILLY_SKILLS_REPO`, `~/Programming/railly/skills`, or `~/railly-skills` (`scripts/resolve-source-root.mjs`). Never into the target repo or an installed copy. The record holds both proposals verbatim, the forward chains, the probe log, the shape scoring, the synthesis, and the HTML page from step 7: a decision whose losing alternatives are not preserved cannot be re-examined when the fix turns out wrong.
 
 Then hand off. The carried assumptions become verification targets for the implementation, and belong in [trail-decisions](../.experimental/trail-decisions/SKILL.md) as rows with their predicates. The must-not-change list from step 1 becomes a checklist for Review Gate step 5, where each entry is driven rather than reasoned about. A probe that refuted a proposal by exposing a defect outside the current scope is an issue candidate, not a footnote.
 When a fix that passed this gate is later found defective, the failure is harvested back into [references/failure-shapes.md](references/failure-shapes.md) with its provenance, the same discipline Review Gate applies to its own catalog. A shape enters only from a recorded case. The run log and the pairing in use are in [references/runs.md](references/runs.md); the method depends on two proposers from different families and an implementer that proposed nothing, not on any particular runtime.
