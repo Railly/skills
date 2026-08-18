@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-12",
+    "repo": "vercel-labs/emulate#96",
+    "base": "70028df5ea02792b768605e416da87b0faf43ccf",
+    "head": "a72de43124fca64e370640312ae1e5ee5c096341",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/vercel-labs/emulate/issues/96",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "A valid RS256 GitHub App JWT resolves the seeded app",
+      "Both documented PKCS#1 and supported PKCS#8 private key PEM inputs verify",
+      "A valid App JWT can mint an installation token",
+      "The installation token can access an allowed repository",
+      "An invalid JWT remains rejected with 401"
+    ],
+    "gaps": [
+      "No separate Issue Contract or Spec review was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "human contributor @sidpalas",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": false
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Verification changes from an imported private CryptoKey to public key material derived by Node; PKCS#1, PKCS#8, valid signatures, and invalid signatures were exercised."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The accepted key input matrix covers documented PKCS#1 and supported PKCS#8 PEM values, with valid and invalid JWT cells."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No user-input resolution or discovery rule changed."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell parsing or argument injection changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No process emission channel or one-shot latch changed."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No shim was added or changed."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Non-App bearer tokens, fallback users, and invalid App JWTs retain their existing behavior in the full suite and real-server dogfood."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "The private-key seed boundary, derived public key, app resolver, installation-token route, and downstream installation token were inspected."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No substrate-dependent parser or repeatedly failing classifier changed."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "The asymmetric JWS contract was checked against Node public-key derivation and jose verification requirements referenced by issue #96."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "The change removes a false authentication failure and does not introduce a new failure outcome."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No command flag was added."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "An invalid JWT was forced against the real server and remained a 401 with the existing GitHub-compatible message."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No heuristic recovery action was added."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No timeout, cancellation, or asynchronous wait contract changed."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "The built CLI loaded a private key from a seed file, resolved the app, verified the JWT, minted a ghs token, and used it on a repository route."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "The effect was observed through a live server and HTTP responses, including the minted token's repository access."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "The built emulate CLI was started with a real PKCS#1 seed and signed RS256 JWT; token minting returned 201 and repository access returned 200."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Existing README and GitHub skill text already promise RS256 private-key signing and emulator verification; dogfood with the documented PKCS#1 format proved the statement."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No documentation example was added or edited."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was supplied."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No loop, membership check, or per-element lookup was added."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "head coverage",
+      "outcome": "pass",
+      "reason": "This report records exact head a72de43124fca64e370640312ae1e5ee5c096341."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "gate.sh style passed."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "The behavior was already documented as supported on the required GitHub surfaces; the change makes the existing contract true and the documented PKCS#1 form was driven end to end."
+    },
+    {
+      "check": "siblings",
+      "outcome": "acknowledged",
+      "reason": "The GitHub App JWT skill passage already states the intended behavior accurately; no wording change is needed."
+    },
+    {
+      "check": "callers authMiddleware",
+      "outcome": "acknowledged",
+      "reason": "Only callers supplying appKeyResolver enter the changed JWT branch; createServer wiring and GitHub test wiring were inspected, while callers without a resolver retain token-map behavior."
+    },
+    {
+      "check": "format and whitespace",
+      "outcome": "pass",
+      "reason": "Prettier and git diff --check passed."
+    },
+    {
+      "check": "lint",
+      "outcome": "pass",
+      "reason": "All 42 monorepo lint tasks passed with warnings only."
+    },
+    {
+      "check": "type-check",
+      "outcome": "pass",
+      "reason": "All 34 monorepo type-check tasks passed."
+    },
+    {
+      "check": "build",
+      "outcome": "pass",
+      "reason": "All 26 monorepo build tasks passed."
+    },
+    {
+      "check": "test",
+      "outcome": "pass",
+      "reason": "All 33 monorepo test tasks passed; focused core finished with 73 tests and GitHub with 81 tests."
+    },
+    {
+      "check": "force-red middleware",
+      "outcome": "pass",
+      "reason": "Restoring private-key verification made authApp undefined and failed the new middleware assertion; public-key restoration returned green."
+    },
+    {
+      "check": "force-red installation flow",
+      "outcome": "pass",
+      "reason": "Restoring private-key verification made the real installation-token test return 401 instead of 201; public-key restoration returned green."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "The map found 9 changed and 4 impacted symbols but zero edges and 20,367 unresolved calls; it materially under-covers and was not used as evidence of safety."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "No documentation files need to change.",
+      "evidence": "The existing surfaces already state RS256 JWT signing with the seeded private key and emulator verification; the built CLI passed that exact contract using documented PKCS#1 PEM."
+    },
+    {
+      "claim": "authMiddleware callers without appKeyResolver are unaffected.",
+      "evidence": "The changed branch requires both an eyJ-prefixed token and a configured resolver; full monorepo tests preserve all ordinary bearer-token paths."
+    }
+  ],
+  "issue_candidates": []
+}

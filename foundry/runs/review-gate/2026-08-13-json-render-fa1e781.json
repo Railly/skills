@@ -1,0 +1,246 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-13",
+    "repo": "vercel-labs/json-render#256",
+    "base": "9adcc092040f7b79eaf53ae7ee32e2125bb9dfcf",
+    "head": "fa1e78191ecf2ac756a6d86312c354dec74ad922",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Issue Contract or Spec review was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "Codex assistance declared in the PR body",
+    "reviewer_model": "GPT-5.6 Codex",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher, parser, or lookup data source was replaced."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "UIElement.repeat.statePath widens from string to string or $item expression."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Every repeat.statePath consumer was enumerated across renderers, validation, prompts, and docs."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell-parsed command construction changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "Warnings are local renderer diagnostics with no background process."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No external binary shim was added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "The change adds a new input form without changing string statePath behavior."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No runtime or framework signal forwarding patch was introduced."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "The resolver does not model an external substrate."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "RFC 6901 and the existing $item resolver were used as the semantic oracle."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No existing call gains a new failure outcome."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No flag, mode, or config bit was added."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "The new outside-repeat warning branch was forced."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No heuristic recovery action was added."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No async wait, cancellation, or timeout changed."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "The core type crosses renderer, validator, prompt, and documentation boundaries."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Rendered DOM output and package build results were observed directly."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Nested repeats and adversarial invalid-scope cases were rendered through the real React package."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "skipped",
+      "reason": "No new always or never invariant was asserted."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Public repeat syntax changed but prompt, web docs, package docs, and skills were not updated."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No documentation example was added."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was provided."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "The new work remains linear in the number of repeated items and adds constant-time path resolution."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "No forbidden punctuation was added."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "The compiled conventions map ran successfully."
+    },
+    {
+      "check": "siblings repeat.statePath",
+      "outcome": "acknowledged",
+      "reason": "The gate found untouched web docs, skills, and changelog surfaces. Contract-carrying docs and prompts are reported as a confirmed finding; historical changelogs are exempt."
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "Reverting the React implementation while retaining the new regression test made the test fail with path.startsWith is not a function."
+    },
+    {
+      "check": "PR staleness",
+      "outcome": "acknowledged",
+      "reason": "Current main added repeat validation and per-item repeat filtering after the PR branch point. Both were tested in a temporary landing composition."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "No whitespace errors were found."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The PR cannot build against current main because validateSpec still passes the widened repeat.statePath union to getByPath as a string.",
+      "evidence": "A clean current-main @json-render/core build passes. After composing PR #256, the DTS build fails at packages/core/src/spec-validator.ts:142 with TS2345: string | { $item: string } is not assignable to string.",
+      "layer": "current-main package build",
+      "source": "map",
+      "path": "UIElement.repeat.statePath -> validateSpec -> getByPath"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The public core type change breaks @json-render/svelte and Svelte does not implement nested repeat resolution.",
+      "evidence": "svelte-check fails at packages/svelte/src/RepeatChildren.svelte:23 because getByPath receives string | { $item: string }. The same file interpolates the object directly into basePath. Other changed renderer packages built after the core dependency was built.",
+      "layer": "cross-renderer public type and runtime parity",
+      "source": "map",
+      "path": "UIElement.repeat.statePath -> Svelte RepeatChildren -> getByPath/basePath"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "Using $item in repeat.statePath outside a repeat warns but then renders unrelated root state.",
+      "evidence": "A real React render with top-level repeat.statePath { $item: \"items\" } logged the warning and rendered state.items. Existing $item prop resolution returns undefined outside repeat scope, so the new resolver violates established semantics.",
+      "layer": "rendered React behavior",
+      "source": "lens",
+      "path": "RepeatChildren outside-scope branch -> /items fallback -> DOM"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "The new repeat resolver disagrees with existing $item path semantics for a leading slash.",
+      "evidence": "Existing $item values are passed to getByPath, which accepts both field and /field. The PR concatenates basePath + '/' + field, producing a double slash. A nested React render using { $item: \"/subitems\" } rendered no items.",
+      "layer": "rendered React behavior and RFC 6901 path resolution",
+      "source": "lens",
+      "path": "$item expression -> string concatenation -> getByPath"
+    },
+    {
+      "id": "F5",
+      "state": "confirmed",
+      "claim": "The AI prompt and public documentation do not expose the feature.",
+      "evidence": "packages/core/src/schema.ts, packages/react/src/schema.ts, and apps/web docs continue to define repeat.statePath only as an absolute string JSON Pointer. The PR changes no README, web doc, or skill file.",
+      "layer": "generated prompt and public contract",
+      "source": "gate",
+      "path": "repeat behavior change -> prompt/docs/skills"
+    },
+    {
+      "id": "I1",
+      "state": "issue_candidate",
+      "claim": "catalog.validate still strips runtime fields such as repeat.",
+      "evidence": "The generated catalog schema does not declare repeat and Zod object parsing strips unknown keys. Existing issue #222 and PR #255 already track this.",
+      "layer": "catalog validation",
+      "source": "lens",
+      "path": "catalog.validate -> generated Zod object"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Historical changelogs that mention repeat.statePath do not need retroactive syntax edits.",
+      "evidence": "Those passages document earlier releases and do not claim to be the current repeat contract."
+    },
+    {
+      "claim": "No separate tests are required for unchanged action statePath parameters.",
+      "evidence": "The union applies only to UIElement.repeat.statePath and action parameters remain strings."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "catalog.validate strips repeat and other runtime fields",
+      "evidence": "The generated element schema omits repeat and unknown object keys are stripped. Existing issue #222 and PR #255 cover it.",
+      "why_out_of_scope": "This predates PR #256 and affects all repeat specs, not only nested repeats."
+    }
+  ]
+}

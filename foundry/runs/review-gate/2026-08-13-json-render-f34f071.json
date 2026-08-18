@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-13",
+    "repo": "vercel-labs/json-render fix for PR #256",
+    "base": "9d3dfc8917c1c6aa5568acbe0969523f3307376c",
+    "head": "f34f0713ae968facf9391bff82bf4eea18547039",
+    "status": "complete",
+    "gaps": [
+      "The full @json-render/core test type-check has pre-existing strict test errors unrelated to this diff.",
+      "The Opus reviewer attempt produced no result; the completed independent review used Claude Sonnet."
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-13-json-render-256-9d3dfc8.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "Existing string repeat.statePath behavior is unchanged.",
+      "The new $item object form resolves relative to the enclosing repeat item only.",
+      "Relative repeat paths outside scope do not fall back to root state.",
+      "Leading-slash and slashless relative paths are equivalent.",
+      "Core, renderers, validation, schemas, prompts, docs, and skills agree."
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-5.6 Codex",
+    "reviewer_model": "Claude Sonnet",
+    "same_family": false
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "The new object form was checked against every previously accepted string form."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The statePath domain widened from string to string or $item expression."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "All runtime, static, validator, prompt, schema, documentation, and skill consumers were enumerated."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell-parsed input changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No background process or one-shot emission changed."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No external binary shim was added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Outside-scope resolution was verified to return no path rather than defaulting to root."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No framework signal forwarding or runtime shim changed."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "The change does not model an external substrate."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "Existing getByPath and $item behavior supplied the compatibility oracle."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "resolveRepeatStatePath can return undefined outside scope and every caller handles it."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No flag, mode, or configuration bit was added."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Outside-scope relative repeats and mismatched sample arrays were forced."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No recovery action was added."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No asynchronous wait, timeout, retry, or cancellation changed."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "The public core type crosses nine renderers plus validator, schema, prompt, docs, and skills."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "React and Svelte output plus static renderer builds were observed directly."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Nested valid, leading-slash, empty-body, and invalid outside-scope cases were exercised through renderer tests."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "All contract-carrying package, web, prompt, and skill surfaces were checked against implemented behavior."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No new standalone documentation example was introduced."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": "Claude Sonnet audited all six rows in .decisions.tsv and flagged none as unsupported."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Validation remains bounded by structural contexts with cycle and context deduplication guards."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "This report is named for and records exact HEAD f34f0713ae968facf9391bff82bf4eea18547039."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "No forbidden punctuation was added."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "The compiled json-render surface map passed."
+    },
+    {
+      "check": "siblings repeat and $item",
+      "outcome": "acknowledged",
+      "reason": "Contract-carrying surfaces were updated; unrelated expression, example, changelog, lockfile, and internal hits carry unchanged semantics."
+    },
+    {
+      "check": "callers resolveRepeatStatePath",
+      "outcome": "pass",
+      "reason": "Every caller is in a reviewed diffed file."
+    },
+    {
+      "check": "callers resolveRepeatItemStatePath",
+      "outcome": "pass",
+      "reason": "Every caller is in a reviewed diffed file."
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "Removing correct repeat resolution made 9 new tests fail; restoring it returned the suite green."
+    },
+    {
+      "check": "focused tests",
+      "outcome": "pass",
+      "reason": "The final run passed 162 tests across core, React, and Svelte."
+    },
+    {
+      "check": "package builds",
+      "outcome": "pass",
+      "reason": "Core and all affected renderer and YAML packages built successfully."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "No whitespace errors or conflict markers were found."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The initial implementation treated a slash-only relative repeat body as an empty child segment; fixed in the reviewed diff.",
+      "evidence": "resolveRepeatStatePath now returns repeatBasePath for both an empty $item and $item equal to slash, with regression coverage.",
+      "layer": "core repeat path resolution",
+      "source": "lens",
+      "path": "RepeatStatePath -> resolveRepeatStatePath -> renderer and validator"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Renderer schemas omitted repeat and would strip or reject the public field; fixed in all nine schemas with a parity test.",
+      "evidence": "packages/core/src/repeat-schema-parity.test.ts passes for image, ink, React, React Email, React Native, React PDF, Solid, Svelte, and Vue.",
+      "layer": "generated renderer schema",
+      "source": "map",
+      "path": "UIElement.repeat -> renderer schema definitions"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "The initial structural validator could duplicate issues for reused DAG nodes; fixed with context-aware deduplication.",
+      "evidence": "Tests prove identical structural contexts emit one issue while inside-scope and outside-scope reuse remain separately validated.",
+      "layer": "structural validator traversal",
+      "source": "map",
+      "path": "validateSpec -> validateRepeatPaths -> repeatValidatedContexts"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "Cycle termination existed but lacked direct regression coverage; fixed with a cyclic child-graph test.",
+      "evidence": "The final 162-test run includes terminates repeat validation for cyclic child graphs.",
+      "layer": "structural validator traversal",
+      "source": "lens",
+      "path": "validateRepeatPaths -> ancestors cycle guard"
+    },
+    {
+      "id": "I1",
+      "state": "issue_candidate",
+      "claim": "Leading-slash $bindItem paths produce a double slash.",
+      "evidence": "packages/core/src/props.ts joins repeatBasePath + slash + itemPath without stripping a leading slash.",
+      "layer": "pre-existing prop binding path resolution",
+      "source": "lens",
+      "path": "resolveBindItemPath -> binding target"
+    },
+    {
+      "id": "I2",
+      "state": "issue_candidate",
+      "claim": "Zero-item repeats differ between runtime and static renderer output.",
+      "evidence": "Runtime renderers retain an empty container while static paths can omit the repeated element; this behavior predates the nested-repeat change.",
+      "layer": "pre-existing renderer parity",
+      "source": "lens",
+      "path": "repeat with zero items -> runtime/static output"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Historical changelogs do not need retroactive edits.",
+      "evidence": "They describe earlier release behavior and are not the current repeat contract."
+    },
+    {
+      "claim": "Existing $item prop, visibility, directive, and action surfaces remain unchanged.",
+      "evidence": "The widened union applies only to UIElement.repeat.statePath."
+    },
+    {
+      "claim": "Examples using root string repeat paths remain valid.",
+      "evidence": "All string statePath semantics are intentionally preserved."
+    },
+    {
+      "claim": "Lockfiles and dependency metadata need no edits.",
+      "evidence": "Their keyword hits carry no repeat behavior or public syntax."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Normalize leading slashes in $bindItem paths",
+      "evidence": "resolveBindItemPath concatenates repeatBasePath and itemPath directly, so /field creates a double slash unlike $item and repeat.statePath.",
+      "why_out_of_scope": "The behavior predates PR #256 and the accepted contract changes only repeat.statePath."
+    },
+    {
+      "title": "Align zero-item repeat output between runtime and static renderers",
+      "evidence": "Runtime renderers retain an empty container while static renderers can omit the repeated element.",
+      "why_out_of_scope": "This is pre-existing general repeat behavior and is not caused by nested relative paths."
+    }
+  ]
+}

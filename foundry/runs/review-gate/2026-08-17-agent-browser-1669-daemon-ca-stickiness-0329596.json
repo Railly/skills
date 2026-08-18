@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-17",
+    "repo": "vercel-labs/agent-browser#1669",
+    "base": "548b159b30eef119ccf6846c8bc807d0eaa3f6f8",
+    "head": "0329596e6dda233a2f0c7711fff7bdfca31ed163",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "fail",
+    "acceptance_reviewed": [
+      "ca-cert-persists-across-later-session-commands",
+      "different-ca-explicitly-replaces-effective-trust",
+      "omission-is-not-explicit-removal"
+    ],
+    "gaps": [
+      "The original solution contract incorrectly required omission/removal to restart the session."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "Chris Tate plus GPT-5 Codex reproduction",
+    "same_family": false
+  },
+  "lenses": [
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "The flag reaches daemon identity, but omission on later invocations is misinterpreted as removal."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Drove the exact two-command sequence and a repeated-flag control."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Observed daemon PID, fingerprint, target, URL, snapshot output, and lifecycle metadata."
+    },
+    {
+      "name": "Test strength",
+      "status": "run",
+      "reason": "The focused unit test passes because it asserts the defective fingerprint transition."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "exact two-command reproduction",
+      "outcome": "acknowledged",
+      "reason": "Finding confirmed; no product fix was implemented during this diagnostic turn."
+    },
+    {
+      "check": "repeated-flag control",
+      "outcome": "pass",
+      "reason": "Repeating --ca-cert preserves daemon PID, target, URL, and trusted snapshot."
+    },
+    {
+      "check": "focused fingerprint unit test",
+      "outcome": "acknowledged",
+      "reason": "It passes while asserting that CA omission changes the fingerprint, so it protects the wrong contract."
+    },
+    {
+      "check": "radius escape autopsy",
+      "outcome": "acknowledged",
+      "reason": "The saved map had zero changed and impacted symbols, so the buggy fingerprint path was absent from the usable map."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Omitting --ca-cert on a later command restarts the daemon and loses the trusted browser page.",
+      "evidence": "The daemon PID changed from 22270 to 22404, the target changed, the URL became about:blank, snapshot returned an empty page, and lifecycle reported restartedBackground:true.",
+      "layer": "multi-command session lifecycle",
+      "source": "lens",
+      "path": "CLI omission -> daemon_config_fingerprint(None) -> ensure_daemon restart -> Chromium close -> fresh about:blank"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The existing unit test protects the defective behavior.",
+      "evidence": "test_daemon_config_fingerprint_tracks_ca_path_content_and_removal passes while asserting the no-CA fingerprint differs from the CA fingerprint.",
+      "layer": "unit contract",
+      "source": "gate",
+      "path": "with_first.ca_cert -> fingerprint -> without_ca assert_ne"
+    }
+  ],
+  "exemptions": [],
+  "issue_candidates": []
+}

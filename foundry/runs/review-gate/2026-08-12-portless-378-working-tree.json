@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-12",
+    "repo": "vercel-labs/portless",
+    "base": "d42c741ac67d20a0b6e1f8f5b4192136de34fa03",
+    "head": "d45f79b8ffa01e488418b60bb1827836d8d017ee",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/vercel-labs/portless/issues/378",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "The Windows startup task has no execution time limit.",
+      "The task still runs as SYSTEM with highest privileges at boot.",
+      "Installation failure does not start or explicitly stop a task.",
+      "Immediate start failure preserves the registered task for the next boot.",
+      "Uninstall removes the task files."
+    ],
+    "gaps": [
+      "No separate Issue Contract or Spec review was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "gpt-5",
+    "reviewer_model": "gpt-5",
+    "same_family": true
+  },
+  "lenses": [
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "GitHub Actions run 31641000991 registered and exported the task on windows-latest with PT0S, SYSTEM, highest privileges, a boot trigger, and cmd.exe."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Built the package, ran the complete test artifact in a non-Git snapshot, then installed and drove the built CLI on windows-latest."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Forced create failure, immediate run failure, reinstall failure ordering, repeated installs, and uninstall cleanup."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced XML generation, file write, schtasks registration, task stop, proxy stop, task start, status, clean, and uninstall consumers."
+    },
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher or semantic data source was replaced."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "No validator or accepted input domain was widened."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No user-input resolution rule changed."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "skipped",
+      "reason": "The existing documented behavior remains a Windows startup task running as SYSTEM; this is an internal reliability correction."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No documentation example changed."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was provided."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No per-element loop or lookup was added."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "gate.sh style passed."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "gate.sh surfaces passed against cases/portless/conventions.md."
+    },
+    {
+      "check": "artifacts",
+      "outcome": "pass",
+      "reason": "The new XML file is removed with the existing recursive Windows service-directory cleanup."
+    },
+    {
+      "check": "callers buildServiceSpec",
+      "outcome": "pass",
+      "reason": "Every call site is in a diffed file."
+    },
+    {
+      "check": "callers currentServiceSpec",
+      "outcome": "pass",
+      "reason": "Every call site is in a diffed file."
+    },
+    {
+      "check": "force-red PT0S",
+      "outcome": "pass",
+      "reason": "Mutating PT0S to PT72H caused three intended service tests to fail, then pass after restoration."
+    },
+    {
+      "check": "Task Scheduler XSD",
+      "outcome": "finding-fixed",
+      "reason": "The first XML used an invalid ServiceAccount LogonType; it was removed and the final XML validates."
+    },
+    {
+      "check": "focused tests",
+      "outcome": "pass",
+      "reason": "28 of 28 service tests passed."
+    },
+    {
+      "check": "complete isolated suite",
+      "outcome": "pass",
+      "reason": "754 of 754 tests passed in a snapshot without Git worktree metadata."
+    },
+    {
+      "check": "build types lint format diff",
+      "outcome": "pass",
+      "reason": "Build, type-check, lint, format check, and git diff --check passed."
+    },
+    {
+      "check": "Windows Task Scheduler runtime",
+      "outcome": "pass",
+      "reason": "Run 31641000991 registered the task, exported PT0S, reported the service running and proxy responding on port 18080, captured Task Scheduler through cuse, and uninstalled cleanly."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Configuring ExecutionTimeLimit in a second PowerShell step can leave a newly created task with PT72H when configuration fails.",
+      "evidence": "The original local implementation performed schtasks /Create before required PowerShell configuration. The fix now registers PT0S in the same schtasks /Create /XML operation.",
+      "layer": "Windows service installation orchestration",
+      "source": "lens",
+      "path": "installService -> schtasks /Create -> PowerShell Set-ScheduledTask"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "A Task Scheduler Exec action should launch the batch file through cmd.exe.",
+      "evidence": "The XSD validates Command as a path type but does not prove a .cmd file is directly executable through CreateProcess. The final XML uses cmd.exe with /d /s /c and a quoted script path.",
+      "layer": "serialized Windows task action",
+      "source": "lens",
+      "path": "buildWindowsTaskXml -> Exec Command and Arguments"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "Windows accepts the generated XML, preserves PT0S, runs as SYSTEM, and starts successfully at boot.",
+      "evidence": "GitHub Actions run 31641000991 on windows-latest accepted the UTF-16 task XML, exported PT0S with SYSTEM and highest privileges, confirmed the proxy responding on port 18080, and captured Task Scheduler with cuse. Boot persistence follows from the registered BootTrigger; an actual reboot was not performed.",
+      "layer": "Windows Task Scheduler runtime",
+      "source": "lens",
+      "path": "schtasks /Create /XML -> Task Scheduler -> cmd.exe -> portless-service.cmd"
+    },
+    {
+      "id": "I1",
+      "state": "issue_candidate",
+      "claim": "portless clean can leave Windows service files behind when no task is registered.",
+      "evidence": "tryUninstallService returns early when schtasks /Query fails, before removing spec.scriptDir. service uninstall does remove the directory and now has direct coverage.",
+      "layer": "Windows cleanup after partial installation",
+      "source": "lens",
+      "path": "handleClean -> tryUninstallService -> schtasks /Query"
+    },
+    {
+      "id": "I2",
+      "state": "issue_candidate",
+      "claim": "A failed reinstall can update the shared service script before task registration succeeds.",
+      "evidence": "installService writes portless-service.cmd before schtasks /Create. This ordering predates #378 and requires Windows-specific file replacement and rollback design.",
+      "layer": "Windows reinstall partial write",
+      "source": "lens",
+      "path": "installService -> writeFileSync scriptPath -> schtasks /Create"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "README, skills/portless/SKILL.md, and CLI help do not need updates.",
+      "evidence": "The user-facing contract remains a Windows Task Scheduler startup task running as SYSTEM; only its internal registration representation and reliability changed."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Windows clean leaves orphaned service files when task registration failed",
+      "evidence": "tryUninstallService returns before fs.rmSync(spec.scriptDir) when schtasks /Query reports no task.",
+      "why_out_of_scope": "The behavior predates #378 and is not required to remove the 72-hour execution limit."
+    },
+    {
+      "title": "Windows reinstall writes service script before task replacement succeeds",
+      "evidence": "The shared .cmd is overwritten before schtasks /Create /XML /F reports success.",
+      "why_out_of_scope": "Safe rollback needs a Windows-specific atomic replacement design and real scheduler validation beyond #378."
+    }
+  ]
+}

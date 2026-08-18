@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-12",
+    "repo": "vercel-labs/wterm",
+    "base": "4852dde5481439883eecf7f61f32f6091be5b468",
+    "head": "working-tree:ce4c7a8fb0cccd8ddd48bcf3d67b1fc8b6a1dcf249efa6057790fc1000783c61",
+    "status": "incomplete",
+    "gaps": [
+      "The reviewed artifact is not committed, so exact-head coverage cannot run against a final SHA."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Issue Contract or Spec review was provided."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family",
+    "reviewer_model": "Claude Sonnet plus Gemini Flash-Lite Solution Gate",
+    "same_family": false
+  },
+  "lenses": [
+    {"name":"inverse regression surface","status":"skipped","reason":"No matcher or lookup data source was replaced."},
+    {"name":"new-domain matrix","status":"run","reason":"Rollover timing, RIS/init, older WASM and 1600 Ghostty identities were forced."},
+    {"name":"resolution-rule consistency across consumers","status":"skipped","reason":"No resolution rule changed."},
+    {"name":"new-failure-outcome propagation","status":"run","reason":"Optional resource state and saturation semantics were traced through public consumers."},
+    {"name":"error-path forcing","status":"run","reason":"Capacity exhaustion, counter overflow and missing exports were forced."},
+    {"name":"non-destructive recovery","status":"run","reason":"RIS and init recovery boundaries were driven."},
+    {"name":"cancellation and timeout hygiene","status":"skipped","reason":"No timer or cancellation contract changed."},
+    {"name":"boundary pipeline trace","status":"run","reason":"Zig state, WASM exports, bridge types and docs were traced."},
+    {"name":"substrate verification","status":"run","reason":"Real WASM and Chromium were exercised."},
+    {"name":"dogfood the built artifact","status":"run","reason":"The Vite fixture drove the shipped DOM surface."},
+    {"name":"docs-behavior parity","status":"run","reason":"Capacity rejection and scroll ownership prose match driven behavior."},
+    {"name":"demonstrative example","status":"skipped","reason":"No example was added."},
+    {"name":"choice audit","status":"run","reason":"Cross-family audit found and fixed the row-height oracle; remaining concerns were refuted."},
+    {"name":"complexity budget","status":"run","reason":"The changes add constant-time counters and remove a retaining Map."}
+  ],
+  "deterministic": [
+    {"check":"exact-head coverage","outcome":"acknowledged","reason":"Blocked until the worktree is committed."},
+    {"check":"git diff --check","outcome":"pass","reason":""},
+    {"check":"style","outcome":"pass","reason":""},
+    {"check":"WASM drift","outcome":"pass","reason":""},
+    {"check":"callers getResourceState","outcome":"pass","reason":""},
+    {"check":"surfaces","outcome":"acknowledged","reason":"No route changed; root and Vite README absences were read and found semantically unaffected."},
+    {"check":"tests builds types lint format","outcome":"pass","reason":"Lint contains one pre-existing PostCSS warning."},
+    {"check":"browser E2E","outcome":"pass","reason":"15/15 serial; focused rollover and resize each passed 5/5."}
+  ],
+  "findings": [
+    {
+      "id": "e2e-hardcoded-row-height",
+      "state": "confirmed",
+      "claim": "The rollover regression hardcoded a 17px row height instead of measuring the browser substrate.",
+      "evidence": "Cross-family choice audit identified the environment-sensitive oracle; the test now reads getBoundingClientRect().height and passes 5/5.",
+      "layer": "browser E2E oracle",
+      "source": "lens",
+      "path": "rendered scrollback row -> measured height -> expected scroll delta"
+    },
+    {
+      "id": "resize-pre-raf-oracle",
+      "state": "refuted",
+      "claim": "Permanent native anchoring suppression breaks resize anchoring.",
+      "evidence": "The test captured the old virtual window before its scheduled RAF. Waiting for the RAF produced 5/5 focused and 15/15 full-suite passes without another product fix.",
+      "layer": "browser virtualized DOM timing",
+      "source": "lens",
+      "path": "scrollTop assignment -> scroll event -> scheduled render -> first-visible observation"
+    }
+  ],
+  "exemptions": [
+    {"claim":"No root README update is required for internal resource telemetry.","evidence":"The public OSC 8 feature statement remains true; the API is documented in the core README and API reference."},
+    {"claim":"No navigation or page-title updates are required.","evidence":"No docs page was added or renamed."},
+    {"claim":"No Vite README update is required.","evidence":"The query flag only exposes the existing debug fixture to E2E."},
+    {"claim":"No changelog or version update is required.","evidence":"Releases are maintainer-controlled."}
+  ],
+  "issue_candidates": [
+    {
+      "title": "Run long-duration RSS and forced-GC hyperlink pressure",
+      "evidence": "The retaining Map is removed and bounded tests pass, but no hours-long heap campaign was run.",
+      "why_out_of_scope": "Operational endurance evidence beyond the reproduced retention mechanism."
+    }
+  ]
+}
