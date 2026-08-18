@@ -1,17 +1,17 @@
 # Case: WASM view lifetime crosses secondary grapheme reads
 
-Status: evaluated
+Status: reviewed
 Validation: contributor-validated
-Human review: pending
-Maintainer acceptance: pending
-Delivery: PR open
-Upstream status checked: 2026-08-10
+Human review: independent-complete
+Maintainer acceptance: approved
+Delivery: merged
+Upstream status checked: 2026-08-11
 Visibility: public
 Repository: vercel-labs/wterm
 Role: contributor
 Source: https://github.com/vercel-labs/wterm/pull/111, commits `981868f0cd618047361a7a58a3cb6c67deb2f0c3` and `cdb41c98be3a911121ced5b57eeeb671134c4c6e`
 
-> Technical validation and automated review are complete. Human review, maintainer approval, and merge remain pending.
+> Technical validation, human review, maintainer approval, and merge are complete. No release newer than 0.3.3 contains this change yet.
 
 ## Observed condition or claim
 
@@ -45,7 +45,7 @@ The project conventions already named this exact invariant for every cached WASM
 
 ## Outcome
 
-PR #111 remains open at head `cdb41c9`.
+PR #111 merged on 2026-08-11 as `77f2913`.
 
 - Complete combining and ZWJ strings remain available from active cells and scrollback.
 - Viewport cache hits no longer reuse a detached `DataView`.
@@ -61,7 +61,7 @@ An interactive visual before/after artifact was started using detached worktrees
 - Source: PR #111, original head `981868f`, review-fix head `cdb41c9`.
 - Runtime: committed Ghostty WASM with `memory.grow()` forced inside the real grapheme export.
 - Tests: the regression failed on the original production implementation at `DataView.getUint32` and passed after restoration; `@wterm/ghostty` passed 38/38.
-- Review: Vercel Agent Review raised the detached-view finding on `981868f`; its second pass and every required check passed on `cdb41c9`. Maintainer review is still required.
+- Review: Vercel Agent Review raised the detached-view finding on `981868f`; its second pass and every required check passed on `cdb41c9`. The PR received human approval and merged.
 - Artifact: exact-head Review Gate records are `foundry/runs/review-gate/2026-08-10-wterm-cdb41c9.json` and `.md`. Visual comparison was interrupted before capture.
 
 ## Transferable lesson
