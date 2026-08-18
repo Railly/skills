@@ -1,0 +1,42 @@
+{
+  "date": "2026-08-12",
+  "repo": "vercel-labs/wterm",
+  "pr": 116,
+  "head": "4852dde5481439883eecf7f61f32f6091be5b468",
+  "mode": "bounded browser and real-WASM fault injection",
+  "verdict": "fail",
+  "findings": [
+    {
+      "id": "RA-116-1",
+      "severity": "high",
+      "classification": "corrupted viewport identity",
+      "claim": "Chromium native scroll anchoring and wterm rollover compensation both adjust scrollTop across frame-separated ring rollover",
+      "introducedBySlice": false
+    },
+    {
+      "id": "RA-116-2",
+      "severity": "medium",
+      "classification": "bounded silent degradation",
+      "claim": "the built-in core silently stops attaching links after 1024 host-lifetime identities",
+      "introducedBySlice": true
+    },
+    {
+      "id": "RA-116-3",
+      "severity": "medium",
+      "classification": "unbounded session growth",
+      "claim": "GhosttyCore retains every resolved hyperlink identity in a host-lifetime JavaScript Map",
+      "introducedBySlice": true
+    }
+  ],
+  "preserved": [
+    "resize bursts recovered the original visible row and scroll offset",
+    "stream interruption and continuation preserved the history anchor before rollover",
+    "the virtualized DOM remained bounded in all browser cells"
+  ],
+  "gaps": [
+    "Firefox and Safari were not executed",
+    "long-duration heap and RSS retention were not measured",
+    "Ghostty pressure was real-WASM Vitest rather than browser-rendered",
+    "transport disconnect and reconnect were out of scope"
+  ]
+}
