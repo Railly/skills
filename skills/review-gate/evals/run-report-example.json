@@ -90,6 +90,39 @@
 			"evidence": "The forced expired-token flow preserved the budget and completed the retry."
 		}
 	],
+	"behavioral_strength": {
+		"assessment": "required",
+		"triggers": ["authentication retry lifecycle"],
+		"dimensions": {
+			"values": [
+				"token state: valid, expired",
+				"attempt: initial, immediate retry",
+				"publication: succeeds, fails"
+			],
+			"exclusions": [
+				"revoked-token refresh is outside the contract and follows the existing rejection path"
+			],
+			"evidence": "The table crosses prior token state, request attempt, and publication outcome."
+		},
+		"oracle": {
+			"source": "Issue Contract acceptance A2 and the persisted retry record",
+			"independent": true,
+			"evidence": "Expected retry budgets come from the contract, not middleware output."
+		},
+		"producer": {
+			"name": "built CLI with local authentication fixture",
+			"status": "exercised",
+			"evidence": "The fixture generated an expired token and an immediate real retry."
+		},
+		"falsification": [
+			{
+				"mutation": "remove retry-budget restoration after token expiration",
+				"red_evidence": "The immediate retry observed a zero budget.",
+				"restored_green_evidence": "Restoring the implementation preserved the original budget."
+			}
+		],
+		"evidence": "The lifecycle model, independent oracle, real producer, and mutation all agree."
+	},
 	"assumptions": [
 		{
 			"id": "A1",
