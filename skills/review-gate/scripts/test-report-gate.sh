@@ -116,6 +116,37 @@ expect_finding \
 	"finding F1 is unverified and cannot be resolved without evidence" \
 	node "$validator" "$unverified_fixed_finding" --structural
 
+missing_dimensions="$tmp_dir/missing-dimensions.json"
+mutate_fixture "$missing_dimensions" 'report.behavioral_strength.dimensions.values = [];'
+expect_finding \
+	"behavioral proof needs an explicit dimension table" \
+	"required behavioral strength must record explicit dimensions" \
+	node "$validator" "$missing_dimensions" --structural
+
+implementation_oracle="$tmp_dir/implementation-oracle.json"
+mutate_fixture "$implementation_oracle" 'report.behavioral_strength.oracle.independent = false;'
+expect_finding \
+	"implementation-derived oracle is rejected" \
+	"required behavioral strength needs an oracle independent of production" \
+	node "$validator" "$implementation_oracle" --structural
+
+synthetic_only="$tmp_dir/synthetic-only.json"
+mutate_fixture "$synthetic_only" '
+report.behavioral_strength.producer.status = "unverified";
+report.behavioral_strength.producer.evidence = "Only hand-built event objects were used.";
+'
+expect_finding \
+	"synthetic-only producer evidence is rejected" \
+	"required behavioral strength must exercise the real input producer" \
+	node "$validator" "$synthetic_only" --structural
+
+missing_falsification="$tmp_dir/missing-falsification.json"
+mutate_fixture "$missing_falsification" 'report.behavioral_strength.falsification = [];'
+expect_finding \
+	"behavioral proof needs fix-absent falsification" \
+	"required behavioral strength needs at least one fix-absent falsification" \
+	node "$validator" "$missing_falsification" --structural
+
 standard_report="$tmp_dir/standard-report.json"
 mutate_fixture "$standard_report" '
 report.risk = {
@@ -134,6 +165,15 @@ report.side_effects = {
   assessment: "none",
   evidence: "The pure transformation creates no durable or externally visible state.",
   commit_points: []
+};
+report.behavioral_strength = {
+  assessment: "not_required",
+  triggers: [],
+  dimensions: { values: [], exclusions: [], evidence: "" },
+  oracle: { source: "", independent: false, evidence: "" },
+  producer: { name: "", status: "not_applicable", evidence: "" },
+  falsification: [],
+  evidence: "The pure transformation is not a protocol, parser, serializer, state machine, lifecycle, event translation, adapter, or compatibility layer."
 };
 '
 expect_pass "standard risk without side effects passes" node "$validator" "$standard_report" --structural
@@ -161,11 +201,75 @@ report.side_effects = {
   evidence: \"The selected historical diff has no declared side effect.\",
   commit_points: []
 };
+report.behavioral_strength = {
+  assessment: \"not_required\",
+  triggers: [],
+  dimensions: { values: [], exclusions: [], evidence: \"\" },
+  oracle: { source: \"\", independent: false, evidence: \"\" },
+  producer: { name: \"\", status: \"not_applicable\", evidence: \"\" },
+  falsification: [],
+  evidence: \"The selected historical diff is not a behavioral translation boundary.\"
+};
 "
 expect_finding \
 	"report head must match checkout head" \
 	"does not match checkout HEAD $head" \
 	node "$validator" "$head_mismatch"
+
+behavioral_repo="$tmp_dir/behavioral-repo"
+mkdir -p "$behavioral_repo/src"
+git -C "$behavioral_repo" init -q
+git -C "$behavioral_repo" config user.name "Review Gate Fixture"
+git -C "$behavioral_repo" config user.email "fixture@example.com"
+printf '%s\n' 'export const identity = (value) => value;' >"$behavioral_repo/src/base.ts"
+git -C "$behavioral_repo" add src/base.ts
+git -C "$behavioral_repo" commit -qm "base"
+behavioral_base="$(git -C "$behavioral_repo" rev-parse HEAD)"
+printf '%s\n' \
+	'export function encodeKeyboardEvent(event: KeyboardEvent) {' \
+	'  return event.type === "keyup" ? "release" : "press";' \
+	'}' >"$behavioral_repo/src/keyboard-input.ts"
+git -C "$behavioral_repo" add src/keyboard-input.ts
+git -C "$behavioral_repo" commit -qm "add keyboard event translation"
+behavioral_head="$(git -C "$behavioral_repo" rev-parse HEAD)"
+behavioral_report="$behavioral_repo/report.json"
+mutate_fixture "$behavioral_report" "
+report.run.base = \"$behavioral_base\";
+report.run.head = \"$behavioral_head\";
+report.risk = {
+  level: \"standard\",
+  triggers: [],
+  independent_challenge: {
+    required: false,
+    satisfied: true,
+    method: \"not_required\",
+    artifact: \"\",
+    evidence: \"No high-risk trigger applies.\"
+  }
+};
+report.properties[0].kind = \"correctness\";
+report.side_effects = {
+  assessment: \"none\",
+  evidence: \"The event encoder creates no durable or external side effect.\",
+  commit_points: []
+};
+report.behavioral_strength = {
+  assessment: \"not_required\",
+  triggers: [],
+  dimensions: { values: [], exclusions: [], evidence: \"\" },
+  oracle: { source: \"\", independent: false, evidence: \"\" },
+  producer: { name: \"\", status: \"not_applicable\", evidence: \"\" },
+  falsification: [],
+  evidence: \"Behavioral proof was incorrectly skipped.\"
+};
+"
+original_dir="$PWD"
+cd "$behavioral_repo"
+expect_finding \
+	"event-translation diff requires behavioral strength" \
+	"diff signals mandatory behavioral strength but assessment is not required" \
+	node "$validator" "$behavioral_report"
+cd "$original_dir"
 
 echo "RESULT [test] $passes passed, $failures failed"
 [[ $failures -eq 0 ]]

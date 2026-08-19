@@ -90,6 +90,36 @@
 			"evidence": "The first invocation failed."
 		}
 	],
+	"behavioral_strength": {
+		"assessment": "required",
+		"triggers": ["startup and retry lifecycle"],
+		"dimensions": {
+			"values": [
+				"startup: succeeds, fails",
+				"attempt: initial, immediate retry"
+			],
+			"exclusions": [],
+			"evidence": "The lifecycle crosses startup outcome with retry attempt."
+		},
+		"oracle": {
+			"source": "documented immediate-retry contract",
+			"independent": true,
+			"evidence": "The expected second-attempt outcome comes from the public contract."
+		},
+		"producer": {
+			"name": "built CLI startup command",
+			"status": "exercised",
+			"evidence": "The command produced the first startup failure."
+		},
+		"falsification": [
+			{
+				"mutation": "retain the published artifact after failed startup",
+				"red_evidence": "The retry test remained absent, exposing the incomplete proof.",
+				"restored_green_evidence": "The fixture is intentionally invalid for the post-commit validator."
+			}
+		],
+		"evidence": "Behavioral strength is declared separately from the missing retry partition."
+	},
 	"assumptions": [],
 	"side_effects": {
 		"assessment": "present",

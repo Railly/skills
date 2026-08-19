@@ -78,6 +78,33 @@ While `schemaVersion` is 0 the schema mutates freely during dogfood: record fric
       "evidence": ""
     }
   ],
+  "behavioral_strength": {
+    "assessment": "required|not_required",
+    "triggers": [],
+    "dimensions": {
+      "values": [],
+      "exclusions": [],
+      "evidence": ""
+    },
+    "oracle": {
+      "source": "",
+      "independent": true,
+      "evidence": ""
+    },
+    "producer": {
+      "name": "",
+      "status": "exercised|unverified|not_applicable",
+      "evidence": ""
+    },
+    "falsification": [
+      {
+        "mutation": "",
+        "red_evidence": "",
+        "restored_green_evidence": ""
+      }
+    ],
+    "evidence": ""
+  },
   "assumptions": [
     {
       "id": "",
@@ -155,6 +182,7 @@ These restate the SKILL.md rules as data constraints: a report violating them is
 - **`claim_inventory`**: contains exactly the four source classes `contract`, `design`, `user_facing`, and `implementation`. Each is reviewed and maps its material claims to property IDs, or records `not_provided` or `not_applicable` with evidence. This makes omission visible before proof begins.
 - **`properties`**: the proof ledger. Every material changed property appears once. `oracle.observes` names the property, not the implementation signal used as a proxy. A complete run requires every property to be `verified`, `proxy_only: false`, and every listed substrate to be `exercised` with evidence.
 - **`properties[].proxy_challenge`**: names the convenient implementation observable, constructs a state where it could hold while the property fails, and executes that counterexample. `separated` means the proxy was falsified as an oracle and cannot be the property evidence. `not_separated` means this attempt did not distinguish them; the direct oracle is still required.
+- **`behavioral_strength`**: always present. Set `assessment: required` when the diff implements or changes a protocol, parser, serializer, state machine, lifecycle, browser or OS event translation, adapter, or compatibility layer. A required assessment names its triggers, records an explicit dimension table and justified exclusions, uses an oracle independent of production, exercises the real input producer, and carries at least one bug-specific red/restored-green mutation. `not_required` needs one-sentence evidence. A selected example list is not a dimension table, and a hand-built object is not real-producer evidence.
 - **`assumptions`**: every carried assumption from the design gate, issue contract, implementation trail, or subsystem model. A complete run contains no `unverified` or `refuted` assumption.
 - **`side_effects.assessment`**: always explicit. `none` requires evidence explaining why the diff creates no durable or externally visible commit point. `present` requires at least one commit point.
 - **`commit_points[].later_fallible_stages`**: enumerate every stage that can fail after the effect becomes durable or externally visible. `failure_partitions[].covers` must cover every stage at least once. Each partition names its ownership region, is forced, records residual state and cleanup ownership, and immediately retries the same user operation. A complete run accepts only `success` or an already documented recovery path.
