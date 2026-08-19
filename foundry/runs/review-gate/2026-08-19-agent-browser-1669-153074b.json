@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-19",
+    "repo": "vercel-labs/agent-browser#1669",
+    "base": "4d19e80d3ec308b53978d829de669d13ed381f04",
+    "head": "153074bf261b5b583cc1343e22d749c79903ffaa",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "ctate maintainer feedback, 2026-08-19",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "readme-ca-example-contains-no-rejected-option-pair",
+      "documented-ca-example-is-validated-by-production-compatibility-rule"
+    ],
+    "gaps": [
+      "No separate Issue Contract or Spec review result was supplied; the maintainer finding is the acceptance oracle for this documentation correction."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family",
+    "reviewer_model": "ctate human maintainer",
+    "same_family": false
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [
+      "user-facing configuration example"
+    ],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "human_review",
+      "artifact": "",
+      "evidence": "The round was initiated by ctate's direct review of the published README example."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "ctate maintainer feedback, 2026-08-19",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "The reported defect is that the README presents caCert together with profile and ignoreHttpsErrors even though production rejects both pairs."
+    },
+    {
+      "source": "design",
+      "location": "separate generic configuration and proxy CA examples",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "The selected shape preserves the broad example while moving caCert into a minimal proxy-specific example whose combined fields are supported."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md configuration examples",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "The generic example retains profile and ignoreHttpsErrors without caCert; the proxy CA example contains only proxy and caCert."
+    },
+    {
+      "source": "implementation",
+      "location": "cli/src/main.rs test_readme_proxy_ca_config_uses_compatible_options",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "The committed test extracts the real README fence, deserializes it through flags::Config, and sends its launch-sensitive values through incompatible_launch_mode_error."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The published README proxy CA configuration is a combination accepted by the production launch compatibility validator.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "whether the exact documented option combination produces an incompatibility error",
+        "layer": "user-facing configuration contract",
+        "method": "extract the fenced JSON from README.md, deserialize through flags::Config, and evaluate the represented launch options with incompatible_launch_mode_error",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "caCert, profile, and ignoreHttpsErrors are each valid configuration keys when considered separately",
+        "counterexample": "a syntactically valid JSON example includes caCert with ignoreHttpsErrors and is rejected by the combined production validator",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Temporarily adding ignoreHttpsErrors to the proxy CA fence made the committed test fail with Cannot use --ca-cert with --ignore-https-errors; restoring the README from a snapshot returned the test to green."
+      },
+      "substrates": [
+        {
+          "name": "README fenced JSON plus Rust production validator",
+          "status": "exercised",
+          "evidence": "The exact fence parsed successfully and the focused test passed after the incompatible options were separated."
+        },
+        {
+          "name": "full Rust test suite",
+          "status": "exercised",
+          "evidence": "1,145 tests passed, 101 were ignored, and 2 doctor CLI integration tests passed."
+        }
+      ],
+      "evidence": "The README example is directly connected to the validator that rejects incompatible CA launch modes, and the force-red mutation proved the connection detects the reported class."
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "production validation",
+      "claim": "proxy and caCert are compatible while caCert with profile or ignoreHttpsErrors is not",
+      "status": "verified",
+      "evidence": "incompatible_launch_mode_error returns no incompatibility for proxy plus caCert on Linux and returns explicit errors for both rejected pairs; the focused tests and full suite passed."
+    },
+    {
+      "id": "A2",
+      "source": "documentation surface sweep",
+      "claim": "Other caCert configuration examples do not repeat the rejected combinations",
+      "status": "verified",
+      "evidence": "Repository search found the docs configuration page already separates the caCert and ignoreHttpsErrors examples, and no other user-facing caCert example includes profile."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The delta changes README prose and adds a test; it does not alter runtime behavior, durable state, processes, network calls, or external systems.",
+    "commit_points": []
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher, parser, or lookup data source changed."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "No production input domain changed."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No value-resolution rule changed."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command string changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No diagnostic channel or latch changed."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No test shim or fake executable was introduced."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "No default changed."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "The new seam between the README fence, Config deserialization, and the production compatibility validator was inspected and force-red tested."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No twice-failed detector or parser changed."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No external semantic was reimplemented."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No production failure outcome changed."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No flag transport path changed in this delta."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "The documented block was mutated to include ignoreHttpsErrors and failed with the production incompatibility error."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No recovery action changed."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No asynchronous lifecycle path changed."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "The example was traced from rendered README JSON through Config fields to incompatible_launch_mode_error."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "skipped",
+      "reason": "The delta is platform-independent documentation and test code."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "skipped",
+      "reason": "The author changed only documentation and a direct validator test; no runtime behavior changed beyond the already gated parent head."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "The example's implied compatibility claim is owned by and checked against the production validator."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Every caCert example was searched; the README correction now agrees with the same compatibility rule the CLI enforces."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "The separated proxy CA example is parsed as real JSON and validated as a combined configuration."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No new implementation choice beyond separating incompatible example cells required a decision trail."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No scale-sensitive path changed."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "head coverage",
+      "outcome": "pass",
+      "reason": "This report records exact head 153074bf261b5b583cc1343e22d749c79903ffaa."
+    },
+    {
+      "check": "style",
+      "outcome": "acknowledged",
+      "reason": "The full PR diff contains pre-existing punctuation findings from earlier commits; the 4d19e80-to-153074b delta adds no em dash or double-hyphen punctuation."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "The configured agent-browser surface map passed."
+    },
+    {
+      "check": "siblings caCert",
+      "outcome": "acknowledged",
+      "reason": "The only absent file reported is untracked .decisions.tsv history; repository search separately reviewed every tracked caCert documentation example."
+    },
+    {
+      "check": "execdeps",
+      "outcome": "pass",
+      "reason": "The existing certutil owner map remains complete."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "The exact delta contains no whitespace errors."
+    },
+    {
+      "check": "Rust fmt",
+      "outcome": "pass",
+      "reason": "cargo fmt --manifest-path cli/Cargo.toml -- --check passed."
+    },
+    {
+      "check": "Rust clippy",
+      "outcome": "pass",
+      "reason": "cargo clippy --manifest-path cli/Cargo.toml --all-targets -- -D warnings passed."
+    },
+    {
+      "check": "Rust tests",
+      "outcome": "pass",
+      "reason": "1,145 unit tests and 2 doctor CLI integration tests passed; 101 tests were ignored."
+    },
+    {
+      "check": "force-red README compatibility",
+      "outcome": "pass",
+      "reason": "Adding ignoreHttpsErrors to the documented CA block made the focused test fail with the production incompatibility error; snapshot restoration returned it to green."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "The map found only the new test module and test symbol with no impacted runtime symbols, but 2,445 unresolved calls, 81 SCIP-unmapped entries, and rust-analyzer duplicate-symbol errors make it orientation-only."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The README combined caCert with profile and ignoreHttpsErrors although production rejects both combinations.",
+      "evidence": "The original fence contained all three keys, and the production validator returns explicit incompatibility errors for both pairs.",
+      "layer": "user-facing configuration contract",
+      "source": "lens",
+      "path": "README agent-browser.json fence -> flags::Config -> incompatible_launch_mode_error",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": ".decisions.tsv remains outside the product diff.",
+      "evidence": "It is an untracked historical decision trail and is not a user-facing documentation surface."
+    },
+    {
+      "claim": "Earlier full-PR punctuation findings are not changed in this correction.",
+      "evidence": "A direct 4d19e80-to-153074b added-line scan found no em dash or double-hyphen punctuation."
+    },
+    {
+      "claim": "No GitHub comment is required.",
+      "evidence": "The established instruction for this PR is to fix valid feedback without replying to comments."
+    }
+  ],
+  "issue_candidates": []
+}
