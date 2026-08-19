@@ -38,6 +38,32 @@
 				"Proposes mutation or falsification evidence"
 			],
 			"files": []
+		},
+		{
+			"id": 4,
+			"name": "event-lifecycle-fixture-validity",
+			"prompt": "A keyboard protocol encoder has green tests for modifier press and release. The release assertion reuses the keydown fixture. Decide whether coverage is strong enough.",
+			"expected_output": "The skill rejects fixture reuse until real producer semantics establish it, models press and release as separate pre-state/event/post-state transitions, compares outputs with an independent protocol oracle, and falsifies the tests with a realistic released-modifier mutation.",
+			"assertions": [
+				"Does not accept type-valid synthetic input as semantically valid",
+				"Requires distinct lifecycle transition fixtures",
+				"Requires an independent protocol oracle",
+				"Requires a bug-specific red and restored green result"
+			],
+			"files": []
+		},
+		{
+			"id": 5,
+			"name": "implicit-protocol-matrix",
+			"prompt": "We tested no flags, each interesting flag on a few examples, and all flags together. Mark the protocol matrix complete.",
+			"expected_output": "The skill refuses to call the matrix complete without an explicit dimension table, derives meaningful combinations from the protocol and host contracts, documents exclusions, and executes or justifies every equivalence class.",
+			"assertions": [
+				"Requires an explicit dimension table",
+				"Derives cells from independent contracts",
+				"Does not infer Cartesian coverage from selected examples",
+				"Requires evidence for excluded cells"
+			],
+			"files": []
 		}
 	]
 }

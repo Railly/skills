@@ -42,3 +42,17 @@ Carry every assumption from Solution Gate, the issue contract, the implementatio
 Classify work as high risk when it handles secrets, authentication or authorization, destructive operations, durable state, externally visible partial state, concurrency, process lifecycle, cross-platform guarantees, or remote side effects.
 
 High-risk work needs an independent challenge source: a different model family, a human reviewer, a normative reference implementation, or a substrate corpus whose oracle was defined independently of the implementation. Save the challenge as a non-empty local artifact beside the report or at another stable local path. An unchecked URL is not evidence.
+
+## Behavioral coverage strength
+
+Run `test-strength` when the diff implements or changes a protocol, parser, serializer, state machine, lifecycle, browser or OS event translation, adapter, or compatibility layer.
+
+Record:
+
+- the explicit behavioral dimensions, values, and externally justified exclusions;
+- an oracle whose expected results are not derived from the production implementation;
+- fixture or generator provenance proving each lifecycle event is semantically valid;
+- fix-absent mutations that fail for the intended reason and restored green evidence;
+- the real input producer and user-visible boundary exercised.
+
+Selected examples do not prove a matrix. A type-valid synthetic object does not prove a reachable event. If a real producer or independent oracle is unavailable, leave the Review Gate run incomplete.

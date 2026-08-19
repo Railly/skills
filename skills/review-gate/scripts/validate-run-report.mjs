@@ -35,7 +35,7 @@ if (!Array.isArray(report?.run?.gaps)) {
 	findings.push("a pass report cannot contain run gaps");
 }
 
-const diffSignals = { highRisk: [], sideEffects: [] };
+const diffSignals = { highRisk: [], sideEffects: [], behavioral: [] };
 if (!structuralOnly) {
 	try {
 		const repositoryHead = execFileSync("git", ["rev-parse", "HEAD"], {
@@ -82,6 +82,18 @@ if (!structuralOnly) {
 				.split("\n")
 				.filter((line) => line.startsWith("+") && !line.startsWith("+++"))
 				.join("\n");
+			if (
+				/(^|\/)(protocol|parser|serializer|codec|encoder|decoder|state[-_]?machine|adapter|compat|keyboard|mouse)(\/|[-_.])/i.test(
+					file,
+				) ||
+				/\b(KeyboardEvent|MouseEvent|PointerEvent|keydown|keyup|mousedown|mouseup|encode|decode|serialize|deserialize|state machine|state transition|protocol flags?)\b/i.test(
+					added,
+				)
+			) {
+				diffSignals.behavioral.push(
+					`${file}: protocol, lifecycle, or event-translation signal`,
+				);
+			}
 			if (
 				/\b(secret|private[_-]?key|credential|password|token|authentication|authorization|permission|access[_ -]?control|acl|encrypt|certificate)\b/i.test(
 					added,
@@ -338,6 +350,99 @@ for (const id of inventoriedPropertyIds) {
 for (const id of propertyIds) {
 	if (!inventoriedPropertyIds.has(id))
 		findings.push(`property ${id} is absent from the claim inventory`);
+}
+
+const behavioralStrength = report?.behavioral_strength;
+if (
+	!behavioralStrength ||
+	!["required", "not_required"].includes(behavioralStrength.assessment)
+) {
+	findings.push(
+		"behavioral_strength.assessment must be required or not_required",
+	);
+} else {
+	requireText(behavioralStrength.evidence, "behavioral_strength.evidence");
+	if (!Array.isArray(behavioralStrength.triggers)) {
+		findings.push("behavioral_strength.triggers must be an array");
+	}
+	if (behavioralStrength.assessment === "required") {
+		if (behavioralStrength.triggers?.length === 0) {
+			findings.push(
+				"required behavioral strength must name at least one trigger",
+			);
+		}
+		if (
+			!Array.isArray(behavioralStrength.dimensions?.values) ||
+			behavioralStrength.dimensions.values.length === 0
+		) {
+			findings.push(
+				"required behavioral strength must record explicit dimensions",
+			);
+		}
+		if (!Array.isArray(behavioralStrength.dimensions?.exclusions)) {
+			findings.push(
+				"behavioral_strength.dimensions.exclusions must be an array",
+			);
+		}
+		requireText(
+			behavioralStrength.dimensions?.evidence,
+			"behavioral_strength.dimensions.evidence",
+		);
+		requireText(
+			behavioralStrength.oracle?.source,
+			"behavioral_strength.oracle.source",
+		);
+		requireText(
+			behavioralStrength.oracle?.evidence,
+			"behavioral_strength.oracle.evidence",
+		);
+		if (behavioralStrength.oracle?.independent !== true) {
+			findings.push(
+				"required behavioral strength needs an oracle independent of production",
+			);
+		}
+		requireText(
+			behavioralStrength.producer?.name,
+			"behavioral_strength.producer.name",
+		);
+		requireText(
+			behavioralStrength.producer?.evidence,
+			"behavioral_strength.producer.evidence",
+		);
+		if (behavioralStrength.producer?.status !== "exercised") {
+			findings.push(
+				"required behavioral strength must exercise the real input producer",
+			);
+		}
+		if (
+			!Array.isArray(behavioralStrength.falsification) ||
+			behavioralStrength.falsification.length === 0
+		) {
+			findings.push(
+				"required behavioral strength needs at least one fix-absent falsification",
+			);
+		} else {
+			for (const [index, mutation] of behavioralStrength.falsification.entries()) {
+				const label = `behavioral_strength.falsification[${index}]`;
+				requireText(mutation?.mutation, `${label}.mutation`);
+				requireText(mutation?.red_evidence, `${label}.red_evidence`);
+				requireText(
+					mutation?.restored_green_evidence,
+					`${label}.restored_green_evidence`,
+				);
+			}
+		}
+	}
+}
+if (
+	diffSignals.behavioral.length > 0 &&
+	behavioralStrength?.assessment !== "required"
+) {
+	findings.push(
+		`diff signals mandatory behavioral strength but assessment is not required: ${[
+			...new Set(diffSignals.behavioral),
+		].join("; ")}`,
+	);
 }
 
 if (!Array.isArray(report?.assumptions)) {
