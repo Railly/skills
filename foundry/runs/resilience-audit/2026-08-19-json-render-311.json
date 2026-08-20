@@ -1,0 +1,18 @@
+{
+  "date": "2026-08-19",
+  "repo": "vercel-labs/json-render#311",
+  "base": "a4d033cf041e7b323ee10f196ef8a3ff2fc1f85f",
+  "status": "pass_with_gap",
+  "cells": [
+    {"fault":"append pressure","oracle":"226 executions instead of 5226","outcome":"preserved_invariant"},
+    {"fault":"binding state-write feedback","oracle":"26 writes and no update-depth error","outcome":"preserved_invariant"},
+    {"fault":"shared-child DAG update","oracle":"11 changes to 22","outcome":"preserved_invariant"},
+    {"fault":"cyclic element graph","oracle":"signature computation terminates","outcome":"graceful_termination"},
+    {"fault":"12000-node graph","oracle":"no RangeError","outcome":"preserved_invariant"},
+    {"fault":"unmount during watch chain","oracle":"second action is not called","outcome":"cleanup_preserved"},
+    {"fault":"component throw then corrective patch","oracle":"corrected value renders","outcome":"recovery_preserved"},
+    {"fault":"cyclic state and BigInt item","oracle":"render completes","outcome":"preserved_invariant"}
+  ],
+  "repetition": "16/16 focused tests, repeated five times",
+  "gaps": ["Chrome heap retention and Fiber collection after forced GC were not measured."]
+}

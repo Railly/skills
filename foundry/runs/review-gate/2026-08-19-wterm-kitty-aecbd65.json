@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-19",
+    "repo": "vercel-labs/wterm",
+    "base": "f5f9c925e4a5e39585a8822c6b6ba1057e2ae909",
+    "head": "aecbd651a64ae9dfd9a218bce368448d1ff67f46",
+    "status": "incomplete",
+    "gaps": [
+      "Two independent Claude-family review invocations hung without output and were aborted; the focused model lens is unavailable."
+    ]
+  },
+  "contract": {
+    "path": "foundry/runs/solution-gate/2026-08-19-wterm-kitty-review-blockers-f5f9c92.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No Issue Contract was provided; the Solution Gate contract and official Kitty protocol were used."]
+  },
+  "provenance": {
+    "author_model": "OpenAI GPT-5 Codex",
+    "reviewer_model": "Claude Opus 5 unavailable after two hung invocations",
+    "same_family": false
+  },
+  "lenses": [
+    {"name":"New-domain matrix","status":"run","reason":"Shifted letters and punctuation, shifted recovery keys, lone and paired modifiers, blur, flags, locks, press, repeat, and release were inspected and driven."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Outputs were checked against the official Kitty keyboard protocol."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Playwright drove real Chromium through textarea, InputHandler, encodeKittyKey, and onData."},
+    {"name":"Error-path forcing","status":"run","reason":"Three production mutations failed at the intended shifted-text, lone-release, and peer-release assertions."},
+    {"name":"Focused independent model review","status":"incomplete","reason":"Cursor Agent and Claude CLI both hung without returning a report."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Existing README and docs already describe negotiated Kitty behavior without the defective outputs."}
+  ],
+  "deterministic": [
+    {"check":"style","outcome":"pass","reason":"gate.sh style passed."},
+    {"check":"callers encodeKittyKey","outcome":"pass","reason":"Every call site is in the reviewed diff."},
+    {"check":"siblings Kitty keyboard","outcome":"pass","reason":"Every matching file is in the diff."},
+    {"check":"format","outcome":"pass","reason":"pnpm format:check passed."},
+    {"check":"type-check","outcome":"pass","reason":"22/22 tasks passed."},
+    {"check":"test","outcome":"pass","reason":"Full matrix passed, including 171 DOM tests."},
+    {"check":"lint","outcome":"pass","reason":"11/11 tasks passed with one pre-existing docs warning."},
+    {"check":"build","outcome":"pass","reason":"15/15 tasks passed."},
+    {"check":"browser E2E","outcome":"pass","reason":"18/18 Chromium tests passed."},
+    {"check":"git diff --check","outcome":"pass","reason":"No whitespace errors."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {"claim":"No documentation update is required.","evidence":"The existing public surfaces describe protocol negotiation; this diff restores those semantics without adding API or user workflow."}
+  ],
+  "issue_candidates": [
+    {"title":"Investigate hanging Claude review runtimes","evidence":"Both Cursor Agent and Claude CLI produced no output for several minutes and required aborting.","reason":"Agent runtime reliability is outside wterm PR #120."}
+  ]
+}

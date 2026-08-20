@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-19",
+    "repo": "vercel-labs/ai-cli",
+    "base": "bfa7f7a9c70167b66c65753e0539bb91bb08e4b7",
+    "head": "1e3cfabbd3cd2eca3aa5f0ba6122ca66f75a5695",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No Issue Contract or separate Spec review was provided."]
+  },
+  "provenance": {
+    "author_model": "GPT-5",
+    "reviewer_model": "GPT-5",
+    "same_family": true
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "run", "reason": "The dependency classifier replaced the local preview-bot matcher; verified five preview bots remain HTML and ClaudeBot remains Markdown." },
+    { "name": "New-domain matrix", "status": "skipped", "reason": "The change narrows agent classification rather than widening accepted input." },
+    { "name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No user-input resolution rule changed." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell parsing changed." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process messaging or latch changed." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No compatibility shim was added." },
+    { "name": "Deliberate-default check", "status": "skipped", "reason": "No default changed." },
+    { "name": "Fresh-seam scan", "status": "run", "reason": "Checked middleware, package classifier, docs route, and Next rewrite seam; pathname contract is unchanged." },
+    { "name": "Substrate differential corpus", "status": "skipped", "reason": "No repeatedly failing local guard exists; upstream classifier corpus is covered by focused regressions." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "No reference implementation was supplied." },
+    { "name": "New-failure-outcome propagation", "status": "skipped", "reason": "No new failure outcome was introduced." },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No CLI flag changed." },
+    { "name": "Error-path forcing", "status": "skipped", "reason": "No error path changed." },
+    { "name": "Non-destructive recovery", "status": "skipped", "reason": "No recovery path changed." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No async lifetime or timeout changed." },
+    { "name": "Boundary pipeline trace", "status": "skipped", "reason": "No new boundary was introduced." },
+    { "name": "Substrate verification", "status": "run", "reason": "Built Next server returned HTML for Slack, Discord, Reddit, Bitly, and Pinterest, and Markdown for ClaudeBot." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "Drove /docs/installation against the production build with all six user agents." },
+    { "name": "Newly-asserted invariant ownership", "status": "skipped", "reason": "No new invariant was asserted in prose." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "Observable crawler representation changed; no documentation contract advertises the package's internal UA list." },
+    { "name": "Demonstrative example", "status": "skipped", "reason": "No documentation example changed." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail exists." },
+    { "name": "Complexity budget", "status": "skipped", "reason": "No loop or per-candidate lookup was added." }
+  ],
+  "deterministic": [
+    { "check": "covered", "outcome": "pass", "reason": "This report covers exact HEAD 1e3cfabbd3cd2eca3aa5f0ba6122ca66f75a5695." },
+    { "check": "style", "outcome": "pass", "reason": "No prohibited punctuation was added." },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "apps/web/app/api/docs-md/[[...slug]]/route.ts and apps/web/next.config.ts are unchanged because middleware pathname and rewrite contracts are identical." },
+    { "check": "force-red", "outcome": "pass", "reason": "On 0.5.0 all five social preview bot assertions failed; on 0.5.1 all six assertions pass." },
+    { "check": "format", "outcome": "pass", "reason": "Biome passed for changed TypeScript files." },
+    { "check": "install-test-typecheck-build", "outcome": "pass", "reason": "Frozen install, focused tests, monorepo typecheck, and web production build passed on exact HEAD." }
+  ],
+  "findings": [
+    {
+      "id": "EX-1",
+      "state": "exempted",
+      "claim": "The docs Markdown route does not need an update.",
+      "evidence": "Middleware still rewrites / to /api/docs-md and every other pathname to /api/docs-md${pathname}; the route contract is unchanged.",
+      "layer": "pathname contract",
+      "source": "gate",
+      "path": "apps/web/middleware.ts -> apps/web/app/api/docs-md/[[...slug]]/route.ts"
+    },
+    {
+      "id": "EX-2",
+      "state": "exempted",
+      "claim": "next.config.ts does not need an update.",
+      "evidence": "The middleware matcher and rewrite callback are unchanged, so explicit .md rewrites remain independent and compatible.",
+      "layer": "rewrite contract",
+      "source": "gate",
+      "path": "apps/web/middleware.ts -> apps/web/next.config.ts"
+    }
+  ],
+  "exemptions": [
+    { "claim": "The docs Markdown route is unaffected.", "evidence": "The pathname-to-/api/docs-md rewrite contract is byte-for-byte unchanged." },
+    { "claim": "next.config.ts is unaffected.", "evidence": "The matcher and rewrite semantics are unchanged; only UA classification moved to the upgraded dependency." }
+  ],
+  "issue_candidates": []
+}

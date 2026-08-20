@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-19",
+    "repo": "vercel-labs/wterm",
+    "base": "cdff1c07890ab2c5ba2efbcc1091f790dfb8f931",
+    "head": "cb2badc787167b9e2a7153b6771ecc8ee0e91e23",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "foundry/runs/solution-gate/2026-08-19-wterm-kitty-review-blockers-f5f9c92.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No Issue Contract was provided; two recorded Solution Gates and the official Kitty protocol were used."
+    ]
+  },
+  "provenance": {
+    "author_model": "OpenAI GPT-5 Codex",
+    "reviewer_model": "Cursor Grok 4.6 High Fast",
+    "same_family": false
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, or lookup data source was replaced."},
+    {"name":"New-domain matrix","status":"run","reason":"Shifted letters and punctuation, recovery keys, keypad identities, locks, flags 1/2/4/8/16, lone and paired modifiers, Meta interleaving, repeat, release, and Cmd+V were reviewed; real Chromium drove load-bearing cells."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"All encodeKittyKey callers were enumerated and shortcut versus protocol ownership is decided in InputHandler before the single encoder boundary."},
+    {"name":"Emission channel and one-shot latch reachability","status":"run","reason":"The browser event path reached InputHandler, encodeKittyKey, and onData; absorbed keydowns were checked against matching keyup suppression."},
+    {"name":"Deliberate-default check","status":"run","reason":"Flags zero and missing Kitty support retain the legacy path; report-all alone changes modifier ownership."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Grok reviewed both HEAD^..HEAD and the cumulative origin/main...HEAD behavior, including deliveredKeys, suppressedKeyUps, pressedModifiers, and blur."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Official Kitty rules and real Chromium differentiated shifted text, modifier state, keypad behavior, recovery releases, and browser shortcuts."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"The root reviewer fetched the official Kitty protocol; Grok additionally compared Ghostty 1.3.1 encoding behavior."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"Negotiated flags were driven from bridge lookup through InputHandler into encoder output for independent and combined states."},
+    {"name":"Error-path forcing","status":"run","reason":"Five production mutations failed at the intended assertions: shifted text, lone release, peer release, Meta modifier bypass, and delivered-key ownership."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Playwright drove real Chromium KeyboardEvents through textarea, InputHandler, encodeKittyKey, and onData."},
+    {"name":"Substrate verification","status":"run","reason":"Observed bytes were asserted from the real browser event producer, not inferred from synthetic event objects."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The built DOM package passed 19 Chromium E2E cases, including Meta lifecycle, interleaved repeat/release, Cmd+V, shifted text, and paired Ctrl."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"InputHandler owns ordered physical modifier and per-key shortcut/protocol lifecycle state; all writers and blur cleanup were enumerated."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Existing docs already describe negotiated Kitty behavior and explicitly state that blur does not synthesize unavailable browser key releases."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail existed for this change."},
+    {"name":"Complexity budget","status":"run","reason":"Per-event Set operations are constant-time; modifier prefix scan is bounded by eight physical modifier codes."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell parsing changed."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No shim was introduced."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No thrown or returned failure outcome was introduced."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action was added; synthetic blur releases were explicitly rejected."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No async wait, timer, or cancellation path changed."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example changed."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"pass","reason":"This report covers exact head cb2badc787167b9e2a7153b6771ecc8ee0e91e23."},
+    {"check":"style","outcome":"pass","reason":"gate.sh style passed."},
+    {"check":"callers encodeKittyKey","outcome":"pass","reason":"Every call site is in a reviewed diff file."},
+    {"check":"siblings Kitty keyboard","outcome":"pass","reason":"Every matching file is represented in the cumulative diff."},
+    {"check":"force-red","outcome":"pass","reason":"Five separate mutations failed their intended assertions and restored green from snapshots."},
+    {"check":"format","outcome":"pass","reason":"pnpm format:check passed."},
+    {"check":"type-check","outcome":"pass","reason":"22/22 tasks passed."},
+    {"check":"test","outcome":"pass","reason":"Full matrix passed, including 172 DOM tests."},
+    {"check":"lint","outcome":"pass","reason":"11/11 tasks passed with one pre-existing docs warning."},
+    {"check":"build","outcome":"pass","reason":"15/15 tasks passed."},
+    {"check":"browser E2E","outcome":"pass","reason":"19/19 Chromium tests passed; the final Cmd+V counterexample also passed in a focused rerun."},
+    {"check":"git diff --check","outcome":"pass","reason":"No whitespace errors."}
+  ],
+  "findings": [
+    {
+      "id": "WTERM-KITTY-META-001",
+      "state": "confirmed",
+      "claim": "Report-all swallowed physical Meta events and current Meta state could suppress the release of a previously delivered key.",
+      "evidence": "Real Chromium produced no bytes for MetaLeft and only CSI 97u for KeyA down then Meta down then KeyA up at aecbd65. At cb2badc it produces the required Meta pair and the complete interleaved press/repeat/release sequence; Cmd+V delivers no V event.",
+      "layer": "DOM keyboard ownership and Kitty emission",
+      "source": "Cursor Grok 4.6 focused lens",
+      "path": "KeyboardEvent -> InputHandler ownership -> encodeKittyKey -> onData"
+    }
+  ],
+  "exemptions": [
+    {"claim":"No documentation update is required.","evidence":"Public docs already promise negotiated Kitty keyboard behavior and describe the browser limitation on unavailable blur releases; the fix restores those semantics without adding API or workflow."}
+  ],
+  "issue_candidates": []
+}

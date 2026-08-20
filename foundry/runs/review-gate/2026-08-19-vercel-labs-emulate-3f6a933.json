@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-19",
+    "repo": "vercel-labs/emulate",
+    "base": "d0219d05818adca4c12bb76ec79a7562c1766a3d",
+    "head": "3f6a9334ed89d2bb72478614f748e9757802be59",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": ["Preserve Slice 3 behavior and regression coverage", "Keep additions below 1000"],
+    "gaps": ["No separate Issue Contract or Spec review result was provided."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "cursor-grok-4.6-xhigh",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "run", "reason": "Runtime moved from two adapters into core; prior Next and Nuxt request surfaces were compared and exercised." },
+    { "name": "New-domain matrix", "status": "run", "reason": "The snapshot parser was regenerated around record, array, optional metadata, legacy, and malformed classes." },
+    { "name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No user-input resolution or discovery rule changed." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell parsing or command append logic changed." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process-channel emission or one-shot notification latch changed." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No shim was added." },
+    { "name": "Deliberate-default check", "status": "run", "reason": "Legacy snapshots without generated metadata and no-persistence behavior were explicitly exercised." },
+    { "name": "Fresh-seam scan", "status": "run", "reason": "The adapter-to-core extraction seam and built-package resolution were inspected and tested." },
+    { "name": "Substrate differential corpus", "status": "skipped", "reason": "No twice-failed detector class required a corpus." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "The feature defines an internal persistence contract rather than mirroring an external implementation." },
+    { "name": "New-failure-outcome propagation", "status": "run", "reason": "Load, initialize, save, parse, and restore failures were forced through exported handlers." },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag was introduced." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Test Strength killed four representative production mutations and Resilience forced every owned failure boundary." },
+    { "name": "Non-destructive recovery", "status": "run", "reason": "Ambiguous initialize/save success and poisoned queues preserved canonical identity and retryability." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "The adapters define no timeout or cancellation policy." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "Seed preparation, snapshot restore, request dispatch, mutation save, and response rewrite were traced across core and both adapters." },
+    { "name": "Substrate verification", "status": "run", "reason": "Built package artifacts, real Request/Response handlers, JWT auth, and filesystem persistence were exercised." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "Built Next and Nuxt adapter exports served and authenticated real GitHub App requests." },
+    { "name": "Newly-asserted invariant ownership", "status": "run", "reason": "All generated identity writers and response surfaces were enumerated; HTTP non-exposure was verified." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "Root, package, web, and skill surfaces were read against generatedSecrets and initialize behavior." },
+    { "name": "Demonstrative example", "status": "run", "reason": "The canonical compare-and-set example requires initialize semantics; sibling docs intentionally summarize it." },
+    { "name": "Choice audit", "status": "run", "reason": "All nine decisions in the untracked trail map to force-red or resilience evidence." },
+    { "name": "Complexity budget", "status": "run", "reason": "The extraction adds only service-count and snapshot-size linear passes; no nested membership regression was found." }
+  ],
+  "deterministic": [
+    { "check": "build, type-check, test, lint, format, diff-check", "outcome": "pass", "reason": "All repository commands completed successfully." },
+    { "check": "style", "outcome": "pass", "reason": "No prohibited punctuation in added prose or comments." },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "The generic GitHub map requested CLI index, but this adapter-only behavior does not alter CLI; the file was read and remains correct." },
+    { "check": "siblings generatedSecrets", "outcome": "acknowledged", "reason": "Untouched hits describe the separate programmatic API, CLI artifact, tests, or changelog; adapter-specific GitHub and framework surfaces were updated." },
+    { "check": "siblings initialize", "outcome": "acknowledged", "reason": "Untouched generic initialization references are unrelated; framework persistence contract passages agree with core." },
+    { "check": "callers createAdapterRuntime", "outcome": "pass", "reason": "Every caller is in the diff." },
+    { "check": "callers filePersistence", "outcome": "pass", "reason": "Every caller is in the diff." },
+    { "check": "Test Strength", "outcome": "pass", "reason": "Four representative mutants killed at the built-package boundary." },
+    { "check": "Resilience Audit", "outcome": "pass", "reason": "Ten pressure rounds passed." },
+    { "check": "Grok review", "outcome": "pass", "reason": "cursor-grok-4.6-xhigh returned ZERO ACTIONABLE FINDINGS." }
+  ],
+  "findings": [],
+  "exemptions": [
+    { "claim": "CLI index need not change", "evidence": "The diff changes adapter handler persistence and does not change CLI commands, flags, or output; packages/emulate/src/index.ts was read." },
+    { "claim": "Programmatic generatedSecrets passages need not change", "evidence": "They describe createEmulator.generatedSecrets property semantics, while this slice adds adapter handler generatedSecrets() methods." },
+    { "claim": ".decisions.tsv remains untracked", "evidence": "It is an implementation audit trail, not a shipped repository surface, and was read for Choice Audit." }
+  ],
+  "issue_candidates": []
+}

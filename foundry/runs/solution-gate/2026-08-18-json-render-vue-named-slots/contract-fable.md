@@ -1,0 +1,57 @@
+# Contract reconstruction: Vue named-slot parity
+
+## 1. Property
+
+For every spec that the shared core accepts, `@json-render/vue` must render the element-level named-slot map — `slots?: Record<string, string[]>` on `UIElement` (`packages/core/src/types.ts:68`) — as named content delivered to the registered component, distinct from `children`, which remains the default-slot content (`packages/core/src/types.ts:66-67`). The semantics delivered at runtime must be the ones core already validates: per-slot missing-child errors (`packages/core/src/spec-validator.ts:134-147`), slot descendants counted as reachable (`spec-validator.ts:324-332`), slot subtrees excluded from the owning element's repeat scope (`spec-validator.ts:289-298`), and lossy autofix pruning of dangling slot references (`spec-validator.ts:490-514`). Today Vue drops all of this: the renderer maps only `resolvedElement.children` into Vue's default slot (`packages/vue/src/renderer.ts:398-440`), the Vue spec schema has no element-level `slots` field (`packages/vue/src/schema.ts:13-30`), so core's `supportsNamedSlots` detection is false for Vue (`packages/core/src/schema.ts:663-677`) and prompt output suppresses named-slot capability listings (`schema.ts:830-851`) even though Vue catalogs already declare `slots: string[]` per component (`packages/vue/src/schema.ts:39-40`).
+
+## 2. Observable success condition
+
+Given a Vue catalog component declaring `slots: ['header', 'default']` (`packages/vue/src/schema.ts:39-40`) and a spec element with `children: [...]` plus `slots: { header: ["h1"] }`:
+
+- The Vue spec schema accepts the element (parity with `packages/react/src/schema.ts:25`), making `elementShape.slots` defined so core reports `supportsNamedSlots === true` (`packages/core/src/schema.ts:677`) and prompt generation emits `slots: header` capability suffixes (`schema.ts:830-851`).
+- The rendered DOM contains the `h1` subtree in the position the component assigns to its `header` slot, and the `children` subtree in the default position — mirroring React, where named-slot keys are rendered separately and passed through a `slots` component input while `children` stays default content (`packages/react/src/renderer.tsx:422-482`; `packages/react/src/catalog-types.ts:60-74`).
+- Registry render functions (both the low-level registry and `defineRegistry`) can consume the named content; today they receive only evaluated default-slot children (`packages/vue/src/renderer.ts:430-440, 783-790, 849-858`).
+- Runtime behavior matches core-validated semantics in the discriminator matrix below (missing refs, repeat scope, nested conversion).
+
+## 3. Must not change
+
+- The shared `UIElement` shape — `children` for default, `slots` for named (`packages/core/src/types.ts:58-81`). Vue consumes it; it does not fork it.
+- Core validator behavior and its tests: slot missing-child errors with the slot name in the message (`packages/core/src/spec-validator.test.ts:62-82`), and named slots not inheriting the owning element's repeat scope (`spec-validator.test.ts:327-353`; `spec-validator.ts:289-298`).
+- Vue's default-child API: registry functions keep receiving `children` as evaluated VNodes (`packages/vue/src/renderer.ts:783-790, 849-858`; `packages/vue/src/catalog-types.ts:58-72`), and low-level registry components keep receiving `{ element, emit, on, bindings, loading }` props with children as Vue's default slot (`packages/vue/src/renderer.ts:65-79, 430-440`). Any slot delivery must be additive.
+- The Vue catalog's existing `slots: string[]` capability declaration (`packages/vue/src/schema.ts:39-40`).
+- `nestedToFlat` output: `slots` emitted as a map of generated keys, omitted when empty (`packages/core/src/types.ts:750-768`).
+- Core's `supportsNamedSlots` detection mechanism — Vue opts in by adding `slots` to its element shape, not by changing core (`packages/core/src/schema.ts:663-677`).
+- Loading-phase tolerance: missing referenced elements are skipped silently while `loading` is true (`packages/vue/src/renderer.ts:407-416`; `packages/react/src/renderer.tsx:422-435`).
+
+## 4. Boundaries
+
+**Trust.** The renderer trusts core validation for well-formedness but must survive invalid input at runtime: missing referenced elements render as nothing, warning only after loading (`packages/react/src/renderer.tsx:425-433`; `packages/vue/src/renderer.ts:410-416`). Slot names arriving in a spec are untrusted relative to catalog declarations; React checks them against registry metadata and warns without failing (`packages/react/src/renderer.tsx:406-420`).
+
+**Authority.** Core owns spec semantics: what `slots` means, missing-child validation, reachability, repeat scoping, autofix (`packages/core/src/spec-validator.ts:134-147, 289-298, 324-332, 490-514`). The catalog owns the set of declared slot names per component (`packages/vue/src/schema.ts:39-40`). The renderer owns only the delivery mechanism and runtime warning policy; React's warn-on-`slots.default` and warn-on-undeclared behavior (`packages/react/src/renderer.tsx:410-418`) is renderer policy, not core-enforced, and the packet marks the Vue policy as unknown.
+
+**Ownership.** The element-level schema gap lives in `packages/vue/src/schema.ts:13-30` and is Vue's to fill (React's equivalent: `packages/react/src/schema.ts:25`). Prompt-side effects flow automatically from core once the shape exists (`packages/core/src/schema.ts:677, 830-851`). React additionally ships a package-local prompt rule for named slots (`packages/react/src/schema.ts:84`); Vue's `defaultRules` (`packages/vue/src/schema.ts:78-96`) are Vue-owned.
+
+**Lifecycle.** While a spec streams in (`loading: true`), dangling slot references must be skipped without warnings; after loading they warn and render nothing (`packages/react/src/renderer.tsx:425-433`). Validation-time, the same dangling reference is a `missing_child` error naming the slot (`packages/core/src/spec-validator.ts:134-147`), and lossy autofix removes it (`spec-validator.ts:490-514`).
+
+**Compatibility.** Existing Vue specs without `slots` must render byte-identically (current path: `packages/vue/src/renderer.ts:398-440`). Existing registry components typed against `DefineRegistryComponentFn` (`renderer.ts:783-790`) and `BaseComponentProps` (`packages/vue/src/catalog-types.ts:58-72`) must keep compiling and working. React fixes the cross-renderer precedent: `slots` as a sibling input to `children` (`packages/react/src/catalog-types.ts:60-74`).
+
+## 5. Discriminator matrix
+
+| Cell | Required observable behavior | Evidence |
+|---|---|---|
+| children only | Unchanged: children resolve to VNodes and render as the component's default slot. | `packages/vue/src/renderer.ts:398-440` (current baseline to preserve) |
+| one named slot | Slot subtree renders into the named channel, not merged into default; children unaffected. | React precedent `packages/react/src/renderer.tsx:462-482`; capability declared at `packages/vue/src/schema.ts:39-40` |
+| multiple named slots | Each name maps independently to its own rendered subtree. | `packages/react/src/renderer.tsx:462-469` (per-entry map over `resolvedElement.slots`) |
+| `slots.default` | React warns "Use children for default slot content" yet still includes the entry in the delivered `slots` map. Vue policy is an open unknown; potential collision with Vue's native `default` slot makes this sharper for Vue. | `packages/react/src/renderer.tsx:410-413, 462-469`; packet Unknown; current default-slot use at `packages/vue/src/renderer.ts:439` |
+| undeclared named slot | React warns listing available slots and still renders; the check only fires when registry metadata exists (set by `defineRegistry`/catalog paths), so bare low-level registries get no warning. Vue has no metadata channel today. | `packages/react/src/renderer.tsx:92-95, 406-420, 816-821`; no `registryMetadata` equivalent anywhere in `packages/vue/src` |
+| missing referenced element, while loading | Skip silently — no warning, nothing rendered for that key. | `packages/react/src/renderer.tsx:425-433`; Vue's children equivalent `packages/vue/src/renderer.ts:410-416` |
+| missing referenced element, after loading | Console warning naming the slot and owning component type; element renders as nothing. Validation reports `missing_child` citing the slot; autofix prunes the reference. | `packages/react/src/renderer.tsx:426-432`; `packages/core/src/spec-validator.ts:134-147, 490-514`; `spec-validator.test.ts:62-82` |
+| repeat on owning element + named-slot content | Children repeat once per item under the item scope; named-slot content renders once, outside the repeat scope. `$item` inside slot content relative to the owner's repeat is a scope error. | Runtime: `packages/react/src/renderer.tsx:449-469` (slots via `renderChildKeys`, not `RepeatChildren`) and `renderer.tsx:566-578` (repeat maps only `element.children`). Validation: `packages/core/src/spec-validator.ts:281-298` (slot children validated with the parent's `repeatBasePath`, not the child scope); `spec-validator.test.ts:327-353` |
+| nested spec converted to flat | `nestedToFlat` walks nested `slots`, assigns generated keys, and emits a flat `slots` map (omitted when empty). The Vue renderer and schema must accept this output. | `packages/core/src/types.ts:685-692, 750-768` |
+| direct low-level registry vs `defineRegistry` | React delivers the rendered `slots` input to both paths unconditionally (`renderer.tsx:471-482`); only the metadata-based warning differs, since `defineRegistry` registers catalog metadata (`renderer.tsx:816-821`). Vue's two paths differ today — low-level components get props plus a native `{ default }` slot (`renderer.ts:430-440`); `defineRegistry` wraps them and forwards `slots.default?.()` as `children` (`renderer.ts:849-858`). The contract requires named content to reach both without breaking either signature. | `packages/react/src/renderer.tsx:92-95, 471-482, 800-821`; `packages/vue/src/renderer.ts:430-440, 783-790, 817-860` |
+
+## 6. Blocking unknowns
+
+1. **Undeclared-slot runtime policy** (packet-declared). React warns and renders (`packages/react/src/renderer.tsx:414-418`); whether Vue should reject, warn, or render silently is undecided. Compounding it: Vue has no `registryMetadata` mechanism (React's is `packages/react/src/renderer.tsx:92-95, 816-821`), so the source of declared slot names at runtime — catalog wiring through `defineRegistry`/`createCatalogRenderer` (`packages/vue/src/renderer.ts:817-860, 952-959`) — is unresolved.
+2. **Registry-author API shape** (packet-declared). Whether component authors receive an abstract `Record<string, VNode[]>` (paralleling React's `slots?: Record<string, ReactNode>`, `packages/react/src/catalog-types.ts:63`), Vue-native slot functions passed in `h()`'s slots argument (as `children` is today, `packages/vue/src/renderer.ts:439`), or something else. This decision determines the additive changes to `ComponentRenderProps` (`renderer.ts:65-79`), `DefineRegistryComponentFn` (`renderer.ts:783-790`), and `BaseComponentProps` (`packages/vue/src/catalog-types.ts:58-72`).
+3. **`slots.default` collision semantics in Vue.** React's warn-and-pass-through (`packages/react/src/renderer.tsx:410-413, 462-469`) has no direct Vue analogue: if named slots are delivered as native Vue slots, a spec-supplied `default` entry would collide with the `children`-backed default slot already passed at `packages/vue/src/renderer.ts:439`. Which side wins, or whether the entry is dropped, cannot be inferred from base evidence.

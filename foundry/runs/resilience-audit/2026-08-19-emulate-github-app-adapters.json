@@ -1,0 +1,41 @@
+{
+  "date": "2026-08-19",
+  "repo": "vercel-labs/emulate",
+  "head": "7e9a1ed88a5be51fdaf796a0c2164b3548e34f80",
+  "verdict": "pass",
+  "forced": [
+    "corrupt persisted snapshot",
+    "first generated-identity save failure followed by retry",
+    "first generated-identity initialize failure followed by retry",
+    "initialize publication followed by lost response",
+    "save publication followed by lost response",
+    "transient persistence load failure followed by retry",
+    "malformed canonical initialize response",
+    "later mutating save failure followed by save-queue recovery",
+    "concurrent cold-start identity selection",
+    "eight-way concurrent cold-start identity selection",
+    "stale seeded:false preparation after another process seeds",
+    "initialize publication failure and temporary-file cleanup",
+    "legacy snapshot without generated-secret metadata",
+    "explicit key exclusion",
+    "HTTP private-key non-exposure"
+  ],
+  "preserved": [
+    "one canonical identity across cold starts",
+    "first request does not succeed until generated identity is durable",
+    "failed initialization can retry",
+    "failed preparation clears only its own rejected promise",
+    "failed first save preserves the generated identity and original JWT",
+    "ambiguous initialize and save success preserve the generated identity",
+    "failed later saves do not poison the save queue",
+    "file saves and initialization publish atomically",
+    "temporary files are removed after success and failure",
+    "corruption fails closed when identity would rotate",
+    "legacy snapshots still authenticate existing JWTs",
+    "generated keys remain server-only"
+  ],
+  "gaps": [
+    "Cross-platform filesystem semantics remain represented by CI rather than a local multi-OS run.",
+    "The custom persistence contract was driven with a deterministic compare-and-set implementation rather than a specific third-party Redis client."
+  ]
+}

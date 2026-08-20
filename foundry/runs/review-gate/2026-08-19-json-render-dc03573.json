@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-19",
+    "repo": "vercel-labs/json-render#311",
+    "base": "a4d033cf041e7b323ee10f196ef8a3ff2fc1f85f",
+    "head": "dc035735521d2b0eefd3dcc3913002fec8d6eaa7",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-19-json-render-311-streaming-oom/packet.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"],
+    "gaps": ["No separate Spec Review result was provided; Solution Gate reviewed the acceptance IDs."]
+  },
+  "provenance": {
+    "author_model": "OpenAI GPT-5 Codex",
+    "reviewer_model": "Google Gemini 3.7 Flash through Vercel AI Gateway",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["React lifecycle and memory-pressure regression"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "evidence/2026-08-19-json-render-325-missing-props.md",
+      "evidence": "Grok reviewed the complete accumulated diff after the external finding fix and returned PASS."
+    }
+  },
+  "claim_inventory": [
+    {"source":"contract","location":"Solution Gate packet","status":"reviewed","properties":["P1","P2","P3"],"evidence":"R0-R8 reviewed."},
+    {"source":"design","location":"Solution Gate decision","status":"reviewed","properties":["P1","P2","P3"],"evidence":"Renderer-level memo and stabilization shape reviewed."},
+    {"source":"user_facing","location":"Issue #311","status":"reviewed","properties":["P1","P2"],"evidence":"Append-paced execution and update loop reproduced."},
+    {"source":"implementation","location":"renderer.tsx and validation.tsx","status":"reviewed","properties":["P1","P2","P3"],"evidence":"Full diff, regressions, mutations, and cross-family review."}
+  ],
+  "properties": [
+    {
+      "id":"P1","claim":"A patch to one element does not execute unchanged element renderers or catalog components.","kind":"availability","status":"verified",
+      "oracle":{"observes":"component and directive executions per append-paced patch","layer":"React renderer","method":"200 separate Testing Library act commits","proxy_only":false},
+      "proxy_challenge":{"proxy":"catalog render count alone","counterexample":"catalog memo passes while internal directive hooks still execute","attempted":true,"outcome":"separated","evidence":"Gemini found this exact counterexample; the element-execution test now fails at 5226 without the wrapper."},
+      "substrates":[{"name":"React with jsdom","status":"exercised","evidence":"226 executions instead of 5226."}],
+      "evidence":"Focused regression and wrapper force-red."
+    },
+    {
+      "id":"P2","claim":"Stable bindings do not create an update-depth feedback loop.","kind":"availability","status":"verified",
+      "oracle":{"observes":"absence of update-depth error and bounded writes","layer":"React effect and state store","method":"binding-dependent write effect","proxy_only":false},
+      "proxy_challenge":{"proxy":"stable render count","counterexample":"bindings can churn even if catalog work is otherwise bounded","attempted":true,"outcome":"separated","evidence":"Removing binding stabilization restores the loop."},
+      "substrates":[{"name":"React with jsdom","status":"exercised","evidence":"26 writes and no Maximum update depth error."}],
+      "evidence":"Binding loop force-red and restored green."
+    },
+    {
+      "id":"P3","claim":"Memoization preserves structural, state, callback, cleanup, and recovery semantics.","kind":"correctness","status":"verified",
+      "oracle":{"observes":"fresh DOM values, callbacks, cleanup and recovery","layer":"React renderer and contexts","method":"focused behavioral matrix","proxy_only":false},
+      "proxy_challenge":{"proxy":"green performance test","counterexample":"fast output can still be stale or fail recovery","attempted":true,"outcome":"separated","evidence":"DAG, callback, own-key, watch cleanup and corrective-patch tests directly observe semantics."},
+      "substrates":[{"name":"React with jsdom","status":"exercised","evidence":"16/16 focused tests."}],
+      "evidence":"Mutation-tested behavior matrix."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment":"required",
+    "triggers":["React lifecycle and graph invalidation"],
+    "dimensions":{"values":["patches","complete specs","state","repeat scope","functions","directives","DAG","cycles","deep graph","unmount","error recovery","cyclic runtime values","BigInt"],"exclusions":["Chrome forced-GC heap profile"],"evidence":"16 focused cells and force-red mutations."},
+    "oracle":{"source":"Testing Library DOM, callback observations, and execution counters","independent":true,"evidence":"Assertions observe outputs and effects outside the implementation."},
+    "producer":{"name":"buildSpecFromParts plus direct Spec consumers","status":"exercised","evidence":"200 append-paced patch rebuilds and direct complete-spec rerenders."},
+    "falsification":[
+      {"mutation":"disable ElementRenderer bailout","red_evidence":"5226 executions instead of 226","restored_green_evidence":"226 executions"},
+      {"mutation":"remove own-key check","red_evidence":"foo remains instead of bar","restored_green_evidence":"bar renders"},
+      {"mutation":"remove watch cleanup or error reset","red_evidence":"post-unmount action or blank recovery","restored_green_evidence":"action cancelled and corrected value renders"}
+    ],
+    "evidence":"Test Strength report."
+  },
+  "assumptions": [
+    {"id":"A1","source":"Solution Gate","claim":"Direct complete-spec consumers still update changed elements.","status":"verified","evidence":"Direct renderer regression."},
+    {"id":"A2","source":"Subsystem model","claim":"All callback and scope inputs invalidate the catalog boundary.","status":"verified","evidence":"Repeat, function, directive and action mutations."},
+    {"id":"A3","source":"Subsystem model","claim":"Graph traversal handles DAGs, cycles and depth without stale output or overflow.","status":"verified","evidence":"Shared-child, cycle and 12000-node tests."}
+  ],
+  "side_effects": {
+    "assessment":"present",
+    "evidence":"The gate classifies the test's state-store write as a side effect. It is in-memory rather than durable, but its post-write React lifecycle was forced and recovered.",
+    "commit_points":[
+      {
+        "id":"CP1",
+        "effect":"A catalog component effect writes a new value to the in-memory React state store.",
+        "owner":"StateProvider",
+        "commit_event":"set('/metric-0', writes) updates the store snapshot.",
+        "later_fallible_stages":["React rerender and effect dependency evaluation"],
+        "failure_partitions":[
+          {
+            "ownership_region":"React state store and catalog effect",
+            "covers":["React rerender and effect dependency evaluation"],
+            "forced":true,
+            "residual_observed":"Without stabilization, the effect loops until Maximum update depth; with the fix, it settles after 26 writes and leaves the current in-memory value.",
+            "cleanup_owner":"React unmount and StateProvider lifetime",
+            "retry":{"attempted":true,"outcome":"success","evidence":"After restoring stabilization, the same render operation completes with 26 writes and no update-depth error."},
+            "evidence":"Binding-loop force-red and restored-green regression."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser or lookup source was replaced."},
+    {"name":"New-domain matrix","status":"skipped","reason":"No accepted external input domain was widened."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No resolution rule changed."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell parsing changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No process channel or latch changed."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No shim changed."},
+    {"name":"Deliberate-default check","status":"run","reason":"Stable validation default preserves empty-function semantics without per-render allocation."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Memo boundaries checked against every reactive prop, callback, scope and descendant input."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No twice-failed detector or guard class."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"No independent reference implementation applies."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No new public failure outcome."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No flags changed."},
+    {"name":"Error-path forcing","status":"run","reason":"Update loop, stale callbacks, deep graph and component throw were forced."},
+    {"name":"Non-destructive recovery","status":"run","reason":"A component throw followed by a corrective patch now recovers."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Unmount during a pending watch chain cancels its remaining action."},
+    {"name":"Boundary pipeline trace","status":"skipped","reason":"No new process, protocol or frame boundary."},
+    {"name":"Substrate verification","status":"run","reason":"React renderer behavior was observed through jsdom and Testing Library."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The real React package boundary processed patch streams and state writes."},
+    {"name":"Newly-asserted invariant ownership","status":"skipped","reason":"No new public invariant was documented."},
+    {"name":"Docs-behavior parity","status":"skipped","reason":"No public behavior contract changed."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example changed."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail was provided."},
+    {"name":"Complexity budget","status":"run","reason":"Signature traversal is iterative O(elements plus structural edges) per complete spec."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"pass","reason":"Run report exists for exact HEAD dc03573."},
+    {"check":"style","outcome":"pass","reason":"No prohibited punctuation in added lines."},
+    {"check":"surfaces","outcome":"pass","reason":"No public contract delta requires docs."},
+    {"check":"force-red","outcome":"pass","reason":"Bailout, keys, bindings, callbacks, DAG, traversal, cleanup and recovery failed at intended assertions."},
+    {"check":"tests","outcome":"pass","reason":"Repository 1086/1086; focused 17/17."},
+    {"check":"type-check","outcome":"pass","reason":"59/59 tasks."},
+    {"check":"lint-format-diff","outcome":"pass","reason":"Lint, Prettier and git diff --check pass."}
+  ],
+  "findings": [
+    {"id":"F1","state":"confirmed","claim":"Recursive signature traversal overflowed on deep graphs.","evidence":"A 12000-node force-red threw RangeError; iterative traversal passes.","layer":"signature traversal","source":"lens","path":"useElementSignatures","resolution":"fixed"},
+    {"id":"F2","state":"confirmed","claim":"Catalog memo retained stale repeat, function and directive callbacks.","evidence":"Focused mutations observed stale values; restored comparator passes.","layer":"catalog callback boundary","source":"lens","path":"CatalogComponentBoundary","resolution":"fixed"},
+    {"id":"F3","state":"confirmed","claim":"Runtime serialization rejected cyclic and BigInt values.","evidence":"Cyclic state plus BigInt regression passes without runtime-value serialization.","layer":"catalog memo boundary","source":"lens","path":"CatalogComponentBoundary","resolution":"fixed"},
+    {"id":"F4","state":"confirmed","claim":"Unchanged internal element renderers still executed tree-wide.","evidence":"Gemini round 1 plus force-red: 5226 executions without the wrapper, 226 restored.","layer":"element renderer boundary","source":"lens","path":"ElementRenderer","resolution":"fixed"},
+    {"id":"F5","state":"confirmed","claim":"Missing and own undefined keys were treated as equal.","evidence":"Gemini round 1 plus force-red: foo remained instead of bar without own-key check.","layer":"resolved prop identity","source":"lens","path":"stabilizeRecord","resolution":"fixed"},
+    {"id":"F6","state":"confirmed","claim":"A type-first streamed element crashed before its required props arrived.","evidence":"Vercel Agent Review finding reproduced through buildSpecFromParts. Removing the signature guard fails in useElementSignatures; removing renderer normalization fails in resolveBindings; restored code renders waiting then ready.","layer":"partial streamed element lifecycle","source":"lens","path":"buildSpecFromParts -> useElementSignatures -> ReactiveElementRenderer","resolution":"fixed"}
+  ],
+  "exemptions": [
+    {"claim":"No documentation update.","evidence":"Public renderer, binding and stream contracts are unchanged."}
+  ],
+  "issue_candidates": [
+    {"title":"Measure Chrome heap and Fiber retention under long append-paced streaming","evidence":"jsdom proves work elimination and loop removal but not browser forced-GC collection.","why_out_of_scope":"Additional operational memory evidence rather than a known defect in this diff."}
+  ]
+}
