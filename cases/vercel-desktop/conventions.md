@@ -27,7 +27,7 @@ Application state, commands, windows, timers, and menu-bar presentation live in 
 
 - The Vercel control item and Gateway Spend amount are separate adjacent macOS status items. Their widths must be explicit when compact spacing is required.
 - The spend amount uses the regular macOS system Sans path when its presentation is not monospaced.
-- The Vercel CLI runs through a non-interactive login shell. Login startup files resolve user-installed CLI paths, while `.zshrc`, prompts, ZLE, and interactive shell workers must not run inside GUI-owned subprocesses.
+- The Vercel CLI runs from a probed absolute path with an explicit runtime `PATH`. Shell startup files, prompts, ZLE, and interactive shell workers must not run inside GUI-owned subprocesses.
 - Removing a window-backed feature also removes its commands, model state, effects, timers, markup, platform helpers, fixtures, and tests.
 
 ## Gate-miss ledger
