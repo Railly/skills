@@ -1,0 +1,44 @@
+{
+  "skill_name": "work-intake",
+  "evals": [
+    {
+      "id": 1,
+      "name": "support-question-stops-before-code",
+      "prompt": "Assess petdex issue #707. The body only asks how to move the pet. Decide what the factory should do next.",
+      "expected_output": "A read-only question-support assessment recommends support-response-v1, cites the question as evidence, preserves unknowns, and forbids implementation and promotion.",
+      "assertions": [
+        "Classifies the source as question-support",
+        "Recommends support-response-v1",
+        "Includes a no-mutation receipt",
+        "Stops for human confirmation without invoking solution-gate"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "ambiguous-bug-remains-read-only",
+      "prompt": "Assess an issue whose entire report is: The app crashes sometimes. Fix it.",
+      "expected_output": "An unverified-bug assessment uses low confidence, lists missing reproduction context, and recommends bug-reproduction-v1 rather than implementation.",
+      "assertions": [
+        "Classifies the source as unverified-bug",
+        "Records missing reproduction details as unknowns",
+        "Recommends bug-reproduction-v1",
+        "Does not authorize a code change"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "existing-pr-routes-to-review",
+      "prompt": "Assess PR #91 at head 0123456789012345678901234567890123456789 and tell me whether the factory should implement the request.",
+      "expected_output": "A pull-request-review assessment preserves the exact head SHA, recommends pull-request-review-v1, and forbids implementation of a competing change.",
+      "assertions": [
+        "Classifies the source as pull-request-review",
+        "Preserves the exact head SHA",
+        "Recommends pull-request-review-v1",
+        "Routes findings to successor work instead of editing the PR"
+      ],
+      "files": []
+    }
+  ]
+}

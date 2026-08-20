@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-13",
+    "repo": "petdex",
+    "base": "6352f8dee1f1dbea0c1e790cc409b51d5a3eb606",
+    "head": "ce57ea5e7e6d6484026680ce4d8a05b34f362447",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Herdr status events produce token-gated Petdex bubbles and aggregate state",
+      "direct Petdex hook agents remain excluded by default",
+      "clicking the pet focuses the exact active Herdr agent pane",
+      "the Petdex hook kill switch remains authoritative"
+    ],
+    "gaps": ["No separate Issue Contract or Spec review status was supplied; this report records the implementation and Standards gate."]
+  },
+  "provenance": {
+    "author_model": "GPT-5.6 Codex",
+    "reviewer_model": "OpenCode big-pickle exact-SHA review",
+    "same_family": false
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "run", "reason": "The bridge was checked against richer direct hooks so excluded agents retain their existing path by default."},
+    {"name": "New-domain matrix", "status": "run", "reason": "Agent aliases, five Herdr states, missing event fields, malformed pane ids, and missing Herdr executable paths were exercised."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Missing Herdr, absent token, the hook kill switch, released panes, and non-matching plugin events were reviewed or forced."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "The path was traced from the Herdr event envelope through Bun, the token-gated server, mailbox metadata, and exact-pane focus."},
+    {"name": "Substrate verification", "status": "run", "reason": "An isolated native Petdex server received a real blocked Herdr event and exposed waiting state plus the expected bubble."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "The ReleaseFast native app was built, the local plugin was linked and enabled, its test action was exercised, and real Herdr pane focus succeeded."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Setup, mappings, direct-hook defaults, concurrency limits, outside-Herdr state visibility, and focus fallback are documented."}
+  ],
+  "deterministic": [
+    {"check": "style", "outcome": "pass", "reason": "review-gate style check passed."},
+    {"check": "surfaces", "outcome": "pass", "reason": "Petdex convention surfaces are covered."},
+    {"check": "siblings Herdr", "outcome": "pass", "reason": "Every Herdr documentation sibling is covered by the diff."},
+    {"check": "callers setBubbleWithMetadata", "outcome": "pass", "reason": "Every call site is in the diff and the only hook_runner.run caller forwards HERDR_PANE_ID."},
+    {"check": "Bun bridge tests", "outcome": "pass", "reason": "9 tests passed with 28 assertions."},
+    {"check": "native tests", "outcome": "pass", "reason": "189 of 189 tests passed on the exact final SHA."},
+    {"check": "ReleaseFast build", "outcome": "pass", "reason": "The baseline native app built successfully with tracing disabled."},
+    {"check": "Biome", "outcome": "pass", "reason": "523 files checked with no errors; one pre-existing informational suggestion remains in petdex-cli tests."},
+    {"check": "isolated end-to-end bridge", "outcome": "pass", "reason": "A blocked Cursor event produced waiting state and a Needs approval bubble through the real local server."},
+    {"check": "exact-SHA independent review", "outcome": "pass", "reason": "OpenCode found no high or medium findings at ce57ea5e7e6d6484026680ce4d8a05b34f362447."}
+  ],
+  "findings": [
+    {
+      "id": "MVP-1",
+      "state": "exempted",
+      "claim": "Near-simultaneous Herdr event processes can apply stale aggregate state last.",
+      "evidence": "The README names the last-write-wins behavior and direct hooks or later events self-heal the global state.",
+      "layer": "event aggregation",
+      "source": "lens",
+      "path": "Herdr event process -> agent list snapshot -> Petdex /state"
+    },
+    {
+      "id": "MVP-2",
+      "state": "exempted",
+      "claim": "A directly hooked agent outside Herdr is invisible to the Herdr aggregate.",
+      "evidence": "The README states the limit and the next direct hook restores its richer state.",
+      "layer": "cross-runtime aggregation",
+      "source": "lens",
+      "path": "outside-Herdr direct hook -> global Petdex state <- Herdr aggregate"
+    },
+    {
+      "id": "MVP-3",
+      "state": "exempted",
+      "claim": "Exact-pane focus has no dedicated timeout and can fall back to no-op for pure bridge bubbles after an agent is released.",
+      "evidence": "Real focus completed successfully, released-pane fallback is documented, and this is accepted for the local MVP.",
+      "layer": "desktop focus",
+      "source": "lens",
+      "path": "pet tap -> herdr agent focus -> originating application fallback"
+    }
+  ],
+  "exemptions": [
+    {"claim": "Per-event aggregate ordering", "evidence": "Documented as an MVP last-write-wins limit with later-event self-healing."},
+    {"claim": "Outside-Herdr direct-agent visibility", "evidence": "Documented as an MVP global-state limit restored by the next direct hook."},
+    {"claim": "Synchronous pane focus", "evidence": "Real Herdr focus passed and released-pane fallback is documented for the MVP."}
+  ],
+  "issue_candidates": []
+}

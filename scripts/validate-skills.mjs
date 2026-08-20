@@ -24,7 +24,6 @@ const INSTALLER_GROUPS = {
 };
 const CANONICAL_WRITERS = new Set([
 	"issue-intake",
-	"pick-an-issue",
 	"record-a-case",
 	"review-gate",
 	"trail-decisions",

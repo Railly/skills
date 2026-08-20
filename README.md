@@ -102,7 +102,7 @@ Not every cycle reaches a case. When work stops with the cycle still open, `hand
 
 ## Maturity
 
-Distribution channel and evidence maturity are separate. Stable contains four canonical skills plus the temporary `pick-an-issue` compatibility alias. Solution Gate is stable by explicit human promotion backed by multiple dogfood runs, while its orchestration redesign and formal baseline comparison remain unevaluated. Candidate and Experimental skills remain installable without implying validation.
+Distribution channel and evidence maturity are separate. Stable contains four canonical skills. Solution Gate is stable by explicit human promotion backed by multiple dogfood runs, while its orchestration redesign and formal baseline comparison remain unevaluated. Candidate and Experimental skills remain installable without implying validation.
 
 The source of truth is [foundry/maturity.json](foundry/maturity.json).
 
@@ -127,8 +127,6 @@ The interactive installer exposes three distinct groups: `Stable`, `Candidates`,
 ```bash
 bunx skills add Railly/skills --skill issue-intake --skill record-a-case --skill review-gate --skill solution-gate
 ```
-
-`pick-an-issue` is a deprecated compatibility alias for `issue-intake` during the v0.0.4 migration window. New installations and workflow references should use `issue-intake`.
 
 Install a candidate explicitly with:
 

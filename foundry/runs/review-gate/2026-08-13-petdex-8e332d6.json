@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-13",
+    "repo": "petdex",
+    "base": "6352f8dee1f1dbea0c1e790cc409b51d5a3eb606",
+    "head": "8e332d63a96124e783977916a500dd9a27d515e5",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Herdr agent aliases display the matching Petdex logo",
+      "unknown agents display the fallback logo in newest and older cards",
+      "bubble title and status remain a compact text block"
+    ],
+    "gaps": ["No separate Issue Contract or Spec review status was supplied."]
+  },
+  "provenance": {
+    "author_model": "GPT-5.6 Codex",
+    "reviewer_model": "OpenCode big-pickle exact-SHA review",
+    "same_family": false
+  },
+  "lenses": [
+    {"name": "New-domain matrix", "status": "run", "reason": "Claude, OpenCode, Qoder, Kimi, Herdr, unknown, and empty agent names were checked."},
+    {"name": "Substrate verification", "status": "run", "reason": "The rebuilt desktop rendered a compact active card with a visible avatar in the live app."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "The local Herdr plugin drove the rebuilt Petdex desktop after restart."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "The stale empty-box comment was removed after exact-SHA review."}
+  ],
+  "deterministic": [
+    {"check": "Zig format", "outcome": "pass", "reason": "src/main.zig passes zig fmt --check."},
+    {"check": "diff whitespace", "outcome": "pass", "reason": "git diff --check passed."},
+    {"check": "Biome", "outcome": "pass", "reason": "523 files checked with no errors and one pre-existing informational suggestion."},
+    {"check": "native tests", "outcome": "pass", "reason": "191 of 191 tests passed with the pinned Native SDK."},
+    {"check": "bridge tests", "outcome": "pass", "reason": "9 of 9 Bun tests passed."},
+    {"check": "ReleaseFast build", "outcome": "pass", "reason": "The baseline native app built successfully with tracing disabled."},
+    {"check": "live visual drive", "outcome": "pass", "reason": "A live Petdex card showed a visible avatar with compact title and status spacing."},
+    {"check": "exact-SHA independent review", "outcome": "pass", "reason": "OpenCode reported CLEAN at 8e332d63a96124e783977916a500dd9a27d515e5."}
+  ],
+  "findings": [],
+  "exemptions": [],
+  "issue_candidates": []
+}

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-10",
+    "repo": "crafter-station/skill-kit",
+    "base": "origin/main",
+    "head": "6fecd573b9421cb62235f65456b8832733010aaf",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/crafter-station/skill-kit/issues/45",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "document context --mcp-timeout N",
+      "state the 20-second default",
+      "state timeout reporting behavior",
+      "agree with CLI help, agent guide, and README"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source changed." },
+    { "name": "New-domain matrix", "status": "skipped", "reason": "No validator or trigger condition changed." },
+    { "name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No resolution rule changed." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command composition changed." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No runtime warning or latch changed." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No test shim changed." },
+    { "name": "Deliberate-default check", "status": "skipped", "reason": "No default behavior changed." },
+    { "name": "Fresh-seam scan", "status": "skipped", "reason": "No runtime or framework patch changed." },
+    { "name": "Substrate differential corpus", "status": "skipped", "reason": "No substrate-modeling guard changed." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "No behavior was reimplemented." },
+    { "name": "New-failure-outcome propagation", "status": "skipped", "reason": "No function outcome changed." },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "The existing flag dispatch was unchanged." },
+    { "name": "Error-path forcing", "status": "skipped", "reason": "No branch, guard, wrapper, or fallback changed." },
+    { "name": "Non-destructive recovery", "status": "skipped", "reason": "No recovery action changed." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "The timeout implementation was unchanged." },
+    { "name": "Boundary pipeline trace", "status": "skipped", "reason": "No boundary was extended." },
+    { "name": "Substrate verification", "status": "skipped", "reason": "The diff documents existing behavior and does not claim a new effect." },
+    { "name": "Dogfood the built artifact", "status": "skipped", "reason": "No runnable artifact behavior changed; the existing CLI flag was exercised during the parent documentation review." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "The packaged skill now advertises an existing flag and its timeout semantics." },
+    { "name": "Demonstrative example", "status": "skipped", "reason": "No example changed." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail exists." },
+    { "name": "Complexity budget", "status": "skipped", "reason": "No executable code changed." }
+  ],
+  "deterministic": [
+    { "check": "head coverage", "outcome": "pass", "reason": "This report records the exact commit head." },
+    { "check": "style", "outcome": "pass", "reason": "gate.sh style passed against origin/main." },
+    { "check": "surfaces", "outcome": "pass", "reason": "gate.sh surfaces passed with the skill-kit conventions." },
+    { "check": "doc siblings", "outcome": "acknowledged", "reason": "README.md, packages/cli/AGENTS.md, bin.ts, and context.ts already document the same flag and remain correct; this diff closes the only missing contract surface." },
+    { "check": "diff check", "outcome": "pass", "reason": "git diff --check passed." },
+    { "check": "skill version", "outcome": "pass", "reason": "bun run skill:version reports 0.11.2 matches the CLI." }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "Existing mcp-timeout siblings do not need edits.",
+      "evidence": "README.md and packages/cli/AGENTS.md already state the 20-second default, while bin.ts and context.ts implement it; only packages/skill/SKILL.md lacked the flag."
+    }
+  ],
+  "issue_candidates": []
+}

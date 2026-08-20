@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-11",
+    "repo": "crafter-station/survey-cli",
+    "base": "9053d3d",
+    "head": "aac56923cb9ea85b6611223176ba9cc6a9f25143",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/crafter-station/survey-cli/issues/1",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "survey new demo creates surveys/demo.ts",
+      "the generated survey is discoverable by survey list",
+      "the generated file parses"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "human contributor",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "skipped", "reason": "No matcher or data source was replaced." },
+    { "name": "New-domain matrix", "status": "run", "reason": "Valid, invalid, and duplicate survey IDs were exercised." },
+    { "name": "Resolution-rule consistency across consumers", "status": "run", "reason": "The generated import was checked through both source-package and compiled-binary discovery paths." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command composition changed." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "There is no background process or latch." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No external binary was shimmed." },
+    { "name": "Deliberate-default check", "status": "skipped", "reason": "No default behavior changed." },
+    { "name": "Fresh-seam scan", "status": "skipped", "reason": "No runtime or framework patch changed." },
+    { "name": "Substrate differential corpus", "status": "skipped", "reason": "No substrate-modeling guard changed." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "No reference behavior was reimplemented." },
+    { "name": "New-failure-outcome propagation", "status": "run", "reason": "Invalid IDs and existing target files were forced through the CLI error path." },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No new flag or mode was added." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Traversal-like IDs and duplicate scaffolds both exited nonzero without overwriting files." },
+    { "name": "Non-destructive recovery", "status": "run", "reason": "Duplicate generation preserved the existing file." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No wait or cancellation changed." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "Generation was traced from CLI parsing through filesystem output and discovery." },
+    { "name": "Substrate verification", "status": "run", "reason": "The generated TypeScript file was loaded from an external working directory." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "The compiled dist/survey binary generated the file and then failed to list it." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "README does not document the new public command." },
+    { "name": "Demonstrative example", "status": "run", "reason": "A real demo scaffold was generated and inspected through survey list." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail exists." },
+    { "name": "Complexity budget", "status": "run", "reason": "The scaffold implementation is small and bounded by fixed template output." }
+  ],
+  "deterministic": [
+    { "check": "head coverage", "outcome": "pass", "reason": "This report records the exact reviewed PR head." },
+    { "check": "style", "outcome": "pass", "reason": "gate.sh style passed." },
+    { "check": "surfaces", "outcome": "fail", "reason": "README and test/cli.test.ts were not updated for the new public command." },
+    { "check": "changed-file Biome", "outcome": "pass", "reason": "src/cli.ts, src/scaffold.ts, and test/scaffold.test.ts pass Biome." },
+    { "check": "tests", "outcome": "pass", "reason": "32 tests passed on the exact head." },
+    { "check": "typecheck", "outcome": "pass", "reason": "bun run typecheck passed." },
+    { "check": "build", "outcome": "pass", "reason": "bun run build passed." },
+    { "check": "diff check", "outcome": "pass", "reason": "git diff --check passed." }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The compiled CLI generates a survey that its own list command cannot load from an external working directory.",
+      "evidence": "dist/survey new demo generates surveys/demo.ts with an @crafter/survey-cli/define import, then dist/survey list fails with Cannot find module '@crafter/survey-cli/define'. The source-package CLI path lists the same file successfully.",
+      "layer": "compiled CLI end-to-end discovery contract",
+      "source": "lens",
+      "path": "src/scaffold.ts"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The new public command is absent from README and from the CLI registration regression test.",
+      "evidence": "README has no survey new usage and test/cli.test.ts does not assert that the new command is registered.",
+      "layer": "public command surface and regression coverage",
+      "source": "gate",
+      "path": "README.md"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "The generated package import is valid when the CLI runs from the source package path.",
+      "evidence": "bun bin/survey.ts list discovered the generated demo survey from the same external directory. This does not refute the compiled-artifact failure."
+    }
+  ],
+  "issue_candidates": []
+}

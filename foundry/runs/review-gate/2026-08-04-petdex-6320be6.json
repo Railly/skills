@@ -1,0 +1,109 @@
+{
+  "run": {
+    "date": "2026-08-04",
+    "repo": "crafter-station/petdex",
+    "branch": "railly/multi-bubble-657",
+    "base": "975893c",
+    "head": "6320be6",
+    "shortsha": "6320be6",
+    "status": "complete",
+    "issue": "#657 multi-bubble per session",
+    "note": "HEAD advanced to 76b7acf (polish-only follow-up) mid-review; finding re-verified against it."
+  },
+  "provenance": {
+    "author_model": "unknown (Hunter + kepler/sonnet per handoff)",
+    "reviewer_model": "claude-opus-5[1m]",
+    "same_family": true,
+    "same_family_warning": "Reviewer shares a family with the likely author model; shared priors mean shared blind spots. Recorded, not blocking.",
+    "conventions": "cases/petdex/conventions.md (loaded; no desktop-native surfaces mapped)"
+  },
+  "deterministic": [
+    {"gate": "style", "outcome": "pass", "note": "one em dash in an added TS comment; house baseline has 9 pre-existing in the same file, so comment em dashes are house style. Not a finding."},
+    {"gate": "surfaces", "outcome": "pass"},
+    {"gate": "callers setBubble", "outcome": "pass", "note": "every call site inside diffed files"},
+    {"gate": "siblings session_id", "outcome": "finding", "note": "hook_runner.zig mentions session_id but is absent from the diff -> confirmed as F1"},
+    {"gate": "stale", "outcome": "pass", "note": "takeBubble/bubbleView/bubble_expires_at_ms hits are substring matches on renamed-and-still-used identifiers"},
+    {"gate": "git diff --check", "outcome": "pass"},
+    {"gate": "biome (changed CLI files)", "outcome": "pass"},
+    {"gate": "tsc --noEmit", "outcome": "pass"},
+    {"gate": "bun test", "outcome": "pass", "detail": "81 pass / 0 fail"},
+    {"gate": "zig test hook_server.zig", "outcome": "pass", "detail": "6/6 at 6320be6 in a clean worktree"}
+  ],
+  "lenses": [
+    {"lens": "Concurrency / shared-state (focus 1)", "disposition": "triggered-and-run", "result": "clear", "evidence": "3s stress: 6 producer threads + 1 consumer over the real SpinMutex; 8,699,516 setBubble calls, 1,094,309 takeBubbles hits, 4,076,912 slots inspected, 0 anomalies. Negative control (lock removed from setBubble) aborts with SIGABRT, proving detection power."},
+    {"lens": "Bounds / memory (focus 2)", "disposition": "triggered-and-run", "result": "clear", "evidence": "Render node accounting enumerated for bubbles_len 0..8: worst case 16 of 17 slots, kepler's count verified against real code. 40 distinct sessions -> takeBubbles caps at 8."},
+    {"lens": "Error-path forcing / force-red", "disposition": "triggered-and-run", "result": "clear", "evidence": "4 mutants: broken session keying -> 3/6 red; inverted LRU -> 1/6 red; dropBubble missing len decrement -> 1/6 red; dropBubble compacting from wrong index -> 1/6 red. Tests have teeth."},
+    {"lens": "Expiry/deadline index pairing (focus 3)", "disposition": "triggered-and-run", "result": "clear", "evidence": "Ported deadline helpers; mid-stack expiry then drain keeps gamma@6000 and refreshes alpha@10000; LRU eviction gives the newcomer a fresh 9000 rather than inheriting the evicted 6000."},
+    {"lens": "Back-compat / deliberate-default (focus 4)", "disposition": "triggered-and-run", "result": "finding F1", "evidence": "Pure sessionless stream is byte-identical to parent (1 slot, counter +1/post). But hook_runner.zig, the path Claude Code actually invokes, never sends session_id."},
+    {"lens": "Untrusted input / new-domain matrix (focus 5)", "disposition": "triggered-and-run", "result": "clear + 1 issue candidate", "evidence": "Drove real HTTP with 64-byte-prefix collisions, mid-UTF8 truncation (invalid UTF-8 key stored but never rendered), embedded quote/escape, JSON-object type confusion, 12-session slot exhaustion, 60-request burst. Server never crashed; auth rejects tokenless posts; CLI safeSessionId caps at 64 ASCII, matching the [64]u8."},
+    {"lens": "Dogfood the built artifact", "disposition": "triggered-and-run", "result": "finding F1 born here", "evidence": "Built the real hook server and the real hook_runner against an isolated port 7788 + sandbox HOME. Two Claude Code sessions through the Zig runner -> {\"slots\":1}; same two with session_id -> {\"slots\":3}."},
+    {"lens": "Complexity budget", "disposition": "triggered-and-run", "result": "clear", "evidence": "setBubble is O(8) linear scan over a fixed 8-slot array on a hook-rate path; bounded by construction."},
+    {"lens": "Substrate verification", "disposition": "triggered-and-run", "result": "clear", "evidence": "Caught a real petdex-desktop (pid 78003) answering on 7777 during the first drive; re-ran on an isolated port and confirmed responder identity via /whoami before trusting any result."},
+    {"lens": "Docs-behavior parity", "disposition": "triggered-and-run", "result": "clear", "evidence": "No user-facing docs surface describes bubble-per-session; the behavior is internal to the hook protocol."},
+    {"lens": "Inverse regression surface", "disposition": "skipped", "reason": "diff adds a keyed dimension; it does not swap a matcher/parser data source"},
+    {"lens": "Resolution-rule consistency", "disposition": "skipped", "reason": "no hostname/route/key overlap resolution in this diff"},
+    {"lens": "Emission channel and one-shot latch", "disposition": "skipped", "reason": "no new user-facing warning or latch"},
+    {"lens": "Shim hermeticity", "disposition": "skipped", "reason": "no external binary stubbed by the new tests"},
+    {"lens": "Fresh-seam scan", "disposition": "skipped", "reason": "no runtime/framework patch"},
+    {"lens": "Reference-implementation oracle", "disposition": "skipped", "reason": "no reference spec reimplemented"},
+    {"lens": "New-failure-outcome propagation", "disposition": "skipped", "reason": "setBubble/takeBubbles add no new failure outcome; takeBubbles' null is the pre-existing not-dirty signal"},
+    {"lens": "Flag-propagation dispatch sweep", "disposition": "triggered-and-run", "result": "finding F1", "evidence": "session_id is the new config bit; traced through all 4 producers: bubble-runner.ts sends it, hook_runner.zig / omp-extension.ts / opencode-plugin.js do not."},
+    {"lens": "Non-destructive recovery", "disposition": "skipped", "reason": "no heuristic detector driving a recovery action"},
+    {"lens": "Cancellation and timeout hygiene", "disposition": "skipped", "reason": "no new async wait or timeout constant"},
+    {"lens": "Boundary pipeline trace", "disposition": "skipped", "reason": "no new frame/process/protocol boundary"},
+    {"lens": "Demonstrative example", "disposition": "skipped", "reason": "no documentation example added"},
+    {"lens": "Choice audit", "disposition": "skipped", "reason": "no .decisions.tsv trail emitted"},
+    {"lens": "Comment punctuation", "disposition": "triggered-and-run", "result": "clear", "evidence": "em dash in comments is established house style (9 pre-existing in the same file)"}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "high",
+      "state": "confirmed",
+      "title": "The Zig hook runner never sends session_id, so the primary shipped path stays single-bubble",
+      "location": "packages/petdex-desktop-native/src/hook_runner.zig:101,103",
+      "evidence": "hook_runner.zig:56 extracts and validates session_id and uses it for session titles (lines 61-67), but neither /bubble body format string includes the field. Driven end to end: two Claude Code sessions through the real runner -> {\"slots\":1,\"sessions\":[{\"session\":\"\"}]}; the identical pair with session_id -> {\"slots\":3}. ~/.claude/settings.json wires PreToolUse/PostToolUse/Stop to $HOME/.petdex/bin/petdex-hook, which main.zig:2822 routes into this runner, so this is the path Claude Code actually takes on this machine.",
+      "impact": "Issue #657's acceptance criterion (two conversations -> two bubbles) does not hold for the default Claude Code install; the feature only works via the TS CLI path.",
+      "verified_at_layer": "user (real binary, real socket, real payloads)"
+    },
+    {
+      "id": "F2",
+      "severity": "low",
+      "state": "confirmed",
+      "title": "omp-extension.ts and opencode-plugin.js also omit session_id",
+      "location": "packages/petdex-desktop-native/src/assets/omp-extension.ts:87-92, packages/petdex-desktop-native/src/assets/opencode-plugin.js:11",
+      "evidence": "Both build a bubble body with text/title/busy/agent_source and no session_id. Same collapse as F1 for those agents. Lower severity than F1 only because these adapters may not expose a session id at all.",
+      "impact": "Multi-bubble silently unavailable for omp and opencode users.",
+      "verified_at_layer": "source enumeration (all 4 /bubble producers)"
+    }
+  ],
+  "exemptions": [
+    {"claim": "Update does not reorder a session to the front of the stack", "evidence": "Named in the handoff as a conscious slice-1 decision; stack order is stable by slot.", "state": "exempted"},
+    {"claim": "Unlocked read of mailbox.state_counter at hook_server.zig:403", "evidence": "Present identically at the parent commit (975893c line 328); pre-existing, not introduced by this diff.", "state": "exempted"},
+    {"claim": "bubble.json mirror holds only the last POST under multi-session", "evidence": "mirrorBubble's signature is unchanged and never received a session param at the parent either; the mirror was always a single last-writer record. Back-compat for its readers is preserved exactly.", "state": "exempted"},
+    {"claim": "Global bubble_counter replaces the parent's per-bubble counter", "evidence": "Only consumer comparing counters is syncBubbleDeadlines, and only for equality against the same session's previous value; monotonic-global is safe there. Pure sessionless stream still yields +1 per post.", "state": "exempted"},
+    {"claim": "Em dash in an added comment", "evidence": "9 pre-existing em dashes in the same file at the parent commit; comment em dashes are house style, and the repo ban covers PRs/commits/external text.", "state": "exempted"}
+  ],
+  "issue_candidates": [
+    {
+      "title": "session_id longer than 64 bytes silently merges two conversations into one bubble",
+      "evidence": "The server truncates to [64]u8 and keys by the truncated prefix; two ids sharing a 64-char prefix land in one slot (verified over real HTTP: two distinct 67-char ids -> one bubble). Not reachable through petdex's own producers, since both bubble-runner.ts safeSessionId (/^[a-zA-Z0-9_-]{1,64}$/) and hook_runner.zig safeSessionId (len > 64 -> null) reject longer ids. A third-party poster holding the token could hit it.",
+      "why_out_of_scope": "Requires a non-petdex producer plus the local token; the shipped clients cannot reach it."
+    },
+    {
+      "title": "A multibyte session_id is truncated mid-UTF-8 into an invalid-UTF-8 key",
+      "evidence": "30 x 3-byte chars truncated at byte 64 yields an invalid UTF-8 key; stored and matched fine because the key only feeds mem.eql and never a render sink (mirrorBubble takes no session param). Harmless today.",
+      "why_out_of_scope": "No observable defect; both shipped validators reject non-ASCII ids. Worth a note if the key ever becomes user-visible."
+    },
+    {
+      "title": "A token-holding local process can evict live conversations by posting 8 synthetic session ids",
+      "evidence": "12 distinct sessions posted in a row evict earlier ones by LRU (verified live). Bounded by the 30/s shared rate limit (measured 39 accepted / 21 limited in a 60-request burst).",
+      "why_out_of_scope": "Requires the 0600 update-token, i.e. an already-local-and-authorized actor; the eviction policy is the intended slice-1 design."
+    },
+    {
+      "title": "dropBubble does not set bubbles_dirty, so a server-side shrink is never pushed to the consumer",
+      "evidence": "After dropBubble, takeBubbles returns null (verified). Benign today because the only dropBubble caller is expireBubbles, which has already removed the bubble from the model. A future server-side dropper would silently desync.",
+      "why_out_of_scope": "No reachable defect in this slice; the comment at hook_server.zig:183-185 states the assumption deliberately."
+    }
+  ]
+}
