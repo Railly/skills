@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-11",
+    "repo": "crafter-station/survey-cli",
+    "base": "9053d3d",
+    "head": "b9732733e29c22b3124232fe0f7cc02178c6e4a9",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/crafter-station/survey-cli/issues/2",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "survey responses <id> delete <timestamp> accepts timestamp prefixes",
+      "the matching response JSON file is deleted",
+      "missing responses fail clearly"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "human contributor",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "skipped", "reason": "No matcher or data source was replaced." },
+    { "name": "New-domain matrix", "status": "run", "reason": "Exact, prefix, missing, malformed-payload, and traversal-shaped timestamp cases were considered." },
+    { "name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Prefix lookup, returned payload timestamp, and physical filename were compared across read and delete consumers." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command composition changed." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "There is no background process or latch." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No external binary was shimmed." },
+    { "name": "Deliberate-default check", "status": "skipped", "reason": "No default behavior changed." },
+    { "name": "Fresh-seam scan", "status": "skipped", "reason": "No runtime or framework patch changed." },
+    { "name": "Substrate differential corpus", "status": "skipped", "reason": "No substrate-modeling guard changed." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "No reference behavior was reimplemented." },
+    { "name": "New-failure-outcome propagation", "status": "run", "reason": "The not-found outcome was checked at helper and CLI layers." },
+    { "name": "Flag-propagation dispatch sweep", "status": "run", "reason": "The nested Commander route was driven through the documented argument order." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Missing responses and a corrupt persisted timestamp were forced." },
+    { "name": "Non-destructive recovery", "status": "run", "reason": "The destructive path was checked for directory containment and exact target selection." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No wait or cancellation changed." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "Arguments were traced through Commander dispatch, prefix lookup, JSON decoding, and unlink." },
+    { "name": "Substrate verification", "status": "run", "reason": "Filesystem state was inspected before and after both CLI and direct-helper deletion attempts." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "The documented delete syntax was executed against the compiled dist/survey binary." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "The issue-specified public syntax is not documented and is not dispatched by the implementation." },
+    { "name": "Demonstrative example", "status": "run", "reason": "A persisted onboarding response was targeted with the documented timestamp-prefix command." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail exists." },
+    { "name": "Complexity budget", "status": "run", "reason": "The helper is small, but reuses a payload-oriented read abstraction for a destructive filename operation." }
+  ],
+  "deterministic": [
+    { "check": "head coverage", "outcome": "pass", "reason": "This report records the exact reviewed PR head." },
+    { "check": "style", "outcome": "pass", "reason": "gate.sh style passed." },
+    { "check": "surfaces", "outcome": "fail", "reason": "README and test/cli.test.ts were not updated for the new public command." },
+    { "check": "changed-file Biome", "outcome": "acknowledged", "reason": "The new hunks are formatted. Whole-file checks expose only pre-existing formatting in unrelated src/storage.ts and test/storage.test.ts lines." },
+    { "check": "tests", "outcome": "pass", "reason": "33 tests passed on the exact head." },
+    { "check": "typecheck", "outcome": "pass", "reason": "bun run typecheck passed." },
+    { "check": "build", "outcome": "pass", "reason": "bun run build passed." },
+    { "check": "diff check", "outcome": "pass", "reason": "git diff --check passed." }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The documented delete command is not dispatched and exits successfully without deleting the response.",
+      "evidence": "Both dist/survey and bun bin/survey.ts interpret `responses onboarding delete <prefix>` as the parent responses command, print the response list, exit 0, and leave the JSON file unchanged.",
+      "layer": "CLI parser and nested command dispatch",
+      "source": "lens",
+      "path": "src/cli.ts"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "A corrupt response payload can make deletion escape the selected survey directory.",
+      "evidence": "A response stored as storage/evil/2026.json with payload timestamp `../target` caused deleteResponse('evil', '../') to unlink storage/target.json. The helper trusts response.timestamp instead of deleting the matched physical file.",
+      "layer": "filesystem containment for destructive operations",
+      "source": "lens",
+      "path": "src/storage.ts:99"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "The new destructive command is absent from README and from CLI-level regression coverage.",
+      "evidence": "README has no delete syntax and test/cli.test.ts never parses or executes the documented nested command. The added test calls deleteResponse directly.",
+      "layer": "public command surface and regression coverage",
+      "source": "gate",
+      "path": "README.md"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "The direct helper deletes a normal response selected by prefix.",
+      "evidence": "The focused storage test passes. This does not cover Commander dispatch or hostile persisted data."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Existing responses show nested route is also unreachable",
+      "evidence": "responses <id> show <timestamp> exhibits the same parent-positional Commander dispatch behavior as delete.",
+      "why_out_of_scope": "The show route predates PR #9, but the shared parser root cause should be covered by the fix."
+    }
+  ]
+}

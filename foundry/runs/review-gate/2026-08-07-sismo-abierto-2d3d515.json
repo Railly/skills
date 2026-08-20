@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-07",
+    "repo": "sismo-abierto",
+    "base": "65e2803346f376991809c2a883db2292ab9c2605",
+    "head": "2d3d515",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Audit every registered panorama and historical report",
+      "Preserve open windows as pending",
+      "Verify the Huayucachi claimed validation against official sources",
+      "Publish the current audit cut and methodology",
+      "Use agent-browser for browser verification"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5",
+    "reviewer_model": "gpt-5",
+    "same_family": true
+  },
+  "lenses": [
+    { "name": "inverse-regression-surface", "status": "run", "reason": "" },
+    { "name": "new-domain-matrix", "status": "run", "reason": "" },
+    { "name": "resolution-rule-consistency-across-consumers", "status": "run", "reason": "" },
+    { "name": "emission-channel-and-one-shot-latch-reachability", "status": "skipped", "reason": "diff has no process channel or one-shot latch" },
+    { "name": "shim-hermeticity", "status": "skipped", "reason": "diff adds no shim or fallback executable" },
+    { "name": "deliberate-default-check", "status": "run", "reason": "" },
+    { "name": "fresh-seam-scan", "status": "run", "reason": "" },
+    { "name": "reference-implementation-oracle", "status": "run", "reason": "" },
+    { "name": "new-failure-outcome-propagation", "status": "run", "reason": "" },
+    { "name": "flag-propagation-dispatch-sweep", "status": "skipped", "reason": "diff adds no command flag or dispatch path" },
+    { "name": "error-path-forcing", "status": "run", "reason": "" },
+    { "name": "non-destructive-recovery", "status": "skipped", "reason": "diff adds no recovery or destructive mutation path" },
+    { "name": "cancellation-and-timeout-hygiene", "status": "skipped", "reason": "diff adds no cancellation or timeout behavior" },
+    { "name": "boundary-pipeline-trace", "status": "run", "reason": "" },
+    { "name": "substrate-verification", "status": "run", "reason": "" },
+    { "name": "dogfood-the-built-artifact", "status": "run", "reason": "" },
+    { "name": "docs-behavior-parity", "status": "run", "reason": "" },
+    { "name": "demonstrative-example", "status": "run", "reason": "" },
+    { "name": "choice-audit", "status": "skipped", "reason": "no decision trail was supplied" },
+    { "name": "complexity-budget", "status": "run", "reason": "" }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "pass", "reason": "" },
+    { "check": "surfaces", "outcome": "pass", "reason": "" },
+    { "check": "stale bbox documentation", "outcome": "pass", "reason": "" },
+    { "check": "callers matchRegion", "outcome": "acknowledged", "reason": "baseline and evaluator callers were read; both consume inside, boundary, and outside consistently, and regression coverage exercises the changed country semantics" },
+    { "check": "unit tests", "outcome": "pass", "reason": "31 tests passed" },
+    { "check": "typecheck and build", "outcome": "pass", "reason": "" },
+    { "check": "agent-browser local smoke", "outcome": "pass", "reason": "index, methodology, Informe 256, Huayucachi evidence, mobile layout, and overflow were verified" },
+    { "check": "radius impact", "outcome": "acknowledged", "reason": "map found baseline and evaluator as top impacted consumers; 2427 unresolved calls mean the map under-covers and was used only for orientation" }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "country bounding boxes classified cross-border events as strict matches",
+      "evidence": "a Colombia coordinate classified as Venezuela before the fix; Natural Earth point-in-polygon and a regression test now return outside",
+      "layer": "geographic classifier",
+      "source": "lens",
+      "path": "packages/audit/src/geography.ts#matchRegion -> packages/audit/src/evaluator.ts#findCandidatesForMatcher via call"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "the panorama audit runner evaluated only 8 of 44 registered claims",
+      "evidence": "the runner loaded predictions.csv directly; it now flattens all six panorama reports and the generated artifact contains 44 unique IDs",
+      "layer": "audit registry",
+      "source": "lens",
+      "path": "packages/audit/src/run.ts#runAudit -> data/audits/audit-results.json -> apps/web/app/verifica/page.tsx"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "the Huayucachi event does not satisfy the frozen magnitude range",
+      "evidence": "IGP reports M5.0 and USGS reviewed M5.3 while W20260803-P2 requires M5.4 to M6.0; the window remains pending and Peru central is vague",
+      "layer": "claimed validation",
+      "source": "lens",
+      "path": "data/predictions/claimed-validations.json -> packages/audit/src/claimed-validations.ts -> apps/web/app/verifica/[predictionId]/page.tsx"
+    }
+  ],
+  "exemptions": [],
+  "issue_candidates": []
+}

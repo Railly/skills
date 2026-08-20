@@ -1,0 +1,248 @@
+{
+	"schemaVersion": 0,
+	"run": {
+		"date": "2026-08-02",
+		"repo": "crafter-station/githunter",
+		"base": "origin/main",
+		"head": "9ae4be4",
+		"status": "incomplete",
+		"gaps": [
+			"The canonical gate script does not implement covered, shellmeta, or rawinput checks.",
+			"The radius map covered 46 impacted symbols from 100 changed symbols and reported 2818 unresolved calls, so manual pipeline reconstruction compensated for incomplete map coverage."
+		]
+	},
+	"contract": {
+		"path": "docs/ranking-system.md",
+		"spec_status": "not_provided",
+		"acceptance_reviewed": [
+			"Five immutable ranking lenses",
+			"Dated metric and ranking snapshots",
+			"Versioned Redis and Postgres reads with bundled fallback",
+			"Public API and responsive ranking UI",
+			"Daily GitHub refresh with adjacent 365-day evidence windows",
+			"Auditable Peru cohort exclusions"
+		],
+		"gaps": [
+			"No separate Spec review result was supplied; autonomous product decisions are documented in the ranking system and ADRs."
+		]
+	},
+	"provenance": {
+		"author_model": "gpt-5",
+		"reviewer_model": "claude-opus-4.8",
+		"same_family": false
+	},
+	"lenses": [
+		{
+			"name": "inverse-regression-surface",
+			"status": "run",
+			"reason": "Search prerendering, header navigation, database exports, API, UI, and refresh surfaces were reviewed and built together."
+		},
+		{
+			"name": "new-domain-matrix",
+			"status": "run",
+			"reason": "Ranking facts, cohorts, lenses, snapshots, entries, confidence, and exclusions were modeled before implementation."
+		},
+		{
+			"name": "resolution-rule-consistency-across-consumers",
+			"status": "run",
+			"reason": "Lens versions and snapshot freshness are resolved consistently across Redis, Postgres, API, and pages."
+		},
+		{
+			"name": "emission-channel-and-one-shot-latch-reachability",
+			"status": "skipped",
+			"reason": "The diff introduces no event channel or one-shot latch."
+		},
+		{
+			"name": "shim-hermeticity",
+			"status": "skipped",
+			"reason": "The diff introduces no compatibility shim."
+		},
+		{
+			"name": "deliberate-default-check",
+			"status": "run",
+			"reason": "Balanced is the documented default lens and static search generation retains the existing mode while failing closed during database outages."
+		},
+		{
+			"name": "fresh-seam-scan",
+			"status": "run",
+			"reason": "GitHub collection, scoring, persistence, caching, API, UI, migration, and scheduled execution seams were inspected."
+		},
+		{
+			"name": "reference-implementation-oracle",
+			"status": "skipped",
+			"reason": "No authoritative reference implementation exists for the versioned lens model."
+		},
+		{
+			"name": "new-failure-outcome-propagation",
+			"status": "run",
+			"reason": "Partial GitHub responses, missing profiles, database errors, Redis errors, invalid routes, and cohort completeness thresholds were traced through callers."
+		},
+		{
+			"name": "flag-propagation-dispatch-sweep",
+			"status": "skipped",
+			"reason": "The diff introduces no dispatch flag."
+		},
+		{
+			"name": "error-path-forcing",
+			"status": "run",
+			"reason": "Partial GraphQL data, malformed caches, stale remote snapshots, invalid lenses, missing database access, and historical-window regressions were forced."
+		},
+		{
+			"name": "non-destructive-recovery",
+			"status": "run",
+			"reason": "Remote failures fall back to an audited bundle and same-day writes are idempotent upserts."
+		},
+		{
+			"name": "cancellation-and-timeout-hygiene",
+			"status": "run",
+			"reason": "GitHub requests have a 30-second abort timeout, bounded retries, and a one-hour task duration."
+		},
+		{
+			"name": "boundary-pipeline-trace",
+			"status": "run",
+			"reason": "The complete GitHub to facts to score to Postgres to Redis to API to UI path was reconstructed and reviewed."
+		},
+		{
+			"name": "substrate-verification",
+			"status": "run",
+			"reason": "TypeScript, Jest, Drizzle validation, Biome, Next production build, HTTP responses, and browser accessibility output were verified."
+		},
+		{
+			"name": "dogfood-the-built-artifact",
+			"status": "run",
+			"reason": "The production build was started locally and all lenses, the API, filtering, lens navigation, and mobile layout were exercised."
+		},
+		{
+			"name": "docs-behavior-parity",
+			"status": "run",
+			"reason": "Metric weights, confidence behavior, refresh semantics, exclusions, fallback order, and operations docs were checked against code."
+		},
+		{
+			"name": "demonstrative-example",
+			"status": "run",
+			"reason": "The bundled Peru snapshot demonstrates all five lenses over 239 profiles with visible metric breakdowns."
+		},
+		{
+			"name": "choice-audit",
+			"status": "run",
+			"reason": "The universal-score rejection and fact-snapshot separation are recorded in two ADRs."
+		},
+		{
+			"name": "complexity-budget",
+			"status": "run",
+			"reason": "Percentile calculation was reduced to sorted per-metric lookup rather than repeated pairwise scans."
+		}
+	],
+	"deterministic": [
+		{
+			"check": "style",
+			"outcome": "pass",
+			"reason": "Canonical style gate and Biome passed."
+		},
+		{
+			"check": "surfaces",
+			"outcome": "pass",
+			"reason": "Every touched surface required by cases/githunter/conventions.md is present."
+		},
+		{
+			"check": "siblings-ranking",
+			"outcome": "pass",
+			"reason": "Every file mentioning ranking behavior is diffed or inspected."
+		},
+		{
+			"check": "siblings-lens",
+			"outcome": "pass",
+			"reason": "Every file mentioning lens behavior is diffed or inspected."
+		},
+		{
+			"check": "callers",
+			"outcome": "pass",
+			"reason": "Callers of snapshot reads, scoring, collection, and persistence are in the diff."
+		},
+		{
+			"check": "stale",
+			"outcome": "pass",
+			"reason": "Retired baseline paths and obsolete confidence and metric claims have zero hits."
+		},
+		{
+			"check": "timings",
+			"outcome": "acknowledged",
+			"reason": "The script reported no ceiling; manual review confirmed the 30-second request timeout and bounded retry budget remain below the one-hour task limit."
+		},
+		{
+			"check": "covered",
+			"outcome": "acknowledged",
+			"reason": "Unavailable in the canonical gate.sh version; exact head was checked manually with git rev-parse."
+		},
+		{
+			"check": "shellmeta",
+			"outcome": "acknowledged",
+			"reason": "Unavailable in the canonical gate.sh version; no shell command construction is introduced by the feature."
+		},
+		{
+			"check": "rawinput",
+			"outcome": "acknowledged",
+			"reason": "Unavailable in the canonical gate.sh version; route parameters are validated against fixed scope and lens identifiers."
+		},
+		{
+			"check": "radius",
+			"outcome": "acknowledged",
+			"reason": "Radius ran but under-covered the diff; manual subsystem reconstruction and external review covered the remaining boundaries."
+		}
+	],
+	"findings": [
+		{
+			"id": "F1",
+			"state": "confirmed",
+			"claim": "The initial collector aborted a full daily refresh when GitHub returned partial data for one renamed or deleted profile.",
+			"evidence": "Fixed by preserving valid aliases when data is present and covered by a partial-batch regression test.",
+			"layer": "GitHub collection boundary",
+			"source": "lens",
+			"path": "GitHub GraphQL response to readBatchProfiles to collectRankingDataset to refreshRankingScope"
+		},
+		{
+			"id": "F2",
+			"state": "confirmed",
+			"claim": "The initial persistence path never supplied prior entries, so rank movement was always null.",
+			"evidence": "Fixed by loading the latest prior-day version-compatible entries and covered by a direction-sensitive movement test.",
+			"layer": "historical persistence",
+			"source": "lens",
+			"path": "ranking_snapshot to persistRankingDataset to buildRankingSnapshot to RankingTable"
+		},
+		{
+			"id": "F3",
+			"state": "confirmed",
+			"claim": "An early Redis return could mask a newer Postgres snapshot.",
+			"evidence": "Fixed by selecting the maximum generatedAt across bundled, Redis, and Postgres snapshots; stale and malformed-cache regressions pass.",
+			"layer": "cache resolution",
+			"source": "lens",
+			"path": "Redis and Postgres to getRankingSnapshot to API and page"
+		},
+		{
+			"id": "F4",
+			"state": "confirmed",
+			"claim": "The original rolling timestamp windows overlapped calendar dates and made merged-PR comparisons inconsistent.",
+			"evidence": "The old algorithm was temporarily restored and the boundary test failed; adjacent UTC calendar windows then passed after restoration.",
+			"layer": "time boundary",
+			"source": "lens",
+			"path": "createEvidenceWindows to GraphQL contributions and merged PR searches to Rising score"
+		}
+	],
+	"exemptions": [
+		{
+			"claim": "No explicit GitHub rate-limit sleep is needed for the current cohort.",
+			"evidence": "A complete live regeneration of 244 source profiles succeeded through the same sequential batched collector without exhausting the rate limit."
+		},
+		{
+			"claim": "The search static-parameter change is within the production boundary.",
+			"evidence": "It preserves static generation when dependencies are healthy and prevents an existing database outage from failing the complete production build."
+		}
+	],
+	"issue_candidates": [
+		{
+			"title": "Rotate the stale production Neon credential",
+			"evidence": "Production-environment builds and local production requests report password authentication failed for githunter_owner while ranking fallback behavior remains healthy.",
+			"why_out_of_scope": "Credential rotation is external account state and is not authorized or recoverable from this code-only PR."
+		}
+	]
+}

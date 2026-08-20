@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-11",
+    "repo": "crafter-station/crafter-tracker",
+    "base": "56b4e414d66465f3e7bb28281890aa35dde268f8",
+    "head": "9813a55edd661fc94aa161b320c95d177fb59c6f",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/crafter-station/crafter-tracker/pull/3",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "static totals and country ranking",
+      "pin-type filtering and A-Z ordering",
+      "Luma event country resolution",
+      "desktop and mobile rendering",
+      "interaction with existing map filters"
+    ],
+    "gaps": ["No separate issue contract or Spec review was provided."]
+  },
+  "provenance": {
+    "author_model": "human contributor with Claude Opus 5 co-author",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "skipped", "reason": "No existing matcher data source was replaced." },
+    { "name": "New-domain matrix", "status": "run", "reason": "Explicit, inferred, online, unknown, substring-collision, and cross-PR location cases were exercised." },
+    { "name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Country resolution was compared across static pins, Luma events, and the pending new-pin PR." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command composition changed." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No background-process diagnostic or latch changed." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No external binary shim was added." },
+    { "name": "Deliberate-default check", "status": "skipped", "reason": "The census is additive and does not replace an existing default." },
+    { "name": "Fresh-seam scan", "status": "skipped", "reason": "No runtime or framework patch changed." },
+    { "name": "Substrate differential corpus", "status": "run", "reason": "The new free-text matcher was forced with Colima, explicit country, remote, and ambiguous place-name inputs." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "No external reference behavior was reimplemented beyond ordinary ISO country codes." },
+    { "name": "New-failure-outcome propagation", "status": "skipped", "reason": "No existing function gained a new failure outcome." },
+    { "name": "Flag-propagation dispatch sweep", "status": "run", "reason": "Existing map filters and the new census filter were driven together." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Missing and misleading location metadata were forced through the Luma route." },
+    { "name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action was added." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No wait, timeout, or cancellation path changed." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "Luma metadata was traced through API conversion, Pin country, computeStats, and rendered rows." },
+    { "name": "Substrate verification", "status": "run", "reason": "Marker counts, rendered totals, rows, and route JSON were observed directly." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "The production build was driven on desktop and mobile through the real census controls." },
+    { "name": "Newly-asserted invariant ownership", "status": "run", "reason": "The PR asserts whole-word city matching and that the census matches the map; both claims were forced." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "The new headline and filter semantics were compared with the PR description and README feature surface." },
+    { "name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail exists." },
+    { "name": "Complexity budget", "status": "run", "reason": "Stats computation is linear in pins plus country sorting and is acceptable for the current data size." }
+  ],
+  "deterministic": [
+    { "check": "head coverage", "outcome": "pass", "reason": "This report records the exact PR head." },
+    { "check": "style", "outcome": "pass", "reason": "gate.sh style passed." },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "The new app/page and census panel behavior is absent from the README feature list; recorded as F4." },
+    { "check": "siblings country", "outcome": "pass", "reason": "Every existing country passage is in the diff." },
+    { "check": "callers resolvePinCountry", "outcome": "pass", "reason": "All current call sites are in changed files." },
+    { "check": "changed-file Biome", "outcome": "pass", "reason": "All six changed files pass Biome." },
+    { "check": "repository Biome", "outcome": "acknowledged", "reason": "Three pre-existing accessibility errors remain in crafternaut.tsx and two SVGs on both PR heads." },
+    { "check": "tests", "outcome": "acknowledged", "reason": "The repository has no test files; bun test reports no tests found." },
+    { "check": "build", "outcome": "pass", "reason": "The Next.js production build and TypeScript checks passed." },
+    { "check": "diff check", "outcome": "pass", "reason": "git diff --check passed." }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The Luma fallback does not implement the promised whole-word city match and classifies Colima as Peru.",
+      "evidence": "A mocked offline Luma event for Colima, Mexico with valid Colima coordinates and no country_code returned country PE because matchCity uses haystacks.includes('lima').",
+      "layer": "Luma API response to census-country pipeline",
+      "source": "lens",
+      "path": "app/api/luma/route.ts:64"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The census keeps counting pin types hidden by the existing map filters.",
+      "evidence": "The production UI started with 20 markers and census total 20. Hiding SHIPPED reduced the map to 16 markers while the census stayed at 20 and retained shipped country counts.",
+      "layer": "map-filter state to rendered census contract",
+      "source": "lens",
+      "path": "app/page.tsx to components/stats-panel.tsx"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "The pending PinturilloElements pin is misclassified as Chile when combined with this PR.",
+      "evidence": "The two PRs merge without a text conflict, but resolvePinCountry sees 'Santiago' first in 'Santiago de Surco, Lima, Perú' and returns CL. Combined stats show CL 1 and leave Peru at 11. The new country field is optional and PR #4 does not set it.",
+      "layer": "cross-PR semantic integration",
+      "source": "lens",
+      "path": "lib/stats.ts resolvePinCountry to PR #4 data/main.json"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "README does not mention the new census feature.",
+      "evidence": "The repository's Features section is the public product surface, while neither app/page.tsx nor components/stats-panel.tsx is accompanied by a README update.",
+      "layer": "public feature documentation",
+      "source": "gate",
+      "path": "README.md"
+    }
+  ],
+  "exemptions": [
+    { "claim": "The existing repository-wide Biome failures are not caused by PR #3.", "evidence": "The same three errors reproduce on PR #4, which changes only data/main.json, while all PR #3 changed files pass Biome." }
+  ],
+  "issue_candidates": []
+}

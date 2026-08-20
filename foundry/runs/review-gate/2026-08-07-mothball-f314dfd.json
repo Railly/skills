@@ -1,0 +1,200 @@
+{
+  "run": {
+    "date": "2026-08-07",
+    "repo": "mothball",
+    "sha": "f314dfd",
+    "base": "v0.1.0",
+    "status": "complete",
+    "verdict": "fix-first"
+  },
+  "provenance": {
+    "author_model": "unknown (kepler/exec agent)",
+    "reviewer_model": "claude-opus-5[1m]",
+    "same_family": true,
+    "warning": "author y reviewer probablemente misma familia (Claude); sesgo de familia no descartable"
+  },
+  "deterministic": [
+    {
+      "gate": "bun test",
+      "outcome": "pass",
+      "detail": "96 pass / 0 fail"
+    },
+    {
+      "gate": "tsc --noEmit",
+      "outcome": "pass"
+    },
+    {
+      "gate": "zero runtime deps",
+      "outcome": "pass",
+      "detail": "dependencies = {}"
+    },
+    {
+      "gate": "zero Bun imports in src non-test",
+      "outcome": "pass"
+    },
+    {
+      "gate": "write-verb grep (gh/vercel/fetch)",
+      "outcome": "pass",
+      "detail": "unico fetch method GET; gh api --method GET; sin exec/execSync"
+    },
+    {
+      "gate": "force-red on write-verb guardrail",
+      "outcome": "pass",
+      "detail": "DELETE inyectado en vercel.ts => 1 test rojo"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "FATAL",
+      "state": "confirmed",
+      "file": "src/vercel.ts:239",
+      "title": "alias del ultimo deployment como proxy de dominio custom: 7/93 candidatos a  tienen dominio verificado",
+      "evidence": "cruzado los 93 candidatos reales contra /v9/projects/<name>/domains: casepilot(casepilot.lat), clerk-plapi, v0-create-remind-fast(remind.fast), store, xmas-2025, krafter-ui-web, fom0(fom0.dev). DNS confirma 3 apuntando a vercel-dns-016. Force-red con el shape real de casepilot falla."
+    },
+    {
+      "id": "F2",
+      "severity": "MAJOR",
+      "state": "confirmed",
+      "file": "src/report.ts + src/summary.ts (pad width 60)",
+      "title": "pad() trunca el COMMAND en la tabla: 51/93 comandos purge salen cortados",
+      "evidence": "renderPurgeTable sobre el cache real: 51 filas con command != lo mostrado. Mitigado: scope truncado => 'scope does not exist' (falla segura), sin colisiones de prefijo hoy."
+    },
+    {
+      "id": "F3",
+      "severity": "MAJOR",
+      "state": "confirmed",
+      "file": "src/cli.ts:392-408",
+      "title": "report ignora fresh: presenta cache de 30 dias con generatedAt=ahora y sin marca de staleness",
+      "evidence": "loadArchiveCache devuelve {data,fresh}; runReportCommand solo destructura data. Repro con cache de 30d: fresh=false, se renderiza igual."
+    },
+    {
+      "id": "F4",
+      "severity": "MAJOR",
+      "state": "confirmed",
+      "file": "README.md:89-91",
+      "title": "README promete 'a project with a custom domain is never a candidate'; falso en produccion, y el ejemplo del propio README (casepilot) es un contraejemplo",
+      "evidence": "misma evidencia que F1; README:76 muestra casepilot como candidate con DOMAINS=-"
+    },
+    {
+      "id": "F5",
+      "severity": "MINOR",
+      "state": "confirmed",
+      "file": "src/archive.ts:217",
+      "title": "traffic pedido con target.login en vez del owner de full_name",
+      "evidence": "repro: full_name=someone-else/adapters listado bajo org crafter-station => GET repos/crafter-station/adapters (404). Latente: hoy 0 repos con owner != login."
+    },
+    {
+      "id": "F6",
+      "severity": "MINOR",
+      "state": "confirmed",
+      "file": "src/archive.ts:121",
+      "title": "archiveExcludes case-sensitive vs nombres GitHub case-insensitive",
+      "evidence": "repro: exclude 'Railly/tinte' no matchea full_name 'railly/Tinte' => candidate. Latente: casing actual de la API coincide."
+    },
+    {
+      "id": "F7",
+      "severity": "MINOR",
+      "state": "confirmed",
+      "file": "src/config.ts:126",
+      "title": "config pre-V2 => archiveExcludes:[] => la lista dura de R7/D3 no protege nada",
+      "evidence": "repro: survey-cli/li-metrics/neon-cli caen a candidate con config viejo. Mitigado por el hint de cli.ts:271 y porque hoy esos repos son recientes."
+    },
+    {
+      "id": "F8",
+      "severity": "MINOR",
+      "state": "confirmed",
+      "file": "src/vercel.ts:136-149",
+      "title": "paginacion: pagination.next que no avanza acumula duplicados hasta el tope de 50",
+      "evidence": "fetch stub con next constante => 50 requests, 49 duplicados. Acotado, no infinito."
+    },
+    {
+      "id": "F9",
+      "severity": "DECISION",
+      "state": "confirmed",
+      "file": "src/archive.ts:124",
+      "title": "forks_count se recolecta pero nunca entra en la regla de candidato",
+      "evidence": "9/56 candidatos reales tienen forks>0"
+    },
+    {
+      "id": "F10",
+      "severity": "DECISION",
+      "state": "confirmed",
+      "file": "src/vercel.ts:247-255",
+      "title": "never-deployed sin gate de edad: 57 projects con command de rm sin importar antiguedad",
+      "evidence": "repro: project creado hace 1 minuto => never-deployed + command de rm. updatedAt nunca se consulta. Hoy los 57 reales tienen >90d."
+    },
+    {
+      "id": "F11",
+      "severity": "MINOR",
+      "state": "confirmed",
+      "file": "src/archive.ts:217",
+      "title": "sin manejo de 429 / secondary rate limit y traffic secuencial",
+      "evidence": "grep: cero retry/backoff. 70 llamadas secuenciales; rate limit core 5000, holgado."
+    }
+  ],
+  "refuted": [
+    {
+      "claim": "command injection via nombre de repo/project",
+      "refutation": "spawn con array de args (sin shell) y el command es solo dato; ademas Vercel rechaza server-side ('must be lowercase, letters/digits/._-') y GitHub tampoco permite metacaracteres. 0/384 projects y 0/317 repos fuera del charset seguro."
+    },
+    {
+      "claim": "latestDeployments[0] podria no ser el mas nuevo",
+      "refutation": "verificado contra la API real en 3 projects: timestamps siempre descendentes."
+    },
+    {
+      "claim": "never-deployed reciente o con dominio se propone a rm hoy",
+      "refutation": "los 57 never-deployed reales: 0 con dominio custom, 0 actualizados en 90d."
+    },
+    {
+      "claim": "fetch de vercel puede colgarse indefinidamente",
+      "refutation": "AbortController con VERCEL_TIMEOUT_MS=30s en vercelGet (vercel.ts:86-87); gh.ts tiene timeout 30s + killTree."
+    },
+    {
+      "claim": "config init --force preserva roots custom (byte-identical)",
+      "refutation": "REFUTADA la afirmacion del autor: pisa roots/maxDepth/prune. Pero cli.ts:275 lo declara explicitamente, asi que no es una mentira del producto."
+    }
+  ],
+  "lenses": [
+    {
+      "lens": "guardrail read-only (R2)",
+      "disposition": "run",
+      "result": "sin ruta de escritura; guardrail con teeth (force-red pasa). Injection refutada."
+    },
+    {
+      "lens": "falsos candidatos",
+      "disposition": "run",
+      "result": "F1 FATAL + F5/F6/F7/F9/F10"
+    },
+    {
+      "lens": "robustez de red",
+      "disposition": "run",
+      "result": "timeouts OK; F8 paginacion; F11 rate limit"
+    },
+    {
+      "lens": "composicion report / staleness",
+      "disposition": "run",
+      "result": "F3"
+    },
+    {
+      "lens": "config migracion",
+      "disposition": "run",
+      "result": "F7 + init --force refutado como 'byte-identical'"
+    },
+    {
+      "lens": "docs-behavior parity",
+      "disposition": "run",
+      "result": "F4"
+    },
+    {
+      "lens": "error-path forcing",
+      "disposition": "run",
+      "result": "403 SAML skip verificado contra 7 scopes reales; traffic error => old-but-alive, nunca candidate"
+    },
+    {
+      "lens": "dogfood the built artifact",
+      "disposition": "partial",
+      "result": "corridas read-only contra APIs reales y caches reales; no se construyo el binario scriptc"
+    }
+  ]
+}

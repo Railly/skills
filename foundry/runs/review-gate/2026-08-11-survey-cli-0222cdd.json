@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-11",
+    "repo": "crafter-station/survey-cli",
+    "base": "origin/main",
+    "head": "0222cddf0e01d773357538b5bb409f5fd3343731",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/crafter-station/survey-cli/issues/4",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "mixed answer shapes are detectable",
+      "CSV remains machine-readable on stdout",
+      "warning is emitted on stderr"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "human contributor",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": false
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "skipped", "reason": "No matcher or data source was replaced." },
+    { "name": "New-domain matrix", "status": "skipped", "reason": "No validator or trigger domain was widened." },
+    { "name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No resolution rule changed." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command composition changed." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "There is no background process or latch." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No external binary was shimmed." },
+    { "name": "Deliberate-default check", "status": "skipped", "reason": "CSV output remains unchanged; only a diagnostic was added." },
+    { "name": "Fresh-seam scan", "status": "skipped", "reason": "No runtime or framework patch changed." },
+    { "name": "Substrate differential corpus", "status": "skipped", "reason": "No substrate-modeling guard changed." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "No reference behavior was reimplemented." },
+    { "name": "New-failure-outcome propagation", "status": "skipped", "reason": "No new failure outcome was added." },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No new flag or mode was added." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Same-shape and mixed-shape branches were both exercised." },
+    { "name": "Non-destructive recovery", "status": "skipped", "reason": "No recovery action changed." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No wait or cancellation changed." },
+    { "name": "Boundary pipeline trace", "status": "skipped", "reason": "No boundary was extended." },
+    { "name": "Substrate verification", "status": "run", "reason": "CSV stdout and warning stderr were captured separately from the CLI." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "The compiled CLI exported two real stored responses with different answer shapes." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "The documented CSV command and output contract remain accurate." },
+    { "name": "Demonstrative example", "status": "skipped", "reason": "No documentation example changed." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail exists." },
+    { "name": "Complexity budget", "status": "run", "reason": "The new loops remain linear in responses plus answer keys." }
+  ],
+  "deterministic": [
+    { "check": "head coverage", "outcome": "pass", "reason": "This report records the exact reviewed head." },
+    { "check": "style", "outcome": "pass", "reason": "gate.sh style passed." },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "README remains accurate because the existing CSV command and data format are unchanged; test/cli has no export harness, while the focused export tests and recorded CLI dogfood cover the behavior." },
+    { "check": "changed-file Biome", "outcome": "pass", "reason": "src/cli.ts, src/export.ts, and test/export.test.ts pass Biome after the maintainer formatting commit." },
+    { "check": "tests", "outcome": "pass", "reason": "34 tests passed." },
+    { "check": "typecheck", "outcome": "pass", "reason": "bun run typecheck passed." },
+    { "check": "build", "outcome": "pass", "reason": "bun run build passed." },
+    { "check": "diff check", "outcome": "pass", "reason": "git diff --check passed." }
+  ],
+  "findings": [],
+  "exemptions": [
+    { "claim": "README does not need an edit.", "evidence": "The documented `responses <id> --export csv` command and CSV data contract are unchanged; the new diagnostic is truthful and goes only to stderr." },
+    { "claim": "test/cli.test.ts does not need an edit for this PR.", "evidence": "Focused tests cover both shape outcomes and the recorded CLI dogfood verifies the flag-to-stderr wiring with stdout captured separately." }
+  ],
+  "issue_candidates": [
+    { "title": "Root Biome command fails on nested site configuration", "evidence": "`biome check .` exits before checking files because both root and site/biome.json declare root configurations.", "why_out_of_scope": "The failure predates PR #10 and is unrelated to CSV export behavior." }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-15",
+    "repo": "crafter-station/butaca",
+    "base": "6ecb0071e5291e81efbaa02081d7130deb428d95",
+    "head": "d1d05c0d59e4110397882ae4bc292b9643181725",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": ".github/workflows/release.yml and scripts/verify-package.sh",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No separate Issue Contract or Spec review was provided"]
+  },
+  "provenance": {
+    "author_model": "gpt-5",
+    "reviewer_model": "gpt-5",
+    "same_family": true
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "run", "reason": "The npm 11 array shape remains accepted while adding npm 12 object support" },
+    { "name": "New-domain matrix", "status": "run", "reason": "Exercised npm 11 array output, npm 12 keyed-object output, and malformed empty-object output" },
+    { "name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "Only the package verifier consumes npm pack JSON" },
+    { "name": "Shell re-parse append domain", "status": "run", "reason": "Verified the extracted filename is a single expected tarball name under both supported npm shapes" },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No background process, warning, or latch changed" },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No external binary shim was added" },
+    { "name": "Deliberate-default check", "status": "run", "reason": "npm 11 array behavior is preserved and malformed output fails closed" },
+    { "name": "Fresh-seam scan", "status": "run", "reason": "The failure was isolated to the filename extraction seam in verify-package.sh" },
+    { "name": "Substrate differential corpus", "status": "run", "reason": "Compared real npm 11.17.0 and npm 12.0.2 pack output shapes" },
+    { "name": "Reference-implementation oracle", "status": "run", "reason": "Used npm pack itself as the oracle for both installed major versions" },
+    { "name": "New-failure-outcome propagation", "status": "run", "reason": "Malformed or unknown JSON now exits before attempting tar extraction" },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No CLI flag or dispatch path changed" },
+    { "name": "Error-path forcing", "status": "run", "reason": "Forced an empty object and verified the filename guard rejects it" },
+    { "name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action was added" },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No wait, timeout, or cancellation path changed" },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "Traced npm pack JSON through jq extraction, filename validation, tar inspection, and installed-package smoke testing" },
+    { "name": "Substrate verification", "status": "run", "reason": "Drove the parser against real npm 11.17.0 and npm 12.0.2 output" },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "bun run verify:package completed against the current package" },
+    { "name": "Newly-asserted invariant ownership", "status": "run", "reason": "verify-package.sh owns the requirement that npm pack return a usable filename" },
+    { "name": "Docs-behavior parity", "status": "skipped", "reason": "This is an internal release-verifier compatibility fix with no user-facing behavior change" },
+    { "name": "Demonstrative example", "status": "run", "reason": "The npm 12 output that failed in Actions now resolves to butaca-0.2.0.tgz" },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted" },
+    { "name": "Complexity budget", "status": "run", "reason": "The fix adds one bounded jq type branch and one fail-closed guard" }
+  ],
+  "deterministic": [
+    { "check": "covered", "outcome": "pass", "reason": "Exact HEAD report exists for d1d05c0" },
+    { "check": "style", "outcome": "pass", "reason": "Shell diff follows repository style" },
+    { "check": "surfaces", "outcome": "pass", "reason": "The changed package verification surface is reviewed" },
+    { "check": "shellmeta", "outcome": "pass", "reason": "No shell-metacharacter detector was added" },
+    { "check": "npm 11 parser", "outcome": "pass", "reason": "Array output resolves to butaca-0.2.0.tgz" },
+    { "check": "npm 12 parser", "outcome": "pass", "reason": "Keyed-object output resolves to butaca-0.2.0.tgz" },
+    { "check": "malformed output", "outcome": "pass", "reason": "An empty object produces no filename and triggers the guard" },
+    { "check": "package verification", "outcome": "pass", "reason": "bun run verify:package completed" },
+    { "check": "radius impact", "outcome": "acknowledged", "reason": "The shell-only diff produces no symbol impact; review used live npm outputs and the failed Actions run" }
+  ],
+  "findings": [
+    {
+      "id": "RG-001",
+      "state": "confirmed",
+      "claim": "npm 12 changed npm pack --json from an array to a package-keyed object, breaking the release verifier",
+      "evidence": "Actions run 31867404795 failed with jq Cannot index object with number; real npm 11 and npm 12 output reproduced the two shapes, and both now resolve to the same tarball filename",
+      "layer": "Release package verification",
+      "source": "lens",
+      "path": "scripts/verify-package.sh"
+    }
+  ],
+  "exemptions": [],
+  "issue_candidates": []
+}

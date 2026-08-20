@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-14",
+    "repo": "crafter-station/butaca",
+    "base": "b577377643e8cef2866b7a50be29c8494760de16",
+    "head": "36557ddcfca7be3e314fa71d25d57779aec1ac9b",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/crafter-station/butaca/issues/1 through /4",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": ["#1", "#2", "#3", "#4"],
+    "gaps": ["No separate Spec review status was provided."]
+  },
+  "provenance": {
+    "author_model": "gpt-5.6-sol",
+    "reviewer_model": "gpt-5.6-sol",
+    "same_family": true
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "run", "reason": "Checked fuzzy matching and checkout-contract removals for values accepted by the prior paths." },
+    { "name": "New-domain matrix", "status": "run", "reason": "Covered partial titles, missing separators, relative dates, ambiguity, quantity, occupied seats, and late-night sessions." },
+    { "name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Movie and date resolution are centralized in elegir and dispatch has one consumer." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command rewriting was added." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "run", "reason": "Warnings reach the attached CLI before order-opening paths." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No external-binary shim was added." },
+    { "name": "Deliberate-default check", "status": "run", "reason": "The default selection maximizes availability while preferring non-late-night sessions." },
+    { "name": "Fresh-seam scan", "status": "run", "reason": "Inspected price, order, map, ranking, hold, and browser-handoff seams." },
+    { "name": "Substrate differential corpus", "status": "skipped", "reason": "No twice-failed guard class triggered a corpus." },
+    { "name": "Reference-implementation oracle", "status": "run", "reason": "Compared get-prices parameters and browser checkout behavior with the observed Cinemark flow." },
+    { "name": "New-failure-outcome propagation", "status": "run", "reason": "All fetchPrices and buildTicketList callers handle PRICES_UNAVAILABLE before opening an order." },
+    { "name": "Flag-propagation dispatch sweep", "status": "run", "reason": "cantidad, preflight, mejor-asiento, dry-run, and yes were traced from parser through elegir dispatch." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Forced missing memberId, schema drift, fuzzy-title regression, late-night regression, ambiguous title, empty prices, and occupied-seat paths." },
+    { "name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action was added." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No new timeout or background wait was added." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "Traced public discovery through authenticated price lookup, order open, map, ranking, hold, and honest browser boundary." },
+    { "name": "Substrate verification", "status": "run", "reason": "Live Cinemark preflight returned session 161965 and ARS 20000 while audit and order-cache state remained unchanged." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "Built dist/cli.js and ran schema elegir plus the live Spider-Man preflight." },
+    { "name": "Newly-asserted invariant ownership", "status": "run", "reason": "Schema parity and side-effect metadata are owned by command-shapes and envelope tests." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "Checked CLI help, README, skill, schema, contract, test cases, and AGENTS limits." },
+    { "name": "Demonstrative example", "status": "run", "reason": "The Spider-Man example requires compact fuzzy matching, relative dates, and preflight." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail was supplied." },
+    { "name": "Complexity budget", "status": "run", "reason": "Seat grouping is bounded by available seats times quantity, with quantity capped at 10." }
+  ],
+  "deterministic": [
+    { "check": "covered", "outcome": "pass", "reason": "The run report matches HEAD 36557dd exactly." },
+    { "check": "style", "outcome": "pass", "reason": "No added em dashes or prohibited comment punctuation." },
+    { "check": "surfaces", "outcome": "pass", "reason": "CLI, README, skill, schema, contracts, and tests are present." },
+    { "check": "stale checkoutUrl", "outcome": "pass", "reason": "No old JSON field remains in contract surfaces." },
+    { "check": "stale held", "outcome": "pass", "reason": "No old held JSON field remains in contract surfaces." },
+    { "check": "siblings checkout", "outcome": "acknowledged", "reason": "Remaining checkout mentions are historical failures, an intentionally invalid command, or the rejected route and do not promise continuation." },
+    { "check": "siblings elegir", "outcome": "acknowledged", "reason": "Untouched matches use elegir as an ordinary Spanish verb and do not describe the new command." },
+    { "check": "siblings sugeridas", "outcome": "acknowledged", "reason": "The untouched README passage already describes the emitted ranking accurately." },
+    { "check": "callers fetchPrices", "outcome": "pass", "reason": "Every call site passes memberId and is in the diff." },
+    { "check": "callers buildTicketList", "outcome": "pass", "reason": "Every call site handles the shared PRICES_UNAVAILABLE contract." },
+    { "check": "radius impact", "outcome": "acknowledged", "reason": "Map saved with 53 changed symbols, 57 impacted symbols, 887 edges, and 1456 unresolved calls, so it was used only for orientation." }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Historical docs still promised a checkout URL that preserved the order.",
+      "evidence": "CONTRACT-AUTH.md, TESTCASES.md, and AGENTS.md contained checkoutUrl or continuation claims and were corrected.",
+      "layer": "documentation contract",
+      "source": "gate",
+      "path": "reservar payload to documentation surfaces"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Availability-only selection chose a 00:50 late-night session for the requested day.",
+      "evidence": "Live dry-run selected session 161949 at 00:50; preferring non-late-night sessions selected session 161965 at 21:00 and the force-red test failed without the comparator.",
+      "layer": "end-to-end selection",
+      "source": "lens",
+      "path": "selectShowtime to runElegir via public Cinemark showtimes"
+    },
+    {
+      "id": "I1",
+      "state": "issue_candidate",
+      "claim": "The repository-wide Biome command in AGENTS.md is not reproducible with an unpinned current Biome.",
+      "evidence": "Biome 2.5.1 rewrites the repository and reports generated dist control-character regex diagnostics; targeted lint passes with four pre-existing noCommaOperator warnings.",
+      "layer": "tooling baseline",
+      "source": "lens",
+      "path": "AGENTS.md verification command to current Biome runtime"
+    }
+  ],
+  "exemptions": [
+    { "claim": "Remaining checkout keyword hits do not need rewriting.", "evidence": "Each remaining hit documents a rejected route, a historical defect, or the intentionally nonexistent checkout command." },
+    { "claim": "Ordinary uses of the Spanish verb elegir do not describe the new command.", "evidence": "The untouched lines discuss occupancy labels or choosing replacement seats and make no command-contract claim." }
+  ],
+  "issue_candidates": [
+    { "title": "Pin Biome and make the documented repository-wide check reproducible", "evidence": "Current unpinned Biome rewrites the repository and flags generated dist while targeted lint is clean except four existing warnings.", "why_out_of_scope": "The four requested issues concern Cinemark contracts and agentic selection, not repository tooling migration." }
+  ]
+}

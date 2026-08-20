@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-13",
+    "repo": "petdex",
+    "base": "115d837aea89c235aa18c5a744ba768ccbc87d5a",
+    "head": "2c1156180b882e5472deef914424afce9c4dffae",
+    "status": "complete",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/crafter-station/petdex/issues/691",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "remote OpenCode, Codex, and Hermes sessions reach the local Petdex hook server",
+      "remote configuration merges preserve foreign hooks and active Hermes profiles",
+      "remote activation is dependency-first, atomic, bounded, and idempotent",
+      "watchers, tunnel, token, lease, and PID files are cleaned up after normal exit and hard crash",
+      "Codex and Hermes subagents do not create standalone cards"
+    ],
+    "gaps": ["No separate Spec review status was supplied; this report records Standards review only."]
+  },
+  "provenance": {
+    "author_model": "external contributor plus GPT-5.6 Codex fixes",
+    "reviewer_model": "OpenCode exact-SHA review plus Claude Opus review of predecessor 1043cda",
+    "same_family": false
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "run", "reason": "The exact delta and every touched remote-agent consumer were reviewed for preserved local-agent behavior."},
+    {"name": "New-domain matrix", "status": "run", "reason": "OpenCode, Codex, and Hermes remote setup, hooks, watchers, profiles, reconnects, and shutdown modes are covered."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Remote path, active Hermes home, session identity, and parent-session rules were traced across writeback, hook, and watcher consumers."},
+    {"name": "Shell re-parse append domain", "status": "run", "reason": "Remote shell helpers use fixed command construction, bounded metadata, atomic writes, and explicit sanitization."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "run", "reason": "Token publication occurs only after the tunnel, dependencies, configs, and watchers are ready."},
+    {"name": "Shim hermeticity", "status": "run", "reason": "Remote helper assets are embedded and installed before their enabling configuration."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Missing optional remote files use explicit exit code 44 while other failures back off."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "The final contributor delta was reviewed independently from predecessor 1043cda."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Exact HEAD passed native, Python, POSIX shell, release, and real-SSH Docker coverage."},
+    {"name": "Reference-implementation oracle", "status": "run", "reason": "Local agent installers provide the merge behavior used for remote writeback."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "argv construction, truncation, fetch, writeback, watcher, and tunnel failures all reach retry or teardown paths."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No public command flag was added."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Tests cover truncation, missing files, stale PIDs, spawn-build failure, failed probes, and hard-crash teardown."},
+    {"name": "Non-destructive recovery", "status": "run", "reason": "Foreign hooks and named Hermes profiles survive merge and reconnect byte-identically."},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "Tunnel health, owner liveness, bounded retries, signals, and supervisor reaping were reviewed and exercised."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "The full path from Settings through SSH, writeback, watchers, token publication, hooks, and cleanup was traced."},
+    {"name": "Substrate verification", "status": "run", "reason": "Exact HEAD passed 186 native tests, ReleaseFast, helper tests, and all platform CI builds."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Linux CI drove the built desktop binary through a real Docker SSH target, reconnect, SIGTERM, and SIGKILL."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "The desktop README describes the gated activation order and cleanup behavior implemented by the exact HEAD."},
+    {"name": "Demonstrative example", "status": "run", "reason": "The Docker scenario demonstrates preservation, activation, hook delivery, reconnect idempotence, and teardown."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No separate decision trail was supplied."},
+    {"name": "Complexity budget", "status": "run", "reason": "Watcher discovery remains bounded to 32 candidates and 8 followed sessions with bounded prefix and tail reads."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "Exact HEAD report exists for 2c11561."},
+    {"check": "style", "outcome": "pass", "reason": "No forbidden punctuation in the reviewed change."},
+    {"check": "surfaces", "outcome": "pass", "reason": "All compiled Petdex desktop remote-agent surfaces are aligned."},
+    {"check": "siblings remote agents", "outcome": "pass", "reason": "OpenCode, Codex, and Hermes setup and runtime paths were reviewed together."},
+    {"check": "siblings SSH", "outcome": "pass", "reason": "Tunnel, probe, fetch, writeback, watcher, and cleanup operations share the reviewed transport contract."},
+    {"check": "callers writeArgv", "outcome": "pass", "reason": "All output-order and argv construction callers are covered by the final delta and tests."},
+    {"check": "callers stageFetched", "outcome": "pass", "reason": "Every fetched-file staging path propagates allocation and truncation failures."},
+    {"check": "timings", "outcome": "pass", "reason": "Retry, readiness, health, and shutdown ceilings are bounded."},
+    {"check": "shellmeta", "outcome": "acknowledged", "reason": "Flagged literals are transport, YAML, and runtime separators rather than unreviewed shell command detectors."},
+    {"check": "native tests", "outcome": "pass", "reason": "186 of 186 passed locally on exact HEAD."},
+    {"check": "release build", "outcome": "pass", "reason": "ReleaseFast built successfully with pinned Native SDK c0b10d0."},
+    {"check": "helper tests", "outcome": "pass", "reason": "Six watcher tests, remote hook tests, and tunnel supervisor tests passed locally."},
+    {"check": "platform CI", "outcome": "pass", "reason": "App, lockfile, SDK pins, macOS, Linux, Windows, and Linux real-SSH Docker checks passed on exact HEAD."},
+    {"check": "independent review", "outcome": "pass", "reason": "OpenCode returned CLEAN on exact HEAD and Claude Opus returned CLEAN on predecessor 1043cda before the final hardening delta."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {"claim": "shellmeta findings do not apply.", "evidence": "The flagged literals are reviewed separators in transport, YAML, and runtime data rather than independent shell execution surfaces."},
+    {"claim": "The Vercel authorization failure is non-code.", "evidence": "The status links to organization authorization for an external contributor and reports no build failure; every code check passed on exact HEAD."},
+    {"claim": "Claude exact-HEAD review is unavailable.", "evidence": "Claude reached its weekly quota. The exact HEAD has an independent OpenCode CLEAN review, exact local and CI evidence, while Claude returned CLEAN on predecessor 1043cda."}
+  ],
+  "issue_candidates": [
+    {"title": "Allow Vercel preview checks for external Petdex contributors", "evidence": "PR #692 is UNSTABLE only because Vercel requests organization authorization.", "why_out_of_scope": "Organization deployment permissions are outside remote-agent synchronization."}
+  ]
+}
