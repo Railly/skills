@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-19",
+    "repo": "vercel-labs/vercel-desktop",
+    "base": "7e2aa8081714bd3853bdd054ec2b45ccefcb4241",
+    "head": "60af7a219e3f3347f4f6079712f52c47bd0c5a75",
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Cursor Agent claude-fable-5-thinking-xhigh produced no output and was interrupted after several minutes.",
+      "The final macOS 11-compatible launcher was exercised directly with Bun and nvm but not reopened from Finder after replacing env -C."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No Issue Contract was provided; the Solution Gate decision was used as design input."]
+  },
+  "provenance": {
+    "author_model": "gpt-5",
+    "reviewer_model": "claude-fable-5-thinking-xhigh",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["process lifecycle", "macOS compatibility", "shell boundary"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-18-vercel-desktop-cli-discovery/decision.md",
+      "evidence": "Fable and Grok independently selected explicit discovery plus exact-environment probing over sourcing shell startup files."
+    }
+  },
+  "claim_inventory": [
+    {"source":"contract","location":"","status":"not_provided","properties":[],"evidence":"No Issue Contract."},
+    {"source":"design","location":"Solution Gate decision","status":"reviewed","properties":["cli-discovery","argv-safety"],"evidence":"Decision reviewed before implementation."},
+    {"source":"user_facing","location":"Packaged onboarding","status":"reviewed","properties":["cli-discovery","team-picker-lifecycle"],"evidence":"User launched the DMG and exercised sign out, sign in, and team listing."},
+    {"source":"implementation","location":"src/app.zig;src/cli_discovery.zig;src/tests.zig","status":"reviewed","properties":["cli-discovery","argv-safety","team-picker-lifecycle"],"evidence":"Deterministic gates and local diff review."}
+  ],
+  "properties": [
+    {"id":"cli-discovery","claim":"A packaged GUI launch can find and run Vercel installed with Bun while Node lives in nvm without reading rc files.","kind":"availability","status":"verified","oracle":{"observes":"Vercel CLI version output under the exact launcher shape","layer":"process substrate","method":"direct launch","proxy_only":false},"proxy_challenge":{"proxy":"absolute Vercel path exists","counterexample":"Bun Vercel shebang cannot find nvm Node","attempted":true,"outcome":"separated","evidence":"Absolute path failed under minimal PATH; composed PATH returned Vercel CLI 58.4.4."},"substrates":[{"name":"Bun plus nvm","status":"exercised","evidence":"Vercel CLI 58.4.4 with Node.js 24.18.0."}],"evidence":"Direct /bin/sh trampoline execution and package build."},
+    {"id":"argv-safety","claim":"Dynamic paths and command arguments are passed as argv slots and remain under Native SDK bounds.","kind":"integrity","status":"verified","oracle":{"observes":"literal metacharacter and spaced argument preservation","layer":"shell boundary","method":"direct adversarial execution and effect tests","proxy_only":false},"proxy_challenge":{"proxy":"quoted shell source looks safe","counterexample":"path with spaces and argument a;$(false)","attempted":true,"outcome":"separated","evidence":"Arguments printed literally; no substitution occurred."},"substrates":[{"name":"/bin/sh","status":"exercised","evidence":"Spaced executable path and metacharacter arguments passed."}],"evidence":"162 tests and direct shell drive."},
+    {"id":"team-picker-lifecycle","claim":"Background spend refresh does not hide the team picker after CLI reauthentication.","kind":"lifecycle","status":"verified","oracle":{"observes":"model remains selecting_team and picker visible","layer":"application state","method":"regression test plus human DMG test","proxy_only":false},"proxy_challenge":{"proxy":"teams remain in memory","counterexample":"phase changes to loading while teams remain loaded","attempted":true,"outcome":"separated","evidence":"Force-red mutation failed exactly the new test."},"substrates":[{"name":"packaged macOS app","status":"exercised","evidence":"User confirmed sign out, sign in, and stable team list."}],"evidence":"Force-red 161/162 then fixed 162/162."}
+  ],
+  "assumptions": [
+    {"id":"macos11-shell","source":"Apple shell_cmds sources","claim":"/bin/sh supports the constant cd and exec trampoline on macOS 11.","status":"verified","evidence":"Uses POSIX sh constructs; env -C was removed after historical Apple sources showed it absent."}
+  ],
+  "side_effects": {"assessment":"none","evidence":"The diff changes process discovery and in-memory state only; existing CLI commands retain their prior external effects.","commit_points":[]},
+  "lenses": [
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"All spawnVercel callers use the resolved plan; rawinput and callers gates passed."},
+    {"name":"Substrate verification","status":"run","reason":"Bun plus nvm launcher and packaged app were exercised."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"DMG was opened from Finder and sign out/sign in was exercised."},
+    {"name":"Choice audit","status":"run","reason":"Local audit found argv budget, retry reset, deterministic nvm ordering, and macOS 11 compatibility issues; external runtime timed out."},
+    {"name":"Inverse regression surface","status":"skipped","reason":"No parser or data source replacement."},
+    {"name":"New-domain matrix","status":"skipped","reason":"No validator widening."},
+    {"name":"New failure outcome propagation","status":"run","reason":"Candidate exhaustion and synchronous spawn rejection paths were inspected and tested."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No new timeout or cancellable wait."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Discovery, probe, cached launch, retry, and missing UI paths were traced."},
+    {"name":"Newly-asserted invariant ownership","status":"skipped","reason":"No new user-facing invariant claim."},
+    {"name":"Docs-behavior parity","status":"skipped","reason":"No public documentation surface changed; canonical review convention was updated."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example."},
+    {"name":"Complexity budget","status":"run","reason":"Discovery is bounded to 24 nvm versions and small fixed candidate sets."}
+  ],
+  "deterministic": [
+    {"check":"style","outcome":"pass","reason":"gate.sh style"},
+    {"check":"surfaces","outcome":"pass","reason":"app changes include tests"},
+    {"check":"callers spawnVercel","outcome":"pass","reason":"all callers are in the diff"},
+    {"check":"rawinput cli_discovery","outcome":"pass","reason":"no competing raw-input resolver"},
+    {"check":"pnpm check","outcome":"pass","reason":"strict markup and manifest checks"},
+    {"check":"pnpm test","outcome":"pass","reason":"162/162"},
+    {"check":"pnpm build","outcome":"pass","reason":"ReleaseFast binary built"},
+    {"check":"pnpm package","outcome":"pass","reason":"signed app and DMG created"}
+  ],
+  "findings": [
+    {"id":"F1","state":"confirmed","claim":"env -C is unavailable on the macOS 11 deployment target.","evidence":"Apple shell_cmds historical sources lacked -C.","layer":"OS compatibility","source":"lens","path":"src/app.zig launcher","resolution":"fixed"},
+    {"id":"F2","state":"confirmed","claim":"Runtime nvm ordering differed from candidate ordering.","evidence":"Filesystem iteration populated PATH before shared semver collection was introduced.","layer":"runtime resolution","source":"lens","path":"collectNvmVersions to buildRuntimePath","resolution":"fixed"},
+    {"id":"F3","state":"confirmed","claim":"The first compatible launcher left fallback runtimePath empty.","evidence":"Consumer sweep found duplicated path_assignment and runtime_path state.","layer":"fallback launch","source":"gate","path":"State fallback to spawnVercel","resolution":"fixed"}
+  ],
+  "exemptions": [
+    {"claim":"No public docs update","evidence":"The UI behavior is unchanged; only executable discovery internals changed, while the canonical review invariant was updated."}
+  ],
+  "issue_candidates": []
+}

@@ -1,0 +1,322 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-19",
+    "repo": "vercel-labs/wterm#120",
+    "base": "cdff1c07890ab2c5ba2efbcc1091f790dfb8f931",
+    "head": "1bc44f97acf50cbab6b3ca3afce75882dfc6f23b",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "foundry/runs/solution-gate/2026-08-19-wterm-kitty-review-blockers-f5f9c92.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No Issue Contract was provided; the recorded Solution Gates, Tate's two concrete blockers, and the official Kitty protocol define the delivery contract."
+    ]
+  },
+  "provenance": {
+    "author_model": "OpenAI GPT-5 Codex",
+    "reviewer_model": "Official Kitty reference oracle plus real Chromium corpus",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "Browser keyboard event translation",
+      "Modifier and key lifecycle state",
+      "Terminal compatibility protocol"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "evidence/2026-08-19-wterm-kitty-1bc44f9-reference-corpus.md",
+      "evidence": "The official Kitty encoder and specification were compared against an explicit flags/modifiers/actions matrix, then the user-facing cells were driven through real Chromium and the core defect was force-red."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Tate blockers and foundry/runs/solution-gate/2026-08-19-wterm-kitty-review-blockers-f5f9c92.md",
+      "status": "reviewed",
+      "properties": ["KITTY-P1", "KITTY-P2"],
+      "evidence": "The two blockers require ordinary shifted text and post-release modifier state; the adjacent isolated-flag contract was derived from the official protocol."
+    },
+    {
+      "source": "design",
+      "location": "Official Kitty keyboard protocol and key_encoding.c",
+      "status": "reviewed",
+      "properties": ["KITTY-P1", "KITTY-P2", "KITTY-P3", "KITTY-P4"],
+      "evidence": "The independent encoder defines legacy ASCII, progressive enhancement, event types, alternate keys, report-all, associated text, and modifier lifecycle semantics."
+    },
+    {
+      "source": "user_facing",
+      "location": "packages/@wterm/dom/README.md and apps/docs/src/app/api-reference/page.mdx",
+      "status": "reviewed",
+      "properties": ["KITTY-P1", "KITTY-P2", "KITTY-P3", "KITTY-P4"],
+      "evidence": "The docs promise negotiated Kitty behavior while retaining legacy behavior for unsupported cores and acknowledge browser-produced event limits."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/@wterm/dom/src/kitty-keys.ts and packages/@wterm/dom/src/input.ts",
+      "status": "reviewed",
+      "properties": ["KITTY-P1", "KITTY-P2", "KITTY-P3", "KITTY-P4"],
+      "evidence": "Both encoder callers, physical modifier tracking, shortcut ownership, blur cleanup, and all changed serialization branches were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "KITTY-P1",
+      "claim": "Flags 2 and 4 alone preserve legacy ASCII press encoding unless they add an event or alternate payload.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Exact bytes emitted for Ctrl, Alt, Shift+Alt, unmapped Ctrl punctuation, and Ctrl+Shift ASCII presses under isolated flags.",
+        "layer": "Official protocol and browser-to-onData boundary",
+        "method": "Reference differential plus real Chromium byte assertions",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A green synthetic Ctrl+A unit test",
+        "counterexample": "Ctrl+semicolon and Shift+Alt+A can still be promoted to CSI-u while Ctrl+A passes.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The matrix added unmapped punctuation and Shift+Alt cells, and Chromium observed ';' and ESC A."
+      },
+      "substrates": [
+        {
+          "name": "Chromium KeyboardEvent producer through InputHandler and onData",
+          "status": "exercised",
+          "evidence": "Exact-head Chromium 19/19, including Ctrl+A, Ctrl+semicolon, Shift+Alt+A, and event-only release."
+        }
+      ],
+      "evidence": "Official encode_key and encode_printable_ascii_key_legacy comparison, 49 focused tests, mutation red/green, and real Chromium corpus."
+    },
+    {
+      "id": "KITTY-P2",
+      "claim": "Modifier release events use post-release state while preserving any still-held physical peer.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Modifier bits on lone and paired left/right releases.",
+        "layer": "Real browser keyup through ordered InputHandler state and emitted CSI-u bytes",
+        "method": "Chromium lifecycle drive",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "KeyboardEvent.ctrlKey on keyup",
+        "counterexample": "Chromium reports ctrlKey false for a released left Ctrl even while right Ctrl remains physically held.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The paired-control Chromium drive required the retained physical-code set to emit modifier 5 on the first release and 1 on the final release."
+      },
+      "substrates": [
+        {
+          "name": "Chromium left/right modifier lifecycle",
+          "status": "exercised",
+          "evidence": "Lone and paired Ctrl press/release sequences passed in the complete Chromium suite."
+        }
+      ],
+      "evidence": "Real producer assertions verify the user-visible release bytes rather than a hand-built event object."
+    },
+    {
+      "id": "KITTY-P3",
+      "claim": "Protocol-owned keys retain ownership through repeat and release while browser-owned shortcuts remain suppressed.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Complete Meta and key byte sequences across interleaving and Cmd+V.",
+        "layer": "Chromium keyboard events to terminal onData",
+        "method": "Built-artifact browser drive",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Current metaKey state",
+        "counterexample": "A key delivered before Meta activates can have metaKey true on repeat and release, while Cmd+V must still stay browser-owned.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The interleaved A/Meta drive emitted press, repeat, and release; Cmd+V emitted only Meta lifecycle events."
+      },
+      "substrates": [
+        {
+          "name": "Chromium Meta and shortcut lifecycle",
+          "status": "exercised",
+          "evidence": "The complete Chromium suite passed the Meta lifecycle and browser shortcut scenario."
+        }
+      ],
+      "evidence": "InputHandler ownership sets and blur cleanup were inspected and driven at the browser boundary."
+    },
+    {
+      "id": "KITTY-P4",
+      "claim": "Report-all and associated-text combinations serialize press, repeat, and release fields without changing independent flag semantics.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "CSI-u fields for report-all alone, report-all plus associated text, and event repeat plus associated text.",
+        "layer": "Encoder output and built browser artifact",
+        "method": "Official serializer comparison plus explicit matrix tests",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "All flags combined passes",
+        "counterexample": "A combined-flags test can pass while report-all without associated text or associated text without event types serializes the wrong empty fields.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Independent cells assert CSI 97u, CSI 97;;97u, and CSI 97;1:2;97u."
+      },
+      "substrates": [
+        {
+          "name": "DOM package artifact used by Playwright",
+          "status": "exercised",
+          "evidence": "Playwright rebuilt @wterm/dom from the exact head and passed 19/19."
+        }
+      ],
+      "evidence": "Independent flag cells pass in the 176-test DOM suite and the rebuilt artifact passes Chromium."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "Protocol serializer",
+      "Browser event translation",
+      "Modifier lifecycle state machine"
+    ],
+    "dimensions": {
+      "values": [
+        "Flags: 0, 1, 2, 4, 8, 16, independent pairs, and all flags",
+        "Actions: press, repeat, release",
+        "Modifiers: none, Shift, Ctrl, Alt, Meta, Ctrl+Alt, Shift+Alt, Ctrl+Shift, left/right peers",
+        "Keys: letters, shifted punctuation, unmapped Ctrl punctuation, recovery keys, navigation, keypad, modifiers, Dead and Unidentified",
+        "Ownership: protocol-delivered, browser shortcut, composition, blur"
+      ],
+      "exclusions": [
+        "Arbitrary keyboard-layout base alternates are unavailable from KeyboardEvent.key and are not invented",
+        "Release events lost while the browser is blurred cannot be synthesized"
+      ],
+      "evidence": "The unit, DOM, and Chromium matrices cover the protocol axes independently and preserve documented browser limitations."
+    },
+    "oracle": {
+      "source": "Official Kitty key_encoding.c and keyboard protocol",
+      "independent": true,
+      "evidence": "The local hashed oracle defines legacy ASCII, progressive enhancements, modifier maps, actions, alternate fields, and associated text."
+    },
+    "producer": {
+      "name": "Chromium KeyboardEvent via Playwright",
+      "status": "exercised",
+      "evidence": "The exact-head built artifact passed all 19 Chromium scenarios, including the load-bearing keyboard cells."
+    },
+    "falsification": [
+      {
+        "mutation": "Invert the no-disambiguation condition from !(flags & 1) to Boolean(flags & 1).",
+        "red_evidence": "Unit and DOM tests failed with CSI 97;5u instead of 0x01 for flag 4 Ctrl+A.",
+        "restored_green_evidence": "After restoring the source from the reversible patch, 49/49 focused tests passed."
+      }
+    ],
+    "evidence": "Protection is based on independent oracle comparison, fix-absent red evidence, restored green evidence, and a real producer boundary."
+  },
+  "assumptions": [
+    {
+      "id": "KITTY-A1",
+      "source": "Subsystem model",
+      "claim": "KeyboardEvent.key is the produced text but cannot recover arbitrary-layout unshifted punctuation.",
+      "status": "verified",
+      "evidence": "Real Chromium produced shifted text; the existing docs explicitly decline to invent unavailable base-layout values."
+    },
+    {
+      "id": "KITTY-A2",
+      "source": "Official reference implementation",
+      "claim": "Alternate-key reporting is pure formatting and isolated flags 2 or 4 retain legacy press encoding when no extra payload is added.",
+      "status": "verified",
+      "evidence": "Official init_encoding_data and encode_key logic plus the differential matrix confirm this rule."
+    },
+    {
+      "id": "KITTY-A3",
+      "source": "InputHandler subsystem model",
+      "claim": "InputHandler is the sole browser keyboard owner and encodeKittyKey has exactly two production call sites.",
+      "status": "verified",
+      "evidence": "gate.sh callers and repo-wide search enumerate both keydown/repeat and keyup callers in input.ts."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The diff translates browser events into in-memory terminal bytes and adds tests; it creates no durable file, database, process, network, or remote commit point.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, or lookup data source was replaced."},
+    {"name":"New-domain matrix","status":"run","reason":"Independent flags, actions, modifier combinations, ASCII classes, recovery keys, keypad, associated text, and lifecycle ownership were enumerated and exercised."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"All encodeKittyKey callers were enumerated; InputHandler is the single rule consumer and owns ordered lifecycle state."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell parsing changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"run","reason":"Browser keydown and keyup reached InputHandler, encodeKittyKey, and onData; suppressed shortcuts were checked against matching releases."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No shim was introduced."},
+    {"name":"Deliberate-default check","status":"run","reason":"Flags zero and missing Kitty support retain the legacy path; each progressive flag was also tested independently."},
+    {"name":"Fresh-seam scan","status":"run","reason":"The final commit and cumulative PR were reviewed around legacyModifiedText, ownership sets, physical modifiers, and blur cleanup."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Official Kitty and real Chromium differentiated press/repeat/release, pure enhancement, modifier peers, shortcuts, and associated text."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Official Kitty key_encoding.c and the keyboard protocol were hashed and compared against the explicit byte matrix."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No thrown or returned failure outcome changed."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"Negotiated bridge flags were traced through InputHandler into exact encoder bytes for independent and combined states."},
+    {"name":"Error-path forcing","status":"run","reason":"The no-disambiguation mutation failed the intended unit and DOM assertions and restored green."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No recovery action was added; blur deliberately clears in-memory ownership without fabricated releases."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No timer, async wait, or cancellation path changed."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Playwright drove real KeyboardEvents through textarea, InputHandler, encoder, and onData."},
+    {"name":"Substrate verification","status":"run","reason":"Exact bytes were observed at the terminal callback, not inferred from internal state."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The exact-head @wterm/dom artifact passed all 19 Chromium scenarios."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"InputHandler owns the physical modifier and browser/protocol key lifecycle sets; all writers and blur cleanup were enumerated."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Existing docs state negotiated Kitty behavior and browser limits; the fixes restore those claims without introducing a new public option."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example changed."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail existed for this change."},
+    {"name":"Complexity budget","status":"run","reason":"Per-event Set operations are constant-time and modifier prefix scans are bounded by physical modifier keys."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"pass","reason":"This report covers exact head 1bc44f97acf50cbab6b3ca3afce75882dfc6f23b; the pre-report check correctly failed first."},
+    {"check":"style","outcome":"pass","reason":"gate.sh style passed."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"api-reference/page.mdx only adds a row to the existing page; docs-navigation.ts already registers /api-reference and page-titles.ts already names it."},
+    {"check":"siblings Kitty keyboard","outcome":"pass","reason":"Every matching file is represented in the cumulative diff and no untouched matching passage remains."},
+    {"check":"callers encodeKittyKey","outcome":"pass","reason":"Every production call site is in input.ts and in the reviewed diff."},
+    {"check":"force-red","outcome":"pass","reason":"The isolated-flag mutation failed with CSI 97;5u and restored 49/49 green."},
+    {"check":"format","outcome":"pass","reason":"pnpm format:check passed on the exact tree."},
+    {"check":"type-check","outcome":"pass","reason":"22/22 tasks passed."},
+    {"check":"test","outcome":"pass","reason":"14/14 tasks passed, including 176 DOM tests."},
+    {"check":"lint","outcome":"pass","reason":"11/11 tasks passed with one pre-existing docs warning."},
+    {"check":"build","outcome":"pass","reason":"15/15 tasks passed."},
+    {"check":"browser E2E","outcome":"pass","reason":"19/19 Chromium tests passed on exact head."},
+    {"check":"git diff --check","outcome":"pass","reason":"No whitespace errors."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"40 changed symbols, 64 impacted, 635 edges, and 4220 unresolved calls; the map is explicitly under-covering and was not used to exonerate missing impact."}
+  ],
+  "findings": [
+    {
+      "id": "WTERM-KITTY-PURE-ENHANCEMENT-001",
+      "state": "confirmed",
+      "claim": "Flags 2 or 4 alone promoted legacy Ctrl and Alt ASCII presses to CSI-u.",
+      "evidence": "Before the final fix, Ctrl+A under flag 4 produced CSI 97;5u. The official oracle requires 0x01; the exact head also preserves Ctrl+semicolon and Shift+Alt+A.",
+      "layer": "Browser keyboard protocol bytes",
+      "source": "lens",
+      "path": "KeyboardEvent -> InputHandler -> encodeKittyKey -> onData",
+      "resolution": "fixed"
+    },
+    {
+      "id": "WTERM-SURFACE-EXEMPTION-001",
+      "state": "exempted",
+      "claim": "docs-navigation.ts and page-titles.ts do not need changes for the api-reference row update.",
+      "evidence": "The route and title already exist; the diff adds a method row and neither adds nor renames a page.",
+      "layer": "Documentation navigation and page identity",
+      "source": "gate",
+      "path": "apps/docs/src/app/api-reference/page.mdx -> docs navigation/title surfaces",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No navigation or page-title update is required for the API reference method row.",
+      "evidence": "docs-navigation.ts already registers /api-reference and page-titles.ts already contains API Reference; no page identity changed."
+    },
+    {
+      "claim": "No further public documentation update is required for the isolated-flag fix.",
+      "evidence": "The existing public contract already promises negotiated Kitty behavior and this change restores official semantics without adding an API, option, or workflow."
+    }
+  ],
+  "issue_candidates": []
+}

@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-18",
+    "repo": "portless",
+    "base": "326e8933e419496beb18422e3711e082e282d35f",
+    "head": "6bf65ebc52428ba6ef251e90cdfb13bb61a40dba",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-18-portless-agent-readability-326e893.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "shared allDocsPages loader",
+      "agent and Accept negotiation",
+      "direct Markdown mirrors",
+      "discovery endpoints",
+      "canonical metadata and JSON-LD",
+      "social preview HTML",
+      "browser 404 and agent Markdown 200",
+      "no fabricated dates",
+      "reserved route exclusions"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["sitewide request routing", "filesystem-backed documentation source"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-18-portless-agent-readability-326e893.md",
+      "evidence": "The closed Solution Gate compared two independent proposals, executable package behavior, and the merged ai-cli precedent before implementation."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "solution-gate/2026-08-18-portless-agent-readability-326e893.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "All must-change and must-not-change clauses were mapped to the local route matrix and exact-head build."
+    },
+    {
+      "source": "design",
+      "location": "solution-gate chosen shape",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The implementation follows the inventory-first loader, one internal Markdown route, package adapter, and explicit social bypass."
+    },
+    {
+      "source": "user_facing",
+      "location": "public HTTP routes and metadata",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The built server was exercised through browser, agent, Accept, direct .md, social, discovery, OG, API, and missing-page requests."
+    },
+    {
+      "source": "implementation",
+      "location": "apps/docs",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "Full diff, callers, matcher exclusions, rewrites, filesystem lookup, metadata, and output tracing were reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Canonical docs serve HTML to browsers and Markdown to agents, explicit Markdown Accept requests, and direct .md URLs.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "HTTP status, Content-Type, response body, Vary, and canonical Link for every representation",
+        "layer": "built Next.js HTTP server",
+        "method": "curl matrix against next start",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "green unit tests",
+        "counterexample": "a correct renderer behind an incorrect proxy matcher or rewrite",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The built-server matrix drove 24 canonical representations independently of the unit suite."
+      },
+      "substrates": [
+        {
+          "name": "Next.js 16 production build and server",
+          "status": "exercised",
+          "evidence": "pnpm --filter @portless/docs build followed by next start on port 4318 and curl route matrix."
+        }
+      ],
+      "evidence": "All six pages returned HTML for browsers and Markdown for ClaudeBot, Accept: text/markdown, and .md mirrors; negotiated responses carried Vary and canonical Link."
+    },
+    {
+      "id": "P2",
+      "claim": "Reserved routes and social preview bots remain outside Markdown negotiation, while browser misses stay 404 and agent misses return Markdown 200.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "response status, MIME type, and payload at reserved, social, and missing routes",
+        "layer": "built Next.js HTTP server",
+        "method": "curl adversarial route matrix",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "matcher source inspection",
+        "counterexample": "a matcher that looks excluded in source but is compiled or ordered incorrectly by Next.js",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "OG returned PNG, search returned JSON, Slackbot and Discordbot returned HTML, browser miss returned 404, and agent miss returned Markdown 200 on the built server."
+      },
+      "substrates": [
+        {
+          "name": "Next.js proxy and rewrite runtime",
+          "status": "exercised",
+          "evidence": "Direct requests covered /og, /og/why, /api/search, /robots.txt, /sitemap.xml, Slackbot, Discordbot, and missing routes."
+        }
+      ],
+      "evidence": "The route matrix passed all must-not-change request classes."
+    },
+    {
+      "id": "P3",
+      "claim": "Discovery and attribution surfaces are generated from the canonical inventory without fabricated freshness.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "llms.txt, sitemap.md, HTML canonical and alternate links, JSON-LD, Markdown frontmatter, and sitemap XML",
+        "layer": "built HTTP responses",
+        "method": "curl content and metadata assertions",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "metadata source objects",
+        "counterexample": "Next.js accepts metadata declarations but omits or rewrites rendered tags",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Rendered HTML was inspected for absolute canonical, text/markdown alternate, and JSON-LD."
+      },
+      "substrates": [
+        {
+          "name": "Next.js metadata renderer",
+          "status": "exercised",
+          "evidence": "Rendered /why HTML and public discovery responses were asserted."
+        }
+      ],
+      "evidence": "Discovery routes resolve, metadata renders, all Markdown pages contain canonical frontmatter, and synthetic lastModified was removed."
+    },
+    {
+      "id": "P4",
+      "claim": "Search, docs-chat, and public Markdown share an allowlisted MDX loader and deployment artifacts include the source MDX files.",
+      "kind": "availability",
+      "status": "verified",
+      "oracle": {
+        "observes": "all inventory pages load through one function, unsafe decoded segments cannot resolve, and the production build completes with output tracing",
+        "layer": "filesystem loader and production bundler",
+        "method": "unit tests, source sweep, force-red mutations, and Next.js build",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "source imports point to the shared loader",
+        "counterexample": "the shared loader works locally but MDX files are absent from the serverless artifact",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "outputFileTracingIncludes explicitly includes src/app/**/*.mdx and the exact-head production build collected page data successfully."
+      },
+      "substrates": [
+        {
+          "name": "local filesystem and Next.js output tracing",
+          "status": "exercised",
+          "evidence": "The loader read all six MDX sources, tests rejected slash, backslash, parent, and empty segments, and build passed."
+        }
+      ],
+      "evidence": "Repo-wide source sweep leaves MDX source composition only in docs-source.ts; callers of loadAllDocsSources are all diffed."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["HTTP User-Agent compatibility layer", "content negotiation adapter"],
+    "dimensions": {
+      "values": [
+        "identity=known AI agent; accept=absent; expected=Markdown",
+        "identity=heuristic-matching link preview; accept=absent; expected=HTML",
+        "identity=ordinary browser; accept=text/markdown; expected=Markdown",
+        "identity=ordinary browser; accept=HTML/default; expected=HTML"
+      ],
+      "exclusions": [
+        "Link-preview UAs that never match BOT_LIKE_REGEX are unchanged by 0.5.1 and covered by the upstream package regression category.",
+        "Signature-Agent detection is unchanged by 0.5.1 and was not part of the reported false-positive class."
+      ],
+      "evidence": "Built-server requests covered ClaudeBot, five heuristic-matching preview UAs, explicit Accept Markdown, and default browser HTML. Existing route tests cover direct .md separately."
+    },
+    "oracle": {
+      "source": "agent-readability v0.5.1 release contract and Portless HTTP representation contract",
+      "independent": true,
+      "evidence": "The upstream v0.5.1 release names the same five preview UAs and requires HTML unfurls while preserving Layers 1 and 2 plus explicit Accept negotiation."
+    },
+    "producer": {
+      "name": "Next.js production HTTP server receiving real User-Agent and Accept headers via curl",
+      "status": "exercised",
+      "evidence": "All five preview UAs returned 200 text/html, ClaudeBot returned 200 text/markdown, and explicit Accept returned Markdown on the built server."
+    },
+    "falsification": [
+      {
+        "mutation": "Run the five-preview-UA contract against @vercel/agent-readability 0.5.0.",
+        "red_evidence": "All five cells failed because shouldServeMarkdown returned true.",
+        "restored_green_evidence": "All five passed on 0.5.1; the full 15-test suite and HTTP matrix passed."
+      }
+    ],
+    "evidence": "The change is protected at package contract, Next.js adapter, and built HTTP response layers."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "solution gate",
+      "claim": "@vercel/agent-readability 0.5.0 owns Accept and AI agent detection semantics.",
+      "status": "verified",
+      "evidence": "Installed package source and types were inspected; built requests verified ClaudeBot and Accept behavior."
+    },
+    {
+      "id": "A2",
+      "source": "subsystem model",
+      "claim": "allDocsPages is the complete public six-page inventory.",
+      "status": "verified",
+      "evidence": "Inventory, sitemap.xml, layouts, tests, discovery responses, and route matrix agree on the same six pages."
+    },
+    {
+      "id": "A3",
+      "source": "implementation",
+      "claim": "Slackbot and Discordbot are the observed social false positives requiring bypass.",
+      "status": "verified",
+      "evidence": "Package detection was probed in the Solution Gate and built-server social requests returned HTML."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The change adds read-only HTTP representations and metadata; it creates no durable runtime writes or external commit points.",
+    "commit_points": []
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, or lookup data source was replaced." },
+    { "name": "New-domain matrix", "status": "run", "reason": "Sitewide negotiation widens request classes; browser, agent, Accept, social, reserved, direct Markdown, and encoded segment cells were driven." },
+    { "name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Filesystem source resolution moved to one loader; callers and raw source composition were swept." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell parsing or command composition changed." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No background process, warning channel, or latch changed." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No external executable shim was added." },
+    { "name": "Deliberate-default check", "status": "run", "reason": "HTTP 200 for agent missing pages and no fabricated dates were traced to the explicit contract and package behavior." },
+    { "name": "Fresh-seam scan", "status": "run", "reason": "Proxy to rewrite to internal route to filesystem loader to metadata seams were inspected and dogfooded." },
+    { "name": "Substrate differential corpus", "status": "skipped", "reason": "No guard has failed review twice on this input class." },
+    { "name": "Reference-implementation oracle", "status": "run", "reason": "The merged ai-cli agent-readability implementation and package 0.5.0 source were compared." },
+    { "name": "New-failure-outcome propagation", "status": "skipped", "reason": "No existing function gained a new failure outcome; the public missing response is a new route contract." },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No CLI flags or dispatch paths changed." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Unknown, encoded slash, encoded backslash, API-shaped Markdown, and browser versus agent missing paths were forced." },
+    { "name": "Non-destructive recovery", "status": "skipped", "reason": "No destructive action or recovery path changed." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No asynchronous timeout, retry, or cancellation protocol changed." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "Requests were traced across proxy detection, rewrites, route validation, loader, renderer, and response headers." },
+    { "name": "Substrate verification", "status": "run", "reason": "The production Next.js build and server, filesystem MDX reads, output tracing, and HTTP responses were exercised." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "The exact implementation was built and driven over HTTP on port 4318." },
+    { "name": "Newly-asserted invariant ownership", "status": "run", "reason": "Canonical, alternate, freshness, and missing-page assertions were checked against all route owners." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "Public behavior was verified directly; README, skill, and CLI help are exempt because product CLI behavior and usage did not change." },
+    { "name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added or edited." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted." },
+    { "name": "Complexity budget", "status": "run", "reason": "The inventory is six entries, cached by href; no unbounded nested scan was introduced." }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "pass", "reason": "No forbidden added prose punctuation." },
+    { "check": "surfaces", "outcome": "pass", "reason": "No mapped CLI behavior path was touched." },
+    { "check": "siblings Markdown", "outcome": "acknowledged", "reason": "mdx-to-markdown.ts is the unchanged cleaner intentionally reused; search-index.ts retains accurate private stripping behavior." },
+    { "check": "callers loadAllDocsSources", "outcome": "pass", "reason": "All callers are in diffed files." },
+    { "check": "callers pageMetadata", "outcome": "acknowledged", "reason": "All five external callers pass fixed valid slugs with no pre-call state; rendered HTML verified their new output." },
+    { "check": "force-red Slackbot bypass", "outcome": "pass", "reason": "Removing Slackbot from the bypass failed the intended social assertion, then restoration returned green." },
+    { "check": "force-red decoded parent segment", "outcome": "pass", "reason": "Allowing parent segments failed the intended safety assertion, then restoration returned green." },
+    { "check": "force-red social preview package version", "outcome": "pass", "reason": "The five-UA preview matrix failed on agent-readability 0.5.0 and passed on 0.5.1." },
+    { "check": "supply-chain policy", "outcome": "pass", "reason": "Frozen install passed with a version-specific minimumReleaseAgeExclude entry for the same-day audited patch; the global 48-hour policy remains enabled." },
+    { "check": "tests", "outcome": "pass", "reason": "15 tests passed on exact HEAD, including five social preview UAs, agent detection, and retry recovery." },
+    { "check": "build", "outcome": "pass", "reason": "Next.js production build and TypeScript passed on exact HEAD." },
+    { "check": "format", "outcome": "pass", "reason": "Prettier check and the repository commit hook passed." },
+    { "check": "diff check", "outcome": "pass", "reason": "git diff --check passed." }
+  ],
+  "findings": [
+    {
+      "id": "E1",
+      "state": "exempted",
+      "claim": "Unchanged Markdown helper and search stripping text do not require edits.",
+      "evidence": "mdx-to-markdown.ts is the selected cleaner reused unchanged, and search-index.ts still strips Markdown after consuming that same cleaner.",
+      "layer": "documentation sibling sweep",
+      "source": "gate",
+      "path": "apps/docs/src/lib/mdx-to-markdown.ts; apps/docs/src/lib/search-index.ts",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "E2",
+      "state": "exempted",
+      "claim": "Five unchanged pageMetadata callers do not require edits.",
+      "evidence": "Each layout passes one fixed inventory slug without mutable pre-call state; the built HTML for all five pages rendered correct canonical and alternate tags.",
+      "layer": "caller contract",
+      "source": "gate",
+      "path": "pageMetadata to child layouts",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "R1",
+      "state": "refuted",
+      "claim": "The local 67 auditor score indicates the implementation misses negotiation and metadata.",
+      "evidence": "llms.txt and sitemap.xml intentionally contain production canonical URLs, so the local auditor followed production pages for its samples; direct local requests verified every allegedly missing signal.",
+      "layer": "audit sampling",
+      "source": "lens",
+      "path": "local audit versus direct route matrix",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "A rejected docs read promise remained cached and prevented recovery from a transient filesystem failure.",
+      "evidence": "Before the fix, docs-source-retry.test.ts forced the first read to reject and observed the second load reject with the same error without a second readFile call. Commit ed06dc0 evicts rejected entries by identity; the test and full suite now pass.",
+      "layer": "shared filesystem promise cache lifecycle",
+      "source": "lens",
+      "path": "loadDocsSource to sourcePromises",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "agent-readability 0.5.0 classified five social link-preview bots as AI agents, causing Markdown responses without OG metadata.",
+      "evidence": "The preview-UA test matrix failed for Slackbot, Discordbot, redditbot, bitlybot, and Pinterestbot on 0.5.0. After upgrading to 0.5.1 and removing the local two-bot bypass, all five returned HTML while ClaudeBot still returned Markdown in unit and built-server checks.",
+      "layer": "agent detection and HTTP content negotiation",
+      "source": "lens",
+      "path": "@vercel/agent-readability detection to Next.js proxy",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "README, skills/portless/SKILL.md, and CLI help are unchanged.",
+      "evidence": "This change adds representations of existing web docs and changes no Portless command, flag, configuration, or product behavior."
+    },
+    {
+      "claim": "mdx-to-markdown.ts and unchanged pageMetadata callers need no edits.",
+      "evidence": "Their contracts remain valid and were exercised through all six built routes."
+    }
+  ],
+  "issue_candidates": []
+}

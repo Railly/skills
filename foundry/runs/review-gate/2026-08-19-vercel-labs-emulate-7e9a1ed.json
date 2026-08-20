@@ -1,0 +1,663 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-19",
+    "repo": "vercel-labs/emulate",
+    "base": "d0219d05818adca4c12bb76ec79a7562c1766a3d",
+    "head": "7e9a1ed88a5be51fdaf796a0c2164b3548e34f80",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "GitHub issue #203 and 05_Areas/vercel/emulate-webhook-signatures-handoff-2026-08-11.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Next.js and Nuxt generate omitted GitHub App keys",
+      "generated keys are server-only",
+      "persistence restores identity across cold starts",
+      "legacy snapshots remain loadable",
+      "explicit keys are excluded"
+    ],
+    "gaps": [
+      "No separate Spec review result was supplied."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5",
+    "reviewer_model": "Gemini 3.1 Pro, Claude Haiku, and Cursor Grok 4.6 xhigh",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "private keys",
+      "JWT authentication",
+      "durable state",
+      "cross-process concurrency",
+      "filesystem atomicity"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "2026-08-19-vercel-labs-emulate-7e9a1ed.md",
+      "evidence": "Gemini, Claude Haiku, and Cursor Grok 4.6 reviewed the subsystem; Grok's final exact-HEAD test-strength and resilience pass returned zero actionable findings."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "GitHub issue #203",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "The Slice 3 contract requires stable persisted identity, server-only access, non-exposure, and both adapters."
+    },
+    {
+      "source": "design",
+      "location": "foundry/runs/solution-gate/2026-08-19-emulate-github-app-adapters-d0219d0.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "The selected shape uses generated secret descriptors, compare-and-set initialization, and adapter-local accessors."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, adapter READMEs, web docs, and skills",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "Every changed usage surface documents generation, restoration, server-only access, and initialize semantics."
+    },
+    {
+      "source": "implementation",
+      "location": "adapter-next, adapter-nuxt, core persistence, and GitHub seed preparation",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "All writers, readers, retries, auth consumers, and persistence transitions were traced and tested."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Omitted GitHub App keys are generated once and restored as the same identity.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "key value and JWT identity across cold starts",
+        "layer": "real adapter handler and persisted snapshot",
+        "method": "compare generatedSecrets and authenticate the original JWT after restore",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "snapshot contains generatedSecrets",
+        "counterexample": "metadata exists while Store auth uses a different key",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Tests authenticate the original JWT, so metadata presence alone cannot pass."
+      },
+      "substrates": [
+        {
+          "name": "Next adapter",
+          "status": "exercised",
+          "evidence": "Focused and full suites passed."
+        },
+        {
+          "name": "Nuxt adapter",
+          "status": "exercised",
+          "evidence": "Focused and full suites passed."
+        }
+      ],
+      "evidence": "Generation, persistence, restore, concurrent starts, stale re-read, and identity-stable retries pass in both adapters."
+    },
+    {
+      "id": "P2",
+      "claim": "Generated private keys remain server-only and absent from HTTP responses.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "actual handler responses and public handler surface",
+        "layer": "HTTP and TypeScript adapter API",
+        "method": "request routes and inspect serialized responses while retrieving secrets only from generatedSecrets()",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "no explicit private-key route",
+        "counterexample": "a generic response or inspector serializes persisted metadata",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "HTTP non-exposure tests inspect real responses across the handler."
+      },
+      "substrates": [
+        {
+          "name": "Next HTTP handler",
+          "status": "exercised",
+          "evidence": "Real Request/Response path passed."
+        },
+        {
+          "name": "Nuxt HTTP handler",
+          "status": "exercised",
+          "evidence": "Real event handler path passed."
+        }
+      ],
+      "evidence": "Only the in-process handler accessor exposes descriptors; HTTP tests find no private key."
+    },
+    {
+      "id": "P3",
+      "claim": "Explicit keys and legacy snapshots remain compatible.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "JWT authentication and generatedSecrets output",
+        "layer": "adapter end-to-end behavior",
+        "method": "authenticate explicit and legacy keys and assert explicit keys are not reported as generated",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "snapshot parser accepts missing metadata",
+        "counterexample": "parse succeeds but restored JWT authentication fails",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The legacy JWT is authenticated after restore."
+      },
+      "substrates": [
+        {
+          "name": "legacy snapshot",
+          "status": "exercised",
+          "evidence": "Snapshot without generated-secret metadata loaded and authenticated."
+        },
+        {
+          "name": "explicit key",
+          "status": "exercised",
+          "evidence": "Explicit key authenticated and generatedSecrets returned empty."
+        }
+      ],
+      "evidence": "Compatibility cells pass in Next and Nuxt."
+    },
+    {
+      "id": "P4",
+      "claim": "Concurrent initialization, transient failures, and stale preparations converge without rotating or overwriting identity.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "canonical persisted state, metadata, original JWT, and successful retry",
+        "layer": "cross-instance adapter lifecycle",
+        "method": "coordinate two handlers, force initialize/save failures, mutate canonical metadata, retry the same operation",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "initialize is called twice",
+        "counterexample": "retry succeeds after silently minting a different key",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Save retry authenticates with the original JWT and asserts the key is unchanged."
+      },
+      "substrates": [
+        {
+          "name": "in-memory compare-and-set persistence",
+          "status": "exercised",
+          "evidence": "Concurrent and transient-failure tests passed in both adapters."
+        }
+      ],
+      "evidence": "Concurrency, transient load/initialize/save failure, ambiguous success, malformed canonical state, stale metadata, and save-queue recovery pass in both adapters; bug-specific mutations went red."
+    },
+    {
+      "id": "P5",
+      "claim": "Filesystem persistence publishes snapshots atomically and cleans temporary files.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "on-disk file contents, mode, rename publication, and temporary-file absence",
+        "layer": "real macOS filesystem",
+        "method": "force success and failure through filePersistence",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "save promise resolves",
+        "counterexample": "save resolves while a temp file remains or target is partially written",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Tests inspect target contents and directory artifacts directly."
+      },
+      "substrates": [
+        {
+          "name": "macOS filesystem",
+          "status": "exercised",
+          "evidence": "Core persistence tests passed on the shipping development platform."
+        }
+      ],
+      "evidence": "Private temp write, owner-only final mode, fsync, atomic rename/link, and cleanup after both initialize and save failures were exercised."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "adapter lifecycle",
+      "persistence protocol",
+      "generated-key state machine"
+    ],
+    "dimensions": {
+      "values": [
+        "omitted key",
+        "explicit key",
+        "restored key",
+        "new App added",
+        "legacy metadata",
+        "corrupt state",
+        "concurrent starts",
+        "initialize failure",
+        "save failure",
+        "canonical metadata update"
+      ],
+      "exclusions": [
+        "live third-party Redis backend because the public contract is backend-neutral compare-and-set initialization"
+      ],
+      "evidence": "Both adapters exercise every listed value through their real request producers."
+    },
+    "oracle": {
+      "source": "JWT verification, persisted snapshot inspection, filesystem inspection, and handler responses",
+      "independent": true,
+      "evidence": "Oracles observe identity, auth, state, and exposure rather than internal call counts."
+    },
+    "producer": {
+      "name": "Next Request handler and Nuxt event handler",
+      "status": "exercised",
+      "evidence": "Tests issue real Request objects through exported handlers."
+    },
+    "falsification": [
+      {
+        "mutation": "remove canonical prepared-state cache update",
+        "red_evidence": "Next stale-metadata regression failed.",
+        "restored_green_evidence": "Both focused suites passed after restoration."
+      },
+      {
+        "mutation": "remove rejected preparation cache reset",
+        "red_evidence": "Next and Nuxt initialize-retry tests failed with storage unavailable.",
+        "restored_green_evidence": "Both suites passed 9/9 after restoration."
+      },
+      {
+        "mutation": "remove save-only temporary-file cleanup",
+        "red_evidence": "The new core failed-save cleanup test failed with one residual .tmp file.",
+        "restored_green_evidence": "Core passed 76/76 after restoration."
+      },
+      {
+        "mutation": "leak the generated key as base64 in an HTTP header",
+        "red_evidence": "The Next and Nuxt HTTP non-exposure tests failed on the encoded key.",
+        "restored_green_evidence": "Both adapter suites passed 14/14 after restoration."
+      },
+      {
+        "mutation": "remove failed-save recovery from pendingSave",
+        "red_evidence": "The Next and Nuxt save-queue recovery tests failed because the third save never ran.",
+        "restored_green_evidence": "Both adapter suites passed 14/14 after restoration."
+      }
+    ],
+    "evidence": "Bug-specific mutations and direct end-to-end oracles demonstrate regression sensitivity."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "issue contract",
+      "claim": "Persistence initialize provides compare-and-set publication semantics.",
+      "status": "verified",
+      "evidence": "The type and docs state the contract; the in-memory producer exercises winner selection across concurrent handlers."
+    },
+    {
+      "id": "A2",
+      "source": "subsystem model",
+      "claim": "Generated secrets need no HTTP transport because server code can call the handler accessor.",
+      "status": "verified",
+      "evidence": "Next and Nuxt examples and tests consume generatedSecrets directly while HTTP responses remain clean."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The change creates and updates durable persistence snapshots containing generated identity metadata.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "publish generated identity snapshot",
+        "owner": "persistence.initialize",
+        "commit_event": "compare-and-set returns the canonical snapshot",
+        "later_fallible_stages": [
+          "seed application",
+          "first full snapshot save"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "adapter initialization",
+            "covers": [
+              "seed application",
+              "first full snapshot save"
+            ],
+            "forced": true,
+            "residual_observed": "canonical identity-only state remains available without rotation",
+            "cleanup_owner": "next adapter request retry",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Initialize and first-save failure tests retry and authenticate the stable identity."
+            },
+            "evidence": "Both adapters preserve the prepared canonical key and retry safely."
+          }
+        ]
+      },
+      {
+        "id": "CP2",
+        "effect": "replace filesystem snapshot",
+        "owner": "filePersistence.save",
+        "commit_event": "atomic rename of fsynced private temporary file",
+        "later_fallible_stages": [
+          "temporary-file write and rename"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "temporary-file publication",
+            "covers": [
+              "temporary-file write and rename"
+            ],
+            "forced": true,
+            "residual_observed": "no temporary file remains after forced failure",
+            "cleanup_owner": "filePersistence.save finally block",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "A subsequent save publishes valid contents."
+            },
+            "evidence": "Core persistence tests inspect cleanup and final contents."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Legacy snapshots without generated-secret metadata and explicit-key seeds were exercised."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Covered omitted keys, explicit keys, restored keys, added Apps, corrupt snapshots, and concurrent cold starts."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "prepareSeed callers in API, CLI, Next, and Nuxt were enumerated and verified."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell parsing changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "generatedSecrets is reachable only from the in-process handler and remains absent from HTTP responses."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No compatibility shim was added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "No-persistence and explicit-key defaults remain unchanged."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Inspected Store snapshots, preparation memoization, persistence queues, request initialization, and JWT resolution."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No repeatedly failing guard class exists."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No external reference implementation was supplied."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Corrupt restore, missing initialize, first-save failure, and initialize publication failure were forced."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No CLI flag changed."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Storage failure, corrupt state, failed publication, and concurrent initialization were forced."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "Failed first save retries, temporary files are removed, and canonical concurrent state is preserved."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No cancellation or timeout contract changed."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced generation through seed preparation, persistence, restore, Store auth, and handler access."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "File modes, file contents, cleanup, persisted snapshots, JWT auth responses, and HTTP non-exposure were observed."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Production builds for Next and Nuxt examples and real handler requests passed."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "All persistence writers and generated-secret access paths were enumerated."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Root, package, skill, service, and web docs match generatedSecrets and initialize behavior."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Examples omit private_key and require the new generatedSecrets and initialize capabilities."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": ".decisions.tsv was reviewed by Gemini; four off-diff failure modes were found and fixed."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "New scans are bounded by configured services, Apps, and secret descriptors, not request-volume collections."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "This report covers exact HEAD 7e9a1ed88a5be51fdaf796a0c2164b3548e34f80."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "gate.sh style passed."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "All adapter and GitHub docs surfaces changed; CLI help is exempt because no CLI behavior or flag changed."
+    },
+    {
+      "check": "siblings generatedSecrets",
+      "outcome": "acknowledged",
+      "reason": "Untouched hits are historical changelog, programmatic API docs, CLI implementation/tests, or the local decision trail; each retains its existing contract."
+    },
+    {
+      "check": "callers prepareSeed",
+      "outcome": "acknowledged",
+      "reason": "API and CLI callers remain compatible with the optional restored-secrets parameter; their full suites passed."
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "Ten critical mutations went red at intended assertions, including stale metadata, rejected preparation/init, identity rotation, restored-key loss, CAS loss, save-queue poisoning, secret header leakage, and temporary-file cleanup."
+    },
+    {
+      "check": "full repository gates",
+      "outcome": "pass",
+      "reason": "pnpm build, type-check, test, lint, format:check, and git diff --check passed after test-strength and resilience additions."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "4,981 edges and 21,073 unresolved calls make the map materially under-covering; it was used only for orientation."
+    }
+  ],
+  "findings": [
+    {
+      "id": "RG-1",
+      "state": "confirmed",
+      "claim": "A memoized seeded:false snapshot could overwrite state seeded by another process.",
+      "evidence": "Gemini identified the race; the new cross-instance regression failed when the re-read was removed and passes on HEAD.",
+      "layer": "cross-process persistence ordering",
+      "source": "lens",
+      "path": "adapter getPreparation -> initApps -> persistence.load",
+      "resolution": "fixed"
+    },
+    {
+      "id": "RG-2",
+      "state": "confirmed",
+      "claim": "A rejected initPromise permanently prevented initialization retry.",
+      "evidence": "The retry regression failed when initPromise reset was removed and passes on HEAD in both adapters.",
+      "layer": "failure recovery",
+      "source": "lens",
+      "path": "ensureInit -> initApps -> persistence.save",
+      "resolution": "fixed"
+    },
+    {
+      "id": "RG-3",
+      "state": "confirmed",
+      "claim": "Direct file saves could leave a truncated snapshot after process failure.",
+      "evidence": "filePersistence.save now writes, fsyncs, atomically renames, and removes its temporary file; core tests pass.",
+      "layer": "filesystem atomicity",
+      "source": "lens",
+      "path": "filePersistence.save -> temporary file -> rename",
+      "resolution": "fixed"
+    },
+    {
+      "id": "RG-4",
+      "state": "confirmed",
+      "claim": "prepareSeed discarded newly generated keys when restored descriptors were non-empty.",
+      "evidence": "The restored-plus-new App regression failed when the merge loop was removed and passes on HEAD.",
+      "layer": "generated-key lifecycle",
+      "source": "lens",
+      "path": "prepareSeed -> materializeGitHubSeedConfig -> generatedSecrets",
+      "resolution": "fixed"
+    },
+    {
+      "id": "RG-5",
+      "state": "confirmed",
+      "claim": "After a cross-process canonical re-read, later mutating saves reused stale generatedSecrets metadata.",
+      "evidence": "Claude Haiku identified the stale preparation cache; both adapters now replace preparationPromise with the canonical prepared state, and the metadata regression fails when that assignment is removed.",
+      "layer": "cross-process metadata consistency",
+      "source": "lens",
+      "path": "initApps -> persistence.load -> preparationPromise -> enqueueSave",
+      "resolution": "fixed"
+    },
+    {
+      "id": "RG-6",
+      "state": "confirmed",
+      "claim": "A rejected preparationPromise permanently prevented retry after a transient persistence.initialize failure.",
+      "evidence": "Cursor Grok 4.6 identified the rejected cache; both adapters now clear only the still-current failed promise, and both regression tests went red without the fix and green after restoration.",
+      "layer": "failure recovery",
+      "source": "lens",
+      "path": "getPreparation -> persistence.initialize -> ensureInit retry",
+      "resolution": "fixed"
+    },
+    {
+      "id": "RG-7",
+      "state": "confirmed",
+      "claim": "The save-failure retry regression did not prove generated identity stability.",
+      "evidence": "Cursor Grok 4.6 identified the weak oracle; both tests now persist initialization state, authenticate retries with the original JWT, and assert generatedSecrets remains unchanged.",
+      "layer": "test oracle strength",
+      "source": "lens",
+      "path": "generatedSecrets -> failed enqueueSave -> request retry -> JWT auth",
+      "resolution": "fixed"
+    },
+    {
+      "id": "EX-1",
+      "state": "exempted",
+      "claim": "packages/emulate/src/index.ts does not need an adapter note.",
+      "evidence": "It only documents CLI flags and dispatch; this commit adds no CLI behavior or flag.",
+      "layer": "documentation surface",
+      "source": "gate",
+      "path": "packages/emulate/src/index.ts",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "IC-1",
+      "state": "issue_candidate",
+      "claim": "Next withEmulate uses a fixed node_modules font glob that may miss hoisted workspace dependencies.",
+      "evidence": "The exact implementation exists unchanged on origin/main and this commit does not alter it.",
+      "layer": "framework bundling",
+      "source": "lens",
+      "path": "packages/@emulators/adapter-next/src/index.ts#withEmulate",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "CLI help is unaffected.",
+      "evidence": "No CLI flag, option, or behavior changes; adapter-only generatedSecrets access is documented on adapter surfaces."
+    },
+    {
+      "claim": "Programmatic API generatedSecrets docs are unaffected.",
+      "evidence": "createEmulator behavior is unchanged; the new behavior belongs to embedded adapter handlers."
+    },
+    {
+      "claim": "Historical changelog is unaffected.",
+      "evidence": "Its entry describes the earlier programmatic API release and remains true."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Resolve Next adapter font tracing from the installed core package",
+      "evidence": "withEmulate hardcodes ./node_modules/@emulators/core/dist/fonts/** and origin/main has the same code.",
+      "why_out_of_scope": "Pre-existing bundling behavior unrelated to generated GitHub App persistence."
+    }
+  ]
+}
