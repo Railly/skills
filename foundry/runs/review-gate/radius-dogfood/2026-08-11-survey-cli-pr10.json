@@ -1,0 +1,131 @@
+{
+  "changed": [
+    {
+      "symbol": "src/cli.ts#buildProgram",
+      "file": "src/cli.ts"
+    },
+    {
+      "symbol": "src/cli.ts#<module>",
+      "file": "src/cli.ts"
+    },
+    {
+      "symbol": "src/export.ts#CsvExport",
+      "file": "src/export.ts"
+    },
+    {
+      "symbol": "src/export.ts#buildCsvExport",
+      "file": "src/export.ts"
+    },
+    {
+      "symbol": "src/export.ts#formatCell",
+      "file": "src/export.ts"
+    },
+    {
+      "symbol": "src/export.ts#<module>",
+      "file": "src/export.ts"
+    },
+    {
+      "symbol": "test/export.test.ts#response",
+      "file": "test/export.test.ts"
+    },
+    {
+      "symbol": "test/export.test.ts#<module>",
+      "file": "test/export.test.ts"
+    }
+  ],
+  "impacted": [
+    {
+      "symbol": "bin/survey.ts#<module>",
+      "file": "bin/survey.ts",
+      "confidence": 1,
+      "depth": 1,
+      "reachedBy": [
+        "src/cli.ts#<module>",
+        "src/cli.ts#buildProgram",
+        "src/export.ts#CsvExport",
+        "src/export.ts#buildCsvExport",
+        "src/export.ts#formatCell"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "src/cli.ts#buildProgram",
+          "provenance": "EXTRACTED"
+        },
+        {
+          "via": "cochange",
+          "from": "3 co-changes in history",
+          "provenance": "INFERRED"
+        }
+      ],
+      "isTest": false
+    },
+    {
+      "symbol": "test/cli.test.ts#<module>",
+      "file": "test/cli.test.ts",
+      "confidence": 0.9,
+      "depth": 1,
+      "reachedBy": [
+        "src/cli.ts#<module>",
+        "src/cli.ts#buildProgram",
+        "src/export.ts#CsvExport",
+        "src/export.ts#buildCsvExport",
+        "src/export.ts#formatCell"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "src/cli.ts#buildProgram",
+          "provenance": "EXTRACTED"
+        }
+      ],
+      "isTest": true
+    },
+    {
+      "symbol": "src/cli.ts#colorizeJson",
+      "file": "src/cli.ts",
+      "confidence": 0.4,
+      "depth": 1,
+      "reachedBy": [
+        "src/cli.ts#<module>",
+        "src/cli.ts#buildProgram",
+        "src/export.ts#CsvExport",
+        "src/export.ts#buildCsvExport",
+        "src/export.ts#formatCell"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "src/cli.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ],
+      "isTest": false
+    },
+    {
+      "symbol": "src/storage.ts#<module>",
+      "file": "src/storage.ts",
+      "confidence": 0.24,
+      "depth": 1,
+      "reachedBy": [],
+      "reasons": [
+        {
+          "via": "cochange",
+          "from": "2 co-changes in history (no structural path)",
+          "provenance": "INFERRED"
+        }
+      ]
+    }
+  ],
+  "visibilityBoundary": {
+    "unresolvedCalls": 301,
+    "dynamicImports": 0
+  },
+  "stats": {
+    "filesIndexed": 21,
+    "symbols": 55,
+    "edges": 132,
+    "reconciledFiles": 21,
+    "elapsedMs": 74
+  }
+}
