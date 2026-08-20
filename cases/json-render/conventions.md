@@ -49,7 +49,17 @@ packages/vue/src/renderer.ts -> packages/vue/README.md skills/vue/SKILL.md
 - Catalog slot declarations are framework-agnostic metadata. Rendering named
   element slots is a platform capability and must be documented per renderer;
   a core type alone does not imply renderer parity.
+- Streamed runtime specs can temporarily violate required `UIElement` fields
+  even when the public TypeScript contract is strict. A new pre-render pass
+  must test partial element states at every downstream consumer it precedes,
+  not only at the first operation that throws.
 
 ## Gate-miss ledger
 
-(empty)
+- 2026-08-19, PR #325: Vercel Agent Review found that the new signature pass
+  called `Object.keys` on a temporarily missing `props` field. Fresh-seam and
+  error-path review missed the partial-required-field class because tests
+  covered missing elements and later children but not a present incomplete
+  element. The literal suggestion also under-reached because `resolveBindings`
+  was the next consumer. Closed by a type-first then props integration test and
+  force-red mutations at both consumers.

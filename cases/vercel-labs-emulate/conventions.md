@@ -9,6 +9,8 @@ packages/@emulators/stripe/src/** :: README.md, skills/stripe/SKILL.md, apps/web
 packages/@emulators/github/src/** :: README.md, skills/github/SKILL.md, apps/web/app/docs/github/page.mdx, packages/@emulators/github/README.md, packages/emulate/src/index.ts
 packages/emulate/src/index.ts :: README.md, skills/emulate/SKILL.md, apps/web/app/docs/page.mdx
 packages/emulate/src/commands/** :: README.md, skills/emulate/SKILL.md, apps/web/app/docs/page.mdx, packages/emulate/src/index.ts
+packages/@emulators/adapter-next/src/** :: README.md, skills/next/SKILL.md, apps/web/app/docs/nextjs/page.mdx, packages/@emulators/adapter-next/README.md
+packages/@emulators/adapter-nuxt/src/** :: README.md, skills/nuxt/SKILL.md, apps/web/app/docs/nuxt/page.mdx, packages/@emulators/adapter-nuxt/README.md
 ```
 
 ## Norms
@@ -36,6 +38,9 @@ packages/emulate/src/commands/** :: README.md, skills/emulate/SKILL.md, apps/web
 - Secret-file confidentiality is an effective-access property. POSIX mode bits alone do not prove owner-only access on filesystems with ACLs.
 - When startup publishes a durable artifact before later fallible stages, failure must either roll back that invocation-owned artifact or leave a directly retryable recovery path.
 - CLI behavior without an opt-in secret-delivery flag remains unchanged.
+- Embedded adapter persistence is one snapshot containing service Stores, token maps, and optional generated-secret provenance.
+- GitHub App private keys remain in server Stores and private persistence backends; route handlers, response rewriting, logs, inspector UI, and client bundles must not expose them.
+- Adapter seed preparation is lazy, memoized, and runs only after persistence has been checked so restored identity always wins over generation.
 
 ## Gate-miss ledger
 
