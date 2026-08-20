@@ -66,6 +66,10 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Resilience Audit](skills/.experimental/resilience-audit) forces timeouts, cancellation, retries, partial state, overload, cleanup, dependency failure, and concurrency paths.
 
+### Simplify
+
+[Simplify](skills/.experimental/simplify) reduces code, diff size, duplication, tests, and maintenance surface within a bounded target while preserving behavior and proving that consolidated regression protection still detects defects.
+
 ### Xref
 
 [Xref](skills/.experimental/xref) snapshots the complete reference graph around a GitHub issue or pull request to surface competing work, orphans, structural links, and file-overlap risks before work begins.

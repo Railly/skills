@@ -1,0 +1,58 @@
+{
+	"skill_name": "simplify",
+	"evals": [
+		{
+			"id": 1,
+			"name": "bounded-pr-reduction",
+			"prompt": "This PR has 1450 additions. Audit what can be deleted or shared and implement a reduction below 1000 additions without losing the generated GitHub App persistence feature. The Next and Nuxt tests look almost identical. Keep all regression coverage and append one commit only.",
+			"expected_output": "Measures tracked and untracked files honestly, inventories distinct invariants, shares test contracts and runtime only where useful, stays below 1000 additions with margin, runs deterministic gates followed by Test Strength, Resilience, and Review Gate, and appends one signed commit without rewriting history.",
+			"assertions": [
+				"Counts untracked shared files in the final line budget",
+				"Preserves every distinct test invariant across both adapters",
+				"Uses structural deduplication instead of formatting or type-safety tricks",
+				"Runs Test Strength before Resilience and Review Gate",
+				"Appends one commit without amending the existing feature commit"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "read-only-reduction-audit",
+			"prompt": "Read this monorepo and tell me where we could simplify it. Do not edit anything yet. I mainly care about duplicated adapters, redundant docs, and tests that cover the same behavior.",
+			"expected_output": "Remains read-only, establishes a complete baseline, distinguishes duplicate files from distinct invariants, ranks candidates by net savings and risk, and proposes a bounded pilot with verification and stop conditions.",
+			"assertions": [
+				"Does not modify source code",
+				"Reports a complete baseline rather than a synthetic quality score",
+				"Ranks candidates using net savings and regression risk",
+				"Names a measurable pilot and stop condition"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "persistence-and-parser-reduction",
+			"prompt": "Simplify this 800-line persistence module. It has shallow snapshot guards, repeated retry logic, and a large test suite. Reduce complexity, but malformed state must still fail closed and transient failures must recover.",
+			"expected_output": "Freezes parser and recovery contracts, centralizes strict validation and retry state, rejects arrays as records, retains failure-path tests, force-red tests the consolidated implementation, and runs a resilience matrix.",
+			"assertions": [
+				"Preserves fail-closed malformed-state behavior",
+				"Rejects arrays where records are required",
+				"Preserves retry and ambiguous-success recovery",
+				"Uses force-red evidence for consolidated tests",
+				"Runs applicable resilience pressure cells"
+			],
+			"files": []
+		},
+		{
+			"id": 4,
+			"name": "broad-quality-audit-near-miss",
+			"prompt": "Give me a broad security, performance, reliability, and maintainability health audit for this repository. I do not have a specific simplification target and I do not want changes yet.",
+			"expected_output": "Routes the request to quality-baseline or improve rather than treating it as an implementation simplification, remains read-only, and does not invent a LOC target.",
+			"assertions": [
+				"Routes the task to quality-baseline or improve",
+				"Remains read-only",
+				"Does not optimize for LOC without a bounded target"
+			],
+			"files": []
+		}
+	]
+}
