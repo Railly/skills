@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "Railly/kai",
+    "base": "origin/main",
+    "head": "0711787af61046c59a18efbe4fa87ba3f3b95708",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "user request in the working session",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5-codex",
+    "reviewer_model": "gpt-5-codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["durable and externally visible production and DNS state claims"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-21-kai-0711787a-production.txt",
+      "evidence": "Live production routes, merged GitHub state and browser-rendered behavior independently challenge the documentation claims."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user request in the working session",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The request requires a standalone Muniscan site, a project research log on Crafter Research, merge to main, and worktree-only feature work."
+    },
+    {
+      "source": "design",
+      "location": "cases/kai/conventions.md and Observatory NORTH.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The design separates the public instrument from its reasoning log and requires bounded score claims."
+    },
+    {
+      "source": "user_facing",
+      "location": "Observatory big-picture.md, slices.md and evidence/status-ledger-v1.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "V11 and V12 are presented as complete with canonical URLs, merged PRs and explicit validation gates."
+    },
+    {
+      "source": "implementation",
+      "location": "evidence/muniscan-public-surfaces-v1.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The release record names exact repository heads, production URLs, Vercel routing and browser verification."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The Observatory documentation consistently records V11 as the standalone atlas and V12 as the separate Crafter Research project log.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the complete coupled documentation surface and live production routes",
+        "layer": "public artifact and durable documentation",
+        "method": "surface gate, repo-wide version search, local-link validation, HTTP checks and browser snapshots",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the five changed Markdown files contain V11 and V12",
+        "counterexample": "the files could agree while their canonical URLs fail or their cited PRs remain unmerged",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Both production URLs returned HTTP 200, rendered their distinct surfaces, and GitHub reported PRs 8, 9 and 13 merged at the cited commits."
+      },
+      "substrates": [
+        {
+          "name": "Kai documentation, GitHub and production web",
+          "status": "exercised",
+          "evidence": "Style and surface gates pass, local links resolve, all cited URLs return 200, and browser QA confirms the atlas and research-log roles."
+        }
+      ],
+      "evidence": "NORTH, big picture, slices, ledger and the new release record agree on the two-surface decision."
+    },
+    {
+      "id": "P2",
+      "claim": "The release record does not overstate Muniscan scores or automated accessibility results.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "the exact claim language beside the recorded QA evidence",
+        "layer": "published research claim boundary",
+        "method": "read every score and accessibility claim, compare it with live Axe output and existing Observatory limitations",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Axe reports zero violations",
+        "counterexample": "zero violations can coexist with an incomplete contrast audit over gradients and therefore cannot establish full accessibility compliance",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The release record explicitly preserves Axe's indeterminate contrast result and says it is not a manual contrast certification."
+      },
+      "substrates": [
+        {
+          "name": "agent-browser Axe audits at 1440, 768 and 390 pixels",
+          "status": "exercised",
+          "evidence": "Each research-log audit reported zero violations and one incomplete contrast check; atlas mobile reported the same boundary."
+        }
+      ],
+      "evidence": "The final claim boundary excludes institutional quality, legal compliance, ownership, accessibility, security and uptime conclusions."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": ""},
+    "oracle": {"source": "", "independent": true, "evidence": ""},
+    "producer": {"name": "", "status": "not_applicable", "evidence": ""},
+    "falsification": [],
+    "evidence": "The diff documents an already deployed release and does not implement or change a protocol, parser, serializer, state machine, lifecycle, adapter, compatibility layer, or browser or OS event translation."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "subsystem model",
+      "claim": "The atlas and research log are live, distinct surfaces rather than two copies of the explorer.",
+      "status": "verified",
+      "evidence": "Browser snapshots show the searchable atlas at muniscan.crafter.ing and the reasoning-focused project log at crafter.ing/muniscan."
+    },
+    {
+      "id": "A2",
+      "source": "implementation",
+      "claim": "The cited repository heads and PR states are durable release evidence.",
+      "status": "verified",
+      "evidence": "Local main matches origin/main in both repositories and gh reports all three cited PRs merged at the exact recorded commits."
+    },
+    {
+      "id": "A3",
+      "source": "design",
+      "claim": "Updating one Observatory slice-state surface requires updating the other three summaries.",
+      "status": "verified",
+      "evidence": "The new Kai conventions surface map passes against the exact HEAD and all four coupled documents are in the diff."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The exact diff only changes Markdown documentation in Kai; production deployment, DNS and GitHub merges occurred in prior reviewed changes and are merely recorded here.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup or data source changed."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No validator or input domain changed."},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No resolution or discovery rule changed."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell behavior changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process channel or latch changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No test shim changed."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Reviewed the deliberate default that each public surface has one job: exploration or reasoning."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Reviewed the seams among DNS, Vercel, repository heads, atlas, lab route and coupled docs."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "No repeatedly failing guard models an external substrate."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No protocol or reference implementation applies."},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "No function or runtime failure outcome changed."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag, mode or configuration bit changed."},
+    {"name": "Error-path forcing", "status": "skipped", "reason": "The documentation diff creates no runtime error path."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No recovery action exists in this change."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No asynchronous operation or timeout changed."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced each documented release claim from Kai to merged PR, repository head, production route and rendered surface."},
+    {"name": "Substrate verification", "status": "run", "reason": "Verified live HTTP, browser DOM, responsive widths, Axe output, search behavior and GitHub state rather than trusting prose."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Drove both production surfaces and searched the atlas for Lima on a 390 pixel viewport."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "The release record owns the two-surface decision, while the conventions file owns synchronization among Observatory summaries."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "The stated atlas, research-log, responsiveness and accessibility boundaries match live behavior and recorded QA."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No instructional example was added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "skipped", "reason": "Documentation adds no runtime loop, lookup or per-element work."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "This report records exact HEAD 0711787af61046c59a18efbe4fa87ba3f3b95708."},
+    {"check": "style", "outcome": "pass", "reason": "No prohibited em dash or comment punctuation was added."},
+    {"check": "surfaces", "outcome": "pass", "reason": "NORTH, big picture, slices and status ledger all changed together."},
+    {"check": "stale", "outcome": "pass", "reason": "Not triggered; no duplicated contract value was renamed or retired."},
+    {"check": "siblings", "outcome": "acknowledged", "reason": "The Muniscan sweep flagged historical recurrence and funding passages; each remains correct because V11 and V12 add public surfaces without changing prior evidence claims."},
+    {"check": "callers", "outcome": "pass", "reason": "Not triggered; no function contract changed."},
+    {"check": "producers", "outcome": "pass", "reason": "Not triggered; no error classifier narrowed."},
+    {"check": "timings", "outcome": "pass", "reason": "Not triggered; no timing constant changed."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered; no shell detector changed."},
+    {"check": "artifacts", "outcome": "pass", "reason": "Not triggered; no persistent runtime artifact is written."},
+    {"check": "rawinput", "outcome": "pass", "reason": "Not triggered; no resolution rule deepened."},
+    {"check": "flagsweep", "outcome": "pass", "reason": "Not triggered; no user-facing flag was added."},
+    {"check": "execdeps", "outcome": "pass", "reason": "Not triggered; no external executable was added."},
+    {"check": "local links", "outcome": "pass", "reason": "Every relative Markdown link under the Observatory resolves."},
+    {"check": "external evidence", "outcome": "pass", "reason": "Both production URLs and all three cited PR URLs return HTTP 200; each PR is merged."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "Exact HEAD has no whitespace errors."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "Historical Muniscan recurrence and funding passages need not change for V11 and V12.",
+      "evidence": "They describe data-production evidence and funding claims that remain unchanged by adding two presentation surfaces."
+    }
+  ],
+  "issue_candidates": []
+}
