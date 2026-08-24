@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.5 - 2026-08-24
+
+Workstream Reconcile turns historical handoffs into a current operating queue by checking their volatile claims against authoritative sources.
+
+### Added
+
+- `workstream-reconcile`, a read-only orchestration skill for reconciling handoffs with live GitHub, local Git, releases, deployments, and package artifacts
+- Separate historical delta and current operating-state classifications, including explicit handling for unpushed work, review responses, integration, releases, verification, and proven stalls
+- Behavior and trigger evals covering local-only fixes, new human feedback, release lag, age-based false stalls, and degraded GitHub access
+- Missing maturity and installer registration for the existing experimental `work-intake` skill, restoring repository validation
+
+### Fixed
+
+- Invalid `xref` YAML frontmatter that caused the installer to omit the skill, plus validator coverage for ambiguous unquoted scalars
+
 ## 0.0.4 - 2026-08-14
 
 The contributor-side selection gate is now named for the lifecycle phase it owns: Issue Intake.
