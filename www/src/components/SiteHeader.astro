@@ -44,10 +44,14 @@ import { release } from "../data/skills";
 		const next = themes[(index + 1) % themes.length];
 		if (next === "system") {
 			delete document.documentElement.dataset.theme;
-			localStorage.removeItem("railly-skills-theme");
+			try {
+				localStorage.removeItem("railly-skills-theme");
+			} catch {}
 		} else {
 			document.documentElement.dataset.theme = next;
-			localStorage.setItem("railly-skills-theme", next);
+			try {
+				localStorage.setItem("railly-skills-theme", next);
+			} catch {}
 		}
 		renderTheme();
 	});
