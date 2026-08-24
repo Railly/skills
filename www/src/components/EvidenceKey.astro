@@ -1,0 +1,27 @@
+---
+const states = [
+	["experimental", "Coherent method and trigger boundary; real-work evidence may be absent."],
+	["dogfooded", "Used on real work without a reliable baseline comparison."],
+	["evaluated", "Compared against a baseline; evidence remains incomplete or inconclusive."],
+	["validated", "Repeatable positive effect across holdouts and trials with human review."],
+];
+---
+
+<section class="evidence-key section-shell" aria-labelledby="evidence-title">
+	<div class="section-heading">
+		<div>
+			<p class="eyebrow">Read the label</p>
+			<h2 id="evidence-title">Maturity is an evidence claim.</h2>
+		</div>
+		<p>Release 0.0.5 has one evaluated method and no validated methods. The catalog says that plainly.</p>
+	</div>
+	<div class="maturity-grid">
+		{states.map(([state, description], index) => (
+			<div class="maturity-row">
+				<span>{String(index).padStart(2, "0")}</span>
+				<strong>{state}</strong>
+				<p>{description}</p>
+			</div>
+		))}
+	</div>
+</section>

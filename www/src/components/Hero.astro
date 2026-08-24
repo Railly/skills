@@ -1,0 +1,48 @@
+---
+import { channelCounts, collectionInstallCommand, evaluatedCount, release, skills } from "../data/skills";
+---
+
+<section class="hero shell" aria-labelledby="hero-title">
+	<div class="hero-copy">
+		<p class="eyebrow"><span class="status-dot"></span> Open engineering methods / release {release}</p>
+		<h1 id="hero-title">Engineering skills with receipts.</h1>
+		<p class="hero-lede">
+			Portable agent protocols shaped by real maintenance work. Every method exposes its source,
+			distribution channel, evidence state, and limits.
+		</p>
+		<div class="command-block" role="group" aria-label="Install Railly Skills">
+			<span aria-hidden="true">$</span>
+			<code>{collectionInstallCommand}</code>
+			<button type="button" data-copy={collectionInstallCommand} aria-label="Copy collection install command">
+				<span data-copy-label>Copy</span>
+			</button>
+		</div>
+		<div class="hero-actions">
+			<a class="button-primary" href="#catalog">Explore {skills.length} skills</a>
+			<a class="button-secondary" href="https://github.com/Railly/skills" target="_blank" rel="noreferrer">
+				Inspect source <span aria-hidden="true">↗</span>
+			</a>
+		</div>
+	</div>
+
+	<div class="evidence-terminal" role="region" aria-label="Release evidence summary">
+		<div class="terminal-bar">
+			<span>foundry://release/{release}</span>
+			<span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+		</div>
+		<div class="terminal-body">
+			<div class="scan-row"><span>registry</span><strong>foundry/maturity.json</strong><em>source</em></div>
+			<div class="scan-row"><span>skills</span><strong>{skills.length} registered</strong><em>complete</em></div>
+			<div class="scan-row"><span>stable</span><strong>{channelCounts.stable} methods</strong><em>channel</em></div>
+			<div class="scan-row"><span>candidate</span><strong>{channelCounts.candidate} methods</strong><em>channel</em></div>
+			<div class="scan-row"><span>experimental</span><strong>{channelCounts.experimental} methods</strong><em>channel</em></div>
+			<div class="terminal-result">
+				<div>
+					<span>baseline compared</span>
+					<strong>{evaluatedCount}/{skills.length}</strong>
+				</div>
+				<p>Evidence states are claims with provenance, not decorative badges.</p>
+			</div>
+		</div>
+	</div>
+</section>
