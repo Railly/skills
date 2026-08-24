@@ -1,0 +1,70 @@
+{
+  "skill_name": "workstream-reconcile",
+  "evals": [
+    {
+      "id": 1,
+      "name": "local-fix-never-pushed",
+      "prompt": "Reassess the Emulate workstream from its handoff. It says the reviewer fix passed locally last week but the PR may still point at the older SHA. Tell me what is actually pending now.",
+      "expected_output": "The report compares the handoff SHA, local branch and remote PR head, classifies the mismatch as local-unpublished, rejects old-head checks as proof, and makes push plus exact-head verification the first action.",
+      "assertions": [
+        "Treats the handoff as a lead rather than current truth",
+        "Checks local HEAD and remote PR head independently",
+        "Classifies meaningful unpushed work as local-unpublished",
+        "Does not run tests, push, comment, or mutate state"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "new-review-invalidates-green-queue",
+      "prompt": "Refresh this portfolio handoff. It says json-render #325 is green and waiting for review, but several days have passed. Reconcile the current queue and prioritize it.",
+      "expected_output": "The report checks current review threads and exact head, surfaces any new human findings ahead of passive review waits, and classifies the item as review-response-needed without equating green CI with readiness.",
+      "assertions": [
+        "Checks current human review evidence rather than only PR state",
+        "Separates exact-head checks from unresolved review findings",
+        "Uses review-response-needed when new human feedback exists",
+        "Explains why the priority changed since the checkpoint"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "merge-with-release-lag",
+      "prompt": "The release PR was merged today. Reassess whether agent-browser v0.35.0 is actually done and update the workstream status.",
+      "expected_output": "The report checks the GitHub release and every intended package registry artifact separately, marks the merge as advanced but release-pending until artifacts exist, and supplies dated verification commands without publishing anything.",
+      "assertions": [
+        "Does not equate a merged release PR with a published release",
+        "Checks release and package artifacts independently",
+        "Uses release-pending when intended artifacts are absent",
+        "Includes a no-mutation receipt"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "age-is-not-stall",
+      "prompt": "This PR has not changed in eight days. Call out whether it is stalled and tell me who should act next.",
+      "expected_output": "The report refuses to infer a stall from age alone, identifies the expected transition and owner, distinguishes normal external waiting from a missed promised action, and reports unknown when evidence is insufficient.",
+      "assertions": [
+        "Does not classify stalled from elapsed time alone",
+        "Names the expected transition and its owner",
+        "Distinguishes waiting-external from stalled",
+        "Uses unknown when current evidence cannot decide"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "auth-and-rate-limit-degradation",
+      "prompt": "Reassess all open Vercel Labs workstreams from the vault, but gh authentication is expired and the public GitHub quota may run out.",
+      "expected_output": "The report uses safe public evidence where possible, states which inventory is complete and which details are unavailable, avoids claiming organization-private completeness, and retains unknown states instead of guessing.",
+      "assertions": [
+        "Records authentication identity and API coverage limits",
+        "Distinguishes complete search inventory from missing detail inspection",
+        "Does not present unavailable checks or reviews as current",
+        "Does not reauthenticate or mutate credentials without authorization"
+      ],
+      "files": []
+    }
+  ]
+}
