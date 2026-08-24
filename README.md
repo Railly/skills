@@ -70,6 +70,14 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Simplify](skills/.experimental/simplify) reduces code, diff size, duplication, tests, and maintenance surface within a bounded target while preserving behavior and proving that consolidated regression protection still detects defects.
 
+### Work Intake
+
+[Work Intake](skills/.experimental/work-intake) assesses one already-selected issue, pull request, or manual request before the factory grants mutation authority. It classifies intent, recommends the minimum workflow, and stops for human confirmation.
+
+### Workstream Reconcile
+
+[Workstream Reconcile](skills/.experimental/workstream-reconcile) treats handoffs as historical leads, revalidates their drift-prone claims against live GitHub, local Git, releases, deployments, and package artifacts, and produces a current read-only operating queue without inferring stalls from age alone.
+
 ### Xref
 
 [Xref](skills/.experimental/xref) snapshots the complete reference graph around a GitHub issue or pull request to surface competing work, orphans, structural links, and file-overlap risks before work begins.

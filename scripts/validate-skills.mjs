@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { validateIssueContracts } from "./lib/issue-contracts.mjs";
 import { markdownLinkTargets } from "./lib/markdown-links.mjs";
+import { parseSkillFrontmatter } from "./lib/skill-frontmatter.mjs";
 
 const SKILLS_DIR = "skills";
 const MARKETPLACE_PATH = join(".claude-plugin", "marketplace.json");
@@ -29,19 +30,6 @@ const CANONICAL_WRITERS = new Set([
 	"trail-decisions",
 ]);
 const errors = [];
-
-function parseFrontmatter(text) {
-	if (!text.startsWith("---")) return null;
-	const end = text.indexOf("\n---", 3);
-	if (end === -1) return null;
-	const block = text.slice(3, end).trim();
-	const keys = {};
-	for (const line of block.split("\n")) {
-		const match = line.match(/^([a-zA-Z0-9_-]+):/);
-		if (match) keys[match[1]] = line.slice(match[0].length).trim();
-	}
-	return keys;
-}
 
 function markdownFiles(root) {
 	return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
@@ -239,7 +227,7 @@ for (const { name: dir, root } of skills) {
 	}
 
 	const skill = readFileSync(skillPath, "utf8");
-	const frontmatter = parseFrontmatter(skill);
+	const frontmatter = parseSkillFrontmatter(skill);
 	if (!frontmatter) {
 		errors.push(`${dir}: missing or malformed frontmatter block`);
 		continue;
