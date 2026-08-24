@@ -1,0 +1,46 @@
+---
+const steps = [
+	{ id: "01", name: "Intake", skill: "issue-intake", state: "stable" },
+	{ id: "02", name: "Contract", skill: "Issue Contract", state: "artifact" },
+	{ id: "03", name: "Shape", skill: "solution-gate", state: "stable" },
+	{ id: "04", name: "Change", skill: "implementation", state: "work" },
+	{ id: "05", name: "Prove", skill: "test-strength", state: "experimental" },
+	{ id: "06", name: "Review", skill: "review-gate", state: "evaluated" },
+	{ id: "07", name: "Record", skill: "record-a-case", state: "stable" },
+];
+---
+
+<section id="workflow" class="workflow section-shell" aria-labelledby="workflow-title">
+	<div class="section-heading">
+		<div>
+			<p class="eyebrow">The operating system</p>
+			<h2 id="workflow-title">A factory loop, not a prompt collection.</h2>
+		</div>
+		<p>
+			Enter at the earliest incomplete state. Open work can hand off and re-enter without pretending the
+			cycle has closed.
+		</p>
+	</div>
+
+	<div class="workflow-board" tabindex="0" role="region" aria-label="Engineering workflow, scroll horizontally to inspect every step">
+		<svg class="trace" aria-hidden="true" viewBox="0 0 1000 190" preserveAspectRatio="none">
+			<path class="trace-base" d="M55 96H945"></path>
+			<path class="trace-signal" d="M55 96H945"></path>
+		</svg>
+		<ol class="workflow-steps">
+			{steps.map((step) => (
+				<li>
+					<span class="step-index">{step.id}</span>
+					<span class="step-node" aria-hidden="true"></span>
+					<strong>{step.name}</strong>
+					<code>{step.skill}</code>
+					<small>{step.state}</small>
+				</li>
+			))}
+		</ol>
+		<div class="handoff-loop">
+			<span aria-hidden="true">↳</span>
+			<div><strong>Cycle remains open?</strong><code>handoff → workstream-reconcile → Change</code></div>
+		</div>
+	</div>
+</section>
