@@ -13,34 +13,24 @@ const steps = [
 <section id="workflow" class="workflow section-shell" aria-labelledby="workflow-title">
 	<div class="section-heading">
 		<div>
-			<p class="eyebrow">The operating system</p>
+			<p class="eyebrow">Workflow</p>
 			<h2 id="workflow-title">A factory loop, not a prompt collection.</h2>
 		</div>
-		<p>
-			Enter at the earliest incomplete state. Open work can hand off and re-enter without pretending the
-			cycle has closed.
-		</p>
+		<p>Enter at the earliest incomplete state. Open work can hand off and re-enter.</p>
 	</div>
 
 	<div class="workflow-board" tabindex="0" role="region" aria-label="Engineering workflow, scroll horizontally to inspect every step">
-		<svg class="trace" aria-hidden="true" viewBox="0 0 1000 190" preserveAspectRatio="none">
-			<path class="trace-base" d="M55 96H945"></path>
-			<path class="trace-signal" d="M55 96H945"></path>
-		</svg>
 		<ol class="workflow-steps">
 			{steps.map((step) => (
 				<li>
 					<span class="step-index">{step.id}</span>
-					<span class="step-node" aria-hidden="true"></span>
-					<strong>{step.name}</strong>
-					<code>{step.skill}</code>
-					<small>{step.state}</small>
+					<div><strong>{step.name}</strong><code>{step.skill}</code></div>
+					<small>{step.state}</small><span class="step-arrow" aria-hidden="true">→</span>
 				</li>
 			))}
 		</ol>
 		<div class="handoff-loop">
-			<span aria-hidden="true">↳</span>
-			<div><strong>Cycle remains open?</strong><code>handoff → workstream-reconcile → Change</code></div>
+			<strong>Cycle open?</strong><code>handoff → workstream-reconcile → Change</code>
 		</div>
 	</div>
 </section>
