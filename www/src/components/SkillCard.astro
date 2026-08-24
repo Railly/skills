@@ -1,0 +1,45 @@
+---
+import type { Skill } from "../data/skills";
+
+interface Props {
+	skill: Skill;
+	index: number;
+}
+
+const { skill, index } = Astro.props;
+---
+
+<article
+	class="skill-card"
+	id={`skill-${skill.name}`}
+	data-skill-card
+	data-name={skill.name}
+	data-channel={skill.channel}
+	data-type={skill.type}
+	data-search={`${skill.name} ${skill.type} ${skill.channel} ${skill.maturity} ${skill.summary}`.toLowerCase()}
+>
+	<div class="skill-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</div>
+	<div class="skill-main">
+		<div class="skill-title-row">
+			<h3><a href={`#skill-${skill.name}`}>{skill.name}</a></h3>
+			<span class:list={["channel-pill", `channel-${skill.channel}`]}>{skill.channel}</span>
+		</div>
+		<p>{skill.summary}</p>
+		<div class="skill-command">
+			<code>{skill.installCommand}</code>
+			<button type="button" data-copy={skill.installCommand} aria-label={`Copy install command for ${skill.name}`}>
+				<span data-copy-label>Copy</span>
+			</button>
+		</div>
+	</div>
+	<div class="skill-evidence">
+		<dl>
+			<div><dt>type</dt><dd>{skill.type}</dd></div>
+			<div><dt>evidence</dt><dd><span class="evidence-dot"></span>{skill.maturity}</dd></div>
+		</dl>
+		<div class="skill-links">
+			<a class="skill-source-link" href={skill.sourceUrl} target="_blank" rel="noreferrer">Source <span aria-hidden="true">↗</span></a>
+			<a href={skill.decisionUrl} target="_blank" rel="noreferrer">Decision <span aria-hidden="true">↗</span></a>
+		</div>
+	</div>
+</article>

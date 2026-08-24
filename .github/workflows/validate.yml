@@ -19,3 +19,12 @@ jobs:
         run: bun test scripts/lib/*.test.mjs
       - name: Verify behavior fixtures
         run: bun scripts/verify-eval-fixtures.mjs
+      - name: Install website dependencies
+        working-directory: www
+        run: bun install --frozen-lockfile
+      - name: Check website
+        working-directory: www
+        run: bun run check
+      - name: Build website
+        working-directory: www
+        run: bun run build

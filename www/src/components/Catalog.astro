@@ -1,0 +1,131 @@
+---
+import { channelCounts, release, skills, types } from "../data/skills";
+import SkillCard from "./SkillCard.astro";
+
+const channels = ["all", "stable", "candidate", "experimental"] as const;
+---
+
+<section id="catalog" class="catalog section-shell" aria-labelledby="catalog-title">
+	<div class="section-heading catalog-heading">
+		<div>
+			<p class="eyebrow">The registry</p>
+			<h2 id="catalog-title">Inspect the methods.</h2>
+		</div>
+		<p>Channel answers where it ships. Evidence answers what has been observed. They are not the same axis.</p>
+	</div>
+
+	<div class="catalog-controls" data-catalog-controls>
+		<div class="search-field">
+			<label for="skill-search">Search the registry</label>
+			<span aria-hidden="true">⌕</span>
+			<input id="skill-search" type="search" name="q" placeholder="Search names, evidence, outcomes…" autocomplete="off" />
+			<kbd>/</kbd>
+		</div>
+		<div class="channel-filters" role="group" aria-label="Filter by distribution channel">
+			{channels.map((channel) => (
+				<button type="button" data-channel-filter={channel} aria-pressed={channel === "all" ? "true" : "false"}>
+					{channel === "all" ? "All" : channel}
+					<span>{channel === "all" ? skills.length : channelCounts[channel]}</span>
+				</button>
+			))}
+		</div>
+		<div class="type-filter">
+			<label for="type-filter">Method type</label>
+			<select id="type-filter" name="type">
+				<option value="all">All types</option>
+				{types.map((type) => <option value={type}>{type}</option>)}
+			</select>
+		</div>
+	</div>
+
+	<div class="catalog-status" aria-live="polite">
+		<span><strong data-result-count>{skills.length}</strong> methods visible</span>
+		<span>registry snapshot / release {release}</span>
+	</div>
+
+	<div class="skill-list" data-skill-list>
+		{skills.map((skill, index) => <SkillCard skill={skill} index={index} />)}
+	</div>
+	<div class="empty-state" data-empty-state hidden>
+		<code>NO_MATCHING_METHOD</code>
+		<p>Try a broader search or clear one of the filters.</p>
+		<button type="button" data-clear-filters>Clear filters</button>
+	</div>
+</section>
+
+<script>
+	const search = document.querySelector<HTMLInputElement>("#skill-search");
+	const typeSelect = document.querySelector<HTMLSelectElement>("#type-filter");
+	const channelButtons = [...document.querySelectorAll<HTMLButtonElement>("[data-channel-filter]")];
+	const cards = [...document.querySelectorAll<HTMLElement>("[data-skill-card]")];
+	const resultCount = document.querySelector<HTMLElement>("[data-result-count]");
+	const emptyState = document.querySelector<HTMLElement>("[data-empty-state]");
+	const clearButton = document.querySelector<HTMLButtonElement>("[data-clear-filters]");
+	let selectedChannel = "all";
+
+	const updateUrl = () => {
+		const url = new URL(window.location.href);
+		const query = search?.value.trim() ?? "";
+		const type = typeSelect?.value ?? "all";
+		query ? url.searchParams.set("q", query) : url.searchParams.delete("q");
+		selectedChannel !== "all"
+			? url.searchParams.set("channel", selectedChannel)
+			: url.searchParams.delete("channel");
+		type !== "all" ? url.searchParams.set("type", type) : url.searchParams.delete("type");
+		window.history.replaceState({}, "", url);
+	};
+
+	const applyFilters = () => {
+		const query = search?.value.trim().toLowerCase() ?? "";
+		const type = typeSelect?.value ?? "all";
+		let visible = 0;
+		for (const card of cards) {
+			const matchesQuery = !query || card.dataset.search?.includes(query);
+			const matchesChannel = selectedChannel === "all" || card.dataset.channel === selectedChannel;
+			const matchesType = type === "all" || card.dataset.type === type;
+			card.hidden = !(matchesQuery && matchesChannel && matchesType);
+			if (!card.hidden) visible += 1;
+		}
+		if (resultCount) resultCount.textContent = String(visible);
+		if (emptyState) emptyState.hidden = visible !== 0;
+		for (const button of channelButtons) {
+			button.setAttribute("aria-pressed", String(button.dataset.channelFilter === selectedChannel));
+		}
+		updateUrl();
+	};
+
+	const hydrateFilters = () => {
+		const params = new URLSearchParams(window.location.search);
+		const query = params.get("q") ?? "";
+		const channel = params.get("channel") ?? "all";
+		const type = params.get("type") ?? "all";
+		if (search) search.value = query;
+		if (channelButtons.some((button) => button.dataset.channelFilter === channel)) selectedChannel = channel;
+		if (typeSelect && [...typeSelect.options].some((option) => option.value === type)) typeSelect.value = type;
+		applyFilters();
+	};
+
+	search?.addEventListener("input", applyFilters);
+	typeSelect?.addEventListener("change", applyFilters);
+	for (const button of channelButtons) {
+		button.addEventListener("click", () => {
+			selectedChannel = button.dataset.channelFilter ?? "all";
+			applyFilters();
+		});
+	}
+	clearButton?.addEventListener("click", () => {
+		if (search) search.value = "";
+		if (typeSelect) typeSelect.value = "all";
+		selectedChannel = "all";
+		applyFilters();
+		search?.focus();
+	});
+	document.addEventListener("keydown", (event) => {
+		if (event.key === "/" && document.activeElement?.tagName !== "INPUT") {
+			event.preventDefault();
+			search?.focus();
+		}
+	});
+	window.addEventListener("popstate", hydrateFilters);
+	hydrateFilters();
+</script>
