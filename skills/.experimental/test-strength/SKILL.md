@@ -32,7 +32,9 @@ In a reversible isolated change, remove the fix, invert the condition, or introd
 
 Do not accept a red caused by compilation failure, unrelated setup, or a different assertion.
 
-**Complete when:** the intended assertion fails for the intended reason without the fix and passes after restoration.
+Introduce the fault where the product executes it, not only where the logic is defined. A test that calls a helper directly cannot observe a broken call site, so a fault that dies in the helper and survives at the call site is an unprotected wiring path, not a killed mutant. When definition and call site differ, falsify at both and report each result.
+
+**Complete when:** the intended assertion fails for the intended reason without the fix, passes after restoration, and the fault was introduced at the call site the product actually runs.
 
 ## 4. Probe the model, not the example
 
@@ -46,7 +48,9 @@ For protocols, state machines, parsers, serializers, and event translation, run 
 
 For other changes, select methods from the contract. Scope campaigns to actionable code. Treat surviving mutants in critical logic as leads. Do not chase a universal mutation or coverage percentage.
 
-**Complete when:** every modeled class is executed or excluded with evidence, generated failures are reproducible, and survivors are killed, justified, or recorded as gaps.
+Every cell or equivalence class enumerated in step 1 needs its own falsifier, because enumeration is a claim about coverage that a sampled campaign does not discharge. A dispatch table, intent map, or state matrix whose entries are enumerated but whose tests exercise a subset has one declared gap per unexercised entry, named individually. Deleting an unexercised entry must break a test, or that entry is unprotected regardless of the suite's color.
+
+**Complete when:** every modeled class is executed or excluded with evidence, every enumerated cell has a falsifier or a named gap, generated failures are reproducible, and survivors are killed, justified, or recorded as gaps.
 
 ## 5. Exercise the real boundary and producer
 
@@ -64,6 +68,6 @@ Repeat new tests, control clocks, randomness, ports, and external state, and rec
 
 ## 7. Report strength
 
-Report the behavioral dimensions and exclusions, oracle provenance, fixture provenance, fix-absent red and restored green evidence, mutation or property results, real producer and boundary exercised, remaining survivors, and verification gaps.
+Report the behavioral dimensions and exclusions, oracle provenance, fixture provenance, fix-absent red and restored green evidence, the falsification site when definition and call site differ, per-cell falsifier coverage, mutation or property results, real producer and boundary exercised, remaining survivors, and verification gaps.
 
 **Complete when:** no claim of protection relies on a green suite, implementation-derived expectations, an implicit matrix, or semantically invalid synthetic input.
