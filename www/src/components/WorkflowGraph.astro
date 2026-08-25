@@ -1,12 +1,16 @@
 ---
 const steps = [
-	{ id: "01", name: "Intake", skill: "issue-intake", state: "stable" },
-	{ id: "02", name: "Contract", skill: "Issue Contract", state: "artifact" },
-	{ id: "03", name: "Shape", skill: "solution-gate", state: "stable" },
-	{ id: "04", name: "Change", skill: "software-factory", state: "experimental" },
-	{ id: "05", name: "Prove", skill: "test-strength", state: "experimental" },
-	{ id: "06", name: "Review", skill: "review-gate", state: "evaluated" },
-	{ id: "07", name: "Record", skill: "record-a-case", state: "stable" },
+	{ id: "01", name: "Select", skill: "issue-intake", note: "optional" },
+	{ id: "02", name: "Admit", skill: "work-intake", note: "authority" },
+	{ id: "03", name: "Contract", skill: "Issue Contract", note: "artifact" },
+	{ id: "04", name: "Shape", skill: "solution-gate", note: "method" },
+	{ id: "05", name: "Execute", skill: "software-factory", note: "method" },
+	{ id: "06", name: "Spec", skill: "acceptance IDs", note: "verdict" },
+	{ id: "07", name: "Review", skill: "review-gate", note: "verdict" },
+	{ id: "08", name: "Show", skill: "before-after", note: "evidence" },
+	{ id: "09", name: "Promote", skill: "human decision", note: "authority" },
+	{ id: "10", name: "Deliver", skill: "authorized action", note: "external" },
+	{ id: "11", name: "Record", skill: "record-a-case", note: "ledger" },
 ];
 ---
 
@@ -16,7 +20,7 @@ const steps = [
 			<p class="eyebrow">Workflow</p>
 			<h2 id="workflow-title">A factory loop, not a prompt collection.</h2>
 		</div>
-		<p>Enter at the earliest incomplete state. Open work can hand off and re-enter.</p>
+		<p><code>factory-loop</code> enters at the earliest incomplete state. Open work can hand off and re-enter.</p>
 	</div>
 
 	<div class="workflow-board" tabindex="0" role="region" aria-label="Engineering workflow, scroll horizontally to inspect every step">
@@ -25,12 +29,12 @@ const steps = [
 				<li>
 					<span class="step-index">{step.id}</span>
 					<div><strong>{step.name}</strong><code>{step.skill}</code></div>
-					<small>{step.state}</small><span class="step-arrow" aria-hidden="true">→</span>
+					<small>{step.note}</small><span class="step-arrow" aria-hidden="true">→</span>
 				</li>
 			))}
 		</ol>
 		<div class="handoff-loop">
-			<strong>Cycle open?</strong><code>handoff → workstream-reconcile → Change</code>
+			<strong>Cycle open?</strong><code>handoff → workstream-reconcile → earliest incomplete state</code>
 		</div>
 	</div>
 </section>

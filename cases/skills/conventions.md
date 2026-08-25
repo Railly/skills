@@ -9,6 +9,8 @@ Foundry governance, maturity registry, and validation script.
 .claude-plugin/marketplace.json -> README.md foundry/maturity.json scripts/validate-skills.mjs
 foundry/maturity.json -> README.md .claude-plugin/marketplace.json foundry/governance.md
 skills/.experimental/ -> README.md .claude-plugin/marketplace.json foundry/maturity.json
+skills/.experimental/factory-loop/ -> README.md CHANGELOG.md .claude-plugin/marketplace.json foundry/maturity.json foundry/rounds www/src/components/WorkflowGraph.astro www/src/components/EvidenceKey.astro www/src/styles/global.css scripts/lib/factory-loop.test.mjs
+skills/.experimental/software-factory/ -> README.md CHANGELOG.md foundry/maturity.json www/src/components/WorkflowGraph.astro www/src/styles/global.css scripts/lib/factory-loop.test.mjs
 skills/issue-intake/ -> README.md foundry/missions foundry/maturity.json
 skills/review-gate/ -> README.md .claude-plugin/marketplace.json foundry/maturity.json
 skills/record-a-case/ -> README.md .claude-plugin/marketplace.json foundry/maturity.json

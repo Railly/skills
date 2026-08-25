@@ -46,6 +46,10 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Before After](skills/.experimental/before-after) turns a bug fix, feature, benchmark, or migration into a minimal browser-openable comparison. It puts old and new behavior on one shared basis, supports screenshotable visual repros, exact benchmark tables, and small feature simulators, and uses the official Vercel report foundation.
 
+### Factory Loop
+
+[Factory Loop](skills/.experimental/factory-loop) routes one engineering work item through admission, contract, shaping, staged execution, exact-head review, before/after acceptance, human promotion, re-entry, and case capture. It enters at the earliest incomplete current state and delegates every phase to its owning skill.
+
 ### Handoff
 
 [Handoff](skills/.experimental/handoff) closes a working cycle so the next session resumes without rereading the transcript. It verifies state against git before asserting it, keeps delivery, verification, and human judgment independent, and stacks each session onto the prior document instead of overwriting it. Closed work with a transferable lesson goes to Record a Case instead.
@@ -76,7 +80,7 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 ### Software Factory
 
-[Software Factory](skills/.experimental/software-factory) runs an admitted change through staged execution between Solution Gate and Review Gate. Each stage produces required evidence before the next begins, thresholds are fixed before the diff exists, and advancement never rests on an agent's own report of success.
+[Software Factory](skills/.experimental/software-factory) runs an admitted change through staged execution between Solution Gate and Review Gate. It implements, reduces, hardens applicable failure paths, runs Test Strength on the final code, and proves real behavior through independent evidence-producing passes.
 
 ### Work Intake
 
@@ -94,27 +98,27 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 ```mermaid
 flowchart LR
-  Baseline[quality-baseline] --> Gap[Verified gap]
-  Backlog[Issue backlog] --> Intake[issue-intake]
-  Intake --> Choice{User chooses}
-  Gap --> Choice
-  Choice --> Contract[Issue Contract]
-  Contract --> Reproduce[Reproduce and map]
-  Reproduce --> Gate[solution-gate]
-  Gate --> Shape[shaping]
-  Shape --> Change[Implement acceptance IDs]
-  Change --> Proof[Deterministic proof]
-  Proof --> Spec[Spec review]
-  Spec --> Review[review-gate]
-  Review --> Case[record-a-case]
-  Case --> Result[Evidence-backed result]
-  Change -.cycle ends open.-> Handoff[handoff]
-  Handoff -.next session.-> Change
+  Select[issue-intake if needed] --> Admit[work-intake]
+  Admit --> HumanA{Human admits Formula}
+  HumanA --> Contract[Reproduce and freeze Issue Contract]
+  Contract --> Shape[solution-gate and shaping]
+  Shape --> Factory[software-factory]
+  Factory --> Spec[Independent Spec review]
+  Spec --> Review[review-gate on exact state]
+  Review --> Show[before-after]
+  Show --> HumanP{Human promotion gate}
+  HumanP --> Deliver[Authorized external action]
+  Deliver --> Case[record-a-case]
+  Review -.code finding.-> Factory
+  Review -.contract finding.-> Shape
+  Factory -.cycle ends open.-> Handoff[handoff]
+  Handoff --> Reconcile[workstream-reconcile]
+  Reconcile -.earliest incomplete state.-> Admit
 ```
 
-Enter at the earliest incomplete state. A reproduced issue can begin at implementation, and an existing diff can begin at proof or review.
+`factory-loop` enters at the earliest incomplete state instead of replaying the whole graph. Inside `software-factory`, the order is implementation, bounded simplification, applicable Resilience Audit, final-code Test Strength, and real-behavior proof.
 
-Not every cycle reaches a case. When work stops with the cycle still open, `handoff` carries state to the next session; `record-a-case` takes over once the work closes and leaves a transferable lesson.
+Not every cycle reaches promotion. When work stops with the cycle still open, `handoff` carries state to the next session; `record-a-case` takes over once the cycle closes and leaves a transferable lesson.
 
 ## Maturity
 

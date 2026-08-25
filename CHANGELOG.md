@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.8 - 2026-08-25
+
+The published workflow now has a master router, while staged execution keeps ownership of implementation evidence, runs final Test Strength after applicable resilience hardening, and can materialize independent passes visibly through Herdr.
+
+### Added
+
+- `factory-loop`, an experimental orchestrator for earliest-incomplete routing, read-only admission, contract and shape gates, staged execution, separate Spec and Standards verdicts, before/after acceptance, explicit promotion authority, re-entry, and Case capture
+- Behavior and trigger evals covering admission, re-entry, resilience ordering, exact-head acceptance, stale evidence, shape-changing feedback, and handoff reconciliation
+- Round 013 recording the orchestration boundary and the questions required for promotion
+
+### Changed
+
+- `software-factory` now delegates applicable hardening to `resilience-audit` before final `test-strength`, invalidates dependent evidence whenever a later stage changes code or tests, and retains Herdr as an optional visible runtime adapter
+- The README and public workflow graph show `work-intake`, Software Factory, Before After, the human promotion gate, and evidence-aware re-entry
+
 ## 0.0.7 - 2026-08-25
 
 Herdr Workstreams turns a selected engineering queue into visible repo-scoped workspaces with one optional portfolio cockpit and specialists launched only when their owning workflow needs them.
