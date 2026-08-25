@@ -1,11 +1,11 @@
 ---
 name: software-factory
-description: "Run an admitted change through staged execution where each stage produces required evidence before the next begins. Use after a shape or Formula is accepted and before a diff is offered for review, when one agent would otherwise implement, clean, test, and judge its own work in a single context. Separate implementation, reduction, test strength, and hardening into independent passes, and refuse to advance on an agent's own claim of completion. Do not use to select work, choose a solution shape, or replace the final review."
+description: "Run an admitted change through staged execution where each stage produces required evidence before the next begins. Use after a shape or Formula is accepted and before a diff is offered for review, when one agent would otherwise implement, clean, test, and judge its own work in a single context. Separate implementation, reduction, resilience hardening, final test strength, and behavioral proof into independent passes, and refuse to advance on an agent's own claim of completion. Do not use to select work, choose a solution shape, or replace the final review."
 compatibility: Requires a repository with runnable checks and an accepted change contract. Stage tooling is repository-specific and must be discovered, never assumed.
 allowed-tools:
   - Skill(test-strength)
   - Skill(simplify)
-  - Skill(review-gate)
+  - Skill(resilience-audit)
   - Skill(herdr-workstreams)
   - Agent
 ---
@@ -17,8 +17,8 @@ allowed-tools:
 accepted shape or Formula
   → 1. implement   → diff
   → 2. reduce      → complexity evidence
-  → 3. strengthen  → surviving-mutant evidence
-  → 4. harden      → failure-path evidence
+  → 3. harden      → failure-path evidence
+  → 4. strengthen  → surviving-mutant evidence
   → 5. prove       → observed behavior
 → Review Gate
 ```
@@ -35,7 +35,7 @@ Skip it when the change is fully mechanical, when its mechanism is determined an
 
 ## 1. Establish the stage contract before any stage runs
 
-Discover what this repository can actually verify. Record the command, not the intention: test runner, coverage, complexity or lint gates, mutation tooling, build, and how behavior is observed.
+Discover what this repository can actually verify. Record the command, not the intention: test runner, coverage, complexity or lint gates, mutation tooling, build, failure injection, and how behavior is observed. Classify whether resilience applies from the accepted contract's process, network, storage, queue, cache, filesystem, browser, third-party, durable-state, concurrency, and lifecycle boundaries.
 
 A stage whose tool does not exist is `unavailable`, and its evidence is owed. It is never silently satisfied, and its absence never blocks the stages that can run.
 
@@ -51,11 +51,11 @@ Each stage receives the change contract and the prior stage's evidence. It does 
 |---|---|---|
 | implement | the behavior change | checks pass at the named command |
 | reduce | behavior-preserving reduction | complexity within the fixed threshold |
-| strengthen | test strength | surviving mutants killed or explained |
 | harden | failure paths | each failure family observed, not asserted |
+| strengthen | test strength on the final hardened code | surviving mutants killed or explained |
 | prove | real behavior | output observed at the layer of the claim |
 
-Stage 3 delegates to `test-strength`. Stage 2 delegates to `simplify` where the reduction is bounded and behavior-preserving. Do not restate their methods here.
+Stage 2 delegates to `simplify` where the reduction is bounded and behavior-preserving. Stage 3 always records a resilience trigger classification and delegates applicable hardening to `resilience-audit`. Stage 4 delegates to `test-strength` after hardening because a resilience fix can change production behavior and add tests; earlier falsification evidence would describe an obsolete diff. Do not restate their methods here.
 
 When running inside Herdr and `herdr-workstreams` is available, materialize each agent-backed stage as a visible on-demand role in the target repo workspace. Keep ordinary commands in panes and return lifecycle plus evidence to this protocol. Visibility never satisfies a stage, and a persistent standing staff does not count as independent passes. Outside Herdr, use the available Agent surface.
 
@@ -66,6 +66,8 @@ When running inside Herdr and `herdr-workstreams` is available, materialize each
 A stage ends when its command says so. It does not end when an agent reports success. "Tests pass", "cleaned up", and "looks correct" are claims; the command output is the evidence.
 
 When a stage cannot pass, do not advance and retry downstream. Record which stage stopped, its output, and what it would take to satisfy it. A blocked stage is a result.
+
+Any later stage that changes production code or tests invalidates dependent evidence. Return to the earliest affected stage; after any hardening fix, rerun Test Strength and real-behavior proof.
 
 **Complete when:** every advance points to observed output, and every stop names its stage.
 

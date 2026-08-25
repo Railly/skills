@@ -78,6 +78,32 @@
 				"Does not treat skipping as a silent default"
 			],
 			"files": []
+		},
+		{
+			"id": 7,
+			"name": "resilience-trigger-classification",
+			"prompt": "This change adds a durable write followed by a remote notification. Happy-path tests pass, so skip hardening and move to mutation testing.",
+			"expected_output": "The factory classifies the durable commit point and later remote failure as resilience triggers, delegates applicable hardening to resilience-audit, and refuses to advance to final test strength without failure-path evidence.",
+			"assertions": [
+				"Classifies resilience from the accepted contract and system boundaries",
+				"Recognizes the durable commit point and later fallible stage",
+				"Delegates hardening to resilience-audit",
+				"Does not advance to test-strength on happy-path evidence alone"
+			],
+			"files": []
+		},
+		{
+			"id": 8,
+			"name": "hardening-invalidates-strength",
+			"prompt": "Test Strength passed, then Resilience Audit found a cleanup bug and changed production code plus its regression test. Keep the earlier mutation result and move to proof.",
+			"expected_output": "The factory rejects the stale Test Strength result, returns to the earliest affected stage, reruns Test Strength on the final hardened code, and only then repeats real-behavior proof.",
+			"assertions": [
+				"Invalidates evidence derived from the pre-hardening diff",
+				"Requires Test Strength on the final hardened code",
+				"Repeats real-behavior proof after the code change",
+				"Does not preserve a stale mutation result"
+			],
+			"files": []
 		}
 	]
 }
