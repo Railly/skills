@@ -50,6 +50,10 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Handoff](skills/.experimental/handoff) closes a working cycle so the next session resumes without rereading the transcript. It verifies state against git before asserting it, keeps delivery, verification, and human judgment independent, and stacks each session onto the prior document instead of overwriting it. Closed work with a transferable lesson goes to Record a Case instead.
 
+### Herdr Workstreams
+
+[Herdr Workstreams](skills/.experimental/herdr-workstreams) turns a human-selected engineering queue into repo-scoped Herdr workspaces, optionally maintains a single-pane control cockpit, keeps only the lead and required runtime processes persistent, and launches planner or reviewer agents visibly on demand for the skill that owns their method.
+
 ### Quality Baseline
 
 [Quality Baseline](skills/.experimental/quality-baseline) identifies repository-wide quality gaps before changes, rejects unsupported findings, and ranks one measurable pilot.

@@ -1,7 +1,8 @@
 ---
 name: review-gate
 description: "Gate a diff before pushing or requesting review: deterministic checks first, then focused lenses selected by what the diff changes. Use before opening or updating a PR, when asked to pre-review a change, or after an external review round to harvest each finding into a new gate."
-compatibility: Requires git and bash for the deterministic layer. Lens passes need a reviewer runtime; prefer a model different from the one that wrote the diff.
+compatibility: Requires git and bash for the deterministic layer.
+allowed-tools: [Skill(herdr-workstreams), Agent]
 ---
 
 # Review gate

@@ -13,3 +13,4 @@ Each directory records one candidate, the evidence considered, benchmark variant
 | [007](007-human-override-promotions/README.md) | explicit human maturity and channel decisions | promote Solution Gate and Handoff; archive the original issue picker |
 | [008](008-register-before-after/README.md) | repeated browser-openable before/after workflow | register as experimental and dogfooded by human override |
 | [011](011-register-software-factory/README.md) | staged execution protocol between the solution and review gates | register as experimental with the overlap question open |
+| [012](012-register-herdr-workstreams/README.md) | visible Herdr topology for selected engineering workstreams | register as experimental with one end-to-end dogfood run owed |
