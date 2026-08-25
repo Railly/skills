@@ -64,6 +64,32 @@
 				"Requires evidence for excluded cells"
 			],
 			"files": []
+		},
+		{
+			"id": 6,
+			"name": "helper-level-falsification",
+			"prompt": "The fix lives in a normalize helper. Our unit test calls normalize directly, inverts the condition, and goes red. Confirm the behavior is protected.",
+			"expected_output": "The skill treats a red at the helper as insufficient when the product reaches that logic through a call site, requires the same fault to be introduced where the product executes it, and reports a surviving call-site fault as an unprotected wiring path rather than a killed mutant.",
+			"assertions": [
+				"Distinguishes definition site from call site",
+				"Requires falsification where the product executes the logic",
+				"Does not accept a helper-level red as whole-path protection",
+				"Reports both results when the sites differ"
+			],
+			"files": []
+		},
+		{
+			"id": 7,
+			"name": "enumerated-table-partial-falsification",
+			"prompt": "Our intent router maps seven intents to seven templates. Three tests cover two of the intents and the suite is green. Call the routing table covered.",
+			"expected_output": "The skill refuses coverage for the five unexercised entries, names one declared gap per entry rather than a single aggregate gap, and requires that deleting an enumerated entry break a test before that entry counts as protected.",
+			"assertions": [
+				"Requires a falsifier per enumerated cell",
+				"Names gaps individually instead of aggregating them",
+				"Uses entry deletion as the protection check",
+				"Does not accept a green suite as table coverage"
+			],
+			"files": []
 		}
 	]
 }

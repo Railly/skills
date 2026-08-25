@@ -70,6 +70,10 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Simplify](skills/.experimental/simplify) reduces code, diff size, duplication, tests, and maintenance surface within a bounded target while preserving behavior and proving that consolidated regression protection still detects defects.
 
+### Software Factory
+
+[Software Factory](skills/.experimental/software-factory) runs an admitted change through staged execution between Solution Gate and Review Gate. Each stage produces required evidence before the next begins, thresholds are fixed before the diff exists, and advancement never rests on an agent's own report of success.
+
 ### Work Intake
 
 [Work Intake](skills/.experimental/work-intake) assesses one already-selected issue, pull request, or manual request before the factory grants mutation authority. It classifies intent, recommends the minimum workflow, and stops for human confirmation.
