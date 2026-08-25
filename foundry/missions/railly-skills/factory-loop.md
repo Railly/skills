@@ -1,6 +1,6 @@
 # Issue Contract: Railly/skills factory-loop
 
-Status: proof-ready
+Status: closed
 Source: manual request to publish the Factory Loop orchestrator
 Target repository: Railly/skills
 Base: dc2ab9752e1398fae7c16cf153c0c3304ff11a62
@@ -63,10 +63,10 @@ Must inspect:
 - [x] `bun scripts/verify-eval-fixtures.mjs` -> existing executable fixture corpus regression; Factory Loop evals are structural until a dedicated harness exists
 - [x] `bun test scripts/lib/*.test.mjs` -> A2, A3, A5, A6, I1-I3, I5
 - [x] `cd www && bun run check && bun run build` -> A6
-- [ ] independent Spec review -> A1, A2, A3, A4, A5, A6, I1, I2, I3, I4, I5
-- [ ] exact-state Review Gate -> Standards
-- [ ] verified current-state Before After -> human acceptance
-- [ ] GitHub PR checks and published `v0.0.8` -> delivery
+- [x] independent Spec review on tree `8674c78f` -> A1, A2, A3, A4, A5, A6, I1, I2, I3, I4, I5
+- [x] exact-state Review Gate on tree `8674c78f` -> Standards pass after six findings were closed
+- [x] real-build Before After, `dc2ab975` vs `f957cb1` -> verified desktop and narrow viewports in light and dark themes
+- [x] PR #19 checks, merge `3c09112`, tag and release `v0.0.8`, and production `skills.railly.dev` -> artifact verified
 
 ## Risk
 
@@ -75,17 +75,20 @@ Must inspect:
 
 ## Promotion
 
-- deterministic: pass on integrated working tree
-- spec: pending
-- standards: pending
-- delivery: authorized, pending exact-state gates
+- deterministic: pass on reviewed tree `8674c78f` and merge `3c09112`
+- spec: pass on tree `8674c78f`
+- standards: pass on tree `8674c78f`
+- delivery: artifact verified at release `v0.0.8` and `skills.railly.dev`
 
 ## Handoff
 
-- exact next command: run independent Spec review against this contract
-- authority boundary: Hunter authorized commit, push, PR, merge, and release for the exact state that passes Spec, Standards, checks, and release verification.
-- known gaps: current Before After predates the `v0.0.7` integration and must be regenerated.
+- exact next command: none; the mission is closed
+- authority boundary: Hunter authorized commit, push, PR, merge, and release for the exact state that passed Spec, Standards, checks, and release verification.
+- case: `cases/skills/factory-loop-v0.0.8-exact-state-release.md`
+- final delivery: PR #19 merged as `3c09112`; release `v0.0.8` and production artifact verified 2026-08-25.
+- known gaps: no outcome baseline comparison and no dedicated executable harness for Factory Loop eval JSON.
 
 ## Contract changes
 
 - 2026-08-25: rebased from `946b484` to `dc2ab97`, preserved Herdr as an optional runtime adapter, moved the release from `0.0.7` to `0.0.8`, and moved the Foundry decision from Round 012 to Round 013.
+- 2026-08-25: closed after successor Spec and Standards passes on tree `8674c78f`, PR #19 merge, release `v0.0.8`, production verification, and Case capture.

@@ -6,6 +6,7 @@ A case records evidence. It does not become a rule, exemplar, or skill merely by
 
 ## Published case studies
 
+- [Railly Skills v0.0.8: review and promotion attach to an exact tree](skills/factory-loop-v0.0.8-exact-state-release.md)
 - [Portless #352: match the full routing discriminator](portless/0352-tailscale-authority-matching.md)
 - [Portless #355: test the changed caller](portless/0355-changed-caller-coverage.md)
 - [agent-browser #1532: revive a discarded tab without losing live-tab state](agent-browser/1532-discarded-tab-revival.md)
