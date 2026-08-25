@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.7 - 2026-08-25
+
+Herdr Workstreams turns a selected engineering queue into visible repo-scoped workspaces with one optional portfolio cockpit and specialists launched only when their owning workflow needs them.
+
+### Added
+
+- `herdr-workstreams`, an experimental Herdr runtime adapter with one workspace per exact checkout, an optional single-pane `00-control` cockpit, minimal persistent leads and runtimes, and visible on-demand specialist agents
+- Human-readable workspace, tab, pane, and globally unique agent naming, with idempotent reuse based on workspace label plus exact cwd
+- Behavior and trigger evals covering queue materialization, external context roots, minimal topology, visible Solution Gate specialists, idempotent resume, portability outside Herdr, and the control-cockpit boundary
+- Round 012 registering the adapter as experimental with its first end-to-end dogfood run still owed
+
+### Changed
+
+- `solution-gate`, `software-factory`, and `review-gate` may launch their agent-backed passes visibly through Herdr while retaining ownership of method, evidence, and verdict
+
 ## 0.0.6 - 2026-08-24
 
 Staged execution now occupies the span between the solution and review gates, and Test Strength no longer treats an enumerated table or a helper-level red as protection.

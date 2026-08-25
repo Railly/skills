@@ -6,6 +6,7 @@ allowed-tools:
   - Skill(test-strength)
   - Skill(simplify)
   - Skill(review-gate)
+  - Skill(herdr-workstreams)
   - Agent
 ---
 # Software factory
@@ -55,6 +56,8 @@ Each stage receives the change contract and the prior stage's evidence. It does 
 | prove | real behavior | output observed at the layer of the claim |
 
 Stage 3 delegates to `test-strength`. Stage 2 delegates to `simplify` where the reduction is bounded and behavior-preserving. Do not restate their methods here.
+
+When running inside Herdr and `herdr-workstreams` is available, materialize each agent-backed stage as a visible on-demand role in the target repo workspace. Keep ordinary commands in panes and return lifecycle plus evidence to this protocol. Visibility never satisfies a stage, and a persistent standing staff does not count as independent passes. Outside Herdr, use the available Agent surface.
 
 **Complete when:** every available stage ran as its own pass with its own evidence.
 

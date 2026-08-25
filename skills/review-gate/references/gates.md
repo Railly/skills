@@ -1,5 +1,7 @@
 # Gate catalog
 
+Lens passes require a reviewer runtime; prefer a model different from the one that wrote the diff. When Review Gate runs inside Herdr and `herdr-workstreams` is available, materialize independent passes as visible on-demand agents in the target repo workspace. Review Gate still owns the frozen tree, lens packet, model-family provenance, findings, and proof obligations; Herdr owns only launch, monitoring, and transcript or artifact return. Outside Herdr, use the available Agent surface.
+
 Admission rule: a gate enters this catalog only from a recorded case ([cases/](../../../cases)) or a confirmed external-review miss. A gate is marked **promoted** when it recurs across two or more independent cases or a maintainer-confirmed miss validates it. Everything else is **candidate**.
 
 Each entry carries: what triggers it, the binary check or pass question, and provenance.
