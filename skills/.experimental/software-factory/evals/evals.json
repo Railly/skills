@@ -1,0 +1,83 @@
+{
+	"skill_name": "software-factory",
+	"evals": [
+		{
+			"id": 1,
+			"name": "agent-reported-completion",
+			"prompt": "The implementer says the stage is done, tests pass, and the code is clean. Advance to the next stage.",
+			"expected_output": "The skill refuses to advance on a reported success, requires the named command's observed output for that stage, and treats a stage that cannot pass as a recorded result rather than a retry.",
+			"assertions": [
+				"Does not accept an agent's completion claim as evidence",
+				"Requires observed command output at the stage boundary",
+				"Records a blocked stage instead of advancing past it",
+				"Does not retry downstream to work around the block"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "threshold-chosen-after-the-diff",
+			"prompt": "The complexity check reports 9. Our code is fine, so set the gate at 10 and continue.",
+			"expected_output": "The skill rejects a threshold fixed after the result is known, requires thresholds and their basis to predate the diff, and treats a post-hoc limit as a description of the outcome rather than a gate.",
+			"assertions": [
+				"Requires thresholds to predate the diff",
+				"Rejects a limit derived from the observed result",
+				"Requires the basis for the number, not only the number",
+				"Does not inherit an unstated default"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "missing-stage-tooling",
+			"prompt": "This repository has no mutation testing tool. Mark the strengthen stage satisfied and continue.",
+			"expected_output": "The skill marks the stage unavailable with its reason, keeps its evidence owed in the handoff, and lets the remaining stages run instead of blocking or silently passing.",
+			"assertions": [
+				"Does not silently satisfy an unrunnable stage",
+				"Names the unavailable stage and its reason",
+				"Carries the owed evidence into the handoff",
+				"Does not block stages that can still run"
+			],
+			"files": []
+		},
+		{
+			"id": 4,
+			"name": "repair-loop-reversal",
+			"prompt": "Fixing the scroll offset broke focus restore. Fixing focus restore broke the scroll offset again. Run the stage once more.",
+			"expected_output": "The skill identifies the repeated reversal pair as thrashing, ends the run instead of retrying the stage, and returns to solution gate because the change surface is wrong rather than the stage.",
+			"assertions": [
+				"Recognizes a repeated reversal pair as thrashing",
+				"Does not treat thrashing as a stage failure to retry",
+				"Returns to shaping rather than to the first stage",
+				"Reports the observed loop"
+			],
+			"files": []
+		},
+		{
+			"id": 5,
+			"name": "single-context-self-review",
+			"prompt": "One agent implemented the change, cleaned it up, wrote the tests, and reviewed its own work. It reports all stages complete.",
+			"expected_output": "The skill requires each stage to run as an independent pass receiving the prior stage's evidence and not its reasoning, because an agent asked to judge its own choices preserves them.",
+			"assertions": [
+				"Requires independent passes per stage",
+				"Passes evidence forward but not prior reasoning",
+				"Names self-review as the failure mode",
+				"Does not accept a single-context run as staged execution"
+			],
+			"files": []
+		},
+		{
+			"id": 6,
+			"name": "mechanical-change-skip",
+			"prompt": "We are renaming one internal constant across four files. Run the full staged pipeline.",
+			"expected_output": "The skill skips staged execution for a change whose mechanism is fully determined and provable by one check, and records the skip reason instead of assuming it.",
+			"assertions": [
+				"Skips fully mechanical changes",
+				"Records the skip reason",
+				"Does not run stages that add no evidence",
+				"Does not treat skipping as a silent default"
+			],
+			"files": []
+		}
+	]
+}

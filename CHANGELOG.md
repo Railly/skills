@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.0.6 - 2026-08-24
+
+Staged execution now occupies the span between the solution and review gates, and Test Strength no longer treats an enumerated table or a helper-level red as protection.
+
+### Added
+
+- `software-factory`, an experimental staged execution protocol that fixes thresholds before the diff exists, requires observed command output at every stage boundary, marks unrunnable stages as owed evidence, and ends a run on a repeated repair reversal
+- Behavior and trigger evals covering reported completion, post-hoc thresholds, missing stage tooling, repair loops, single-context self-review, and the mechanical-change skip
+- Round 011 registering the candidate with its overlap question against `test-strength`, `simplify`, and `work-intake` left open by design
+
+### Changed
+
+- `test-strength` requires falsification at the call site the product executes, not only at the definition site, and reports both results when they differ
+- `test-strength` requires a falsifier per enumerated cell, names one gap per unexercised entry instead of an aggregate, and uses entry deletion as the protection check
+- The published workflow graph names `software-factory` at the change step instead of unowned implementation
+
 ## 0.0.5 - 2026-08-24
 
 Workstream Reconcile turns historical handoffs into a current operating queue by checking their volatile claims against authoritative sources.
