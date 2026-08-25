@@ -1,0 +1,95 @@
+{
+  "skill_name": "herdr-workstreams",
+  "evals": [
+    {
+      "id": 1,
+      "name": "selected-queue-to-workspaces",
+      "prompt": "I ran workstream-reconcile and selected wterm and emulate. Set up Herdr so I can resume both, using their local checkouts and the handoffs in my notes vault.",
+      "expected_output": "The skill proposes one workspace per selected checkout, keeps implementation cwd in each repo, treats the vault as optional read-only context, asks approval before mutation, and leaves unselected workstreams untouched.",
+      "assertions": [
+        "Creates or reuses one workspace per exact checkout rather than one workspace for the vault",
+        "Uses the notes vault as context without making it the implementation cwd",
+        "Presents the topology plan before creating or moving Herdr resources",
+        "Does not materialize unselected queue items"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "minimal-persistent-topology",
+      "prompt": "Prepare my repo in Herdr with Codex as the main agent and a persistent dev server. Also keep Fable and Grok open forever in adjacent panes in case I need review.",
+      "expected_output": "The skill keeps only the lead and verified runtime process persistent, explains that reviewers are launched on demand, and does not start a dev command until it is discovered and requested.",
+      "assertions": [
+        "Keeps at most lead and runtime as persistent panes",
+        "Does not create standing reviewer agents",
+        "Discovers the repository-native dev command instead of assuming one",
+        "Does not install dependencies during topology setup"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "visible-solution-gate-specialists",
+      "prompt": "Solution Gate needs two independent shaping passes. Make them visible in Herdr using Cursor Fable and Grok, wait for both, and give the artifacts back to the gate.",
+      "expected_output": "The skill launches two uniquely named, read-only, on-demand agents in the repo workspace after resolving current model IDs, monitors bounded lifecycle states, and returns evidence handles without deciding the gate.",
+      "assertions": [
+        "Keeps Solution Gate as the method owner",
+        "Resolves model IDs from the installed runtime before launch",
+        "Uses unique visible Herdr agent names and read-only runtime modes",
+        "Does not count timeout, unknown, blocked, stalled, or empty output as evidence"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "idempotent-resume",
+      "prompt": "Set up agent-browser in Herdr again. I think there is already a workspace with that name, but I do not remember which checkout it points to.",
+      "expected_output": "The skill inspects the existing workspace and pane cwd, reuses only an exact checkout match, and proposes rather than silently repairing a collision or moving user panes.",
+      "assertions": [
+        "Does not reuse a workspace from its label alone",
+        "Checks the absolute checkout behind existing panes",
+        "Avoids duplicate workspaces when identity matches",
+        "Requires approval before moving or closing existing panes"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "near-miss-prioritization",
+      "prompt": "Look through all my handoffs and decide which three projects I should work on this week. Do not set up any terminals yet.",
+      "expected_output": "The request routes to workstream-reconcile or another prioritization method, remains read-only, and does not invoke Herdr topology setup.",
+      "assertions": [
+        "Does not claim ownership of portfolio prioritization",
+        "Routes stale handoff reconciliation to workstream-reconcile",
+        "Does not create workspaces, tabs, panes, or agents"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "outside-herdr-fallback",
+      "prompt": "Run Solution Gate from a normal terminal where HERDR_ENV is unset. Herdr is installed elsewhere on the machine.",
+      "expected_output": "The owning gate uses its normal Agent surface without attaching to or controlling another Herdr session, and reports Herdr visibility as unavailable rather than blocking the method.",
+      "assertions": [
+        "Does not inspect or control Herdr when HERDR_ENV is unset",
+        "Falls back to the owning skill's Agent surface",
+        "Does not block Solution Gate solely because Herdr visibility is unavailable"
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "control-cockpit-boundary",
+      "prompt": "Keep one master Herdr session open from my preferred notes vault so I can monitor wterm and emulate. Put every coding agent and dev server inside that master workspace too.",
+      "expected_output": "The skill proposes one optional single-pane control workspace rooted at the configured context location, keeps implementation and runtimes in repo-scoped workspaces, and uses Herdr's global state and sidebar instead of duplicating project panes.",
+      "assertions": [
+        "Keeps the control workspace to one coordinator pane",
+        "Does not host implementation workers or dev servers in the control workspace",
+        "Treats the control root as configurable context rather than a required vault",
+        "Uses custom workspace, tab, pane, and globally unique agent labels",
+        "Uses event-driven blocked or done reporting instead of a standing reviewer panel"
+      ],
+      "files": []
+    }
+  ]
+}

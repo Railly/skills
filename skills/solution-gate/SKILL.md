@@ -3,6 +3,7 @@ name: solution-gate
 description: "Orchestrate Shaping to decide whether a fix or contributor PR is the right thing to build. Use before implementation when a defect has multiple solution shapes, changes a contract or persistent state, follows a prior review finding, or requires adopting, amending, absorbing, recreating, or rejecting an existing patch. Freeze the evidence-backed contract, run isolated Shaping passes, refute their weakest assumptions, feed evidence back into their fit checks, then gate the selected shape. Skip mechanical changes."
 allowed-tools:
   - Skill(shaping)
+  - Skill(herdr-workstreams)
   - Agent
 ---
 # Solution gate
@@ -45,6 +46,8 @@ Invoke `shaping` in two isolated reviewer runs on different model families, neit
 - a recommended survivor, rejected alternatives, and required spikes.
 
 Do not ask for Solution Gate's old proposal schema. Predictions, costs, and harmful branches are extracted from shaped mechanisms during the adversarial pass. If only one shape is physically possible, record the evidence instead of manufacturing alternatives.
+
+When running inside Herdr and `herdr-workstreams` is available, use it to materialize both passes as visible on-demand agents in the target repo workspace. Herdr owns only launch and lifecycle; this gate still owns isolation, the frozen packet, model-family independence, artifacts, and verdict. Outside Herdr, use the available Agent surface.
 
 **Complete when:** two independent shaping artifacts exist, or the record proves the solution is mechanically determined.
 
