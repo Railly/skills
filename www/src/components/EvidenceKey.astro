@@ -1,10 +1,14 @@
 ---
+import { evaluatedCount, release, skills } from "../data/skills";
+
 const states = [
 	["experimental", "Coherent method and trigger boundary; real-work evidence may be absent."],
 	["dogfooded", "Used on real work without a reliable baseline comparison."],
 	["evaluated", "Compared against a baseline; evidence remains incomplete or inconclusive."],
 	["validated", "Repeatable positive effect across holdouts and trials with human review."],
 ];
+
+const validatedCount = skills.filter((skill) => skill.maturity === "validated").length;
 ---
 
 <section class="evidence-key section-shell" aria-labelledby="evidence-title">
@@ -13,7 +17,7 @@ const states = [
 			<p class="eyebrow">Evidence model</p>
 			<h2 id="evidence-title">Maturity is an evidence claim.</h2>
 		</div>
-		<p>Release 0.0.5 has one evaluated method and no validated methods.</p>
+		<p>Release {release} has {evaluatedCount} evaluated method and {validatedCount} validated methods.</p>
 	</div>
 	<div class="maturity-grid">
 		{states.map(([state, description], index) => (
