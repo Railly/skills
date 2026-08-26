@@ -1,0 +1,51 @@
+SUNAT CLI Buzón SOL independent substrate evidence
+Date: 2026-08-26
+Target: crafter-research/sunat-cli
+Base: origin/main ab7d8e6a7ee7fbc22b5a48345e2750b72cdb967a
+Head: 42e8e0e77ffc817c5d38d738355668fcf404d223
+
+Live SUNAT producer drive
+- Authenticated through the canonical SOL entry MenuInternet.htm?pestana=*&agrupacion=*.
+- Buzón frame opened through the real agent-browser and cross-origin CDP path.
+- Sanitized result: ready=true, folders=0, alerts=0, items=1.
+- Message summary: pagesFetched=1, observedCount=0, countMismatch=true.
+- Notification summary: pagesFetched=1, observedCount=1, countMismatch=true.
+- No subject, RUC, message code, credential, query value, body, or attachment was recorded.
+
+Sanitized network trace
+- GET /ol-ti-itvisornoti/visor/master, Document, 200.
+- GET /ol-ti-itvisornoti/visor/ajax/listarCarpetas, Fetch and XHR, 200.
+- POST /ol-ti-itvisornoti/visor/consultarAlertas, Fetch and XHR, 200.
+- GET /ol-ti-itvisornoti/visor/listNotiMenPag, Fetch and XHR, 200.
+- GET /ol-ti-itvisornoti/visor/obtenerDetalleNotiMen, XHR, status null.
+- The detail request was attempted automatically by the portal and aborted locally before a response. No detail body was read.
+
+Private filesystem substrate
+- Exact-head canonical empty snapshot round trip succeeded.
+- Directory mode 0700, file mode 0600, totalCount=0.
+- macOS ls -lde showed no extended ACL entries.
+- A post-write caller failure was forced and the same operation retried successfully with a valid snapshot.
+
+Behavior and artifact verification
+- Unit: 427 pass, 1 Windows-only skip, 0 fail.
+- E2E: 73 pass, 2 opt-in SUNAT beta skips, 0 fail.
+- Total green tests: 500.
+- CLI Node build passed.
+- Website Astro build passed, 4 pages generated.
+- npm audit: 0 vulnerabilities.
+- npm registry signatures: 231 verified.
+- npm attestations in dependency audit: 74 verified.
+- Packed artifact: crafter-sunat-cli-0.13.0.tgz.
+- Packed files: 104.
+- SHA-256: 9bdc6cc9a4a8fffdd42730f0ccbba02858dc8b47539e392f4b42e7200309422b.
+- Clean package install reported version 0.13.0, exposed buzon list and status, and served the metadata-only schema.
+
+Fix-absent falsification
+- Removing detail route installation made the route-order test fail.
+- Marking baseline items new made the baseline-state test fail.
+- Removing 429 retry made the retry test fail.
+- Removing failed-portal browser close made cleanup ordering fail.
+- Removing AbortSignal timeout made the request-boundary test fail.
+- Removing total-count consistency validation made contradictory-state rejection fail.
+- Restoring the legacy SOL base URL made the canonical-entry source test fail.
+All snapshots were restored and the exact-head suite returned green.

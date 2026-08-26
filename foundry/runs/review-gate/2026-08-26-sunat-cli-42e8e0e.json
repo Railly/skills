@@ -1,0 +1,668 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-26",
+    "repo": "crafter-research/sunat-cli",
+    "base": "origin/main",
+    "head": "42e8e0e77ffc817c5d38d738355668fcf404d223",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "user request plus 04_Projects/_active/sunat-cli/buzon-reader shaping artifacts",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5.6-sol",
+    "reviewer_model": "gpt-5.6-sol",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "SOL authentication and browser session reuse",
+      "private durable taxpayer metadata state",
+      "cross-origin browser and process lifecycle",
+      "live remote read-only requests"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-26-sunat-cli-buzon-substrate.txt",
+      "evidence": "A sanitized live SUNAT trace, real macOS permission probe, clean packed install, and fix-absent mutations directly challenged the implementation."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user request in the working session",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "evidence": "The requested release is a production-ready Buzón reader that can surface novel problems without reading private message bodies or creating SUNAT mutations."
+    },
+    {
+      "source": "design",
+      "location": "04_Projects/_active/sunat-cli/buzon-reader big picture, breadboard and slices",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "The shaped design fixes the metadata-only boundary, manual invocation, bounded pagination, private baseline state and explicit upstream contradictions."
+    },
+    {
+      "source": "user_facing",
+      "location": "README, package README, limitations, bundled skills, schema and bilingual website",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P5"
+      ],
+      "evidence": "Every public surface names list and offline status, the local snapshot, metadata-only exclusions and manual invocation."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/cli/src/buzon, command registration, auth, tests and built package",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "evidence": "The exact diff, test suites, real portal drive, Node artifact and clean install were reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The live reader collects only inbox metadata and prevents message-detail responses, attachment reads and SUNAT mutations.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "the actual network requests and responses produced while opening and listing Buzón SOL",
+        "layer": "live browser network boundary",
+        "method": "sanitized agent-browser request trace during exact-head live collection",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the source contains no detail-fetch call",
+        "counterexample": "the SUNAT visor itself attempts the detail endpoint automatically after the CLI clicks the Buzón entry",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The live trace observed obtenerDetalleNotiMen with status null while metadata endpoints returned 200, proving the route abort rather than source absence enforces the boundary."
+      },
+      "substrates": [
+        {
+          "name": "authenticated SUNAT Buzón SOL portal through agent-browser",
+          "status": "exercised",
+          "evidence": "Folders, alerts and list routes returned 200; the detail route had no response; no body or attachment endpoint completed."
+        }
+      ],
+      "evidence": "The schema, help and live request trace agree on the metadata-only boundary."
+    },
+    {
+      "id": "P2",
+      "claim": "Pagination and remote failure handling are bounded, serialized and preserve contradictory upstream counts without inventing certainty.",
+      "kind": "availability",
+      "status": "verified",
+      "oracle": {
+        "observes": "request order, retry policy, timeout, page stop conditions and separately reported producer counts",
+        "layer": "protocol adapter plus live producer",
+        "method": "dimensioned unit corpus, timeout/retry mutations and exact-head SUNAT collection",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "one fixture page normalizes correctly",
+        "counterexample": "later pages, throttling, malformed rows or conflicting total and records fields could loop, duplicate or hide drift",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The corpus covers duplicates, malformed rows, endPage, max-page cap, 429, terminal failures and multiple reported counts; live SUNAT produced countMismatch=true."
+      },
+      "substrates": [
+        {
+          "name": "SUNAT listNotiMenPag producer and artificial boundary corpus",
+          "status": "exercised",
+          "evidence": "Both message and notification kinds completed in one page, while unit tests drove retry and pagination cells."
+        }
+      ],
+      "evidence": "Requests have a 15 second fetch timeout, 1200 ms pacing, bounded retries and a 1 to 100 page cap."
+    },
+    {
+      "id": "P3",
+      "claim": "The local snapshot is private, strictly validated and recoverable without exposing rejected contents.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "the actual persisted bytes, filesystem permissions, validation outcome and retry state",
+        "layer": "macOS filesystem",
+        "method": "real SUNAT_HOME round trip, stat and ls -lde plus corrupt-state tests",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "writePrivateFile is called",
+        "counterexample": "a valid-looking write could retain permissive modes, extra private fields or internally contradictory counters",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The real file was 0600 in a 0700 directory with no ACL entries; body/token extras were absent; incomplete and contradictory states were rejected."
+      },
+      "substrates": [
+        {
+          "name": "macOS APFS temporary SUNAT_HOME",
+          "status": "exercised",
+          "evidence": "Canonical empty-state round trip succeeded with 0700/0600 permissions and totalCount zero."
+        }
+      ],
+      "evidence": "The strict allowlist validates every nested field and safe integer before offline status reads it."
+    },
+    {
+      "id": "P4",
+      "claim": "The first successful collection creates a baseline, and later collections classify new, known and missing identities deterministically.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "state transitions across absent, repeated, added and missing identity sets",
+        "layer": "local state machine",
+        "method": "multi-step state tests with independently asserted expected counts and fix-absent mutation",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "newSincePrevious is false in a single result",
+        "counterexample": "the first run could incorrectly alert every historical item or later runs could lose missing identities",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing the baseline guard made the transition test red; restored code produced baseline zero-new, later one-new and later one-missing."
+      },
+      "substrates": [
+        {
+          "name": "real private-state writer with synthetic identity transitions",
+          "status": "exercised",
+          "evidence": "Three sequential writes and a post-commit retry exercised the full transition contract."
+        }
+      ],
+      "evidence": "The baseline and reconciliation states are deterministic and covered through the same writer used by the CLI."
+    },
+    {
+      "id": "P5",
+      "claim": "The 0.13.0 package and website expose the promised command, schema, documentation and Node-compatible artifact.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "the contents and behavior of the packed tarball and generated website",
+        "layer": "distribution artifacts",
+        "method": "npm pack, clean install, Node execution and Astro production build",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "source tests and package.json say version 0.13.0",
+        "counterexample": "the tarball could omit the schema or built command while source tests remain green",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "A clean install of the 104-file tarball reported 0.13.0, listed buzon list/status and returned the metadata-only schema."
+      },
+      "substrates": [
+        {
+          "name": "packed npm tarball installed into an empty directory under Node",
+          "status": "exercised",
+          "evidence": "Artifact SHA-256 9bdc6cc9a4a8fffdd42730f0ccbba02858dc8b47539e392f4b42e7200309422b passed version, help and schema checks."
+        },
+        {
+          "name": "Astro production website build",
+          "status": "exercised",
+          "evidence": "Four static pages built and bilingual content reports 500 green tests."
+        }
+      ],
+      "evidence": "CLI build, website build, package audit, tarball install and public content all agree."
+    },
+    {
+      "id": "P6",
+      "claim": "All SOL consumers use the canonical menu entry that currently authenticates instead of the legacy base URL that returns 503.",
+      "kind": "availability",
+      "status": "verified",
+      "oracle": {
+        "observes": "the real SUNAT redirect and authenticated menu reached by the shared URL",
+        "layer": "live SOL authentication boundary",
+        "method": "live login and subsequent exact-head Buzón collection through the exported SOL_MENU_URL",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the URL contains MenuInternet.htm",
+        "counterexample": "the legacy base path has the same pathname but returned SUNAT 503 while the canonical query entry redirected to login and dashboard",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The legacy URL was observed failing; the query-bearing entry logged in and supported the live collection. Auth, Buzón, F616 and RHE now share it."
+      },
+      "substrates": [
+        {
+          "name": "live SUNAT SOL menu",
+          "status": "exercised",
+          "evidence": "Canonical login completed and the Buzón entry was found on the resulting authenticated dashboard."
+        }
+      ],
+      "evidence": "A single exported constant owns the canonical entry and source wiring tests guard every consumer."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "SUNAT pagination and retry protocol",
+      "metadata normalization parser",
+      "baseline reconciliation state machine",
+      "browser lifecycle and route interception",
+      "filesystem persistence adapter"
+    ],
+    "dimensions": {
+      "values": [
+        "kind: message, notification",
+        "pagination: first page, endPage, empty page, duplicate rows, max-page cap",
+        "response: 200, 403, 429, 503, transport status 0",
+        "row: valid, duplicate, missing code, control text, fractional observed count",
+        "state: absent, empty baseline, repeat, new, missing, corrupt, permissive, incomplete, internally inconsistent",
+        "portal: detail auto-attempt aborted, successful cleanup, failed-open cleanup",
+        "auth: unauthenticated canonical redirect, authenticated menu, legacy base 503"
+      ],
+      "exclusions": [
+        "message bodies and attachments are intentionally blocked",
+        "triage, acknowledgement, filing and payment are not implemented",
+        "polling and multi-RUC operation are not implemented",
+        "fecVigencia receives no legal interpretation",
+        "opt-in SUNAT beta CPE mutation tests remain unrelated and skipped"
+      ],
+      "evidence": "The matrix spans both inbox kinds, protocol outcomes, row shapes, state transitions, lifecycle failures and live authentication."
+    },
+    "oracle": {
+      "source": "shaped metadata-only contract, SUNAT producer behavior and independently asserted transition/count expectations",
+      "independent": true,
+      "evidence": "Expected boundaries and transitions were written independently of the implementation; the real producer exposed the automatic detail attempt and contradictory counts."
+    },
+    "producer": {
+      "name": "authenticated live SUNAT Buzón SOL through agent-browser and cross-origin CDP",
+      "status": "exercised",
+      "evidence": "Exact head 42e8e0e opened the real visor, fetched both kinds and recorded only sanitized route/status/count evidence."
+    },
+    "falsification": [
+      {
+        "mutation": "Remove detail route installation before the visor click.",
+        "red_evidence": "The route-order test failed.",
+        "restored_green_evidence": "Restoring the snapshot returned the targeted and full suites to green."
+      },
+      {
+        "mutation": "Mark first-baseline items as new.",
+        "red_evidence": "The baseline transition test failed.",
+        "restored_green_evidence": "Restoring the baseline guard returned the transition test to green."
+      },
+      {
+        "mutation": "Remove 429 from retryable statuses.",
+        "red_evidence": "The retry-policy test failed.",
+        "restored_green_evidence": "Restoring 429 handling returned the protocol test to green."
+      },
+      {
+        "mutation": "Remove browser close from failed portal opening.",
+        "red_evidence": "The cleanup-order test failed.",
+        "restored_green_evidence": "Restoring close-before-unroute returned the lifecycle test to green."
+      },
+      {
+        "mutation": "Remove AbortSignal timeout from metadata fetches.",
+        "red_evidence": "The request-expression test failed.",
+        "restored_green_evidence": "Restoring the 15 second timeout returned the boundary test to green."
+      },
+      {
+        "mutation": "Remove totalCount consistency validation.",
+        "red_evidence": "The contradictory-state test failed.",
+        "restored_green_evidence": "Restoring consistency validation returned corrupt-state rejection to green."
+      },
+      {
+        "mutation": "Replace the canonical SOL menu entry with the legacy base URL.",
+        "red_evidence": "The shared-entry source test failed.",
+        "restored_green_evidence": "Restoring SOL_MENU_URL returned all consumer wiring checks to green."
+      }
+    ],
+    "evidence": "The change is protected at parser, protocol, state, lifecycle, live producer, real filesystem and packed-artifact layers."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "live portal model",
+      "claim": "The visor's automatic detail request can be blocked before it receives a response.",
+      "status": "verified",
+      "evidence": "The live trace recorded obtenerDetalleNotiMen with status null while every allowed metadata request completed."
+    },
+    {
+      "id": "A2",
+      "source": "live authentication model",
+      "claim": "The canonical query-bearing MenuInternet entry remains the working SOL login and dashboard entry.",
+      "status": "verified",
+      "evidence": "The live canonical login and exact-head collection succeeded on 2026-08-26."
+    },
+    {
+      "id": "A3",
+      "source": "producer contract",
+      "claim": "SUNAT may report total, records and row counts that disagree.",
+      "status": "verified",
+      "evidence": "The exact live run produced countMismatch=true and the CLI preserved each observed count separately."
+    },
+    {
+      "id": "A4",
+      "source": "filesystem model",
+      "claim": "Private storage helpers enforce owner-only modes and clear inherited ACL exposure on macOS.",
+      "status": "verified",
+      "evidence": "The exact-head APFS probe produced 0700/0600 and ls -lde showed no ACL entries."
+    },
+    {
+      "id": "A5",
+      "source": "browser topology",
+      "claim": "The Buzón application runs in a cross-origin execution context reachable through CDP after the menu click.",
+      "status": "verified",
+      "evidence": "The live collector connected to the ww1.sunat.gob.pe visor context and fetched both inbox kinds."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The feature publishes a private local metadata snapshot by atomic replacement. Remote calls are read-only and no SUNAT mutation endpoint is invoked.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "publish the current private Buzón metadata snapshot",
+        "owner": "applyBuzonChanges through writePrivateFile",
+        "commit_event": "the owner-only temporary file is atomically renamed to SUNAT_HOME/buzon/state.json",
+        "later_fallible_stages": [
+          "human or JSON output rendering"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "CLI caller after snapshot publication",
+            "covers": [
+              "human or JSON output rendering"
+            ],
+            "forced": true,
+            "residual_observed": "the strict snapshot remained readable and internally consistent after the simulated later-stage failure",
+            "cleanup_owner": "no cleanup is required because the published snapshot is valid; the next list invocation reconciles it",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The same state operation was retried immediately with one added identity and returned the expected new, known and total counts."
+            },
+            "evidence": "The post-write retry regression test forces this partition on the real state writer."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Forced removal of each core guard and confirmed the relevant test went red."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Covered both kinds, page boundaries, remote outcomes, malformed rows and state transitions."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Enumerated auth, Buzón, F616 and RHE consumers and centralized the canonical SOL entry."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell-command composition or append rule changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "Mismatch diagnostics remain on foreground stderr while machine output remains stdout-only."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No test shim or platform simulation was added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Confirmed max-pages defaults to 25 and first run intentionally creates a zero-new baseline."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Inspected menu login, route installation, cross-origin CDP, state publication, output and cleanup seams."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Drove sanitized live SUNAT routes and a real macOS private-state corpus."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "Used the live SUNAT portal as the producer oracle while keeping expected privacy and state transitions independent."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Walked portal opening, retry exhaustion, corrupt state and command error handling."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "Verified --max-pages in help, schema, README and both bundled skill surfaces."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Forced throttling, terminal errors, corrupt state, failed portal cleanup and post-write caller failure."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "Corrupt state directs users to move the file aside; valid post-write state retries without deletion."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Metadata fetches are bounded at 15 seconds and route/browser cleanup is best-effort and idempotent."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced canonical login through menu click, route abort, CDP metadata fetch, normalization, snapshot and output."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Verified the real SUNAT network boundary and APFS permissions rather than relying only on fixtures."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Installed the tarball cleanly under Node and drove version, help, schema and offline status."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Source tests own detail-route ordering, canonical URL consumers, timeout and strict state consistency."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Help, schema, READMEs, limitations, skills and bilingual website match the implemented boundary."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Examples show bounded list and offline status without presenting bodies or legal conclusions."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": "The shaping artifacts record metadata-only Shape A and explicit exclusions."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Collection is serialized, capped at 100 pages per kind and stores a single bounded allowlisted snapshot."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "This report records exact HEAD 42e8e0e77ffc817c5d38d738355668fcf404d223."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "Added lines contain no prohibited prose punctuation."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "All command, Buzón, schema and package-version surfaces required by conventions changed together."
+    },
+    {
+      "check": "siblings Buzón",
+      "outcome": "pass",
+      "reason": "Every Buzón documentation passage is in the exact diff."
+    },
+    {
+      "check": "siblings MenuInternet.htm",
+      "outcome": "acknowledged",
+      "reason": "Untouched hits are the correct RHE JavaScript action path and historical endpoint inventory, not alternative login constants."
+    },
+    {
+      "check": "timings",
+      "outcome": "acknowledged",
+      "reason": "The 30 second browser child-process timeout cannot delay the direct CDP fetch; the fetch itself aborts at 15 seconds."
+    },
+    {
+      "check": "flagsweep --max-pages --output",
+      "outcome": "acknowledged",
+      "reason": "Flagged workflows, core bin and unrelated command tests mention the global --output flag but do not inventory Buzón subcommand flags."
+    },
+    {
+      "check": "artifacts",
+      "outcome": "acknowledged",
+      "reason": "The repo has no clean command or cleanup allowlist; recovery is intentionally non-destructive and documented as moving a bad snapshot aside."
+    },
+    {
+      "check": "execdeps",
+      "outcome": "pass",
+      "reason": "No new executable dependency was added; agent-browser was already declared and installed."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "The map reports 91 changed symbols, 42 impacted, 1920 edges and 4215 unresolved calls, so it under-covers and was used only for orientation."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "Exact HEAD has no whitespace errors."
+    },
+    {
+      "check": "unit tests",
+      "outcome": "pass",
+      "reason": "427 passed, 1 Windows-only test skipped, 0 failed."
+    },
+    {
+      "check": "E2E tests",
+      "outcome": "pass",
+      "reason": "73 passed, 2 unrelated opt-in SUNAT beta tests skipped, 0 failed."
+    },
+    {
+      "check": "build and package",
+      "outcome": "pass",
+      "reason": "CLI Node build, 4-page website build, 104-file tarball, clean install and schema checks passed."
+    },
+    {
+      "check": "security audit",
+      "outcome": "pass",
+      "reason": "npm audit found 0 vulnerabilities; 231 registry signatures and 74 attestations were verified."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "A failed visor open could remove the abort route before closing the browser that still owned the automatic detail attempt.",
+      "evidence": "Lifecycle review found cleanup ordering wrong; the source-order regression turned red when close was removed and the corrected order passed.",
+      "layer": "browser lifecycle and privacy boundary",
+      "source": "lens",
+      "path": "openBuzonPortal failure -> browser close -> route removal",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "A metadata request could wait indefinitely inside the cross-origin CDP evaluation.",
+      "evidence": "The initial fetch expression had no AbortSignal; a 15 second timeout was added and its removal makes the request-boundary test fail.",
+      "layer": "remote protocol timeout",
+      "source": "lens",
+      "path": "createBuzonRequester -> Runtime.evaluate -> browser fetch",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "The first strict-state validator did not fully prove nested completeness and counter consistency.",
+      "evidence": "Incomplete nested and contradictory totalCount snapshots were accepted until exact-key and arithmetic checks plus regressions were added.",
+      "layer": "durable state integrity",
+      "source": "lens",
+      "path": "readBuzonState -> validState -> offline status",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "SOL consumers could diverge between a canonical menu entry and a legacy base URL that now returns 503.",
+      "evidence": "Live navigation reproduced the 503 on the base entry; a shared constant fixed auth, Buzón, F616 and RHE and the exact-head live login passed.",
+      "layer": "authentication entry and consumer propagation",
+      "source": "map",
+      "path": "browser/auth.ts#loginSOL -> workflows/rhe.ts#emitRHE -> commands/rhe/index.ts#createRheCommand",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Untouched MenuInternet.htm occurrences in RHE and research do not need replacement.",
+      "evidence": "The RHE occurrence is an authenticated ejecuta action target and the research occurrence documents endpoint behavior rather than opening the legacy login URL."
+    },
+    {
+      "claim": "Global --output surfaces do not need to document --max-pages.",
+      "evidence": "They are workflow YAML, global CLI parsing or unrelated command-specific docs and contain no Buzón flag inventory."
+    },
+    {
+      "claim": "The 30 second browser child-process timeout need not be reduced below the 15 second metadata fetch timeout.",
+      "evidence": "Buzón metadata executes over the direct CDP WebSocket, not through the child-process run helper where the 30 second constant lives."
+    },
+    {
+      "claim": "No Buzón clear command is required for the new snapshot.",
+      "evidence": "The shaped command surface contains only list and offline status, while invalid-state recovery explicitly preserves user data by moving the file aside."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Monitor SUNAT Buzón count contract drift",
+      "evidence": "The live producer returned row counts that disagree with reported total or records values, and the CLI now exposes countMismatch instead of choosing one.",
+      "why_out_of_scope": "Continuous monitoring requires credentials, scheduling and alerting, all explicitly excluded from the manual metadata-reader release."
+    }
+  ]
+}
