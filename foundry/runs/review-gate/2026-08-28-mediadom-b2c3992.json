@@ -1,0 +1,486 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-28",
+    "repo": "mediadom-lab/packages/mediadom",
+    "base": "560a32a7a3af0592025b3220ecf0e8c8bace1e66",
+    "head": "b2c3992358c946eb28fc143f44967ff05e2f7b79",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "packages/mediadom/INTERNAL.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "MediaDom only; SSRec excluded",
+      "internal repository with clean history",
+      "no npm publication",
+      "no-key synthetic demo",
+      "Vercelian tester documentation"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5.6-sol",
+    "reviewer_model": "gpt-5.6-sol",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "cross-version process compatibility",
+      "durable media output",
+      "filesystem side effects"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "2026-08-28-mediadom-b2c3992-independent.txt",
+      "evidence": "Real FFmpeg 6.1.6, 7.1.5, and 9.0.1 binaries completed the synthetic audio and camera workflow; ffprobe and visual frame inspection checked produced artifacts."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user requirements and packages/mediadom/INTERNAL.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5", "P6"],
+      "evidence": "The scope requires MediaDom only, an internal no-key demo, no npm publication, and clean extraction."
+    },
+    {
+      "source": "design",
+      "location": "packages/mediadom/README.md and producer-neutral pointer-track boundary",
+      "status": "reviewed",
+      "properties": ["P2", "P3", "P4", "P5", "P6"],
+      "evidence": "The design separates observation, edit state, render views, pointer-track producers, and source immutability."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, INTERNAL.md, scoped CLI help, schema JSON, and demo report",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "Every changed user-facing claim was exercised through the CLI or inspected in the tracked release tree."
+    },
+    {
+      "source": "implementation",
+      "location": "src/ffmpeg.ts, src/renderer.ts, src/schema.ts, src/cli.ts, src/pointer-track-file.ts, and scripts/internal-demo.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5", "P6"],
+      "evidence": "The exact commit diff, callers, output boundaries, and package metadata were reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The internal V1 tree is private, contains only MediaDom, and carries no npm publication or private local material.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "the tracked release files and package publication setting",
+        "layer": "release tree",
+        "method": "inspect package.json, tracked paths, staged secret patterns, large files, and media extensions",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "README says the package is private",
+        "counterexample": "package.json could omit private:true while prose still claims privacy",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The contract test reads package.json and asserts private:true; the release scan checks tracked content independently."
+      },
+      "substrates": [
+        {
+          "name": "exact git tree at b2c3992",
+          "status": "exercised",
+          "evidence": "Tracked-file scans returned no disallowed media, personal paths, private fixture names, or assigned secrets."
+        }
+      ],
+      "evidence": "package.json is private:true, no npm command ran, and only packages/mediadom is selected for extraction."
+    },
+    {
+      "id": "P2",
+      "claim": "Camera is discoverable and consistent across schema, scoped help, parser rejection, and dispatcher.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "commands a schema-only caller can construct and execute",
+        "layer": "CLI process boundary",
+        "method": "invoke schema camera, camera --help, valid camera commands, and an unknown flag",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "global help contains the word camera",
+        "counterexample": "camera could be absent from schema and unknown flags could pass through",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing camera from VERB_FLAGS made schema, scoped help, and parser-rejection tests fail."
+      },
+      "substrates": [
+        {
+          "name": "Bun CLI subprocess",
+          "status": "exercised",
+          "evidence": "camera schema, scoped help, plan, render, and rejection paths executed as separate processes."
+        }
+      ],
+      "evidence": "The camera contract tests pass and the full schema round-trip suite passes."
+    },
+    {
+      "id": "P3",
+      "claim": "Audio rendering selects an FFmpeg filter-script option supported by the installed executable.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "successful rendered audio and the actual argv recorded in its receipt",
+        "layer": "real FFmpeg process and output file",
+        "method": "run the complete demo with FFmpeg 6.1.6, 7.1.5, and 9.0.1, then inspect receipt argv and ffprobe duration",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the selector helper returns a plausible string",
+        "counterexample": "the renderer call site could ignore the selected option",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Hardcoding an invalid call-site option made the real CLI render exit 5; restored selection rendered successfully."
+      },
+      "substrates": [
+        {
+          "name": "FFmpeg 6.1.6, 7.1.5, and 9.0.1",
+          "status": "exercised",
+          "evidence": "FFmpeg 6 selected -filter_complex_script; FFmpeg 7 and 9 selected -/filter_complex; all produced measured audio."
+        }
+      ],
+      "evidence": "The differential substrate corpus and recorded receipt argv prove the compatibility choice reaches the executable."
+    },
+    {
+      "id": "P4",
+      "claim": "Pointer-track version 1 is accepted, unversioned tracks remain compatible, and unknown versions are refused.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "the parsed track returned by the file boundary or its typed refusal",
+        "layer": "serialized JSON file reader",
+        "method": "read independent JSON files with version 1, no version, and version 2",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the TypeScript interface names version 1",
+        "counterexample": "runtime JSON parsing could accept any version regardless of the type",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Runtime file tests require version 2 to throw and prove both supported classes read."
+      },
+      "substrates": [
+        {
+          "name": "serialized pointer-track JSON files",
+          "status": "exercised",
+          "evidence": "The first-party demo produced version 1 and the reader tests covered legacy and unknown versions."
+        }
+      ],
+      "evidence": "All three version classes are explicit and tested at the file boundary."
+    },
+    {
+      "id": "P5",
+      "claim": "The no-key internal demo produces a valid audio edit and a visually distinct two-shot camera render from synthetic fixtures.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "output hashes, durations, streams, shot counts, and rendered pixels",
+        "layer": "generated media artifacts",
+        "method": "run demo without API keys, probe both outputs, and inspect frames at the two shot times",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "every subprocess exits zero",
+        "counterexample": "commands could succeed while producing empty, wrong-duration, or visually unchanged files",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "ffprobe bounds, render hash, shot equality, stream inspection, and two visually different frames check the artifacts themselves."
+      },
+      "substrates": [
+        {
+          "name": "generated H.264/AAC fixture and pointer-track version 1",
+          "status": "exercised",
+          "evidence": "The demo generated, opened, cut, rendered, probed, and visually inspected its own redistributable artifacts."
+        }
+      ],
+      "evidence": "The report records 2.6-second edited audio, 4.0-second camera output, and two planned and rendered shots."
+    },
+    {
+      "id": "P6",
+      "claim": "The compatibility change preserves source immutability and records the real FFmpeg argv in the receipt.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "source hash before and after render plus receipt argv",
+        "layer": "filesystem artifact boundary",
+        "method": "execute render and compare source bytes while inspecting receipt output",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "a render file exists",
+        "counterexample": "the destination could exist after overwriting the source or recording invented argv",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Existing source-alias tests compare bytes across direct, relative, parent, and symlink paths; the demo checks receipt argv."
+      },
+      "substrates": [
+        {
+          "name": "real filesystem aliases and FFmpeg render",
+          "status": "exercised",
+          "evidence": "The complete test suite retained every source-alias invariant and the demo recorded the negotiated option."
+        }
+      ],
+      "evidence": "All source immutability tests pass and sourceUntouched remains true on the real render path."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "FFmpeg compatibility layer",
+      "pointer-track file protocol",
+      "CLI schema and dispatch protocol"
+    ],
+    "dimensions": {
+      "values": [
+        "FFmpeg capability: slash supported; slash unsupported and legacy supported; neither supported",
+        "FFmpeg wiring: selector honored at renderer call site; selector ignored",
+        "pointer version: 1; absent legacy; unknown",
+        "camera contract: schema listed; scoped help; valid flags; unknown flag",
+        "artifact state: audio render; camera render; final validation; failure and retry"
+      ],
+      "exclusions": [
+        "Windows is outside the stated internal macOS contract",
+        "API-backed instruments are outside the base no-key demo",
+        "SSRec capture is outside this release and the pointer track remains producer-neutral"
+      ],
+      "evidence": "Every declared class has a direct test or real substrate run; exclusions are stated in INTERNAL.md and release scope."
+    },
+    "oracle": {
+      "source": "real FFmpeg option semantics, serialized file outcomes, schema/parser round trips, ffprobe, and visual frames",
+      "independent": true,
+      "evidence": "Expected behavior comes from external executables and user-facing contracts rather than production branch constants."
+    },
+    "producer": {
+      "name": "real FFmpeg binaries plus first-party synthetic pointer-track producer",
+      "status": "exercised",
+      "evidence": "Three installed FFmpeg versions and the demo's independent JSON writer drove the actual CLI."
+    },
+    "falsification": [
+      {
+        "mutation": "return the legacy option when slash syntax is supported",
+        "red_evidence": "ffmpeg-compat test expected -/filter_complex and received -filter_complex_script",
+        "restored_green_evidence": "All three compatibility tests passed after restoration"
+      },
+      {
+        "mutation": "replace the renderer call-site selection with -not-a-filter-script-option",
+        "red_evidence": "The end-to-end CLI render returned exit 5 at the intended render assertion",
+        "restored_green_evidence": "The 844-test suite and real demo passed after restoration"
+      },
+      {
+        "mutation": "remove camera from the shared verb table",
+        "red_evidence": "Schema, scoped-help, and unknown-flag contract tests all failed",
+        "restored_green_evidence": "All camera contract tests passed after restoration"
+      }
+    ],
+    "evidence": "Definition, call-site, protocol, real-process, serialized-input, and artifact-level protection were all exercised."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "INTERNAL.md",
+      "claim": "The initial dogfood environment is macOS with Bun, FFmpeg, and ffprobe.",
+      "status": "verified",
+      "evidence": "The clean local substrate uses macOS arm64, Bun 1.3.11, and three Homebrew FFmpeg versions."
+    },
+    {
+      "id": "A2",
+      "source": "package.json and user scope",
+      "claim": "Internal V1 is not an npm release.",
+      "status": "verified",
+      "evidence": "private:true remains asserted by test and no publication command ran."
+    },
+    {
+      "id": "A3",
+      "source": "user scope",
+      "claim": "SSRec is not required to evaluate or release MediaDom.",
+      "status": "verified",
+      "evidence": "The complete demo creates its own producer-neutral version 1 pointer track and the tracked tree has zero ssrec-track references."
+    },
+    {
+      "id": "A4",
+      "source": "internal demo design",
+      "claim": "The base fixture is safe to redistribute internally.",
+      "status": "verified",
+      "evidence": "Every media byte and pointer event is generated locally from FFmpeg lavfi and literal synthetic data."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The demo creates a timestamped run directory, media artifacts, a MediaDom store, and a final report.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "isolated internal-demo run directory and generated artifacts",
+        "owner": "scripts/internal-demo.ts",
+        "commit_event": "timestamped run directory created under ignored tmp/internal-demo",
+        "later_fallible_stages": [
+          "fixture generation",
+          "audio observation and edit",
+          "camera render",
+          "artifact validation and report"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "fixture process bootstrap",
+            "covers": ["fixture generation"],
+            "forced": true,
+            "residual_observed": "an isolated empty timestamped run directory",
+            "cleanup_owner": "ignored demo workspace; no shared state",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Removing the PATH fault and rerunning created a new run directory and passed."
+            },
+            "evidence": "FFmpeg was removed from PATH and the demo failed with ENOENT."
+          },
+          {
+            "ownership_region": "audio renderer process boundary",
+            "covers": ["audio observation and edit"],
+            "forced": true,
+            "residual_observed": "synthetic source, pointer track, store, and render filter stayed inside the failed run directory",
+            "cleanup_owner": "isolated timestamped run; retry never reuses it",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Restoring the negotiated call site and rerunning completed the workflow."
+            },
+            "evidence": "An invalid filter option forced the real audio render to exit 5 after prior artifacts existed."
+          },
+          {
+            "ownership_region": "camera renderer process boundary",
+            "covers": ["camera render"],
+            "forced": true,
+            "residual_observed": "the audio edit and camera sendcmd sidecar remained isolated in the failed run directory",
+            "cleanup_owner": "isolated timestamped run; retry never overwrites it",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "An immediate normal retry produced both outputs and a pass report."
+            },
+            "evidence": "A wrapper forced camera FFmpeg to exit 91 after the audio edit existed."
+          },
+          {
+            "ownership_region": "artifact validation and report boundary",
+            "covers": ["artifact validation and report"],
+            "forced": true,
+            "residual_observed": "both media artifacts remained available for diagnosis and no pass report was written",
+            "cleanup_owner": "isolated timestamped run; retry writes a new complete report",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "An immediate normal retry measured both artifacts and wrote report.json."
+            },
+            "evidence": "A wrapper forced final ffprobe validation to exit 92 after both render stages."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "inverse-regression-surface", "status": "run", "reason": "Full schema round-trip and source-safety suites remained green."},
+    {"name": "new-domain-matrix", "status": "run", "reason": "FFmpeg capability, pointer version, CLI contract, and artifact states were enumerated."},
+    {"name": "resolution-rule-consistency-across-consumers", "status": "run", "reason": "Schema, parser, scoped help, dispatcher, README, and skill were compared."},
+    {"name": "shell-re-parse-append-domain", "status": "skipped", "reason": "No shell fragment is composed from user input; Bun.spawn receives argv arrays."},
+    {"name": "emission-channel-and-one-shot-latch-reachability", "status": "run", "reason": "CLI subprocess tests capture stdout and stderr independently and demo emits one JSON report."},
+    {"name": "shim-hermeticity", "status": "skipped", "reason": "No production shim was introduced; failure wrappers were isolated review fixtures."},
+    {"name": "deliberate-default-check", "status": "run", "reason": "Camera defaults are published in schema and echoed by plan output."},
+    {"name": "fresh-seam-scan", "status": "run", "reason": "New seams at FFmpeg process, pointer JSON, demo filesystem, and clean release tree were reviewed."},
+    {"name": "substrate-differential-corpus", "status": "run", "reason": "FFmpeg 6.1.6, 7.1.5, and 9.0.1 completed the same workflow."},
+    {"name": "reference-implementation-oracle", "status": "skipped", "reason": "The producer-neutral protocol has no canonical external implementation; real executable and artifact oracles were used."},
+    {"name": "new-failure-outcome-propagation", "status": "run", "reason": "Unsupported FFmpeg and pointer versions propagate typed dependency or pointer-track failures."},
+    {"name": "flag-propagation-dispatch-sweep", "status": "run", "reason": "Every camera flag is shared by schema publication and parser rejection."},
+    {"name": "error-path-forcing", "status": "run", "reason": "Missing FFmpeg, invalid renderer option, camera exit 91, final ffprobe exit 92, and unknown pointer version were forced."},
+    {"name": "non-destructive-recovery", "status": "run", "reason": "Every forced demo failure was followed by a successful immediate retry in a new isolated run directory."},
+    {"name": "cancellation-and-timeout-hygiene", "status": "skipped", "reason": "The diff adds no cancellation, timeout, signal, or long-lived process lifecycle."},
+    {"name": "boundary-pipeline-trace", "status": "run", "reason": "Synthetic input was traced through open, query, cut, audio render, camera plan/render, ffprobe, and report."},
+    {"name": "substrate-verification", "status": "run", "reason": "Real media files, streams, durations, hashes, and pixels were inspected."},
+    {"name": "dogfood-the-built-artifact", "status": "run", "reason": "The exact TypeScript CLI at the reviewed commit executed the no-key internal workflow."},
+    {"name": "newly-asserted-invariant-ownership", "status": "run", "reason": "Version ownership sits in the reader; verb ownership sits in schema.ts; capability ownership sits in ffmpeg.ts."},
+    {"name": "docs-behavior-parity", "status": "run", "reason": "README, INTERNAL, served skill, scoped help, and schema match observed commands."},
+    {"name": "demonstrative-example", "status": "run", "reason": "bun run demo is a deterministic copyable example using synthetic inputs."},
+    {"name": "choice-audit", "status": "run", "reason": "Capability probing, backward-compatible pointer versioning, and clean extraction boundaries were compared against alternatives."},
+    {"name": "complexity-budget", "status": "run", "reason": "The implementation adds one probe, one generic help formatter, one version check, and one isolated demo without a new service or package dependency."}
+  ],
+  "deterministic": [
+    {"check": "style", "outcome": "pass", "reason": "No em dash or comment punctuation violations."},
+    {"check": "surfaces", "outcome": "pass", "reason": "Every mapped code, contract, docs, test, and CI surface changed together."},
+    {"check": "stale local paths", "outcome": "pass", "reason": "Zero personal absolute path or mediadom-lab hits in the tracked package."},
+    {"check": "stale private fixtures", "outcome": "pass", "reason": "Zero cueva-263, channel-3, or ssrec-track hits in the tracked package."},
+    {"check": "callers filterComplexScriptFlag", "outcome": "pass", "reason": "Every call site was included in the diff and exercised."},
+    {"check": "callers readPointerTrack", "outcome": "pass", "reason": "Every call site was included in the diff and exercised."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "No whitespace errors."},
+    {"check": "secret scan", "outcome": "pass", "reason": "No assigned secrets, private keys, GitHub tokens, or Vercel tokens in tracked release files."},
+    {"check": "large and media file scan", "outcome": "pass", "reason": "No tracked release file over 1 MB and no tracked media extension."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The served MediaDom skill described pointer tracks without the new version contract.",
+      "evidence": "Fresh-seam review found the README was versioned while skills/mediadom/SKILL.md still listed only duration and arrays.",
+      "layer": "docs-behavior parity",
+      "source": "lens",
+      "path": "src/pointer-track-file.ts to skills/mediadom/SKILL.md via user contract",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The initial release tree still contained personal absolute paths, private fixture names, and an SSRec-specific producer hint.",
+      "evidence": "Repo-wide scans found personal absolute paths, mediadom-lab, private fixture labels, and an SSRec command name before sanitization; the final exact tree has zero hits.",
+      "layer": "release confidentiality",
+      "source": "gate",
+      "path": "README, served skill, CLI error, source and test prose",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "The FFmpeg compatibility claim initially had only a simulated legacy branch.",
+      "evidence": "Installing and running FFmpeg 6.1.6 exercised the legacy option through the full demo; FFmpeg 7.1.5 and 9.0.1 exercised slash syntax.",
+      "layer": "substrate compatibility",
+      "source": "lens",
+      "path": "src/ffmpeg.ts to src/renderer.ts to real FFmpeg process",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No real SSRec producer was driven.",
+      "evidence": "SSRec is explicitly outside this release; the product boundary is a producer-neutral JSON file and the first-party synthetic producer drove that boundary."
+    },
+    {
+      "claim": "No Windows substrate was exercised.",
+      "evidence": "INTERNAL.md explicitly limits the initial tester contract to macOS."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Add an automated FFmpeg 6 and latest compatibility matrix",
+      "evidence": "Both real versions pass locally, while CI currently installs only the latest Homebrew FFmpeg.",
+      "why_out_of_scope": "The internal V1 needs one reliable CI path; multi-version automation is follow-up hardening."
+    },
+    {
+      "title": "Require pointer-track version after producer migration",
+      "evidence": "The reader intentionally accepts unversioned tracks for migration while rejecting unknown explicit versions.",
+      "why_out_of_scope": "SSRec and other producers are outside this release and must migrate before strict enforcement."
+    },
+    {
+      "title": "Bring camera renders into the receipt and verify workflow",
+      "evidence": "The demo verifies camera duration, streams, shot counts, and pixels, but mdom verify is currently tied to EDL audio renders.",
+      "why_out_of_scope": "Internal V1 proves camera output without redefining the existing EDL receipt contract."
+    }
+  ]
+}
