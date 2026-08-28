@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 0,
+  "run": {"date": "2026-08-28", "repo": "crafter-station/ssrec", "base": "82d4d69e25ef809ca0c5063835072c1af6ca01a6", "head": "d5980878b332298cf16ffc518c3a6dd89a21acae", "status": "complete", "verdict": "pass", "gaps": []},
+  "contract": {"path": "vercel-labs/mediadom issue #3 producer migration", "spec_status": "not_provided", "acceptance_reviewed": ["known producer emits version 1", "no SSRec release"], "gaps": []},
+  "provenance": {"author_model": "gpt-5.6-sol", "reviewer_model": "gpt-5.6-sol", "same_family": true},
+  "risk": {"level": "standard", "triggers": ["serialized producer contract"], "independent_challenge": {"required": false, "satisfied": true, "method": "not_required", "artifact": "", "evidence": ""}},
+  "claim_inventory": [
+    {"source": "contract", "location": "MediaDom issue #3", "status": "reviewed", "properties": ["P1"], "evidence": "The known producer must emit version 1."},
+    {"source": "design", "location": "SSRec TypeScript PointerTrack interface", "status": "reviewed", "properties": ["P1"], "evidence": "Version belongs in the producer-neutral serialized object."},
+    {"source": "user_facing", "location": "serialized pointer-track JSON boundary", "status": "reviewed", "properties": ["P1"], "evidence": "The output is consumed by MediaDom rather than released as SSRec."},
+    {"source": "implementation", "location": "ts/src/input-events.ts and ts/test/input-events.test.ts", "status": "reviewed", "properties": ["P1"], "evidence": "The exact two-file diff and runtime return were reviewed."}
+  ],
+  "properties": [{
+    "id": "P1",
+    "claim": "SSRec's TypeScript pointer-track exporter always emits literal version 1 and its output is accepted by MediaDom.",
+    "kind": "correctness",
+    "status": "verified",
+    "oracle": {"observes": "the serialized producer output and independent consumer result", "layer": "JSON producer-consumer boundary", "method": "run readPointerTrack on real SSRec metadata, serialize it, and pass it to MediaDom camera plan", "proxy_only": false},
+    "proxy_challenge": {"proxy": "the interface requires version 1", "counterexample": "the runtime object could still omit the field", "attempted": true, "outcome": "separated", "evidence": "Removing the return field made the producer test receive undefined."},
+    "substrates": [{"name": "SSRec metadata fixture and MediaDom CLI", "status": "exercised", "evidence": "The producer returned version 1 and the independent consumer accepted the serialized file."}],
+    "evidence": "Go build, vet, format, and tests pass; TypeScript typecheck and all 46 tests pass."
+  }],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["serialized pointer-track protocol"],
+    "dimensions": {"values": ["producer returns null when no track", "producer returns a track with literal version 1", "independent consumer accepts serialized output"], "exclusions": ["SSRec publication and capture runtime are outside this MediaDom release"], "evidence": "Existing null behavior remained covered and the new producer-consumer boundary ran."},
+    "oracle": {"source": "MediaDom runtime reader and direct serialized output", "independent": true, "evidence": "The expected field is checked outside the producer implementation."},
+    "producer": {"name": "SSRec readPointerTrack", "status": "exercised", "evidence": "A real metadata fixture drove the exporter."},
+    "falsification": [{"mutation": "remove version 1 from the returned object", "red_evidence": "The producer test received undefined instead of 1.", "restored_green_evidence": "Typecheck and all 46 TypeScript tests passed after restoration."}],
+    "evidence": "The production return, serialization, and independent consumer boundary were exercised."
+  },
+  "assumptions": [
+    {"id": "A1", "source": "MediaDom issue #3", "claim": "SSRec is a known pointer-track producer.", "status": "verified", "evidence": "Its exported shape is consumed by MediaDom camera plan."},
+    {"id": "A2", "source": "user scope", "claim": "SSRec itself is not released now.", "status": "verified", "evidence": "Only a source commit is prepared; no tag, package, or deployment is created."}
+  ],
+  "side_effects": {"assessment": "none", "evidence": "The diff only adds a literal field to an in-memory returned object and a test assertion; it performs no new write or external effect.", "commit_points": []},
+  "lenses": [
+    {"name": "boundary-pipeline-trace", "status": "run", "reason": "The real producer output crossed into MediaDom."},
+    {"name": "newly-asserted-invariant-ownership", "status": "run", "reason": "The known SSRec exporter is the only changed writer."},
+    {"name": "docs-behavior-parity", "status": "skipped", "reason": "No SSRec user-facing release surface changes."}
+  ],
+  "deterministic": [
+    {"check": "test strength", "outcome": "pass", "reason": "Removing the runtime field made the intended test fail."},
+    {"check": "Go validation", "outcome": "pass", "reason": "Build, vet, format, and tests pass."},
+    {"check": "TypeScript validation", "outcome": "pass", "reason": "Typecheck and all 46 tests pass."}
+  ],
+  "findings": [],
+  "exemptions": [{"claim": "No SSRec release artifacts", "evidence": "The user explicitly scoped publication to MediaDom only."}],
+  "issue_candidates": []
+}

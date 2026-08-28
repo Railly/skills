@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 0,
+  "run": {"date": "2026-08-28", "repo": "vercel-labs/mediadom", "base": "c894237e4e247c73051065670ec4073ed2421a24", "head": "3cf56b7f87e46724b7fff845bf1c83d0735e699f", "status": "complete", "verdict": "pass", "gaps": []},
+  "contract": {"path": "GitHub issues #1, #2, and #3", "spec_status": "not_provided", "acceptance_reviewed": ["FFmpeg CI matrix", "camera receipt and verify", "pointer version migration", "no npm publication"], "gaps": []},
+  "provenance": {"author_model": "gpt-5.6-sol", "reviewer_model": "gpt-5.6-sol", "same_family": true},
+  "risk": {"level": "high", "triggers": ["durable media output", "protocol migration", "cross-version compatibility"], "independent_challenge": {"required": true, "satisfied": true, "method": "substrate_corpus", "artifact": "2026-08-28-mediadom-internal2-independent.txt", "evidence": "Real FFmpeg 6, 7, and 9, a real SSRec export, filesystem hashes, and a forced process failure exercised the clean internal tree."}},
+  "claim_inventory": [
+    {"source": "contract", "location": "GitHub issues #1, #2, and #3", "status": "reviewed", "properties": ["P1"], "evidence": "All acceptance items were checked."},
+    {"source": "design", "location": "README.md and INTERNAL.md", "status": "reviewed", "properties": ["P1"], "evidence": "The clean tree keeps MediaDom producer-neutral and private."},
+    {"source": "user_facing", "location": "README, served skill, help, schema, and demo", "status": "reviewed", "properties": ["P1"], "evidence": "Every published behavior was driven."},
+    {"source": "implementation", "location": "exact c894237 to 3cf56b7 diff", "status": "reviewed", "properties": ["P1"], "evidence": "The clean export is byte-identical to the reviewed source package."}
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The clean internal tree implements the FFmpeg matrix, strict pointer version, camera receipts, drift verification, source integrity, failure cleanup, and retry behavior claimed by internal.2.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {"observes": "serialized inputs, real media artifacts, hashes, exit codes, and filesystem state", "layer": "clean repository CLI and filesystem", "method": "run full checks and demo, compare source-package bytes, force drift and FFmpeg failure, and retry", "proxy_only": false},
+      "proxy_challenge": {"proxy": "the source and export diffs have the same line counts", "counterexample": "equal line counts could hide different bytes or behavior", "attempted": true, "outcome": "separated", "evidence": "Every changed file was byte-compared and the clean tree independently ran 855 tests and the demo."},
+      "substrates": [{"name": "clean vercel-labs/mediadom tree with FFmpeg and APFS", "status": "exercised", "evidence": "Full check, demo, drift cases, forced failure, retry, and byte comparison passed."}],
+      "evidence": "The exact clean commit is private internal.2 and no npm publication ran."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["pointer protocol", "receipt serializer and parser", "FFmpeg adapter", "render lifecycle"],
+    "dimensions": {"values": ["version 1, missing, unknown", "receipt valid, missing, malformed", "artifact match, different, absent", "FFmpeg success and failure", "same-command retry", "FFmpeg 6, 7, and 9"], "exclusions": ["Windows", "SSRec release"], "evidence": "Direct tests and substrate runs cover every class."},
+    "oracle": {"source": "real executables, serialized producer output, hashes, and filesystem state", "independent": true, "evidence": "Outcomes are observed outside production predicates."},
+    "producer": {"name": "SSRec readPointerTrack exporter", "status": "exercised", "evidence": "Its real version 1 JSON crossed into MediaDom camera plan."},
+    "falsification": [
+      {"mutation": "remove required pointer version handling", "red_evidence": "Migration test failed.", "restored_green_evidence": "Pointer suite passed."},
+      {"mutation": "remove receipt publication", "red_evidence": "Receipt existence failed.", "restored_green_evidence": "Receipt suite passed."},
+      {"mutation": "skip output or plan drift", "red_evidence": "Expected exit 7 became 0.", "restored_green_evidence": "Drift suite passed."}
+    ],
+    "evidence": "Five fix-absent mutations and the clean runtime completed."
+  },
+  "assumptions": [
+    {"id": "A1", "source": "INTERNAL.md", "claim": "Initial dogfood targets macOS with Bun and FFmpeg.", "status": "verified", "evidence": "The stated environment completed the workflow."},
+    {"id": "A2", "source": "package.json", "claim": "No npm publication occurs.", "status": "verified", "evidence": "private true remains set and no publish command ran."},
+    {"id": "A3", "source": "user scope", "claim": "SSRec is not part of this release.", "status": "verified", "evidence": "The clean package has no SSRec dependency and its demo is self-contained."}
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Camera render publishes script, media, and receipt artifacts.",
+    "commit_points": [{
+      "id": "C1", "effect": "camera artifacts become visible", "owner": "renderCamera", "commit_event": "sendcmd script write", "later_fallible_stages": ["render and receipt pipeline"],
+      "failure_partitions": [{"ownership_region": "camera render transaction", "covers": ["render and receipt pipeline"], "forced": true, "residual_observed": "No owned artifact remained after forced FFmpeg exit 91.", "cleanup_owner": "renderCamera catch block", "retry": {"attempted": true, "outcome": "success", "evidence": "The identical command succeeded immediately."}, "evidence": "The real CLI failure and retry test passed."}]
+    }]
+  },
+  "lenses": [
+    {"name": "protocol-and-lifecycle-review", "status": "run", "reason": "Version, receipt, compatibility, and side-effect paths were exercised."},
+    {"name": "docs-behavior-parity", "status": "run", "reason": "README, INTERNAL, skill, help, and schema agree."},
+    {"name": "substrate-verification", "status": "run", "reason": "Real files and executables were inspected."}
+  ],
+  "deterministic": [
+    {"check": "full check", "outcome": "pass", "reason": "855 tests passed."},
+    {"check": "source sync", "outcome": "pass", "reason": "Every changed file is byte-identical to the source package."},
+    {"check": "release scan", "outcome": "pass", "reason": "No secrets, personal paths, media, or large files entered the commit."}
+  ],
+  "findings": [
+    {"id": "F1", "state": "confirmed", "claim": "Failed render recovery could leave a blocking sidecar.", "evidence": "Forced exit reproduced it; cleanup and same-command retry now pass.", "layer": "render lifecycle", "source": "lens", "path": "script write to FFmpeg failure", "resolution": "fixed"}
+  ],
+  "exemptions": [{"claim": "No SSRec release", "evidence": "Only MediaDom internal.2 is released."}],
+  "issue_candidates": []
+}

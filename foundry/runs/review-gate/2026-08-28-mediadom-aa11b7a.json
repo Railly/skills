@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-28",
+    "repo": "railly/mediadom-lab/packages/mediadom",
+    "base": "d82343a5c2afec90cbe17ba69b3078ca2db1e773",
+    "head": "aa11b7aeb31ffe51abd82b548b110c890f650288",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "GitHub issues vercel-labs/mediadom#1, #2, and #3",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "FFmpeg 6 and latest CI matrix",
+      "camera receipt and verify workflow",
+      "required pointer-track version 1",
+      "SSRec remains outside the release",
+      "no npm publication"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5.6-sol",
+    "reviewer_model": "gpt-5.6-sol",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["durable media output", "protocol migration", "cross-version executable compatibility", "parallel CI execution"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "2026-08-28-mediadom-internal2-independent.txt",
+      "evidence": "Real FFmpeg 6, 7, and 9, a real SSRec producer boundary, filesystem hashes, and forced process failure independently exercised the claims."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "GitHub issues #1, #2, and #3",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "Every acceptance item was mapped to implementation, docs, tests, and runtime evidence."
+    },
+    {
+      "source": "design",
+      "location": "packages/mediadom/README.md and cases/mediadom/conventions.md",
+      "status": "reviewed",
+      "properties": ["P2", "P3", "P4"],
+      "evidence": "The design keeps pointer producers neutral, makes receipts explicit, and preserves source immutability."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, INTERNAL.md, served skill, CLI help, schema, and demo report",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The published commands, errors, exit codes, and demo claims were driven through the CLI."
+    },
+    {
+      "source": "implementation",
+      "location": "CI workflow, camera receipt and command modules, pointer reader, schema, demo, and tests",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The exact base-to-head diff, call sites, side effects, and failure paths were reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "CI exercises the complete check and demo on FFmpeg 6 and current with supported action versions.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the real executable option and generated artifacts",
+        "layer": "FFmpeg process and filesystem",
+        "method": "run the same demo on FFmpeg 6.1.6, 7.1.5, and 9.0.1 and inspect receipt argv and outputs",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the workflow contains a matrix",
+        "counterexample": "both jobs could select the same executable or skip the demo",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Each real binary reported its version, selected its supported option, and produced measured artifacts."
+      },
+      "substrates": [
+        {"name": "FFmpeg 6.1.6, 7.1.5, and 9.0.1", "status": "exercised", "evidence": "All three completed the audio and camera workflow."}
+      ],
+      "evidence": "The workflow matrix runs bun run check and bun run demo in both jobs; local substrate runs pass."
+    },
+    {
+      "id": "P2",
+      "claim": "Pointer tracks require version 1, missing versions receive migration guidance, unknown versions fail, and the known SSRec producer emits version 1.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "serialized producer output and MediaDom reader outcomes",
+        "layer": "JSON file boundary",
+        "method": "drive version 1, missing, and unknown files plus a real SSRec export",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "TypeScript interfaces name version 1",
+        "counterexample": "runtime JSON or a producer could omit the field despite the type",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing the producer field or reader guard made the intended tests fail; real serialized output was consumed."
+      },
+      "substrates": [
+        {"name": "SSRec serialized pointer-track JSON and MediaDom CLI", "status": "exercised", "evidence": "The export contained version 1 and camera plan accepted it."}
+      ],
+      "evidence": "Reader, CLI migration, docs, served skill, demo, and producer tests agree."
+    },
+    {
+      "id": "P3",
+      "claim": "Camera render publishes a receipt binding source, track, settings, script, plan, FFmpeg argv, and output, and verify detects every supported drift class.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "artifact hashes, rebuilt plan digest, and CLI exit status",
+        "layer": "filesystem and CLI process boundary",
+        "method": "render and verify, then independently mutate or remove each receipt input and inspect exit 7",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "a receipt file exists",
+        "counterexample": "the receipt could exist while an input, script, setting, plan, or output differs",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Source, track, script, settings, output, and absence mutations each produced the expected non-pass result."
+      },
+      "substrates": [
+        {"name": "real H.264/AAC camera render", "status": "exercised", "evidence": "The CLI rendered, hashed, verified, and probed the generated media."}
+      ],
+      "evidence": "The 10-test receipt suite and internal demo pass."
+    },
+    {
+      "id": "P4",
+      "claim": "Camera rendering does not change source or track bytes, refuses existing artifacts, cleans owned artifacts after failure, and supports an immediate retry.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "filesystem state before failure, after failure, and after retry",
+        "layer": "real process and filesystem boundary",
+        "method": "hash inputs, force FFmpeg exit 91, inspect all artifact paths, and retry the identical command",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the failed command returns nonzero",
+        "counterexample": "a correct exit code could still leave a sidecar that blocks retry",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The forced failure test requires output, script, and receipt to be absent before the same command succeeds."
+      },
+      "substrates": [
+        {"name": "APFS filesystem and real CLI subprocess", "status": "exercised", "evidence": "Hash checks, collision sentinels, forced failure cleanup, and immediate retry all passed."}
+      ],
+      "evidence": "Full check passes with 855 tests and the demo reports sourceUnchanged true."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["pointer-track protocol", "camera receipt serializer and parser", "FFmpeg compatibility layer", "render lifecycle"],
+    "dimensions": {
+      "values": [
+        "pointer version: 1, absent, unknown",
+        "receipt: valid, missing, malformed, unknown version",
+        "artifact: match, different, absent for source, track, script, and output",
+        "plan: matching settings and tampered settings",
+        "render: success, sidecar collision, FFmpeg failure and retry",
+        "FFmpeg: legacy option and slash option",
+        "demo concurrency: three simultaneous runs"
+      ],
+      "exclusions": ["Windows is outside the current internal macOS contract", "SSRec capture and release are outside MediaDom publication"],
+      "evidence": "The matrix is covered by deterministic tests, three executable versions, the real producer boundary, and parallel demos."
+    },
+    "oracle": {
+      "source": "real FFmpeg behavior, SHA-256 filesystem reads, CLI exit codes, and independently serialized SSRec output",
+      "independent": true,
+      "evidence": "Expected results are observed outside the production branch predicates."
+    },
+    "producer": {
+      "name": "SSRec readPointerTrack exporter",
+      "status": "exercised",
+      "evidence": "A real export was serialized and consumed by MediaDom camera plan."
+    },
+    "falsification": [
+      {"mutation": "remove the missing-version reader guard", "red_evidence": "The migration assertion failed for the intended message.", "restored_green_evidence": "Pointer and CLI contract tests passed after restoration."},
+      {"mutation": "remove version 1 from the SSRec producer", "red_evidence": "The producer test received undefined.", "restored_green_evidence": "All 46 SSRec TypeScript tests passed after restoration."},
+      {"mutation": "disable camera receipt publication", "red_evidence": "The receipt existence assertion failed.", "restored_green_evidence": "The complete receipt suite passed after restoration."},
+      {"mutation": "skip output-drift failure", "red_evidence": "Verify returned 0 where the test required 7.", "restored_green_evidence": "The drift suite passed after restoration."},
+      {"mutation": "force plan comparison to match", "red_evidence": "Tampered settings returned 0 where the test required 7.", "restored_green_evidence": "Plan mismatch detection passed after restoration."}
+    ],
+    "evidence": "Fix-absent mutations, real producers, real executables, serialized files, and user-visible exits all have direct evidence."
+  },
+  "assumptions": [
+    {"id": "A1", "source": "INTERNAL.md", "claim": "Initial Vercelian dogfood targets macOS with Bun, FFmpeg, and ffprobe.", "status": "verified", "evidence": "The workflow and local substrate use that environment."},
+    {"id": "A2", "source": "package.json and user scope", "claim": "This is not an npm publication.", "status": "verified", "evidence": "private true remains set and no npm publication command ran."},
+    {"id": "A3", "source": "user scope", "claim": "SSRec is only a compatible producer and is not part of the MediaDom release.", "status": "verified", "evidence": "MediaDom has no SSRec dependency and its demo is self-contained."},
+    {"id": "A4", "source": "camera receipt contract", "claim": "SHA-256 and byte length observe artifact identity for internal verification.", "status": "verified", "evidence": "Same-size substitution and independent mutations were detected at the filesystem layer."}
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Camera render writes a sendcmd script, output media, and an atomic receipt; the demo writes isolated run artifacts.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "camera render artifacts become visible beside the requested output",
+        "owner": "renderCamera",
+        "commit_event": "the sendcmd script is written before FFmpeg starts",
+        "later_fallible_stages": ["FFmpeg render", "input integrity check", "receipt publication"],
+        "failure_partitions": [
+          {
+            "ownership_region": "camera render transaction",
+            "covers": ["FFmpeg render", "input integrity check", "receipt publication"],
+            "forced": true,
+            "residual_observed": "No output, script, or receipt remains after the forced FFmpeg failure; the same cleanup block owns all later thrown stages.",
+            "cleanup_owner": "renderCamera catch block",
+            "retry": {"attempted": true, "outcome": "success", "evidence": "The identical command succeeded immediately after restoring FFmpeg."},
+            "evidence": "A PATH-precedence shim forced FFmpeg exit 91 through the real CLI, then the test inspected all three paths and retried."
+          }
+        ]
+      },
+      {
+        "id": "C2",
+        "effect": "an isolated internal demo run directory is created",
+        "owner": "scripts/internal-demo.ts",
+        "commit_event": "mkdtemp atomically creates a unique directory",
+        "later_fallible_stages": ["demo workflow"],
+        "failure_partitions": [
+          {
+            "ownership_region": "isolated demo workflow",
+            "covers": ["demo workflow"],
+            "forced": true,
+            "residual_observed": "Failure artifacts remain only inside the unique ignored run directory.",
+            "cleanup_owner": "ignored tmp workspace",
+            "retry": {"attempted": true, "outcome": "success", "evidence": "Three simultaneous retries each completed in a different directory."},
+            "evidence": "The original timestamp collision reproduced under parallel execution; mkdtemp removed it and three concurrent demos passed."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "inverse-regression-surface", "status": "run", "reason": "Existing receipt and pointer behavior remained green."},
+    {"name": "new-domain-matrix", "status": "run", "reason": "Version, receipt, artifact, FFmpeg, and lifecycle classes were enumerated."},
+    {"name": "resolution-rule-consistency-across-consumers", "status": "run", "reason": "Reader, CLI, demo, docs, and producer agree."},
+    {"name": "shell-re-parse-append-domain", "status": "skipped", "reason": "Production process execution uses argv arrays."},
+    {"name": "emission-channel-and-one-shot-latch-reachability", "status": "run", "reason": "CLI stdout, stderr, and exit codes were driven."},
+    {"name": "shim-hermeticity", "status": "run", "reason": "The failure shim won through explicit PATH precedence and exit 91 was observed."},
+    {"name": "deliberate-default-check", "status": "run", "reason": "The intentional migration closes and tests the former temporary compatibility path."},
+    {"name": "fresh-seam-scan", "status": "run", "reason": "Receipt, CI, producer, and verify seams were traced."},
+    {"name": "substrate-differential-corpus", "status": "run", "reason": "FFmpeg 6, 7, and 9 executed the workflow."},
+    {"name": "reference-implementation-oracle", "status": "skipped", "reason": "No external reference implementation exists for the private pointer protocol."},
+    {"name": "new-failure-outcome-propagation", "status": "run", "reason": "All pointer and receipt errors reach published CLI exits."},
+    {"name": "flag-propagation-dispatch-sweep", "status": "run", "reason": "Receipt is published by schema, parser, help, and dispatcher."},
+    {"name": "error-path-forcing", "status": "run", "reason": "Malformed inputs, drift, collisions, and FFmpeg failure were forced."},
+    {"name": "non-destructive-recovery", "status": "run", "reason": "Forced render failure cleans artifacts and immediate retry succeeds."},
+    {"name": "cancellation-and-timeout-hygiene", "status": "skipped", "reason": "No timeout or cancellation path changed."},
+    {"name": "boundary-pipeline-trace", "status": "run", "reason": "SSRec JSON crosses into MediaDom plan and camera media crosses render and verify."},
+    {"name": "substrate-verification", "status": "run", "reason": "Hashes and media artifacts were read from disk."},
+    {"name": "dogfood-the-built-artifact", "status": "run", "reason": "The real CLI completed the internal demo."},
+    {"name": "newly-asserted-invariant-ownership", "status": "run", "reason": "All known pointer producers and the reader were enumerated."},
+    {"name": "docs-behavior-parity", "status": "run", "reason": "README, INTERNAL, served skill, help, and schema match runtime behavior."},
+    {"name": "demonstrative-example", "status": "run", "reason": "The demo requires render receipts, verify, source integrity, and both shots."},
+    {"name": "choice-audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "complexity-budget", "status": "run", "reason": "Verification adds linear hashing and one deterministic plan rebuild."}
+  ],
+  "deterministic": [
+    {"check": "style and surfaces", "outcome": "pass", "reason": "Mapped code, docs, tests, demo, and CI moved together."},
+    {"check": "stale values", "outcome": "pass", "reason": "Legacy migration prose and checkout v4 have zero hits."},
+    {"check": "callers", "outcome": "pass", "reason": "All readPointerTrack, renderCamera, and verifyCamera call sites were reviewed."},
+    {"check": "flagsweep receipt", "outcome": "acknowledged", "reason": "Receipt pre-existed on the generic verify verb; flagged pointer internals and unrelated tests are not camera documentation surfaces."},
+    {"check": "test strength", "outcome": "pass", "reason": "Five fix-absent mutations failed for the intended reasons and restored green."},
+    {"check": "full check", "outcome": "pass", "reason": "855 tests passed with zero failures."},
+    {"check": "release scan", "outcome": "pass", "reason": "No secrets, personal paths, media, or files over 1 MB entered the diff."}
+  ],
+  "findings": [
+    {"id": "F1", "state": "confirmed", "claim": "Parallel demos collided because their run directory used only a timestamp.", "evidence": "Concurrent runs reproduced the collision; mkdtemp made three simultaneous runs pass.", "layer": "demo lifecycle", "source": "lens", "path": "scripts/internal-demo.ts to CI matrix", "resolution": "fixed"},
+    {"id": "F2", "state": "confirmed", "claim": "A failed camera render left a sendcmd sidecar that blocked retry.", "evidence": "Forced FFmpeg exit 91 reproduced the residual; transactional cleanup and an immediate-retry test now pass.", "layer": "render lifecycle", "source": "lens", "path": "camera render script write to FFmpeg failure", "resolution": "fixed"},
+    {"id": "F3", "state": "confirmed", "claim": "Review conventions still described unversioned tracks as supported.", "evidence": "The stale invariant contradicted the required version contract and was updated.", "layer": "review contract", "source": "gate", "path": "pointer reader to conventions", "resolution": "fixed"}
+  ],
+  "exemptions": [
+    {"claim": "Flagsweep findings in pointer internals do not require receipt prose.", "evidence": "Receipt is not a new global flag and those files do not document the camera command surface."},
+    {"claim": "No SSRec release was performed.", "evidence": "Only its source producer contract changed; MediaDom remains dependency-free and independently demoable."}
+  ],
+  "issue_candidates": []
+}
