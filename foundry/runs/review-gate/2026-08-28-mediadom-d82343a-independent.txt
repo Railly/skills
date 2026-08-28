@@ -1,6 +1,6 @@
 MediaDom internal V1 independent substrate challenge
 
-Target commit: b2c3992358c946eb28fc143f44967ff05e2f7b79
+Target commit: d82343a5c2afec90cbe17ba69b3078ca2db1e773
 Base commit: 560a32a7a3af0592025b3220ecf0e8c8bace1e66
 
 Real substrate matrix:
@@ -51,6 +51,7 @@ Behavioral falsification:
 Security and release boundary:
 
 - The tracked package contains no media files over the release extensions and no tracked file over 1 MB.
-- Staged scans found no personal absolute paths, private fixture names, SSRec command names, private keys, GitHub tokens, Vercel tokens, or assigned API secrets.
+- Byte-aware staged scans found no personal identifiers, absolute paths, private fixture names, SSRec command names, private keys, GitHub tokens, Vercel tokens, or assigned API secrets.
+- Every tracked TypeScript, test, script, skill, and workflow file is text-classified; literal NUL separators were replaced with equivalent escaped literals before the final run.
 - package.json remains private: true.
 - No npm publication or Vercel deployment was performed.

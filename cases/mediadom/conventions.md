@@ -41,4 +41,4 @@ packages/mediadom/package.json :: packages/mediadom/src/name.ts, packages/mediad
 
 ## Gate-miss ledger
 
-None recorded.
+- 2026-08-28: ordinary text scans skipped TypeScript files containing literal NUL separators. Release scans must classify tracked files first and search remaining content byte-aware.

@@ -4,7 +4,7 @@
     "date": "2026-08-28",
     "repo": "mediadom-lab/packages/mediadom",
     "base": "560a32a7a3af0592025b3220ecf0e8c8bace1e66",
-    "head": "b2c3992358c946eb28fc143f44967ff05e2f7b79",
+    "head": "d82343a5c2afec90cbe17ba69b3078ca2db1e773",
     "status": "complete",
     "verdict": "pass",
     "gaps": []
@@ -37,7 +37,7 @@
       "required": true,
       "satisfied": true,
       "method": "substrate_corpus",
-      "artifact": "2026-08-28-mediadom-b2c3992-independent.txt",
+      "artifact": "2026-08-28-mediadom-d82343a-independent.txt",
       "evidence": "Real FFmpeg 6.1.6, 7.1.5, and 9.0.1 binaries completed the synthetic audio and camera workflow; ffprobe and visual frame inspection checked produced artifacts."
     }
   },
@@ -92,7 +92,7 @@
       },
       "substrates": [
         {
-          "name": "exact git tree at b2c3992",
+          "name": "exact git tree at d82343a",
           "status": "exercised",
           "evidence": "Tracked-file scans returned no disallowed media, personal paths, private fixture names, or assigned secrets."
         }
@@ -416,7 +416,7 @@
   "deterministic": [
     {"check": "style", "outcome": "pass", "reason": "No em dash or comment punctuation violations."},
     {"check": "surfaces", "outcome": "pass", "reason": "Every mapped code, contract, docs, test, and CI surface changed together."},
-    {"check": "stale local paths", "outcome": "pass", "reason": "Zero personal absolute path or mediadom-lab hits in the tracked package."},
+    {"check": "byte-aware stale identifiers", "outcome": "pass", "reason": "All tracked source is text-classified and byte-aware scans found zero personal identifiers, absolute paths, private fixtures, or mediadom-lab hits."},
     {"check": "stale private fixtures", "outcome": "pass", "reason": "Zero cueva-263, channel-3, or ssrec-track hits in the tracked package."},
     {"check": "callers filterComplexScriptFlag", "outcome": "pass", "reason": "Every call site was included in the diff and exercised."},
     {"check": "callers readPointerTrack", "outcome": "pass", "reason": "Every call site was included in the diff and exercised."},
@@ -453,6 +453,16 @@
       "layer": "substrate compatibility",
       "source": "lens",
       "path": "src/ffmpeg.ts to src/renderer.ts to real FFmpeg process",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "Literal NUL separators caused ordinary text scans to skip two TypeScript files and hide personal benchmark prose.",
+      "evidence": "Byte inspection found NUL separators in derivation.ts and confirm.ts. Equivalent escaped literals restored text classification, then byte-aware scans and the complete 844-test suite passed.",
+      "layer": "release confidentiality",
+      "source": "gate",
+      "path": "src/derivation.ts and src/confirm.ts",
       "resolution": "fixed"
     }
   ],
