@@ -5,6 +5,7 @@ Use this after a real issue, pull request, review, or incident. Complete only fi
 ```markdown
 # Case: <short name>
 
+Case schema: 2
 Status: observed | candidate | evaluated | reviewed | promoted | rejected
 Validation: unvalidated | contributor-validated | independently-validated
 Human review: pending | contributor-complete | independent-complete
@@ -15,6 +16,8 @@ Repository: <owner/repo or private>
 Role: contributor | maintainer
 Issue or PR: <public URL or approved private reference>
 Upstream status checked: <YYYY-MM-DD or not-applicable>
+Knowledge disposition: link-existing | create-candidate | gap | no-change
+Knowledge target: pattern.<id> | gap.<id> | none
 
 ## Observed failure
 
@@ -66,5 +69,7 @@ What can be public, what must remain private, and who approved that boundary?
 Do not replace unavailable evidence with plausible reconstruction. Mark it unknown.
 
 These fields are independent. A merged change is not automatically validated, and contributor validation is not maintainer acceptance.
+
+Schema 2 requires exactly one compiled-knowledge disposition. Existing-pattern and candidate-pattern targets must link back to the case, candidate creation remains non-promoted, gap targets must already exist in compiled provenance, and no-change uses `none`.
 
 An agent-generated or synthetic backfill defaults to `Status: observed`, `Validation: unvalidated`, and `Human review: pending`. Upgrade those fields only after explicit review of the underlying evidence.
