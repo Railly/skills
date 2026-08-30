@@ -36,8 +36,9 @@ The oracle is the shaped V4 contract plus the existing three-variant eval protoc
 | Remove latest-active digest verification | validator call site | Stale-active assertion failed with an empty error set |
 | Remove the closed top-level field check | validator branch | Unknown private transcript assertion failed while the nested-field check remained red |
 | Permit arbitrary tracked candidate paths | validator branch | Canonical candidate-path assertion failed even though patch-content validation remained red |
+| Skip proposed-record validation before idempotent comparison | recorder call site | A retry carrying an unknown private transcript returned a successful no-op instead of failing closed |
 
-All ten mutants were killed by the intended assertions. The source was restored after each mutation. The original nine focused tests passed twice consecutively before the final history-validation and review-hardening assertions were added; the complete eleven-test suite passed with 37 expectations after those additions.
+All eleven mutants were killed by the intended assertions. The source was restored after each mutation. The original nine focused tests passed twice consecutively before the final history-validation and review-hardening assertions were added; the complete eleven-test suite passed with 39 expectations after those additions.
 
 ## Boundary evidence and gaps
 
