@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "patterns": [
     {
       "schema_version": 1,
@@ -593,6 +593,47 @@
       }
     }
   ],
+  "impacts": [
+    {
+      "schema_version": 1,
+      "kind": "skill-impact",
+      "id": "impact.record-a-case.autonomous-disposition-order",
+      "skill": "record-a-case",
+      "summary": "Rejected an explicit disposition order that did not beat the released procedure and weakened validation status attribution.",
+      "sources": {
+        "patterns": [
+          "pattern.drive-the-shipped-surface"
+        ],
+        "no_action_reason": null
+      },
+      "candidate": {
+        "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/candidate.patch",
+        "digest": "sha256:9de3560f3e4b6db51ffd790a65166faa0d3e4c4b9ef1b47e87028b37b9a7afb6"
+      },
+      "evaluation": {
+        "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/evaluation.json",
+        "result": "fail",
+        "variants": [
+          "candidate-skill",
+          "no-skill",
+          "released-skill"
+        ],
+        "summary": "Candidate and release tied on the initial assertions; the candidate additionally overclaimed independent validation."
+      },
+      "decision": {
+        "outcome": "rejected",
+        "authority": "deterministic-gate",
+        "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/decision.md",
+        "rationale": "No measured improvement and a weaker evidence-status boundary."
+      },
+      "active_skill": {
+        "path": "skills/record-a-case/SKILL.md",
+        "before_digest": "sha256:f6936a7f48ec672adfd7c888cb484e815ebd32416493ef62d371cf56547340ed",
+        "after_digest": "sha256:f6936a7f48ec672adfd7c888cb484e815ebd32416493ef62d371cf56547340ed"
+      },
+      "supersedes": []
+    }
+  ],
   "nodes": [
     {
       "id": "pattern.drive-the-shipped-surface",
@@ -713,9 +754,28 @@
       "kind": "skill",
       "channel": "experimental",
       "maturity": "dogfooded"
+    },
+    {
+      "id": "impact.record-a-case.autonomous-disposition-order",
+      "kind": "impact",
+      "outcome": "rejected",
+      "title": "Rejected an explicit disposition order that did not beat the released procedure and weakened validation status attribution."
     }
   ],
   "edges": [
+    {
+      "from": "impact.record-a-case.autonomous-disposition-order",
+      "to": "pattern.drive-the-shipped-surface",
+      "relationship": "derived-from",
+      "status": "active"
+    },
+    {
+      "from": "impact.record-a-case.autonomous-disposition-order",
+      "to": "skill.record-a-case",
+      "relationship": "targets",
+      "status": "active",
+      "outcome": "rejected"
+    },
     {
       "from": "pattern.drive-the-shipped-surface",
       "to": "skill.record-a-case",
@@ -1304,6 +1364,78 @@
       "fingerprint": "86c47213fb748bf12453e28bea67b0d2efeca81a73555d7c660ea01325dd9842",
       "classification": "reference",
       "rationale": "Reviewed matched lines: the name identifies a boundary, dependency, source artifact, catalog entry, or related method; this file does not prove application.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/decision.md",
+      "fingerprint": "4975a4153e86909ad78cea66e8de47929167d54ce574b6871f7a6fdc19e6beeb",
+      "classification": "decision",
+      "rationale": "Reviewed matched lines: this file records the rejection decision for a procedural candidate; it does not prove application of the released skill.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/evals.json",
+      "fingerprint": "f365db16448b037c072a3ebda40343ee40b3b255ed81fad812fd986f3e322361",
+      "classification": "evaluation",
+      "rationale": "Reviewed matched lines: this file defines evaluation prompts and assertions; it is not an application ledger.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/evaluation.json",
+      "fingerprint": "6c484a89107906d511cfabb7a0582c2a3d4b5d8cc39bc897b60c8c3c81047f1f",
+      "classification": "evaluation",
+      "rationale": "Reviewed matched lines: this file compares candidate, released, and no-skill behavior; it is evaluation evidence only.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/impact-record.json",
+      "fingerprint": "7edafedc30c555e164cced996bbb5e1f9b5c95830c380032002760399690c472",
+      "classification": "decision",
+      "rationale": "Reviewed matched lines: this file serializes a rejected lifecycle decision and active-skill digest; it does not prove application.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/iteration-1/benchmark.json",
+      "fingerprint": "725e1bd4490704d8b8ca28384049f4a774ba63a3e45ee52e4f5f572277c65379",
+      "classification": "evaluation",
+      "rationale": "Reviewed matched lines: this generated benchmark records comparative eval results; it is not application evidence.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/iteration-1/benchmark.md",
+      "fingerprint": "96a18a4c6d38744a860eeb728866a5ddd35bd898aa078d18a51cdc1e4d0a457c",
+      "classification": "evaluation",
+      "rationale": "Reviewed matched lines: this file summarizes comparative eval results and the decision signal; it is not application evidence.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/iteration-1/raw-evidence.json",
+      "fingerprint": "431926799b221134ec0d9f65e91b2083f01059564b16fbee98df10ea99d5e7eb",
+      "classification": "evaluation",
+      "rationale": "Reviewed matched lines: this bundle preserves the six raw eval responses, execution accounts, prompts, and grades; it is evaluation evidence, not an application ledger.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/packet.json",
+      "fingerprint": "1e7d6589fb74d30fefc3e593b29f0aaa378757f61108f4933d1a0ad1754565aa",
+      "classification": "reference",
+      "rationale": "Reviewed matched lines: this packet bounds provenance, patterns, audit outcomes, and evidence for proposal generation; it does not prove application.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/review-gate/2026-08-29-skills-a1289e8.json",
+      "fingerprint": "1d3ed5e7fdaaf41be05dc1a10385121a560e4ee372130a17d9e2bd1790f57483",
+      "classification": "evaluation",
+      "rationale": "Reviewed matched lines: this report evaluates the proposal loop and references its target skill; it is not application evidence for the released procedure.",
       "supports_application": false
     },
     {

@@ -2,7 +2,7 @@
 
 **Selected shape:** C, compiled knowledge graph with human-readable pages
 
-**Implementation:** V1 compiled pilot, V2 full catalog provenance, and V3 case-to-pattern loop are complete. The catalog covers 19 of 19 provenance pages and 279 reviewed textual matches with drift fingerprints.
+**Implementation:** V1 compiled pilot, V2 full catalog provenance, V3 case-to-pattern loop, and V4 proposal-impact loop are complete. The catalog covers 19 of 19 provenance pages and 287 reviewed textual matches with drift fingerprints. The first atomic proposal was rejected and preserved while the active procedure remained byte-identical.
 
 ## Frame
 
@@ -54,7 +54,7 @@
 | **C1** | **Authored knowledge sources** | |
 | C1.1 | Pattern pages store stable IDs, status, summaries, root causes, strategies, exceptions, typed evidence, affected skills, and history | |
 | C1.2 | Skill provenance pages store evidence, patterns, decisions, and explicit gaps for every registered skill | |
-| C1.3 | An append-only impact ledger records every proposed skill change, its inputs, eval outcome, human decision, and supersession | |
+| C1.3 | An append-only impact ledger records every proposed skill change, its inputs, eval outcome, decision authority, and supersession; acceptance requires a human decision | |
 | **C2** | **Compilation and validation** | |
 | C2.1 | A shared parser compiles authored pages and typed relationships into one in-memory graph | |
 | C2.2 | A compiler writes or checks the compact index, coverage matrix, and machine graph | |
@@ -126,7 +126,7 @@ flowchart TB
             N8["N8: eval protocol"]
             S11["S11: eval and round evidence"]
             U12["U12: eval scorecard"]
-            U13["U13: human decision"]
+            U13["U13: decision authority"]
             N9["N9: impact recorder"]
             S4["S4: impact.jsonl"]
             S9["S9: active SKILL.md"]
@@ -266,7 +266,7 @@ flowchart TB
         N8["N8: eval protocol"]
         S11["S11: eval evidence"]
         U12["U12: scorecard"]
-        U13["U13: human decision"]
+        U13["U13: decision authority"]
         N9["N9: impact recorder"]
         S4["S4: impact ledger"]
         S9["S9: active skill"]
@@ -365,4 +365,4 @@ flowchart TB
 |  |  |  |
 |:---|:---|:---|
 | **V1: COMPILED PILOT**<br>✅ COMPLETE<br><br>• Pattern and provenance schema<br>• Compiler, validator, projections<br>• `review-gate` rich evidence<br>• `before-after` explicit gap<br><br>*Demo: compile and break one relationship* | **V2: FULL CATALOG PROVENANCE**<br>✅ COMPLETE<br><br>• 19/19 provenance pages<br>• 279 textual matches classified<br>• Unsupported gaps preserved<br>• Match fingerprints enforced<br><br>*Demo: inspect any skill from one coverage report* | **V3: CASE-TO-PATTERN LOOP**<br>✅ COMPLETE<br><br>• Schema 2 disposition contract<br>• Typed pattern, gap, or no-change target<br>• Real case reinforces an existing pattern<br>• Dogfood commit leaves `skills/` unchanged<br><br>*Demo: validate the case and regenerate the index* |
-| **V4: PROPOSAL AND IMPACT LOOP**<br>⏳ PENDING<br><br>• Build bounded packet<br>• Propose one atomic patch<br>• Run existing eval protocol<br>• Preserve rejection history<br><br>*Demo: reject a patch without losing its lesson* | **V5: FAIL-CLOSED AND RUNTIME BOUNDARY**<br>⏳ PENDING<br><br>• Join provenance to maturity<br>• Add CI enforcement<br>• Verify installed package boundary<br>• Synchronize public docs<br><br>*Demo: unsupported maturity fails, installed execution works* |  |
+| **V4: PROPOSAL AND IMPACT LOOP**<br>✅ COMPLETE<br><br>• Bounded one-skill packet<br>• Atomic candidate outside active tree<br>• No-skill, released, candidate, and transfer eval<br>• Append-only rejection with digest proof<br><br>*Demo: rejected patch remains queryable while the active skill is byte-identical* | **V5: FAIL-CLOSED AND RUNTIME BOUNDARY**<br>⏳ PENDING<br><br>• Join provenance to maturity<br>• Add CI enforcement<br>• Verify installed package boundary<br>• Synchronize public docs<br><br>*Demo: unsupported maturity fails, installed execution works* |  |

@@ -130,6 +130,12 @@ describe("knowledge compiler", () => {
 		const first = renderKnowledge(compileKnowledge(knowledge));
 		const second = renderKnowledge(compileKnowledge(knowledge));
 		expect(first).toEqual(second);
+		expect(
+			JSON.parse(first["foundry/knowledge/graph.json"]).schema_version,
+		).toBe(2);
+		expect(first["foundry/knowledge/index.md"]).toContain(
+			"No proposal impacts recorded yet.",
+		);
 		expect(first["foundry/knowledge/coverage.md"]).toContain(
 			"| alpha | stable | dogfooded | supported | 1 | 0 | 1 | 0 |",
 		);
