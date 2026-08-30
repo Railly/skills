@@ -2,7 +2,7 @@
 
 **Selected shape:** C, compiled knowledge graph with human-readable pages
 
-**Implementation:** V1 compiled pilot and V2 full catalog provenance are complete. V2 covers 19 of 19 provenance pages and 276 reviewed textual matches with drift fingerprints.
+**Implementation:** V1 compiled pilot, V2 full catalog provenance, and V3 case-to-pattern loop are complete. The catalog covers 19 of 19 provenance pages and 279 reviewed textual matches with drift fingerprints.
 
 ## Frame
 
@@ -364,5 +364,5 @@ flowchart TB
 
 |  |  |  |
 |:---|:---|:---|
-| **V1: COMPILED PILOT**<br>✅ COMPLETE<br><br>• Pattern and provenance schema<br>• Compiler, validator, projections<br>• `review-gate` rich evidence<br>• `before-after` explicit gap<br><br>*Demo: compile and break one relationship* | **V2: FULL CATALOG PROVENANCE**<br>✅ COMPLETE<br><br>• 19/19 provenance pages<br>• 276 textual matches classified<br>• Unsupported gaps preserved<br>• Match fingerprints enforced<br><br>*Demo: inspect any skill from one coverage report* | **V3: CASE-TO-PATTERN LOOP**<br>⏳ PENDING<br><br>• Extend case schema<br>• Add knowledge disposition<br>• Link or create pattern<br>• Never mutate a skill<br><br>*Demo: record a case and regenerate the index* |
+| **V1: COMPILED PILOT**<br>✅ COMPLETE<br><br>• Pattern and provenance schema<br>• Compiler, validator, projections<br>• `review-gate` rich evidence<br>• `before-after` explicit gap<br><br>*Demo: compile and break one relationship* | **V2: FULL CATALOG PROVENANCE**<br>✅ COMPLETE<br><br>• 19/19 provenance pages<br>• 279 textual matches classified<br>• Unsupported gaps preserved<br>• Match fingerprints enforced<br><br>*Demo: inspect any skill from one coverage report* | **V3: CASE-TO-PATTERN LOOP**<br>✅ COMPLETE<br><br>• Schema 2 disposition contract<br>• Typed pattern, gap, or no-change target<br>• Real case reinforces an existing pattern<br>• Dogfood commit leaves `skills/` unchanged<br><br>*Demo: validate the case and regenerate the index* |
 | **V4: PROPOSAL AND IMPACT LOOP**<br>⏳ PENDING<br><br>• Build bounded packet<br>• Propose one atomic patch<br>• Run existing eval protocol<br>• Preserve rejection history<br><br>*Demo: reject a patch without losing its lesson* | **V5: FAIL-CLOSED AND RUNTIME BOUNDARY**<br>⏳ PENDING<br><br>• Join provenance to maturity<br>• Add CI enforcement<br>• Verify installed package boundary<br>• Synchronize public docs<br><br>*Demo: unsupported maturity fails, installed execution works* |  |
