@@ -185,6 +185,12 @@ describe("knowledge compiler", () => {
 			"private:/home/person/secret.md",
 			"private:C:\\work\\secret.md",
 			"private:file:///tmp/secret.md",
+			"private:~/secret.md",
+			"private:$HOME/secret.md",
+			"private:$" + "{HOME}/secret.md",
+			"private:%USERPROFILE%\\secret.md",
+			"private:$PWD/secret.md",
+			"private:../secret.md",
 		]) {
 			knowledge.patterns[0].evidence[0] = {
 				path,
@@ -206,6 +212,19 @@ describe("knowledge compiler", () => {
 		);
 	});
 
+	test("accepts an opaque approved private pointer", () => {
+		const repository = fixture();
+		const knowledge = loadKnowledge(repository);
+		knowledge.patterns[0].evidence[0] = {
+			path: "private:approved-system/item-42",
+			relationship: "origin",
+			visibility: "approved-private",
+			status: "active",
+		};
+		const validation = validateKnowledge(repository, knowledge);
+		expect(validation.errors).toEqual([]);
+	});
+
 	test("rejects public evidence outside tracked repository files", () => {
 		const repository = fixture();
 		const knowledge = loadKnowledge(repository);
@@ -220,6 +239,18 @@ describe("knowledge compiler", () => {
 		expect(untracked.errors.join("\n")).toContain(
 			"must reference a tracked repository file",
 		);
+	});
+
+	test("rejects decisions outside tracked Foundry files", () => {
+		const repository = fixture();
+		const knowledge = loadKnowledge(repository);
+		for (const decision of [".git/config", "cases/one.md"]) {
+			knowledge.skills[0].decisions = [decision];
+			const validation = validateKnowledge(repository, knowledge);
+			expect(validation.errors.join("\n")).toContain(
+				"decision must reference a tracked Foundry file",
+			);
+		}
 	});
 
 	test("fails red when a registered skill has no provenance page", () => {

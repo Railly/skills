@@ -118,7 +118,11 @@ function privatePointerExposesLocalPath(value) {
 		pointer.startsWith("/") ||
 		pointer.startsWith("\\") ||
 		/^[a-z]:[\\/]/i.test(pointer) ||
-		/^file:/i.test(pointer)
+		/^file:/i.test(pointer) ||
+		/^~(?:[\\/]|$)/.test(pointer) ||
+		/^\.\.?(?:[\\/]|$)/.test(pointer) ||
+		/^\$(?:\{[^}]+\}|[a-z_][a-z0-9_]*)(?:[\\/]|$)/i.test(pointer) ||
+		/^%[^%]+%(?:[\\/]|$)/.test(pointer)
 	);
 }
 
@@ -302,9 +306,13 @@ export function validateKnowledge(
 				if (
 					!target ||
 					!existsSync(target) ||
-					!resolvesInsideRepository(repository, target)
+					!resolvesInsideRepository(repository, target) ||
+					!decision.startsWith("foundry/") ||
+					!trackedPaths.has(decision)
 				) {
-					errors.push(`${owner}: missing decision "${decision}"`);
+					errors.push(
+						`${owner}: decision must reference a tracked Foundry file "${decision}"`,
+					);
 				}
 			}
 		}
