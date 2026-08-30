@@ -1,0 +1,383 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-29",
+    "repo": "Railly/skills",
+    "base": "72a4a769c1f3884eb9c3ed059c54f838aa50e294",
+    "head": "a7e38d32bb42392261a26c307438c0a1aa24363b",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "foundry/candidates/2026-08-compiled-knowledge-layer/shaping.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Spec review was supplied; this report records the Standards review."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5.6",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "confidentiality boundary",
+      "durable generated repository artifacts"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "../test-strength/2026-08-29-skills-compiled-knowledge.md",
+      "evidence": "An opaque-pointer rejection corpus, actual Git index, exact-head mutation suite, and forced generated-file write failure exercised the changed boundaries."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "foundry/candidates/2026-08-compiled-knowledge-layer/shaping.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "The shaping acceptance slices, non-goals, and knowledge boundary were checked against the final tree."
+    },
+    {
+      "source": "design",
+      "location": "foundry/knowledge/README.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The authored-versus-generated model, typed relationship schema, pointer policy, and audit workflow were reviewed."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md; NORTH.md; cases/skills/conventions.md",
+      "status": "reviewed",
+      "properties": ["P2", "P5"],
+      "evidence": "Repository identity, confidentiality language, commands, and executable surface declarations agree with behavior."
+    },
+    {
+      "source": "implementation",
+      "location": "scripts/lib/knowledge.mjs; scripts/compile-knowledge.mjs; scripts/validate-knowledge.mjs; scripts/audit-knowledge-matches.mjs",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "The parser, validator, compiler, audit, tests, CI, generated projections, and installer listing were exercised on the exact head."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Authored knowledge preserves typed relationship endpoints, statuses, reverse links, and graph edge semantics.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "the authored relationship contract and generated graph semantics",
+        "layer": "repository knowledge model",
+        "method": "validate authored pages and compare generated graph fields to source metadata",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "successful JSON serialization",
+        "counterexample": "serialize valid-looking edges after deleting relationship status",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The graph-status mutation remained serializable but failed the projection assertion."
+      },
+      "substrates": [
+        {
+          "name": "authored Markdown and generated graph JSON",
+          "status": "exercised",
+          "evidence": "Nineteen skill pages and one pattern compiled and validated on the real repository corpus."
+        }
+      ],
+      "evidence": "Validator and focused tests passed, including graph status and reverse-link checks."
+    },
+    {
+      "id": "P2",
+      "claim": "Public evidence and decisions resolve only to safe tracked repository files while private evidence remains an opaque non-path token.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "whether every retrieval handle stays inside its declared confidentiality and repository boundary",
+        "layer": "filesystem, Git index, and pointer grammar",
+        "method": "exercise real paths and the actual Git index against accepted and rejected corpora",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "path existence or a private prefix",
+        "counterexample": "use Git internals, untracked files, traversal, URLs, shell expansion, local paths, and free-form private values",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Existing unsafe paths and permissive private-prefix values were rejected while opaque allowlisted forms passed."
+      },
+      "substrates": [
+        {
+          "name": "macOS filesystem real paths and repository Git index",
+          "status": "exercised",
+          "evidence": "Tests resolved symlink and traversal containment and queried tracked membership in the current checkout."
+        }
+      ],
+      "evidence": "The final opaque grammar is private:<system>:<id>; public evidence and decisions require tracked in-repository files, with decisions confined to foundry/."
+    },
+    {
+      "id": "P3",
+      "claim": "Generated index, coverage, graph, and audit summary are deterministic projections of authored sources.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "byte equality between freshly rendered outputs and committed projections",
+        "layer": "generated repository artifacts",
+        "method": "compile, check, repeat five focused runs, and restore to baseline hashes after a forced partial-write partition",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the compiler exits successfully once",
+        "counterexample": "change authored pattern content without recompiling and separately fail the third projection write after earlier writes commit",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Check mode identified stale projections, and the forced write failure exposed residual earlier writes before retry converged."
+      },
+      "substrates": [
+        {
+          "name": "Bun 1.3.11 filesystem writes in an isolated exact-head worktree",
+          "status": "exercised",
+          "evidence": "The compiler wrote real files, failed with EACCES at the protected graph, then succeeded on immediate retry after permission restoration."
+        }
+      ],
+      "evidence": "Compile and check passed on the exact head; post-restoration hashes matched the original four projection hashes."
+    },
+    {
+      "id": "P4",
+      "claim": "The textual-match ledger detects new, removed, or changed exact-token matches and excludes substring collisions.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "the exact current set and fingerprints of repository skill-token lines",
+        "layer": "real textual corpus",
+        "method": "scan the repository, compare all records to the reviewed ledger, and mutate token and line behavior",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "substring presence",
+        "counterexample": "place alpha inside alphabet while the audited token is alpha",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Changing the matcher to substring semantics produced an extra alpha match and failed the test."
+      },
+      "substrates": [
+        {
+          "name": "tracked repository text corpus",
+          "status": "exercised",
+          "evidence": "The audit checked 276 reviewed match pairs and caught an exact mutated fingerprint."
+        }
+      ],
+      "evidence": "The exact-head audit and its check mode passed with 276 records."
+    },
+    {
+      "id": "P5",
+      "claim": "The knowledge layer does not become an installable skill surface and its validation runs in pull-request CI.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the actual locally discoverable skill list and the committed CI command surface",
+        "layer": "installer discovery and GitHub Actions workflow",
+        "method": "run the installer list command and execute the same validation commands declared in CI",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "knowledge files live outside the skills directory",
+        "counterexample": "ask the real installer to enumerate every skill from the repository root",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The installer listed exactly nineteen skills in the three intended channels and no knowledge artifact."
+      },
+      "substrates": [
+        {
+          "name": "skills installer CLI and repository CI commands",
+          "status": "exercised",
+          "evidence": "bunx --bun skills add . --list and the validate, compile-check, audit-check, test, and site commands completed."
+        }
+      ],
+      "evidence": "Surface, sibling, CI, repository validation, and website build checks passed."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "Markdown metadata parser",
+      "textual-match parser",
+      "graph serializer"
+    ],
+    "dimensions": {
+      "values": [
+        "metadata shape",
+        "public evidence boundary",
+        "private evidence grammar",
+        "decision boundary",
+        "graph relationship semantics",
+        "exact textual matching",
+        "projection freshness",
+        "maturity enforcement"
+      ],
+      "exclusions": [
+        "automatic judgment of whether a source proves application",
+        "automatic procedure mutation",
+        "strict maturity enforcement in this slice"
+      ],
+      "evidence": "The explicit dimension table and rejected classes are recorded in the independent challenge artifact."
+    },
+    "oracle": {
+      "source": "NORTH.md, foundry/knowledge/README.md, authored Markdown, real paths, and git ls-files",
+      "independent": true,
+      "evidence": "The expected boundaries come from product contracts and repository state rather than implementation return values."
+    },
+    "producer": {
+      "name": "repository Markdown corpus and Git index",
+      "status": "exercised",
+      "evidence": "Public commands parsed the repository's actual authored pages, cases, maturity registry, and tracked-file set."
+    },
+    "falsification": [
+      {
+        "mutation": "Weaken the private pointer grammar to accept any private-prefixed value.",
+        "red_evidence": "The local-path rejection corpus failed because invalid pointers were accepted.",
+        "restored_green_evidence": "Restoring the opaque grammar returned all focused tests to green."
+      },
+      {
+        "mutation": "Remove tracked-file enforcement for public evidence.",
+        "red_evidence": "Git internals and an untracked file became accepted and their assertions failed.",
+        "restored_green_evidence": "Restoring tracked containment returned the boundary tests to green."
+      },
+      {
+        "mutation": "Remove the Foundry and tracked-file restrictions from decisions.",
+        "red_evidence": "The non-Foundry decision assertion failed.",
+        "restored_green_evidence": "Restoring both restrictions returned decision tests to green."
+      },
+      {
+        "mutation": "Replace exact-token matching with substring matching.",
+        "red_evidence": "alphabet produced an extra alpha match and failed the expected record set.",
+        "restored_green_evidence": "Restoring token boundaries returned the audit tests to green."
+      },
+      {
+        "mutation": "Drop relationship status from generated graph edges.",
+        "red_evidence": "The graph projection assertion failed.",
+        "restored_green_evidence": "Restoring status serialization returned the projection tests to green."
+      },
+      {
+        "mutation": "Point authored evidence at a missing case.",
+        "red_evidence": "Validation failed on the exact missing path.",
+        "restored_green_evidence": "Restoring the authored handle returned validation to green."
+      },
+      {
+        "mutation": "Change authored pattern content without recompiling.",
+        "red_evidence": "Check mode reported stale index and graph projections.",
+        "restored_green_evidence": "Recompilation made check mode pass."
+      },
+      {
+        "mutation": "Change one audited matching line.",
+        "red_evidence": "Audit check reported the exact stale fingerprint key.",
+        "restored_green_evidence": "Restoring the line returned the 276-pair audit to green."
+      }
+    ],
+    "evidence": "Seventeen focused tests with forty expectations, eight fix-absent mutations, five repeat runs, and the real repository producer boundary passed after restoration."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "foundry/candidates/2026-08-compiled-knowledge-layer/shaping.md",
+      "claim": "The current repository case corpus is the public evidence boundary for this slice.",
+      "status": "verified",
+      "evidence": "Every public handle was resolved against repository containment and tracked membership."
+    },
+    {
+      "id": "A2",
+      "source": "foundry/knowledge/README.md",
+      "claim": "Private sources can remain useful without exposing a filesystem location.",
+      "status": "verified",
+      "evidence": "Opaque private system and identifier tokens validate while all path-like variants are rejected."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The compiler durably rewrites four repository projections in sequence.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "A generated projection becomes visible on disk.",
+        "owner": "compile-knowledge command",
+        "commit_event": "writeFileSync returns for a projection path",
+        "later_fallible_stages": [
+          "write remaining generated projections"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "local generated-file writer",
+            "covers": [
+              "write remaining generated projections"
+            ],
+            "forced": true,
+            "residual_observed": "The updated index remained durable while the protected graph and later audit projection retained their earlier hashes.",
+            "cleanup_owner": "the caller restores the injected filesystem permission before retry",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "After restoring graph write permission, the same compile operation succeeded and check mode passed; reverting the source mutation and recompiling restored all baseline hashes."
+            },
+            "evidence": "The exact-head isolated worktree returned EACCES at the third write after the first projection hash changed."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "run", "reason": "The diff changed metadata and pointer acceptance boundaries."},
+    {"name": "New-domain matrix", "status": "run", "reason": "Accepted and rejected pointer and match classes required an explicit matrix."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Validation, compilation, audit, and docs consume the same contracts."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command construction or reparse contract changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No event channel or latch changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim or wrapper changed."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Advisory maturity mode and strict mode are deliberate separate defaults."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "The new authored-to-generated and public-to-private seams were inspected."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Repeated pointer-boundary review misses triggered a concrete rejection corpus."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No independent reference implementation exists for this repository-specific model."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Validation and compile failures propagate through CLI exit codes and CI."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag crosses multiple dispatch envelopes."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Missing evidence, stale projections, stale fingerprints, and write failure were forced."},
+    {"name": "Non-destructive recovery", "status": "run", "reason": "The partial generated-file write was retried and converged to baseline hashes."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No async lifecycle or cancellation boundary changed."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Authored Markdown through parser, validator, projections, audit, CI, and installer was traced."},
+    {"name": "Substrate verification", "status": "run", "reason": "Real filesystem paths, Git index, Bun writes, and repository corpus were exercised."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Public repository commands and the real installer listing were executed."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Each new product and confidentiality sentence was mapped to its enforcing layer."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "README, NORTH, knowledge docs, shaping status, commands, and actual behavior were reconciled."},
+    {"name": "Demonstrative example", "status": "run", "reason": "Real provenance pages, pattern, audit records, and generated projections demonstrate the model."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted for this change."},
+    {"name": "Complexity budget", "status": "run", "reason": "The 276-pair corpus and repeated command timings remained sub-second for focused checks."}
+  ],
+  "deterministic": [
+    {"check": "repository unit tests", "outcome": "pass", "reason": "Forty-one tests and one hundred eleven expectations passed."},
+    {"check": "skill and issue-contract validation", "outcome": "pass", "reason": "Nineteen skills and six issue contracts passed."},
+    {"check": "knowledge validation and projection check", "outcome": "pass", "reason": "One pattern and nineteen provenance pages validated; all generated files were current."},
+    {"check": "textual match audit", "outcome": "pass", "reason": "All 276 reviewed match pairs matched current fingerprints."},
+    {"check": "evaluation fixtures", "outcome": "pass", "reason": "Five fixtures passed."},
+    {"check": "website check and build", "outcome": "pass", "reason": "Static checks and production build completed."},
+    {"check": "surface and sibling gates", "outcome": "finding-fixed", "reason": "The surface-map syntax was corrected and its previous false green was recorded."},
+    {"check": "shell metadata gate", "outcome": "acknowledged", "reason": "Reported regexes model Markdown and path matching and are never shell-reparsed."},
+    {"check": "radius impact map", "outcome": "acknowledged", "reason": "It indexed zero changed mjs symbols and 42 unresolved calls, so it supplied orientation only and no safety claim."},
+    {"check": "strict maturity mode", "outcome": "acknowledged", "reason": "It intentionally remains red for four documented non-experimental evidence gaps."},
+    {"check": "installer list", "outcome": "pass", "reason": "It found exactly nineteen skills in Stable, Candidates, and Experimental, with no knowledge corpus exposed."},
+    {"check": "diff whitespace", "outcome": "pass", "reason": "git diff --check passed."}
+  ],
+  "findings": [
+    {"id": "F1", "state": "confirmed", "claim": "The shaping overview contradicted completed V1 and V2 slices.", "evidence": "The overview still described both slices as pending while their checklists were complete.", "layer": "product status", "source": "lens", "path": "shaping overview to slice status", "resolution": "fixed"},
+    {"id": "F2", "state": "confirmed", "claim": "Surface declarations used syntax the deterministic gate did not parse.", "evidence": "The conventions file used arrows and whitespace-separated targets; the gate expects double-colon and comma separation.", "layer": "deterministic surface map", "source": "gate", "path": "conventions declaration to surface parser", "resolution": "fixed"},
+    {"id": "F3", "state": "confirmed", "claim": "Approved-private evidence accepted local paths and other retrievable values.", "evidence": "Successive probes accepted absolute, home-relative, variable, URL, and free-form pointer variants.", "layer": "confidentiality boundary", "source": "lens", "path": "metadata parser to private evidence validator", "resolution": "fixed"},
+    {"id": "F4", "state": "confirmed", "claim": "Public evidence could resolve to existing but untracked or Git-internal files.", "evidence": "Existing-path containment alone admitted .git/config and an untracked local file.", "layer": "public evidence boundary", "source": "lens", "path": "public handle to filesystem and Git index", "resolution": "fixed"},
+    {"id": "F5", "state": "confirmed", "claim": "Decision handles were not confined to tracked Foundry artifacts.", "evidence": "The original validator admitted existing in-repository files outside foundry and without tracked membership.", "layer": "decision retrieval boundary", "source": "lens", "path": "decision handle to repository artifact", "resolution": "fixed"},
+    {"id": "F6", "state": "confirmed", "claim": "Generated graph edges dropped relationship status.", "evidence": "Authored relationships carried status but the original edge projection omitted it.", "layer": "graph projection", "source": "lens", "path": "authored relationship to graph edge", "resolution": "fixed"},
+    {"id": "F7", "state": "confirmed", "claim": "Pull-request CI omitted deterministic projection and audit freshness checks.", "evidence": "The original workflow validated knowledge but did not run compiler or audit check modes.", "layer": "continuous integration", "source": "map", "path": "authored source to pull-request enforcement", "resolution": "fixed"}
+  ],
+  "exemptions": [],
+  "issue_candidates": []
+}
