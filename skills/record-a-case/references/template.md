@@ -5,6 +5,7 @@ Use this schema when materializing a case. Preserve every status axis even when 
 ```markdown
 # Case: <short name>
 
+Case schema: 2
 Status: observed | candidate | evaluated | reviewed | promoted | rejected
 Validation: unvalidated | contributor-validated | independently-validated
 Human review: pending | contributor-complete | independent-complete
@@ -15,6 +16,8 @@ Visibility: public | approved-private
 Repository: <owner/repo or private>
 Role: contributor | maintainer
 Source: <retrieval handles>
+Knowledge disposition: link-existing | create-candidate | gap | no-change
+Knowledge target: pattern.<id> | gap.<id> | none
 
 > <unvalidated or review note when applicable>
 
@@ -52,3 +55,5 @@ Source: <retrieval handles>
 ```
 
 Record unavailable evidence as unknown. Keep only the selected candidate classification when the destination format permits it.
+
+`link-existing` requires an active origin, application, evaluation, or transfer backlink. `create-candidate` requires an active origin backlink and the pattern remains `candidate`. Contradiction, rejection, and inactive evidence do not support those dispositions. `gap` requires an existing compiled gap ID. `no-change` requires `none`.

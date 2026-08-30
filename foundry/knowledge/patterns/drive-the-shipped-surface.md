@@ -22,12 +22,23 @@
       "relationship": "evaluation",
       "visibility": "public",
       "status": "active"
+    },
+    {
+      "path": "cases/skills/compiled-knowledge-pointer-boundary.md",
+      "relationship": "application",
+      "visibility": "public",
+      "status": "active"
     }
   ],
   "skills": [
     {
       "name": "review-gate",
       "relationship": "motivates",
+      "status": "active"
+    },
+    {
+      "name": "record-a-case",
+      "relationship": "supports",
       "status": "active"
     }
   ],
@@ -53,4 +64,4 @@ A lower seam is sufficient when the claim is explicitly local to that seam. Unav
 
 ## History
 
-The agent-browser case supplied the concrete dogfood failure. Foundry round 002 independently showed the adjacent-layer version of the same problem when valid candidates were dropped using unit evidence against caller-level claims.
+The agent-browser case supplied the concrete dogfood failure. Foundry round 002 independently showed the adjacent-layer version of the same problem when valid candidates were dropped using unit evidence against caller-level claims. The compiled-knowledge pointer case extended the pattern to data boundaries: successive source-level filters looked safe until rejected input classes were driven through the real validator.

@@ -1,6 +1,6 @@
 ---
 name: record-a-case
-description: "Record completed or interrupted maintenance work as an evidence ledger. Use after resolving, disproving, reviewing, or investigating an issue, PR, incident, or agent run; when backfilling an old session; or when another skill needs a durable case before extracting a method."
+description: "Record completed or interrupted maintenance work as an evidence ledger and classify its compiled-knowledge disposition. Use after resolving, disproving, reviewing, or investigating an issue, PR, incident, or agent run; when backfilling an old session; or when another skill needs durable evidence before extracting or reinforcing a pattern."
 compatibility: Requires access to the work evidence. Writing a case requires an authorized destination; live issue, PR, branch, and release checks require network access.
 ---
 
@@ -68,13 +68,26 @@ Choose the smallest provisional destination:
 
 **Complete when:** the lesson states its evidence boundary and exactly one smallest destination is selected.
 
-## 5. Pass the confidentiality gate
+## 5. Classify compiled knowledge
+
+Read the compact knowledge index before opening detailed pattern or provenance pages. Record exactly one disposition and its typed target:
+
+- `link-existing` with an existing `pattern.<id>` when the case reinforces that pattern
+- `create-candidate` with a new `pattern.<id>` when no existing pattern fits; create it with candidate status and link the case as source evidence
+- `gap` with an existing `gap.<id>` when evidence is missing or ambiguous
+- `no-change` with `none` when the lesson should remain case-local
+
+For `link-existing`, add the case as active origin, application, evaluation, or transfer evidence. For `create-candidate`, add it as active origin evidence. Contradiction, rejection, or inactive evidence cannot support either disposition. Update skill provenance only when the case supports a typed relationship. Never edit an installable skill during this step. Promotion and procedural mutation remain separate reviewed workflows.
+
+**Complete when:** the case, target pattern or gap, and reverse links agree; generated projections are current; and the case operation changed no file under `skills/`.
+
+## 6. Pass the confidentiality gate
 
 For a public case, retain public repositories and the author's public work. Sanitize secrets, customer data, private review text, internal chat, local paths, neighboring-project identity, and unapproved employer context. Ambiguous provenance routes the case to an approved private destination or a public coverage-gap record.
 
 **Complete when:** every source is authorized for the chosen visibility and the public draft contains no private retrieval handle or identity.
 
-## 6. Materialize the case
+## 7. Materialize the case
 
 Read [the case schema and allowed values](references/template.md), then write to `cases/<repo>/` under the canonical source root. Use another destination only when the user explicitly names it and it is not an installed skill copy. Follow the canonical corpus naming and validation rules. Without write authority, return the complete draft in the response.
 
@@ -82,4 +95,6 @@ Set human-review status only from explicit human feedback or retrievable review 
 
 When the case closes a live mission, update its canonical Issue Contract to `Status: closed` and record the case path and final delivery state. Do not fill missing proof retrospectively.
 
-**Complete when:** the artifact passes the destination's validator, all schema fields are resolved, the live contract points to the case when applicable, and a reader can reconstruct the work from retrieval handles without trusting the narrative.
+Stage the new public case before validation so tracked-file evidence checks can resolve it, then validate the case and compiled knowledge and regenerate projections.
+
+**Complete when:** the artifact passes the destination's validator, all schema fields and the knowledge disposition are resolved, the live contract points to the case when applicable, and a reader can reconstruct the work from retrieval handles without trusting the narrative.

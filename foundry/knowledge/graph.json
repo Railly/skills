@@ -16,6 +16,12 @@
           "status": "active"
         },
         {
+          "path": "cases/skills/compiled-knowledge-pointer-boundary.md",
+          "relationship": "application",
+          "visibility": "public",
+          "status": "active"
+        },
+        {
           "path": "foundry/rounds/002-review-gate-blind-replication/README.md",
           "relationship": "evaluation",
           "visibility": "public",
@@ -23,6 +29,11 @@
         }
       ],
       "skills": [
+        {
+          "name": "record-a-case",
+          "relationship": "supports",
+          "status": "active"
+        },
         {
           "name": "review-gate",
           "relationship": "motivates",
@@ -232,18 +243,22 @@
         "schema_version": 1,
         "kind": "skill",
         "skill": "record-a-case",
-        "summary": "Record a Case produced much of the repository corpus, but historical cases usually omit whether the published procedure was explicitly applied.",
-        "patterns": [],
-        "evidence": [],
+        "summary": "Record a Case now has an explicit schema 2 application that links a reviewed case to compiled knowledge without mutating installable procedure.",
+        "patterns": [
+          "pattern.drive-the-shipped-surface"
+        ],
+        "evidence": [
+          {
+            "path": "cases/skills/compiled-knowledge-pointer-boundary.md",
+            "relationship": "application",
+            "visibility": "public",
+            "status": "active"
+          }
+        ],
         "decisions": [
           "foundry/rounds/003-distribution-ladder/README.md"
         ],
-        "gaps": [
-          {
-            "id": "gap.record-a-case.explicit-application",
-            "description": "Record a prospective case that identifies the procedure version and shows which required fields or checks changed the resulting ledger."
-          }
-        ],
+        "gaps": [],
         "source": "foundry/knowledge/skills/record-a-case.md"
       }
     },
@@ -701,6 +716,12 @@
     }
   ],
   "edges": [
+    {
+      "from": "pattern.drive-the-shipped-surface",
+      "to": "skill.record-a-case",
+      "relationship": "supports",
+      "status": "active"
+    },
     {
       "from": "pattern.drive-the-shipped-surface",
       "to": "skill.review-gate",
@@ -1239,6 +1260,14 @@
     },
     {
       "skill": "record-a-case",
+      "path": "cases/skills/compiled-knowledge-pointer-boundary.md",
+      "fingerprint": "3992ace3fcde2d19d87cd11d319992992804d0dcf1a87f6a9009fc1d3f105000",
+      "classification": "application",
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome.",
+      "supports_application": true
+    },
+    {
+      "skill": "record-a-case",
       "path": "cases/skills/conventions.md",
       "fingerprint": "68ab361667bf3c8da73255b35d00f98e379ef3f4bc5663cd19f0d41bb0478286",
       "classification": "reference",
@@ -1572,6 +1601,14 @@
       "classification": "reference",
       "rationale": "Reviewed matched lines: the name identifies a boundary, dependency, source artifact, catalog entry, or related method; this file does not prove application.",
       "supports_application": false
+    },
+    {
+      "skill": "review-gate",
+      "path": "cases/skills/compiled-knowledge-pointer-boundary.md",
+      "fingerprint": "658a780e9abfa6e585c8dbbd21f493453da3f36dde9ea895032c27cec55f4b4e",
+      "classification": "application",
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome.",
+      "supports_application": true
     },
     {
       "skill": "review-gate",
