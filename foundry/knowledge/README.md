@@ -56,7 +56,7 @@ Every audited skill-file pair stores a fingerprint of its exact matching lines. 
 
 Evidence relationships are `origin`, `application`, `evaluation`, `transfer`, `contradiction`, or `rejection`. Skill relationships are `motivates`, `supports`, `contradicts`, or `supersedes`. Every evidence and skill relationship has status `active`, `contradicted`, `superseded`, or `stale`.
 
-Public evidence must resolve inside this repository. Approved private evidence uses a redacted `private:` pointer and must never contain a local filesystem path.
+Public evidence must resolve to a tracked file inside this repository. Approved private evidence uses the opaque form `private:<system>:<id>`. Private pointers never contain paths, URLs, credentials, or free-form descriptions.
 
 ## Runtime boundary
 
