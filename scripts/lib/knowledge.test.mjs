@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
+import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -96,6 +97,8 @@ function fixture() {
 			2,
 		)}\n\`\`\`\n`,
 	);
+	execFileSync("git", ["init", "-q"], { cwd: repository });
+	execFileSync("git", ["add", "."], { cwd: repository });
 	return repository;
 }
 
@@ -130,6 +133,14 @@ describe("knowledge compiler", () => {
 		expect(first["foundry/knowledge/coverage.md"]).toContain(
 			"| alpha | stable | dogfooded | supported | 1 | 0 | 1 | 0 |",
 		);
+		expect(JSON.parse(first["foundry/knowledge/graph.json"]).edges).toEqual([
+			{
+				from: "pattern.drive-surface",
+				to: "skill.alpha",
+				relationship: "motivates",
+				status: "active",
+			},
+		]);
 	});
 
 	test("fails red when public evidence is missing", () => {
@@ -165,6 +176,50 @@ describe("knowledge compiler", () => {
 		};
 		const validation = validateKnowledge(repository, knowledge);
 		expect(validation.errors.join("\n")).toContain("exposes a local path");
+	});
+
+	test("rejects private pointers that embed non-macOS local paths", () => {
+		const repository = fixture();
+		const knowledge = loadKnowledge(repository);
+		for (const path of [
+			"private:/home/person/secret.md",
+			"private:C:\\work\\secret.md",
+			"private:file:///tmp/secret.md",
+		]) {
+			knowledge.patterns[0].evidence[0] = {
+				path,
+				relationship: "origin",
+				visibility: "approved-private",
+				status: "active",
+			};
+			const validation = validateKnowledge(repository, knowledge);
+			expect(validation.errors.join("\n")).toContain("exposes a local path");
+		}
+		knowledge.patterns[0].evidence[0] = {
+			relationship: "origin",
+			visibility: "approved-private",
+			status: "active",
+		};
+		const missing = validateKnowledge(repository, knowledge);
+		expect(missing.errors.join("\n")).toContain(
+			"private evidence must use a private: pointer",
+		);
+	});
+
+	test("rejects public evidence outside tracked repository files", () => {
+		const repository = fixture();
+		const knowledge = loadKnowledge(repository);
+		knowledge.patterns[0].evidence[0].path = ".git/config";
+		const metadata = validateKnowledge(repository, knowledge);
+		expect(metadata.errors.join("\n")).toContain(
+			"must reference a tracked repository file",
+		);
+		writeFileSync(join(repository, "local-note.md"), "local only\n");
+		knowledge.patterns[0].evidence[0].path = "local-note.md";
+		const untracked = validateKnowledge(repository, knowledge);
+		expect(untracked.errors.join("\n")).toContain(
+			"must reference a tracked repository file",
+		);
 	});
 
 	test("fails red when a registered skill has no provenance page", () => {
