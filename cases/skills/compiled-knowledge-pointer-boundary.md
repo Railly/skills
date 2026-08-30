@@ -5,16 +5,16 @@ Status: evaluated
 Validation: independently-validated
 Human review: pending
 Maintainer acceptance: pending
-Delivery: PR open
+Delivery: local
 Upstream status checked: 2026-08-29
 Visibility: public
 Repository: Railly/skills
 Role: maintainer
-Source: https://github.com/Railly/skills/pull/22; commits `a7e38d32bb42392261a26c307438c0a1aa24363b` and `9a6fb05`; `foundry/runs/review-gate/2026-08-29-skills-a7e38d3.json`
+Source: V1 and V2 precursor https://github.com/Railly/skills/pull/22 at `4b3203c`; implementation head `a7e38d32bb42392261a26c307438c0a1aa24363b`; local V3 procedure commit `9a6fb05`; `foundry/runs/review-gate/2026-08-29-skills-a7e38d3.json`
 Knowledge disposition: link-existing
 Knowledge target: pattern.drive-the-shipped-surface
 
-> The implementation and exact-head review are retrievable. Human review and maintainer acceptance remain pending until the pull request is reviewed.
+> The pointer implementation and its exact-head review are retrievable in the V1 and V2 precursor pull request. This V3 case and compilation remain local; human review and maintainer acceptance are pending.
 
 ## Observed condition or claim
 
@@ -30,15 +30,15 @@ The work used `record-a-case` at procedure commit `9a6fb05` after the implementa
 
 ## Outcome
 
-Private evidence now accepts only `private:<system>:<id>`. Public evidence and decisions require tracked repository files inside their declared boundaries. The exact-head review passed, the pull request is open and mergeable, and all reported checks are green. The case reinforces the existing shipped-surface pattern because the decisive proof came from driving accepted and rejected values through the actual validator boundary.
+Private evidence now accepts only `private:<system>:<id>`. Public evidence and decisions require tracked repository files inside their declared boundaries. The precursor pull request is open, mergeable, and green at `4b3203c`; this V3 case-to-pattern update remains local and has only local validation. The case reinforces the existing shipped-surface pattern because the decisive proof came from driving accepted and rejected values through the actual validator boundary.
 
 ## Evidence
 
-- Source: Pull request 22, implementation head `a7e38d3`, and the committed exact-head report.
+- Source: Precursor pull request 22 at `4b3203c`, implementation head `a7e38d3`, local procedure commit `9a6fb05`, and the committed exact-head report.
 - Runtime: Bun 1.3.11 on macOS arm64.
 - Tests: 41 tests with 111 expectations passed on the implementation head; eight fix-absent mutations failed at their intended assertions and restored green.
 - Review: Independent frozen-tree review returned pass with no findings after the boundary fixes; author and reviewer shared a model family, recorded as a limitation.
-- Artifact: Deterministic index, coverage, graph, and 277-pair textual audit; GitHub validation and Vercel preview checks were green on 2026-08-29.
+- Artifact: The precursor pull request's deterministic index, coverage, graph, and 277-pair audit had green GitHub validation and Vercel preview checks on 2026-08-29. The local V3 graph and 279-pair audit pass local checks only.
 
 ## Transferable lesson
 

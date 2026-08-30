@@ -12,7 +12,7 @@ These skills turn real engineering work into portable agent protocols. They favo
 
 ### Record a Case
 
-[Record a Case](skills/record-a-case) captures completed, interrupted, or backfilled maintenance work as an evidence ledger. It keeps validation, human review, maintainer acceptance, and delivery independent.
+[Record a Case](skills/record-a-case) captures completed, interrupted, or backfilled maintenance work as an evidence ledger. It keeps validation, human review, maintainer acceptance, and delivery independent, then records one compiled-knowledge disposition: link an existing pattern, create a candidate pattern, preserve a gap, or make no compiled change.
 
 ### Review Gate
 
