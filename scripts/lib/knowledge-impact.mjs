@@ -25,6 +25,26 @@ const REQUIRED_VARIANTS = new Set([
 	"released-skill",
 	"candidate-skill",
 ]);
+const IMPACT_KEYS = new Set([
+	"schema_version",
+	"kind",
+	"id",
+	"skill",
+	"summary",
+	"sources",
+	"candidate",
+	"evaluation",
+	"decision",
+	"active_skill",
+	"supersedes",
+]);
+const SOURCES_KEYS = new Set(["patterns", "no_action_reason"]);
+const CANDIDATE_KEYS = new Set(["path", "digest"]);
+const EVALUATION_KEYS = new Set(["path", "result", "variants", "summary"]);
+const DECISION_KEYS = new Set(["outcome", "authority", "path", "rationale"]);
+const ACTIVE_SKILL_KEYS = new Set(["path", "before_digest", "after_digest"]);
+const CANDIDATE_PATH =
+	/^foundry\/runs\/proposal-impact\/[a-z0-9]+(?:[.-][a-z0-9]+)*\/candidate\.patch$/;
 
 export function sha256(content) {
 	return `sha256:${createHash("sha256").update(content).digest("hex")}`;
@@ -111,6 +131,41 @@ function validateText(value, label, errors) {
 	}
 }
 
+function validateKeys(value, allowed, label, errors) {
+	if (!value || typeof value !== "object" || Array.isArray(value)) {
+		errors.push(`${label} must be an object`);
+		return;
+	}
+	for (const key of Object.keys(value)) {
+		if (!allowed.has(key))
+			errors.push(`${label} contains unknown field "${key}"`);
+	}
+}
+
+function validateCandidatePatch(path, expectedSkillPath, owner, errors) {
+	const text = readFileSync(path, "utf8");
+	const diffHeaders = [...text.matchAll(/^diff --git a\/(.+) b\/(.+)$/gm)];
+	if (diffHeaders.length !== 1) {
+		errors.push(`${owner}: candidate patch must contain exactly one file diff`);
+		return;
+	}
+	const [, before, after] = diffHeaders[0];
+	if (before !== expectedSkillPath || after !== expectedSkillPath) {
+		errors.push(
+			`${owner}: candidate patch must target only "${expectedSkillPath}"`,
+		);
+	}
+	if (
+		!text.includes(`--- a/${expectedSkillPath}\n`) ||
+		!text.includes(`+++ b/${expectedSkillPath}\n`)
+	) {
+		errors.push(`${owner}: candidate patch has invalid skill file headers`);
+	}
+	if (!/^@@ /m.test(text)) {
+		errors.push(`${owner}: candidate patch must contain a unified diff hunk`);
+	}
+}
+
 export function validateImpactLedger(
 	repository,
 	impacts,
@@ -129,6 +184,7 @@ export function validateImpactLedger(
 
 	for (const [index, impact] of impacts.entries()) {
 		const owner = `foundry/knowledge/impact.jsonl:${index + 1}`;
+		validateKeys(impact, IMPACT_KEYS, owner, errors);
 		if (impact?.schema_version !== 1 || impact?.kind !== "skill-impact") {
 			errors.push(`${owner}: expected schema_version 1 and kind skill-impact`);
 		}
@@ -143,6 +199,7 @@ export function validateImpactLedger(
 		validateText(impact?.summary, `${owner}: summary`, errors);
 
 		const sources = impact?.sources;
+		validateKeys(sources, SOURCES_KEYS, `${owner}: sources`, errors);
 		if (!sources || !Array.isArray(sources.patterns)) {
 			errors.push(`${owner}: sources.patterns must be an array`);
 		} else {
@@ -161,6 +218,7 @@ export function validateImpactLedger(
 		}
 
 		const outcome = impact?.decision?.outcome;
+		validateKeys(impact?.decision, DECISION_KEYS, `${owner}: decision`, errors);
 		if (!OUTCOMES.has(outcome)) {
 			errors.push(`${owner}: invalid decision outcome "${outcome}"`);
 		}
@@ -187,6 +245,12 @@ export function validateImpactLedger(
 			errors.push(`${owner}: ${outcome} requires a candidate artifact`);
 		}
 		if (candidate) {
+			validateKeys(candidate, CANDIDATE_KEYS, `${owner}: candidate`, errors);
+			if (!CANDIDATE_PATH.test(candidate.path ?? "")) {
+				errors.push(
+					`${owner}: candidate.path must be a proposal-impact candidate.patch`,
+				);
+			}
 			if (!DIGEST.test(candidate.digest ?? "")) {
 				errors.push(`${owner}: candidate.digest must be sha256`);
 			}
@@ -206,10 +270,23 @@ export function validateImpactLedger(
 				if (actual !== candidate.digest) {
 					errors.push(`${owner}: candidate digest does not match its artifact`);
 				}
+				const expectedSkillPath = activeSkillPath(
+					registry ?? {},
+					impact?.skill,
+				);
+				if (expectedSkillPath) {
+					validateCandidatePatch(
+						candidatePath,
+						expectedSkillPath,
+						owner,
+						errors,
+					);
+				}
 			}
 		}
 
 		const evaluation = impact?.evaluation;
+		validateKeys(evaluation, EVALUATION_KEYS, `${owner}: evaluation`, errors);
 		if (!evaluation || !EVALUATION_RESULTS.has(evaluation.result)) {
 			errors.push(
 				`${owner}: evaluation.result must be pass, fail, or inconclusive`,
@@ -244,6 +321,7 @@ export function validateImpactLedger(
 		}
 
 		const active = impact?.active_skill;
+		validateKeys(active, ACTIVE_SKILL_KEYS, `${owner}: active_skill`, errors);
 		const expectedPath = activeSkillPath(registry ?? {}, impact?.skill);
 		if (!active || active.path !== expectedPath) {
 			errors.push(`${owner}: active_skill.path must be "${expectedPath}"`);
@@ -307,14 +385,37 @@ export function validateImpactLedger(
 
 export function stableImpact(impact) {
 	return {
-		...impact,
+		schema_version: impact.schema_version,
+		kind: impact.kind,
+		id: impact.id,
+		skill: impact.skill,
+		summary: impact.summary,
 		sources: {
-			...impact.sources,
 			patterns: [...(impact.sources?.patterns ?? [])].sort(),
+			no_action_reason: impact.sources?.no_action_reason ?? null,
 		},
+		candidate: impact.candidate
+			? {
+					path: impact.candidate.path,
+					digest: impact.candidate.digest,
+				}
+			: null,
 		evaluation: {
-			...impact.evaluation,
+			path: impact.evaluation?.path,
+			result: impact.evaluation?.result,
 			variants: [...(impact.evaluation?.variants ?? [])].sort(),
+			summary: impact.evaluation?.summary,
+		},
+		decision: {
+			outcome: impact.decision?.outcome,
+			authority: impact.decision?.authority,
+			path: impact.decision?.path,
+			rationale: impact.decision?.rationale,
+		},
+		active_skill: {
+			path: impact.active_skill?.path,
+			before_digest: impact.active_skill?.before_digest,
+			after_digest: impact.active_skill?.after_digest,
 		},
 		supersedes: [...(impact.supersedes ?? [])].sort(),
 	};

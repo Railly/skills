@@ -15,6 +15,7 @@ import {
 	parseImpactLedger,
 	recordImpact,
 	sha256,
+	stableImpact,
 	validateImpactLedger,
 } from "./knowledge-impact.mjs";
 
@@ -42,7 +43,7 @@ function fixture() {
 			"demo",
 			"candidate.patch",
 		),
-		"candidate one\n",
+		"diff --git a/skills/alpha/SKILL.md b/skills/alpha/SKILL.md\n--- a/skills/alpha/SKILL.md\n+++ b/skills/alpha/SKILL.md\n@@ -1 +1 @@\n-# Alpha\n+# Candidate Alpha\n",
 	);
 	writeFileSync(
 		join(repository, "foundry", "runs", "proposal-impact", "demo", "eval.json"),
@@ -140,6 +141,21 @@ describe("impact ledger", () => {
 			patterns,
 		});
 		expect(validation.errors).toEqual([]);
+	});
+
+	test("rejects unknown fields and strips them from normalization", () => {
+		const { repository, registry, patterns, impact } = fixture();
+		impact.private_transcript = "secret";
+		impact.decision.hidden_reasoning = "private";
+		const errors = validateImpactLedger(repository, [impact], {
+			registry,
+			patterns,
+		}).errors.join("\n");
+		expect(errors).toContain('unknown field "private_transcript"');
+		expect(errors).toContain('unknown field "hidden_reasoning"');
+		const normalized = stableImpact(impact);
+		expect(normalized.private_transcript).toBeUndefined();
+		expect(normalized.decision.hidden_reasoning).toBeUndefined();
 	});
 
 	test("requires valid sources, unique identities, and a complete eval matrix", () => {
@@ -258,6 +274,63 @@ describe("impact ledger", () => {
 				patterns,
 			}).errors.join("\n"),
 		).toContain("must reference a tracked repository file");
+	});
+
+	test("requires one candidate patch targeting the active skill", () => {
+		const { repository, registry, patterns, impact } = fixture();
+		const evalPath = join(
+			repository,
+			"foundry",
+			"runs",
+			"proposal-impact",
+			"demo",
+			"eval.json",
+		);
+		impact.candidate.path = "foundry/runs/proposal-impact/demo/eval.json";
+		impact.candidate.digest = fileDigest(evalPath);
+		let errors = validateImpactLedger(repository, [impact], {
+			registry,
+			patterns,
+		}).errors.join("\n");
+		expect(errors).toContain(
+			"candidate.path must be a proposal-impact candidate.patch",
+		);
+		expect(errors).toContain(
+			"candidate patch must contain exactly one file diff",
+		);
+		const candidatePath = join(
+			repository,
+			"foundry",
+			"runs",
+			"proposal-impact",
+			"demo",
+			"candidate.patch",
+		);
+		writeFileSync(
+			candidatePath,
+			"diff --git a/skills/beta/SKILL.md b/skills/beta/SKILL.md\n--- a/skills/beta/SKILL.md\n+++ b/skills/beta/SKILL.md\n@@ -1 +1 @@\n-old\n+new\n",
+		);
+		impact.candidate.path = "foundry/runs/proposal-impact/demo/candidate.patch";
+		impact.candidate.digest = fileDigest(candidatePath);
+		errors = validateImpactLedger(repository, [impact], {
+			registry,
+			patterns,
+		}).errors.join("\n");
+		expect(errors).toContain(
+			'candidate patch must target only "skills/alpha/SKILL.md"',
+		);
+		writeFileSync(
+			candidatePath,
+			"diff --git a/skills/alpha/SKILL.md b/skills/alpha/SKILL.md\n--- a/skills/alpha/SKILL.md\n+++ b/skills/alpha/SKILL.md\n",
+		);
+		impact.candidate.digest = fileDigest(candidatePath);
+		errors = validateImpactLedger(repository, [impact], {
+			registry,
+			patterns,
+		}).errors.join("\n");
+		expect(errors).toContain(
+			"candidate patch must contain a unified diff hunk",
+		);
 	});
 
 	test("builds one bounded packet with relevant history and retrieval handles", () => {

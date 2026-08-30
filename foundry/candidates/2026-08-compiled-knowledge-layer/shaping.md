@@ -151,7 +151,7 @@ Shape C, selected by Hunter on 2026-08-29.
 | **C1** | **Authored knowledge sources** | |
 | C1.1 | `foundry/knowledge/patterns/<id>.md` stores a stable pattern ID, status, summary, root cause, strategy, exceptions, typed evidence links, affected skills, and history | |
 | C1.2 | `foundry/knowledge/skills/<skill>.md` stores the complete provenance projection for one registered skill, including evidence, patterns, decisions, and explicit gaps | |
-| C1.3 | `foundry/knowledge/impact.jsonl` appends one immutable record per proposed skill change, including pattern sources, candidate identity, eval outcome, human decision, and supersession | |
+| C1.3 | `foundry/knowledge/impact.jsonl` appends one immutable record per proposed skill change, including pattern sources, candidate identity, eval outcome, decision authority, and supersession; acceptance requires a human decision | |
 | **C2** | **Compilation and validation** | |
 | C2.1 | `scripts/lib/knowledge.mjs` parses authored pages and typed relationships into one in-memory graph | |
 | C2.2 | `scripts/compile-knowledge.mjs` writes `index.md`, `coverage.md`, and `graph.json`, or checks that committed projections are current with `--check` | |
@@ -187,7 +187,7 @@ No flagged unknown remains in the selected shape. Autonomous trace ingestion, au
 | P1.1 | Evidence capture | Operator records completed, interrupted, disproven, or reviewed work |
 | P1.2 | Knowledge authoring | Maintainer classifies evidence and edits patterns or skill provenance |
 | P1.3 | Projection and validation | Operator compiles the graph and reads deterministic coverage or failure output |
-| P1.4 | Skill proposal and evaluation | Maintainer builds a bounded packet, evaluates one candidate, and records the human decision |
+| P1.4 | Skill proposal and evaluation | Maintainer builds a bounded packet, evaluates one candidate, and records the outcome and decision authority; acceptance remains human-only |
 | P2 | Installed agent runtime | Consumer invokes an installed active skill without Foundry knowledge access |
 | P3 | Target repository | The external codebase or artifact on which the installed skill operates |
 
@@ -207,7 +207,7 @@ No flagged unknown remains in the selected shape. Autonomous trace ingestion, au
 | U10 | P1.4 | proposal packet | Bounded patterns, history, outcomes, and evidence | display | → N7 | |
 | U11 | P1.4 | candidate diff | Atomic skill patch or no-action result | display | → N8 | |
 | U12 | P1.4 | eval scorecard | No-skill, released, candidate, trigger, and transfer results | display | → U13 | |
-| U13 | P1.4 | human gate | Accept, reject, absorb, or retain no change | decide | → N9 | |
+| U13 | P1.4 | decision gate | Accept by human authority, or reject, absorb, or retain no change with recorded authority | decide | → N9 | |
 | U14 | P2 | agent interface | Consumer engineering task | invoke | → N10 | |
 | U15 | P2 | agent interface | Agent result and evidence | display | | |
 | U16 | P1.2 | catalog audit | Per-skill applied-evidence decisions and gaps | display | | |
@@ -294,7 +294,7 @@ flowchart TB
             N8["N8: eval protocol"]
             S11["S11: eval and round evidence"]
             U12["U12: eval scorecard"]
-            U13["U13: human decision"]
+            U13["U13: decision authority"]
             N9["N9: impact recorder"]
             S4["S4: impact.jsonl"]
             S9["S9: active SKILL.md"]

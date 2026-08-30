@@ -119,7 +119,7 @@ A maintainer can derive one atomic skill proposal from compiled knowledge, evalu
 | U10 | P1.4 | proposal packet | Bounded patterns, history, outcomes, and evidence | display | → N7 | |
 | U11 | P1.4 | candidate diff | Atomic skill patch or no-action result | display | → N8 | |
 | U12 | P1.4 | eval scorecard | No-skill, released, candidate, trigger, and transfer results | display | → U13 | |
-| U13 | P1.4 | human gate | Accept, reject, absorb, or retain no change | decide | → N9 | |
+| U13 | P1.4 | decision gate | Accept by human authority, or reject, absorb, or retain no change with recorded authority | decide | → N9 | |
 | N6 | P1.4 | proposal packet builder | Select one skill's relevant compiled context | call | | → U10 |
 | N7 | P1.4 | skill proposer | Produce one skill patch or no-action result | call | → S10 | → U11 |
 | N8 | P1.4 | existing eval protocol | Run behavioral variants and transfer holdout | call | → S11 | → U12 |
@@ -215,7 +215,7 @@ flowchart TB
         N8["N8: eval protocol"]
         S11["S11: eval evidence"]
         U12["U12: scorecard"]
-        U13["U13: human decision"]
+        U13["U13: decision authority"]
         N9["N9: impact recorder"]
         S4["S4: impact ledger"]
         S9["S9: active skill"]
