@@ -198,7 +198,7 @@ maintenance work
 → promote, absorb, or reject
 ```
 
-Read the [foundry overview](foundry), [governance](foundry/governance.md), [source repository policy](foundry/source-of-truth.md), [Issue Contract workflow](foundry/missions), [eval protocol](foundry/eval-protocol.md), and [case template](foundry/case-template.md). Deprecated methods and the archived Unfold protocol remain under [foundry/deprecated](foundry/deprecated).
+Read the [product direction](NORTH.md), [foundry overview](foundry), [compiled knowledge](foundry/knowledge), [governance](foundry/governance.md), [source repository policy](foundry/source-of-truth.md), [Issue Contract workflow](foundry/missions), [eval protocol](foundry/eval-protocol.md), and [case template](foundry/case-template.md). Deprecated methods and the archived Unfold protocol remain under [foundry/deprecated](foundry/deprecated).
 
 Public issues and pull requests may become public cases. Confidential evidence stays in an organization-approved private system; only generalized, sanitized lessons cross into this repository.
 
@@ -207,10 +207,13 @@ Public issues and pull requests may become public cases. Confidential evidence s
 ```bash
 bun scripts/validate-skills.mjs
 bun scripts/validate-issue-contracts.mjs
+bun scripts/validate-knowledge.mjs
+bun scripts/compile-knowledge.mjs --check
+bun scripts/audit-knowledge-matches.mjs --check
 bun scripts/verify-eval-fixtures.mjs
 ```
 
-CI checks frontmatter, progressive disclosure, internal links, maturity metadata, public-case boundaries, Issue Contracts, eval metadata, and executable fixtures.
+CI checks frontmatter, progressive disclosure, internal links, maturity metadata, public-case boundaries, Issue Contracts, compiled knowledge, eval metadata, and executable fixtures. Strict knowledge maturity enforcement joins CI after the four unsupported non-experimental skills gain prospective application evidence or their maturity changes.
 
 ## License
 

@@ -17,6 +17,12 @@ jobs:
         run: bun scripts/validate-skills.mjs
       - name: Test validators
         run: bun test scripts/lib/*.test.mjs
+      - name: Validate compiled knowledge
+        run: bun scripts/validate-knowledge.mjs
+      - name: Check compiled knowledge projections
+        run: bun scripts/compile-knowledge.mjs --check
+      - name: Check textual match audit
+        run: bun scripts/audit-knowledge-matches.mjs --check
       - name: Verify behavior fixtures
         run: bun scripts/verify-eval-fixtures.mjs
       - name: Install website dependencies

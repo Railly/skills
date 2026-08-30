@@ -13,10 +13,12 @@ real work
 
 ## Surfaces
 
+- [NORTH.md](../NORTH.md): selected product direction, non-goals, decision rules, and success signals.
 - [SHAPING.md](SHAPING.md): why the foundry exists and which repository shape was selected.
 - [governance.md](governance.md): evidence ownership, maturity, and promotion rules.
 - [case-template.md](case-template.md): how to record a real issue, method, outcome, and lesson.
 - [eval-protocol.md](eval-protocol.md): how to compare no skill, current skill, and candidate skill.
+- [knowledge/](knowledge): authored patterns and skill provenance with generated index, coverage, and graph projections.
 - [candidates/](candidates): aggregated rules, exemplars, eval ideas, and coverage gaps awaiting a round.
 - [rounds/](rounds): immutable promotion decisions and benchmark summaries.
 - [missions/](missions): live canonical Issue Contracts.
@@ -54,6 +56,7 @@ Rejection and absorption are intended outcomes of this system. A new skill is th
 
 ## Current candidates
 
+- [Compiled Knowledge Layer](candidates/2026-08-compiled-knowledge-layer/big-picture.md): selected Foundry memory layer with compiler, deterministic projections, 19 provenance pages, and 276 reviewed textual matches; case-to-pattern compilation is next.
 - [agent-browser evidence pack](candidates/2026-07-agent-browser-evidence-pack.md): unvalidated reproduction and proof rules awaiting a prospective round.
 - [Issue Contract retrospective pilot](candidates/2026-07-issue-contract-pilot): five reconstructed contracts support the approved phase-neutral artifact; prospective outcome evidence is still required.
 - [trail-decisions](../skills/.experimental/trail-decisions): decision-trail method awaiting focused dogfooding.
