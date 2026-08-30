@@ -175,7 +175,9 @@ describe("knowledge compiler", () => {
 			status: "active",
 		};
 		const validation = validateKnowledge(repository, knowledge);
-		expect(validation.errors.join("\n")).toContain("exposes a local path");
+		expect(validation.errors.join("\n")).toContain(
+			"opaque private:<system>:<id>",
+		);
 	});
 
 	test("rejects private pointers that embed non-macOS local paths", () => {
@@ -191,6 +193,10 @@ describe("knowledge compiler", () => {
 			"private:%USERPROFILE%\\secret.md",
 			"private:$PWD/secret.md",
 			"private:../secret.md",
+			"private:~person/secret.md",
+			"private:$env:USERPROFILE\\secret.md",
+			"private:%HOMEDRIVE%%HOMEPATH%\\secret.md",
+			"private:home/person/secret.md",
 		]) {
 			knowledge.patterns[0].evidence[0] = {
 				path,
@@ -199,7 +205,9 @@ describe("knowledge compiler", () => {
 				status: "active",
 			};
 			const validation = validateKnowledge(repository, knowledge);
-			expect(validation.errors.join("\n")).toContain("exposes a local path");
+			expect(validation.errors.join("\n")).toContain(
+				"opaque private:<system>:<id>",
+			);
 		}
 		knowledge.patterns[0].evidence[0] = {
 			relationship: "origin",
@@ -207,16 +215,14 @@ describe("knowledge compiler", () => {
 			status: "active",
 		};
 		const missing = validateKnowledge(repository, knowledge);
-		expect(missing.errors.join("\n")).toContain(
-			"private evidence must use a private: pointer",
-		);
+		expect(missing.errors.join("\n")).toContain("opaque private:<system>:<id>");
 	});
 
 	test("accepts an opaque approved private pointer", () => {
 		const repository = fixture();
 		const knowledge = loadKnowledge(repository);
 		knowledge.patterns[0].evidence[0] = {
-			path: "private:approved-system/item-42",
+			path: "private:approved-system:item-42",
 			relationship: "origin",
 			visibility: "approved-private",
 			status: "active",

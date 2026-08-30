@@ -31,6 +31,8 @@ const RELATIONSHIP_STATUSES = new Set([
 	"superseded",
 	"stale",
 ]);
+const PRIVATE_POINTER_PATTERN =
+	/^private:[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9._-]*$/i;
 const GENERATED_FILES = new Set(["index.md", "coverage.md"]);
 const METADATA_PATTERN = /^## Metadata\s*\n+```json\s*\n([\s\S]*?)\n```/m;
 
@@ -111,21 +113,6 @@ function trackedRepositoryPaths(repository) {
 	);
 }
 
-function privatePointerExposesLocalPath(value) {
-	if (typeof value !== "string") return false;
-	const pointer = value.slice("private:".length);
-	return (
-		pointer.startsWith("/") ||
-		pointer.startsWith("\\") ||
-		/^[a-z]:[\\/]/i.test(pointer) ||
-		/^file:/i.test(pointer) ||
-		/^~(?:[\\/]|$)/.test(pointer) ||
-		/^\.\.?(?:[\\/]|$)/.test(pointer) ||
-		/^\$(?:\{[^}]+\}|[a-z_][a-z0-9_]*)(?:[\\/]|$)/i.test(pointer) ||
-		/^%[^%]+%(?:[\\/]|$)/.test(pointer)
-	);
-}
-
 function validateEvidence(repository, trackedPaths, owner, evidence, errors) {
 	if (!Array.isArray(evidence) || evidence.length === 0) {
 		errors.push(`${owner}: evidence must contain at least one entry`);
@@ -145,12 +132,11 @@ function validateEvidence(repository, trackedPaths, owner, evidence, errors) {
 		if (entry?.visibility === "approved-private") {
 			if (
 				typeof entry.path !== "string" ||
-				!entry.path.startsWith("private:")
+				!PRIVATE_POINTER_PATTERN.test(entry.path)
 			) {
-				errors.push(`${label} private evidence must use a private: pointer`);
-			}
-			if (privatePointerExposesLocalPath(entry.path)) {
-				errors.push(`${label} exposes a local path`);
+				errors.push(
+					`${label} private evidence must use an opaque private:<system>:<id> pointer`,
+				);
 			}
 			continue;
 		}
