@@ -208,6 +208,15 @@ bun scripts/record-impact.mjs foundry/runs/proposal-impact/<run>/impact-record.j
 
 Rejected candidates remain queryable in the compiled graph and cannot change the active skill digest. Accepted candidates require passing eval evidence and explicit human authority.
 
+Every supported agent use can also produce a private Skillkit receipt. Routine usage remains telemetry. Reviewed failures, corrections, interruptions, novel transfers, and maintainer feedback can be compiled into sanitized candidates with:
+
+```bash
+skillkit receipts --all --json > /private/path/receipts.json
+bun scripts/compile-usage-receipts.mjs /private/path/receipts.json
+```
+
+The compiler copies no transcript, local path, session ID, or private summary. It creates no canonical case and changes no skill automatically.
+
 Read the [product direction](NORTH.md), [foundry overview](foundry), [compiled knowledge](foundry/knowledge), [governance](foundry/governance.md), [source repository policy](foundry/source-of-truth.md), [Issue Contract workflow](foundry/missions), [eval protocol](foundry/eval-protocol.md), and [case template](foundry/case-template.md). Deprecated methods and the archived Unfold protocol remain under [foundry/deprecated](foundry/deprecated).
 
 Public issues and pull requests may become public cases. Confidential evidence stays in an organization-approved private system; only generalized, sanitized lessons cross into this repository.
