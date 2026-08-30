@@ -15,6 +15,7 @@ Visibility: public | approved-private
 Repository: <owner/repo or private>
 Role: contributor | maintainer
 Issue or PR: <public URL or approved private reference>
+Source: <retrieval handles>
 Upstream status checked: <YYYY-MM-DD or not-applicable>
 Knowledge disposition: link-existing | create-candidate | gap | no-change
 Knowledge target: pattern.<id> | gap.<id> | none
