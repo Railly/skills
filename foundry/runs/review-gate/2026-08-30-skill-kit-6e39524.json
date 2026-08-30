@@ -1,0 +1,472 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-30",
+    "repo": "crafter-station/skill-kit",
+    "base": "73d4dcba9e10359b097563acd7f7b717f1510fe1",
+    "head": "6e395247ef09910e1e5b43611cea099b6cf02e8a",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "foundry/candidates/2026-08-usage-receipts/slices.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "scan session-owning Macs in place",
+      "Tailscale MagicDNS and non-interactive SSH boundary",
+      "exact Skillkit version before remote mutation",
+      "private JSON export without transcript or database copying",
+      "absolute compiled SessionEnd hook"
+    ],
+    "gaps": [
+      "Remote annotation, transcript outcome inference, and multi-host aggregation in one invocation remain excluded."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5.6",
+    "reviewer_model": "GPT-5.5",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "remote command execution",
+      "private session-derived metadata",
+      "remote SQLite mutation",
+      "Claude settings mutation"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "2026-08-30-skill-kit-6e39524.md",
+      "evidence": "A frozen-head adversarial reviewer drove invalid targets, invalid authentication, the real Tailscale host, the compiled binary, and the strict Railly compiler. The incremental review returned pass on exact head 6e39524."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Railly/skills foundry/candidates/2026-08-usage-receipts/slices.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "The remote rollout, error boundaries, absolute hook, and physical proof items were exercised."
+    },
+    {
+      "source": "design",
+      "location": "Railly/skills foundry/candidates/2026-08-usage-receipts/shaping.md; big-picture.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "Skillkit remains beside source sessions and transports only private receipt JSON."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md; packages/cli/README.md; packages/cli/AGENTS.md; skills/skillkit/SKILL.md; bundled core skill",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "Every real command-discovery surface documents the Tailscale target, exact version, private export, and no remote annotation."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/cli/src/receipts/remote.ts; packages/cli/src/lib/hooks.ts; packages/cli/src/bin.ts",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "Unit tests, three killed mutations, compiled CLI probes, SHA matching, and two independent review passes exercised the exact tree."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Remote collection accepts only bounded read options against a validated Tailscale MagicDNS target and quotes every remote command argument.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "target normalization, forwarded argument vector, SSH command string, exit status, stderr, and stdout",
+        "layer": "remote adapter and compiled CLI",
+        "method": "exercise valid, non-ts.net, malformed-user, annotation, cursor-injection, and auth-failure inputs",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "SSH itself authenticates the host",
+        "counterexample": "supply a public hostname or shell-shaped cursor before SSH",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Public hosts and malformed receipt ids fail before the runner; remote annotation is rejected before network access."
+      },
+      "substrates": [
+        {
+          "name": "compiled CLI and real remote session Mac over Tailscale",
+          "status": "exercised",
+          "evidence": "Valid MagicDNS succeeded; invalid target and invalid auth emitted concise errors with no JSON stdout."
+        }
+      ],
+      "evidence": "Validation, allowlisting, shell quoting, BatchMode, timeout, and accept-new behavior were inspected and tested."
+    },
+    {
+      "id": "P2",
+      "claim": "The exact remote Skillkit version is checked before scan, and a complete private schema-valid export is buffered before local stdout is written.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "runner call order, remote version, scan invocation, parsed schema, visibility, and first stdout byte",
+        "layer": "injected remote runner and compiled CLI process",
+        "method": "force a version mismatch and invalid JSON, then drive a real successful export",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "a reachable SSH host implies compatible output",
+        "counterexample": "return version 0.12.0 or malformed JSON",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Version mismatch stops after one call; invalid JSON is rejected before stdout; the physical export returns schema version 1 and private visibility."
+      },
+      "substrates": [
+        {
+          "name": "local and remote arm64 binaries",
+          "status": "exercised",
+          "evidence": "Both binaries had SHA256 9aaed72ac1068c80f0476ff092a8e41e0a8aabff22bd37d67f67c03ae9c621e7 and version 0.13.0."
+        }
+      ],
+      "evidence": "The real all-receipts call returned 214 complete receipts and no partial JSON path was observed."
+    },
+    {
+      "id": "P3",
+      "claim": "A compiled Skillkit hook uses its absolute executable path, migrates the legacy PATH-dependent hook, preserves unrelated hooks, and removes only managed entries.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "Claude settings JSON before and after install, repeat install, migration, removal, and physical status",
+        "layer": "real settings file and isolated test settings",
+        "method": "exercise install, deduplication, migration, preservation, removal, and compiled/source command generation",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the hook works in an interactive shell",
+        "counterexample": "run SessionEnd without shell startup PATH",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The compiled command is '<remote-home>/.local/bin/skillkit' scan --quiet and the fix-absent compiled=false mutation failed its test."
+      },
+      "substrates": [
+        {
+          "name": "remote Claude settings on remote session Mac",
+          "status": "exercised",
+          "evidence": "skillkit auto reports the absolute command active and a repeated install is idempotent."
+        }
+      ],
+      "evidence": "Eight hook tests and the physical remote status cleared the lifecycle."
+    },
+    {
+      "id": "P4",
+      "claim": "Raw transcripts and the remote SQLite database remain on the source Mac while the strict Railly compiler receives only the private receipt export and emits no private fields.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "transported stdout, compiler output tokens, aggregate counts, candidate count, and filesystem transfer commands",
+        "layer": "real SSH stream and Railly compiler stdout",
+        "method": "pipe the real remote export directly into the compiler and scan serialized output for private keys and paths",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Tailscale encryption alone makes copying transcripts acceptable",
+        "counterexample": "look for transcript, database, /Users/, session_id, summary, procedure_path, or project data after compilation",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Only receipt JSON crossed the boundary and compiled output contained none of the forbidden tokens."
+      },
+      "substrates": [
+        {
+          "name": "214 real remote receipts from 37 skills",
+          "status": "exercised",
+          "evidence": "156 Claude and 58 Codex receipts compiled to 9 aggregates, 0 candidates, 110 unregistered exclusions, and 104 registered unknown exclusions."
+        }
+      ],
+      "evidence": "All 214 outcomes remained unknown and every automatic promotion flag remained false."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "remote transport and command boundary",
+      "version-before-mutation ordering",
+      "buffer-before-output protocol",
+      "persistent hook migration"
+    ],
+    "dimensions": {
+      "values": [
+        "valid host, trailing-dot host, non-ts.net host, malformed user, and invalid authentication",
+        "all, pending, limit, after, json, annotate, unknown, and injection-shaped options",
+        "matching, mismatching, missing, and unreachable remote Skillkit",
+        "valid private export, invalid JSON, wrong schema, wrong visibility, and no stdout",
+        "compiled absolute hook, source hook, legacy hook, unrelated hook, duplicate install, and removal"
+      ],
+      "exclusions": [
+        "Windows or Linux remote hosts",
+        "Tailscale SSH server mode",
+        "remote annotation",
+        "multiple remote hosts in one command"
+      ],
+      "evidence": "264 full tests, 561 expectations, targeted remote and hook tests, physical failure probes, and the real 214-receipt export cover the listed classes."
+    },
+    "oracle": {
+      "source": "Shape C4-B, raw runner call order, physical SSH behavior, Claude settings JSON, and Railly's closed schema",
+      "independent": true,
+      "evidence": "Expected boundaries came from the durable shape and raw side effects rather than normalized CLI success output."
+    },
+    "producer": {
+      "name": "compiled Skillkit 0.13.0 on both Macs",
+      "status": "exercised",
+      "evidence": "The exact-checksum binaries scanned the remote corpus and streamed a compiler-safe private export."
+    },
+    "falsification": [
+      {
+        "mutation": "Remove the .ts.net target restriction.",
+        "red_evidence": "The target-validation test accepted build-mac.local and failed.",
+        "restored_green_evidence": "Restoring the MagicDNS restriction returned the targeted and 264-test suites to green."
+      },
+      {
+        "mutation": "Disable the exact-version mismatch branch.",
+        "red_evidence": "The ordering test proceeded past version and failed later on invalid JSON.",
+        "restored_green_evidence": "Restoring the branch stopped after the version call and returned the suite to green."
+      },
+      {
+        "mutation": "Force compiled hook detection to false.",
+        "red_evidence": "The absolute-path hook test received skillkit scan --quiet and failed.",
+        "restored_green_evidence": "Restoring compiled detection returned all eight hook tests and the full suite to green."
+      }
+    ],
+    "evidence": "Each critical guard has kill evidence and restored-green evidence."
+  },
+  "deterministic": [
+    {
+      "check": "skill version synchronization",
+      "outcome": "pass",
+      "reason": "Both bundled skill surfaces match CLI version 0.13.0."
+    },
+    {
+      "check": "type check",
+      "outcome": "pass",
+      "reason": "CLI and web packages pass."
+    },
+    {
+      "check": "CLI unit suite",
+      "outcome": "pass",
+      "reason": "264 tests and 561 expectations pass."
+    },
+    {
+      "check": "compiled CLI build",
+      "outcome": "pass",
+      "reason": "The 68-module native CLI bundle completed."
+    },
+    {
+      "check": "targeted Biome",
+      "outcome": "pass",
+      "reason": "All changed TypeScript files are clean; the repository-wide baseline has unrelated existing findings."
+    },
+    {
+      "check": "gate style",
+      "outcome": "pass",
+      "reason": "Added lines follow repository punctuation rules."
+    },
+    {
+      "check": "gate surfaces",
+      "outcome": "pass",
+      "reason": "The repaired Skillkit convention confirms all command-discovery surfaces are updated."
+    },
+    {
+      "check": "gate siblings and flagsweep",
+      "outcome": "pass",
+      "reason": "Every Tailscale mention is in the diff and every annotation documentation surface includes remote."
+    },
+    {
+      "check": "gate callers",
+      "outcome": "pass",
+      "reason": "All runRemoteReceipts and installHook call sites are in the diff."
+    },
+    {
+      "check": "gate shellmeta",
+      "outcome": "acknowledged",
+      "reason": "The gate sees the fixed export separator as detector logic. Variable arguments are closed, validated, and single-quoted; no raw script is classified or appended."
+    },
+    {
+      "check": "gate timings",
+      "outcome": "pass",
+      "reason": "The added SSH ceiling clears timing constants in the changed files."
+    },
+    {
+      "check": "gate execdeps",
+      "outcome": "acknowledged",
+      "reason": "SSH is an operating-system prerequisite for remote mode, not a package installed by Skillkit. Local-only commands remain unaffected."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "The map has 1,206 edges and 3,481 unresolved calls, so it under-covers and was orientation only."
+    },
+    {
+      "check": "exact-head independent review",
+      "outcome": "pass",
+      "reason": "The frozen 6e39524 follow-up returned pass with no code findings."
+    },
+    {
+      "check": "public metadata audit",
+      "outcome": "pass",
+      "reason": "The exact diff contains no real SSH user, tailnet identifier, machine name, Tailscale IP, token, key, or password; remote examples use synthetic fixtures."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Remote authorization",
+      "status": "run",
+      "reason": "Targets, users, options, quoting, authentication, and SSH mode were challenged."
+    },
+    {
+      "name": "Lifecycle ordering",
+      "status": "run",
+      "reason": "Validation, version, scan, export, parse, and stdout were inspected and forced."
+    },
+    {
+      "name": "Privacy boundary",
+      "status": "run",
+      "reason": "The physical stream and compiled packet were scanned for private fields and paths."
+    },
+    {
+      "name": "Hook durability",
+      "status": "run",
+      "reason": "Absolute path, migration, preservation, idempotency, and removal were exercised."
+    },
+    {
+      "name": "Failure reporting",
+      "status": "run",
+      "reason": "Invalid target and invalid auth return concise stderr, nonzero status, and no JSON."
+    },
+    {
+      "name": "Radius impact orientation",
+      "status": "run",
+      "reason": "Convergence at scan and shared database callers was inspected, then free exploration covered remote-only paths the map did not rank."
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "foundry/candidates/2026-08-usage-receipts/shaping.md",
+      "claim": "The source Mac is the correct privacy and database ownership boundary.",
+      "status": "verified",
+      "evidence": "The real flow ran parsing and SQLite writes remotely and transported only receipt JSON."
+    },
+    {
+      "id": "A2",
+      "source": "packages/cli/src/receipts/remote.ts",
+      "claim": "Matching published Skillkit versions share the receipt export contract.",
+      "status": "verified",
+      "evidence": "Both exact-checksum 0.13.0 binaries emitted schema version 1; development dogfood additionally compared SHA256."
+    },
+    {
+      "id": "A3",
+      "source": "packages/cli/src/lib/hooks.ts",
+      "claim": "process.execPath is the stable executable path for Bun compiled binaries.",
+      "status": "verified",
+      "evidence": "The physical remote hook stores <remote-home>/.local/bin/skillkit and remains active outside interactive PATH setup."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Remote scan updates the source Mac's Skillkit database; hook installation updates Claude settings; first-contact SSH may update local known_hosts.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "Remote scan reconciles session invocations and private receipts in ~/.skillkit/analytics.db.",
+        "owner": "remote skillkit scan --quiet",
+        "commit_event": "remote SQLite transactions return",
+        "later_fallible_stages": [
+          "remote receipt export",
+          "SSH transport",
+          "local JSON parse",
+          "downstream compilation"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "remote adapter after scan",
+            "covers": [
+              "remote receipt export",
+              "SSH transport",
+              "local JSON parse",
+              "downstream compilation"
+            ],
+            "forced": true,
+            "residual_observed": "No partial JSON was written and the remote database remained readable after invalid output and authentication probes.",
+            "cleanup_owner": "No cleanup is required because the remote scan is idempotent and its database remains the source of truth.",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The physical all-receipts command was retried and returned the same 214 receipt identities."
+            },
+            "evidence": "Injected invalid JSON and physical failure probes partitioned post-scan failures from the committed remote database."
+          }
+        ]
+      },
+      {
+        "id": "CP2",
+        "effect": "Claude SessionEnd stores the absolute Skillkit scan command.",
+        "owner": "installHook",
+        "commit_event": "settings.json is rewritten",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      }
+    ]
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Remote failures exposed Bun code frames and stack traces.",
+      "evidence": "The first invalid-target probe printed compiled source frames from /$bunfs/.",
+      "layer": "CLI failure reporting",
+      "source": "independent_review",
+      "path": "main catch to stderr",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "shellmeta findings for #, (, backtick, and command substitution are not applicable.",
+      "evidence": "The code does not detect or append to user scripts. It constructs a fixed export prefix and single-quotes every validated argv element."
+    },
+    {
+      "claim": "Repository-wide Biome failures are not caused by this diff.",
+      "evidence": "Targeted changed-file Biome passes; the full baseline reports unrelated pre-existing web and heatmap findings."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Add released build identity to remote compatibility checks",
+      "evidence": "Published versions are the compatibility contract, while unreleased dogfood builds can share a semver. This run compensated with exact SHA256 deployment proof.",
+      "why_out_of_scope": "A build identity protocol requires a release metadata decision beyond this remote adapter."
+    },
+    {
+      "title": "Measure Cursor receipt coverage on the remote corpus",
+      "evidence": "The remote Mac holds Cursor session files, while the current physical export contained Claude and Codex receipt rows only.",
+      "why_out_of_scope": "Connector recognition quality is separate from safe remote transport."
+    }
+  ]
+}
