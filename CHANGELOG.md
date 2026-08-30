@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.0.9 - 2026-08-30
+
+Skill usage can now become durable private evidence, and repeated cases can compile into reusable knowledge without turning raw sessions into public artifacts.
+
+### Added
+
+- Private usage receipt compilation with explicit redaction, provenance, confidence, and review boundaries
+- A compiled knowledge layer connecting cases, patterns, skill guidance, and impact evidence
+- An atomic proposal impact loop with candidate, evaluation, falsification, decision, and ledger artifacts
+- Knowledge validation, projection checks, textual-match audits, and behavior fixtures in CI
+
+### Changed
+
+- `record-a-case` can capture sanitized receipt-derived cases while preserving the boundary between private evidence and public procedure
+- Foundry documentation now defines the source-of-truth and promotion path from evidence to reusable skill guidance
+
 ## 0.0.8 - 2026-08-25
 
 The published workflow now has a master router, while staged execution keeps ownership of implementation evidence, runs final Test Strength after applicable resilience hardening, and can materialize independent passes visibly through Herdr.
