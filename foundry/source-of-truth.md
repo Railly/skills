@@ -28,6 +28,7 @@ It validates the Foundry registry, marketplace manifest, and case corpus. It doe
 | Project review conventions | `cases/<repo>/conventions.md` |
 | Skill eval definition or fixture | `skills/<skill>/evals/` or `skills/.experimental/<skill>/evals/` |
 | Review Gate run report | `foundry/runs/review-gate/` |
+| Sanitized usage-receipt compilation | `foundry/runs/usage-receipts/` |
 | Radius dogfood map and ledger | `foundry/runs/review-gate/radius-dogfood/` |
 | Candidate, decision, or pilot | `foundry/candidates/` or `foundry/rounds/` |
 | Live Issue Contract | `foundry/missions/<owner-repo>/` |
