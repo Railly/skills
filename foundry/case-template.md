@@ -70,6 +70,6 @@ Do not replace unavailable evidence with plausible reconstruction. Mark it unkno
 
 These fields are independent. A merged change is not automatically validated, and contributor validation is not maintainer acceptance.
 
-Schema 2 requires exactly one compiled-knowledge disposition. Existing-pattern and candidate-pattern targets must link back to the case, candidate creation remains non-promoted, gap targets must already exist in compiled provenance, and no-change uses `none`.
+Schema 2 requires exactly one compiled-knowledge disposition. Existing-pattern links require active supportive evidence, candidate patterns require an active origin backlink and remain non-promoted, gap targets must already exist in compiled provenance, and no-change uses `none`. A case containing knowledge fields without `Case schema: 2` fails validation.
 
 An agent-generated or synthetic backfill defaults to `Status: observed`, `Validation: unvalidated`, and `Human review: pending`. Upgrade those fields only after explicit review of the underlying evidence.

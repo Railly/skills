@@ -56,4 +56,4 @@ Knowledge target: pattern.<id> | gap.<id> | none
 
 Record unavailable evidence as unknown. Keep only the selected candidate classification when the destination format permits it.
 
-`link-existing` and `create-candidate` require the target pattern to link back to the case. A created pattern remains `candidate`. `gap` requires an existing compiled gap ID. `no-change` requires `none`.
+`link-existing` requires an active origin, application, evaluation, or transfer backlink. `create-candidate` requires an active origin backlink and the pattern remains `candidate`. Contradiction, rejection, and inactive evidence do not support those dispositions. `gap` requires an existing compiled gap ID. `no-change` requires `none`.

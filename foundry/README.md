@@ -56,7 +56,7 @@ Rejection and absorption are intended outcomes of this system. A new skill is th
 
 ## Current candidates
 
-- [Compiled Knowledge Layer](candidates/2026-08-compiled-knowledge-layer/big-picture.md): selected Foundry memory layer with compiler, deterministic projections, 19 provenance pages, and 276 reviewed textual matches; case-to-pattern compilation is next.
+- [Compiled Knowledge Layer](candidates/2026-08-compiled-knowledge-layer/big-picture.md): selected Foundry memory layer with compiler, deterministic projections, 19 provenance pages, 279 reviewed textual matches, and a validated case-to-pattern loop; proposal and impact compilation is next.
 - [agent-browser evidence pack](candidates/2026-07-agent-browser-evidence-pack.md): unvalidated reproduction and proof rules awaiting a prospective round.
 - [Issue Contract retrospective pilot](candidates/2026-07-issue-contract-pilot): five reconstructed contracts support the approved phase-neutral artifact; prospective outcome evidence is still required.
 - [trail-decisions](../skills/.experimental/trail-decisions): decision-trail method awaiting focused dogfooding.
