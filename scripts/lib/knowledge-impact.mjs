@@ -538,6 +538,14 @@ export function recordImpact(repository, knowledge, proposed) {
 	if (currentValidation.errors.length > 0) {
 		throw new Error(currentValidation.errors.join("\n"));
 	}
+	const proposedValidation = validateImpactLedger(
+		repository,
+		[proposed],
+		validationOptions,
+	);
+	if (proposedValidation.errors.length > 0) {
+		throw new Error(proposedValidation.errors.join("\n"));
+	}
 	const existing = knowledge.impacts.find(
 		(impact) => impact.id === proposed?.id,
 	);

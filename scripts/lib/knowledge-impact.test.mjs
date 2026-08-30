@@ -428,6 +428,14 @@ describe("impact ledger", () => {
 		);
 		expect(retry.appended).toBe(false);
 		expect(readFileSync(ledger, "utf8")).toBe(firstBytes);
+		expect(() =>
+			recordImpact(
+				repository,
+				{ ...knowledge, impacts: first.impacts },
+				{ ...impact, private_transcript: "secret" },
+			),
+		).toThrow('unknown field "private_transcript"');
+		expect(readFileSync(ledger, "utf8")).toBe(firstBytes);
 		const conflict = { ...impact, summary: "Different meaning." };
 		expect(() =>
 			recordImpact(
