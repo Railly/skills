@@ -12,11 +12,13 @@ Railly Skills turns real engineering evidence into portable agent procedures who
 - The existing Foundry already separates cases, maturity, behavior evals, human promotion, and installable procedure.
 - Round 006 showed that skill-name matches require manual interpretation because mentions, planned use, and actual method application are different relationships.
 - WikiSkill provides research evidence that persistent compiled knowledge can improve skill evolution when it remains separate from the executing agent's context.
+- The first proposal-impact run preserved a rejected procedural patch, its three-variant evaluation, decision rationale, and unchanged active-skill digest in the compiled graph.
 
 ## Direction bets
 
 1. Add a Foundry-only compiled knowledge layer between recorded evidence and executable skills, with human-readable pages, typed relationships, generated projections, and deterministic validation.
 2. Give every registered skill an explicit provenance page. Dogfooded or higher maturity must resolve to applied evidence, while missing evidence remains a visible gap.
+3. Keep proposal generation bounded to one skill, preserve every outcome, and require passing evidence plus human authority before active procedure changes.
 
 ## Non-goals
 

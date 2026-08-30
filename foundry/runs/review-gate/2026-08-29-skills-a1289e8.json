@@ -1,0 +1,344 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-29",
+    "repo": "Railly/skills",
+    "base": "df79bf4334f0434026854b780f33bca21b6cd923",
+    "head": "a1289e87221cf2ae893d222c7005fe43de0094d1",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "foundry/candidates/2026-08-compiled-knowledge-layer/slices.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Spec review was supplied; this report records the Standards review for V4."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5.6",
+    "reviewer_model": "GPT-5.6",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "durable append-only repository history",
+      "active procedure promotion boundary"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "2026-08-29-skills-a1289e8.md",
+      "evidence": "A frozen-head independent review drove the real CLIs, raw eval corpus, active file digests, closed schema, patch boundary, idempotent retry, and rejection path."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "foundry/candidates/2026-08-compiled-knowledge-layer/slices.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The V4 slice was checked against the packet, ledger, promotion gate, dogfood run, and generated projections."
+    },
+    {
+      "source": "design",
+      "location": "foundry/candidates/2026-08-compiled-knowledge-layer/shaping.md; foundry/knowledge/README.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "Bounded evidence, decision authority, append history, atomic patch identity, and human-only acceptance were reconciled."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md; NORTH.md; foundry/README.md",
+      "status": "reviewed",
+      "properties": ["P1", "P3", "P4"],
+      "evidence": "Repository navigation and V4 delivery status agree with the shipped command surfaces."
+    },
+    {
+      "source": "implementation",
+      "location": "scripts/lib/knowledge-impact.mjs; scripts/build-proposal-packet.mjs; scripts/record-impact.mjs; scripts/lib/knowledge.mjs",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "Focused tests, eleven fix-absent mutations, real CLI drives, dogfood artifacts, and repository checks exercised the exact tree."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "A proposal packet is bounded to one registered skill and exposes only its active digest, linked knowledge, prior impacts, reviewed outcomes, and evidence handles.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "the packet JSON fields and per-skill evidence set",
+        "layer": "real packet CLI output",
+        "method": "build the Record a Case packet and compare it with the authored registries and unrelated fixture history",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the packet names the requested skill",
+        "counterexample": "add an unrelated skill impact and check whether it leaks into impact_history",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing the per-skill filter exposed the unrelated impact and killed the bounded-history assertion."
+      },
+      "substrates": [
+        {
+          "name": "real repository knowledge registries and packet CLI",
+          "status": "exercised",
+          "evidence": "The committed Record a Case packet contains only target-linked history and handles."
+        }
+      ],
+      "evidence": "The packet CLI produced the committed bounded packet and rejected an output path outside Foundry."
+    },
+    {
+      "id": "P2",
+      "claim": "Every impact record is closed-schema, tracked, digest-bound, and uses at most one canonical patch targeting the active SKILL.md.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "accepted and rejected record classes, Git tracking state, artifact bytes, and patch headers",
+        "layer": "impact validator and repository filesystem",
+        "method": "drive valid and adversarial records through the real recorder and compare digests with files on disk",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "a candidate path exists under Foundry",
+        "counterexample": "supply a tracked README with its correct digest or add unknown private fields to an identical retry",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Both inputs failed at the real CLI boundary; the ledger digest remained unchanged."
+      },
+      "substrates": [
+        {
+          "name": "real Git index, candidate patch, ledger, and recorder CLI",
+          "status": "exercised",
+          "evidence": "The dogfood candidate is tracked, digest-matched, one-file, and targets skills/record-a-case/SKILL.md."
+        }
+      ],
+      "evidence": "Closed-key checks, patch parsing, tracked-file checks, and raw CLI retries passed on the frozen head."
+    },
+    {
+      "id": "P3",
+      "claim": "Only a human-authorized, passing accepted outcome may change active procedure bytes; every other outcome preserves them and history continuity.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "decision authority, eval result, before and after digests, active file bytes, and ordered history",
+        "layer": "ledger validator plus active repository file",
+        "method": "exercise the full outcome matrix and compare recorded digests with the active skill bytes",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "decision outcome equals accepted",
+        "counterexample": "mark a record accepted without human authority, passing eval, or a changed active digest",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Each missing acceptance precondition produced its own error; the complete accepted fixture passed."
+      },
+      "substrates": [
+        {
+          "name": "temporary Git producer fixtures and active Record a Case skill",
+          "status": "exercised",
+          "evidence": "All five outcomes were modeled; the real rejection left the active skill at digest f6936a7f."
+        }
+      ],
+      "evidence": "History continuity, current-active verification, rejection byte equality, and acceptance authority assertions passed."
+    },
+    {
+      "id": "P4",
+      "claim": "The dogfood proposal preserves auditable three-variant evidence, records its rejection once, and projects impact history deterministically.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "raw outputs, grading, decision, one-line ledger bytes, and generated index and graph bytes",
+        "layer": "committed dogfood corpus and generated projections",
+        "method": "inspect raw evidence, retry the recorder, and run compile and audit check modes",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "all initial eval assertions are green",
+        "counterexample": "inspect the raw outputs for schema errors and status overclaim despite the green score summary",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Raw-output analysis showed non-discriminating assertions and a candidate status regression, so the proposal was rejected."
+      },
+      "substrates": [
+        {
+          "name": "six anonymized model outputs, transcripts, grading, ledger, index, and graph",
+          "status": "exercised",
+          "evidence": "The committed raw-evidence artifact makes all three variants for both prompts independently inspectable."
+        }
+      ],
+      "evidence": "The identical retry was a no-op, the ledger stayed one line with the same SHA, and deterministic projections were current."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "closed record schema",
+      "append and retry protocol",
+      "active procedure lifecycle"
+    ],
+    "dimensions": {
+      "values": [
+        "accepted, rejected, absorbed, superseded, and no-change",
+        "candidate patch and no-action",
+        "no-skill, released-skill, and candidate-skill eval variants",
+        "first append, identical retry, conflicting retry, and stale retry",
+        "tracked, untracked, missing, escaping, and wrong-target artifacts",
+        "current, stale, changed, and discontinuous active digests",
+        "known and unknown fields at every object level"
+      ],
+      "exclusions": [
+        "concurrent recorder processes",
+        "filesystem crash inside the operating-system append",
+        "semantic patch application beyond one-file headers and hunks",
+        "automatic proposal generation",
+        "automatic procedure promotion"
+      ],
+      "evidence": "The complete dimension table and all eleven killed mutations are recorded in the dogfood falsification artifact."
+    },
+    "oracle": {
+      "source": "shaped V4 contract, Git-tracked bytes, active skill digest, raw eval outputs, and decision artifact",
+      "independent": true,
+      "evidence": "Expected states came from durable contracts and filesystem bytes rather than normalized validator output."
+    },
+    "producer": {
+      "name": "real packet and recorder CLIs over the repository dogfood record",
+      "status": "exercised",
+      "evidence": "The valid retry returned no-op; an unknown-field retry exited 1; ledger bytes and active skill bytes stayed unchanged."
+    },
+    "falsification": [
+      {
+        "mutation": "Skip proposed-record validation before idempotent comparison.",
+        "red_evidence": "An identical retry carrying private_transcript returned a successful no-op.",
+        "restored_green_evidence": "Restoring pre-comparison validation made the CLI exit 1 and the full suite pass."
+      },
+      {
+        "mutation": "Permit arbitrary tracked candidate paths.",
+        "red_evidence": "A tracked non-patch artifact passed candidate identity checks.",
+        "restored_green_evidence": "Restoring the canonical path and patch parser rejected the artifact while the focused suite passed."
+      },
+      {
+        "mutation": "Remove the non-acceptance byte-equality guard.",
+        "red_evidence": "A rejected record that changed active bytes escaped its outcome-specific assertion.",
+        "restored_green_evidence": "Restoring the guard returned the outcome matrix to green."
+      }
+    ],
+    "evidence": "Eleven focused tests with thirty-nine expectations, eleven killed mutants, the real producer path, and the raw three-variant corpus passed after restoration."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "foundry/knowledge/README.md",
+      "claim": "Human authority is required only when active procedure bytes are accepted for change.",
+      "status": "verified",
+      "evidence": "Human acceptance passed only with all three gates; deterministic rejection remained valid."
+    },
+    {
+      "id": "A2",
+      "source": "foundry/candidates/2026-08-compiled-knowledge-layer/shaping.md",
+      "claim": "One proposal carries either one atomic candidate patch or an explicit no-action reason.",
+      "status": "verified",
+      "evidence": "Candidate and no-change fixtures passed their valid classes and rejected mixed or missing identities."
+    },
+    {
+      "id": "A3",
+      "source": "scripts/compile-knowledge.mjs",
+      "claim": "The compileKnowledge caller mutates no state before compilation and handles the expanded projections through the existing renderer loop.",
+      "status": "verified",
+      "evidence": "The caller loads and validates before compilation; write mode begins only after renderKnowledge returns, and check mode passed."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "recordImpact appends one durable JSONL record and then verifies the final ledger identity.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "One normalized impact line becomes durable in foundry/knowledge/impact.jsonl.",
+        "owner": "recordImpact",
+        "commit_event": "appendFileSync returns",
+        "later_fallible_stages": [
+          "read and parse the ledger",
+          "verify the final record identity"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "post-append verification",
+            "covers": [
+              "read and parse the ledger",
+              "verify the final record identity"
+            ],
+            "forced": true,
+            "residual_observed": "A valid final line was pre-established as the residual state equivalent to process loss after append.",
+            "cleanup_owner": "idempotent retry in recordImpact",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Retrying the same record returned no-op with the ledger digest and one-line count unchanged."
+            },
+            "evidence": "The retry path revalidated current history and the proposed closed schema before comparing canonical records."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Prior-finding closure", "status": "run", "reason": "All five independent-review findings were re-driven on the frozen exact head."},
+    {"name": "Closed-schema confidentiality", "status": "run", "reason": "Unknown top-level and nested fields were tested on new records and retries."},
+    {"name": "Atomic patch boundary", "status": "run", "reason": "Tracked non-patch, wrong-target, multi-file, and missing-hunk classes were challenged."},
+    {"name": "Promotion authorization", "status": "run", "reason": "Authority, eval result, digest change, and non-acceptance preservation were exercised."},
+    {"name": "Append and retry lifecycle", "status": "run", "reason": "First append, identical retry, conflicting retry, stale history, and post-append residual recovery were checked."},
+    {"name": "Raw eval auditability", "status": "run", "reason": "Prompts, responses, transcripts, grading, and claims were inspected across all six runs."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Decision authority and human-only acceptance language were reconciled across public and design docs."},
+    {"name": "Generated projection freshness", "status": "run", "reason": "Index, graph, audit, and coverage check modes passed."},
+    {"name": "Radius impact orientation", "status": "run", "reason": "Radius returned no changed symbols and 42 unresolved calls, so it was treated as under-covering."}
+  ],
+  "deterministic": [
+    {"check": "repository unit tests", "outcome": "pass", "reason": "Fifty-seven tests and one hundred sixty-eight expectations passed."},
+    {"check": "skill and issue-contract validation", "outcome": "pass", "reason": "Nineteen skills and six issue contracts passed."},
+    {"check": "knowledge validation and projection check", "outcome": "pass", "reason": "One pattern and nineteen provenance pages validated; generated files were current."},
+    {"check": "textual match audit", "outcome": "pass", "reason": "All 288 reviewed skill-file pairs matched current fingerprints."},
+    {"check": "evaluation fixtures", "outcome": "pass", "reason": "Five executable behavior fixtures passed."},
+    {"check": "website check and build", "outcome": "pass", "reason": "Astro diagnostics, Biome, and the production build completed."},
+    {"check": "gate style", "outcome": "pass", "reason": "The base-to-head added lines passed repository punctuation rules."},
+    {"check": "gate surfaces", "outcome": "acknowledged", "reason": "Global coverage.md is byte-current and unchanged because impact history changes evaluation evidence, not provenance application or gap counts."},
+    {"check": "gate callers", "outcome": "acknowledged", "reason": "All changed impact callers are in the diff; compileKnowledge is called only after read-only load and validation and before any write."},
+    {"check": "radius impact map", "outcome": "acknowledged", "reason": "It indexed zero changed symbols with 42 unresolved calls and supplied no safety claim."},
+    {"check": "exact-head independent review", "outcome": "pass", "reason": "The frozen a1289e8 implementation review returned pass with no actionable findings."}
+  ],
+  "findings": [
+    {"id": "F1", "state": "confirmed", "claim": "Unknown fields could enter or survive normalized impact records.", "evidence": "The original schema validated required fields but did not reject additional private fields.", "layer": "ledger confidentiality", "source": "lens", "path": "record input to normalized JSONL", "resolution": "fixed"},
+    {"id": "F2", "state": "confirmed", "claim": "Any tracked Foundry document could serve as a candidate artifact.", "evidence": "The original validator checked only path scope, tracking, and digest.", "layer": "candidate integrity", "source": "lens", "path": "candidate path to active skill target", "resolution": "fixed"},
+    {"id": "F3", "state": "confirmed", "claim": "The dogfood score summary was not independently auditable from committed raw outputs.", "evidence": "Benchmark entries named response and transcript files that were absent from the repository.", "layer": "evaluation evidence", "source": "lens", "path": "benchmark claims to raw model outputs", "resolution": "fixed"},
+    {"id": "F4", "state": "confirmed", "claim": "Design docs implied human authority for every impact outcome.", "evidence": "The real rejection correctly used deterministic-gate authority while acceptance alone requires a human.", "layer": "documentation contract", "source": "lens", "path": "decision authority to promotion rule", "resolution": "fixed"},
+    {"id": "F5", "state": "confirmed", "claim": "An invalid identical retry with unknown fields returned a successful no-op.", "evidence": "Idempotent normalization ran before closed-schema validation and stripped the bad field.", "layer": "recorder boundary", "source": "lens", "path": "proposed retry to idempotent comparison", "resolution": "fixed"}
+  ],
+  "exemptions": [
+    {
+      "claim": "foundry/knowledge/coverage.md does not change for V4 impact history.",
+      "evidence": "The surface contains provenance application and gap counts only; compile-knowledge --check proves its current bytes."
+    },
+    {
+      "claim": "Marketplace and maturity registries do not change.",
+      "evidence": "V4 changes evidence and proposal tooling but leaves procedure identity, channel, packaging, and maturity unchanged."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Define multi-process and mid-write crash semantics for impact recording",
+      "evidence": "V4 verifies single-process append and retry recovery but does not lock concurrent writers or fault-inject a crash inside appendFileSync.",
+      "why_out_of_scope": "V4 promises a local append-only proposal loop, not concurrent daemon writes or operating-system crash atomicity."
+    },
+    {
+      "title": "Validate candidate patch applicability and semantics",
+      "evidence": "V4 validates one target file, canonical headers, a hunk, tracking, and digest; it does not apply every future patch during ledger validation.",
+      "why_out_of_scope": "Semantic evaluation belongs to the proposal eval and promotion stage; the V4 ledger records identity and evidence."
+    }
+  ]
+}

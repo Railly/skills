@@ -2,6 +2,11 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
 import { summarizeTextualMatchAudit } from "./knowledge-audit.mjs";
+import {
+	parseImpactLedger,
+	stableImpact,
+	validateImpactLedger,
+} from "./knowledge-impact.mjs";
 
 const PATTERN_STATUSES = new Set([
 	"candidate",
@@ -193,7 +198,14 @@ export function loadKnowledge(repository) {
 	const audit = existsSync(auditPath)
 		? JSON.parse(readFileSync(auditPath, "utf8"))
 		: null;
-	return { repository: root, maturity, patterns, skills, audit };
+	const impactPath = join(root, "foundry", "knowledge", "impact.jsonl");
+	const impacts = existsSync(impactPath)
+		? parseImpactLedger(
+				readFileSync(impactPath, "utf8"),
+				normalizePath(root, impactPath),
+			)
+		: [];
+	return { repository: root, maturity, patterns, skills, audit, impacts };
 }
 
 export function validateKnowledge(
@@ -368,6 +380,12 @@ export function validateKnowledge(
 			else warnings.push(message);
 		}
 	}
+	errors.push(
+		...validateImpactLedger(repository, knowledge.impacts ?? [], {
+			registry,
+			patterns: knowledge.patterns,
+		}).errors,
+	);
 
 	return { errors, warnings };
 }
@@ -398,6 +416,9 @@ export function compileKnowledge(knowledge) {
 				`${right.skill}:${right.path}`,
 			),
 	);
+	const impacts = [...(knowledge.impacts ?? [])]
+		.map(stableImpact)
+		.sort((left, right) => left.id.localeCompare(right.id));
 	const nodes = [
 		...patterns.map((pattern) => ({
 			id: pattern.id,
@@ -411,25 +432,53 @@ export function compileKnowledge(knowledge) {
 			channel: skill.channel,
 			maturity: skill.maturity,
 		})),
+		...impacts.map((impact) => ({
+			id: impact.id,
+			kind: "impact",
+			outcome: impact.decision.outcome,
+			title: impact.summary,
+		})),
 	];
-	const edges = patterns
-		.flatMap((pattern) =>
+	const edges = [
+		...patterns.flatMap((pattern) =>
 			pattern.skills.map((skill) => ({
 				from: pattern.id,
 				to: `skill.${skill.name}`,
 				relationship: skill.relationship,
 				status: skill.status,
 			})),
-		)
-		.sort((left, right) =>
-			`${left.from}:${left.to}:${left.relationship}`.localeCompare(
-				`${right.from}:${right.to}:${right.relationship}`,
-			),
-		);
+		),
+		...impacts.flatMap((impact) => [
+			{
+				from: impact.id,
+				to: `skill.${impact.skill}`,
+				relationship: "targets",
+				status: "active",
+				outcome: impact.decision.outcome,
+			},
+			...impact.sources.patterns.map((pattern) => ({
+				from: impact.id,
+				to: pattern,
+				relationship: "derived-from",
+				status: "active",
+			})),
+			...impact.supersedes.map((prior) => ({
+				from: impact.id,
+				to: prior,
+				relationship: "supersedes",
+				status: "active",
+			})),
+		]),
+	].sort((left, right) =>
+		`${left.from}:${left.to}:${left.relationship}`.localeCompare(
+			`${right.from}:${right.to}:${right.relationship}`,
+		),
+	);
 	return {
-		schema_version: 1,
+		schema_version: 2,
 		patterns,
 		skills,
+		impacts,
 		nodes,
 		edges,
 		textual_matches: textualMatches,
@@ -450,6 +499,12 @@ export function renderKnowledge(compiled) {
 					`- [${skill.name}](skills/${skill.name}.md): ${skill.provenance.summary}`,
 			)
 		: ["No skill provenance pages authored yet."];
+	const impactLines = compiled.impacts.length
+		? compiled.impacts.map(
+				(impact) =>
+					`- ${impact.id}: ${impact.skill}, ${impact.decision.outcome}. ${impact.summary} Decision: ${impact.decision.path}.`,
+			)
+		: ["No proposal impacts recorded yet."];
 	const index = [
 		"# Compiled knowledge index",
 		"",
@@ -462,6 +517,10 @@ export function renderKnowledge(compiled) {
 		"## Skill provenance",
 		"",
 		...skillLines,
+		"",
+		"## Proposal impact",
+		"",
+		...impactLines,
 		"",
 	].join("\n");
 

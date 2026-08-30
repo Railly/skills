@@ -193,10 +193,20 @@ Real work becomes a case before it becomes an instruction:
 maintenance work
 → case
 → candidate lesson
+→ bounded proposal packet
 → baseline comparison
 → human review
 → promote, absorb, or reject
 ```
+
+Build a one-skill proposal packet and record a reviewed outcome with:
+
+```bash
+bun scripts/build-proposal-packet.mjs record-a-case --output foundry/runs/proposal-impact/<run>/packet.json
+bun scripts/record-impact.mjs foundry/runs/proposal-impact/<run>/impact-record.json
+```
+
+Rejected candidates remain queryable in the compiled graph and cannot change the active skill digest. Accepted candidates require passing eval evidence and explicit human authority.
 
 Read the [product direction](NORTH.md), [foundry overview](foundry), [compiled knowledge](foundry/knowledge), [governance](foundry/governance.md), [source repository policy](foundry/source-of-truth.md), [Issue Contract workflow](foundry/missions), [eval protocol](foundry/eval-protocol.md), and [case template](foundry/case-template.md). Deprecated methods and the archived Unfold protocol remain under [foundry/deprecated](foundry/deprecated).
 
