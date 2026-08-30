@@ -7,10 +7,12 @@ Project overlay for the review-gate skill, compiled from `README.md` and `packag
 User-facing CLI behavior is documented in the root README, the CLI agent guide, and the packaged skill.
 
 ```surfaces
-packages/cli/src/bin.ts :: README.md, packages/cli/AGENTS.md, packages/skill/SKILL.md
-packages/cli/src/commands/context.ts :: README.md, packages/cli/AGENTS.md, packages/skill/SKILL.md
-packages/cli/src/scanner/mcp.ts :: README.md, packages/cli/AGENTS.md, packages/skill/SKILL.md
-packages/cli/src/scanner/registry.ts :: README.md, packages/cli/AGENTS.md, packages/skill/SKILL.md
+packages/cli/src/bin.ts :: README.md, packages/cli/README.md, packages/cli/AGENTS.md, skills/skillkit/SKILL.md, packages/cli/src/skill-data/core/SKILL.md
+packages/cli/src/commands/receipts.ts :: README.md, packages/cli/README.md, packages/cli/AGENTS.md, skills/skillkit/SKILL.md, packages/cli/src/skill-data/core/SKILL.md, packages/cli/src/skill-data/core/references/commands.md
+packages/cli/src/receipts/remote.ts :: README.md, packages/cli/README.md, packages/cli/AGENTS.md, skills/skillkit/SKILL.md, packages/cli/src/skill-data/core/SKILL.md, packages/cli/src/skill-data/core/references/commands.md
+packages/cli/src/commands/context.ts :: README.md, packages/cli/README.md, packages/cli/AGENTS.md, skills/skillkit/SKILL.md, packages/cli/src/skill-data/core/SKILL.md
+packages/cli/src/scanner/mcp.ts :: README.md, packages/cli/README.md, packages/cli/AGENTS.md, skills/skillkit/SKILL.md, packages/cli/src/skill-data/core/SKILL.md
+packages/cli/src/scanner/registry.ts :: README.md, packages/cli/README.md, packages/cli/AGENTS.md, skills/skillkit/SKILL.md, packages/cli/src/skill-data/core/SKILL.md
 ```
 
 ## House norms

@@ -13,12 +13,14 @@ Railly Skills turns real engineering evidence into portable agent procedures who
 - Round 006 showed that skill-name matches require manual interpretation because mentions, planned use, and actual method application are different relationships.
 - WikiSkill provides research evidence that persistent compiled knowledge can improve skill evolution when it remains separate from the executing agent's context.
 - The first proposal-impact run preserved a rejected procedural patch, its three-variant evaluation, decision rationale, and unchanged active-skill digest in the compiled graph.
+- Skillkit already observes cross-agent skill invocations, but historical rows do not prove outcome, exact procedure version, or method application. Those unknowns must remain explicit.
 
 ## Direction bets
 
 1. Add a Foundry-only compiled knowledge layer between recorded evidence and executable skills, with human-readable pages, typed relationships, generated projections, and deterministic validation.
 2. Give every registered skill an explicit provenance page. Dogfooded or higher maturity must resolve to applied evidence, while missing evidence remains a visible gap.
 3. Keep proposal generation bounded to one skill, preserve every outcome, and require passing evidence plus human authority before active procedure changes.
+4. Give every observed skill use a private receipt, aggregate routine usage, and surface only high-signal receipts as reviewable case candidates.
 
 ## Non-goals
 
@@ -27,11 +29,13 @@ Railly Skills turns real engineering evidence into portable agent procedures who
 - Do not place the knowledge corpus inside installed skill packages or target repositories.
 - Do not turn every case or pattern into a new skill.
 - Do not block the first useful slice on perfect historical reconstruction of the full corpus.
+- Do not publish raw session transcripts, treat invocation counts as maturity evidence, or auto-create canonical cases from telemetry.
 
 ## Decision rules
 
 - Every authored relationship needs a stable ID, explicit type, and retrievable or bounded private evidence handle.
 - A textual mention is not evidence that a skill was applied.
+- A usage receipt is telemetry until a maintainer reviews its outcome, evidence handle, confidentiality, and knowledge disposition.
 - An executing agent reads active procedure only; maintainers and proposers query compiled knowledge separately.
 - Skill changes are atomic, reversible, evaluated against the released version, and promoted only by a human.
 - Generated indexes and coverage reports never become competing sources of truth.
@@ -44,6 +48,7 @@ Railly Skills turns real engineering evidence into portable agent procedures who
 - A rejected skill change remains queryable and prevents the same unsupported proposal from being repeated.
 - Catalog validation detects unsupported maturity, broken evidence links, duplicate IDs, and stale projections.
 - An installed agent completes its task without access to Foundry knowledge artifacts.
+- Every supported agent invocation produces an idempotent private receipt, while failed, corrected, interrupted, or explicitly nominated transfers become reviewable candidates without automatic publication.
 
 ## Open questions
 
