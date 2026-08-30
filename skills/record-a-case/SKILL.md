@@ -77,7 +77,7 @@ Read the compact knowledge index before opening detailed pattern or provenance p
 - `gap` with an existing `gap.<id>` when evidence is missing or ambiguous
 - `no-change` with `none` when the lesson should remain case-local
 
-For `link-existing` and `create-candidate`, add the case to the pattern evidence and update skill provenance only when the case supports a typed relationship. Never edit an installable skill during this step. Promotion and procedural mutation remain separate reviewed workflows.
+For `link-existing`, add the case as active origin, application, evaluation, or transfer evidence. For `create-candidate`, add it as active origin evidence. Contradiction, rejection, or inactive evidence cannot support either disposition. Update skill provenance only when the case supports a typed relationship. Never edit an installable skill during this step. Promotion and procedural mutation remain separate reviewed workflows.
 
 **Complete when:** the case, target pattern or gap, and reverse links agree; generated projections are current; and the case operation changed no file under `skills/`.
 
