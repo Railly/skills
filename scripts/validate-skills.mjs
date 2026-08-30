@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
+import { validateCaseKnowledge } from "./lib/case-knowledge.mjs";
 import { validateIssueContracts } from "./lib/issue-contracts.mjs";
+import { loadKnowledge } from "./lib/knowledge.mjs";
 import { markdownLinkTargets } from "./lib/markdown-links.mjs";
 import { parseSkillFrontmatter } from "./lib/skill-frontmatter.mjs";
 
@@ -30,6 +32,10 @@ const CANONICAL_WRITERS = new Set([
 	"trail-decisions",
 ]);
 const errors = [];
+const knowledge = loadKnowledge(resolve("."));
+const knowledgeGaps = knowledge.skills.flatMap((skill) =>
+	(skill.gaps ?? []).map((gap) => gap.id),
+);
 
 function markdownFiles(root) {
 	return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
@@ -115,6 +121,14 @@ function validateCase(file) {
 			);
 		}
 	}
+	errors.push(
+		...validateCaseKnowledge({
+			path: file.split("\\").join("/"),
+			text,
+			patterns: knowledge.patterns,
+			gaps: knowledgeGaps,
+		}).errors,
+	);
 }
 
 if (!existsSync(SKILLS_DIR)) {
