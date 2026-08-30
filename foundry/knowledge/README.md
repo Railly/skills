@@ -4,7 +4,7 @@ This directory is the durable layer between evidence and procedures.
 
 - `patterns/` contains authored transferable knowledge.
 - `skills/` contains authored provenance pages for registered skills.
-- `impact.jsonl` is reserved for future append-only outcome records.
+- `impact.jsonl` preserves append-only proposal outcomes, candidate identities, evaluation handles, decisions, and active-skill digests.
 - `index.md`, `coverage.md`, and `graph.json` are generated projections.
 - `audits/2026-08-29-textual-match-audit.json` classifies every current exact-token skill-file match in the evidence corpus.
 
@@ -15,9 +15,11 @@ bun scripts/validate-knowledge.mjs
 bun scripts/compile-knowledge.mjs
 bun scripts/compile-knowledge.mjs --check
 bun scripts/audit-knowledge-matches.mjs --check
+bun scripts/build-proposal-packet.mjs record-a-case
+bun scripts/record-impact.mjs foundry/runs/proposal-impact/<run>/impact-record.json
 ```
 
-`--enforce-maturity` upgrades unsupported non-experimental maturity claims from warnings to errors. It stays optional until the four visible prospective evidence gaps are resolved or their maturity changes.
+`--enforce-maturity` upgrades unsupported non-experimental maturity claims from warnings to errors. It stays optional until the three visible prospective evidence gaps are resolved or their maturity changes.
 
 ## Authored pattern contract
 
@@ -51,6 +53,14 @@ The compiler joins these pages with `foundry/maturity.json`. `coverage.md` expos
 The initial full-catalog classification is recorded in [the 2026-08-29 provenance audit](audits/2026-08-29-catalog-provenance.md). Its [generated coverage](audits/2026-08-29-textual-match-coverage.md) summarizes the reviewed application, evaluation, decision, reference, planned, and incidental relationships.
 
 Every audited skill-file pair stores a fingerprint of its exact matching lines. A new match, removed match, or changed matching line makes validation fail until a maintainer reads and reclassifies it. Application evidence linked from a provenance page cannot contradict the reviewed audit verdict.
+
+## Proposal impact contract
+
+The packet builder returns only one registered skill's active digest, provenance, linked patterns, prior impacts, reviewed catalog outcomes, and selected evidence handles. A proposal produces one atomic patch or a no-action result outside the active skill tree.
+
+Every line in `impact.jsonl` records one unique proposal ID, source patterns or an explicit no-action reason, candidate artifact and digest, all three evaluation variants, decision authority and rationale, active-skill before and after digests, and supersession history. Rejection, absorption, supersession, and no-change require byte-identical active procedure. Acceptance additionally requires passing eval evidence and human authority.
+
+The impact recorder validates the full history before append, verifies the final record after append, and treats an identical retry as a no-op. A reused ID with different bytes fails.
 
 ## Evidence relationships
 

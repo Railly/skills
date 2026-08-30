@@ -19,6 +19,7 @@ real work
 - [case-template.md](case-template.md): how to record a real issue, method, outcome, and lesson.
 - [eval-protocol.md](eval-protocol.md): how to compare no skill, current skill, and candidate skill.
 - [knowledge/](knowledge): authored patterns and skill provenance with generated index, coverage, and graph projections.
+- [knowledge/impact.jsonl](knowledge/impact.jsonl): append-only accepted, rejected, absorbed, superseded, and no-change proposal outcomes.
 - [candidates/](candidates): aggregated rules, exemplars, eval ideas, and coverage gaps awaiting a round.
 - [rounds/](rounds): immutable promotion decisions and benchmark summaries.
 - [missions/](missions): live canonical Issue Contracts.
@@ -56,7 +57,7 @@ Rejection and absorption are intended outcomes of this system. A new skill is th
 
 ## Current candidates
 
-- [Compiled Knowledge Layer](candidates/2026-08-compiled-knowledge-layer/big-picture.md): selected Foundry memory layer with compiler, deterministic projections, 19 provenance pages, 279 reviewed textual matches, and a validated case-to-pattern loop; proposal and impact compilation is next.
+- [Compiled Knowledge Layer](candidates/2026-08-compiled-knowledge-layer/big-picture.md): selected Foundry memory layer with compiler, deterministic projections, 19 provenance pages, 286 reviewed textual matches, a validated case-to-pattern loop, and a dogfooded proposal-impact rejection; fail-closed runtime proof is next.
 - [agent-browser evidence pack](candidates/2026-07-agent-browser-evidence-pack.md): unvalidated reproduction and proof rules awaiting a prospective round.
 - [Issue Contract retrospective pilot](candidates/2026-07-issue-contract-pilot): five reconstructed contracts support the approved phase-neutral artifact; prospective outcome evidence is still required.
 - [trail-decisions](../skills/.experimental/trail-decisions): decision-trail method awaiting focused dogfooding.
