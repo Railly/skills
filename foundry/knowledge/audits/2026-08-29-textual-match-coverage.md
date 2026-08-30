@@ -11,7 +11,7 @@ Generated from the reviewed skill-file classifications. Each fingerprint covers 
 | issue-intake | 4 | 0 | 0 | 0 | 2 | 2 | 0 | 0 |
 | performance-proof | 6 | 0 | 0 | 1 | 2 | 3 | 0 | 0 |
 | quality-baseline | 5 | 1 | 1 | 1 | 2 | 1 | 0 | 0 |
-| record-a-case | 6 | 1 | 1 | 0 | 2 | 3 | 0 | 0 |
+| record-a-case | 13 | 1 | 1 | 4 | 4 | 4 | 0 | 0 |
 | resilience-audit | 13 | 1 | 1 | 1 | 2 | 9 | 0 | 0 |
 | review-gate | 69 | 41 | 41 | 4 | 3 | 21 | 0 | 0 |
 | signature-repro | 4 | 1 | 1 | 1 | 2 | 0 | 0 | 0 |

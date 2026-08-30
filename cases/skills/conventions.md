@@ -18,8 +18,10 @@ foundry/missions/* :: README.md, scripts/validate-issue-contracts.mjs, foundry/s
 foundry/knowledge/patterns/*.md :: foundry/knowledge/index.md, foundry/knowledge/coverage.md, foundry/knowledge/graph.json
 foundry/knowledge/skills/*.md :: foundry/knowledge/coverage.md, foundry/knowledge/graph.json
 foundry/knowledge/audits/*.json :: foundry/knowledge/audits/*-coverage.md, foundry/knowledge/graph.json
+foundry/knowledge/impact.jsonl :: foundry/knowledge/index.md, foundry/knowledge/graph.json
 scripts/lib/knowledge.mjs :: scripts/lib/knowledge.test.mjs, foundry/knowledge/index.md, foundry/knowledge/coverage.md, foundry/knowledge/graph.json
 scripts/lib/knowledge-audit.mjs :: scripts/lib/knowledge-audit.test.mjs, foundry/knowledge/audits/*-coverage.md, foundry/knowledge/graph.json
+scripts/lib/knowledge-impact.mjs :: scripts/lib/knowledge-impact.test.mjs, scripts/build-proposal-packet.mjs, scripts/record-impact.mjs, foundry/knowledge/index.md, foundry/knowledge/graph.json
 ```
 
 ## Norms

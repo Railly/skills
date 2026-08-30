@@ -1,0 +1,327 @@
+{
+  "metadata": {
+    "skill_name": "record-a-case",
+    "skill_path": "foundry/runs/proposal-impact/2026-08-29-record-a-case-autonomous-disposition/candidate.patch",
+    "executor_model": "Codex subagent (model identity unavailable)",
+    "analyzer_model": "Codex subagent (model identity unavailable)",
+    "timestamp": "2026-08-30T01:59:20Z",
+    "evals_run": [
+      1,
+      2
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "candidate_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Chooses exactly one disposition: link-existing with target pattern.drive-the-shipped-surface",
+          "passed": true,
+          "evidence": "response.md declares exactly one pair: `Knowledge disposition: link-existing` and `Knowledge target: pattern.drive-the-shipped-surface`, then explicitly says `This is the only compiled-knowledge disposition.` No competing disposition or target appears."
+        },
+        {
+          "text": "Keeps human review pending and delivery local instead of inferring acceptance or release",
+          "passed": true,
+          "evidence": "response.md records `Human review: pending`, `Maintainer acceptance: pending`, and `Delivery: local`. Its closing sentence preserves those values until explicit human review instead of claiming approval, merge, or release."
+        },
+        {
+          "text": "Names the case-to-pattern evidence link and reciprocal projection or provenance update",
+          "passed": true,
+          "evidence": "response.md names `cases/skills/compiled-knowledge-pointer-boundary.md` and proposes adding it to `foundry/knowledge/patterns/drive-the-shipped-surface.md` as active `application` evidence. It also names the supported `foundry/knowledge/skills/record-a-case.md` application link and the generated `index.md`, `coverage.md`, and `graph.json` projections."
+        },
+        {
+          "text": "Does not propose editing an installable skill",
+          "passed": true,
+          "evidence": "response.md limits authored proposals to a case, a Foundry pattern, and a Foundry provenance page, and explicitly states `No file under skills/ should change.` transcript.md likewise records `Proposed no installable-skill edit.`"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "candidate_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Chooses exactly one disposition: no-change with target none",
+          "passed": true,
+          "evidence": "response.md states exactly one current classification: 'Knowledge disposition: no-change' and 'Knowledge target: none'. Its later reconsideration condition does not select an additional disposition. transcript.md independently records: 'Selected exactly one disposition: `no-change` with target `none`.'"
+        },
+        {
+          "text": "Classifies the session summary as unreviewed and leaves validation, review, and acceptance conservative",
+          "passed": true,
+          "evidence": "response.md says, 'The session summary is an unreviewed report' and records 'Validation: unvalidated', 'Human review: pending', and 'Maintainer acceptance: pending'."
+        },
+        {
+          "text": "Does not link the unrelated shipped-surface pattern or invent a gap identifier",
+          "passed": true,
+          "evidence": "response.md says, 'The active shipped-surface pattern does not fit this mechanism and cannot receive active evidence from this case' and 'there is no existing signing or certificate gap to target.' It explicitly directs: 'Do not change or add any `pattern.*` record or backlink' and 'Do not change or add any `gap.*` record or backlink.' No pattern or gap identifier appears in the proposed target, which is `none`."
+        },
+        {
+          "text": "Does not propose editing an installable skill",
+          "passed": true,
+          "evidence": "response.md explicitly says, 'Do not change provenance links or any installable skill.' transcript.md reports, 'Made no repository or installable-skill changes.' The only proposed durable addition is a case-local ledger under `cases/<repo>/`."
+        }
+      ],
+      "notes": [
+        "Human review and maintainer acceptance remain pending, as required by the case evidence."
+      ]
+    },
+    {
+      "eval_id": 1,
+      "configuration": "no_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Chooses exactly one disposition: link-existing with target pattern.drive-the-shipped-surface",
+          "passed": true,
+          "evidence": "response.md contains one Compiled-knowledge disposition block: `disposition: link-existing` with `target.type: pattern` and `target.id: pattern.drive-the-shipped-surface`. No other compiled-knowledge disposition is proposed."
+        },
+        {
+          "text": "Keeps human review pending and delivery local instead of inferring acceptance or release",
+          "passed": true,
+          "evidence": "The status block states `human_review_status: pending` and `delivery_status: local`. The rationale also says the closure does not imply that human review completed or local delivery was published."
+        },
+        {
+          "text": "Names the case-to-pattern evidence link and reciprocal projection or provenance update",
+          "passed": true,
+          "evidence": "Under Knowledge changes, response.md says to add a link from `cases/validator-evidence-pointer-opaque-grammar.md` to `pattern.drive-the-shipped-surface`, typed as `supports`, and to attach or reference the public-safe real-CLI invocation and result from the case record. These are the case-to-pattern evidence link and the case provenance update."
+        },
+        {
+          "text": "Does not propose editing an installable skill",
+          "passed": true,
+          "evidence": "response.md explicitly says, `Do not change ... any installable skill.` It also explains that no new skill motivation is warranted because the existing pattern already names `record-a-case`."
+        }
+      ],
+      "notes": [
+        "Human review remains pending, as required by the case state."
+      ]
+    },
+    {
+      "eval_id": 2,
+      "configuration": "no_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Chooses exactly one disposition: no-change with target none",
+          "passed": true,
+          "evidence": "response.md contains one disposition entry, `disposition`: `no_change`, immediately paired with one typed target, `typed_target`: `compiled_knowledge:none`. No second disposition or target appears in the response or transcript."
+        },
+        {
+          "text": "Classifies the session summary as unreviewed and leaves validation, review, and acceptance conservative",
+          "passed": true,
+          "evidence": "response.md calls the source `The single unreviewed summary` and sets `observation_status`: `unverified`, `evidence_status`: `insufficient`, `reproduction_status`: `not_reproduced`, `human_review_status`: `pending`, `maintainer_acceptance_status`: `pending`, and `promotion_status`: `blocked`."
+        },
+        {
+          "text": "Does not link the unrelated shipped-surface pattern or invent a gap identifier",
+          "passed": true,
+          "evidence": "response.md explicitly says the evidence does not support `changing the active shipped-surface pattern or registering a signing/certificate gap`, directs `Add no compiled-index link`, and names no pattern or gap identifier."
+        },
+        {
+          "text": "Does not propose editing an installable skill",
+          "passed": true,
+          "evidence": "The only proposed artifact in response.md is `cases/2026-08-29-macos-signing-failure-unverified.md`; it also says to change no compiled knowledge file, active pattern, or gap registry entry. No installable skill edit is proposed anywhere in response.md or transcript.md."
+        }
+      ],
+      "notes": [
+        "Human review and maintainer acceptance remain pending for the proposed case."
+      ]
+    },
+    {
+      "eval_id": 1,
+      "configuration": "released_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Chooses exactly one disposition: link-existing with target pattern.drive-the-shipped-surface",
+          "passed": true,
+          "evidence": "response.md declares one disposition pair in the case header: `Knowledge disposition: link-existing` and `Knowledge target: pattern.drive-the-shipped-surface`. The rationale explicitly rejects creating a new pattern, selecting a gap, or mutating procedure."
+        },
+        {
+          "text": "Keeps human review pending and delivery local instead of inferring acceptance or release",
+          "passed": true,
+          "evidence": "response.md sets `Human review: pending`, `Maintainer acceptance: pending`, and `Delivery: local`. Its status note also says no human review, maintainer decision, or delivered artifact is evidenced."
+        },
+        {
+          "text": "Names the case-to-pattern evidence link and reciprocal projection or provenance update",
+          "passed": true,
+          "evidence": "response.md proposes `cases/skills/positive-opaque-evidence-pointer-grammar.md`, adds it as active public `application` evidence in `foundry/knowledge/patterns/drive-the-shipped-surface.md`, adds the same case path as active application evidence in `foundry/knowledge/skills/record-a-case.md`, and names regenerated `foundry/knowledge/graph.json` and `foundry/knowledge/coverage.md` projections."
+        },
+        {
+          "text": "Does not propose editing an installable skill",
+          "passed": true,
+          "evidence": "response.md states `No installable skill file should change` and limits proposed authored changes to a case, the Foundry pattern page, and the Foundry skill-provenance page. transcript.md independently records that the proposal avoids changing an installable skill."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "released_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Chooses exactly one disposition: no-change with target none",
+          "passed": true,
+          "evidence": "response.md declares exactly one pair in the case header, 'Knowledge disposition: no-change' and 'Knowledge target: none', then reiterates: 'Exactly one disposition applies: `no-change` with typed target `none`.' No competing disposition or target is proposed."
+        },
+        {
+          "text": "Classifies the session summary as unreviewed and leaves validation, review, and acceptance conservative",
+          "passed": true,
+          "evidence": "response.md states 'Source: unknown; an unreviewed session summary is the only account' and sets 'Validation: unvalidated', 'Human review: pending', and 'Maintainer acceptance: pending'. The evidence ledger also says 'Source: unreviewed session summary only.'"
+        },
+        {
+          "text": "Does not link the unrelated shipped-surface pattern or invent a gap identifier",
+          "passed": true,
+          "evidence": "response.md explains that the case 'cannot reinforce `pattern.drive-the-shipped-surface`' and explicitly directs: 'Do not add a backlink' and 'Do not invent a `gap.<id>` or use `gap`'. It proposes no pattern or gap identifier as the target."
+        },
+        {
+          "text": "Does not propose editing an installable skill",
+          "passed": true,
+          "evidence": "response.md says 'Do not edit any file under `skills/`' and limits any possible durable addition to a case ledger in an authorized approved-private destination. transcript.md likewise records 'no ... installable-skill changes.'"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "candidate_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "tokens": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "no_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "tokens": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "released_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "tokens": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.00",
+      "time_seconds": "+0.0",
+      "tokens": "+0"
+    }
+  },
+  "notes": [
+    "All 24 graded assertions passed across candidate_skill, released_skill, and no_skill for both evals, so the measured pass rate does not discriminate skill value: every configuration is 1.0 with zero variance.",
+    "Eval 1 exposes a conservative-status difference that the assertions miss. candidate_skill sets Validation to independently-validated, but its own grading claim marks that level unverified because the prompt supplies a real CLI exercise without an independent rerun or reviewer. released_skill uses contributor-validated and explicitly preserves independent validation as unknown.",
+    "Eval 1 no_skill passes despite not using the schema 2 case contract. It emits custom fields such as case_status, verification_status, and a nested target object instead of the canonical Case schema, Status, Validation, Maintainer acceptance, Knowledge disposition, and Knowledge target fields.",
+    "Eval 1 no_skill also uses supports as the case-to-pattern evidence relationship. supports is a skill relationship, while case evidence must use origin, application, evaluation, transfer, contradiction, or rejection.",
+    "Eval 2 no_skill passes after spelling the disposition as no_change and the target as compiled_knowledge:none. Those are not validator-accepted schema values; the required exact pair is no-change with literal target none.",
+    "The released_skill outputs are the most conservative about missing retrieval authority. Eval 1 leaves Repository and Source unknown and blocks canonical materialization until public handles exist; Eval 2 refuses to fabricate a path.",
+    "Timing and resource comparisons are unavailable. Every run records time_seconds 0.0, tokens 0, and tool_calls 0, so the reported deltas are placeholders rather than efficiency evidence.",
+    "One run was executed per eval and configuration. Zero standard deviation does not demonstrate repeatability."
+  ]
+}
