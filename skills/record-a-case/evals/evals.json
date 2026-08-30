@@ -46,6 +46,7 @@
 			"prompt": "Record this completed public case. The evidence reinforces pattern.drive-the-shipped-surface and should update compiled knowledge without changing any installable skill.",
 			"expected_output": "The case uses schema 2, selects link-existing with the pattern ID, adds reciprocal evidence links, regenerates projections, and leaves skills unchanged.",
 			"assertions": [
+				"Uses Case schema 2 so the disposition is validator-enforced",
 				"Records exactly one link-existing disposition and pattern target",
 				"Adds the case as evidence on the existing pattern",
 				"Updates provenance only for supported typed relationships",
@@ -59,6 +60,7 @@
 			"prompt": "This reviewed case has a transferable mechanism but matches no compiled pattern. Record it and create the smallest candidate pattern without promoting procedure.",
 			"expected_output": "The case selects create-candidate, the new pattern remains candidate and cites the case, projections regenerate, and no skill procedure changes.",
 			"assertions": [
+				"Uses Case schema 2 so the disposition is validator-enforced",
 				"Records exactly one create-candidate disposition and pattern target",
 				"Creates a candidate rather than active pattern",
 				"Links the case as source evidence",
@@ -72,6 +74,7 @@
 			"prompt": "The evidence is ambiguous and may not justify a reusable pattern. Record the case conservatively and choose between a known compiled gap or no compiled change.",
 			"expected_output": "The case selects exactly one durable outcome: gap with an existing gap ID or no-change with none, without inventing a pattern.",
 			"assertions": [
+				"Uses Case schema 2 so the disposition is validator-enforced",
 				"Selects exactly one allowed knowledge disposition",
 				"Uses an existing gap ID or the literal none target",
 				"Does not fabricate a pattern from ambiguous evidence",
