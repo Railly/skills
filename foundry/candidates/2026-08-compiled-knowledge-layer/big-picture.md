@@ -2,7 +2,7 @@
 
 **Selected shape:** C, compiled knowledge graph with human-readable pages
 
-**Implementation:** V1 compiled pilot, V2 full catalog provenance, V3 case-to-pattern loop, and V4 proposal-impact loop are complete. The catalog covers 19 of 19 provenance pages and 286 reviewed textual matches with drift fingerprints. The first atomic proposal was rejected and preserved while the active procedure remained byte-identical.
+**Implementation:** V1 compiled pilot, V2 full catalog provenance, V3 case-to-pattern loop, and V4 proposal-impact loop are complete. The catalog covers 19 of 19 provenance pages and 287 reviewed textual matches with drift fingerprints. The first atomic proposal was rejected and preserved while the active procedure remained byte-identical.
 
 ## Frame
 
@@ -54,7 +54,7 @@
 | **C1** | **Authored knowledge sources** | |
 | C1.1 | Pattern pages store stable IDs, status, summaries, root causes, strategies, exceptions, typed evidence, affected skills, and history | |
 | C1.2 | Skill provenance pages store evidence, patterns, decisions, and explicit gaps for every registered skill | |
-| C1.3 | An append-only impact ledger records every proposed skill change, its inputs, eval outcome, human decision, and supersession | |
+| C1.3 | An append-only impact ledger records every proposed skill change, its inputs, eval outcome, decision authority, and supersession; acceptance requires a human decision | |
 | **C2** | **Compilation and validation** | |
 | C2.1 | A shared parser compiles authored pages and typed relationships into one in-memory graph | |
 | C2.2 | A compiler writes or checks the compact index, coverage matrix, and machine graph | |
@@ -126,7 +126,7 @@ flowchart TB
             N8["N8: eval protocol"]
             S11["S11: eval and round evidence"]
             U12["U12: eval scorecard"]
-            U13["U13: human decision"]
+            U13["U13: decision authority"]
             N9["N9: impact recorder"]
             S4["S4: impact.jsonl"]
             S9["S9: active SKILL.md"]
@@ -266,7 +266,7 @@ flowchart TB
         N8["N8: eval protocol"]
         S11["S11: eval evidence"]
         U12["U12: scorecard"]
-        U13["U13: human decision"]
+        U13["U13: decision authority"]
         N9["N9: impact recorder"]
         S4["S4: impact ledger"]
         S9["S9: active skill"]

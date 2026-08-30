@@ -56,9 +56,9 @@ Every audited skill-file pair stores a fingerprint of its exact matching lines. 
 
 ## Proposal impact contract
 
-The packet builder returns only one registered skill's active digest, provenance, linked patterns, prior impacts, reviewed catalog outcomes, and selected evidence handles. A proposal produces one atomic patch or a no-action result outside the active skill tree.
+The packet builder returns only one registered skill's active digest, provenance, linked patterns, prior impacts, reviewed catalog outcomes, and selected evidence handles. A proposal produces one atomic `foundry/runs/proposal-impact/<run>/candidate.patch` or a no-action result outside the active skill tree. The patch must contain exactly one file diff whose old and new headers both name the target's active `SKILL.md`.
 
-Every line in `impact.jsonl` records one unique proposal ID, source patterns or an explicit no-action reason, candidate artifact and digest, all three evaluation variants, decision authority and rationale, active-skill before and after digests, and supersession history. Rejection, absorption, supersession, and no-change require byte-identical active procedure. Acceptance additionally requires passing eval evidence and human authority.
+Every line in `impact.jsonl` records one unique proposal ID, source patterns or an explicit no-action reason, candidate artifact and digest, all three evaluation variants, decision authority and rationale, active-skill before and after digests, and supersession history. The schema is closed at every object level, so unknown fields fail validation and cannot enter normalized serialization. Rejection, absorption, supersession, and no-change require byte-identical active procedure. Acceptance additionally requires a changed active digest, passing eval evidence, and human authority.
 
 The impact recorder validates the full history before append, verifies the final record after append, and treats an identical retry as a no-op. A reused ID with different bytes fails.
 
