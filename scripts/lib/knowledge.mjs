@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
 import { summarizeTextualMatchAudit } from "./knowledge-audit.mjs";
@@ -99,7 +100,29 @@ function resolvesInsideRepository(repository, target) {
 	return resolved.startsWith(`${root}/`);
 }
 
-function validateEvidence(repository, owner, evidence, errors) {
+function trackedRepositoryPaths(repository) {
+	return new Set(
+		execFileSync("git", ["ls-files", "-z"], {
+			cwd: repository,
+			encoding: "utf8",
+		})
+			.split("\0")
+			.filter(Boolean),
+	);
+}
+
+function privatePointerExposesLocalPath(value) {
+	if (typeof value !== "string") return false;
+	const pointer = value.slice("private:".length);
+	return (
+		pointer.startsWith("/") ||
+		pointer.startsWith("\\") ||
+		/^[a-z]:[\\/]/i.test(pointer) ||
+		/^file:/i.test(pointer)
+	);
+}
+
+function validateEvidence(repository, trackedPaths, owner, evidence, errors) {
 	if (!Array.isArray(evidence) || evidence.length === 0) {
 		errors.push(`${owner}: evidence must contain at least one entry`);
 		return;
@@ -122,7 +145,7 @@ function validateEvidence(repository, owner, evidence, errors) {
 			) {
 				errors.push(`${label} private evidence must use a private: pointer`);
 			}
-			if (/\/Users\/|\\Users\\/.test(entry?.path ?? "")) {
+			if (privatePointerExposesLocalPath(entry.path)) {
 				errors.push(`${label} exposes a local path`);
 			}
 			continue;
@@ -134,6 +157,8 @@ function validateEvidence(repository, owner, evidence, errors) {
 			errors.push(`${label} references missing path "${entry.path}"`);
 		} else if (!resolvesInsideRepository(repository, target)) {
 			errors.push(`${label} resolves outside the repository`);
+		} else if (!trackedPaths.has(entry.path)) {
+			errors.push(`${label} must reference a tracked repository file`);
 		}
 	}
 }
@@ -188,6 +213,7 @@ export function validateKnowledge(
 ) {
 	const errors = [];
 	const warnings = [];
+	const trackedPaths = trackedRepositoryPaths(repository);
 	const registry = knowledge.maturity?.skills ?? {};
 	const patternIds = new Set();
 	const skillNames = new Set();
@@ -218,7 +244,7 @@ export function validateKnowledge(
 		if (typeof pattern.summary !== "string" || pattern.summary.length === 0) {
 			errors.push(`${owner}: summary is required`);
 		}
-		validateEvidence(repository, owner, pattern.evidence, errors);
+		validateEvidence(repository, trackedPaths, owner, pattern.evidence, errors);
 		if (!Array.isArray(pattern.skills) || pattern.skills.length === 0) {
 			errors.push(`${owner}: skills must contain at least one relationship`);
 		} else {
@@ -266,7 +292,7 @@ export function validateKnowledge(
 		if (!Array.isArray(skill.evidence)) {
 			errors.push(`${owner}: evidence must be an array`);
 		} else if (skill.evidence.length > 0) {
-			validateEvidence(repository, owner, skill.evidence, errors);
+			validateEvidence(repository, trackedPaths, owner, skill.evidence, errors);
 		}
 		if (!Array.isArray(skill.decisions)) {
 			errors.push(`${owner}: decisions must be an array`);
@@ -398,6 +424,7 @@ export function compileKnowledge(knowledge) {
 				from: pattern.id,
 				to: `skill.${skill.name}`,
 				relationship: skill.relationship,
+				status: skill.status,
 			})),
 		)
 		.sort((left, right) =>
