@@ -6,15 +6,20 @@ Foundry governance, maturity registry, and validation script.
 ## Surface map
 
 ```surfaces
-.claude-plugin/marketplace.json -> README.md foundry/maturity.json scripts/validate-skills.mjs
-foundry/maturity.json -> README.md .claude-plugin/marketplace.json foundry/governance.md
-skills/.experimental/ -> README.md .claude-plugin/marketplace.json foundry/maturity.json
-skills/.experimental/factory-loop/ -> README.md CHANGELOG.md .claude-plugin/marketplace.json foundry/maturity.json foundry/rounds www/src/components/WorkflowGraph.astro www/src/components/EvidenceKey.astro www/src/styles/global.css scripts/lib/factory-loop.test.mjs
-skills/.experimental/software-factory/ -> README.md CHANGELOG.md foundry/maturity.json www/src/components/WorkflowGraph.astro www/src/styles/global.css scripts/lib/factory-loop.test.mjs
-skills/issue-intake/ -> README.md foundry/missions foundry/maturity.json
-skills/review-gate/ -> README.md .claude-plugin/marketplace.json foundry/maturity.json
-skills/record-a-case/ -> README.md .claude-plugin/marketplace.json foundry/maturity.json
-foundry/missions/ -> README.md scripts/validate-issue-contracts.mjs foundry/source-of-truth.md
+.claude-plugin/marketplace.json :: README.md, foundry/maturity.json, scripts/validate-skills.mjs
+foundry/maturity.json :: README.md, .claude-plugin/marketplace.json, foundry/governance.md, foundry/knowledge/coverage.md, foundry/knowledge/graph.json
+skills/.experimental/* :: README.md, .claude-plugin/marketplace.json, foundry/maturity.json
+skills/.experimental/factory-loop/* :: README.md, CHANGELOG.md, .claude-plugin/marketplace.json, foundry/maturity.json, foundry/rounds/*, www/src/components/WorkflowGraph.astro, www/src/components/EvidenceKey.astro, www/src/styles/global.css, scripts/lib/factory-loop.test.mjs
+skills/.experimental/software-factory/* :: README.md, CHANGELOG.md, foundry/maturity.json, www/src/components/WorkflowGraph.astro, www/src/styles/global.css, scripts/lib/factory-loop.test.mjs
+skills/issue-intake/* :: README.md, foundry/missions/*, foundry/maturity.json
+skills/review-gate/* :: README.md, .claude-plugin/marketplace.json, foundry/maturity.json
+skills/record-a-case/* :: README.md, .claude-plugin/marketplace.json, foundry/maturity.json
+foundry/missions/* :: README.md, scripts/validate-issue-contracts.mjs, foundry/source-of-truth.md
+foundry/knowledge/patterns/*.md :: foundry/knowledge/index.md, foundry/knowledge/coverage.md, foundry/knowledge/graph.json
+foundry/knowledge/skills/*.md :: foundry/knowledge/coverage.md, foundry/knowledge/graph.json
+foundry/knowledge/audits/*.json :: foundry/knowledge/audits/*-coverage.md, foundry/knowledge/graph.json
+scripts/lib/knowledge.mjs :: scripts/lib/knowledge.test.mjs, foundry/knowledge/index.md, foundry/knowledge/coverage.md, foundry/knowledge/graph.json
+scripts/lib/knowledge-audit.mjs :: scripts/lib/knowledge-audit.test.mjs, foundry/knowledge/audits/*-coverage.md, foundry/knowledge/graph.json
 ```
 
 ## Norms
@@ -31,8 +36,8 @@ foundry/missions/ -> README.md scripts/validate-issue-contracts.mjs foundry/sour
 - New skills include trigger evals and method evals.
 - Skill files remain within the validator's progressive-disclosure line budget.
 - Moving a skill requires updating all repository-relative links.
-- Validation runs with Bun through `validate-skills.mjs`, `validate-issue-contracts.mjs`, and `verify-eval-fixtures.mjs`.
+- Validation runs with Bun through `validate-skills.mjs`, `validate-issue-contracts.mjs`, `validate-knowledge.mjs`, `compile-knowledge.mjs --check`, `audit-knowledge-matches.mjs --check`, and `verify-eval-fixtures.mjs`.
 
 ## Gate-miss ledger
 
-(empty)
+- 2026-08-29: the surface map used `->` and space-separated targets while `gate.sh surfaces` parses `::` and comma-separated targets. The gate returned a false pass without running any rule. Converted the map to executable syntax, added Knowledge surfaces, and reran it on the compiled-knowledge diff.
