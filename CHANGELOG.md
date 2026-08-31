@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.0.10 - 2026-08-30
+## 0.0.10 - 2026-08-31
 
 Security-sensitive changes now have a dedicated threat-boundary review that keeps vulnerability classification separate from the final merge gate.
 
