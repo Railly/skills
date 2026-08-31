@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.10 - 2026-08-30
+
+Security-sensitive changes now have a dedicated threat-boundary review that keeps vulnerability classification separate from the final merge gate.
+
+### Added
+
+- `security-review`, an evaluated experimental skill for attacker modeling, trust boundaries, exploitability chains, safe boundary verification, and merge-relevance classification
+- Classification guidance for vulnerabilities, hardening, non-security defects, informational observations, and verification gaps
+- An exact-state security receipt contract consumed by Review Gate
+- Five behavior evals covering DNS rebinding, equivalent-authority plugin inheritance, cross-tenant credential leakage, lifecycle defects, missing deployment assumptions, and security-keyword near misses
+- Round 014 recording the ownership boundary and the 100% versus 89.3% baseline result
+
 ## 0.0.9 - 2026-08-30
 
 Skill usage can now become durable private evidence, and repeated cases can compile into reusable knowledge without turning raw sessions into public artifacts.

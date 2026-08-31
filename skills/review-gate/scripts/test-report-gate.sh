@@ -85,6 +85,77 @@ expect_finding \
 	"independent challenge artifact must be a local auditable file" \
 	node "$validator" "$unchecked_url" --structural
 
+missing_security_review="$tmp_dir/missing-security-review.json"
+mutate_fixture "$missing_security_review" 'delete report.security_review;'
+expect_finding \
+	"security-sensitive work needs a security receipt" \
+	"security-sensitive work requires a security_review receipt" \
+	node "$validator" "$missing_security_review" --structural
+
+stale_security_review="$tmp_dir/stale-security-review.json"
+mutate_fixture "$stale_security_review" 'report.security_review.fingerprint.head_sha = "stale-head";'
+expect_finding \
+	"stale security receipts are rejected" \
+	"security_review receipt head does not match run.head" \
+	node "$validator" "$stale_security_review" --structural
+
+security_blocker="$tmp_dir/security-blocker.json"
+mutate_fixture "$security_blocker" '
+report.security_review.status = "findings";
+report.security_review.observations[0] = {
+  id: "SEC-001",
+  classification: "confirmed_vulnerability",
+  scope: "in_scope_security_regression",
+  confidence: "high",
+  evidence: ["A lower-trust principal crossed the authorization boundary."]
+};
+report.security_review.merge_relevance.security_blockers = ["SEC-001"];
+'
+expect_finding \
+	"open security blockers block pass" \
+	"security_review has unresolved security blockers" \
+	node "$validator" "$security_blocker" --structural
+
+security_gap="$tmp_dir/security-gap.json"
+mutate_fixture "$security_gap" '
+report.security_review.status = "incomplete";
+report.security_review.observations[0] = {
+  id: "SEC-001",
+  classification: "verification_gap",
+  scope: "adjacent_security_blocker",
+  confidence: "low",
+  evidence: ["The supported reverse-proxy behavior is unknown."]
+};
+report.security_review.verification.gaps = ["Reverse-proxy behavior was not available to test."];
+'
+expect_finding \
+	"security verification gaps block pass" \
+	"security_review has unresolved verification gaps" \
+	node "$validator" "$security_gap" --structural
+
+hardening_only="$tmp_dir/hardening-only.json"
+mutate_fixture "$hardening_only" '
+report.security_review.observations = [
+  {
+    id: "SEC-001",
+    classification: "hardening",
+    scope: "out_of_scope_hardening",
+    confidence: "high",
+    evidence: ["The receiver already has equivalent authority."]
+  },
+  {
+    id: "SEC-002",
+    classification: "non_security_defect",
+    scope: "unrelated_bug",
+    confidence: "high",
+    evidence: ["Startup reports success before bind completion."]
+  }
+];
+'
+expect_pass \
+	"hardening and non-security observations do not block" \
+	node "$validator" "$hardening_only" --structural
+
 missing_commit_point="$tmp_dir/missing-commit-point.json"
 mutate_fixture "$missing_commit_point" 'report.side_effects.commit_points = [];'
 expect_finding \

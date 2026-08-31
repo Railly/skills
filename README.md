@@ -74,6 +74,10 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Resilience Audit](skills/.experimental/resilience-audit) forces timeouts, cancellation, retries, partial state, overload, cleanup, dependency failure, and concurrency paths.
 
+### Security Review
+
+[Security Review](skills/.experimental/security-review) models attackers, assets, authority, and trust boundaries to distinguish exploitable vulnerabilities from hardening, non-security defects, and verification gaps. It emits an exact-state security receipt for Review Gate without taking ownership of the final merge verdict.
+
 ### Simplify
 
 [Simplify](skills/.experimental/simplify) reduces code, diff size, duplication, tests, and maintenance surface within a bounded target while preserving behavior and proving that consolidated regression protection still detects defects.
