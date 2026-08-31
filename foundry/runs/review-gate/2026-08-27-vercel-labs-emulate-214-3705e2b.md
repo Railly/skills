@@ -53,7 +53,7 @@ Update these required sibling surfaces so the behavior is stated consistently.
 - The pass-only report validator correctly returned findings for the five open defects and their failed proof obligations.
 - Built CLI replay, conflict, canonicalization, form encoding, credential scoping, and one-capture behavior passed.
 - Radius: 46 changed symbols, 19 impacted, 4,980 edges, 21,101 unresolved calls. The map under-covers.
-- Full evidence: [substrate report](/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/evidence/2026-08-27-emulate-214-3705e2b-substrate.md)
+- Full evidence: [substrate report](evidence/2026-08-27-emulate-214-3705e2b-substrate.md)
 
 ## Exemptions claimed
 
