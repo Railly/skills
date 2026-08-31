@@ -1,83 +1,71 @@
 ---
 name: before-after
-description: "Build a minimal, browser-openable before/after artifact that makes a code change, bug fix, feature, benchmark, migration, or visual behavior easy to see and appreciate. Use whenever the user asks for before/after, antes y despues, compare old vs new, show the bug and fix, open it in my browser, make it screenshotable, show benchmark deltas, or wants to experience a newly built feature rather than read a diff. Prefer this over explain-diff when the main job is visual comparison and evidence, not a long pedagogical walkthrough."
-compatibility: "Requires a writable output directory and a browser. Bun is used for the bundled scaffold script. Real-build comparisons may require the target repo's own build and dev tools."
+description: "Create granular, browser-openable visual proof for a web UI change by capturing the same real DOM element or page state before and after with agent-browser. Use when a web bug fix, component change, responsive adjustment, loading state, interaction, or styling change has a visible browser result worth demonstrating, including show me, prove the visual fix, before and after, antes y despues, screenshot the change, or make it reviewable. Do not use for backend-only changes, migrations, benchmarks, performance claims, native desktop UI, code explanations, or changes with no meaningful visible web delta."
+compatibility: "Requires agent-browser, Bun, a writable artifact directory, and browser-accessible baseline and changed states."
 ---
 
 # Before after
 
-Make the change visible on one shared basis. The artifact is not a prettier diff. It should let the reader see, trigger, or measure the old and new behavior without reconstructing the conclusion from prose.
+Produce honest, element-level evidence for a visible web change by composing existing `agent-browser` commands.
 
-Read [references/patterns.md](references/patterns.md) and [references/vercel-visual-system.md](references/vercel-visual-system.md) before composing the page.
+Read [the capture protocol](references/capture-protocol.md), [the visual proof patterns](references/patterns.md), and [the Vercel visual system](references/vercel-visual-system.md) completely before acting. Load the installed `agent-browser` core skill before running browser commands.
 
-## 1. Freeze the comparison
+## Visual gate
 
-Write down:
+Use this skill only when the changed behavior can be seen in a browser:
 
-- The reader's question.
-- The exact baseline and changed artifacts, commits, builds, or measurements.
-- The one action or workload both sides receive.
-- The observable difference and the caveat that limits the claim.
+- Component layout, content, styling, or responsive changes.
+- Loading, empty, error, validation, hover, focus, or interaction states.
+- A visual regression fix that can be reproduced deterministically.
 
-Keep both sides comparable. Same input, viewport, timing basis, units, environment, and measurement method unless the difference itself is the subject. Label simulations, fixtures, and approximations honestly.
+Do not use it merely because code changed. Use relevant tests for nonvisual work, `performance-proof` for measured performance claims, and `explain-diff` for code understanding. If the delta cannot be reproduced honestly, report the evidence gap instead of manufacturing a comparison.
 
-## 2. Choose one shape
+## Required proof basis
 
-- **Visual behavior:** two real lanes or reproducible states, one shared action, visible result, screenshot-ready.
-- **Benchmark:** decisive delta first, then one semantic table with exact values, units, sample, and method.
-- **Feature tour:** before/after first, then the smallest interaction that lets the reader feel the new capability, followed by proof.
+Before capturing, freeze:
 
-Do not force all three shapes into every artifact. If the change has no meaningful visual or behavioral surface, use `explain-diff` instead.
+- Exact baseline and changed source states.
+- URL, app process, authentication, data, route, interaction, and readiness signal.
+- Browser session, viewport, device pixel ratio, theme, and zoom.
+- One stable selector for the smallest element that contains the meaningful change.
+- Expected visible difference and the claim's limit.
 
-## 3. Gather evidence before designing
+Both sides should differ only in the behavior under review. Preserve the same browser session and tab when hot reload can update the changed state without losing data. Do not modify product source solely to add a proof selector unless the user authorizes that change.
 
-Prefer real builds, traces, fixtures, recordings, screenshots, and exact test output. Drive the shipped surface when possible. Do not present final-state equality as proof of temporal behavior, and do not convert an unmeasured improvement into a number.
+## Evidence requirements
 
-The first viewport should answer:
+Capture the baseline before editing whenever possible. If the implementation already exists, use a separate baseline build or safely reproduce the prior state only when source edits are authorized, the exact local diff is preserved, and the changed state is restored immediately afterward. Never reset or discard unrelated work.
 
-1. What changed?
-2. Which side is before and which is after?
-3. What should I notice?
+Use the same URL, selector, viewport, data, interaction, and wait condition for `before.png` and `after.png`. For temporal claims such as flicker or ordering, use video or an ordered state sequence because two settled screenshots do not prove timing.
 
-## 4. Build the artifact
+Inspect both captures before generating the report:
 
-Save outside the code repo with a date-prefixed filename:
+- Same element boundary and surrounding context.
+- Same pixel dimensions unless size is the intended change.
+- No loading, stale hot reload, tooltip, cursor, focus ring, or transient overlay on only one side.
+- Intended difference remains visible at normal report scale.
+- No unrelated content or data drift.
 
-```bash
-bun <skill-root>/scripts/create.mjs \
-  --out /absolute/path/YYYY-MM-DD-subject-before-after.html \
-  --title "Concrete claim" \
-  --subject "Project or feature" \
-  --summary "One evidence-led sentence"
+Use the screenshot diff as supporting evidence. A pixel diff detects change but does not decide correctness.
+
+## Artifact
+
+Run the bundled `scripts/create.mjs` with the exact command in [the capture protocol](references/capture-protocol.md). It validates PNG inputs and dimensions, copies the captures, creates a responsive HTML report, and writes a JSON manifest with source identities, URL, selector, dimensions, and comparison policy.
+
+Pass `--allow-size-change true` only when size or layout is the claim and explain the exception. The normal evidence package is:
+
+```text
+subject/
+├── before.png
+├── after.png
+├── diff.png
+├── YYYY-MM-DD-subject-before-after.html
+├── YYYY-MM-DD-subject-before-after.json
+└── YYYY-MM-DD-subject-before-after.assets/
 ```
 
-The script copies the official Vercel report foundation beside the HTML. Edit the generated page to replace scaffold content with the observed evidence.
+## Verify and hand off
 
-Use one long responsive page. Put the comparison before background or implementation detail. Keep audit evidence available below the first read. Add controls only when they trigger or clarify a real state change.
+Open the generated HTML with `agent-browser`. Inspect desktop and narrow viewports plus light and dark OS themes. Confirm that the first viewport presents both captures, labels and provenance stand alone, images are sharp and unclipped, and limits are explicit.
 
-## 5. Use Vercel design judgment
-
-Use Geist Sans for prose and numbers. Use Geist Mono only for code, commands, paths, timestamps, and short identifiers. Stay monochrome unless color encodes a sourced state or data distinction.
-
-Reject gradients, glows, blobs, glass, ornamental shadows, decorative motion, all-caps eyebrows, pill metadata, generic card grids, repeated metric boxes, fake screenshots, and nested panels. Build hierarchy with type, alignment, shared scales, spacing, and evidence placement.
-
-## 6. Verify before handoff
-
-Open the actual HTML and check:
-
-- Desktop and narrow viewport.
-- Light and dark OS themes.
-- First viewport communicates the comparison.
-- Controls work with mouse and keyboard.
-- No overflow, clipped labels, broken code blocks, or character-level wrapping.
-- Every number has a unit and provenance.
-- Before and after remain on the same visual and measurement basis.
-- The artifact is understandable without the conversation.
-
-Return the absolute artifact path and an exact open command:
-
-```bash
-open /absolute/path/YYYY-MM-DD-subject-before-after.html
-```
-
-Do not commit, push, deploy, or modify the compared repos unless the user separately authorized it.
+Open the report for the user and return links to the HTML, `before.png`, and `after.png`, plus validation status. Do not commit, push, deploy, or mutate the baseline solely because this skill ran.

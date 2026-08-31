@@ -34,45 +34,31 @@
     }
 
     .vbg-custom-evidence {
-      min-height: 240px;
       margin-block-start: var(--vbg-space-6);
-      display: grid;
-      place-items: center;
       border: 1px solid var(--vbg-border-subtle);
       border-radius: var(--vbg-radius);
       background: var(--vbg-surface-secondary);
-      color: var(--vbg-text-secondary);
-      text-align: center;
+      overflow: hidden;
     }
 
-    .vbg-custom-delta {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      gap: var(--vbg-space-4);
-      align-items: baseline;
+    .vbg-custom-evidence img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .vbg-custom-caption {
+      margin-block-start: var(--vbg-space-3);
+      color: var(--vbg-text-secondary);
+      font-size: var(--vbg-type-small);
+    }
+
+    .vbg-custom-fact {
       padding-block: var(--vbg-space-8);
       border-block: 1px solid var(--vbg-border-default);
-    }
-
-    .vbg-custom-delta-value {
       font-size: var(--vbg-type-title);
       line-height: var(--vbg-leading-title);
       font-weight: var(--vbg-weight-heading);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .vbg-custom-delta-value:last-child {
-      text-align: end;
-    }
-
-    .vbg-custom-arrow {
-      color: var(--vbg-text-secondary);
-    }
-
-    .vbg-custom-run {
-      border-color: var(--vbg-text-primary);
-      background: var(--vbg-text-primary);
-      color: var(--vbg-surface-primary);
     }
 
     @media (max-width: 720px) {
@@ -88,19 +74,6 @@
         border-inline-start: 0;
         border-block-start: 1px solid var(--vbg-border-default);
         padding-inline-start: 0;
-      }
-
-      .vbg-custom-delta {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .vbg-custom-delta-value:last-child {
-        text-align: start;
-      }
-
-      .vbg-custom-arrow {
-        transform: rotate(90deg);
-        transform-origin: left center;
       }
     }
   </style>
@@ -126,55 +99,62 @@
         <div class="vbg-custom-comparison" role="group" aria-label="Before and after comparison">
           <article class="vbg-custom-peer">
             <p class="vbg-label">Before</p>
-            <h2 class="vbg-heading-20">Observed baseline</h2>
-            <p>Replace this with the exact old behavior and its provenance.</p>
-            <div class="vbg-custom-evidence">Baseline evidence</div>
+            <h2 class="vbg-heading-20">__BEFORE_HEADING__</h2>
+            <p>__BEFORE_COPY__</p>
+            <figure class="vbg-custom-evidence">
+              <img src="__BEFORE_IMAGE__" width="__BEFORE_WIDTH__" height="__BEFORE_HEIGHT__" alt="Web interface before the change">
+            </figure>
+            <p class="vbg-custom-caption">__BASELINE__</p>
           </article>
 
           <article class="vbg-custom-peer">
             <p class="vbg-label">After</p>
-            <h2 class="vbg-heading-20">Observed change</h2>
-            <p>Replace this with the exact new behavior on the same basis.</p>
-            <div class="vbg-custom-evidence">Changed evidence</div>
+            <h2 class="vbg-heading-20">__AFTER_HEADING__</h2>
+            <p>__AFTER_COPY__</p>
+            <figure class="vbg-custom-evidence">
+              <img src="__AFTER_IMAGE__" width="__AFTER_WIDTH__" height="__AFTER_HEIGHT__" alt="Web interface after the change">
+            </figure>
+            <p class="vbg-custom-caption">__CHANGED__</p>
           </article>
         </div>
       </section>
 
       <section class="vbg-section">
         <h2>What changed</h2>
-        <div class="vbg-custom-delta" role="group" aria-label="Primary before and after delta">
-          <div>
-            <p class="vbg-label">Before</p>
-            <p class="vbg-custom-delta-value">Old value</p>
-          </div>
-          <span class="vbg-custom-arrow">to</span>
-          <div>
-            <p class="vbg-label">After</p>
-            <p class="vbg-custom-delta-value">New value</p>
-          </div>
-        </div>
+        <p class="vbg-custom-fact">__SUMMARY__</p>
       </section>
 
       <section class="vbg-section">
-        <h2>Evidence</h2>
-        <p>Keep exact values, units, workload, environment, and caveats here.</p>
+        <h2>Evidence basis</h2>
         <div class="vbg-table-wrap">
           <table>
-            <caption>Comparison on one shared measurement basis</caption>
+            <caption>Element-level visual comparison</caption>
             <thead>
               <tr>
-                <th scope="col">Metric</th>
-                <th scope="col" class="vbg-numeric">Before</th>
-                <th scope="col" class="vbg-numeric">After</th>
-                <th scope="col" class="vbg-numeric">Delta</th>
+                <th scope="col">Property</th>
+                <th scope="col">Recorded value</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <th scope="row">Primary metric</th>
-                <td class="vbg-numeric">0</td>
-                <td class="vbg-numeric">0</td>
-                <td class="vbg-numeric">0</td>
+                <th scope="row">URL</th>
+                <td><code>__URL__</code></td>
+              </tr>
+              <tr>
+                <th scope="row">Selector</th>
+                <td><code>__SELECTOR__</code></td>
+              </tr>
+              <tr>
+                <th scope="row">Capture dimensions</th>
+                <td><code>__DIMENSIONS__</code></td>
+              </tr>
+              <tr>
+                <th scope="row">Baseline</th>
+                <td>__BASELINE__</td>
+              </tr>
+              <tr>
+                <th scope="row">Changed state</th>
+                <td>__CHANGED__</td>
               </tr>
             </tbody>
           </table>
@@ -182,20 +162,14 @@
       </section>
 
       <section class="vbg-section">
-        <h2>Try it</h2>
-        <p>Add one native control only when it triggers or clarifies the real behavior.</p>
-        <button type="button" class="vbg-button vbg-custom-run">Run comparison</button>
-      </section>
-
-      <section class="vbg-section">
         <h2>Limits</h2>
-        <p class="vbg-note">State what this comparison does not prove.</p>
+        <p class="vbg-note">__CAVEAT__</p>
       </section>
     </main>
 
     <footer class="vbg-footer">
       <span class="vbg-logo" role="img" aria-label="Vercel"></span>
-      <span>Before/after evidence</span>
+      <span>Web visual proof</span>
     </footer>
   </div>
 </body>
