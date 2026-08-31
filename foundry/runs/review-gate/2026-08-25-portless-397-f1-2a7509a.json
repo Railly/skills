@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-25",
+    "repo": "portless",
+    "base": "2ac15191f438f8b3064b73453b60ff702b15d0f8",
+    "head": "2a7509aea2c2f3b9a07b205db22b380c83e71d1f",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "inline Factory Loop successor contract for confirmed PR #397 finding F1",
+    "spec_status": "pass",
+    "acceptance_reviewed": ["F1-A", "F1-B", "F1-C"],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex with independent macOS/Linux substrate corpus",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["process lifecycle", "privilege elevation", "cross-platform guarantee"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-25-portless-397-f1-2a7509a-substrate.txt",
+      "evidence": "An independently stated process-result oracle drove the built exact-head CLI through a real macOS PTY, real loopback listener, and fresh Linux container."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "inline Factory Loop successor contract",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "F1-A requires immediate nonzero propagation, F1-B preserves the child diagnosis without duplication, and F1-C preserves successful readiness discovery."
+    },
+    {
+      "source": "design",
+      "location": "mechanically narrow successor shape",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "Only the child-result seam changes. Sudo policy, fallback behavior, docs, protocol, and non-interactive guidance are non-goals."
+    },
+    {
+      "source": "user_facing",
+      "location": "built CLI stderr plus existing README, CLI help, commands docs, and portless skill",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The existing contract already says failed elevation exits nonzero. Exact-head dogfood preserves its actionable child error and removes only the contradictory delayed duplicate."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/portless/src/cli.ts and packages/portless/src/cli.test.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The full exact-head diff, both ensureProxyRunning callers, result partitions, ranked Radius impacts, and parent-layer regression were reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Interactive app auto-start treats a child nonzero exit as terminal without readiness polling or a duplicate parent failure.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "parent exit status, elapsed time, and complete terminal output after the real child exits nonzero",
+        "layer": "built parent CLI through child process and PTY",
+        "method": "fake sudo executable exits 23 under a real macOS PTY and Linux process boundary",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the child itself exits nonzero",
+        "counterexample": "the child exits promptly while the parent ignores status and polls readiness for five seconds",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Baseline took 5.15 to 5.70 seconds and duplicated the error; exact head exited 1 in 493 milliseconds with no duplicate."
+      },
+      "substrates": [
+        {
+          "name": "macOS PTY and POSIX child process",
+          "status": "exercised",
+          "evidence": "Built exact-head CLI exited 1 in 493 milliseconds after fake sudo status 23."
+        },
+        {
+          "name": "Linux arm64 Debian Node 24 process boundary",
+          "status": "exercised",
+          "evidence": "Fresh clone built and all three privileged-startup tests passed in 253 milliseconds."
+        }
+      ],
+      "evidence": "Direct evidence is preserved in the independent substrate artifact and the regression test."
+    },
+    {
+      "id": "P2",
+      "claim": "The child privilege diagnosis and recovery command remain the only user-visible failure explanation.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "complete built CLI terminal output",
+        "layer": "user-visible stderr",
+        "method": "capture the real PTY transcript after sudo status 23",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "parent exits quickly",
+        "counterexample": "the parent exits quickly but suppresses the child's actionable recovery command",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The transcript contains the privilege error and `sudo portless proxy start --no-tls`, and does not contain `Failed to start proxy.`."
+      },
+      "substrates": [
+        {
+          "name": "macOS interactive terminal output",
+          "status": "exercised",
+          "evidence": "Real PTY transcript captured the exact child message and absence of the duplicate."
+        },
+        {
+          "name": "Linux captured process output",
+          "status": "exercised",
+          "evidence": "Linux regression asserts the child error and duplicate absence."
+        }
+      ],
+      "evidence": "Observed at the user-facing boundary, not inferred from source."
+    },
+    {
+      "id": "P3",
+      "claim": "A successful child start still enters readiness discovery and produces a usable loopback proxy.",
+      "kind": "availability",
+      "status": "verified",
+      "oracle": {
+        "observes": "a real TCP listener serving an HTTP response with the portless marker and stopping cleanly",
+        "layer": "loopback TCP and built CLI lifecycle",
+        "method": "start on an OS-assigned unprivileged port, curl it, then stop it",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the startup command exits zero",
+        "counterexample": "the command exits zero while no usable listener exists",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "A real request returned `X-Portless: 1`, proving the listener rather than trusting command output."
+      },
+      "substrates": [
+        {
+          "name": "macOS IPv4 loopback",
+          "status": "exercised",
+          "evidence": "Built exact-head proxy started, served the portless HTTP marker, and stopped cleanly."
+        },
+        {
+          "name": "Linux clean child-result partition",
+          "status": "exercised",
+          "evidence": "Build and privileged-startup matrix passed under Linux; repository E2E separately drove 11 framework proxy paths on macOS."
+        }
+      ],
+      "evidence": "The success partition remains status 0 only and was exercised on the real listener substrate."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["process lifecycle", "privilege-elevation adapter", "cross-platform compatibility"],
+    "dimensions": {
+      "values": [
+        "entry=interactive app auto-start; child=status 1; expected=immediate parent exit 1, child diagnosis only",
+        "entry=interactive app auto-start; child=status 0; expected=readiness discovery",
+        "entry=auto-start; child=spawn error; expected=immediate existing parent diagnosis",
+        "entry=auto-start; child=signal; expected=immediate existing parent diagnosis",
+        "entry=non-interactive auto-start; privileged port; expected=fail before child spawn with manual guidance",
+        "platform=macOS/Linux; privileged threshold active; platform=Windows; sudo branch excluded by product definition"
+      ],
+      "exclusions": [
+        "Windows is excluded from the changed sudo branch because isWindows makes needsSudo false; repository Windows CI remains a compatibility check.",
+        "Successful real sudo authorization was not required because status 0 uses the same readiness partition exercised by real unprivileged loopback startup."
+      ],
+      "evidence": "Every reachable child-result partition was read; the nonzero partition was force-red, macOS PTY-driven, and Linux-driven; status 0 reached a real listener."
+    },
+    "oracle": {
+      "source": "POSIX synchronous child-process terminal semantics and the frozen F1 contract",
+      "independent": true,
+      "evidence": "The oracle was stated in the substrate artifact without deriving expected results from the production branch structure."
+    },
+    "producer": {
+      "name": "real Node child process, POSIX executable, PTY, and loopback TCP listener",
+      "status": "exercised",
+      "evidence": "macOS real PTY and loopback plus Linux real child execution were driven."
+    },
+    "falsification": [
+      {
+        "mutation": "At the executed ensureProxyRunning call site, replace the nonzero-status guard with a null-status guard.",
+        "red_evidence": "The parent-layer regression entered the delayed path and failed at the intended no-duplicate assertion.",
+        "restored_green_evidence": "Restoring cli.ts from a filesystem snapshot returned the same test green in 374 milliseconds."
+      }
+    ],
+    "evidence": "The regression rejects the original defect at the parent CLI boundary and remains deterministic below the fixed two-second ceiling."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "subsystem model",
+      "claim": "A synchronous nonzero child exit is terminal and cannot later publish proxy readiness.",
+      "status": "verified",
+      "evidence": "The child has already terminated; baseline polling only delayed and duplicated failure, while no state files existed."
+    },
+    {
+      "id": "A2",
+      "source": "implementation shape",
+      "claim": "Status 0 remains the only child result eligible for readiness discovery.",
+      "status": "verified",
+      "evidence": "Exact-head source partitions status 0 from nonzero, error, signal, and null; real loopback success and full tests pass."
+    },
+    {
+      "id": "A3",
+      "source": "surface exemption",
+      "claim": "README and skills/portless/SKILL.md require no successor edit because they already describe failed elevation as fatal and do not promise the five-second duplicate.",
+      "status": "verified",
+      "evidence": "Both canonical passages were read and agree with exact-head built behavior."
+    },
+    {
+      "id": "A4",
+      "source": "platform model",
+      "claim": "Windows cannot enter the changed sudo branch.",
+      "status": "verified",
+      "evidence": "needsSudo is guarded by !isWindows and the regression suite is skipped on win32; Windows CI remains required after push."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The child process can emit terminal output and, on success, publish a daemon and proxy state before the parent performs readiness discovery.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "child startup process terminates with a user-visible result",
+        "owner": "proxy start child",
+        "commit_event": "spawnSync returns error, signal, null status, zero, or nonzero status after inherited output is emitted",
+        "later_fallible_stages": ["parent result classification", "parent readiness discovery", "parent failure reporting"],
+        "failure_partitions": [
+          {
+            "ownership_region": "child nonzero terminal outcome",
+            "covers": ["parent result classification", "parent readiness discovery", "parent failure reporting"],
+            "forced": true,
+            "residual_observed": "No readiness polling, no duplicate parent error, no proxy.pid, and no proxy.port.",
+            "cleanup_owner": "none required because the child terminated before publishing state",
+            "retry": {
+              "attempted": true,
+              "outcome": "documented_recovery",
+              "evidence": "The documented no-sudo recovery started a real loopback proxy on an explicit unprivileged port and stopped it cleanly."
+            },
+            "evidence": "Fake sudo status 23 was forced in the regression, real PTY dogfood, and Linux run."
+          },
+          {
+            "ownership_region": "child success and parent discovery",
+            "covers": ["parent readiness discovery", "parent failure reporting"],
+            "forced": true,
+            "residual_observed": "A responding loopback listener and valid portless marker were observed, then state and process were removed by proxy stop.",
+            "cleanup_owner": "proxy stop",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Full CLI and E2E suites repeatedly started, served through, and stopped proxies."
+            },
+            "evidence": "Real loopback dogfood plus 16 E2E tests."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, lookup, or data source was replaced."},
+    {"name":"New-domain matrix","status":"skipped","reason":"No input validator or trigger domain was widened."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No resolution, precedence, or discovery rule changed."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell composition or shell detector changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"run","reason":"Child inherited output and attached parent output were driven through a real PTY; only the child diagnosis remains."},
+    {"name":"Shim hermeticity","status":"run","reason":"The fake sudo executable was prepended to PATH, its unique status 23 was observed, and missing-sudo coverage remained green."},
+    {"name":"Deliberate-default check","status":"run","reason":"The successor preserves PR #397's already documented fatal default and changes only propagation latency and duplication."},
+    {"name":"Fresh-seam scan","status":"run","reason":"The complete handleProxy child to ensureProxyRunning parent seam and every result partition were inspected."},
+    {"name":"Substrate differential corpus","status":"run","reason":"The same failure contract ran on macOS and Linux, and the success partition reached real loopback."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"No external protocol governs this product-specific parent-child startup policy."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Nonzero status was traced through ensureProxyRunning into runApp, multi-app, default single, run, named, default mode, and main."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No flag or configuration bit changed."},
+    {"name":"Error-path forcing","status":"run","reason":"Nonzero status, missing executable, non-interactive refusal, immediate retry, and residual state were forced; error and signal partitions retain existing diagnosis."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery was added."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"The change removes an invalid five-second wait after a terminal child result and adds no new timeout; the exact production wait was measured before and after."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Parent CLI to child proxy start to sudo and back was driven through process, terminal, filesystem, and loopback boundaries."},
+    {"name":"Substrate verification","status":"run","reason":"Exit, latency, output, state files, TCP listener, HTTP marker, and cleanup were observed directly."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The built exact-head CLI was driven through real PTY failure and real loopback success."},
+    {"name":"Newly-asserted invariant ownership","status":"skipped","reason":"The successor adds no prose invariant; it enforces the already accepted fatal child outcome at its parent consumer."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Existing README, skill, docs, and CLI help passages already describe fatal elevation; exact-head behavior now agrees without a successor prose change."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example was added or edited."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail was supplied."},
+    {"name":"Complexity budget","status":"skipped","reason":"The change adds no per-element work and removes the readiness loop from one terminal result partition."}
+  ],
+  "deterministic": [
+    {"check":"covered initial","outcome":"acknowledged","reason":"Expected pre-report red before this exact-head report existed."},
+    {"check":"style","outcome":"pass","reason":"No forbidden added punctuation or style finding."},
+    {"check":"surfaces README.md","outcome":"acknowledged","reason":"The canonical passage already says failed elevation exits nonzero; the successor changes no documented contract."},
+    {"check":"surfaces skills/portless/SKILL.md","outcome":"acknowledged","reason":"The canonical agent passage already says failed elevation exits nonzero; the successor changes no usage semantics."},
+    {"check":"stale","outcome":"pass","reason":"No value, message, flag, or contract term was renamed or retired."},
+    {"check":"siblings","outcome":"pass","reason":"The diff adds no documentation behavior statement; all existing fatal-elevation passages were read for parity."},
+    {"check":"callers ensureProxyRunning","outcome":"pass","reason":"Every call site is in cli.ts and was inspected; Radius ranked runApp and multi-app as the primary impacts."},
+    {"check":"timings","outcome":"pass","reason":"No wait ceiling was added."},
+    {"check":"shellmeta","outcome":"pass","reason":"No shell detector changed."},
+    {"check":"artifacts","outcome":"pass","reason":"No persistent file writer was added."},
+    {"check":"rawinput","outcome":"pass","reason":"No resolution rule deepened."},
+    {"check":"execdeps","outcome":"pass","reason":"No external executable invocation was added."},
+    {"check":"force-red","outcome":"pass","reason":"Call-site mutation restored delayed duplication and failed the intended assertion; snapshot restoration passed."},
+    {"check":"eslint","outcome":"pass","reason":"Changed TypeScript files and root lint passed."},
+    {"check":"type-check","outcome":"pass","reason":"Root type-check passed."},
+    {"check":"format","outcome":"pass","reason":"Changed files passed Prettier; clean exact-head CI format verification remains part of pre-push proof."},
+    {"check":"build","outcome":"pass","reason":"Root build and fresh Linux package build passed."},
+    {"check":"test","outcome":"pass","reason":"858 repository tests passed with one documented skip."},
+    {"check":"test:e2e","outcome":"pass","reason":"16 E2E tests passed with two documented Python-fixture skips."}
+  ],
+  "findings": [
+    {
+      "id":"F1",
+      "state":"confirmed",
+      "claim":"Interactive app auto-start ignored the fatal child exit, waited five seconds, and duplicated failure.",
+      "evidence":"Baseline real PTY and force-red mutation reproduced the delayed duplicate; exact head exits 1 in 493 milliseconds with only the child diagnosis.",
+      "layer":"parent CLI process lifecycle and user-visible latency",
+      "source":"map",
+      "path":"handleProxy child nonzero exit to ensureProxyRunning to runApp and multi-app callers",
+      "resolution":"fixed"
+    }
+  ],
+  "exemptions": [
+    {"claim":"README.md requires no successor edit.","evidence":"Its canonical macOS/Linux privilege passage already states that failed elevation exits nonzero and gives both recovery options."},
+    {"claim":"skills/portless/SKILL.md requires no successor edit.","evidence":"Its canonical proxy lifecycle passage already states that failed elevation exits nonzero without fallback and gives both recovery options."},
+    {"claim":"Windows does not require direct changed-branch behavior proof.","evidence":"The changed needsSudo branch is statically unreachable when isWindows is true; Windows CI remains required for compatibility."}
+  ],
+  "issue_candidates": []
+}

@@ -1,0 +1,29 @@
+Review evidence for crafter-research/muniscan exact head 4bbf6cf019a50484d2de311b1bacbe54b1929669
+
+Archived run 31327852019:
+- 3,065 enriched entities, all HTTP 200
+- 1,441 municipalities discovered
+- union with published 2026-08-08 census restores 412 and yields 1,853 unique municipalities
+
+Archived run 31293639412:
+- 3,117 enriched entities, all HTTP 200
+- 1,495 municipalities discovered
+- union with published 2026-08-08 census restores 386 and yields 1,881 unique municipalities
+
+Force-red mutations in an isolated snapshot:
+- replacing restoreKnownMunicipalities with current discovery only made src/discover.test.ts fail because restored was 0 instead of 1
+- removing the non-2xx branch made src/fetch.test.ts fail because HTTP 404 returned ok:true
+- allowing the newest earlier directory without requiring index.json made src/history.test.ts fail with ENOENT on the failed 2026-08-09 directory
+
+Restored-green evidence:
+- bun test: 27 pass, 0 fail, 43 assertions
+- bun run typecheck: pass
+- focused tests repeated five times: pass
+- git diff --check: pass
+
+Oracle provenance:
+- previous published data/2026-08-08/index.json supplies the stable known municipal slugs
+- GitHub Actions artifacts 9043072140 and 9033162821 supply independent incomplete-run observations
+- WHAT counts as municipality remains the existing isMunicipality contract
+
+The live patched producer run remains a post-merge validation step because one scan takes about 85 minutes.

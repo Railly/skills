@@ -1,0 +1,38 @@
+PR: vercel-labs/agent-browser#1719
+Base: 9d9a3bbd5e4f8c0a17a1c4dfd2f8e8d74b5ee998
+Head: 0cdaaa03e40ba850f64533f061e4a9821bbb4197
+
+Real Chrome E2Es
+- e2e_diff_snapshot: pass
+- e2e_diff_url_aligns_refs_after_snapshot: pass
+- restored combined run: 2 passed
+
+Force-red mutations
+- Reusing the existing state.ref_map during a successful diff makes e2e_diff_snapshot fail because repeated unchanged diffs report changed=true.
+- Clearing and mutating the existing state.ref_map before a failing selector makes e2e_diff_snapshot fail when click e1 returns Unknown ref.
+- Removing URL-diff invalidation makes e2e_diff_url_aligns_refs_after_snapshot fail because stale refs remain after navigation starts.
+- Restored from /tmp/pr1719-actions.rs.snapshot, not from version control. Both E2Es pass after restoration.
+
+Built CLI dogfood
+- Invalid diff snapshot selector returned an error, then click @e1 succeeded.
+- Unreadable baseline returned an error, then click @e1 succeeded.
+- Failed URL1 navigation invalidated @e1.
+- Failed URL2 navigation left the browser on URL1 and invalidated @e1.
+- Successful URL diff left refs for URL2 actionable.
+
+Deterministic checks
+- cargo fmt -- --check: pass
+- cargo clippy -- -D warnings: pass
+- cargo test: 1,146 passed, 102 ignored in main binary; 2 doctor tests passed; 2 pin-tab tests ignored
+- gate style: pass
+- gate callers for handle_diff_snapshot and handle_diff_url: pass
+- git diff --check: pass
+- CI visible required checks: pass; Native E2E Tests skipped
+
+Surface acknowledgments
+- README, docs, MCP, commands, output, and skill surfaces are unaffected because command names, flags, wire fields, output shape, and documented final-page behavior are unchanged. This patch fixes internal ref epoch and failure-state handling.
+- Broad siblings matches are unrelated uses of the word diff; the relevant diff command surfaces were read.
+
+Radius
+- 8 changed, 138 impacted, 8,030 edges, 2,445 unresolved calls, 81 SCIP-unmapped.
+- The map over-covers through execute_command and under-covers state semantics. No finding came from the map.

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "skill": "record-a-case",
+  "candidate": "foundry/runs/proposal-impact/2026-08-30-record-a-case-manifest-projection/candidate.patch",
+  "variants": [
+    "no-skill",
+    "released-skill",
+    "candidate-skill"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "name": "resume-after-compaction",
+      "assertions": [
+        "Uses the schema-v1 work-item manifest as primary stage inventory",
+        "Verifies drift-prone external state instead of reconstructing stable stage history",
+        "Preserves conservative evidence and human-review status boundaries",
+        "Keeps canonical writes out of installed skill copies"
+      ],
+      "results": {
+        "no-skill": {
+          "passed": 0,
+          "total": 4
+        },
+        "released-skill": {
+          "passed": 2,
+          "total": 4
+        },
+        "candidate-skill": {
+          "passed": 4,
+          "total": 4
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "closed-mission-projection",
+      "assertions": [
+        "Projects the case ledger from the manifest",
+        "Records the case and delivery state in both contract and manifest",
+        "Produces one close-cycle receipt with handoff, case, git, and promotion state",
+        "Generates reviewed SkillKit outcome annotations without inventing missing proof"
+      ],
+      "results": {
+        "no-skill": {
+          "passed": 0,
+          "total": 4
+        },
+        "released-skill": {
+          "passed": 1,
+          "total": 4
+        },
+        "candidate-skill": {
+          "passed": 4,
+          "total": 4
+        }
+      }
+    }
+  ],
+  "result": "pass",
+  "summary": "Static contract evaluation across two transfer scenarios shows the candidate preserves the released evidence boundaries while adding manifest-first resume, close-cycle projection, and reviewed outcome annotation. Candidate passed 8 of 8 assertions, released skill passed 3 of 8, and no-skill passed 0 of 8.",
+  "limitations": [
+    "This is a deterministic instruction-contract comparison, not an agent-output benchmark.",
+    "Prospective cycle-time and external-finding outcomes remain to be measured on real work-item manifests."
+  ]
+}

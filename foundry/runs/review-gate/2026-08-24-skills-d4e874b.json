@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-24",
+    "repo": "Railly/skills",
+    "base": "c4acad8cfc9b2a5a5c43f86e05abf57e86a4ce3a",
+    "head": "d4e874b66bff1b5431925fe427c4d7ed339d2f9d",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "not provided",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No Issue Contract or separate Spec review was provided; the shaping and breadboarding artifacts define the accepted website scope."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["durable browser theme preference in localStorage"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-24-skills-d4e874b-browser-corpus.txt",
+      "evidence": "A real Chromium corpus independently exercised URL and event transitions, keyboard input, localStorage persistence, storage denial, empty state, reset, and the exact-head static artifact."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "not provided",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "No Issue Contract was supplied."
+    },
+    {
+      "source": "design",
+      "location": "www/docs/skills-landing-shaping.md, www/docs/skills-landing-breadboard.md, www/docs/skills-landing-frame.md, www/docs/skills-landing-slices.md, and www/docs/skills-landing-big-picture.md",
+      "status": "reviewed",
+      "properties": ["registry-projection", "url-filter-state", "accessible-responsive-surface", "claim-parity"],
+      "evidence": "The design artifacts define an evidence ledger, a registry-derived catalog, URL-backed discovery, Railly identity, and a responsive static Astro implementation."
+    },
+    {
+      "source": "user_facing",
+      "location": "www/src/components, www/src/pages, and www/src/layouts/Layout.astro",
+      "status": "reviewed",
+      "properties": ["registry-projection", "url-filter-state", "accessible-responsive-surface", "claim-parity"],
+      "evidence": "Headlines, evidence summaries, catalog metadata, source links, decision links, install commands, release labels, filters, and accessibility labels were inspected in the built page."
+    },
+    {
+      "source": "implementation",
+      "location": "c4acad8..d4e874b",
+      "status": "reviewed",
+      "properties": ["registry-projection", "url-filter-state", "accessible-responsive-surface", "claim-parity"],
+      "evidence": "The exact diff, static build, Astro diagnostics, Biome output, repository validators, browser interactions, responsive screenshots, reduced-motion behavior, and axe results were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "registry-projection",
+      "claim": "The built catalog faithfully projects all skills, channels, maturity values, types, summaries, decisions, and release metadata from foundry/maturity.json.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "registry records and their rendered catalog representation",
+        "layer": "built static artifact",
+        "method": "direct registry inspection plus browser and generated HTML inspection",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Astro build exits zero",
+        "counterexample": "A build can pass while a hardcoded card count, channel count, or release label is stale.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The registry contains 16 skills split into 4 stable, 2 candidate, and 10 experimental entries at release 0.0.5; the built and browser-driven catalog exposes the same values from the imported registry."
+      },
+      "substrates": [
+        {
+          "name": "Astro static HTML and browser DOM",
+          "status": "exercised",
+          "evidence": "bun run build produced /index.html and /og.svg, and the browser rendered all 16 catalog entries."
+        }
+      ],
+      "evidence": "www/src/data/skills.ts imports foundry/maturity.json at build time and supplies the catalog, channel totals, types, source paths, decision paths, install commands, and release."
+    },
+    {
+      "id": "url-filter-state",
+      "claim": "Search, channel, and type filters update and restore URL state while showing the correct catalog subset.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the query string, pressed controls, visible cards, and live result count",
+        "layer": "browser interaction",
+        "method": "drive query and channel URLs in the built page",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "filter event listeners exist in source",
+        "counterexample": "Listeners can exist while hydration ignores URL state or card visibility and result count diverge.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The browser loaded ?q=review with 4 visible results and ?channel=stable with 4 visible results; controls and result count agreed with the DOM."
+      },
+      "substrates": [
+        {
+          "name": "Chromium browser history and DOM",
+          "status": "exercised",
+          "evidence": "Search and channel deep links were loaded and verified, and the implementation handles replaceState and popstate."
+        }
+      ],
+      "evidence": "Valid deep links restore filter state and produce the expected visible-card count."
+    },
+    {
+      "id": "accessible-responsive-surface",
+      "claim": "The static site remains usable across desktop, mobile, light and dark themes, keyboard focus, and reduced-motion preferences.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "rendered layout, keyboard-visible controls, semantic accessibility tree, copy feedback, and computed animation state",
+        "layer": "browser and accessibility substrate",
+        "method": "desktop and mobile browser runs, axe scan, copy interaction, theme switch, and reduced-motion emulation",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "responsive and reduced-motion CSS rules are present",
+        "counterexample": "Rules can parse while content overflows, controls become unusable, axe reports violations, or animation remains active.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Desktop and 390px mobile screenshots were inspected in dark and light modes, axe reported 0 violations, copy feedback changed to Copied with a live toast, and reduced-motion computed workflow animation as none."
+      },
+      "substrates": [
+        {
+          "name": "desktop Chromium",
+          "status": "exercised",
+          "evidence": "/tmp/railly-skills-qa/desktop.png and interactive browser checks."
+        },
+        {
+          "name": "390px mobile Chromium emulation",
+          "status": "exercised",
+          "evidence": "/tmp/railly-skills-qa/mobile-prod.png and /tmp/railly-skills-qa/mobile-light.png."
+        },
+        {
+          "name": "reduced-motion and accessibility emulation",
+          "status": "exercised",
+          "evidence": "Workflow animation computed to none under prefers-reduced-motion and axe found 0 violations."
+        }
+      ],
+      "evidence": "The user-facing site was driven across the supported visual, input, and motion states."
+    },
+    {
+      "id": "claim-parity",
+      "claim": "Install, source, decision, release, channel, and evidence claims shown by the site agree with repository truth.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "rendered claims compared directly with repository paths and maturity records",
+        "layer": "repository and built website boundary",
+        "method": "compare data projection and generated links with foundry/maturity.json and the repository tree",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "all rendered links have plausible URL syntax",
+        "counterexample": "A syntactically valid GitHub URL or install command can name the wrong channel path, decision, skill, or release.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Stable entries resolve under skills/<name>, candidate and experimental entries under skills/.experimental/<name>, decision URLs use each registry decision field, and release 0.0.5 comes from the registry."
+      },
+      "substrates": [
+        {
+          "name": "Railly/skills repository tree and generated site",
+          "status": "exercised",
+          "evidence": "All 16 skills passed repository validation and the generated catalog uses the same registry records."
+        }
+      ],
+      "evidence": "No independent hardcoded inventory exists in the website; repository validation and direct path inspection passed."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["browser keydown event translation", "URL-backed filter state", "durable theme preference"],
+    "dimensions": {
+      "values": [
+        "prior URL: empty, q=review, channel=stable, q=no-match",
+        "event: initial load, slash keydown, search input, clear click, theme click, reload",
+        "storage: available with no value, available with light value, denied on set and remove",
+        "expected post-state: URL, focused control, pressed channel, visible-card count, empty state, theme dataset, theme label"
+      ],
+      "exclusions": ["Clipboard permission denial is outside the event-translation trigger and is covered separately by direct browser error-path forcing."],
+      "evidence": "The browser corpus records each pre-state, producer event, visible output, and post-state against the exact built artifact."
+    },
+    "oracle": {
+      "source": "Browser URL, DOM, focus, Storage API, and accessibility state observed independently from implementation helpers",
+      "independent": true,
+      "evidence": "Expected values come from the product contract and registry counts: review maps to four named cards, stable maps to four named cards, no-match maps to zero plus visible empty state, clear maps to all 16, and theme clicks cycle System, Light, Dark, System."
+    },
+    "producer": {
+      "name": "Chromium navigation, keyboard, click, input, history, and Storage APIs",
+      "status": "exercised",
+      "evidence": "agent-browser drove real page loads, slash keydown, input, clear and theme button clicks, reloads, and Storage.prototype failure injection."
+    },
+    "falsification": [
+      {
+        "mutation": "Replace hydrateFilters() final applyFilters() call with updateUrl(), leaving parsed URL values but skipping card visibility and count synchronization.",
+        "red_evidence": "After rebuilding the mutant, Chromium loaded ?q=review with the input set to review but count 16 and 16 visible cards instead of four.",
+        "restored_green_evidence": "After restoring applyFilters() and rebuilding, a fresh Chromium session loaded ?q=review with count 4 and four visible cards."
+      }
+    ],
+    "evidence": "The real browser producer covered the modeled transitions, the hydration mutant failed at the intended user-visible assertion, the restored artifact passed, and storage denial surfaced and drove the exact-head fix."
+  },
+  "assumptions": [
+    {
+      "id": "build-time-registry",
+      "source": "www/docs/skills-landing-shaping.md",
+      "claim": "A build-time registry snapshot is preferable to a runtime GitHub dependency for this landing.",
+      "status": "verified",
+      "evidence": "The static build imports foundry/maturity.json, emits the current 16-skill release, and requires no runtime network call."
+    },
+    {
+      "id": "channel-evidence-separation",
+      "source": "foundry governance and website design",
+      "claim": "Distribution channel and evidence maturity remain separate concepts.",
+      "status": "verified",
+      "evidence": "The catalog renders and explains channel and maturity independently from distinct registry fields."
+    },
+    {
+      "id": "astro-root-isolation",
+      "source": "www/docs/skills-landing-shaping.md",
+      "claim": "Keeping the Astro app under www avoids changing skill distribution behavior.",
+      "status": "verified",
+      "evidence": "All existing repository validators and 19 tests pass, while CI adds isolated install, check, and build steps under www."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The only durable effect is the user's theme preference in origin-scoped localStorage. URL history replacement, clipboard writes on explicit copy, and DOM state are session or user-mediated browser effects rather than server state.",
+    "commit_points": [
+      {
+        "id": "theme-preference",
+        "effect": "Persist or clear the origin-scoped railly-skills-theme preference.",
+        "owner": "browser Storage API",
+        "commit_event": "localStorage.setItem or localStorage.removeItem returns successfully",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, lookup source, or existing semantic data source was replaced."},
+    {"name":"New-domain matrix","status":"skipped","reason":"No existing trigger condition or validator domain was widened."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Traced channel-specific source paths, decision paths, install commands, release, counts, cards, and OG output back to one registry projection."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell command construction or append behavior runs in the product."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No cross-process notification or one-shot latch was introduced."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No shim was introduced."},
+    {"name":"Deliberate-default check","status":"run","reason":"Invalid or absent URL filters deliberately fall back to all entries while theme defaults to system preference."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Inspected registry-to-build, build-to-browser, URL-to-filter, clipboard feedback, CI, and future Vercel root seams."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No guard has failed review twice on the same input class."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"No protocol or algorithm has an applicable normative reference implementation."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No callable production contract gained a new failure outcome."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No user-facing CLI flag was added."},
+    {"name":"Error-path forcing","status":"run","reason":"Exercised empty filter results, clipboard failure feedback, and denied localStorage writes at the browser boundary; storage denial exposed and then verified the theme-label fix."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action or durable state was added."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No asynchronous request, cancellation, polling, or product timeout was added."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced maturity JSON through Astro data projection, components, static output, browser interaction, and CI build."},
+    {"name":"Substrate verification","status":"run","reason":"Verified the DOM, screenshots, accessibility scan, clipboard feedback, URL state, and computed reduced-motion animation instead of relying on source claims."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Built the Astro artifact and drove search, channel filtering, copy, theme, mobile layout, and reduced-motion behavior in a real browser."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"Verified that registry-derived inventory and channel-to-path rules are owned by www/src/data/skills.ts and not duplicated across cards."},
+    {"name":"Docs-behavior parity","status":"run","reason":"The shaping and breadboarding claims agree with the built catalog, browser behavior, responsive layout, and repository registry."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No behavior demonstration example was added to product documentation."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists for this change."},
+    {"name":"Complexity budget","status":"run","reason":"Filtering is one linear pass over 16 cards per interaction with constant-time field comparisons; no nested per-card scan or remote query exists."}
+  ],
+  "deterministic": [
+    {"check":"bun scripts/validate-skills.mjs","outcome":"pass","reason":"All 16 skills are valid."},
+    {"check":"bun scripts/validate-issue-contracts.mjs","outcome":"pass","reason":"All 5 Issue Contracts are valid."},
+    {"check":"bun test scripts/lib/*.test.mjs","outcome":"pass","reason":"All 19 tests passed."},
+    {"check":"bun scripts/verify-eval-fixtures.mjs","outcome":"pass","reason":"All 5 executable fixtures passed."},
+    {"check":"clean bun install --frozen-lockfile","outcome":"finding-fixed","reason":"GitHub Actions exposed corporate registry URLs embedded by the Vercel laptop; exact HEAD uses registry.npmjs.org and installs 272 packages from an empty node_modules directory."},
+    {"check":"bun run check","outcome":"pass","reason":"Astro reported 0 errors, warnings, and hints; Biome reported no findings."},
+    {"check":"bun run build","outcome":"pass","reason":"The static /index.html and /og.svg routes built successfully."},
+    {"check":"git diff --check","outcome":"pass","reason":"No whitespace errors."},
+    {"check":"gate.sh style","outcome":"pass","reason":"No prohibited punctuation in added lines."},
+    {"check":"gate.sh surfaces","outcome":"pass","reason":"The existing distribution surface map remains satisfied."},
+    {"check":"test-strength browser mutation","outcome":"finding-fixed","reason":"A broken hydration mutant produced 16 instead of 4 review results, then restored green; storage-denial forcing exposed a theme-label mismatch fixed in ed9658e."},
+    {"check":"gate.sh covered","outcome":"pass","reason":"This report covers exact HEAD d4e874b."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"The map found 14 changed symbols and no impacted symbols, but 42 unresolved calls against 19 edges means it under-covers Astro; browser and build evidence remain authoritative."}
+  ],
+  "findings": [
+    {
+      "id": "theme-storage-denial",
+      "state": "confirmed",
+      "claim": "When localStorage rejects a theme write, the document theme changed but the visible theme label stayed stale because the event handler threw before renderTheme().",
+      "evidence": "Chromium with Storage.prototype.setItem forced to throw moved data-theme from light to dark while the label remained Light. Exact HEAD wraps storage writes and now cycles label and dataset through Light, Dark, and System under denied storage.",
+      "layer": "browser theme interaction and durable preference boundary",
+      "source": "lens",
+      "path": "www/src/components/SiteHeader.astro",
+      "resolution": "fixed"
+    },
+    {
+      "id": "private-registry-lockfile",
+      "state": "confirmed",
+      "claim": "The committed Bun lockfile embedded the Vercel laptop's authenticated corporate npm registry and could not install in GitHub Actions.",
+      "evidence": "Actions run 32784617256 returned 401 for registry.k8s.vercel-security.com. Exact HEAD contains no corporate registry URLs and a clean frozen install from registry.npmjs.org installed 272 packages before check and build passed.",
+      "layer": "CI dependency installation boundary",
+      "source": "gate",
+      "path": "www/bun.lock",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {"claim":"No Issue Contract or separate Spec review was required.","evidence":"The user-approved shaping and breadboarding artifacts define a static landing with no application protocol or sensitive behavior."},
+    {"claim":"No cross-family reviewer was used.","evidence":"The conservative high-risk classification comes only from origin-scoped theme persistence; an independent real-browser substrate corpus supplied the required challenge instead."},
+    {"claim":"Radius reports no propagated impact.","evidence":"The map is explicitly treated as under-covering because 42 unresolved calls exceed its 19 resolved edges; the pass rests on direct build and browser evidence."}
+  ],
+  "issue_candidates": []
+}

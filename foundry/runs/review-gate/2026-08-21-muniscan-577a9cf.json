@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "crafter-research/muniscan",
+    "base": "origin/main",
+    "head": "577a9cfb02b39a579dafe925bfa51d6e61ffe1b8",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "04_Projects/_shaping/crafter-public-systems-observatory/slices.md#V8",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "100 rows split 20 per ranking band",
+      "one sequential bounded GET per row",
+      "result excluded from score and interpreted as a point observation"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5-codex",
+    "reviewer_model": "gpt-5-codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["remote HTTP observations", "durable generated dataset"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-21-muniscan-577a9cf-corpus.txt",
+      "evidence": "An independently reconstructed oracle over the published snapshot matched all 100 production rows, and Bun HTTP producers exercised the runtime boundary."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Observatory V8 slice",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "V8 requires a bounded 100-site observation attached to a scored snapshot without creating another score."
+    },
+    {
+      "source": "design",
+      "location": "cases/muniscan/conventions.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The surface map and subsystem invariants define stratification, one domain per municipality, sequential observation and claim limits."
+    },
+    {
+      "source": "user_facing",
+      "location": "HEALTH-SAMPLE.md, METHOD.md, LIMITATIONS.md, README.md and CLI help",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "All public surfaces state the frame, request behavior, excluded interpretations and recurring workflow."
+    },
+    {
+      "source": "implementation",
+      "location": "src/sample.ts, src/cli.ts and monthly-scan.yml",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The selector, HTTP adapter, output serializer and workflow wiring were reviewed end to end."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "A scored snapshot yields exactly 100 deterministic rows, 20 evenly spread within each of five ranking bands and at most one selected domain per municipality row.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the exact selected slug and domain sequence",
+        "layer": "published snapshot sampling boundary",
+        "method": "reconstruct band boundaries and positions independently from selectHealthSample and compare every row",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the output has 100 rows and 20 quintile labels each",
+        "counterexample": "taking the first 20 rows of every band satisfies both counts but is not evenly spread",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The first-N mutation kept the counts but failed the band-end assertion with expected rank 40 and received 20."
+      },
+      "substrates": [
+        {
+          "name": "published data/2026-08-08/index.json",
+          "status": "exercised",
+          "evidence": "The independent oracle matched all 100 production rows with zero mismatches across 1,794 municipalities and 381 eligible rows."
+        }
+      ],
+      "evidence": "The real snapshot produces 100 unique municipalities, 100 unique domains and 20 rows per band."
+    },
+    {
+      "id": "P2",
+      "claim": "Each target receives one sequential GET with redirects and a 15-second timeout; bodies are not retained and request failures become bounded observation rows.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "runtime request concurrency, redirect result, retained fields and error result",
+        "layer": "Bun HTTP producer and fetch boundary",
+        "method": "drive observeTarget and observeSample against real Bun servers for redirect, delay and closed-port cases",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the implementation uses await inside a loop",
+        "counterexample": "a helper could start requests before returning promises or retain bodies after the awaited fetch",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The delayed server observed maximum concurrency one; the redirected response exposed no body field; a closed server returned an error row."
+      },
+      "substrates": [
+        {
+          "name": "Bun.serve plus runtime fetch",
+          "status": "exercised",
+          "evidence": "302 to 204 redirect, closed connection and three delayed routes were driven through the production adapter."
+        }
+      ],
+      "evidence": "HTTP boundary tests pass repeatedly and progress is emitted after each completed row."
+    },
+    {
+      "id": "P3",
+      "claim": "The output is a point observation outside the municipality score and does not claim ownership, uptime, quality, accessibility, security or compliance.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "dataflow into score and the literal interpretation fields on every public surface",
+        "layer": "score boundary and public claim contract",
+        "method": "trace score and diff consumers and sweep docs, CLI help and serialized interpretation text",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "health-sample.json is a separate filename",
+        "counterexample": "a separate file could still feed ranking code or claim that reachability is uptime",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "No score or diff caller reads the file, and the serialized interpretation plus method docs explicitly exclude those claims."
+      },
+      "substrates": [
+        {
+          "name": "Muniscan source and public documentation surfaces",
+          "status": "exercised",
+          "evidence": "Call-site and sibling sweeps passed; the health step runs after score and before data PR creation."
+        }
+      ],
+      "evidence": "The initial ownership wording was corrected to hostname classification before the exact-head review."
+    },
+    {
+      "id": "P4",
+      "claim": "The monthly pipeline creates the observation only after a complete scored snapshot and includes it in the same reviewable data pull request.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "workflow step ordering and create-pull-request add path",
+        "layer": "GitHub Actions workflow contract",
+        "method": "inspect the exact workflow sequence: scan, score, diff, health sample, then data pull request",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the workflow mentions health-sample",
+        "counterexample": "the step could run before score, outside the PR add path or after the job timeout budget",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The step is after score and diff, data is the PR add path, and the timeout budget was increased from 300 to 325 minutes."
+      },
+      "substrates": [
+        {
+          "name": ".github/workflows/monthly-scan.yml",
+          "status": "exercised",
+          "evidence": "The exact source orders all five stages and scopes PR publication to data. Runtime publication remains a separate V8 completion gate."
+        }
+      ],
+      "evidence": "A health failure prevents PR creation and falls into the existing partial-artifact and issue path."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["HTTP adapter", "deterministic sampling protocol"],
+    "dimensions": {
+      "values": [
+        "eligible or ineligible municipality",
+        "five ranking bands",
+        "ordered, reversed or tied input",
+        "one or multiple classified domains",
+        "sufficient or insufficient eligible population",
+        "redirected HTTP response or connection failure",
+        "single target or delayed multi-target sequence"
+      ],
+      "exclusions": [
+        "live 100-domain publication is a post-merge completion gate and is not represented as review evidence"
+      ],
+      "evidence": "Tests cover counts, band endpoints, determinism, lexical domain choice, invalid size, insufficient population, redirect, failure and sequentiality."
+    },
+    "oracle": {
+      "source": "independent rank-position reconstruction over the published snapshot and Bun HTTP runtime semantics",
+      "independent": true,
+      "evidence": "The selection oracle does not call the production selector and the HTTP tests use real runtime producers instead of mocked fetch objects."
+    },
+    "producer": {
+      "name": "published index.json and Bun.serve",
+      "status": "exercised",
+      "evidence": "The production selector consumed the full published snapshot and the HTTP adapter consumed real redirect, closed-port and delayed responses."
+    },
+    "falsification": [
+      {
+        "mutation": "replace even spacing with the first N rows of every band",
+        "red_evidence": "the band endpoint test expected rank 40 and received 20",
+        "restored_green_evidence": "all eight sampler tests passed after snapshot restoration"
+      },
+      {
+        "mutation": "remove ranking and slug sorting so input order controls the sample",
+        "red_evidence": "the reversed-input equality assertion failed at the intended row sequence",
+        "restored_green_evidence": "all eight sampler tests passed after snapshot restoration"
+      }
+    ],
+    "evidence": "Focused tests repeated 20 times: 160 pass, 0 fail, 780 assertions."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "design",
+      "claim": "Published ranking is the stratification axis for this first observation.",
+      "status": "verified",
+      "evidence": "Every published row has a dense ranking assigned by score, and the method explicitly names that axis without calling it representative of all municipal websites."
+    },
+    {
+      "id": "A2",
+      "source": "subsystem model",
+      "claim": "sistemas_propios is a hostname classification rather than verified ownership.",
+      "status": "verified",
+      "evidence": "score.ts derives the field from slug/domain matching; all new public claims were corrected to classification language."
+    },
+    {
+      "id": "A3",
+      "source": "implementation",
+      "claim": "A worst-case 100 by 15-second observation needs up to 25 additional workflow minutes.",
+      "status": "verified",
+      "evidence": "The requests are sequential and bounded at 15,000 ms, so the workflow timeout was increased by exactly 25 minutes."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The command makes externally observable GET requests and writes health-sample.json after all observations finish.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "write data/YYYY-MM-DD/health-sample.json",
+        "owner": "src/cli.ts healthSample",
+        "commit_event": "writeJson returns after serializing all 100 rows",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher or parser data source was replaced."},
+    {"name": "New-domain matrix", "status": "run", "reason": "The new sampling and HTTP domains were enumerated across ranking, eligibility, domain count and network outcomes."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "The ranking and sistemas_propios sources were traced from score through sample serialization."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell construction changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process channel or latch changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim or global mock is used."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Lexical-first domain, HTTPS, five bands and one GET are explicit method defaults."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Reviewed score to selection to HTTP to serialization to workflow publication seams."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Independent reconstruction matched all production rows on the published snapshot."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No normative reference implementation exists for this new method."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "A request failure becomes an observation row; only precondition and sample construction failures abort."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag or config bit was added."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Forced insufficient population, invalid size, missing snapshot and closed connection paths."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "The GET observer does not mutate remote state and output is regenerated from the scored snapshot."},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "Each fetch uses AbortSignal.timeout and response bodies are cancelled before returning."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced index.json through selection and HTTP observation into health-sample.json and the data PR."},
+    {"name": "Substrate verification", "status": "run", "reason": "Used a published snapshot and real Bun HTTP servers."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Drove the production selector on the full published snapshot and the CLI missing-snapshot error."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "HEALTH-SAMPLE.md owns interpretation and sample.ts owns deterministic selection."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "README, method, limitations, CLI help, serialized text and workflow behavior align."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No demonstrative example was added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "Selection sorts the eligible census once; HTTP cost is intentionally 100 sequential bounded requests."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "This report records exact head 577a9cfb02b39a579dafe925bfa51d6e61ffe1b8."},
+    {"check": "style", "outcome": "pass", "reason": "gate.sh style passed after replacing the added em dash."},
+    {"check": "surfaces", "outcome": "pass", "reason": "Every required code, test, documentation and workflow surface is in the diff."},
+    {"check": "stale", "outcome": "pass", "reason": "No contract value was renamed or retired."},
+    {"check": "siblings", "outcome": "pass", "reason": "Every file mentioning health-sample is in the diff with no untouched stale passage."},
+    {"check": "callers", "outcome": "pass", "reason": "Every observeSample call site is in the diff."},
+    {"check": "timings", "outcome": "acknowledged", "reason": "The 15-second request bound adds 25 worst-case minutes; the job timeout was increased from 300 to 325 minutes."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered."},
+    {"check": "artifacts", "outcome": "acknowledged", "reason": "health-sample.json is an immutable published data artifact regenerated with its snapshot, not cache or state managed by a cleanup command."},
+    {"check": "rawinput", "outcome": "pass", "reason": "Not triggered."},
+    {"check": "flagsweep", "outcome": "pass", "reason": "Not triggered."},
+    {"check": "execdeps", "outcome": "pass", "reason": "Not triggered."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "Map saved with 351 unresolved calls against 149 edges, so it under-covers and was orientation only."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Initial wording described sistemas_propios as declared ownership even though it is a hostname classification.",
+      "evidence": "score.ts derives sistemas_propios heuristically; HEALTH-SAMPLE.md, LIMITATIONS.md, README, CLI help and serialized text now say classified and deny verified ownership.",
+      "layer": "public claim contract",
+      "source": "lens",
+      "path": "score.belongsTo to sample docs",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The original workflow kept a 300-minute job ceiling despite adding up to 25 minutes of sequential HTTP time.",
+      "evidence": "100 requests times the 15-second bound equals 1,500 seconds; timeout-minutes is now 325.",
+      "layer": "workflow completion budget",
+      "source": "lens",
+      "path": "sample.observeTarget timeout to monthly-scan job timeout",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {"claim": "Score and diff code need no edit.", "evidence": "Neither reads health-sample.json and the workflow creates it after both operations."},
+    {"claim": "No cleanup registration is required.", "evidence": "The output is an immutable published artifact under the dated snapshot, not ephemeral state."},
+    {"claim": "A live 100-domain artifact is deferred from feature review.", "evidence": "V8 remains incomplete until the first real artifact is produced and reviewed after merge."}
+  ],
+  "issue_candidates": []
+}

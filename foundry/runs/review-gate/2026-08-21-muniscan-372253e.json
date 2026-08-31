@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "crafter-research/muniscan",
+    "base": "origin/main",
+    "head": "372253efda03afb00280544e04d599cce28ccf36",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "standalone Muniscan website with a distinct visual identity",
+      "snapshot explorer and evidence boundaries",
+      "responsive browser verification"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5-codex",
+    "reviewer_model": "gpt-5-codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["browser-visible URL history state", "browser event handling"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-21-muniscan-372253e-browser-corpus.txt",
+      "evidence": "The durable corpus records all encoded source slugs plus the real Chromium result href, focus, geometry and accessibility observations."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user request",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The requested surface is a standalone Muniscan site with its own identity, backed by the public snapshot and linked to the Crafter Research log."
+    },
+    {
+      "source": "design",
+      "location": "docs/visual-identity.md and docs/design-tokens.json",
+      "status": "reviewed",
+      "properties": ["P3", "P4"],
+      "evidence": "The atlas identity, responsive layout rules and prohibited interpretations are explicit."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md and src/web/pages/index.astro",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "Counts, dates, links, method boundaries and interpretation limits were checked against the published artifacts."
+    },
+    {
+      "source": "implementation",
+      "location": "astro.config.mjs and src/web",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "Static data imports, initial rendering, client-side filtering, link construction and responsive styles were reviewed and driven."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The website renders the 2026-08-21 snapshot and its summary values without recomputing or mutating the source data.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "rendered counts and values against the source JSON",
+        "layer": "built static artifact",
+        "method": "compare rendered output with index.json, diff.json and health-sample.json",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the page builds successfully",
+        "counterexample": "a successful build could still hard-code stale counts",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The source summaries and built HTML were inspected independently: 1,871 municipalities, median 34, 53 HTTP 2xx rows and the 1,794 to 1,871 comparison agree."
+      },
+      "substrates": [
+        {
+          "name": "Astro static build",
+          "status": "exercised",
+          "evidence": "bun run build produced the route and agent-browser loaded the built preview."
+        }
+      ],
+      "evidence": "The rendered page consumes the versioned 2026-08-21 artifacts directly."
+    },
+    {
+      "id": "P2",
+      "claim": "Search filters the full municipal census safely and preserves already percent-encoded gob.pe slugs in result links.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "visible result count, text and destination href",
+        "layer": "browser DOM after user input",
+        "method": "search for a municipality whose source slug contains percent encoding and inspect the resulting href",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "ordinary ASCII municipality links work",
+        "counterexample": "encodeURIComponent double-encodes source percent sequences while leaving ASCII links apparently correct",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The initial implementation produced a double-encoding risk; after the fix, Ichuña renders exactly https://www.gob.pe/muniichu%C3%B1a."
+      },
+      "substrates": [
+        {
+          "name": "Chromium at local built preview",
+          "status": "exercised",
+          "evidence": "Search for Ichuña returned one row, the expected href and keyboard focus through Meta+K."
+        }
+      ],
+      "evidence": "Dynamic names and slugs pass through HTML escaping; the query is serialized with URLSearchParams."
+    },
+    {
+      "id": "P3",
+      "claim": "The page remains usable at mobile width without document overflow and exposes no confirmed automated accessibility violations.",
+      "kind": "other",
+      "status": "verified",
+      "oracle": {
+        "observes": "document geometry and axe-core violations",
+        "layer": "browser layout and accessibility tree",
+        "method": "drive a 390 by 844 Chromium viewport, compare scrollWidth with clientWidth and run agent-browser a11y",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CSS contains media queries",
+        "counterexample": "a wide table or grid can still widen the document despite responsive rules",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "At 390 px, scrollWidth and clientWidth were both 390; the table owns its local horizontal scroll."
+      },
+      "substrates": [
+        {
+          "name": "Chromium 390 by 844",
+          "status": "exercised",
+          "evidence": "No document overflow; full-page screenshot saved at /tmp/muniscan-gate/mobile-final.png."
+        },
+        {
+          "name": "axe-core 4.12.1",
+          "status": "exercised",
+          "evidence": "0 violations; one inconclusive contrast group on partially obscured table cells was not reported as a violation."
+        }
+      ],
+      "evidence": "Desktop, tablet and mobile checks from the implementation pass were reconfirmed at the narrow boundary after the final fix."
+    },
+    {
+      "id": "P4",
+      "claim": "Public wording treats rankings and HTTP results as bounded observations, not compliance, ownership, quality or uptime claims.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "literal claims and caveats on the public surface",
+        "layer": "user-facing content contract",
+        "method": "sweep the page, README and visual identity for prohibited interpretations and read each occurrence in context",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the page includes one generic limitations note",
+        "counterexample": "a separate metric heading could still call the HTTP sample uptime or the score compliance",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The distribution, explorer, comparison, HTTP and citation sections each carry scope-specific language."
+      },
+      "substrates": [
+        {
+          "name": "built public copy",
+          "status": "exercised",
+          "evidence": "Rendered DOM states hostname classification, one-shot HTTP observation and no causal or legal inference."
+        }
+      ],
+      "evidence": "No score is presented as compliance, quality or uptime."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["browser keyboard event and URL-history translation"],
+    "dimensions": {
+      "values": [
+        "empty query or populated query",
+        "ASCII slug or already percent-encoded slug",
+        "zero, one, under 50 or over 50 matches",
+        "Meta+K or Control+K focus gesture",
+        "query present or absent in URL history"
+      ],
+      "exclusions": [
+        "IME composition is delegated to the native search input and does not have custom translation logic"
+      ],
+      "evidence": "The browser drive covered populated encoded input, result rendering, URL query state and Meta+K focus; source inspection covers the empty and capped branches."
+    },
+    "oracle": {
+      "source": "immutable index.json identifiers and browser DOM state",
+      "independent": true,
+      "evidence": "Expected result names and hrefs come from the source snapshot, independently of the rendering implementation."
+    },
+    "producer": {
+      "name": "Chromium keyboard and input events",
+      "status": "exercised",
+      "evidence": "agent-browser filled the real search input, dispatched Meta+K and observed DOM and URL history output."
+    },
+    "falsification": [
+      {
+        "mutation": "apply encodeURIComponent to an already percent-encoded source slug",
+        "red_evidence": "The independent corpus shows muniichu%C3%B1a becomes muniichu%25C3%25B1a, which no longer equals the published identifier.",
+        "restored_green_evidence": "The restored direct escaped-slug implementation produced https://www.gob.pe/muniichu%C3%B1a in Chromium."
+      }
+    ],
+    "evidence": "The event translation and encoded-identifier path were driven at the real browser boundary."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "design",
+      "claim": "The 2026-08-21 artifacts are immutable published inputs for this release.",
+      "status": "verified",
+      "evidence": "The repository conventions declare published run directories immutable and the web imports that exact directory."
+    },
+    {
+      "id": "A2",
+      "source": "subsystem model",
+      "claim": "gob.pe source slugs may already contain percent-encoded characters.",
+      "status": "verified",
+      "evidence": "Three rows in the published snapshot contain percent sequences; the browser drive covered one."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Search input updates the browser-visible query string through history.replaceState; it creates no server or filesystem state.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "replace the current browser URL query parameter",
+        "owner": "src/web/pages/index.astro render",
+        "commit_event": "window.history.replaceState returns",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser or lookup data source was replaced."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No validator or trigger condition was widened."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Slug handling was traced through static and dynamic link construction; the dynamic double-encoding defect was fixed."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell construction changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process channel or latch exists."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim or global mock exists."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "The first 12 rows, 50-result cap, snapshot date and fixed copy are explicit defaults."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Reviewed JSON import to render, inline JSON to search and search row to outbound link seams."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "This is not a repeatedly failed guard or cross-substrate protocol."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No normative reference implementation exists for the visual surface."},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "No function contract gained a new failure outcome."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag or configuration bit was added."},
+    {"name": "Error-path forcing", "status": "run", "reason": "No-match and encoded-slug search states were exercised in the browser."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "The page has no recovery or destructive flow."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No asynchronous request or timeout was added."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced source snapshot through Astro serialization and the browser search boundary."},
+    {"name": "Substrate verification", "status": "run", "reason": "Observed DOM geometry, hrefs, focus and accessibility in Chromium."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Loaded the Astro preview, searched real data and exercised the keyboard shortcut at mobile width."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Exact-date and interpretation claims are owned by the imported immutable snapshot and explicit copy."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "README, identity guide and browser behavior agree on the site URL, data date and claim boundaries."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No demonstrative code example was added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "Each query scans 1,871 small rows and caps DOM rendering at 50; the bounded dataset makes the linear path appropriate."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "This report records exact head 372253efda03afb00280544e04d599cce28ccf36."},
+    {"check": "style", "outcome": "pass", "reason": "gate.sh style passed."},
+    {"check": "surfaces", "outcome": "pass", "reason": "gate.sh surfaces passed for the registered Muniscan surface map."},
+    {"check": "stale", "outcome": "pass", "reason": "No contract value was retired."},
+    {"check": "siblings", "outcome": "acknowledged", "reason": "HEALTH-SAMPLE.md, LIMITATIONS.md, the immutable sample JSON and CLI mention the project or existing measurement behavior but do not describe the new website surface."},
+    {"check": "callers", "outcome": "pass", "reason": "No function contract changed."},
+    {"check": "timings", "outcome": "pass", "reason": "No timing constant was added."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered."},
+    {"check": "artifacts", "outcome": "pass", "reason": "No persistent state or cache artifact was introduced."},
+    {"check": "rawinput", "outcome": "pass", "reason": "Not triggered."},
+    {"check": "flagsweep", "outcome": "pass", "reason": "Not triggered."},
+    {"check": "execdeps", "outcome": "pass", "reason": "No production external executable was introduced."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "Radius reported no changed symbols for Astro files and 351 unresolved calls, so the map under-covers and was not used as proof."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Dynamic search results double-encoded the three source slugs that already contain percent escapes.",
+      "evidence": "encodeURIComponent would turn %C3%B1 into %25C3%25B1; after the fix, the browser exposes https://www.gob.pe/muniichu%C3%B1a.",
+      "layer": "browser navigation href",
+      "source": "lens",
+      "path": "index.json slug to inline JSON to render to anchor href",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Existing method, limitation, CLI and immutable data surfaces need no website-specific edit.",
+      "evidence": "They describe measurement production and interpretation, while the new site is an additional read-only presentation surface with its own README link."
+    }
+  ],
+  "issue_candidates": []
+}

@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-20",
+    "repo": "crafter-research/website",
+    "base": "origin/main",
+    "head": "d97f34ba64483fe03a8943a6d4a3222dc45ab39a",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "not provided",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5-codex",
+    "reviewer_model": "gpt-5-codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["externally visible HTTP GET requests during build validation"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-20-crafter-research-website-d97f34b-link-corpus.txt",
+      "evidence": "An independently observable corpus exercised sixteen public HTTP targets, and a local HTTP fixture forced a 503 response followed by a successful immediate retry."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user request in the working session",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The request calls for maturity based on activity, consistency, and real output, then presenting that evidence on the website."
+    },
+    {
+      "source": "design",
+      "location": "cases/crafter-research-website/conventions.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The conventions require one factual registry, public evidence, bilingual claims, verification dates, limitations, and fail-closed featured records."
+    },
+    {
+      "source": "user_facing",
+      "location": "src/components/HomePage.astro and src/i18n/home.ts",
+      "status": "reviewed",
+      "properties": ["P1"],
+      "evidence": "The homepage promises five inspectable projects with evidence, status, verification date, and known limitations in English and Spanish."
+    },
+    {
+      "source": "implementation",
+      "location": "src/data/projects.ts, scripts/validate-projects.ts, and package.json",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The implementation centralizes five records and makes the project validator a prerequisite of both check and build."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The built homepage publishes five evidence-backed project records with localized framing, maturity, sources, verification dates, and limitations.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the final static HTML and browser-rendered project cards",
+        "layer": "built user-facing artifact",
+        "method": "build all routes, count project-card elements, inspect project names and claims, and run desktop/mobile EN/ES browser QA",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the source registry contains five entries",
+        "counterexample": "five records can exist while the template omits them or a locale route renders an empty section",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The built EN, ES, PT, and ZH HTML was inspected independently and each contains five project-card elements and all five project names."
+      },
+      "substrates": [
+        {
+          "name": "Astro static output and local browser",
+          "status": "exercised",
+          "evidence": "Sixteen pages built; EN/ES desktop and mobile QA found five cards, no horizontal overflow, no console errors, and zero Axe violations."
+        }
+      ],
+      "evidence": "dist/index.html, dist/es/index.html, dist/pt/index.html, and dist/zh/index.html each contain the expected five cards; placeholder text is absent."
+    },
+    {
+      "id": "P2",
+      "claim": "Featured project claims are checked before the site can build.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the build pipeline executing the project validator before Astro",
+        "layer": "repository build boundary",
+        "method": "run bun run check and bun run build and inspect the script chain and validator output",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the validator passes when run directly",
+        "counterexample": "a standalone validator can pass while the production build never invokes it",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "package.json chains check:projects before both astro check and astro build; both commands logged validation before Astro execution."
+      },
+      "substrates": [
+        {
+          "name": "Bun repository scripts with public URL checks",
+          "status": "exercised",
+          "evidence": "Both check and build validated five records, five featured records, and sixteen public URLs."
+        }
+      ],
+      "evidence": "bun run check and bun run build passed on exact HEAD d97f34b."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": ""},
+    "oracle": {"source": "", "independent": true, "evidence": ""},
+    "producer": {"name": "", "status": "not_applicable", "evidence": ""},
+    "falsification": [],
+    "evidence": "The diff adds a typed static content registry, presentation, and validation script; it does not change a protocol, parser, serializer, state machine, lifecycle, adapter, compatibility layer, or browser/OS event translation."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "subsystem model",
+      "claim": "Project facts have one source used by every homepage locale.",
+      "status": "verified",
+      "evidence": "HomePage.astro imports featuredProjects once; EN and ES select localized fields while PT and ZH explicitly use the English presentation."
+    },
+    {
+      "id": "A2",
+      "source": "implementation",
+      "claim": "Public evidence links are reachable at review time.",
+      "status": "verified",
+      "evidence": "The validator followed redirects and received successful responses for all sixteen unique public URLs."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The static site has no runtime mutation, but build validation sends externally visible HTTP GET requests to each public evidence URL.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "outbound HTTP GET observed by the target server",
+        "owner": "scripts/validate-projects.ts link validator",
+        "commit_event": "the target server accepts the request",
+        "later_fallible_stages": ["HTTP response status evaluation"],
+        "failure_partitions": [
+          {
+            "ownership_region": "remote response and validator",
+            "covers": ["HTTP response status evaluation"],
+            "forced": true,
+            "residual_observed": "The first local fixture request returned 503; no local or remote application state was retained by the validator.",
+            "cleanup_owner": "AbortSignal and fetch lifecycle",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "An immediate second GET to the same fixture returned 200; the fixture observed exactly two requests."
+            },
+            "evidence": "Local Bun HTTP fixture output: {first:503, second:200, attempts:2}."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source was replaced."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No validator was relaxed and no trigger domain was widened."},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No user-input resolution or discovery rule changed."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell construction changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process channel or latch exists in this change."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim changed."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Reviewed explicit EN fallback for PT and ZH and confirmed all locale routes render five cards."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Reviewed registry to template, locale fallback, validator to build, and public URL boundaries; no defect found."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "No guard has repeated failures requiring a differential corpus."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No protocol or reference implementation applies."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Validator failures propagate through check:projects into both check and build; no caller swallows the exit status."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag was introduced."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Reviewed every validation rejection and confirmed errors accumulate, print, and exit nonzero before Astro runs."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action exists."},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "All sixteen link checks completed under the per-request 15 second AbortSignal timeout; no persistent pending state exists."},
+    {"name": "Boundary pipeline trace", "status": "skipped", "reason": "The change does not extend an existing action across frame, process, or protocol boundaries."},
+    {"name": "Substrate verification", "status": "run", "reason": "Verified generated HTML and browser output, not only command success."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Built and inspected the website in desktop/mobile EN/ES plus static output for all four locale routes."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Confirmed the single registry owns project facts and the build script owns the fail-closed validation boundary."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Maturity, evidence, dates, limitations, and locale fallback in the rendered site agree with the registry and validator."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "Registry validation is linear in projects plus unique URLs; rendering is linear in five featured records."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "This report records exact HEAD d97f34ba64483fe03a8943a6d4a3222dc45ab39a."},
+    {"check": "style", "outcome": "pass", "reason": "No prohibited prose punctuation was added."},
+    {"check": "surfaces", "outcome": "pass", "reason": "Every dependent surface in the project conventions is present in the diff."},
+    {"check": "stale", "outcome": "pass", "reason": "Removed empty-note placeholder labels and rendered placeholder text have zero hits in built EN/ES output."},
+    {"check": "siblings", "outcome": "pass", "reason": "Project claims live in the new canonical registry and its mapped homepage, translation, style, and validation surfaces."},
+    {"check": "callers", "outcome": "pass", "reason": "No existing function contract changed."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered; no shell detector changed."},
+    {"check": "artifacts", "outcome": "pass", "reason": "Not triggered; no new persistent runtime artifact is written."},
+    {"check": "rawinput", "outcome": "pass", "reason": "Not triggered; no resolution rule deepened."},
+    {"check": "execdeps", "outcome": "pass", "reason": "Not triggered; no external executable was added."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "The four Biome noImportantStyles warnings do not block this change.",
+      "evidence": "The same reduced-motion declarations and warnings exist on origin/main and intentionally override animation cascade for accessibility."
+    },
+    {
+      "claim": "The empty blog collection warnings do not block this change.",
+      "evidence": "The warning predates the diff, the research collection builds, and all sixteen routes complete successfully."
+    }
+  ],
+  "issue_candidates": []
+}

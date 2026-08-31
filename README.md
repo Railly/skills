@@ -100,6 +100,8 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 ## Workflow
 
+Every active Issue Contract has a schema-v1 manifest sidecar. It carries exact repository identity, authorization, the risk profile and time budget, orchestration degradation, atomic stage receipts, evidence fingerprints, outcomes, and close-cycle state. Each stage reads that manifest first and verifies only fields that may have drifted.
+
 ```mermaid
 flowchart LR
   Select[issue-intake if needed] --> Admit[work-intake]
@@ -175,6 +177,24 @@ ln -s ~/railly-skills/skills/review-gate ~/.claude/skills/review-gate
 
 For Codex, Cursor, and other compatible agents, install or link the same folder under the corresponding project or personal skills directory.
 
+Development installs should be symlinks to the canonical checkout. Diagnose a linked, exact-copy, diverged, or missing install with:
+
+```bash
+bun scripts/skills-doctor.mjs --installed ~/.agents/skills
+```
+
+The doctor also compares each canonical package against the declared Git revision. A linked install backed by uncommitted package changes reports `source=dirty` and fails until the source can be tied to a revision. A stable Review Gate pass records the executing skill revision and refuses an unresolved, diverged, or dirty identity.
+
+Preview a reversible development-link migration, then apply it only from a clean canonical package revision:
+
+```bash
+bun scripts/link-skills.mjs --installed ~/.agents/skills
+bun scripts/link-skills.mjs --installed ~/.agents/skills --apply
+```
+
+Every replaced directory is moved to the printed backup root before its relative symlink is created. The operation preflights every selected package and rolls back links already changed if a later operation fails.
+Pass `--source <repository>` when the migration command is running from a separate tools checkout.
+
 ## Repository structure
 
 ```text
@@ -221,6 +241,15 @@ bun scripts/compile-usage-receipts.mjs /private/path/receipts.json
 
 The compiler copies no transcript, local path, session ID, or private summary. It creates no canonical case and changes no skill automatically.
 
+For a closed work-item manifest, generate reviewed annotations and apply them locally only after inspecting the JSON:
+
+```bash
+bun scripts/work-item.mjs annotations /private/path/work-item.manifest.json --output /private/path/annotations.json
+skillkit receipts --annotate /private/path/annotations.json
+```
+
+Remote annotation is intentionally unsupported. Apply annotations on the machine that owns the SkillKit receipt database.
+
 Read the [product direction](NORTH.md), [foundry overview](foundry), [compiled knowledge](foundry/knowledge), [governance](foundry/governance.md), [source repository policy](foundry/source-of-truth.md), [Issue Contract workflow](foundry/missions), [eval protocol](foundry/eval-protocol.md), and [case template](foundry/case-template.md). Deprecated methods and the archived Unfold protocol remain under [foundry/deprecated](foundry/deprecated).
 
 Public issues and pull requests may become public cases. Confidential evidence stays in an organization-approved private system; only generalized, sanitized lessons cross into this repository.
@@ -234,6 +263,7 @@ bun scripts/validate-knowledge.mjs
 bun scripts/compile-knowledge.mjs --check
 bun scripts/audit-knowledge-matches.mjs --check
 bun scripts/verify-eval-fixtures.mjs
+bunx @crafter/skillkit@0.13.0 audit skills --json --strict
 ```
 
 CI checks frontmatter, progressive disclosure, internal links, maturity metadata, public-case boundaries, Issue Contracts, compiled knowledge, eval metadata, and executable fixtures. Strict knowledge maturity enforcement joins CI after the four unsupported non-experimental skills gain prospective application evidence or their maturity changes.

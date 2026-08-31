@@ -1,0 +1,6 @@
+Independent reference validation
+
+Redocly CLI validated the generated OpenAPI 3.1 document with zero warnings before publication.
+The same document object is returned by the server-rendered /openapi.json route.
+Astro integration tests exercised that route through the HTTP server and asserted its official media type, version, path, and operationId.
+The production-specific adjustment removed prerendering so Vercel preserves application/vnd.oai.openapi+json instead of normalizing it to application/json.

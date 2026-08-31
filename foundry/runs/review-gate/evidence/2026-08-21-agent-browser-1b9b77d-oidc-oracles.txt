@@ -1,0 +1,33 @@
+Independent challenge evidence for vercel-labs/agent-browser commit 1b9b77daa9de6fa8628bb6a4789696a23ef0423c
+
+Normative and independently implemented sources reviewed:
+
+1. Vercel Trusted Sources documentation, updated 2026-07-15
+   https://vercel.com/docs/deployment-protection/methods-to-bypass-deployment-protection/trusted-sources
+   Confirms the x-vercel-trusted-oidc-idp-token header, same-project development to Preview default, explicit environment mappings, dashboard management steps, and Secure Backend Access with OIDC Federation prerequisite.
+
+2. Merged Vercel plugin skill, vercel/vercel-plugin#130
+   Local content fetched from merge commit 1e821f3087d6d52b06b918d39d57345e2e4f3cf8, skills/access-protected-vercel-deployment/SKILL.md.
+   Confirms the header, same-project Preview default, development to production mapping, token confidentiality, and the distinction from x-vercel-oidc-token.
+
+3. Browser-agent protected previews guide
+   /Users/raillyhugo/Downloads/vercel-browser-agent-protected-previews.pdf
+   Nine pages visually checked and text-extracted. It records live verification on agent-browser 0.34.0, including protected HTML, subresources, in-page fetches, same-project self-access, static bypass fallback, and dead ends such as Shareable Links and Deployment Protection Exceptions.
+
+4. Merged v0 implementation, vercel/v0#26430
+   Confirms VERCEL_OIDC_TOKEN with x-vercel-trusted-oidc-idp-token for development to Preview agent-browser access and static-secret fallback behavior.
+
+5. Vercel CLI 59.1.4 source and help
+   vercel project token mints a development OIDC token through POST /projects/:projectId/token. vercel project protection supports SSO, password, skew, Git fork protection, and automation bypass management, but does not expose Trusted Sources rule management. Public documentation describes dashboard-only Trusted Sources management; no public REST endpoint was found.
+
+Independent substrate checks:
+
+- A stubbed shell execution proved the documented vc project token flow delivers the exact JWT value as valid JSON in x-vercel-trusted-oidc-idp-token.
+- The same check proved the flow emits no token output and the TOKEN variable ends with the subshell.
+- agent-browser skills list and skills get protected-vercel-deployments exposed the bundled skill from the built CLI.
+
+Style exemption:
+
+- Review Gate's generic style detector flags the added em dash.
+- The repository AGENTS.md permits an em dash sparingly, and every neighboring Available Skills entry uses the same em dash separator.
+- Hunter explicitly directed that this repository style is correct. The finding is acknowledged as a detector conflict, not silently skipped.

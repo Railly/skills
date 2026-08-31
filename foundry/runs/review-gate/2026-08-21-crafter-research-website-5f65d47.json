@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "crafter-research/website",
+    "base": "077fe643572e04f751ed439a95e9309c43010598",
+    "head": "5f65d47dcde85f707fb932324e20205593178617",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "not provided",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5-codex",
+    "reviewer_model": "gpt-5-codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["externally visible HTTP GET requests during build validation"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-21-crafter-research-website-5f65d47-muniscan.txt",
+      "evidence": "The exact-head validator exercised 43 public HTTP targets, and a local HTTP fixture forced a 503 response followed by a successful immediate retry with no residual application state."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user request in the working session",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The request authorized an integrated Muniscan public surface, creative responsive UI, and full PR delivery."
+    },
+    {
+      "source": "design",
+      "location": "cases/crafter-research-website/conventions.md and Muniscan METHOD.md/LIMITATIONS.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The design requires localized static routes, greca-safe gutters, inspectable evidence, and explicit claim boundaries."
+    },
+    {
+      "source": "user_facing",
+      "location": "src/components/MuniscanPage.astro",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The page exposes latest measurement, distribution, pipeline, recurrence, bounded HTTP observation, downloads, limitations, and correction route."
+    },
+    {
+      "source": "implementation",
+      "location": "Muniscan component, localized routes, navigation, project registries, validator, and package scripts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The implementation is static Astro output with localized internal links and repository-native validation."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The public page reports the 2026-08-21 Muniscan snapshot accurately and keeps interpretation limits adjacent to the results.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "rendered claims against immutable source JSON and method documents",
+        "layer": "public evidence and built user-facing artifact",
+        "method": "query source artifacts directly, inspect every numeric and methodological claim, then inspect rendered EN and ES pages",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the page builds successfully",
+        "counterexample": "valid Astro can render stale numbers or overclaim an HTTP point observation as uptime",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Every number was independently queried from entities.json, index.json, diff.json, and health-sample.json; claim-boundary searches and visual inspection confirmed the limitations remain visible."
+      },
+      "substrates": [
+        {
+          "name": "Muniscan published data and browser-rendered page",
+          "status": "exercised",
+          "evidence": "The source-data oracle and browser screenshots are recorded in the evidence artifact."
+        }
+      ],
+      "evidence": "The page matches 3,474 enriched entities, 1,871 scored municipalities, 409 restored municipalities, median 34, the complete diff, and the bounded 100-domain HTTP sample."
+    },
+    {
+      "id": "P2",
+      "claim": "The measurement UI remains legible, responsive, greca-safe, and structurally accessible across supported themes and widths.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "actual browser layout, scroll geometry, accessibility tree, and Axe output",
+        "layer": "browser rendering boundary",
+        "method": "drive light and dark pages at 1440, 768, and 390 pixels; inspect full page and each subsection; run Axe",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CSS media queries exist",
+        "counterexample": "media queries can compile while cards overflow, collide with side patterns, or produce invalid definition-list structure",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Real viewport geometry showed scrollWidth equal to innerWidth in all six cases; two initial Axe issues and metric-index collisions were fixed before the final zero-violation run."
+      },
+      "substrates": [
+        {
+          "name": "Chromium at 1440x1000, 768x900, and 390x844 in light and dark",
+          "status": "exercised",
+          "evidence": "Six final screenshots and overflow probes are recorded under /tmp/muniscan-qa and summarized in the evidence artifact."
+        }
+      ],
+      "evidence": "No page overflow, no console errors, no Axe violations, and visible horizontal clearance from the grecas at desktop and tablet widths."
+    },
+    {
+      "id": "P3",
+      "claim": "Muniscan is reachable through localized site surfaces and all routes and evidence links survive the production build.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "generated static routes and browser navigation hrefs",
+        "layer": "site routing and build boundary",
+        "method": "build every locale, inspect sitemap route generation, and query Home, Projects, Header, and Footer links in the browser",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "route source files exist",
+        "counterexample": "route files can exist while internal cards open the wrong locale, validators reject the unpublished canonical URL, or the route is absent from the static build",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The build emitted /muniscan plus ES/PT/ZH variants, the Spanish surfaces point to /es/muniscan without a new tab, and all six public evidence links returned 200."
+      },
+      "substrates": [
+        {
+          "name": "Astro static output, validator, and local browser navigation",
+          "status": "exercised",
+          "evidence": "The final build emitted 32 pages and the link validator passed 43 unique public URLs."
+        }
+      ],
+      "evidence": "Localized route generation, internal navigation, external evidence links, and final build all pass."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": ""},
+    "oracle": {"source": "", "independent": true, "evidence": ""},
+    "producer": {"name": "", "status": "not_applicable", "evidence": ""},
+    "falsification": [],
+    "evidence": "The diff adds static presentation and localized routing. It does not change a protocol, parser, serializer, state machine, lifecycle, browser or OS event translation, adapter, or compatibility layer."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "product shape",
+      "claim": "An integrated /muniscan page is sufficient before a separate Muniscan application is justified.",
+      "status": "verified",
+      "evidence": "The page exposes the proof link, raw downloads, method, limitations, recurrence, and correction route without requiring duplicated hosting or a new brand surface."
+    },
+    {
+      "id": "A2",
+      "source": "implementation",
+      "claim": "Relative project links preserve the active locale while external links remain externally validated.",
+      "status": "verified",
+      "evidence": "Browser QA observed /es/muniscan from Spanish Home and Projects without target=_blank, while repository links retain target=_blank and the validator checked only HTTP URLs."
+    },
+    {
+      "id": "A3",
+      "source": "claim model",
+      "claim": "The recurrent run supports one recurrence claim but not a stable monthly operating-history claim.",
+      "status": "verified",
+      "evidence": "Two scored snapshots and one validated diff are public; both EN and ES copy state the narrower claim explicitly."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The production page is static, but build validation sends externally visible HTTP GET requests to public evidence URLs.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "outbound HTTP GET observed by the target server",
+        "owner": "scripts/validate-projects.ts link validator",
+        "commit_event": "the target server accepts the request",
+        "later_fallible_stages": ["HTTP response status evaluation"],
+        "failure_partitions": [
+          {
+            "ownership_region": "remote response and validator",
+            "covers": ["HTTP response status evaluation"],
+            "forced": true,
+            "residual_observed": "The first local fixture request returned 503; the validator retained no local application state.",
+            "cleanup_owner": "AbortSignal and fetch lifecycle",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "An immediate second GET returned 200 and the fixture observed exactly two requests."
+            },
+            "evidence": "Local Bun HTTP fixture output: {first:503, second:200, attempts:2}."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source was replaced."},
+    {"name": "New-domain matrix", "status": "run", "reason": "Internal relative links are now accepted while only absolute HTTP links enter remote validation; EN and ES internal/external cases were driven."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Home and Projects use the same translated-path rule and were both driven in Spanish."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell construction changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No background process channel or latch exists."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No test shim changed."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "English is canonical, Spanish is native, and PT/ZH intentionally reuse English content with existing localized navigation behavior."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Reviewed route, locale, navigation, project registries, validator, raw-data links, and build seams."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "No repeated guard failure or substrate-modeling detector exists."},
+    {"name": "Reference-implementation oracle", "status": "run", "reason": "Immutable Muniscan JSON and method documents served as the direct reference oracle for public claims."},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "No existing function gained a new failure outcome."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag, mode, or config bit was introduced."},
+    {"name": "Error-path forcing", "status": "run", "reason": "The initial canonical absolute internal link produced a validator 404 and was replaced with localized relative routing; final check and build pass."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action exists."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No timeout or async runtime operation was added."},
+    {"name": "Boundary pipeline trace", "status": "skipped", "reason": "No action was extended across a frame, process, or protocol boundary."},
+    {"name": "Substrate verification", "status": "run", "reason": "Verified rendered DOM, static routes, link attributes, screenshots, geometry, console, Axe, and HTTP link responses."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Drove EN and ES pages, Home and Projects entry points, six viewport/theme cases, and every visual subsection."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Every public measurement claim was traced to the published Muniscan artifact that owns it."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Rendered method, recurrence, HTTP, score, and limitation language agrees with repository evidence and source behavior."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "The page renders fixed-size static collections; there is no per-record nested lookup or client loop."
+    }
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "This report records exact HEAD 5f65d47dcde85f707fb932324e20205593178617."},
+    {"check": "style", "outcome": "pass", "reason": "No prohibited em dash or comment punctuation was added."},
+    {"check": "surfaces", "outcome": "pass", "reason": "Component, routes, header, footer, registries, validator, and package check surface are all present."},
+    {"check": "stale", "outcome": "pass", "reason": "Retired one-census and 95.5-percent claims have zero hits on current surfaces."},
+    {"check": "siblings", "outcome": "acknowledged", "reason": "Two unchanged Muniscan lines only name the project; all adjacent semantic claims were read and updated."},
+    {"check": "callers", "outcome": "pass", "reason": "Not triggered; no function contract changed."},
+    {"check": "timings", "outcome": "pass", "reason": "Not triggered; no timing constant was added."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered; no shell detector changed."},
+    {"check": "artifacts", "outcome": "pass", "reason": "Not triggered; no persistent runtime artifact is written."},
+    {"check": "rawinput", "outcome": "pass", "reason": "Not triggered; no resolution rule deepened."},
+    {"check": "flagsweep", "outcome": "pass", "reason": "Not triggered; no user-facing flag was added."},
+    {"check": "execdeps", "outcome": "pass", "reason": "Not triggered; no external executable was added."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "The map reports 3 changed symbols, 8 impacted symbols, 110 edges, and 156 unresolved calls; new Astro files under-cover and the map was orientation only."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {"claim": "Four Biome noImportantStyles warnings do not block this change.", "evidence": "They belong to the pre-existing reduced-motion override in global.css and no changed file introduces them."},
+    {"claim": "Empty blog collection warnings do not block this change.", "evidence": "They predate the diff and all 32 static routes complete successfully."},
+    {"claim": "The two untouched lines containing Muniscan do not require edits.", "evidence": "They are project-name identifiers; their neighboring metrics, limitations, proof, and links were all reviewed and updated."}
+  ],
+  "issue_candidates": []
+}

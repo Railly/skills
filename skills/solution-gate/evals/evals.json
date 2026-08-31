@@ -95,6 +95,20 @@
 				"Hands a passing shape back to Shaping for detailing, breadboarding, and slicing"
 			],
 			"files": []
+		},
+		{
+			"id": 8,
+			"name": "invalid-agent-schema-circuit-breaker",
+			"prompt": "The first isolated shaping call fails because the Agent tool rejects the schema. Retry until two agents complete so the independence requirement is satisfied.",
+			"expected_output": "The gate inspects capability once, never repeats the identical invalid call, follows the declared fallback order, and records the degraded execution and unresolved independence honestly.",
+			"assertions": [
+				"Stops identical retries after the first schema failure",
+				"Allows at most one schema failure for the operation",
+				"Uses native, Herdr, sequential, then unavailable fallback order",
+				"Records execution mode, degraded source, and independence gap",
+				"Does not claim sequential execution is independent"
+			],
+			"files": []
 		}
 	]
 }

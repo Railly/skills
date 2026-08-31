@@ -1,0 +1,50 @@
+Review Gate independent substrate corpus
+Target: portless PR #397
+HEAD: 2ac15191f438f8b3064b73453b60ff702b15d0f8
+Base: 2cd0719e152abe72e4e45700fdf9119b1cad4f1b
+
+Independent oracle
+
+A synchronous child process that exits nonzero has already settled startup failure. The parent must not poll for a successful daemon after observing that terminal child outcome. Failed privileged startup must leave no proxy.pid or proxy.port, and a retry must execute the operation again.
+
+Exact-head artifact
+
+Built from an isolated detached checkout with tsup 8.5.1. TypeScript noEmit and ESLint passed. The frozen review checkout was not modified.
+
+Cells
+
+1. Direct proxy start, real spawnSync, fake sudo executable exits 23.
+   Command surface: portless proxy start --no-tls
+   Observed: exit 1 in 0.33s; error named status 23; recovery command preserved --no-tls; no proxy.pid or proxy.port.
+
+2. Direct proxy start, sudo absent from PATH.
+   Authored test observed: exit 1; spawnSync sudo ENOENT; no proxy.pid or proxy.port.
+
+3. Interactive app auto-start, same fake sudo exits 23.
+   Command surface: portless review-app /usr/bin/true with PORTLESS_HTTPS=0 under a PTY.
+   Observed: child printed the fatal elevation error, then parent waited the full discovery loop and printed a second failure. Exit 1 in 5.15s.
+   Finding: packages/portless/src/cli.ts:1128 only excludes signal termination. It polls after result.status is nonzero.
+
+4. Non-interactive app auto-start.
+   Observed: exit 1 in 0.04s before spawning sudo, with terminal and explicit-port alternatives. This pre-existing path is unaffected.
+
+5. Explicit unprivileged port.
+   Command surface: portless proxy start -p 1355 --no-tls.
+   Result: unverified. This execution sandbox rejects listen(127.0.0.1) with EPERM. The authored lifecycle test fails in beforeEach for the same reason.
+
+Test-strength mutation
+
+Mutation: change the new privileged-failure process.exit(1) to process.exit(0), rebuild dist/cli.js, run the two privileged startup tests.
+Red: both tests failed at the intended status assertion, expected 1 and received 0.
+Restore: restore process.exit(1), rebuild, both tests pass.
+Repeatability: the restored pair passed three consecutive runs.
+
+Harness note
+
+A source-only mutation without rebuilding survived because cli.test.ts executes dist/cli.js. That result was rejected. All accepted mutation evidence rebuilt the shipped artifact before red and green runs.
+
+Unavailable substrates
+
+- Successful loopback listener startup is blocked by sandbox EPERM.
+- A real Linux sudo implementation and Windows process behavior were not available.
+- GitHub API revalidation was unavailable because api.github.com could not be reached; local origin/pr/397-review resolves to the frozen HEAD.

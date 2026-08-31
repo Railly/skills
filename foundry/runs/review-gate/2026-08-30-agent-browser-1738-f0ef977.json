@@ -1,0 +1,360 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-08-30",
+    "repo": "vercel-labs/agent-browser",
+    "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+    "head": "f0ef9771426c068e335c5fdb4a0d03362e104fd4",
+    "profile": "external-pr",
+    "skill_revision": "git:6ee1206df4f1+dirty:54762b3b9eae",
+    "status": "complete",
+    "verdict": "findings",
+    "gaps": [
+      "No exact-head Test Strength receipt exists for the changed authorization, parser, protocol, and lifecycle behavior.",
+      "No exact-head Resilience Audit receipt exists for process startup, sidecar publication, child-exit cleanup, retry, or subprocess credential containment.",
+      "The independent reviewer operation failed after two runtime schema errors; sequential isolated self-review does not satisfy high-risk independence.",
+      "The executing Review Gate package checkout is dirty, so its digest is recorded but cannot be tied to a clean released skill revision.",
+      "Windows effective confidentiality for the token-bearing dashboard.config file was not exercised; the Windows integration job was skipped."
+    ]
+  },
+  "execution": {
+    "mode": "sequential_isolated",
+    "degraded_from": "native_subagent",
+    "independence_gap": "The independent reviewer operation failed at the runtime capability schema boundary. Separate sequential lens artifacts were produced in the same reviewer context and are not cross-family independence.",
+    "schema_failures": 2,
+    "operations": [
+      {
+        "operation": "independent security reviewer launch",
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "independent lifecycle and coverage reviewer launch",
+        "schema_failures": 1,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "PR #1738 title and body, repository AGENTS.md, and changed user-facing surfaces",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "A1: dashboard API requests require trusted same-origin browser provenance",
+      "A2: reverse-proxied origins require explicit exact HTTPS allowlisting",
+      "A3: DNS-rebinding and cross-origin form-smuggling requests are rejected before execution",
+      "A4: external dashboard access requires the generated token while loopback remains tokenless",
+      "A5: strict startup validation and repeated-start lifecycle behavior match the documentation"
+    ],
+    "gaps": [
+      "No separate Issue Contract, Solution Gate, Spec, or decision trail accompanied the external PR."
+    ]
+  },
+  "provenance": {
+    "author_model": "not provided; commits authored by Chris Tate",
+    "reviewer_model": "OpenAI GPT-5.6-sol high",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "authentication bearer token",
+      "authorization of browser HTTP and WebSocket requests",
+      "process lifecycle and detached child startup",
+      "durable token-bearing config and PID sidecars",
+      "subprocess and plugin trust boundaries"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": false,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-30-agent-browser-1738-f0ef977.md",
+      "evidence": "The local built-artifact corpus directly exercised the user-visible boundaries and found two blockers, but it is not an independent reviewer source."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "PR #1738 title and body",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The PR promises trusted same-origin provenance, explicit reverse-proxy allowlisting, and rejection of form-smuggling and DNS-rebinding requests."
+    },
+    {
+      "source": "design",
+      "location": "commit messages and inline trust-boundary comments",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The design composes exact Origin and Host checks with a generated external bearer token, persists lifecycle configuration, and keeps loopback tokenless."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, CLI help, docs dashboard/commands/configuration pages, core skill, and commands reference",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P4", "P5"],
+      "evidence": "The changed surfaces promise strict validation, loopback defaults, private external access URLs, host-bound cookies, and stop-before-reconfiguration behavior."
+    },
+    {
+      "source": "implementation",
+      "location": "cli/src/main.rs, cli/src/native/stream/dashboard.rs, cli/src/mcp.rs, packages/dashboard, and cli/tests/dashboard_cli.rs",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "The diff changes authorization, token bootstrap, lifecycle sidecars, detached startup, API dispatch, session proxying, CLI and MCP parsing, and browser client routing."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Only trusted same-origin browser requests with the required external token can execute dashboard API and WebSocket actions.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "whether unauthorized requests reach exec, mutation, session proxy, or WebSocket relay behavior",
+        "layer": "built dashboard HTTP and WebSocket request boundary",
+        "method": "drive same-origin, cross-origin, missing provenance, DNS-rebinding Host, form-compatible POST, preflight, missing token, invalid token, loopback, and external-origin cells",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the origin helper returns the expected boolean in unit tests",
+        "counterexample": "route dispatch executes before the helper or a WebSocket path bypasses the HTTP authorization composition",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "The full suite observed execution counters and route responses at the handler boundary for HTTP and WebSocket paths."
+      },
+      "substrates": [
+        {
+          "name": "built Rust dashboard handlers and lifecycle integration binary on macOS",
+          "status": "exercised",
+          "evidence": "1177 Rust unit tests and four dashboard CLI integration tests passed, including all added authorization cases."
+        }
+      ],
+      "evidence": "The authorization core held in the exercised substrate. This does not clear credential containment or startup lifecycle findings."
+    },
+    {
+      "id": "P2",
+      "claim": "A successful dashboard start result means the detached server is listening on the requested port and its sidecars describe a live process.",
+      "kind": "lifecycle",
+      "status": "unverified",
+      "oracle": {
+        "observes": "command exit status, JSON success, TCP reachability, PID liveness, and sidecar residuals",
+        "layer": "built CLI plus OS process and TCP substrate",
+        "method": "occupy the requested port, invoke dashboard start, then inspect the reported PID, reachability, and sidecars",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the detached child process was spawned successfully",
+        "counterexample": "spawn succeeds but the child later fails its listener bind",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "F1 reproduced exactly this counterexample: exit 0 and success true with a dead PID and stale sidecars."
+      },
+      "substrates": [
+        {
+          "name": "built CLI, macOS process table, APFS sidecars, and occupied IPv4 loopback port",
+          "status": "exercised",
+          "evidence": "The recorded PID was dead after 400 ms while dashboard.pid and dashboard.config remained present."
+        }
+      ],
+      "evidence": "Finding F1 prevents verification."
+    },
+    {
+      "id": "P3",
+      "claim": "The reverse-proxy dashboard access token remains confined to the dashboard authentication boundary.",
+      "kind": "confidentiality",
+      "status": "unverified",
+      "oracle": {
+        "observes": "whether a dashboard-launched child or configured plugin can read the bearer token",
+        "layer": "built dashboard API to child CLI to stdio plugin process",
+        "method": "authenticate to /api/exec, run a configured plugin, and have the plugin report whether the token environment variable is present",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the browser stores the token in a Secure host-bound cookie and the dashboard removes its mode and port variables before spawning a child",
+        "counterexample": "the dashboard process environment still contains the token and ordinary environment inheritance carries it into CLI and plugin subprocesses",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "F2 observed the exact 64-character token in the plugin environment."
+      },
+      "substrates": [
+        {
+          "name": "built dashboard, authenticated /api/exec route, child CLI, and configured stdio plugin",
+          "status": "exercised",
+          "evidence": "The plugin marker existed, had length 64, and exactly matched dashboard.config access_token."
+        }
+      ],
+      "evidence": "Finding F2 prevents verification."
+    },
+    {
+      "id": "P4",
+      "claim": "The token-bearing dashboard config is confidential on every supported platform.",
+      "kind": "confidentiality",
+      "status": "unverified",
+      "oracle": {
+        "observes": "effective access to dashboard.config by principals other than the current user",
+        "layer": "platform filesystem ACL and permissions",
+        "method": "inspect effective Unix permissions and Windows ACL access on files created by the built CLI",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Unix mode bits are 0600",
+        "counterexample": "the Windows fs::write branch inherits an ACL that grants another principal read access",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Unix mode 0600 was observed, but Windows uses a different creation branch and no Windows substrate was available."
+      },
+      "substrates": [
+        {
+          "name": "macOS APFS",
+          "status": "exercised",
+          "evidence": "dashboard.config was created with mode 0600."
+        }
+      ],
+      "evidence": "The supported Windows substrate remains a named verification gap."
+    },
+    {
+      "id": "P5",
+      "claim": "CLI, MCP, browser client, README, docs, and core skill agree on the changed dashboard behavior.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "accepted CLI and MCP arguments, browser route construction, and behavior statements on each required surface",
+        "layer": "parsers, built dashboard client, help output, and user-facing documentation",
+        "method": "trace allowedOrigins and port through MCP to CLI, build the dashboard, and read every mapped behavior passage",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "all expected files appear in the diff",
+        "counterexample": "a touched file retains an old behavior passage or MCP accepts a shape the CLI rejects",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "The focused parser tests, dashboard build, line-level sibling review, and MCP argument test remained aligned."
+      },
+      "substrates": [
+        {
+          "name": "built Next.js dashboard plus Rust CLI and MCP tests",
+          "status": "exercised",
+          "evidence": "Dashboard production build passed and the full Rust suite passed the CLI/MCP lifecycle tests."
+        }
+      ],
+      "evidence": "The required behavior surfaces agree at the reviewed head."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "No exact-head Test Strength receipt exists. Review Gate did not recreate the specialist mutation and behavioral-matrix procedure."
+    },
+    "resilience": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "No exact-head Resilience Audit receipt exists. Review Gate forced representative failure paths but did not claim a complete specialist failure-partition receipt."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "implementation and docs",
+      "claim": "A successfully spawned dashboard child is a successfully started dashboard server.",
+      "status": "refuted",
+      "evidence": "F1: the child failed its later bind while the parent returned success and published sidecars."
+    },
+    {
+      "id": "A2",
+      "source": "implementation",
+      "claim": "Removing dashboard mode and port variables before child execution removes dashboard-only authority from subprocesses.",
+      "status": "refuted",
+      "evidence": "F2: the access-token variable remained inherited through the CLI and plugin process boundaries."
+    },
+    {
+      "id": "A3",
+      "source": "PR design",
+      "claim": "Exact external Origin allowlisting plus Host equality prevents DNS-rebinding authorization.",
+      "status": "verified",
+      "evidence": "The DNS-rebinding Host mismatch and cross-origin cases were rejected before execution in the handler suite."
+    },
+    {
+      "id": "A4",
+      "source": "documentation",
+      "claim": "Loopback can remain tokenless because both browser provenance and loopback Host are required.",
+      "status": "verified",
+      "evidence": "IPv4 and IPv6 loopback cells passed, while an attacker Host could not obtain the loopback exemption."
+    }
+  ],
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "run", "reason": "Checked loopback tokenless behavior, external token behavior, HTTP, WebSocket, Origin, Referer, and no-Origin non-browser WebSocket cases."},
+    {"name": "New-domain matrix", "status": "run", "reason": "Enumerated IPv4, IPv6, external HTTPS origins, default and explicit ports, malformed entries, credentials, paths, queries, and fragments."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Traced scheme-specific default-port normalization through allowed-origin configuration, Host comparison, HTTP, and WebSocket consumers."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell-string parsing or command appending changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "run", "reason": "The detached child's bind failure is sent to null stderr and cannot reach the invoking user, producing F1."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim or compatibility module was introduced."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Validated the deliberate tokenless loopback default and external HTTPS-only default against the built handlers."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Examined new lifecycle sidecars, token bootstrap, process environment, CLI/MCP dispatch, and same-origin route centralization."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "No independent cross-platform or reference corpus was available; this remains part of the independence gap."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "The feature has no declared reference implementation."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Forced invalid arguments, occupied-port child failure, config write handling, and unauthorized request outcomes; occupied-port failure did not propagate."},
+    {"name": "Flag-propagation dispatch sweep", "status": "run", "reason": "Traced --allowed-origins and port through CLI parsing, environment fallback, MCP schema and args, persisted config, and child environment."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Forced malformed options, invalid origins, cross-origin requests, missing tokens, DNS rebinding, unavailable session ports, and occupied dashboard ports."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action was added."},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "Reviewed detached startup and stop ownership. No timeout was added, but startup has no readiness handshake and publishes before child failure can be observed."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced browser fragment to cookie to HTTP/WebSocket authorization, and dashboard API to child CLI to configured plugin process."},
+    {"name": "Substrate verification", "status": "run", "reason": "Observed TCP reachability, process liveness, sidecars, file permissions, route execution, and plugin environment rather than trusting command output."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Built and drove dashboard startup, authenticated API execution, plugin invocation, failure paths, and production dashboard assets."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Enumerated writers and readers of the access token, allowed origins, PID, config, cookie, and child process environment."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Verified mapped CLI, MCP, README, web docs, and skill statements; the startup success claim is contradicted by F1."},
+    {"name": "Demonstrative example", "status": "run", "reason": "The documented external-origin start command was driven through the built binary and produced an external tokenized access URL."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail exists for the external PR."},
+    {"name": "Complexity budget", "status": "skipped", "reason": "No scale-sensitive loop or per-element lookup was added on the authorization path."}
+  ],
+  "deterministic": [
+    {"check": "covered before report", "outcome": "acknowledged", "reason": "Expected initial finding because no exact-head report existed before this run."},
+    {"check": "style", "outcome": "pass", "reason": ""},
+    {"check": "surfaces", "outcome": "acknowledged", "reason": "docs/src/app/streaming/page.mdx documents the separate raw session WebSocket server, not standalone dashboard lifecycle or reverse-proxy access."},
+    {"check": "siblings allowed-origins", "outcome": "pass", "reason": ""},
+    {"check": "flagsweep allowed-origins versus port", "outcome": "acknowledged", "reason": "Every flagged --port hit belongs to raw streaming, Lightpanda, Appium, or Safari rather than the dashboard command."},
+    {"check": "timings", "outcome": "pass", "reason": ""},
+    {"check": "artifact cleanup registration", "outcome": "pass", "reason": ""},
+    {"check": "git diff --check", "outcome": "pass", "reason": ""},
+    {"check": "cargo fmt", "outcome": "pass", "reason": ""},
+    {"check": "cargo test", "outcome": "pass", "reason": ""},
+    {"check": "dashboard production build", "outcome": "pass", "reason": ""},
+    {"check": "cargo clippy -D warnings", "outcome": "acknowledged", "reason": "Blocked by pre-existing clippy::for_unbounded_range at cli/src/native/browser.rs:3494, outside this PR diff."},
+    {"check": "exact-head GitHub checks", "outcome": "pass", "reason": ""}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "dashboard start reports success and persists PID/config before proving the detached child bound the requested port",
+      "evidence": "With the requested port occupied, the built CLI exited 0 with success:true, left both sidecars, and recorded a PID that was already dead after 400 ms.",
+      "layer": "built CLI, OS process lifecycle, TCP listener, and filesystem",
+      "source": "dogfood",
+      "path": "cli/src/main.rs:1102-1131 -> cli/src/native/stream/dashboard.rs:615-622",
+      "resolution": "open"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "the external dashboard bearer token is inherited by dashboard-launched CLI, session, and plugin subprocesses",
+      "evidence": "An authenticated /api/exec plugin invocation observed the exact 64-character AGENT_BROWSER_DASHBOARD_ACCESS_TOKEN in the plugin environment.",
+      "layer": "dashboard API to child CLI to configured stdio plugin process",
+      "source": "boundary pipeline trace",
+      "path": "cli/src/native/stream/dashboard.rs:916-921 -> cli/src/plugins.rs:201-217",
+      "resolution": "open"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "docs/src/app/streaming/page.mdx does not need dashboard --allowed-origins documentation",
+      "evidence": "The page documents agent-browser stream enable and the per-session raw WebSocket transport; standalone dashboard behavior is documented on the dashboard and commands pages."
+    },
+    {
+      "claim": "skill-data/core/references/streaming.md does not need dashboard --allowed-origins documentation",
+      "evidence": "It is the protocol reference for raw session streaming; the dashboard contract is present in the core skill and commands reference."
+    },
+    {
+      "claim": "flagsweep hits in Lightpanda, Appium, Safari, and cli/src/commands.rs do not require --allowed-origins",
+      "evidence": "Their --port flags configure unrelated browser engines or raw stream servers and are not dashboard documentation surfaces."
+    }
+  ],
+  "issue_candidates": []
+}

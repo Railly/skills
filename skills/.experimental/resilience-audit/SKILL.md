@@ -8,6 +8,8 @@ compatibility: Requires a runnable target or test harness. Fault injection and s
 
 A happy-path pass says nothing about failure behavior. Force each material failure and observe the invariant directly.
 
+Read the work-item manifest first when one exists. Verify the current head, contract digest, relevant paths, environment, and executing `skill_revision`. Reuse prior evidence only when its fingerprint proves the later diff cannot affect the failure boundary.
+
 ## 1. Map failure boundaries
 
 Trace critical operations across process, network, storage, queue, cache, filesystem, browser, and third-party boundaries. For each, name the owner, timeout, cancellation path, retry policy, idempotency key, cleanup duty, durable state, and user-visible outcome.
@@ -64,4 +66,6 @@ Repeat the failure, combine it with realistic concurrency or load, and inspect p
 
 Report the pressure matrix, traces, violated invariants, fixes, remaining gaps, operational signals, and rollback. Run the repository review gate when available.
 
-**Complete when:** the report separates forced evidence from inference and no unexecuted cell is described as safe.
+Emit a stage receipt containing status, head, command, relevant paths, contract digest, environment digest, skill revision, elapsed time, report path, commit points, forced partitions, cleanup owners, retries, and a reusable flag with dependency-cone evidence. Update the manifest atomically.
+
+**Complete when:** the report separates forced evidence from inference, no unexecuted cell is described as safe, and the manifest points to the exact receipt.

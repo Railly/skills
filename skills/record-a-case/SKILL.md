@@ -10,7 +10,7 @@ Treat the case as an evidence ledger. Preserve what happened before extracting a
 
 ## Canonical write root
 
-Before writing, resolve the canonical `Railly/skills` checkout through `RAILLY_SKILLS_REPO`, `~/Programming/railly/skills`, or `~/railly-skills`. The canonical resolver is `scripts/resolve-source-root.mjs`. Never write a case, eval, or log into the current repo's `.agents/skills`, `.claude/skills`, another installed skill copy, or the target repository. If the source root is unavailable, return the draft and report the blocked write.
+Before writing, run the packaged `scripts/resolve-source-root.mjs`, which honors `RAILLY_SKILLS_REPO`. Never write a case, eval, or log into the current repo's `.agents/skills`, `.claude/skills`, another installed skill copy, or the target repository. If the source root is unavailable, return the draft and report the blocked write.
 
 ## 1. Bound one case
 
@@ -20,7 +20,7 @@ Name the maintenance unit: one issue, PR, incident, review, disproven claim, or 
 
 ## 2. Build the ledger
 
-Inventory evidence before prose. Collect durable retrieval handles:
+When a work-item manifest exists, treat it as the primary inventory and verify only drift-prone external state. Do not reconstruct stage order, skill revisions, elapsed time, promotion, or close-cycle state from the session transcript. Inventory evidence before prose. Collect durable retrieval handles:
 
 - repository, commit, branch, issue, and PR
 - Issue Contract path, final state, and acceptance IDs when one exists
@@ -93,8 +93,8 @@ Read [the case schema and allowed values](references/template.md), then write to
 
 Set human-review status only from explicit human feedback or retrievable review evidence. Present new agent-authored records as pending review.
 
-When the case closes a live mission, update its canonical Issue Contract to `Status: closed` and record the case path and final delivery state. Do not fill missing proof retrospectively.
+When the case closes a live mission, project the ledger from the manifest, update its Issue Contract to `Status: closed`, and record the case path and final delivery state in both artifacts. Generate SkillKit outcome annotations with the packaged `scripts/work-item.mjs annotations <manifest> --output <private-path>`, inspect the private JSON, then apply it locally with `skillkit receipts --annotate <private-path>`. Remote annotation is unsupported. Do not fill missing proof retrospectively.
 
 Stage the new public case before validation so tracked-file evidence checks can resolve it, then validate the case and compiled knowledge and regenerate projections.
 
-**Complete when:** the artifact passes the destination's validator, all schema fields and the knowledge disposition are resolved, the live contract points to the case when applicable, and a reader can reconstruct the work from retrieval handles without trusting the narrative.
+**Complete when:** the artifact passes the destination's validator, all schema fields and the knowledge disposition are resolved, the live contract and manifest point to the case when applicable, the close-cycle receipt reports handoff, case, git, and promotion state, and a reader can reconstruct the work from retrieval handles without trusting the narrative.

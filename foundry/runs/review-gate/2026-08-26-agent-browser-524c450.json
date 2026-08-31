@@ -1,0 +1,433 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-26",
+    "repo": "vercel-labs/agent-browser",
+    "base": "8934fdb7ff5c016b46d473454ec51c0df814bead",
+    "head": "524c450ec2bb56109e52bd4f2c875301176ed558",
+    "status": "complete",
+    "verdict": "findings",
+    "gaps": []
+  },
+  "contract": {
+    "path": "none: PR 1725 has no linked Issue Contract",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No Issue Contract or Spec review result was supplied. The PR body is treated as design and user-facing intent, never as a Spec pass."
+    ]
+  },
+  "provenance": {
+    "author_model": "unknown (not disclosed in the PR body or commits)",
+    "reviewer_model": "claude-opus-5, xhigh reasoning",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "cross-platform guarantee: the diff changes native executable selection by host architecture",
+      "process lifecycle: the selected path becomes the process image for every launcher invocation"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "2026-08-26-agent-browser-524c450-challenge.md",
+      "evidence": "An independently authored GitHub Actions corpus ran on a real windows-11-arm64 runner. Run 33002500967 exercised the base/head resolution matrix, x64 emulation, the first-party native producer, npm pack/install, and installed shim state. Run 33002161430 independently supplies the same green emulation and native-producer receipts; its overall failure came from a harness control-flow bug in the first matrix attempt, corrected in run 33002500967."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "none: PR 1725 has no linked issue, Issue Contract, or Spec review result",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "gh pr view returned no linked issue and no supplied Spec state."
+    },
+    {
+      "source": "design",
+      "location": "PR 1725 body, paragraph 1",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The preference and fallback claims were driven on real Windows ARM64. The broader alignment claim is refuted because the installed shim and launcher can select different binaries, but the base/head matrix proves that divergence predates this diff and is therefore an issue candidate rather than an in-scope finding."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md:1584-1591, docs/src/app/page.mdx:65, docs/src/app/changelog/page.mdx:255, bin/agent-browser.js:82, bin/agent-browser.js:89-90",
+      "status": "reviewed",
+      "properties": ["P1", "P4"],
+      "evidence": "The platform surfaces omit Windows ARM64 despite #1269 documenting support, a pre-existing issue candidate. The no-binary error is an in-scope finding because the head changes only its Expected path to x64 while retaining win32-arm64 on the preceding line."
+    },
+    {
+      "source": "implementation",
+      "location": "bin/agent-browser.js:64-73, test/launcher.test.mjs:1-115, .github/workflows/ci.yml:26-42, package.json:33",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "Four changed files, 144 insertions, 0 deletions. The exact head was driven against its merge base on Windows ARM64."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "On Windows ARM64, the launcher selects an existing x64 binary when it is the only binary present, prefers arm64 when arm64 exists, and reports failure when neither exists.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the executable path actually returned by the launcher and its process exit status for each installed-tree state",
+        "layer": "real Windows ARM64 launcher execution",
+        "method": "run the base and head launchers on windows-11-arm64 with self-reporting executables in each of four present-file states",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the four synthetic cells added in test/launcher.test.mjs pass",
+        "counterexample": "a synthetic matrix can pass while x64 PE emulation fails on the real OS or while an installed global shim bypasses the launcher",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Run 33002500967 replaced the proxy with a real Windows ARM64 host. Head selected x64 for x64-only, arm64 for both and arm64-only, and exited 1 for neither. The installed-shim drive separately confirmed that entry points can diverge when both binaries exist."
+      },
+      "substrates": [
+        {
+          "name": "Microsoft Windows 11 Enterprise, ARM 64-bit Processor",
+          "status": "exercised",
+          "evidence": "Run 33002500967, jobs 98287683210 and 98287683375: PROCESSOR_ARCHITECTURE=ARM64; native Node reported win32/arm64; all four head cells executed."
+        }
+      ],
+      "evidence": "Head matrix: x64-only -> x64 exit 0; both -> arm64 exit 0; arm64-only -> arm64 exit 0; neither -> exit 1 expecting x64. Base matrix establishes the delta and disproves the earlier attribution of shim divergence to this PR."
+    },
+    {
+      "id": "P2",
+      "claim": "On Windows ARM64 where only a source-built native arm64 binary exists, the CLI runs it instead of failing with a missing-binary error.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the generated PE architecture and the launcher-selected process on a real Windows ARM64 host",
+        "layer": "first-party producer through real launcher execution",
+        "method": "build through scripts/copy-native.js, inspect the COFF machine field, run --version, and execute the arm64-only launcher cell",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the existsSync preference branch is present",
+        "counterexample": "the branch could be dead if no supported producer emitted the exact filename or if the produced artifact were not an ARM64 PE",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Run 33002500967 job 98287683603 exercised scripts/copy-native.js, which emitted agent-browser-win32-arm64.exe (12,548,608 bytes, COFF 0xAA64). It ran --version successfully; the head arm64-only matrix selected it and exited 0."
+      },
+      "substrates": [
+        {
+          "name": "source-built ARM64 PE on Windows ARM64",
+          "status": "exercised",
+          "evidence": "Run 33002500967 job 98287683603: COFF 0xAA64 and agent-browser 0.35.0 exit 0."
+        }
+      ],
+      "evidence": "The real producer, produced artifact, and launcher consumer were all exercised on the target OS."
+    },
+    {
+      "id": "P3",
+      "claim": "Binary selection on every platform other than Windows ARM64 is unchanged by this diff.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "reachability of the added branch as a function of osKey and archKey",
+        "layer": "source-level branch reachability",
+        "method": "inspect the exact guard and every assignment feeding osKey and archKey",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the added darwin/arm64 test passes",
+        "counterexample": "one Darwin cell cannot establish unchanged behavior for Linux, musl, Windows x64, and unsupported platforms",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The property is instead closed at its own layer: only osKey=win32 and archKey=arm64 can enter bin/agent-browser.js:67, and the block only reassigns the local archKey."
+      },
+      "substrates": [
+        {
+          "name": "source-level reachability of bin/agent-browser.js:67",
+          "status": "exercised",
+          "evidence": "The exact-head guard excludes every non-win32-arm64 input before its only side effect."
+        }
+      ],
+      "evidence": "Verified at the layer of the claim."
+    },
+    {
+      "id": "P4",
+      "claim": "The npm-generated global shim on Windows ARM64 points at an executable that exists after postinstall.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the installed .cmd target and the installed files after two real global installs",
+        "layer": "installed package filesystem state",
+        "method": "npm pack, npm install -g twice, read the generated .cmd, and list both PE files",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "postinstall prints that shims point to the native binary",
+        "counterexample": "the message could be emitted while the literal shim target is absent or names the other architecture",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Run 33002500967 job 98287683603 read the installed shim itself: it targets agent-browser-win32-x64.exe, which existed at 13,642,752 bytes alongside the 12,548,608-byte arm64 file."
+      },
+      "substrates": [
+        {
+          "name": "npm global install on Windows ARM64",
+          "status": "exercised",
+          "evidence": "Run 33002500967 job 98287683603 performed npm pack and two global installs, then inspected the real shim and installed tree."
+        }
+      ],
+      "evidence": "The shim targets an existing x64 file. It does not always select the same architecture as the launcher when both files exist, but the base/head matrix proves that divergence is pre-existing."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "compatibility layer: OS/architecture maps to a native artifact",
+      "OS translation: the fallback depends on Windows x64 emulation"
+    ],
+    "dimensions": {
+      "values": [
+        "version: merge base 8934fdb, exact head 524c450",
+        "Windows ARM64 files present: x64 only, both, arm64 only, neither",
+        "process architecture: published x64 PE (COFF 0x8664), source-built arm64 PE (COFF 0xAA64)",
+        "entry point: JavaScript launcher, npm-generated global shim",
+        "operation: --version, install, no-binary failure"
+      ],
+      "exclusions": [
+        "Non-Windows-ARM64 platforms are excluded from the runtime cross because the exact guard cannot reach them; P3 closes that claim by full source-level reachability.",
+        "Shell-metacharacter argv classes are excluded because child_process.spawn receives an argv array and no shell re-parses it.",
+        "Repeated flake sampling is excluded because the matrix has no timing, network, randomness, or shared mutable state after checkout; every observed cell has a deterministic local file-state oracle."
+      ],
+      "evidence": "Run 33002500967 crossed base and head with all four installed-tree states on a real Windows ARM64 runner. The native job exercised both producer architectures and the installed shim boundary."
+    },
+    "oracle": {
+      "source": "independently authored expected matrix plus PE COFF machine fields, process exit status, self-reported executable path, and installed .cmd contents",
+      "independent": true,
+      "evidence": "Expected results were defined outside the production launcher. The matrix reports the process path actually executed; COFF fields establish architecture without trusting application output; installed shim contents establish the bypass path directly."
+    },
+    "producer": {
+      "name": "scripts/copy-native.js and scripts/postinstall.js/npm global installation",
+      "status": "exercised",
+      "evidence": "Run 33002500967 job 98287683603 built through the first-party copy-native producer, packed the package, installed it globally twice, and inspected the installed binaries and shim. The PR suite still uses stubs, which remains finding F3, but the gate's producer obligation is closed."
+    },
+    "falsification": [
+      {
+        "mutation": "remove the added Windows ARM64 fallback by running the merge-base launcher",
+        "red_evidence": "Run 33002500967 job 98287683496: base with x64-only exited 1 and expected agent-browser-win32-arm64.exe.",
+        "restored_green_evidence": "Run 33002500967 job 98287683210: exact head with the same x64-only state selected agent-browser-win32-x64.exe and exited 0."
+      },
+      {
+        "mutation": "replace the preference with unconditional x64 selection, represented by the opposite arm64-only/both outcome",
+        "red_evidence": "The real head corpus establishes the required inverse cases: both and arm64-only select arm64 and exit 0. An unconditional-x64 implementation would select the wrong path for both and fail when only arm64 exists.",
+        "restored_green_evidence": "Run 33002500967 job 98287683210 observed both inverse cells green on exact head."
+      }
+    ],
+    "evidence": "The compatibility guarantee is no longer inferred from a green synthetic suite. It has fix-absent red, exact-head green, real producer, real PE artifacts, real target OS, installed package state, and failure-path evidence."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "bin/agent-browser.js:64-66 and the PR body",
+      "claim": "An x64 Windows executable runs on Windows ARM64 through built-in emulation.",
+      "status": "verified",
+      "evidence": "Run 33002500967 job 98287683375: Microsoft Windows 11 Enterprise, ARM 64-bit Processor, PROCESSOR_ARCHITECTURE=ARM64; the published 13,642,752-byte COFF 0x8664 image returned agent-browser 0.35.0 and exit 0."
+    },
+    {
+      "id": "A2",
+      "source": "subsystem model",
+      "claim": "The first-party source-build path produces agent-browser-win32-arm64.exe.",
+      "status": "verified",
+      "evidence": "Run 33002500967 job 98287683603 exercised scripts/copy-native.js and produced the exact filename, 12,548,608 bytes, COFF 0xAA64; --version exited 0."
+    },
+    {
+      "id": "A3",
+      "source": "test/launcher.test.mjs harness design",
+      "claim": "Copying bin/agent-browser.js into a temporary package root preserves the behavior the synthetic suite measures.",
+      "status": "verified",
+      "evidence": "The launcher imports only Node builtins and resolves relative to __dirname. More importantly, the same resolution outcomes were reproduced without that copy assumption on the real target OS."
+    },
+    {
+      "id": "A4",
+      "source": "PR body claim to add coverage to CI",
+      "claim": "The new launcher job runs on pull_request.",
+      "status": "verified",
+      "evidence": ".github/workflows/ci.yml:26-42 has no if condition and the workflow triggers on pull_request at :6."
+    },
+    {
+      "id": "A5",
+      "source": "new CI job step list",
+      "claim": "pnpm run test:launcher needs no dependency installation.",
+      "status": "verified",
+      "evidence": "The suite imports only node: builtins and devDependencies is empty. This also supports the nit-tier F4."
+    },
+    {
+      "id": "A6",
+      "source": "initial project-scope attribution",
+      "claim": "The launcher-versus-shim divergence is introduced by this diff.",
+      "status": "refuted",
+      "evidence": "Run 33002500967 proves the both-present launcher cell is identical at base and head: both select arm64. The installed shim selects x64 when both exist, but that postinstall rule predates the PR. The earlier attribution incorrectly used base's x64-only hard error, a different precondition, to claim novelty in the both-present state. The real divergence is moved to issue candidates."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The diff itself adds one existsSync lookup and a local reassignment before an existing spawn. Test writes remain in a mkdtemp root. The external oracle created disposable CI artifacts, not product-side state, and did not mutate the PR or upstream checkout.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"The arm64-only and both cells verify that the final commit preserves native preference while the x64-only base/head pair verifies the fallback."},
+    {"name":"New-domain matrix","status":"run","reason":"All four Windows ARM64 present-file states were exercised at base and head. F2 is the neither-present delta."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Launcher, postinstall, copy-native, and installed shim were compared. The divergence is real but pre-existing, so it is an issue candidate."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"The launcher uses spawn with an argv array and adds no shell parsing."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No daemon, warning channel, or once-latch is changed."},
+    {"name":"Shim hermeticity","status":"run","reason":"Synthetic isolation was reviewed and then bypassed with a real Windows ARM64 drive."},
+    {"name":"Deliberate-default check","status":"run","reason":"The changelog for #1269 and base/head x64-only results prove the old launcher failure was an omission, not a deliberate default."},
+    {"name":"Fresh-seam scan","status":"skipped","reason":"No runtime or framework is patched to expose a new signal."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Run 33002500967 exercised real Windows ARM64, both PE architectures, all four file states, and installed shim state."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"postinstall and copy-native were compared to the launcher and then exercised through their real outputs."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"The diff removes the x64-only failure, retains neither-present failure, and has one getBinaryName caller that handles both outcomes."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"Adapted to entry points: JavaScript launcher and global shim were both driven."},
+    {"name":"Error-path forcing","status":"run","reason":"The neither-present path was forced at base and head on Windows ARM64, confirming F2."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"existsSync on an absolute path is exact, not heuristic recovery."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No async wait, timeout, or cancellation is added."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Producer, packed package, global install, shim, launcher, and process image were traced end to end."},
+    {"name":"Substrate verification","status":"run","reason":"COFF fields, runner architecture, executable output, exit codes, and installed filesystem state were observed."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"A real published x64 artifact and a real source-built arm64 artifact were run on Windows ARM64; npm pack/install drove the shipped boundary."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"Every writer was enumerated. The PR body's broad alignment claim is false, but the false part predates the PR."},
+    {"name":"Docs-behavior parity","status":"run","reason":"The advertised-platform omission is pre-existing and recorded as an issue candidate."},
+    {"name":"Demonstrative example","status":"skipped","reason":"The diff adds no documentation example."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists for this diff."},
+    {"name":"Complexity budget","status":"skipped","reason":"The diff adds one constant-time existsSync and no loop or per-element lookup."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"pass","reason":"The canonical run report exists for exact head 524c450ec2bb56109e52bd4f2c875301176ed558."},
+    {"check":"style","outcome":"pass","reason":"No em dash or prohibited comment punctuation appears on added lines."},
+    {"check":"stale","outcome":"acknowledged","reason":"Not applicable: the diff has 144 insertions and 0 deletions."},
+    {"check":"surfaces","outcome":"pass","reason":"The project surface map has no rule triggered by these four paths; documentation was still checked under its lens."},
+    {"check":"siblings","outcome":"acknowledged","reason":"effectiveArch reaches postinstall outside the diff. The real substrate disproves the initial in-scope attribution; the triplicated rule remains an issue candidate."},
+    {"check":"callers","outcome":"pass","reason":"getBinaryName has one caller, in the same changed file, and that caller handles both outcomes."},
+    {"check":"producers","outcome":"acknowledged","reason":"No error classifier is narrowed; the behavioral producer was nevertheless exercised through copy-native and postinstall."},
+    {"check":"timings","outcome":"pass","reason":"No ceiling, timeout, wait, or polling constant is added."},
+    {"check":"shellmeta","outcome":"pass","reason":"No detector of shell metacharacters is added."},
+    {"check":"flagsweep","outcome":"acknowledged","reason":"No flag, mode, or config value is added."},
+    {"check":"execdeps","outcome":"acknowledged","reason":"No new external executable dependency is introduced."},
+    {"check":"rawinput","outcome":"acknowledged","reason":"All arch() re-derivations were read. bin/agent-browser.js:89 is confirmed as F2; postinstall and copy-native differences are pre-existing issue candidates."},
+    {"check":"artifacts","outcome":"pass","reason":"The diff writes no persistent state or config artifact."},
+    {"check":"report","outcome":"acknowledged","reason":"The exact-head validator is expected to exit 1 because it is pass-only and this completed run has verdict=findings, open F2/F3/F4, and refuted assumption A6. Its nonzero result is the correct findings verdict, not an incomplete execution."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "issue_candidate",
+      "claim": "The launcher and npm-generated global shim select different binaries when both x64 and arm64 executables exist on Windows ARM64.",
+      "evidence": "Run 33002500967: base and head both-present launcher cells both select arm64. The real npm-installed .cmd selects x64 while both 12,548,608-byte arm64 and 13,642,752-byte x64 files exist. The divergence is real and end-to-end, but the base cell proves it predates this diff. The prior review incorrectly inferred novelty from base's x64-only hard error, which has the opposite precondition.",
+      "layer": "installed package and entry-point dispatch on Windows ARM64",
+      "source": "lens",
+      "path": "",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "When neither executable exists on Windows ARM64, the head error names win32-arm64 and then says it expected agent-browser-win32-x64.exe.",
+      "evidence": "Run 33002500967 head job 98287683210 forced the neither-present state: exit 1 and Expected ...win32-x64.exe while the preceding error says No binary found for win32-arm64. Base job 98287683496 expected ...win32-arm64.exe, proving the inconsistency is introduced by this diff. Fix by naming the resolved fallback explicitly or making both lines use one architecture model.",
+      "layer": "user-visible launcher failure path",
+      "source": "gate",
+      "path": "",
+      "resolution": "open"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "The PR's committed launcher suite omits the neither-present failure cell, does not exercise the global-shim entry point, and fabricates executable files instead of invoking a first-party producer.",
+      "evidence": "test/launcher.test.mjs has x64-only, both, arm64-only, and Darwin cells, but no neither-present cell and no npm shim drive. Lines 37-46 write marker stubs. The external corpus closes the review gate's proof obligation and confirms why these omitted cells matter, but it does not strengthen the PR's committed regression protection. The real producer was exercised externally, so the producer claim itself is verified; the remaining finding is about what the PR will protect after merge.",
+      "layer": "committed behavioral regression coverage",
+      "source": "lens",
+      "path": "",
+      "resolution": "open"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "The new dependency-free CI job sets up pnpm even though it can run the Node test directly.",
+      "evidence": "The suite imports only Node builtins and devDependencies is empty. The workflow's dependency-free version-sync sibling invokes node directly; jobs that set up pnpm also install dependencies. Using pnpm keeps the package script single-sourced, so this is nit-tier.",
+      "layer": "CI workflow definition",
+      "source": "lens",
+      "path": "",
+      "resolution": "open"
+    },
+    {
+      "id": "F5",
+      "state": "issue_candidate",
+      "claim": "The advertised platform surfaces omit Windows ARM64 support.",
+      "evidence": "README.md:1584-1591 and docs/src/app/page.mdx:65 omit Windows ARM64, while the changelog records x64-emulation support in #1269. The omission predates this branch.",
+      "layer": "documentation platform contract",
+      "source": "lens",
+      "path": "",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F6",
+      "state": "refuted",
+      "claim": "The added code comment falsely claims complete consistency with postinstall.",
+      "evidence": "The exact comment narrows itself to keeping the fallback consistent, and the fallback is x64 in both paths. The broader PR-body wording is inaccurate but its false part describes a pre-existing divergence.",
+      "layer": "comment assertion",
+      "source": "lens",
+      "path": "",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F7",
+      "state": "refuted",
+      "claim": "Nothing produces agent-browser-win32-arm64.exe, so the new branch is dead.",
+      "evidence": "Run 33002500967 job 98287683603 exercised scripts/copy-native.js and produced a runnable 12,548,608-byte COFF 0xAA64 executable with the exact name.",
+      "layer": "producer-to-consumer reachability",
+      "source": "lens",
+      "path": "",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F8",
+      "state": "issue_candidate",
+      "claim": "The source-built native Windows ARM64 binary panics when running agent-browser install.",
+      "evidence": "Run 33002500967 job 98287683603: the COFF 0xAA64 binary exited 101 and panicked at cli/src/install.rs:181 with Unsupported platform for Chrome for Testing download. run_install guards Linux aarch64 only, while platform_key has no Windows aarch64 case. The x64 image under emulation proceeded to Downloading Chrome 152.0.7977.64 for win64. This defect predates the PR, but it means the binary the new launcher prefers cannot perform install while the fallback it deprioritizes can.",
+      "layer": "native CLI install command on Windows ARM64",
+      "source": "lens",
+      "path": "",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {"claim":"The surface map's non-firing result exonerates no documentation surface.","evidence":"All mapped rules are keyed on unrelated Rust paths, so docs were inspected independently."},
+    {"claim":"stale, producers, and flagsweep are not applicable.","evidence":"The diff deletes nothing, narrows no classifier, and adds no flag or config value."},
+    {"claim":"Non-Windows-ARM64 runtime cells are excluded from the changed-behavior matrix.","evidence":"The exact guard excludes them; P3 verifies the full source-level partition."},
+    {"claim":"Shell-metacharacter argv classes are excluded.","evidence":"spawn receives an argv array and no shell re-parses it."},
+    {"claim":"Node 22.23.2 on the oracle runner is accepted as a substrate deviation.","evidence":"package.json requests Node >=24, so npm emitted EBADENGINE. The launcher uses stable builtins, and all resolution, producer, PE execution, npm install, and shim observations completed; the deviation does not change the architecture rule under review."},
+    {"claim":"Author-model family remains unknown without blocking completion.","evidence":"The PR and commits disclose no model. same_family=false records no known shared family; high-risk independence comes from the independently authored substrate corpus, not model provenance."},
+    {"claim":"The first oracle run's overall failure does not invalidate its green emulation and native jobs.","evidence":"Run 33002161430 failed because the harness did not clear LASTEXITCODE before the base matrix. Run 33002500967 corrected that harness defect and all four jobs passed; only the green jobs from run 1 are cited as corroboration."},
+    {"claim":"No radius Impact Map is required.","evidence":"radius was unavailable. The review-gate skill says to skip silently when the CLI is absent; the complete review used direct consumer enumeration and a real substrate corpus instead."}
+  ],
+  "issue_candidates": [
+    {
+      "title": "Launcher and global shim choose different binaries when both Windows ARM64 artifacts exist",
+      "evidence": "Run 33002500967 observes launcher -> arm64 at both base and head, while the installed .cmd points to x64 with both files present.",
+      "why_out_of_scope": "The merge-base both-present cell already selects arm64 and postinstall already writes x64, so the divergence predates this PR."
+    },
+    {
+      "title": "Windows ARM64 is missing from advertised platform surfaces",
+      "evidence": "README and docs enumerate five platforms and omit Windows ARM64 despite changelog #1269 documenting support.",
+      "why_out_of_scope": "Both capability and omission predate this branch."
+    },
+    {
+      "title": "The Windows ARM64 resolution rule is triplicated without a shared resolver",
+      "evidence": "bin/agent-browser.js, scripts/postinstall.js, and scripts/copy-native.js independently encode the platform/architecture mapping.",
+      "why_out_of_scope": "The structural duplication predates the PR and requires a broader cross-script refactor."
+    },
+    {
+      "title": "Native Windows ARM64 agent-browser panics on install",
+      "evidence": "Run 33002500967: native arm64 install exits 101 at cli/src/install.rs:181; the emulated x64 binary proceeds with a win64 Chrome download.",
+      "why_out_of_scope": "The unsupported platform_key and missing run_install guard predate this launcher-only diff."
+    },
+    {
+      "title": "cuse cannot install on GitHub windows-11-arm64 runners",
+      "evidence": "Recorded as crafter-agents/cuse#103; cuse has no Windows ARM64 asset mapping. crafter-agents/cuse#104 records the missing supported-runner contract.",
+      "why_out_of_scope": "This is a limitation of the independent oracle tool, not agent-browser PR 1725. A dedicated workflow was used instead."
+    }
+  ]
+}

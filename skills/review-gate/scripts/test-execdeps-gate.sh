@@ -8,6 +8,7 @@ trap 'rm -rf "$fixture"' EXIT
 git -C "$fixture" init -q
 git -C "$fixture" config user.email test@example.com
 git -C "$fixture" config user.name Test
+git -C "$fixture" config commit.gpgsign false
 mkdir -p "$fixture/src" "$fixture/install"
 printf '%s\n' 'fn main() {}' >"$fixture/src/tool.rs"
 printf '%s\n' 'packages = ["runtime"]' >"$fixture/install/debian.txt"

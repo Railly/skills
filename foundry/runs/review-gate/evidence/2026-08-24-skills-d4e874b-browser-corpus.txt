@@ -1,0 +1,48 @@
+Railly Skills browser substrate corpus
+Date: 2026-08-24
+Base: c4acad8cfc9b2a5a5c43f86e05abf57e86a4ce3a
+Head: d4e874b66bff1b5431925fe427c4d7ed339d2f9d
+Producer: Chromium driven with agent-browser against Astro's built preview
+
+Independent expected model
+
+1. ?q=review maps to review-gate, trail-decisions, simplify, and test-strength: four visible cards.
+2. ?channel=stable maps to issue-intake, record-a-case, review-gate, and solution-gate: four visible cards and stable pressed.
+3. Slash keydown outside an input focuses skill-search.
+4. A search with no matches yields zero visible cards and exposes the empty state.
+5. Clear filters removes query parameters, restores all 16 cards, and focuses skill-search.
+6. Theme clicks transition System to Light to Dark to System. Dataset and visible label agree.
+7. A saved light preference survives reload.
+8. If Storage setItem and removeItem throw, transitions 6 still hold for the session without an uncaught handler failure.
+
+Observed exact-head results
+
+- ?q=review: input review, result count 4, exactly the four expected cards.
+- ?channel=stable: result count 4, stable pressed, exactly the four expected cards.
+- Slash keydown: activeElement.id became skill-search.
+- Search zzzz-no-match: count 0 and empty-state hidden=false.
+- Clear filters: URL returned to /, count 16, focus returned to skill-search.
+- Persisted light then reload: dataset light, storage light, label Light.
+- Denied Storage API: clicks produced dataset/label Light/Light, Dark/Dark, System/System.
+
+Fix-absent mutation
+
+- Mutation: hydrateFilters() called updateUrl() instead of applyFilters().
+- Mutant result after build: ?q=review populated the input but left count 16 and 16 visible cards.
+- Restored result after build: ?q=review returned count 4 and four visible cards.
+
+Finding and closure
+
+- Pre-fix denied setItem moved dataset light to dark while label remained Light because the handler threw before renderTheme().
+- Fix: wrap setItem and removeItem separately and always render the current in-session theme.
+- Post-fix denied-storage sequence completed Light, Dark, System with synchronized labels.
+
+Other substrate evidence
+
+- Axe: 0 violations.
+- prefers-reduced-motion: workflow animation computed to none.
+- Screenshots inspected: /tmp/railly-skills-qa/desktop.png, /tmp/railly-skills-qa/mobile-prod.png, /tmp/railly-skills-qa/mobile-light.png.
+- Astro check: 0 errors, 0 warnings, 0 hints.
+- Biome: clean.
+- Astro static build emitted /index.html and /og.svg.
+- A clean frozen install from registry.npmjs.org installed 272 packages, then check and build passed.

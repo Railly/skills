@@ -28,7 +28,10 @@ describe("factory workflow contract", () => {
 		expect(spec).toBeGreaterThan(-1);
 		expect(show).toBeGreaterThan(spec);
 		expect(promote).toBeGreaterThan(show);
-		expect(skill).toContain("Any code or contract change invalidates every downstream artifact");
+		expect(skill).toContain(
+			"Any code or contract change invalidates downstream artifacts that depended on it",
+		);
+		expect(skill).toContain("compute the dependency cone");
 		expect(skill).toContain("human promote → deliver → record");
 		expect(skill).toContain("Skill(ship)");
 		expect(skill).toContain("If an owning workflow is unavailable");
@@ -37,11 +40,27 @@ describe("factory workflow contract", () => {
 	test("Herdr stays a runtime adapter instead of becoming a lifecycle owner", () => {
 		const loop = read("skills/.experimental/factory-loop/SKILL.md");
 		const factory = read("skills/.experimental/software-factory/SKILL.md");
-		expect(loop).toContain("`herdr-workstreams` is an optional runtime adapter");
-		expect(loop).toContain("Topology and lifecycle state never satisfy a phase");
+		expect(loop).toContain(
+			"`herdr-workstreams` is an optional runtime adapter",
+		);
+		expect(loop).toContain(
+			"Topology and lifecycle state never satisfy a phase",
+		);
 		expect(factory).toContain("Skill(herdr-workstreams)");
 		expect(factory).toContain("Visibility never satisfies a stage");
 		expect(factory).toContain("Skill(resilience-audit)");
+	});
+
+	test("isolated review prefers FX through AI Gateway and excludes Cursor", () => {
+		const review = read("skills/review-gate/SKILL.md");
+		const runtime = read(
+			"skills/solution-gate/references/orchestration-runtime.md",
+		);
+		expect(review).toContain("scripts/run-fx-review.mjs");
+		expect(review).toContain("Vercel AI Gateway");
+		expect(review).toContain("Cursor and `cursor-agent` are not supported");
+		expect(runtime).toContain("execution_mode: fx_worker");
+		expect(runtime).toContain("auth=AI_GATEWAY_API_KEY");
 	});
 
 	test("the public graph exposes Spec, delivery, and case capture in order", () => {
@@ -73,9 +92,13 @@ describe("factory workflow contract", () => {
 	test("the public graph and release summary scale from current data", () => {
 		const styles = read("www/src/styles/global.css");
 		const evidence = read("www/src/components/EvidenceKey.astro");
-		expect(styles).toContain("grid-template-columns: repeat(11, minmax(145px, 1fr));");
+		expect(styles).toContain(
+			"grid-template-columns: repeat(11, minmax(145px, 1fr));",
+		);
 		expect(styles.match(/min-width: 1595px;/g)).toHaveLength(2);
-		expect(evidence).toContain('import { evaluatedCount, release, skills } from "../data/skills"');
+		expect(evidence).toContain(
+			'import { evaluatedCount, release, skills } from "../data/skills"',
+		);
 		expect(evidence).not.toContain("Release 0.0.5");
 	});
 });

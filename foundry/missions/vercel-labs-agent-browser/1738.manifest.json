@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "work_item": {
+    "source": "https://github.com/vercel-labs/agent-browser/pull/1738",
+    "repository": "vercel-labs/agent-browser",
+    "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-pr-1738",
+    "base_sha": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+    "head_sha": "f0ef9771426c068e335c5fdb4a0d03362e104fd4",
+    "dirty_digest": null,
+    "authorization": "read-only",
+    "profile": "external-pr",
+    "budget_minutes": 90,
+    "budget_started_at": "2026-08-31T00:16:42.802Z",
+    "budget_escalation": null
+  },
+  "skill_revisions": {
+    "review-gate": {
+      "revision": "git:6ee1206df4f1+dirty:54762b3b9eae",
+      "digest": "sha256:54762b3b9eaee572bc4bd4ac3df5e7c9618bc801f64ea2d53b9d62e21418b3c7",
+      "path": "/Users/raillyhugo/Programming/railly/skills/skills/review-gate",
+      "status": "diverged"
+    }
+  },
+  "orchestration": {
+    "execution_mode": "sequential_isolated",
+    "degraded_from": "native_subagent",
+    "independence_gap": "The independent reviewer operation failed at the runtime capability schema boundary. Separate sequential lens artifacts were produced in the same reviewer context and are not cross-family independence.",
+    "schema_failures": 2,
+    "operations": [
+      {
+        "operation": "independent security reviewer launch",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "independent lifecycle and coverage reviewer launch",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false
+      }
+    ]
+  },
+  "stages": {
+    "intake": {
+      "status": "pending",
+      "skill": null,
+      "skill_revision": null,
+      "head_sha": null,
+      "started_at": null,
+      "finished_at": null,
+      "duration_ms": null,
+      "evidence": [],
+      "reason": null,
+      "receipt_id": null,
+      "fingerprint": null
+    },
+    "solution": {
+      "status": "pending",
+      "skill": null,
+      "skill_revision": null,
+      "head_sha": null,
+      "started_at": null,
+      "finished_at": null,
+      "duration_ms": null,
+      "evidence": [],
+      "reason": null,
+      "receipt_id": null,
+      "fingerprint": null
+    },
+    "implementation": {
+      "status": "pending",
+      "skill": null,
+      "skill_revision": null,
+      "head_sha": null,
+      "started_at": null,
+      "finished_at": null,
+      "duration_ms": null,
+      "evidence": [],
+      "reason": null,
+      "receipt_id": null,
+      "fingerprint": null
+    },
+    "spec": {
+      "status": "pending",
+      "skill": null,
+      "skill_revision": null,
+      "head_sha": null,
+      "started_at": null,
+      "finished_at": null,
+      "duration_ms": null,
+      "evidence": [],
+      "reason": null,
+      "receipt_id": null,
+      "fingerprint": null
+    },
+    "test_strength": {
+      "status": "pending",
+      "skill": null,
+      "skill_revision": null,
+      "head_sha": null,
+      "started_at": null,
+      "finished_at": null,
+      "duration_ms": null,
+      "evidence": [],
+      "reason": null,
+      "receipt_id": null,
+      "fingerprint": null
+    },
+    "resilience": {
+      "status": "pending",
+      "skill": null,
+      "skill_revision": null,
+      "head_sha": null,
+      "started_at": null,
+      "finished_at": null,
+      "duration_ms": null,
+      "evidence": [],
+      "reason": null,
+      "receipt_id": null,
+      "fingerprint": null
+    },
+    "review": {
+      "status": "fail",
+      "skill": "review-gate",
+      "skill_revision": "git:6ee1206df4f1+dirty:54762b3b9eae",
+      "head_sha": "f0ef9771426c068e335c5fdb4a0d03362e104fd4",
+      "started_at": "2026-08-31T00:16:42.802Z",
+      "finished_at": "2026-08-31T00:38:10.000Z",
+      "duration_ms": 1287198,
+      "evidence": [
+        "foundry/runs/review-gate/2026-08-30-agent-browser-1738-f0ef977.json",
+        "foundry/runs/review-gate/2026-08-30-agent-browser-1738-f0ef977.md",
+        "foundry/runs/review-gate/evidence/2026-08-30-agent-browser-1738-f0ef977.md",
+        "F1: startup success precedes listener readiness",
+        "F2: external bearer token reaches dashboard-launched subprocesses"
+      ],
+      "reason": "Exact-head verdict is findings with two confirmed blockers and unresolved required receipt and independence gaps.",
+      "receipt_id": "review-gate:vercel-labs-agent-browser:1738:f0ef977",
+      "fingerprint": {
+        "head_sha": "f0ef9771426c068e335c5fdb4a0d03362e104fd4",
+        "changed_paths_digest": "sha256:fb55e834c89eb1a49a1131050b69092c4989f101b8545916edf3541c96ccd09c",
+        "contract_digest": "sha256:1cdc6e33a5ead83d845e39c979161db68078e9eb581ce1261431b5ce19faa12d",
+        "command": "review-gate external-pr exact-head review with cargo test, dashboard build, deterministic gates, and built-artifact dogfood",
+        "environment_digest": "sha256:5b78c5f5709fdf48c659f56a7fe1025391476d2869eaf4c8ea8bad57994b32b9",
+        "skill_revision": "git:6ee1206df4f1+dirty:54762b3b9eae",
+        "relevant_paths": [
+          "cli/src/main.rs",
+          "cli/src/native/stream/dashboard.rs",
+          "cli/src/mcp.rs",
+          "cli/tests/dashboard_cli.rs",
+          "packages/dashboard",
+          "README.md",
+          "docs/src/app",
+          "skill-data/core"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      }
+    },
+    "before_after": {
+      "status": "pending",
+      "skill": null,
+      "skill_revision": null,
+      "head_sha": null,
+      "started_at": null,
+      "finished_at": null,
+      "duration_ms": null,
+      "evidence": [],
+      "reason": null,
+      "receipt_id": null,
+      "fingerprint": null
+    },
+    "promotion": {
+      "status": "pending",
+      "skill": null,
+      "skill_revision": null,
+      "head_sha": null,
+      "started_at": null,
+      "finished_at": null,
+      "duration_ms": null,
+      "evidence": [],
+      "reason": null,
+      "receipt_id": null,
+      "fingerprint": null
+    },
+    "handoff": {
+      "status": "pending",
+      "skill": null,
+      "skill_revision": null,
+      "head_sha": null,
+      "started_at": null,
+      "finished_at": null,
+      "duration_ms": null,
+      "evidence": [],
+      "reason": null,
+      "receipt_id": null,
+      "fingerprint": null
+    },
+    "case": {
+      "status": "pending",
+      "skill": null,
+      "skill_revision": null,
+      "head_sha": null,
+      "started_at": null,
+      "finished_at": null,
+      "duration_ms": null,
+      "evidence": [],
+      "reason": null,
+      "receipt_id": null,
+      "fingerprint": null
+    }
+  },
+  "outcome": {
+    "status": "failed",
+    "delivery": "pending",
+    "external_findings": 2,
+    "review_rounds": 1,
+    "regression_7d": null,
+    "regression_30d": null,
+    "human_corrections": 0,
+    "exact_head_reuse_count": 0,
+    "interrupted_stages": [
+      "review"
+    ],
+    "restarted_stages": [
+      "review"
+    ],
+    "escaped_finding_classes": [
+      "startup-readiness-before-success",
+      "secret-environment-inheritance"
+    ]
+  },
+  "close_cycle": {
+    "handoff": "pending",
+    "case": "pending",
+    "git": "pending",
+    "promotion": "pending"
+  },
+  "updated_at": "2026-08-31T00:41:56.059Z"
+}

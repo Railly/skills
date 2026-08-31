@@ -2,6 +2,7 @@
 # Deterministic layer of the review gate. Every check is binary: exit 0 (pass) or 1 (findings).
 # Run from inside the target repository.
 set -uo pipefail
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 usage() {
 	cat <<'EOF'
@@ -45,6 +46,8 @@ Usage:
                                               assumptions, covers every post-commit failure stage and retry, and has
                                               an independent challenge source when high risk. --structural skips
                                               exact checkout HEAD and diff-signal checks for schema fixtures only
+  gate.sh render <run-report.json> [output.md]
+                                              Generate the human report deterministically from schema-v1 JSON
   gate.sh all <conventions.md> [<base-ref>]   style + surfaces
 
 <base-ref> defaults to the merge base with origin/HEAD (falls back to HEAD~1).
@@ -556,8 +559,6 @@ check_report() {
 	local report="${1:-}"
 	[[ -z "$report" ]] && usage
 	shift || true
-	local script_dir
-	script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 	node "$script_dir/validate-run-report.mjs" "$report" "$@"
 }
 
@@ -718,6 +719,7 @@ case "$cmd" in
 	execdeps) check_execdeps "$@" ;;
 	covered) check_covered "$@" ;;
 	report) check_report "$@" ;;
+	render) bun "$script_dir/render-run-report.mjs" "$@" ;;
 	style) check_style "$@" ;;
 	stale) check_stale "$@" ;;
 	surfaces) check_surfaces "$@" ;;

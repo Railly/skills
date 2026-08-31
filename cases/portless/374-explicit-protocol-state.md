@@ -1,91 +1,73 @@
-# Case: PR #374 follow-up: explicit protocol state beats timing and string proxies
+# Case: PR #374: explicit authenticated protocol state beats timing and string proxies
 
-Status: evaluated
-Validation: contributor-validated
-Human review: pending
-Maintainer acceptance: pending
-Delivery: local
-Upstream status checked: 2026-08-12
+Status: promoted
+Validation: independently-validated
+Human review: independent-complete
+Maintainer acceptance: approved
+Delivery: merged
+Upstream status checked: 2026-08-29
 Visibility: public
 Repository: vercel-labs/portless
 Role: contributor
-Source: https://github.com/vercel-labs/portless/pull/374; `foundry/runs/solution-gate/2026-08-11-portless-366-374-60394ae-10dc32d.md`; `foundry/runs/review-gate/2026-08-11-portless-374-ad974fc.md`
-
-> The validated implementation exists as an uncommitted working-tree diff on top of local commit `ad974fc694b2ee55a9fdb40a60b4d48a1ffbb1f6`. PR #374 still points to `10dc32d5777f45e5d97c15a2be718f866d2074cf`, where the required Linux and Windows checks are failing.
+Source: https://github.com/vercel-labs/portless/pull/374; commit `d3615ddc9cdff14a69428f8eacb815f16cd0764c`; merge commit `1ad573bb95810daf6cd50c1718707015450f3f09`; `foundry/runs/review-gate/2026-08-29-portless-374-ea90fc6.md`; `foundry/runs/review-gate/evidence/2026-08-29-portless-374-ea90fc6-independent-challenge.md`
 
 ## Observed condition or claim
 
-Four failures remained in the hosts-sync warning path:
+The hosts-sync path originally inferred behavior from weak proxies:
 
 - synchronous CLI tests paid the compatibility ceiling because an in-process mock producer could not respond while `spawnSync` blocked its event loop
 - a `.local` suffix was treated as proof of active LAN mDNS, suppressing custom `.local` warnings
 - the internal sync route accepted authorities beginning with `127.`, intercepting a legitimate app hostname such as `127.evil.test`
 - hosts-file exactness inspected only one hostname per line, missing stale aliases on valid multi-name lines
+- an unauthenticated browser-shaped loopback POST could reach the internal callback
 
 ## Red signal
 
-Each failure inferred semantic state from a weaker proxy:
-
-- elapsed time stood in for producer capability
-- a hostname suffix stood in for active resolution mode
-- a string prefix stood in for canonical request authority
-- the first hostname token stood in for the complete hosts mapping
-
-Those proxies collapse states that require different behavior.
+Elapsed time, hostname suffixes, string prefixes, first-token parsing, and loopback origin were being used as substitutes for producer capability, active mode, canonical authority, complete hosts mappings, and authenticated protocol participation.
 
 ## Method used
 
-The solution gate reproduced all four defects. Its decisive probe showed that adding an acknowledgement handler to the existing in-process test did not help: the parent event loop was blocked. Moving the producer across a process boundary completed the request in 58 ms, refuting the proposal to shorten production compatibility timing for a test-harness problem.
+The solution gate reproduced the defects and rejected shortening production compatibility timing. Moving the mock producer across a process boundary completed the request promptly, showing that the delay belonged to the test harness rather than the protocol.
 
-The selected shape made the protocol states explicit:
+The implementation made producer outcomes explicit:
 
 - `acted`: a current daemon performed the sync
 - `disabled`: a current daemon will not perform it
 - `absent`: no producer exists
 - `mute`: preserve the bounded watcher opportunity for an older daemon
 
-Only `mute` pays the compatibility window. The same change:
+Only an older mute daemon retains the bounded compatibility wait. The same change derives LAN state from the persisted marker, requires exact canonical authority, and parses every hostname alias.
 
-- derives LAN mode from the persisted LAN marker rather than the `.local` suffix
-- separates peer-address loopback from exact canonical request authority
-- parses every hostname alias before an inline hosts-file comment
-
-The review gate traced LAN state through single-app, alias, startup, Turbo, and direct paths, then mutated six mechanisms independently.
+The security successor added a fresh challenge-bound HMAC before the client discloses the bearer token. The daemon requires that bearer and rejects browser provenance before invoking the callback. Token publication and cleanup remain daemon-owned. The regression tests use only stub callbacks, temporary state, and ephemeral loopback servers.
 
 ## Outcome
 
-The local implementation distinguishes producer states and applies exact domain predicates. The review gate reported:
+The simplified final tree `ea90fc6a1b3f6e47475e07beea5e9c49cfd4f592` was committed as `d3615ddc9cdff14a69428f8eacb815f16cd0764c`, independently challenged, approved, and merged as `1ad573bb95810daf6cd50c1718707015450f3f09`.
 
-- build passed
-- 246 module tests passed
-- the custom `.local` CLI integration passed in about 0.5 seconds
-- lint, typecheck, and diff checks passed
-- six independent test-strength mutations failed for the intended reason and passed after restoration
-
-Delivery remains local. The public PR still carries its earlier failing CI result and does not contain the validated follow-up.
+The Review Gate reported no blocking findings. CI, Windows CI, security, Socket, and Vercel checks passed. The neutral local suite passed 933 tests with 1 skipped across 22 test files.
 
 ## Evidence
 
-- Source: PR #374 at public head `10dc32d`; local base commit `ad974fc`; solution-gate decision record; review-gate report and structured run record.
-- Runtime: separate-process timing probe, custom `.local` CLI integration, internal-route probes, and hosts-file mapping probes are recorded in the gate artifacts.
-- Tests: 246 module tests plus six mechanism-specific mutations in the review-gate record.
-- Review: solution gate rejected shortening production timing; review gate completed with no remaining blocking findings.
-- Artifact: one local commit plus an uncommitted working-tree implementation; public PR remains unchanged.
+- Source: PR #374, final contributor commit `d3615ddc9cdff14a69428f8eacb815f16cd0764c`, reviewed tree `ea90fc6a1b3f6e47475e07beea5e9c49cfd4f592`, and merge commit `1ad573bb95810daf6cd50c1718707015450f3f09`.
+- Runtime: mixed-version, malformed-proof, duplicate-proof, delayed-response, publication-failure, cleanup, HTTP, HTTPS, peer, authority, and browser-provenance paths were exercised against ephemeral loopback servers.
+- Tests: 933 passed and 1 skipped. Force-red mutations rejected callback authorization bypass, destructive token replacement, HMAC proof-validation removal, and browser-provenance rejection removal.
+- Review: the Review Gate passed; an isolated Claude Sonnet 4.5 review of the frozen contract and exported diff passed after its concerns were converted into executable probes; the PR received approval.
+- Artifact: the before/after record shows the same browser-shaped request changing from one stub callback invocation to a fail-closed 401 with zero invocations. No privileged system file was accessed.
 
 ## Transferable lesson
 
-When behavior depends on protocol or parser state, represent that state directly. Timing, suffixes, prefixes, and first-token shortcuts are useful observations, but they are not substitutes for producer capability, active mode, canonical authority, or the complete mapping.
+When behavior depends on protocol or parser state, represent and authenticate that state directly. Timing, suffixes, prefixes, first-token shortcuts, and loopback location are observations, not proof of producer capability, active mode, canonical authority, complete mapping, or trusted participation.
 
 ## Exceptions
 
 - An older mute daemon intentionally retains a bounded wait because it cannot acknowledge the new trigger.
-- The public PR's failing Linux and Windows checks predate the local follow-up.
-- The exact validated diff has no commit SHA and cannot yet be exercised by PR CI.
+- Processes running as the same operating-system user remain inside the explicit trust boundary.
+- The before/after proof covers rejection before a stub callback on loopback HTTP. It does not claim isolation from same-user processes.
 
 ## Candidate changes
 
-- Reference rule: enumerate protocol states explicitly and let each state select its wait, warning, and fallback behavior; never infer the state from a timeout or surface string when the producer or parser can state it directly.
+- Reference rule: enumerate protocol states explicitly, authenticate privileged transitions before disclosing capabilities, and let each verified state select its wait, warning, fallback, and callback behavior.
 
 ## Confidentiality review
 
-Public repository and public PR metadata only. Private review wording, identities, local paths, and employer-internal context are omitted.
+Public repository, public PR metadata, public commit identifiers, and sanitized local evidence only. Private review wording, local paths, secrets, neighboring-project identity, and employer-internal context are omitted.

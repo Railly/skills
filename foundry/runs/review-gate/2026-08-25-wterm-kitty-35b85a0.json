@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-25",
+    "repo": "vercel-labs/wterm#120",
+    "base": "cdff1c07890ab2c5ba2efbcc1091f790dfb8f931",
+    "head": "35b85a0fc6e95828b4bc9746ef26d77fd34b43e6",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "Official Kitty keyboard protocol, upstream lock-modifier history, and PR #120 Tate blockers",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "Lock-only F1 selects its legacy SS3 sequence",
+      "Lock-only DECCKM cursor input selects its legacy application sequence",
+      "Ctrl plus lock remains CSI encoded with all modifier bits",
+      "Cumulative Kitty keyboard behavior remains unchanged"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "OpenAI GPT-5 Codex",
+    "reviewer_model": "Official Kitty reference oracle and upstream implementation history",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "Browser keyboard event translation",
+      "Terminal compatibility protocol",
+      "Modifier-dependent encoding selection"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "evidence/2026-08-25-wterm-kitty-35b85a0-reference-oracle.md",
+      "evidence": "Official protocol prose and upstream Kitty history independently require locks to be ignored for legacy functional selection, while the Ctrl plus lock counterexample verifies CSI modifier preservation."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "PR #120 blockers and the authorized lock-modifier successor scope",
+      "status": "reviewed",
+      "properties": ["KITTY-LOCK-P1", "KITTY-LOCK-P2", "KITTY-LOCK-P3"],
+      "evidence": "The exact two-file successor diff and all acceptance cases were reviewed against the promotion instruction."
+    },
+    {
+      "source": "design",
+      "location": "Official Kitty keyboard protocol and upstream key_encoding.c history",
+      "status": "reviewed",
+      "properties": ["KITTY-LOCK-P1", "KITTY-LOCK-P2"],
+      "evidence": "Protocol prose and commits 15f4c476, a4db27a8, and dd249df5 establish the lock-exclusion rule."
+    },
+    {
+      "source": "user_facing",
+      "location": "Built @wterm/dom keyboard bytes observed through Chromium",
+      "status": "reviewed",
+      "properties": ["KITTY-LOCK-P1", "KITTY-LOCK-P3"],
+      "evidence": "The rebuilt browser artifact emits the expected legacy functional bytes and the cumulative 19-scenario suite remains green."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/@wterm/dom/src/kitty-keys.ts and packages/@wterm/dom/src/__tests__/kitty-keys.test.ts",
+      "status": "reviewed",
+      "properties": ["KITTY-LOCK-P1", "KITTY-LOCK-P2", "KITTY-LOCK-P3"],
+      "evidence": "Both changed predicates, all encodeKittyKey callers, legacy branches, and exact byte assertions were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "KITTY-LOCK-P1",
+      "claim": "Caps Lock and Num Lock alone preserve legacy F-key and DECCKM application-cursor sequences.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Exact bytes for lock-only F1 and lock-only ArrowUp in DECCKM.",
+        "layer": "KeyboardEvent modifier state through encodeKittyKey output",
+        "method": "Official protocol differential, exact unit bytes, and rebuilt browser artifact",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "An unmodified F1 legacy test",
+        "counterexample": "Unmodified F1 can pass while Caps Lock incorrectly promotes it to CSI 1;65P.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Restoring the former modifierBits predicate made the Caps Lock F1 assertion fail with CSI 1;65P."
+      },
+      "substrates": [
+        {
+          "name": "Rebuilt @wterm/dom artifact in Chromium plus direct lock-state events",
+          "status": "exercised",
+          "evidence": "Chromium traversed the production path and direct getModifierState events supplied active lock state; exact outputs were ESC OP and ESC OA."
+        }
+      ],
+      "evidence": "The focused lock test, 182-test DOM suite, reference oracle, mutation, and built artifact converge on the same bytes."
+    },
+    {
+      "id": "KITTY-LOCK-P2",
+      "claim": "Ignoring lock bits is limited to legacy selection and does not erase other modifier semantics.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Exact CSI output for Ctrl plus Caps Lock plus F1.",
+        "layer": "Modifier bit construction and functional-key serialization",
+        "method": "Negative-case exact byte assertion against the Kitty modifier map",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Lock-only legacy output",
+        "counterexample": "Clearing lock bits globally could make lock-only cases pass but emit CSI 1;5P instead of CSI 1;69P when Ctrl is also held.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Ctrl plus Caps Lock plus F1 emits CSI 1;69P, preserving both modifier classes in CSI encoding."
+      },
+      "substrates": [
+        {
+          "name": "DOM KeyboardEvent modifier-state serializer",
+          "status": "exercised",
+          "evidence": "The exact event shape traversed modifierBits, legacyFunctionalSequence, and CSI serialization."
+        }
+      ],
+      "evidence": "The implementation derives nonLockModifiers only for branch eligibility and keeps modifierBits for serialization."
+    },
+    {
+      "id": "KITTY-LOCK-P3",
+      "claim": "The successor preserves cumulative Kitty keyboard behavior outside lock-only legacy selection.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Existing keyboard outputs across flags, actions, modifiers, functional keys, shortcuts, and lifecycle events.",
+        "layer": "DOM unit suite and real Chromium InputHandler boundary",
+        "method": "Exact-head cumulative regression suites",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The three new lock assertions",
+        "counterexample": "A broad modifier predicate change could satisfy new examples while regressing printable keys, releases, browser shortcuts, or event flags.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "182 focused DOM tests, 14 full test tasks, and 19 Chromium scenarios passed on the exact head."
+      },
+      "substrates": [
+        {
+          "name": "Chromium KeyboardEvent through InputHandler and terminal onData",
+          "status": "exercised",
+          "evidence": "The exact-head rebuilt artifact passed all 19 cumulative Chromium scenarios."
+        }
+      ],
+      "evidence": "Full format, build, test, serial type-check, lint, Zig, focused DOM, and browser gates passed."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["Protocol encoder", "Browser event translation", "Modifier-dependent legacy selection"],
+    "dimensions": {
+      "values": [
+        "Locks: Caps Lock and Num Lock",
+        "Functional classes: F1 SS3 and DECCKM cursor application",
+        "Modifier classes: lock-only and Ctrl plus lock",
+        "Surrounding behavior: flags, actions, lifecycle, shortcuts, printable and functional keys"
+      ],
+      "exclusions": [
+        "Headless Chromium cannot toggle OS lock state, so active-lock producer state is supplied by direct KeyboardEvent getModifierState fixtures"
+      ],
+      "evidence": "The matrix covers both changed branches, the necessary negative case, and cumulative unchanged behavior."
+    },
+    "oracle": {
+      "source": "Official Kitty keyboard protocol and upstream implementation history",
+      "independent": true,
+      "evidence": "The protocol and commit 15f4c476 independently define has-no-unlocked-modifiers semantics for F1 through F4 and DECCKM."
+    },
+    "producer": {
+      "name": "Chromium KeyboardEvent via Playwright using the rebuilt DOM artifact",
+      "status": "exercised",
+      "evidence": "The cumulative suite passed 19 of 19 and a separate probe observed ESC OP and ESC OA; the active OS lock limitation is explicitly recorded."
+    },
+    "falsification": [
+      {
+        "mutation": "Restore both legacy-selection predicates from nonLockModifiers === 0 to modifierBits === 0.",
+        "red_evidence": "The new lock test failed because Caps Lock plus F1 emitted CSI 1;65P instead of ESC OP.",
+        "restored_green_evidence": "After applying the inverse patch, the focused lock test passed 14 of 14, the DOM suite passed 182 of 182, and the tree was clean."
+      }
+    ],
+    "evidence": "Independent oracle comparison, exact former-defect mutation, restored green suites, a negative modifier case, and a rebuilt browser artifact protect the changed rule."
+  },
+  "assumptions": [
+    {
+      "id": "KITTY-LOCK-A1",
+      "source": "Kitty modifier map",
+      "claim": "Caps Lock and Num Lock occupy bits 64 and 128 in wterm modifierBits.",
+      "status": "verified",
+      "evidence": "The modifier construction and existing tests map getModifierState lock names to these exact bits."
+    },
+    {
+      "id": "KITTY-LOCK-A2",
+      "source": "Reference oracle",
+      "claim": "Legacy functional selection ignores lock modifiers but CSI serialization retains reported modifier bits.",
+      "status": "verified",
+      "evidence": "Official protocol prose, upstream history, and the Ctrl plus Caps Lock counterexample agree."
+    },
+    {
+      "id": "KITTY-LOCK-A3",
+      "source": "Production call graph",
+      "claim": "InputHandler is the production browser consumer of encodeKittyKey.",
+      "status": "verified",
+      "evidence": "The canonical caller sweep and direct source inspection found both production calls in input.ts."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The change selects in-memory terminal byte sequences and adds tests; it introduces no process, network, file, database, timeout, retry, cleanup, or durable-state boundary.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, or lookup data source was replaced."},
+    {"name":"New-domain matrix","status":"run","reason":"Caps Lock, Num Lock, F1, DECCKM ArrowUp, lock-only, and Ctrl plus lock were exercised."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Every encodeKittyKey production caller was enumerated and reviewed."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell parsing changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"run","reason":"Chromium reached InputHandler, encodeKittyKey, and terminal onData through the built artifact."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No shim was introduced."},
+    {"name":"Deliberate-default check","status":"run","reason":"The legacy default remains selected only when no unlocked modifier requires CSI encoding."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Both changed predicates and their adjacent Escape, F-key, recovery, and cursor branches were reviewed."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Direct lock-state events and the rebuilt Chromium artifact cover complementary substrate capabilities."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Official protocol prose and upstream Kitty implementation history define the intended predicate."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No failure outcome changed."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"Pure alternate reporting and existing cumulative flag combinations were exercised."},
+    {"name":"Error-path forcing","status":"run","reason":"Restoring the former predicate forced the intended lock test red and restoration returned it green."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No recovery action or persistent resource changed."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No async wait, timeout, cancellation, or cleanup path changed."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"The real path is Chromium KeyboardEvent to InputHandler to encoder to terminal onData."},
+    {"name":"Substrate verification","status":"run","reason":"Exact terminal bytes were observed, and the browser lock-state limitation is explicit."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The exact-head DOM artifact passed all 19 Chromium scenarios."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"legacyFunctionalSequence owns the selection rule and its modifier inputs were traced."},
+    {"name":"Docs-behavior parity","status":"run","reason":"The change restores the existing negotiated Kitty protocol contract without a new public surface."},
+    {"name":"Demonstrative example","status":"run","reason":"The before/after artifact demonstrates F1, DECCKM ArrowUp, and the Ctrl counterexample."},
+    {"name":"Choice audit","status":"skipped","reason":"No project decision trail governs this narrow correction."},
+    {"name":"Complexity budget","status":"run","reason":"Two constant-time bit masks replace two direct zero comparisons without adding state or allocation."}
+  ],
+  "deterministic": [
+    {"check":"covered","outcome":"pass","reason":"This report is uniquely named for exact head 35b85a0."},
+    {"check":"style","outcome":"pass","reason":"Canonical style gate passed."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"docs-navigation.ts already registers /api-reference and page-titles.ts already names API Reference."},
+    {"check":"siblings Kitty","outcome":"acknowledged","reason":"examples/ghostty/src/main.ts mentions Kitty protocols but does not own DOM keyboard encoding semantics."},
+    {"check":"callers encodeKittyKey","outcome":"pass","reason":"All production call sites are in the reviewed input.ts surface."},
+    {"check":"spec","outcome":"pass","reason":"Lock-only F1, lock-only DECCKM, Ctrl plus lock CSI preservation, and must-not-change cumulative behavior pass."},
+    {"check":"force-red","outcome":"pass","reason":"The former predicate emitted CSI 1;65P instead of ESC OP; restoration returned the 182-test DOM suite to green."},
+    {"check":"format","outcome":"pass","reason":"Exact files and root pnpm format:check passed."},
+    {"check":"focused DOM","outcome":"pass","reason":"182 of 182 tests passed."},
+    {"check":"test","outcome":"pass","reason":"14 of 14 root test tasks passed."},
+    {"check":"type-check","outcome":"pass","reason":"The authoritative serial rerun passed 22 of 22 tasks."},
+    {"check":"build","outcome":"pass","reason":"15 of 15 build tasks passed."},
+    {"check":"lint","outcome":"pass","reason":"11 of 11 tasks passed with one pre-existing docs warning."},
+    {"check":"Zig","outcome":"pass","reason":"Zig tests passed."},
+    {"check":"browser E2E","outcome":"pass","reason":"The exact-head Chromium suite passed 19 of 19."},
+    {"check":"git diff --check","outcome":"pass","reason":"No whitespace errors and the target tree is clean."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"43 changed symbols, 64 impacted, 646 edges, and 4290 unresolved calls; the map under-covers and was used only for orientation."},
+    {"check":"resilience","outcome":"not_applicable","reason":"No process, network, storage, timeout, retry, cleanup, or durable-state boundary changed."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "No documentation navigation or page-title edit is required.",
+      "evidence": "The existing route and title already represent the API reference page; no page identity changed."
+    },
+    {
+      "claim": "The Ghostty example needs no edit.",
+      "evidence": "Its generic Kitty protocols label does not describe or implement DOM functional-key lock semantics."
+    }
+  ],
+  "issue_candidates": []
+}

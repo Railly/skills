@@ -1,0 +1,39 @@
+Crafter Research Muniscan public page, exact HEAD 5f65d47dcde85f707fb932324e20205593178617
+
+Source-data oracle
+- data/2026-08-21/entities.json: 3,474 enriched entities, 409 restored municipalities, 94.3% coverage of 3,685 declared entities.
+- data/2026-08-21/index.json: 1,871 scored municipalities, median 34, 395 hostname-classified municipal systems, 30 zero scores.
+- data/2026-08-21/diff.json: 78 additions, 1 removal, 6 up, 4 down, 1,783 unchanged.
+- data/2026-08-21/health-sample.json: n=100, 68 HTTP responses, 32 without a response, 53 2xx responses.
+- Every claim boundary was checked against METHOD.md, LIMITATIONS.md, and HEALTH-SAMPLE.md.
+
+Repository checks
+- bun run check: pass, 0 Astro errors, 0 Astro warnings, 0 hints.
+- bun run build: pass, 32 static pages, including /muniscan and EN/ES/PT/ZH locale routes.
+- bun scripts/validate-projects.ts: 5 featured records, 20 audited projects, 6 public-system records, 43 public URLs.
+- git diff --check: pass.
+- review-gate style: pass.
+- review-gate surfaces: pass after adding the Muniscan route to the canonical surface map.
+- stale “Only one census”: zero hits.
+- stale “95.5% of declared entities”: zero hits.
+- siblings “Muniscan”: two acknowledged unchanged lines only name the project; all adjacent facts and behavior claims were reviewed and updated.
+- All six public raw-data and method links returned HTTP 200.
+- Local failure partition: first GET returned 503, immediate retry returned 200, exactly two requests observed, no local application state remained.
+
+Browser substrate
+- Light and dark at 1440x1000, 768x900, and 390x844.
+- document scrollWidth equaled innerWidth in all six cases.
+- Header exposes Muniscan at 1440 and intentionally folds secondary navigation below 900px.
+- Full-page and section screenshots inspected for hero, measurement, pipeline, recurrence, HTTP observation, artifacts, and limitations.
+- Home and Projects route /es/muniscan internally without target=_blank; external repository links remain new-tab links.
+- /es/muniscan renders lang=es, Spanish title and H1, and localized footer path.
+- Agent-browser console errors: none.
+- Axe: 0 violations. Contrast remained incomplete because the page background is a gradient, not a detected violation.
+
+Radius orientation
+- 3 changed symbols, 8 impacted symbols, 110 edges, 156 unresolved calls.
+- The map under-covers new Astro files and was used only for orientation.
+
+Known pre-existing warnings
+- Four Biome noImportantStyles warnings belong to the reduced-motion override in global.css and predate this diff.
+- Empty blog collection warnings predate this diff and do not block any static route.

@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-25",
+    "repo": "portless",
+    "base": "2cd0719e152abe72e4e45700fdf9119b1cad4f1b",
+    "head": "2ac15191f438f8b3064b73453b60ff702b15d0f8",
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Successful explicit unprivileged startup could not reach the real listener because the sandbox rejects loopback listen with EPERM.",
+      "Real Linux sudo and Windows substrates were unavailable.",
+      "GitHub API PR metadata could not be revalidated because api.github.com was unreachable.",
+      "Some shell commands used the target or isolated copy as their command working directory instead of keeping every command at /Users/raillyhugo/kai as requested; the frozen target stayed clean."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No Issue Contract or separate Spec review was supplied; Standards review used the PR title and exact base-to-head diff only."]
+  },
+  "provenance": {
+    "author_model": "unknown",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["process lifecycle", "privilege elevation", "cross-platform guarantee", "durable proxy state"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-25-portless-397-2ac1519-substrate.txt",
+      "evidence": "An independently stated process-result oracle drove real child processes and filesystem state against the built exact-head CLI."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "PR title supplied by cockpit",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The title claims privileged proxy elevation failures become fatal. No separate Issue Contract was provided."
+    },
+    {
+      "source": "design",
+      "location": "not provided",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "No Solution Gate, design artifact, or decision trail accompanied the handoff."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, apps/docs/src/app/commands/page.mdx, skills/portless/SKILL.md, CLI help and errors",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "All current proxy-start behavior passages were swept and the built error/help surfaces were driven."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/portless/src/cli.ts, cli-utils.ts, cli.test.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The exact diff, complete parent/child startup path, callers, state files, tests, and built artifact were reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "A privileged proxy elevation failure exits nonzero and does not start or persist a fallback endpoint.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "CLI exit status plus proxy.pid and proxy.port on the filesystem",
+        "layer": "built CLI process and state directory",
+        "method": "real spawnSync to a fake sudo that exits 23 and an absent-sudo PATH",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "error text or green unit tests",
+        "counterexample": "the CLI can print an error yet exit zero or persist/start port 1355",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The exit-zero mutation preserved all error text but both tests went red after rebuilding; filesystem inspection found no pid or port marker."
+      },
+      "substrates": [
+        {
+          "name": "macOS Node 24 process spawning a POSIX fake sudo executable",
+          "status": "exercised",
+          "evidence": "Direct proxy start exited 1 in 0.33s for sudo status 23 and left no proxy.pid or proxy.port."
+        }
+      ],
+      "evidence": "Both failure forms were exercised twice in the authored suite and direct dogfood verified the built artifact."
+    },
+    {
+      "id": "P2",
+      "claim": "The fatal child outcome propagates promptly through every proxy auto-start caller.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "parent CLI latency and messages after the child process has synchronously exited nonzero",
+        "layer": "interactive app auto-start CLI path",
+        "method": "PTY drive of portless review-app /usr/bin/true with fake sudo exit 23",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "direct proxy start exits promptly",
+        "counterexample": "the child exits promptly but ensureProxyRunning ignores status and polls readiness",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Direct startup took 0.33s; interactive app auto-start took 5.15s and printed a second generic failure."
+      },
+      "substrates": [
+        {
+          "name": "interactive parent-child CLI lifecycle under PTY",
+          "status": "exercised",
+          "evidence": "Confirmed finding at packages/portless/src/cli.ts:1128."
+        }
+      ],
+      "evidence": "Property is refuted by confirmed finding F1."
+    },
+    {
+      "id": "P3",
+      "claim": "The error preserves the requested startup configuration and gives an actionable recovery command.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the built CLI recovery command",
+        "layer": "user-facing stderr",
+        "method": "drive --no-tls and the authored cert/key/TLD/wildcard vector",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "buildProxyStartConfig unit behavior",
+        "counterexample": "the inner builder is correct but the final printed command drops or rewrites flags",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "Built stderr preserved --no-tls; authored CLI drive preserved cert, key, test TLD, and wildcard."
+      },
+      "substrates": [
+        {
+          "name": "built CLI stderr",
+          "status": "exercised",
+          "evidence": "Recovery command was sudo portless proxy start --no-tls for the dogfood cell."
+        }
+      ],
+      "evidence": "Observed at the user-facing layer, not only from helper output."
+    },
+    {
+      "id": "P4",
+      "claim": "An explicitly selected unprivileged port remains a working no-sudo alternative.",
+      "kind": "availability",
+      "status": "unverified",
+      "oracle": {
+        "observes": "a real listener responding on the selected unprivileged port and clean stop",
+        "layer": "TCP loopback and built CLI lifecycle",
+        "method": "portless proxy start -p 1355 --no-tls followed by stop",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "help text and source path bypass sudo",
+        "counterexample": "the no-sudo branch is selected but the listener fails to bind or publish state",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The sandbox rejected listen(127.0.0.1) with EPERM, so source and docs cannot close the availability claim."
+      },
+      "substrates": [
+        {
+          "name": "macOS loopback TCP listener",
+          "status": "unverified",
+          "evidence": "Sandbox EPERM blocked both the built drive and the authored lifecycle test before a listener could bind."
+        }
+      ],
+      "evidence": "Required success substrate unavailable."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["process lifecycle", "privilege-elevation adapter", "cross-platform compatibility layer"],
+    "dimensions": {
+      "values": [
+        "entry=direct proxy start; port=implicit privileged; sudo=exit 23; expected=exit 1, no fallback state",
+        "entry=direct proxy start; port=implicit privileged; sudo=missing; expected=exit 1, no fallback state",
+        "entry=app auto-start interactive; child=exit 1; expected=prompt parent failure without readiness polling",
+        "entry=app auto-start non-interactive; privileged port; expected=fail before prompting",
+        "entry=direct proxy start; port=explicit unprivileged; expected=start without sudo",
+        "platform=Windows; privileged threshold not applicable; expected=no sudo path"
+      ],
+      "exclusions": [
+        "Root execution was excluded because it bypasses the changed elevation adapter by product definition.",
+        "Successful real sudo authorization was unavailable and is recorded as a gap rather than modeled synthetically."
+      ],
+      "evidence": "Four lifecycle cells were driven through real child processes; unprivileged success and unavailable platforms remain explicit gaps."
+    },
+    "oracle": {
+      "source": "POSIX child-process terminal outcome and the independently stated PR contract",
+      "independent": true,
+      "evidence": "A synchronous nonzero child outcome is terminal; filesystem state, elapsed time, and the parent CLI boundary were observed independently of production branches."
+    },
+    "producer": {
+      "name": "Node spawnSync driving a real executable and the built portless CLI through direct and PTY parent-child paths",
+      "status": "unverified",
+      "evidence": "Failure producers were exercised. Successful TCP producer and real sudo/Windows producers were unavailable."
+    },
+    "falsification": [
+      {
+        "mutation": "Change the new privileged-failure process.exit(1) to process.exit(0), rebuild dist/cli.js, and run both privileged startup tests.",
+        "red_evidence": "Both tests failed at their intended status assertion, expected 1 and received 0.",
+        "restored_green_evidence": "Restored process.exit(1), rebuilt, and both tests passed; the pair passed three consecutive runs."
+      }
+    ],
+    "evidence": "Failure contract protection is strong, but mandatory real-producer coverage remains incomplete due listener, sudo, and Windows gaps."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "subsystem model",
+      "claim": "Every proxy-start caller treats a nonzero child exit as terminal.",
+      "status": "refuted",
+      "evidence": "ensureProxyRunning polls for five seconds after the child reports sudo failure."
+    },
+    {
+      "id": "A2",
+      "source": "implementation",
+      "claim": "Failure occurs before fallback proxy state is written.",
+      "status": "verified",
+      "evidence": "No proxy.pid or proxy.port existed after both direct failure forms."
+    },
+    {
+      "id": "A3",
+      "source": "user-facing prose",
+      "claim": "Port 1355 remains an explicit working alternative on supported systems.",
+      "status": "unverified",
+      "evidence": "The sandbox denied loopback bind with EPERM, preventing the required success drive."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Successful startup may publish proxy.pid, proxy.port, logs, certificates, and a live daemon; the changed failure branch must commit none of these.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "privileged child may publish proxy state and daemon process",
+        "owner": "elevated proxy start child",
+        "commit_event": "proxy state files and listening daemon are created after successful elevation",
+        "later_fallible_stages": ["parent readiness discovery", "parent success reporting"],
+        "failure_partitions": [
+          {
+            "ownership_region": "child elevation before commit",
+            "covers": ["parent readiness discovery", "parent success reporting"],
+            "forced": true,
+            "residual_observed": "No proxy.pid or proxy.port; no listener existed.",
+            "cleanup_owner": "none required before commit",
+            "retry": {
+              "attempted": true,
+              "outcome": "failed",
+              "evidence": "The authored test repeated the same failed operation twice without residual state, but a successful recovery retry could not be completed because loopback listen is blocked."
+            },
+            "evidence": "Fake sudo status 23 and missing sudo were forced."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, lookup source, or semantic data source was replaced."},
+    {"name":"New-domain matrix","status":"skipped","reason":"No guard or validator widened its accepted input domain."},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"No resolution, precedence, or discovery rule changed."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell-script composition or detector changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"run","reason":"Direct child and attached parent channels were driven; the fatal error reaches the terminal but is followed by a duplicate parent error after polling."},
+    {"name":"Shim hermeticity","status":"run","reason":"The fake sudo was prepended to PATH and observed through its unique exit status; missing-sudo PATH was also driven."},
+    {"name":"Deliberate-default check","status":"run","reason":"Removing implicit fallback is the explicit product choice in title and all updated contract surfaces; explicit 1355 remains documented."},
+    {"name":"Fresh-seam scan","status":"run","reason":"The child handleProxy to parent ensureProxyRunning seam surfaced F1."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No external-substrate guard or detector changed."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"No written external protocol or reference implementation governs the product-specific fallback policy."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"The new nonzero child outcome was traced through handleProxy, ensureProxyRunning, runApp, and multi-app startup; F1 confirms propagation is incomplete."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No new flag or config bit was added."},
+    {"name":"Error-path forcing","status":"run","reason":"Sudo exit status, missing executable, direct startup, interactive auto-start, non-interactive auto-start, repeated failure, and residual state were forced."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"The change removes an automatic heuristic recovery and adds no replacement recovery action."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"No new timeout was added, but parent readiness polling was timed after the new terminal child outcome and produced F1."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"The process boundary from parent CLI to child proxy start to sudo and back was traced through direct and auto-start entry points."},
+    {"name":"Substrate verification","status":"run","reason":"Exit status and filesystem state were observed; listener success remains an explicit gap."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"An exact-head tsup artifact was driven through direct and app auto-start failure paths."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"The new no-fallback invariant is owned by handleProxy for direct startup, but its terminal-outcome implications are not owned by ensureProxyRunning, producing F1."},
+    {"name":"Docs-behavior parity","status":"run","reason":"README, CLI help, commands docs, and skill passages agree with direct fatal behavior and explicit 1355 alternative."},
+    {"name":"Demonstrative example","status":"run","reason":"The changed -p 1355 examples require the explicit no-sudo alternative, but execution was blocked by loopback EPERM and remains a gap."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail was supplied."},
+    {"name":"Complexity budget","status":"skipped","reason":"No per-element loop, membership check, or lookup was added."}
+  ],
+  "deterministic": [
+    {"check":"covered initial","outcome":"acknowledged","reason":"Expected pre-report red: no exact-head report existed before this Review Gate run."},
+    {"check":"style","outcome":"pass","reason":"No universal style finding; portless house norm permits the added em dash and no forbidden prose double dash was added."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"README and skill requirements passed. cli-utils.ts to clean-utils.ts fired only because a fallback-port comment changed; no writer or persistent artifact was added."},
+    {"check":"stale Falling back to port","outcome":"pass","reason":"Zero hits."},
+    {"check":"stale falls back to port 1355","outcome":"pass","reason":"Zero hits."},
+    {"check":"siblings sudo","outcome":"acknowledged","reason":"Broad hits were individually triaged; unrelated elevation operations and history are exempt, and every current proxy-start contract passage was read."},
+    {"check":"callers handleProxy","outcome":"pass","reason":"Every call site is in the diffed cli.ts and was read."},
+    {"check":"callers ensureProxyRunning","outcome":"pass","reason":"Both runApp and multi-app call sites are in cli.ts and were read; F1 lies inside the changed-contract parent itself."},
+    {"check":"timings","outcome":"pass","reason":"No wait ceiling was added."},
+    {"check":"shellmeta","outcome":"pass","reason":"No shell-metacharacter detector was added."},
+    {"check":"artifacts","outcome":"acknowledged","reason":"Not triggered: the diff adds no persistent file writer."},
+    {"check":"rawinput","outcome":"acknowledged","reason":"Not triggered: no resolution rule deepened."},
+    {"check":"execdeps","outcome":"pass","reason":"No executable dependency map rule triggered; sudo was already a production dependency."},
+    {"check":"force-red","outcome":"pass","reason":"After rebuilding the shipped artifact, exit-zero mutation made both privileged tests fail for the intended status assertion; restored build passed."},
+    {"check":"eslint","outcome":"pass","reason":"Changed TypeScript files passed repository ESLint."},
+    {"check":"type-check","outcome":"pass","reason":"tsc --noEmit passed."},
+    {"check":"format","outcome":"pass","reason":"Prettier check passed all six changed files."},
+    {"check":"build","outcome":"pass","reason":"tsup built the isolated exact-head artifact."}
+  ],
+  "findings": [
+    {
+      "id":"F1",
+      "state":"confirmed",
+      "claim":"Interactive app auto-start ignores the fatal child exit and waits the full five-second readiness loop before duplicating the failure.",
+      "evidence":"Fake sudo exit 23: direct proxy start exited 1 in 0.33s; PTY app auto-start printed the same child error, then Failed to start proxy after 5.15s. cli.ts:1128 polls whenever result.signal is absent, including result.status=1.",
+      "layer":"parent CLI process lifecycle and user-visible latency",
+      "source":"map",
+      "path":"handleProxy → child process exit 1 → ensureProxyRunning via spawnSync → readiness loop",
+      "resolution":"open"
+    },
+    {
+      "id":"G1",
+      "state":"unverified",
+      "claim":"The explicit unprivileged-port alternative successfully starts and stops a real listener.",
+      "evidence":"Both built drive and authored lifecycle test were blocked because sandbox listen(127.0.0.1) returns EPERM.",
+      "layer":"TCP loopback and daemon lifecycle",
+      "source":"lens",
+      "path":"",
+      "resolution":"open"
+    },
+    {
+      "id":"G2",
+      "state":"unverified",
+      "claim":"The changed behavior is correct with real Linux sudo and on Windows.",
+      "evidence":"Those supported substrates were unavailable; fake sudo exercises process outcomes but cannot replace platform-specific integration.",
+      "layer":"OS privilege adapter",
+      "source":"lens",
+      "path":"",
+      "resolution":"open"
+    }
+  ],
+  "exemptions": [
+    {"claim":"clean-utils.ts need not change for the cli-utils.ts comment edit.","evidence":"The diff adds no file constant, path construction, or write call; artifact cleanup is unaffected."},
+    {"claim":"Unchanged sudo passages outside proxy startup need not change.","evidence":"Each describes certificates, services, cleanup, mDNS installation, OAuth setup, or history rather than proxy-start fallback semantics."},
+    {"claim":"The web docs landing page need not duplicate the failure policy.","evidence":"It only states the still-true auto-elevation behavior; the updated commands page owns the detailed startup contract."}
+  ],
+  "issue_candidates": [
+    {"title":"Installed Review Gate copy is missing its canonical source-root resolver","evidence":"The skill instructs scripts/resolve-source-root.mjs, but that file is absent under /Users/raillyhugo/kai/.agents/skills/review-gate; the canonical source checkout contains and successfully runs it.","why_out_of_scope":"This is packaging of the review workflow, not portless PR #397."}
+  ]
+}

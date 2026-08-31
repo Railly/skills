@@ -169,7 +169,7 @@ function validateCandidatePatch(path, expectedSkillPath, owner, errors) {
 export function validateImpactLedger(
 	repository,
 	impacts,
-	{ registry, patterns = [] } = {},
+	{ registry, patterns = [], verifyActiveState = true } = {},
 ) {
 	const errors = [];
 	const trackedPaths = trackedRepositoryPaths(repository);
@@ -370,13 +370,15 @@ export function validateImpactLedger(
 		}
 	}
 
-	for (const [skill, digest] of previousSkillDigest.entries()) {
-		const path = activeSkillPath(registry, skill);
-		const target = path ? resolve(repository, path) : null;
-		if (target && existsSync(target) && fileDigest(target) !== digest) {
-			errors.push(
-				`foundry/knowledge/impact.jsonl: latest impact for "${skill}" does not match the active skill digest`,
-			);
+	if (verifyActiveState) {
+		for (const [skill, digest] of previousSkillDigest.entries()) {
+			const path = activeSkillPath(registry, skill);
+			const target = path ? resolve(repository, path) : null;
+			if (target && existsSync(target) && fileDigest(target) !== digest) {
+				errors.push(
+					`foundry/knowledge/impact.jsonl: latest impact for "${skill}" does not match the active skill digest`,
+				);
+			}
 		}
 	}
 
@@ -533,7 +535,7 @@ export function recordImpact(repository, knowledge, proposed) {
 	const currentValidation = validateImpactLedger(
 		repository,
 		knowledge.impacts,
-		validationOptions,
+		{ ...validationOptions, verifyActiveState: false },
 	);
 	if (currentValidation.errors.length > 0) {
 		throw new Error(currentValidation.errors.join("\n"));

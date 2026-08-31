@@ -1,52 +1,41 @@
 # sunat-cli review conventions
 
-Bootstrapped 2026-08-26 from CONTRIBUTING.md, README.md, package manifests,
-the release workflow, and the repository source.
+Bootstrapped 2026-08-25 from `CONTRIBUTING.md`, the repository README, package metadata, and the project instructions supplied for this hardening cycle.
 
 ## Surface map
 
+Published behavior changes must update the README or `packages/cli/LIMITATIONS.md` when relevant. Privacy-sensitive command, storage, browser, and workflow changes also keep the bundled agent skill aligned.
+
 ```surfaces
-packages/cli/src/commands/** :: packages/cli/bin/sunat.ts, README.md, packages/cli/README.md, packages/cli/src/skills/core.md, packages/cli/skills/sunat-cli/SKILL.md, skills/sunat-cli/SKILL.md, packages/cli/tests/e2e/**
-packages/cli/src/buzon/** :: packages/cli/src/commands/buzon/**, packages/cli/src/schemas/buzon.json, packages/cli/LIMITATIONS.md, README.md, packages/cli/README.md, packages/cli/src/skills/endpoints.md, packages/cli/skills/sunat-cli/SKILL.md, skills/sunat-cli/SKILL.md, packages/website/src/lib/content.ts, packages/cli/tests/unit/buzon-*.test.ts, packages/cli/tests/e2e/buzon-cli.test.ts
-packages/cli/src/browser/** :: packages/cli/tests/unit/**, packages/cli/tests/e2e/**
-packages/cli/src/schemas/** :: packages/cli/src/commands/schema.ts, packages/cli/tests/e2e/**
-packages/cli/package.json :: package-lock.json
+packages/cli/src/data/audit.ts :: README.md, packages/cli/LIMITATIONS.md, packages/cli/skills/sunat-cli/SKILL.md
+packages/cli/src/data/config.ts :: README.md, packages/cli/LIMITATIONS.md, packages/cli/skills/sunat-cli/SKILL.md
+packages/cli/src/data/keychain.ts :: README.md, packages/cli/LIMITATIONS.md, packages/cli/skills/sunat-cli/SKILL.md
+packages/cli/src/browser/client.ts :: packages/cli/LIMITATIONS.md, packages/cli/skills/sunat-cli/SKILL.md
+packages/cli/src/workflows/f616.ts :: packages/cli/LIMITATIONS.md, packages/cli/skills/sunat-cli/SKILL.md, packages/cli/skills/sunat-cli/references/schemas.md
+packages/cli/src/workflows/rhe.ts :: packages/cli/LIMITATIONS.md, packages/cli/skills/sunat-cli/SKILL.md
+packages/cli/package.json :: .github/workflows/test.yml, .github/workflows/release.yml
 ```
 
-## Norms
+## House norms
 
-- Never commit real Clave SOL credentials, certificates, tokens, taxpayer
-  records, audit logs, or production tax documents.
-- Use offline fixtures, public read-only endpoints, mocks, or explicitly scoped
-  live checks. Live checks record only sanitized structural evidence.
-- Preserve dry-run, confirmation, intent-token, idempotency, and audit behavior
-  for commands that can mutate external state.
-- Document portal assumptions and failure modes because SUNAT interfaces can
-  change without notice.
-- Published behavior updates the root README and package README or limitations
-  where relevant.
-- Unit and end-to-end tests run with Bun. Release installation, audit, packing,
-  trusted publishing, and registry verification run with the pinned npm client.
-- A package version change updates package-lock.json and is released only from
-  main through the release workflow.
-- Pull requests list verification commands, live surfaces exercised, and known
-  limitations.
+- Use npm 11.6.4 for dependency installation, audit, lockfiles, package construction, and trusted publishing. Use Bun 1.3.11 only as the required runtime and test runner.
+- Use Biome, never ESLint or Prettier.
+- Never include real credentials, certificates, tokens, taxpayer records, portal screenshots, or audit logs in fixtures, commits, issues, or pull requests.
+- Live SUNAT mutation requires explicit authorization and the existing dry-run, confirmation, intent-token, idempotency, and audit controls.
+- No AI coauthor trailers and no prose em dashes.
 
 ## Subsystem invariants
 
-- Browser-backed commands use the authenticated local `agent-browser` session.
-  Browser state and local snapshots remain private under `SUNAT_HOME`.
-- Read-only commands do not call filing, payment, acknowledgement, or document
-  mutation endpoints.
-- Buzón SOL metadata collection blocks the detail endpoint before opening the
-  visor, serializes metadata requests, and preserves upstream counts and status
-  values without legal interpretation.
-- The built artifact runs under Node without Bun and includes every registered
-  command, schema, bundled skill, and documentation file promised by the package.
-- A release is complete only when the registry tarball, GitHub release asset,
-  tag, provenance attestation, and main commit agree.
+- Secret values may enter through interactive prompts, environment variables, or OS credential storage, but never through child-process argv, CLI output, or reflected backend errors.
+- Browser field values cross the `agent-browser` process boundary through stdin, never argv.
+- Config and audit persistence are fail-closed allowlists. Unknown fields are discarded rather than preserved.
+- Durable local state uses owner-only directories and files, atomic replacement, and removal of inherited macOS ACL access.
+- Audit identifiers are keyed references. Raw taxpayer identifiers, free-form arguments, remote bodies, XML, screenshots, and errors are not durable audit data.
+- Legacy data is re-sanitized when it changes after the privacy marker, including data recreated by a downgrade.
+- Remote REST, TUS, SIRE, SOAP, browser, and portal failures do not reflect untrusted response bodies, URLs, filesystem paths, or secrets.
+- The exact tarball tested and attested is the tarball published. Registry bytes, npm provenance, GitHub attestation, installed version, and CLI smoke behavior are verified after publication.
+- Real SUNAT operations are excluded from repository validation. Tests use mocks, fixtures, public read-only surfaces, or beta-only smoke paths.
 
 ## Gate-miss ledger
 
-| date | finding | which gate missed | why | what closed it |
-|---|---|---|---|---|
+- None recorded.

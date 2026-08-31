@@ -1,0 +1,370 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-25",
+    "repo": "railly",
+    "base": "14edf50d1e8eb03667230c74400036f63a1de975",
+    "head": "3ba5e1557f69a35d589fcbd10ec87924bc140344",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "User-provided Is Agentic remediation requirements in the active task",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "SSR homepage with H1 and more than 500 visible characters",
+      "HTTP 404 recovery in HTML and Markdown",
+      "Accept text/markdown negotiation with Vary",
+      "Discoverable developer and agent instructions",
+      "Organization and Person JSON-LD",
+      "About, Contact, and Privacy trust anchors"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "Codex GPT-5",
+    "reviewer_model": "Codex GPT-5",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["externally visible HTTP responses", "cache-variant behavior", "security-resource discoverability", "test subprocess lifecycle"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "/tmp/railly-agentic-preview-qa/report.md",
+      "evidence": "The HTTP contract was independently challenged through RFC 9110 and acceptmarkdown.com rules, an authenticated Vercel preview, Chrome, axe, the Vercel edge, native resource endpoints, and fix-absent mutations."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Active user request",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
+      "evidence": "Reviewed all nine audit findings and the endpoint, test, behavior-preservation, and verification requirements."
+    },
+    {
+      "source": "design",
+      "location": "Implementation decisions and cases/railly/conventions.md",
+      "status": "reviewed",
+      "properties": ["P2", "P3", "P4", "P6", "P7"],
+      "evidence": "Reviewed SSR middleware topology, document/API boundary, cache variation, honest developer-resource claims, canonical host, and static blog/newsletter preservation."
+    },
+    {
+      "source": "user_facing",
+      "location": "Homepage, llms.txt, agent-instructions.md, developers, contact, privacy, and 404 copy",
+      "status": "reviewed",
+      "properties": ["P1", "P3", "P4", "P7"],
+      "evidence": "Read every new public page and machine-readable document and exercised its links in the protected preview."
+    },
+    {
+      "source": "implementation",
+      "location": "Commit 3ba5e1557f69a35d589fcbd10ec87924bc140344",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
+      "evidence": "Reviewed the exact 22-file commit, callers, Vercel routes, generated output, tests, and deployed preview behavior."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The raw homepage response contains an H1 and meaningful server-rendered text without requiring JavaScript.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "The HTTP HTML body and rendered visible-text boundary",
+        "layer": "Vercel edge and browser DOM",
+        "method": "Fetched the preview HTML, removed script/style/tag content in integration tests, and inspected browser H1 plus body innerText.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Raw response byte count",
+        "counterexample": "A large app shell can exceed 500 bytes while exposing little visible content and no H1.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The test strips scripts and styles before counting; browser inspection found H1 Railly Hugo and 1,768 visible characters."
+      },
+      "substrates": [
+        {"name": "Astro HTTP integration", "status": "exercised", "evidence": "agent-readiness integration test passed."},
+        {"name": "Protected Vercel preview in Chrome", "status": "exercised", "evidence": "OIDC-authenticated agent-browser inspection returned the homepage, H1, and visible DOM text."}
+      ],
+      "evidence": "Preview GET / returned 200 text/html and the browser accessibility tree exposed the homepage H1 and agent-focused section."
+    },
+    {
+      "id": "P2",
+      "claim": "Document requests negotiate HTML and Markdown using Accept semantics and prevent CDN variant mixing.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Status, representation content type, selected body, and cache variation at the public HTTP boundary",
+        "layer": "HTTP protocol",
+        "method": "Compared q-values, explicit q=0, wildcard, unsupported, GET, and HEAD cases against RFC 9110 Accept precedence and acceptmarkdown.com Vary requirements.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A text/markdown Content-Type on one response",
+        "counterexample": "Markdown can be returned correctly once while a missing Vary header allows the CDN to serve a cached HTML variant later.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing Vary: Accept failed the intended test with Received: Accept-Encoding; restored code passed and preview responses carried Vary: Accept, Accept-Encoding."
+      },
+      "substrates": [
+        {"name": "Bun unit matrix", "status": "exercised", "evidence": "13 Accept combinations plus Vary merge behavior passed."},
+        {"name": "Vercel edge through authenticated Chrome fetch", "status": "exercised", "evidence": "HTML, Markdown, 406, q-value, and HEAD responses matched the model."}
+      ],
+      "evidence": "Preview / returned text/html by default, text/markdown for Markdown preference, HTML when Markdown had q=0, and 406 for application/pdf."
+    },
+    {
+      "id": "P3",
+      "claim": "Unknown document routes return HTTP 404 with useful recovery in both HTML and Markdown.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Actual HTTP status and recovery body at the unknown-route boundary",
+        "layer": "Vercel routing and response",
+        "method": "Fetched a nonexistent route as HTML, Markdown, and HEAD and inspected status, content type, and recovery links.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A page body that says 404",
+        "counterexample": "A soft 404 can render recovery copy while returning HTTP 200.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The preview returned status 404 in HTML and Markdown; removing the sitemap recovery link failed the intended test before snapshot restoration."
+      },
+      "substrates": [
+        {"name": "Astro integration server", "status": "exercised", "evidence": "HTML and Markdown 404 tests passed."},
+        {"name": "Vercel deployment route fallback", "status": "exercised", "evidence": "Protected preview returned 404 and actionable recovery links, including llms.txt and sitemap-index.xml."}
+      ],
+      "evidence": "The real adapter route config ends with a 404-status fallback to _render, and the deployed unknown route returned the intended body."
+    },
+    {
+      "id": "P4",
+      "claim": "Agents can discover specific when-to-use guidance, developer resources, and trust pages.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Public endpoint availability, headings, links, and agent guidance",
+        "layer": "Public content and navigation",
+        "method": "Fetched and read llms.txt, agent-instructions.md, developers, contact, privacy, about, and security.txt; navigated the visual pages in Chrome.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Files exist in source",
+        "counterexample": "A source file can be omitted from deployment, return the wrong content type, or be undiscoverable from navigation and llms.txt.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Every endpoint was fetched from the Vercel preview and developers/contact/privacy were linked from public navigation or footer and llms.txt."
+      },
+      "substrates": [
+        {"name": "Vercel preview HTTP", "status": "exercised", "evidence": "llms.txt, agent instructions, developers, contact, privacy, about, and security.txt returned 200."},
+        {"name": "Desktop and 390px Chrome", "status": "exercised", "evidence": "Screenshots and accessibility snapshots showed discoverable, readable pages without overlap."}
+      ],
+      "evidence": "llms.txt includes When to use and How agents should use it; developers honestly states that the portfolio is not a hosted API, webhook, OpenAPI, auth, or MCP service."
+    },
+    {
+      "id": "P5",
+      "claim": "Homepage JSON-LD completely identifies the Person and Organization requested by the audit.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Parsed JSON-LD graph fields and identity references",
+        "layer": "Structured data",
+        "method": "Parsed the deployed application/ld+json script and asserted Person url/sameAs/jobTitle and Organization contactPoint/address.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "JSON-LD script tag presence",
+        "counterexample": "A script can exist but contain invalid JSON, disconnected identities, or omit required properties.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Both unit parsing and browser JSON.parse returned the expected complete graph and linked founder IDs."
+      },
+      "substrates": [
+        {"name": "Schema unit test", "status": "exercised", "evidence": "Person and Organization completeness test passed."},
+        {"name": "Deployed browser DOM", "status": "exercised", "evidence": "Parsed live preview JSON-LD matched canonical www.railly.dev identity data."}
+      ],
+      "evidence": "Organization includes email contactPoint and Buenos Aires/AR PostalAddress; Person includes url, sameAs, jobTitle, and description."
+    },
+    {
+      "id": "P6",
+      "claim": "Negotiation applies only to document routes and preserves native API, feed, and sitemap behavior.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Native status, body, and content type for excluded public resources",
+        "layer": "HTTP routing boundary",
+        "method": "Fetched projects JSON, RSS XML, sitemap XML, and security.txt from the preview and checked middleware exclusion unit cases.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Document routes negotiate correctly",
+        "counterexample": "Middleware can still accidentally rewrite /api or .xml resources while all document tests pass.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Preview returned application/json for projects and application/xml for RSS and sitemap, with their original bodies."
+      },
+      "substrates": [
+        {"name": "Unit route classifier", "status": "exercised", "evidence": "API, asset, and mutation exclusions passed."},
+        {"name": "Vercel preview native resources", "status": "exercised", "evidence": "All excluded endpoint checks returned 200 with native content types."}
+      ],
+      "evidence": "The public endpoint matrix verified /api/projects.json, /rss.xml, /sitemap-index.xml, and /.well-known/security.txt."
+    },
+    {
+      "id": "P7",
+      "claim": "The new pages preserve the site's visual system and work at desktop and mobile widths.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Rendered layout, navigation, text visibility, and browser errors",
+        "layer": "Browser UI",
+        "method": "Used authenticated agent-browser screenshots and accessibility snapshots at desktop and 390x844, then checked console and page errors.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Server returned 200",
+        "counterexample": "A successful response can still render clipped, overlapping, blank, or broken after client transitions.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Waited for Astro View Transitions to settle, inspected screenshots, confirmed body opacity 1 and no active animations, and observed no console errors."
+      },
+      "substrates": [
+        {"name": "Chrome desktop", "status": "exercised", "evidence": "Homepage, developers, contact, privacy, and 404 screenshots inspected."},
+        {"name": "Chrome 390x844", "status": "exercised", "evidence": "Developers page remained readable with the existing horizontal mobile navigation pattern."}
+      ],
+      "evidence": "No agent-readiness visual or functional regressions were found."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["HTTP Accept parser", "content-negotiation protocol", "Astro-to-Vercel middleware adapter"],
+    "dimensions": {
+      "values": [
+        "method: GET, HEAD, excluded POST",
+        "media range: missing, empty, text/html, text/markdown, text/*, */*, unsupported application/pdf",
+        "quality: default 1, weighted preference, explicit q=0, all supported q=0",
+        "specificity: exact, subtype wildcard, global wildcard",
+        "resource class: canonical document, known document without bespoke Markdown, API, XML, asset, unknown document",
+        "status: 200, 404, 406",
+        "cache behavior: empty Vary, existing Vary, existing Accept"
+      ],
+      "exclusions": [
+        "Multipart and non-media Accept extensions are outside this site's two-representation contract.",
+        "API and asset routes are intentionally excluded from document negotiation and retain their native serializers."
+      ],
+      "evidence": "Unit and integration tests cover all listed equivalence classes, and the deployed browser fetch drove the same public boundary."
+    },
+    "oracle": {
+      "source": "RFC 9110 Accept precedence plus acceptmarkdown.com Vary requirement and the user-provided contract",
+      "independent": true,
+      "evidence": "Expected selections were written as an explicit table and compared to real response status, media type, body, and Vary rather than generated by production helpers."
+    },
+    "producer": {
+      "name": "Chrome Fetch through Vercel Deployment Protection and the Vercel edge",
+      "status": "exercised",
+      "evidence": "agent-browser 0.35.0 used a short-lived project OIDC header to fetch the protected preview and exercise real browser-generated Accept requests."
+    },
+    "falsification": [
+      {
+        "mutation": "Removed Vary: Accept from appendNegotiationHeaders",
+        "red_evidence": "Focused test exited 1 with Expected Accept, Accept-Encoding and Received Accept-Encoding.",
+        "restored_green_evidence": "Snapshot restored byte-for-byte and the negotiation/content suites returned 21 pass, 0 fail."
+      },
+      {
+        "mutation": "Removed the sitemap recovery link from getNotFoundMarkdown",
+        "red_evidence": "Focused 404 recovery test exited 1 on its intended sitemap assertion.",
+        "restored_green_evidence": "Snapshot restored byte-for-byte and the negotiation/content suites returned 21 pass, 0 fail."
+      }
+    ],
+    "evidence": "All 86 repository tests pass on the exact commit, including the real HTTP integration server and the explicit protocol matrix."
+  },
+  "assumptions": [
+    {"id": "A1", "source": "Subsystem model", "claim": "Astro middleware executes for server-rendered document routes on Vercel.", "status": "verified", "evidence": "Protected preview responses carried negotiated types and Vary headers from middleware."},
+    {"id": "A2", "source": "Design", "claim": "Blog and newsletter entries can remain prerendered while the rest of the site uses server output.", "status": "verified", "evidence": "Production build emitted static blog/newsletter artifacts and completed successfully."},
+    {"id": "A3", "source": "User-facing claims", "claim": "railly.dev is a portfolio/discovery layer and does not provide site-wide auth, webhooks, OpenAPI, or MCP.", "status": "verified", "evidence": "Repository route inventory and public developer resources expose no such contracts; copy directs users to per-project documentation."},
+    {"id": "A4", "source": "SEO design", "claim": "www.railly.dev remains the established canonical host.", "status": "verified", "evidence": "Apex performs one 307 to www, existing siteConfig and deployed canonical tags use www consistently."},
+    {"id": "A5", "source": "Adapter boundary", "claim": "The custom 404 status survives Vercel fallback routing and Markdown conversion.", "status": "verified", "evidence": "Deployed unknown routes returned 404 for HTML, Markdown, and HEAD."}
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Runtime code has no database, filesystem, or remote-write side effects, but each completed request publishes an externally visible HTTP status, representation, and cache policy.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "Publish an HTTP response variant and its cache metadata to the Vercel edge and client.",
+        "owner": "Astro middleware and Vercel adapter",
+        "commit_event": "The middleware returns a Response or passes the rendered response back to Vercel.",
+        "later_fallible_stages": ["Vercel route delivery", "CDN variant caching", "client body delivery"],
+        "failure_partitions": [
+          {
+            "ownership_region": "Vercel edge and client delivery",
+            "covers": ["Vercel route delivery", "CDN variant caching", "client body delivery"],
+            "forced": true,
+            "residual_observed": "Unsupported requests returned 406 without cached HTML; alternating HTML and Markdown requests retained their own content types and Vary headers; unknown routes retained 404.",
+            "cleanup_owner": "No cleanup required because requests are read-only and publish no durable application state.",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Repeated HTML, Markdown, HEAD, 404, JSON, RSS, and sitemap requests against the protected preview returned the same intended status and representation."
+            },
+            "evidence": "Authenticated Chrome fetch and Vercel endpoint matrices exercised the deployed edge repeatedly, including opposing cache variants."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "run", "reason": "Cleared the inverse risk that negotiation might replace native JSON/XML serializers by exercising excluded endpoint types."},
+    {"name": "New-domain matrix", "status": "run", "reason": "Enumerated methods, exact and wildcard media ranges, q-values, route classes, and statuses."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Checked negotiation selection, middleware response conversion, 404 conversion, explicit Markdown routes, and API exclusions."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell parsing or command construction changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process channel or one-shot state changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim or compatibility executable changed."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Verified missing and wildcard Accept default to HTML while explicit preferences and exclusions remain honored."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Inspected middleware/page routing, Vercel fallback routes, HEAD handling, static resources, and View Transition settling."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Compared unit parser, Astro integration server, Vercel edge, authenticated Chrome, and generated adapter routes."},
+    {"name": "Reference-implementation oracle", "status": "run", "reason": "Used RFC 9110 semantics and acceptmarkdown.com cache requirements as an implementation-independent oracle."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Forced 406 and 404 outcomes and checked excluded API/resource callers retain native behavior."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No user-facing flag or environment setting was added."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Forced unsupported Accept, unknown HTML, unknown Markdown, and HEAD-on-unknown cases."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "The changed paths have no durable state or cleanup behavior."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No long-running operation, cancellation, retry, or timeout was introduced."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced browser request through Deployment Protection, Vercel routing, Astro middleware, page rendering, and response headers."},
+    {"name": "Substrate verification", "status": "run", "reason": "Exercised the actual protected Vercel deployment with short-lived OIDC authentication."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Navigated and visually inspected the built preview at desktop and mobile widths with console and axe checks."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Mapped every new protocol/content invariant to unit, integration, or deployed-boundary tests."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Verified llms.txt and agent instructions match actual negotiation, endpoint, and service-boundary behavior."},
+    {"name": "Demonstrative example", "status": "run", "reason": "The documented Accept: text/markdown request was executed against the preview and returned Markdown."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision-trail artifact was provided."},
+    {"name": "Complexity budget", "status": "run", "reason": "Accept parsing is linear in the small header entry and representation counts; no per-content loop or unbounded lookup was introduced."}
+  ],
+  "deterministic": [
+    {"check": "review-gate style", "outcome": "pass", "reason": "No prohibited punctuation in added lines."},
+    {"check": "review-gate surfaces", "outcome": "pass", "reason": "All compiled agent-readiness surfaces are present."},
+    {"check": "Biome changed files", "outcome": "pass", "reason": "22 changed files checked with no findings."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "No whitespace errors."},
+    {"check": "Bun tests", "outcome": "pass", "reason": "86 pass, 0 fail on exact HEAD."},
+    {"check": "Astro production build", "outcome": "pass", "reason": "Vercel adapter build completed and generated runtime plus sitemap/static artifacts."},
+    {"check": "Force-red Vary", "outcome": "pass", "reason": "Mutation failed for the intended assertion and restored green."},
+    {"check": "Force-red 404 recovery", "outcome": "pass", "reason": "Mutation failed for the intended assertion and restored green."},
+    {"check": "Protected preview endpoint matrix", "outcome": "pass", "reason": "All intended endpoints, representations, statuses, and native resource types matched the contract."},
+    {"check": "Global Biome", "outcome": "acknowledged", "reason": "Pre-existing formatting drift remains only in scripts/sync-project-stars.ts and src/lib/github-stars.ts, neither touched by this commit."},
+    {"check": "Global Astro check", "outcome": "acknowledged", "reason": "Pre-existing 13 nullability errors remain only in src/components/layout/BackgroundDither.astro, untouched by this commit."}
+  ],
+  "findings": [
+    {"id": "I1", "state": "issue_candidate", "claim": "Shared footer and homepage secondary text fail WCAG AA contrast in dark mode.", "evidence": "Axe measured 1.45:1 to 2.41:1 and the dogfood report includes an annotated screenshot.", "layer": "pre-existing visual accessibility", "source": "lens", "path": "shared Footer.astro and existing palette", "resolution": "not_applicable"},
+    {"id": "I2", "state": "issue_candidate", "claim": "Project star glyphs use aria-hidden with an empty value.", "evidence": "Axe reported seven aria-valid-attr-value incomplete nodes on the pre-existing project list.", "layer": "pre-existing semantic accessibility", "source": "lens", "path": "existing homepage project-card markup", "resolution": "not_applicable"}
+  ],
+  "exemptions": [
+    {"claim": "Global lint and type-check debt is outside this commit.", "evidence": "All reported failures are confined to four untouched pre-existing files, while focused checks over every changed file pass."},
+    {"claim": "Brand search ranking cannot be proven by a preview deployment.", "evidence": "The code now strengthens canonical titles, identity schema, resources, and internal discovery, but search reindexing and backlinks are external asynchronous systems."}
+  ],
+  "issue_candidates": [
+    {"title": "Raise shared footer and metadata contrast to WCAG AA", "evidence": "Axe found site-wide dark-mode ratios below 4.5:1; see /tmp/railly-agentic-preview-qa/report.md.", "why_out_of_scope": "The palette and shared footer styling predate this work, and changing them would alter the requested visual design beyond agent-readiness scope."},
+    {"title": "Render decorative project stars with aria-hidden=true", "evidence": "Axe found seven empty aria-hidden values on the existing homepage project list.", "why_out_of_scope": "The affected project-card markup predates this change and is unrelated to the agent-facing interfaces."},
+    {"title": "Clear existing repository lint and Astro nullability debt", "evidence": "Global lint has two formatting errors and Astro check has 13 BackgroundDither nullability errors on main.", "why_out_of_scope": "All failures are in untouched files and focused validation for this commit is green."}
+  ]
+}

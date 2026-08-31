@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "crafter-research/website",
+    "base": "952b9798e9efa69b54eff634d8a9a8da684700d4",
+    "head": "dd023a47039df3c8e1bcde7f990506c789939e2a",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "not provided",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5-codex",
+    "reviewer_model": "gpt-5-codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "not_required",
+      "artifact": "",
+      "evidence": "The change is static public content and layout with no secrets, authentication, destructive action, durable mutation, concurrency, process lifecycle, or remote side effect."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user requests in the working session",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The request asks for a credible compute and grant support surface, responsive spacing that respects the side grecas, stronger cards, and public-interest framing."
+    },
+    {
+      "source": "design",
+      "location": "/Users/raillyhugo/kai/05_Areas/research/2026-08-21-crafter-research-support-brief.md and /Users/raillyhugo/kai/05_Areas/research/2026-08-21-crafter-compute-native-projects-shaping.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The briefs define the proof points, proposed compute-native programs, support asks, public-interest framing, and independence boundary."
+    },
+    {
+      "source": "user_facing",
+      "location": "src/components/SupportPage.astro and localized navigation",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P4"],
+      "evidence": "The page labels shipped proof and proposed research separately, explains support paths and independence, and routes contact to railly@crafterstation.com."
+    },
+    {
+      "source": "implementation",
+      "location": "SupportPage.astro, support route files, ui.ts, Layout.astro, SiteHeader.astro, SiteFooter.astro, global.css, and package.json",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The implementation adds all locale routes, shared content, navigation, layout, responsive styles, focus styles, a skip link, and repository checks."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Support is reachable and correctly rendered at /support, /es/support, /pt/support, and /zh/support with valid navigation and locale semantics.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the built route output and browser document language",
+        "layer": "built user-facing artifact",
+        "method": "build all routes and inspect EN, ES, and PT browser output, route targets, fallback notice, document lang, and content lang",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the Astro source files and translation keys exist",
+        "counterexample": "route generation can succeed while navigation targets the wrong locale or English fallback is declared as Portuguese or Chinese",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The initial PT and ZH fallback declared the content in the route language despite English copy; browser inspection exposed it and exact HEAD now emits a localized notice with the content block declared lang=en."
+      },
+      "substrates": [
+        {
+          "name": "Astro static output and local browser",
+          "status": "exercised",
+          "evidence": "Twenty-four pages built; /support, /es/support, and /pt/support were driven, locale routes remained correct, and PT exposed document lang=pt plus content lang=en."
+        }
+      ],
+      "evidence": "All four static support routes build from one shared component and preserve locale-aware navigation and fallback semantics."
+    },
+    {
+      "id": "P2",
+      "claim": "Published proof, proposed research, resource asks, and independence policy remain accurate, visibly distinct, and aligned with the approved briefs.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the rendered claims and their classification against the source briefs",
+        "layer": "public content contract",
+        "method": "compare every material number, program status, support ask, and independence statement with both research briefs, then inspect the built page",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the source component includes the expected numbers and a proposed label",
+        "counterexample": "correct strings can still be visually merged so proposed work reads as shipped output",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Built-page inspection confirmed separate proof and proposed-program sections, repeated compute-gated status, three proposed programs, proof values 11, 21,244, and N=35, and working mailto links."
+      },
+      "substrates": [
+        {
+          "name": "rendered EN and ES support pages",
+          "status": "exercised",
+          "evidence": "Both locales visibly separate inspectable baselines from proposed work and route support inquiries to railly@crafterstation.com."
+        }
+      ],
+      "evidence": "The public claims match the briefs and do not present compute-gated proposals as existing output."
+    },
+    {
+      "id": "P3",
+      "claim": "The support layout uses available horizontal space without colliding with the side grecas or overflowing at desktop, tablet, or mobile widths.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "actual rendered geometry and horizontal scroll width",
+        "layer": "browser layout substrate",
+        "method": "capture and inspect every subsection at 1440, 768, and 390 pixels in light and dark themes and compare scrollWidth with clientWidth",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CSS declares a centered max-width and responsive grid rules",
+        "counterexample": "declared widths can still collide with decorative side patterns, crush cards, or create overflow from child content",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Browser screenshots at 1440, 768, and 390 showed clear greca margins, expanded card layouts, balanced subsections, and no horizontal overflow."
+      },
+      "substrates": [
+        {
+          "name": "Chromium at 1440, 768, and 390 CSS pixels",
+          "status": "exercised",
+          "evidence": "Every support subsection was visually checked in the built artifact across desktop, tablet, and mobile, including light and dark modes."
+        }
+      ],
+      "evidence": "Responsive QA found no collisions, wasted single-column desktop grid, crushed cards, or overflow."
+    },
+    {
+      "id": "P4",
+      "claim": "The support page preserves keyboard focus, skip navigation, semantic headings, readable contrast, and accessible link behavior.",
+      "kind": "other",
+      "status": "verified",
+      "oracle": {
+        "observes": "the browser accessibility tree, focus styles, headings, links, and Axe results",
+        "layer": "rendered accessibility substrate",
+        "method": "inspect focus-visible and skip-link behavior, heading order, localized semantics, and run Axe against the built page",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the source includes semantic tags and focus-visible CSS",
+        "counterexample": "valid source can render hidden focus, broken heading structure, duplicate labels, or accessibility violations after composition",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The composed built page exposes the skip link and visible focus treatment, preserves headings and labeled links, and Axe reported zero violations."
+      },
+      "substrates": [
+        {
+          "name": "built browser DOM and Axe WCAG audit",
+          "status": "exercised",
+          "evidence": "Axe returned 0 violations; focus, headings, language fallback, and links were manually inspected."
+        }
+      ],
+      "evidence": "No automated accessibility violation or manual keyboard/navigation defect was found."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": ""},
+    "oracle": {"source": "", "independent": true, "evidence": ""},
+    "producer": {"name": "", "status": "not_applicable", "evidence": ""},
+    "falsification": [],
+    "evidence": "The diff adds static content, route composition, and responsive presentation; it does not implement or change a protocol, parser, serializer, state machine, lifecycle, adapter, compatibility layer, or browser or OS event translation."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "subsystem model",
+      "claim": "One shared SupportPage component is the content owner for every locale route.",
+      "status": "verified",
+      "evidence": "Both route files render SupportPage and the localized static path generator covers es, pt, and zh."
+    },
+    {
+      "id": "A2",
+      "source": "design and implementation",
+      "claim": "Portuguese and Chinese may fall back to English only when the fallback is explicit and its content language is machine-readable.",
+      "status": "verified",
+      "evidence": "Exact HEAD renders localized fallback notices and wraps English fallback content with lang=en while preserving document lang=pt or lang=zh."
+    },
+    {
+      "id": "A3",
+      "source": "public content model",
+      "claim": "Current proof and proposed compute-gated programs are separate states with separate visual ownership.",
+      "status": "verified",
+      "evidence": "The built page places proof in its own section and gives every proposed program a proposed or compute-gated status before its description."
+    },
+    {
+      "id": "A4",
+      "source": "layout model",
+      "claim": "The centered 74rem content rail clears desktop grecas and mobile suppresses decorative patterns.",
+      "status": "verified",
+      "evidence": "Desktop, tablet, and mobile screenshots show clear side spacing and no pattern collision or horizontal overflow."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The diff creates static routes, copy, navigation, and CSS only. It has no runtime write, remote mutation, durable commit point, or externally visible partial state.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source was replaced."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No existing validator or trigger domain was widened."},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No user-input resolution or discovery rule changed."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell construction changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process channel or latch exists in this change."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No test shim changed."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Verified English as canonical, native Spanish, and explicit English fallback with correct content language for Portuguese and Chinese."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Reviewed component to route, locale, navigation, footer, layout, style, and build-check seams, including Radius impacts on i18n utilities."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "No repeated guard failure or external-substrate detector exists."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No protocol or normative implementation applies."},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "No function gains a new failure outcome."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag, mode, or config bit was added."},
+    {"name": "Error-path forcing", "status": "skipped", "reason": "The static content surface adds no new runtime error path."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action exists."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No async wait, timeout, or cancellation path was added."},
+    {"name": "Boundary pipeline trace", "status": "skipped", "reason": "No existing feature crosses a new frame, process, or protocol boundary."},
+    {"name": "Substrate verification", "status": "run", "reason": "Verified final static HTML, browser geometry, locale semantics, links, focus, and accessibility instead of relying on source or command output."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Drove the built support routes at desktop, tablet, and mobile sizes in light and dark themes and inspected every subsection."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Enumerated the owner of proof versus proposed status, fallback language, and sponsor-independence claims in the shared content component."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Rendered proof values, program status, support asks, independence policy, contact links, and locale fallback agree with the research briefs and route behavior."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "skipped", "reason": "The diff adds no per-element loop, membership scan, or runtime lookup path."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "This report records exact HEAD dd023a47039df3c8e1bcde7f990506c789939e2a."},
+    {"check": "style", "outcome": "pass", "reason": "The exact diff contains no prohibited prose punctuation."},
+    {"check": "surfaces", "outcome": "pass", "reason": "All support component, route, navigation, footer, i18n, layout, style, and package surfaces required by conventions are in the diff."},
+    {"check": "stale", "outcome": "pass", "reason": "Not triggered because no duplicated contract value was renamed or retired."},
+    {"check": "siblings", "outcome": "pass", "reason": "Support behavior is represented on all intended navigation, locale, route, and content surfaces; no untouched contract passage was found."},
+    {"check": "callers", "outcome": "pass", "reason": "Not triggered because no existing function contract changed."},
+    {"check": "timings", "outcome": "pass", "reason": "Not triggered because no timing ceiling was added."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered because no shell detector changed."},
+    {"check": "artifacts", "outcome": "pass", "reason": "Not triggered because no persistent runtime artifact is written."},
+    {"check": "rawinput", "outcome": "pass", "reason": "Not triggered because no resolution rule deepened."},
+    {"check": "flagsweep", "outcome": "pass", "reason": "Not triggered because no user-facing flag was added."},
+    {"check": "execdeps", "outcome": "pass", "reason": "Not triggered because no external executable was added."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "Exact-base map records 1 changed and 5 impacted symbols; 138 unresolved calls against 100 edges means it under-covers Astro and was used only for orientation."},
+    {"check": "bun run check", "outcome": "pass", "reason": "Astro reported zero diagnostics and Biome reported only four acknowledged reduced-motion warnings."},
+    {"check": "bun run build", "outcome": "pass", "reason": "The exact committed tree generated all 24 pages."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "The exact diff contains no whitespace errors."}
+    ,{"check": "diff risk signal", "outcome": "acknowledged", "reason": "The validator's durable-state regex matches the word link inside nav-link and skip-link. The added lines contain HTML links and CSS selectors, not filesystem link(), persistence, or runtime writes."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Portuguese and Chinese fallback content was declared in the route language even though the copy was English.",
+      "evidence": "Built PT and ZH pages initially inherited the document language for English fallback content; the final tree adds localized notices and lang={contentLang}, and browser inspection confirms lang=en on the fallback block.",
+      "layer": "built locale semantics",
+      "source": "map",
+      "path": "src/i18n/ui.ts#ui → src/i18n/utils.ts#getLangFromUrl and useTranslations via use → src/components/SupportPage.astro fallback rendering",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Four Biome noImportantStyles warnings do not block this change.",
+      "evidence": "They are the pre-existing reduced-motion overrides that intentionally suppress animation and transitions for accessibility."
+    },
+    {
+      "claim": "The empty blog collection warning does not block this change.",
+      "evidence": "The warning predates the support page and all 24 static pages complete successfully."
+    },
+    {
+      "claim": "A formal Issue Contract and separate Spec review are not required to report this Standards gate as complete.",
+      "evidence": "No Issue Contract was supplied; the reviewed user requests and two approved research briefs provide the content and layout claims without implying a Spec pass."
+    },
+    {
+      "claim": "The validator's durable-state diff signal does not make this static page high risk.",
+      "evidence": "Its regex matches the bare word link in nav-link and skip-link; inspection of every matched added line confirms HTML anchors and CSS selectors only, with no filesystem link(), persistence API, or runtime write."
+    }
+  ],
+  "issue_candidates": []
+}

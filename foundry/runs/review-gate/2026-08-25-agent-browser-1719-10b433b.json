@@ -1,0 +1,331 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-25",
+    "repo": "vercel-labs/agent-browser",
+    "base": "585e740fcef069d74e21f0e88e8bf4ea7df34385",
+    "head": "10b433b110ba56653d5000ed580b6d0f2fe28163",
+    "status": "complete",
+    "verdict": "findings",
+    "gaps": []
+  },
+  "contract": {
+    "path": "PR #1719 body and user request for merge safety",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "not provided",
+    "reviewer_model": "GPT-5 Codex with deterministic Review Gate",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "externally visible mutable browser-session ref state"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "evidence/2026-08-25-agent-browser-1719-chrome-ab.txt",
+      "evidence": "The exact base and head binaries were driven through real Chrome with the same failure sequence; only head loses the prior actionable ref."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "PR #1719 body",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The PR claims aligned reference epochs for snapshot and URL diffs while retaining actionable refs on the final page."
+    },
+    {
+      "source": "design",
+      "location": "no Issue Contract or Solution Gate supplied",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "The implementation and repository invariants provide the reviewed shape."
+    },
+    {
+      "source": "user_facing",
+      "location": "PR body, CLI diff help, README.md, docs/src/app/diffing/page.mdx",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The surfaces promise comparisons that reflect page content and leave the browser usable on the current page."
+    },
+    {
+      "source": "implementation",
+      "location": "cli/src/native/actions.rs, element.rs, e2e_tests.rs at 10b433b",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The diff adds two resets, a RefMap reset assertion, and real-Chrome regression tests."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Unchanged snapshot and same-URL comparisons align generated refs and report no content change after prior snapshot activity.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "empty semantic diff and identical snapshots from real Chrome",
+        "layer": "built CLI through daemon and Chrome accessibility tree",
+        "method": "repeat changed E2Es and drive inline-baseline and same-URL workflows",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "RefMap next_ref resets to one in a unit test",
+        "counterexample": "the reset helper works but one command fails to call it before capture",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing each production call leaves the unit test green but makes its command E2E fail with a false diff."
+      },
+      "substrates": [
+        {
+          "name": "macOS arm64 with real headless Chrome",
+          "status": "exercised",
+          "evidence": "Both changed E2Es passed three repeats and a combined run; built CLI returned changed=false and identical=true."
+        }
+      ],
+      "evidence": "Real producer output aligns at e1/e2 and produces zero additions and removals for unchanged content."
+    },
+    {
+      "id": "P2",
+      "claim": "After a successful diff, refs resolve against the current page and remain actionable.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "the DOM effect caused by acting through the emitted ref",
+        "layer": "real Chrome DOM after built CLI action",
+        "method": "click checkbox refs and fill scoped input refs, then read DOM state by CSS selector",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the diff response contains ref text",
+        "counterexample": "the response prints e1 while the shared map points at stale or absent nodes",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Actions were performed by ref and independently confirmed through CSS-selector DOM reads."
+      },
+      "substrates": [
+        {
+          "name": "full-page, selector-scoped, and same-URL Chrome pages",
+          "status": "exercised",
+          "evidence": "Checkbox clicks became checked=true and the scoped input read scoped-ok after ref-based actions."
+        }
+      ],
+      "evidence": "Successful command paths leave the shared map representing the final/current snapshot."
+    },
+    {
+      "id": "P3",
+      "claim": "A diff failure before a new snapshot is captured preserves the last valid actionable ref map.",
+      "kind": "lifecycle",
+      "status": "unverified",
+      "oracle": {
+        "observes": "whether a prior ref still changes the DOM after the diff error",
+        "layer": "built CLI and real Chrome DOM",
+        "method": "force invalid-selector failure, click the prior ref, then read checkbox state",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the diff returns the intended invalid-selector error",
+        "counterexample": "the error is correct but state was already cleared before the failure",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Head returns the correct error and still loses e1; base returns the same error and preserves e1."
+      },
+      "substrates": [
+        {
+          "name": "macOS arm64 with real headless Chrome",
+          "status": "exercised",
+          "evidence": "Base click exits 0 and checks the box; head click exits 1 with Unknown ref and leaves it unchecked."
+        }
+      ],
+      "evidence": "Confirmed finding F1 blocks verification of this property."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "browser interaction state",
+      "mutable ref-map lifecycle"
+    ],
+    "dimensions": {
+      "values": [
+        "command: diff_snapshot | diff_url",
+        "prior refs: fresh | populated",
+        "page relation: unchanged | narrowly changed",
+        "scope: full page | selector subtree",
+        "baseline transport: inline | file",
+        "capture outcome: success | selector failure",
+        "post-state: aligned diff | actionable final refs | preserved prior refs on pre-capture failure"
+      ],
+      "exclusions": [
+        "diff_screenshot is excluded because it does not mutate RefMap",
+        "WebDriver is excluded because these native diff handlers require the Chrome native backend"
+      ],
+      "evidence": "All success cells relevant to the resets were exercised through Chrome; the failure cell exposed F1."
+    },
+    "oracle": {
+      "source": "real Chrome accessibility tree and DOM, plus exact base-commit A/B",
+      "independent": true,
+      "evidence": "Expected equality comes from identical page content, and actionability is observed through DOM state rather than RefMap internals."
+    },
+    "producer": {
+      "name": "real headless Chrome through the built native CLI and daemon",
+      "status": "exercised",
+      "evidence": "All changed E2Es and dogfood workflows launched Chrome under isolated AGENT_BROWSER_NAMESPACE values."
+    },
+    "falsification": [
+      {
+        "mutation": "remove the new state.ref_map.clear() before diff_snapshot capture",
+        "red_evidence": "e2e_diff_snapshot fails at changed=false because unchanged content reports true",
+        "restored_green_evidence": "restored exact actions.rs snapshot; both changed E2Es pass"
+      },
+      {
+        "mutation": "remove the new state.ref_map.clear() before the first diff_url capture",
+        "red_evidence": "e2e_diff_url_aligns_refs_after_snapshot fails at identical=true because it reports false",
+        "restored_green_evidence": "restored exact actions.rs snapshot; both changed E2Es pass"
+      }
+    ],
+    "evidence": "The new tests reject both smallest fix-absent implementations, but do not reject the confirmed failure-state regression."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "PR design",
+      "claim": "A fresh reference epoch aligns unchanged snapshots.",
+      "status": "verified",
+      "evidence": "Both command E2Es fail without their reset and pass with it."
+    },
+    {
+      "id": "A2",
+      "source": "subsystem model",
+      "claim": "The map left after a successful diff corresponds to the page a user can act on.",
+      "status": "verified",
+      "evidence": "Ref actions changed DOM state after full, scoped, and URL comparisons."
+    },
+    {
+      "id": "A3",
+      "source": "implementation ordering",
+      "claim": "Clearing shared refs before snapshot capture cannot leave the session in a worse state when capture fails.",
+      "status": "refuted",
+      "evidence": "Invalid selector fails after the clear; exact head loses e1 while exact base preserves it."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Successful and failed commands can replace or clear the externally visible in-memory ref map.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "clear the shared actionable ref map",
+        "owner": "handle_diff_snapshot",
+        "commit_event": "state.ref_map.clear() before take_snapshot",
+        "later_fallible_stages": [
+          "selector evaluation",
+          "DOM node description",
+          "accessibility-tree capture"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "Chrome snapshot capture",
+            "covers": [
+              "selector evaluation",
+              "DOM node description",
+              "accessibility-tree capture"
+            ],
+            "forced": true,
+            "residual_observed": "invalid-selector failure leaves the shared map empty",
+            "cleanup_owner": "handle_diff_snapshot currently has no rollback owner",
+            "retry": {
+              "attempted": true,
+              "outcome": "failed",
+              "evidence": "Immediate retry of the prior user action click @e1 fails with Unknown ref."
+            },
+            "evidence": "Finding F1 reproduces through the real CLI and Chrome."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"no matcher, parser, lookup source, or semantic source replacement"},
+    {"name":"New-domain matrix","status":"skipped","reason":"no trigger condition or validator was widened"},
+    {"name":"Resolution-rule consistency across consumers","status":"skipped","reason":"no user-input resolution rule changed"},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"no shell-parsed command construction changed"},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"no warning channel or one-shot latch changed"},
+    {"name":"Shim hermeticity","status":"skipped","reason":"no external-binary shim was added"},
+    {"name":"Deliberate-default check","status":"skipped","reason":"the change fixes accidental generated-ref drift rather than reversing a tested product default"},
+    {"name":"Fresh-seam scan","status":"skipped","reason":"no runtime/framework signal patch was added"},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"no guard models an external substrate"},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"generated ref epochs have no external written reference contract; real Chrome plus the base build provides the oracle"},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"no function gains a new outcome class"},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"no flag or mode was added"},
+    {"name":"Error-path forcing","status":"run","reason":"forced selector resolution failure after the new clear and confirmed F1"},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"no heuristic recovery action was added"},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"no wait, timeout, cancellation, or task lifecycle changed"},
+    {"name":"Boundary pipeline trace","status":"skipped","reason":"no frame, process, or protocol boundary was extended"},
+    {"name":"Substrate verification","status":"run","reason":"observed diff equality and ref actionability in the real Chrome DOM"},
+    {"name":"Dogfood the built artifact","status":"run","reason":"drove full, scoped, URL, inline-baseline, file-baseline, success, and failure workflows through the exact built CLI"},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"verified the PR claim that the final page keeps actionable refs and found the failure-path exception"},
+    {"name":"Docs-behavior parity","status":"run","reason":"reviewed CLI, README, docs, and MCP claims; no new docs needed, with pre-existing mismatches recorded as issue candidates"},
+    {"name":"Demonstrative example","status":"skipped","reason":"no documentation example changed"},
+    {"name":"Choice audit","status":"skipped","reason":"no decision trail exists"},
+    {"name":"Complexity budget","status":"skipped","reason":"no loop, membership check, or per-element lookup was added"}
+  ],
+  "deterministic": [
+    {"check":"exact head and base","outcome":"pass","reason":"reviewed 10b433b against merge base 585e740; GitHub main still equals the base"},
+    {"check":"reference graph","outcome":"acknowledged","reason":"xref is unavailable; GitHub timeline, search, review comments, and closing references show no linked or competing nodes"},
+    {"check":"style and diff check","outcome":"pass","reason":"gate style, git diff --check, and added-line punctuation checks pass"},
+    {"check":"surface map","outcome":"acknowledged","reason":"README, docs, and skill surfaces are unchanged because no command contract changes; only false generated-ref differences are removed"},
+    {"check":"cargo fmt","outcome":"pass","reason":"exact repository command passes"},
+    {"check":"cargo clippy","outcome":"pass","reason":"exact repository command with -D warnings passes"},
+    {"check":"cargo test","outcome":"pass","reason":"1,148 tests passed across binaries; 104 ignored; zero failed"},
+    {"check":"changed Chrome E2Es","outcome":"pass","reason":"both pass three repeated runs and one combined serial run under isolated namespaces"},
+    {"check":"force-red","outcome":"pass","reason":"removing each new production reset makes its matching E2E fail for false ref-only differences; restored tree is green"},
+    {"check":"radius impact","outcome":"acknowledged","reason":"8 changed, 138 impacted, 8,029 edges, and 2,445 unresolved calls; convergence is dominated by broad execute_command fan-in and under-covers state semantics"},
+    {"check":"CI status","outcome":"acknowledged","reason":"all required visible checks pass, but Native E2E Tests are skipped and review is still required"}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "A failed diff snapshot erases the last valid refs before it has a replacement snapshot.",
+      "evidence": "Exact head: invalid selector then click @e1 gives Unknown ref and checkbox false. Exact base: same error then click succeeds and checkbox is true.",
+      "layer": "built CLI through daemon to real Chrome DOM",
+      "source": "lens",
+      "path": "handle_diff_snapshot -> state.ref_map.clear -> take_snapshot selector failure -> prior ref action",
+      "resolution": "open"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No README, docs, MCP, or skill update is required for the intended fix.",
+      "evidence": "The command names, flags, output contract, and documented comparison semantics are unchanged; the diff removes generated-ref noise."
+    },
+    {
+      "claim": "No stale-value, timing, shell, artifact-cleanup, external-executable, or caller-contract gate applies.",
+      "evidence": "The diff adds only in-memory RefMap resets, tests, and a static HTML fixture."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "diff snapshot without baseline does not use the last session snapshot",
+      "evidence": "CLI, MCP, README, and docs promise latest-session comparison; handle_diff_snapshot uses String::new() when baseline is absent and no session snapshot cache exists.",
+      "why_out_of_scope": "Pre-existing behavior untouched by the reset diff."
+    },
+    {
+      "title": "documented snapshot baseline file workflow produces a newline-only false diff",
+      "evidence": "Built CLI `snapshot > baseline.txt` followed by unchanged `diff snapshot --baseline baseline.txt` reports one addition and removal because the baseline has a final newline and the current snapshot does not.",
+      "why_out_of_scope": "Pre-existing text-normalization behavior, independent of ref numbering."
+    },
+    {
+      "title": "diff url accepts options the native handler ignores",
+      "evidence": "parse_diff and MCP accept selector, compact, depth, screenshot, and fullPage; handle_diff_url constructs SnapshotOptions::default and never reads those fields.",
+      "why_out_of_scope": "Pre-existing dispatch parity defect untouched by PR #1719."
+    }
+  ]
+}

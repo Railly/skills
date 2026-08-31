@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Browser-shaped hosts sync is rejected</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet" referrerpolicy="no-referrer">
+  <link href="2026-08-28-portless-374-hosts-sync-before-after.assets/vercel-brand.css" rel="stylesheet">
+  <style>
+    .vbg-custom-opening {
+      padding-block-start: var(--vbg-space-10);
+    }
+
+    .vbg-custom-comparison {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      border-block: 1px solid var(--vbg-border-default);
+    }
+
+    .vbg-custom-peer {
+      min-width: 0;
+      padding-block: var(--vbg-space-8);
+    }
+
+    .vbg-custom-peer + .vbg-custom-peer {
+      border-inline-start: 1px solid var(--vbg-border-default);
+      padding-inline-start: var(--vbg-space-8);
+    }
+
+    .vbg-custom-peer:first-child {
+      padding-inline-end: var(--vbg-space-8);
+    }
+
+    .vbg-custom-evidence {
+      min-height: 240px;
+      margin-block-start: var(--vbg-space-6);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--vbg-space-4);
+      padding: var(--vbg-space-6);
+      border: 1px solid var(--vbg-border-subtle);
+      border-radius: var(--vbg-radius);
+      background: var(--vbg-surface-secondary);
+    }
+
+    .vbg-custom-status {
+      font-family: "Geist Mono", monospace;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      line-height: 1;
+      font-weight: var(--vbg-weight-heading);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .vbg-custom-callback {
+      color: var(--vbg-text-secondary);
+      font-family: "Geist Mono", monospace;
+      font-size: var(--vbg-type-body);
+    }
+
+    .vbg-custom-delta {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: var(--vbg-space-4);
+      align-items: baseline;
+      padding-block: var(--vbg-space-8);
+      border-block: 1px solid var(--vbg-border-default);
+    }
+
+    .vbg-custom-delta-value {
+      font-size: var(--vbg-type-title);
+      line-height: var(--vbg-leading-title);
+      font-weight: var(--vbg-weight-heading);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .vbg-custom-delta-value:last-child {
+      text-align: end;
+    }
+
+    .vbg-custom-arrow {
+      color: var(--vbg-text-secondary);
+    }
+
+    .vbg-custom-code {
+      overflow-x: auto;
+      padding: var(--vbg-space-5);
+      border: 1px solid var(--vbg-border-subtle);
+      border-radius: var(--vbg-radius);
+      background: var(--vbg-surface-secondary);
+      font-family: "Geist Mono", monospace;
+      font-size: var(--vbg-type-small);
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    @media (max-width: 720px) {
+      .vbg-custom-comparison {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .vbg-custom-peer:first-child {
+        padding-inline-end: 0;
+      }
+
+      .vbg-custom-peer + .vbg-custom-peer {
+        border-inline-start: 0;
+        border-block-start: 1px solid var(--vbg-border-default);
+        padding-inline-start: 0;
+      }
+
+      .vbg-custom-delta {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .vbg-custom-delta-value:last-child {
+        text-align: start;
+      }
+
+      .vbg-custom-arrow {
+        transform: rotate(90deg);
+        transform-origin: left center;
+      }
+    }
+  </style>
+</head>
+<body class="vbg-report" data-theme="auto">
+  <div class="vbg-shell">
+    <a class="vbg-skip-link" href="#main">Skip to content</a>
+    <header class="vbg-header">
+      <div class="vbg-masthead">
+        <span class="vbg-identity"><span class="vbg-wordmark" role="img" aria-label="Vercel"></span></span>
+        <div class="vbg-document-meta">
+          <span>Portless PR #374</span>
+          <time datetime="2026-08-28">2026-08-28</time>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="vbg-section vbg-custom-opening">
+        <h1 class="vbg-title">Browser-shaped hosts sync is rejected</h1>
+        <div class="vbg-lede"><p>The same loopback POST changed from invoking the callback to a fail-closed 401 response.</p></div>
+
+        <div class="vbg-custom-comparison" role="group" aria-label="Before and after comparison">
+          <article class="vbg-custom-peer">
+            <p class="vbg-label">Before</p>
+            <h2 class="vbg-heading-20">Reachability acted as authority</h2>
+            <p>A browser-shaped loopback POST reached the internal callback without client authorization.</p>
+            <div class="vbg-custom-evidence">
+              <span class="vbg-custom-status">204</span>
+              <span class="vbg-custom-callback">stub callback count: 1</span>
+            </div>
+          </article>
+
+          <article class="vbg-custom-peer">
+            <p class="vbg-label">After</p>
+            <h2 class="vbg-heading-20">Client proof is required</h2>
+            <p>The same request is rejected before the stub callback because it has no valid internal authorization.</p>
+            <div class="vbg-custom-evidence">
+              <span class="vbg-custom-status">401</span>
+              <span class="vbg-custom-callback">stub callback count: 0</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="vbg-section">
+        <h2>What changed</h2>
+        <div class="vbg-custom-delta" role="group" aria-label="Primary before and after delta">
+          <div>
+            <p class="vbg-label">Before</p>
+            <p class="vbg-custom-delta-value">Callback invoked</p>
+          </div>
+          <span class="vbg-custom-arrow">to</span>
+          <div>
+            <p class="vbg-label">After</p>
+            <p class="vbg-custom-delta-value">Rejected before callback</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="vbg-section">
+        <h2>Evidence</h2>
+        <p>The behavioral result is unchanged after simplifying the implementation and regression suite.</p>
+        <div class="vbg-table-wrap">
+          <table>
+            <caption>Comparison on one shared measurement basis</caption>
+            <thead>
+              <tr>
+                <th scope="col">Metric</th>
+                <th scope="col" class="vbg-numeric">Before</th>
+                <th scope="col" class="vbg-numeric">After</th>
+                <th scope="col" class="vbg-numeric">Delta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">HTTP status</th>
+                <td class="vbg-numeric">204</td>
+                <td class="vbg-numeric">401</td>
+                <td class="vbg-numeric">Rejected</td>
+              </tr>
+              <tr>
+                <th scope="row">Stub callback invocations</th>
+                <td class="vbg-numeric">1</td>
+                <td class="vbg-numeric">0</td>
+                <td class="vbg-numeric">−1</td>
+              </tr>
+              <tr>
+                <th scope="row">Security-fix additions</th>
+                <td class="vbg-numeric">900 lines</td>
+                <td class="vbg-numeric">599 lines</td>
+                <td class="vbg-numeric">−301 lines</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="vbg-section">
+        <h2>Shared request</h2>
+        <p>Both sides received the same simple cross-site POST against an ephemeral loopback server.</p>
+        <pre class="vbg-custom-code">POST /.portless/hosts-sync
+Host: 127.0.0.1
+Origin: https://attacker.example
+Sec-Fetch-Site: cross-site
+Content-Type: text/plain</pre>
+      </section>
+
+      <section class="vbg-section">
+        <h2>Limits</h2>
+        <p class="vbg-note">This proves rejection before a stub callback on macOS loopback HTTP. It does not claim protection from another process running as the same operating-system user. No privileged system file was read or written.</p>
+        <p class="vbg-note">Baseline: published tree <code>a14bcb0321d822478d8d15b7911689b6a9a13060</code>. After: simplified reviewed tree <code>ea90fc6a1b3f6e47475e07beea5e9c49cfd4f592</code>.</p>
+      </section>
+    </main>
+
+    <footer class="vbg-footer">
+      <span class="vbg-logo" role="img" aria-label="Vercel"></span>
+      <span>Before/after evidence</span>
+    </footer>
+  </div>
+</body>
+</html>

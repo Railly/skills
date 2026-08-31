@@ -1,0 +1,224 @@
+review-gate substrate evidence
+repo   vercel-labs/emulate
+pr     210
+base   d0219d05818adca4c12bb76ec79a7562c1766a3d
+head   9800e0104de0922cf80205fc35f5e9e46ef2e459 (9800e01)
+root   /Users/raillyhugo/Programming/vercel/emulate-210-review (detached, disposable worktree)
+date   2026-08-26
+runner bun (pnpm and bash were unavailable in this environment; see GAPS)
+
+
+================================================================================
+1. FROZEN CHECKOUT AND NO-MUTATION RECEIPT
+================================================================================
+
+$ git -C /Users/raillyhugo/Programming/vercel/emulate-210-review rev-parse HEAD
+9800e0104de0922cf80205fc35f5e9e46ef2e459
+
+$ git -C .../emulate-210-review merge-base origin/main HEAD
+d0219d05818adca4c12bb76ec79a7562c1766a3d
+
+$ git -C .../emulate-210-review diff --name-only d0219d0 9800e01
+README.md
+apps/web/app/docs/google/page.mdx
+packages/@emulators/google/README.md
+packages/@emulators/google/src/__tests__/google.test.ts
+packages/@emulators/google/src/calendar-discovery.ts
+packages/@emulators/google/src/routes/calendar.ts
+packages/emulate/src/index.ts
+packages/emulate/src/registry.ts
+skills/google/SKILL.md
+
+$ git -C .../emulate-210-review diff --check d0219d0 9800e01
+(exit 0, no output)
+
+$ git -C .../emulate-210-review status --porcelain
+(empty)
+
+The tracked tree was never modified. Three forwarding modules were placed under
+emulate-210-review/node_modules/ (gitignored, not source) so the frozen checkout could run
+without a package install:
+  node_modules/@emulators/core/index.ts -> ../../../packages/@emulators/core/src/index.js
+  node_modules/jose/index.js            -> the real jose 6.x in the sibling checkout
+  node_modules/vitest/index.ts          -> re-exports beforeEach/describe/expect/it from bun:test
+The core shim points at the frozen checkout's own core SOURCE, not the sibling checkout's
+dist, because core/dist/index.js was built 2026-08-11 while core/src last changed 2026-08-12
+(commit 7aea54a) and is therefore stale.
+
+
+================================================================================
+2. THE PR'S OWN SUITE AT THE FROZEN HEAD
+================================================================================
+
+$ bun test /Users/raillyhugo/Programming/vercel/emulate-210-review/packages/@emulators/google/src/__tests__/google.test.ts
+
+ 18 pass
+ 0 fail
+ 201 expect() calls
+Ran 18 tests across 1 file. [84.00ms]
+
+Coverage of the run is total, not partial:
+$ grep -c '  it(' .../google.test.ts   -> 18
+$ wc -l .../google.test.ts             -> 1414
+
+Caveat: executed under bun:test through the vitest forwarding module, not under vitest itself.
+The file imports only { beforeEach, describe, expect, it } and uses no vi.* API, so the four
+bindings forward one-to-one; no assertion behavior was redefined or relaxed.
+
+
+================================================================================
+3. DOGFOOD 1: PRODUCTION WIRING AT A ROOT BASE URL
+================================================================================
+
+Driver mirrors packages/emulate/src/api.ts:44-84 exactly: resolveBaseUrl, defaultFallback,
+createServer(googlePlugin, ...), plugin.seed(store, baseUrl), then serve({ fetch: app.fetch }).
+createServer alone does not seed (core/src/server.ts:92 registers only), so the explicit seed
+call is required to reproduce the CLI.
+
+port        45102
+baseUrl     http://localhost:45102
+fallbackUser {"login":"testuser@gmail.com","id":1,"scopes":["openid","email","profile"]}
+
+GET /discovery/v1/apis/calendar/v3/rest            -> 200 (no Authorization header required)
+    kind          "discovery#restDescription"
+    rootUrl       "http://localhost:45102/"
+    servicePath   "calendar/v3/"
+    basePath      "/calendar/v3/"
+    baseUrl       "http://localhost:45102/calendar/v3/"
+    batchPath     "batch/calendar/v3"
+    root parameters keys = []
+
+POST /batch/calendar/v3
+     Authorization: Bearer local-test-token
+     -> 404
+     {"message":"Not Found","documentation_url":"https://emulate.dev/google"}
+
+     The 404 body is core's catch-all: packages/@emulators/core/src/server.ts:94-102.
+     The advertised batch path resolves to no route.
+
+GET /calendar/v3/users/me/calendarList
+    Authorization: Bearer local-test-token       -> 200, items: primary, cal_team
+
+GET /calendar/v3/calendars/primary/events?singleEvents=true   -> 200
+GET /calendar/v3/calendars/primary/events?singleEvents=false  -> 200
+    bodies byte-identical. The advertised parameter is never read.
+
+GET /calendar/v3/calendars/primary/events?orderBy=startTime   -> 200
+    (upstream Calendar v3 returns 400 for orderBy=startTime without singleEvents=true)
+GET /calendar/v3/calendars/primary/events?orderBy=updated      -> 200
+    (not advertised in the document's orderBy enum, which is ["startTime"])
+
+GET /calendar/v3/calendars/primary/events?fields=items(id)     -> 200, full unprojected body
+GET /calendar/v3/calendars/primary/events?alt=json             -> 200, parameter ignored
+
+GET /.well-known/openid-configuration                          -> 200, endpoints clean
+
+
+================================================================================
+4. DOGFOOD 2: ADAPTER MOUNT PATH WITH A TRAILING SLASH
+================================================================================
+
+The new docs claim: "The document advertises the base URL configured for the running
+emulator, including any adapter mount path." The new test asserts the same shape at
+google.test.ts:1240 ("https://example.test/emulate/google/").
+
+port     45103
+baseUrl  resolveBaseUrl({service:"google", port:45103,
+           baseUrl:"http://localhost:45103/emulate/{service}/"})
+         = "http://localhost:45103/emulate/google/"
+
+NEW consumer, calendar discovery (normalizes the trailing slash, calendar-discovery.ts:2):
+    rootUrl      "http://localhost:45103/emulate/google/"
+    baseUrl      "http://localhost:45103/emulate/google/calendar/v3/"
+    basePath     "/emulate/google/calendar/v3/"
+    servicePath  "calendar/v3/"
+    batchPath    "batch/calendar/v3"
+  -> the mount-path claim in the new docs is TRUE.
+
+PRE-EXISTING sibling consumer, OIDC discovery (bare interpolation, routes/oauth.ts:98-103):
+    authorization_endpoint "http://localhost:45103/emulate/google//o/oauth2/v2/auth"  <- //
+    token_endpoint         "http://localhost:45103/emulate/google//oauth2/token"       <- //
+    userinfo_endpoint      "http://localhost:45103/emulate/google//oauth2/v2/userinfo" <- //
+    revocation_endpoint    "http://localhost:45103/emulate/google//oauth2/revoke"      <- //
+    jwks_uri               "http://localhost:45103/emulate/google//oauth2/v3/certs"    <- //
+  -> the // EMISSION is confirmed. It is pre-existing and outside this diff.
+     Reachability of those URLs was NOT demonstrated: the driver serves the app at the
+     listener root rather than under a real /emulate/google mount, so the 404s observed
+     for those paths are a harness artifact and are not evidence of a user-visible break.
+
+POST /emulate/google/batch/calendar/v3   -> 404
+  -> the batchPath defect is not an artifact of a root base URL; it reproduces under a mount.
+
+
+================================================================================
+5. INPUT-DOMAIN SWEEP THROUGH resolveBaseUrl + buildCalendarDiscoveryDocument
+================================================================================
+
+  http://localhost:45102                       OK
+  http://localhost:45102/                      OK
+  http://localhost:45102//                     OK
+  http://localhost:45102/emulate/{service}/    OK
+  https://example.test/emulate/google/         OK
+  /emulate/google/                             THROW TypeError:
+        "/emulate/google/calendar/v3/" cannot be parsed as a URL
+  //example.test/emulate/google/               THROW TypeError
+  example.test/emulate/google/                 THROW TypeError
+  "  http://localhost:45102  "                 THROW TypeError
+
+Graded as NOT a finding. The repo-wide assumption is that baseUrl is absolute:
+packages/@emulators/vercel/src/routes/blob.ts:169 and deployments.ts:47 already call
+new URL(baseUrl) unguarded, the CLI documents --base-url <url> as a URL
+(packages/emulate/src/index.ts:41), and the adapters always synthesize an absolute origin
+(packages/@emulators/adapter-next/src/index.ts:191-197, 248 -> `${origin}${servicePrefix}`).
+PR 210 inherits a pre-existing precondition; it does not introduce one.
+
+
+================================================================================
+6. STATIC AUDIT RECEIPTS
+================================================================================
+
+batchPath, whole repository:
+$ git -C .../emulate-210-review grep -n 'batchPath' -- packages
+packages/@emulators/google/src/calendar-discovery.ts:19:    batchPath: "batch/calendar/v3",
+  -> exactly one occurrence: the advertisement. No consumer, no route.
+
+$ git -C .../emulate-210-review grep -rn '"/batch\|/batch/' -- packages
+  -> no route registration anywhere.
+
+batchPath in the new tests:
+$ grep -c 'batchPath' .../google.test.ts   -> 0
+  -> the new suite makes zero assertions about the field it introduces.
+
+recurrence support (the reason singleEvents would matter):
+$ git -C .../emulate-210-review grep -inE 'recurrence|recurringEventId|RRULE|originalStartTime' -- packages/@emulators/google
+  -> no hits.
+
+assertions that pin the shape under review (packages/@emulators/google/src/__tests__/google.test.ts):
+  line  993  expect(document.parameters).toEqual({})
+  line 1065  expect(recordProperty(listParameters, "orderBy").enum).toEqual(["startTime"])
+  line 1066  expect(listParameters.showDeleted).toBeUndefined()
+  line 1129  const unauthenticatedCalendarRes = await app.request(`${base}/calendar/v3/users/me/calendarList`)
+  line 1130  expect(unauthenticatedCalendarRes.status).toBe(401)
+  line 1140  expect([...refs].filter((ref) => schemas[ref] === undefined)).toEqual([])
+
+google-api-python-client, argmap construction (source read, NOT executed here):
+  googleapiclient/discovery.py:130       STACK_QUERY_PARAMETERS = {trace, pp, userip, strict}
+  googleapiclient/discovery.py:813       _fix_up_parameters merges the ROOT parameters block
+  googleapiclient/discovery.py:837-845   plus only STACK_QUERY_PARAMETERS
+  googleapiclient/discovery.py:1104-1106 unknown keyword ->
+        TypeError("Got an unexpected keyword argument ...") raised before any HTTP request
+  -> with root parameters == {}, .list(..., fields=...) / prettyPrint / quotaUser / alt / key
+     raise client-side, in the exact workflow the new docs and README teach.
+
+
+================================================================================
+7. UPSTREAM DOCUMENT DIFFERENTIAL (root-level keys)
+================================================================================
+
+Live Google Calendar v3 discovery document carries a root "parameters" block with:
+  alt, fields, key, oauth_token, prettyPrint, quotaUser, userIp
+and root keys absent from the emulated document:
+  auth, documentationLink, icons, ownerDomain, ownerName, revision
+
+The emulated document ships "parameters": {} (calendar-discovery.ts:20) and the new test
+pins that empty object as correct (line 993).

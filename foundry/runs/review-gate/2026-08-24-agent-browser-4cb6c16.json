@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-24",
+    "repo": "vercel-labs/agent-browser",
+    "base": "origin/main",
+    "head": "4cb6c1634736f91bfad34a2521b76ad72d8e4c88",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "user request: diagnose the failed agent-browser release and CI jobs, fix them, and thoroughly rerun the flaky test",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "cargo-zigbuild reference oracle, GitHub CI failure logs, and cross-toolchain substrate corpus",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "cross-platform release compatibility across Rust, Zig, GNU, musl, ARM64, and x64",
+      "process lifecycle observation and child cleanup in a macOS-sensitive test"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "evidence/2026-08-24-agent-browser-release-recovery-reference-oracle.txt",
+      "evidence": "The upstream cargo-zigbuild patch filters the exact failing Rust linker argument, while real /bin/sh process runs and a four-target artifact corpus challenge the process and release claims independently of the diff."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user request in this thread",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The requested outcome is recovered release builds plus a non-flaky macOS process test."
+    },
+    {
+      "source": "design",
+      "location": "no separate Issue Contract or Solution Gate",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "The failed GitHub job logs and upstream cargo-zigbuild implementation define the narrow recovery shape."
+    },
+    {
+      "source": "user_facing",
+      "location": "no product docs, help, API, or runtime behavior changes",
+      "status": "not_applicable",
+      "properties": [],
+      "evidence": "Both changed surfaces are internal release tooling or test reliability."
+    },
+    {
+      "source": "implementation",
+      "location": ".github/workflows/release.yml and cli/src/native/daemon.rs at 4cb6c16",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The exact two-file diff upgrades cargo-zigbuild and replaces a fixed test sleep with bounded polling and exact status verification."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Rust 1.98 and Zig 0.16 can build every Linux release target in the workflow when cargo-zigbuild 0.23.2 is used.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "successful linker completion and an emitted ELF for each of the four Linux release targets",
+        "layer": "real Rust, Zig, and cargo-zigbuild toolchain",
+        "method": "build all four workflow targets and inspect each output artifact",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "cargo-zigbuild 0.23.2 source contains the expected filter",
+        "counterexample": "the filter could exist while the project still fails to link due to another Rust 1.98 or Zig 0.16 incompatibility",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "All four project targets linked successfully, so the source-level filter is not the sole oracle."
+      },
+      "substrates": [
+        {
+          "name": "aarch64-unknown-linux-gnu.2.28 and aarch64-unknown-linux-musl",
+          "status": "exercised",
+          "evidence": "Both ARM64 release builds emitted valid AArch64 ELF artifacts."
+        },
+        {
+          "name": "x86_64-unknown-linux-gnu.2.28 and x86_64-unknown-linux-musl",
+          "status": "exercised",
+          "evidence": "Both x64 release builds emitted valid x86-64 ELF artifacts."
+        }
+      ],
+      "evidence": "The four real release builds passed with rustc 1.98.0, Zig 0.16.0, and cargo-zigbuild 0.23.2."
+    },
+    {
+      "id": "P2",
+      "claim": "The dependency upgrade preserves the release artifact compatibility contract: GNU binaries require no GLIBC newer than 2.28 and musl binaries remain static.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "ELF linkage mode, architecture, interpreter, and referenced GLIBC symbol versions",
+        "layer": "built release artifacts",
+        "method": "inspect all four ELF artifacts with file and scan the GNU version requirements",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the workflow target name still includes .2.28 or musl",
+        "counterexample": "a successful build could silently link a GNU symbol newer than 2.28 or make a musl artifact dynamic",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Artifact inspection, rather than target naming, showed GLIBC_2.28 as the GNU maximum and static linkage for both musl outputs."
+      },
+      "substrates": [
+        {
+          "name": "GNU ARM64 and x64 ELF outputs",
+          "status": "exercised",
+          "evidence": "Both are dynamic for their expected architecture and reference no GLIBC version above 2.28."
+        },
+        {
+          "name": "musl ARM64 and x64 ELF outputs",
+          "status": "exercised",
+          "evidence": "Both artifacts are reported as statically linked."
+        }
+      ],
+      "evidence": "The artifact corpus preserved the workflow's architecture and libc compatibility promises."
+    },
+    {
+      "id": "P3",
+      "claim": "The Unix child-exit test tolerates scheduler delay, remains bounded, observes the exact exit code 42, and does not intentionally orphan the child on timeout.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "the real child process status returned by std::process::Child::try_wait",
+        "layer": "macOS process boundary through /bin/sh",
+        "method": "run immediate and one-second-delayed real child exits, mutate back to the fixed-sleep defect, repeat the delayed case 100 times, and run the full suite",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the test passes once with an immediate child exit",
+        "counterexample": "the scheduler can keep the child live past a fixed sleep even though an immediate isolated run passes",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The one-second delayed producer made the fixed-sleep implementation fail at the intended assertion, while bounded polling passed it 100 of 100 times."
+      },
+      "substrates": [
+        {
+          "name": "real macOS /bin/sh child process",
+          "status": "exercised",
+          "evidence": "Command spawned /bin/sh, immediate and delayed exits produced status code 42, and the final narrow test passed again."
+        },
+        {
+          "name": "full macOS x64 Rust CI-equivalent suite",
+          "status": "exercised",
+          "evidence": "1,145 tests passed, 101 were ignored, and both doctor integration tests passed."
+        }
+      ],
+      "evidence": "The old timing assumption was forced red; the deadline-polling implementation was restored green and survived 100 delayed repetitions."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["process lifecycle test behavior changed"],
+    "dimensions": {
+      "values": [
+        "producer timing: immediate exit or exit after one second",
+        "pre-observation state: child still running or already exited",
+        "transition: /bin/sh exits with status 42",
+        "observation: try_wait returns None while live and Some(status) after exit",
+        "schedule sample: isolated run, 100 repeated delayed runs, and full-suite contention"
+      ],
+      "exclusions": [
+        "a permanently non-exiting child is outside this regression test's exit-detection contract; the ten-second deadline is harness cleanup and its branch explicitly kills and waits before failing",
+        "Windows is excluded by the existing cfg(unix) contract and /bin/sh producer"
+      ],
+      "evidence": "The model covers the scheduler-delay family that caused CI to return None after 200 ms and the exact status transition the test promises to observe."
+    },
+    "oracle": {
+      "source": "operating-system child status from a real /bin/sh producer",
+      "independent": true,
+      "evidence": "Expected status 42 comes from the shell command, not from the polling implementation."
+    },
+    "producer": {
+      "name": "std::process::Command spawning /bin/sh",
+      "status": "exercised",
+      "evidence": "The narrow test, delayed mutation, 100-run campaign, and full suite all used the real process producer."
+    },
+    "falsification": [
+      {
+        "mutation": "change the child to sleep 1; exit 42 and restore the old fixed 200 ms sleep implementation",
+        "red_evidence": "The test failed at the intended assertion: try_wait() returned None but child should have exited.",
+        "restored_green_evidence": "Deadline polling passed the same delayed producer, then passed 100 of 100 repetitions and the final immediate source."
+      }
+    ],
+    "evidence": "The test rejects the exact timing-assumption defect, reaches a real OS process boundary, and is deterministic under repeated delay."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "failed release job and upstream cargo-zigbuild patch",
+      "claim": "Rust 1.98's new Cortex-A53 linker argument is the cause of both ARM64 release failures.",
+      "status": "verified",
+      "evidence": "The failed job passes the exact unsupported argument through cargo-zigbuild 0.22.3, and upstream filters that exact value in 0.23.2."
+    },
+    {
+      "id": "A2",
+      "source": "failed macOS x64 CI job",
+      "claim": "The macOS failure is a scheduler timing assumption rather than a broken try_wait contract.",
+      "status": "verified",
+      "evidence": "CI failed only because try_wait returned None after the fixed sleep; a real delayed child reproduces that state, then deadline polling observes exit 42."
+    },
+    {
+      "id": "A3",
+      "source": "subsystem model",
+      "claim": "No product documentation needs updating because neither change alters a user-facing command or runtime contract.",
+      "status": "verified",
+      "evidence": "The diff only changes the release build tool version and a cfg(test) function."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The diff itself publishes nothing and changes no production runtime path; release publication still requires merge and the existing main-branch workflow, while the process change is confined to cfg(test).",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "no matcher, parser, lookup, or data source changed"},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "no validator or accepted input domain changed"},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "no value resolution rule changed"},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "the static shell test fixture is not constructed from user input"},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "no process messaging or latch changed"},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "no repository shim or subprocess fixture path changed"},
+    {"name": "Deliberate-default check", "status": "skipped", "reason": "no product default changed"},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "read the full release target matrix and child-process test seam, including timeout cleanup and exact status handling"},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "built GNU and musl artifacts for both ARM64 and x64 under the exact current Rust and Zig versions"},
+    {"name": "Reference-implementation oracle", "status": "run", "reason": "upstream cargo-zigbuild commit 7e791b4 filters and tests the exact failing argument"},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "no production function contract gains a new failure outcome"},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "no flag changed"},
+    {"name": "Error-path forcing", "status": "run", "reason": "the old fixed-sleep path was forced to fail for the intended None status and the release failure was read from the real linker log"},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "no heuristic production recovery action changed"},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "the test wait is bounded at ten seconds and timeout cleanup kills and waits for the child before panic"},
+    {"name": "Boundary pipeline trace", "status": "skipped", "reason": "no feature extends across a new product boundary"},
+    {"name": "Substrate verification", "status": "run", "reason": "validated ELF architecture, dynamic or static linkage, and GNU version requirements on built artifacts"},
+    {"name": "Dogfood the built artifact", "status": "skipped", "reason": "the diff changes release tooling and a test, not a new locally runnable user-facing feature"},
+    {"name": "Newly-asserted invariant ownership", "status": "skipped", "reason": "no new product invariant is documented"},
+    {"name": "Docs-behavior parity", "status": "skipped", "reason": "the behavior delta is internal CI and test reliability"},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "no documentation example changed"},
+    {"name": "Choice audit", "status": "skipped", "reason": "no decision trail was provided"},
+    {"name": "Complexity budget", "status": "skipped", "reason": "the bounded test-only polling loop is independent of user input size and sleeps between checks"}
+  ],
+  "deterministic": [
+    {"check": "head coverage", "outcome": "pass", "reason": "this report records exact HEAD 4cb6c1634736f91bfad34a2521b76ad72d8e4c88"},
+    {"check": "style", "outcome": "pass", "reason": "gate.sh style passed"},
+    {"check": "surfaces", "outcome": "pass", "reason": "gate.sh surfaces found no missing user-facing surface"},
+    {"check": "timings", "outcome": "pass", "reason": "gate.sh timings found no product wait ceiling; the changed deadline is test-only"},
+    {"check": "Rust format", "outcome": "pass", "reason": "cargo fmt --manifest-path cli/Cargo.toml -- --check passed"},
+    {"check": "Rust clippy", "outcome": "pass", "reason": "cargo clippy --manifest-path cli/Cargo.toml -- -D warnings passed"},
+    {"check": "diff integrity", "outcome": "pass", "reason": "git diff --check origin/main...HEAD passed and the target worktree remained clean"},
+    {"check": "four-target release build", "outcome": "pass", "reason": "GNU and musl builds passed for ARM64 and x64"},
+    {"check": "flaky repetition", "outcome": "pass", "reason": "the one-second delayed child variant passed 100 of 100 repetitions"},
+    {"check": "macOS x64 full suite", "outcome": "pass", "reason": "1,145 unit tests and 2 doctor integration tests passed; 101 tests were ignored"},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "2 changed and 0 impacted symbols, but 2,445 unresolved calls make the map under-covering"}
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "No user-facing docs or changelog entry are required.",
+      "evidence": "The workflow dependency and cfg(test) polling logic do not change shipped commands, flags, APIs, or runtime semantics."
+    },
+    {
+      "claim": "The ten-second timeout is not treated as a product timing contract.",
+      "evidence": "It only bounds a cfg(test) harness whose asserted behavior is observing a child that exits with code 42."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Improve Rust semantic indexing for agent-browser radius maps",
+      "evidence": "The exact-head map reports 2,445 unresolved calls and 81 SCIP-unmapped entries, so zero impacted symbols is under-covering.",
+      "why_out_of_scope": "This is a review-tooling coverage gap and does not affect the release or flaky-test fix."
+    }
+  ]
+}

@@ -667,6 +667,45 @@
         "after_digest": "sha256:f6936a7f48ec672adfd7c888cb484e815ebd32416493ef62d371cf56547340ed"
       },
       "supersedes": []
+    },
+    {
+      "schema_version": 1,
+      "kind": "skill-impact",
+      "id": "impact.record-a-case.manifest-projection",
+      "skill": "record-a-case",
+      "summary": "Accepted manifest-first case projection to reduce state reconstruction while preserving evidence and authority boundaries.",
+      "sources": {
+        "patterns": [
+          "pattern.drive-the-shipped-surface"
+        ],
+        "no_action_reason": null
+      },
+      "candidate": {
+        "path": "foundry/runs/proposal-impact/2026-08-30-record-a-case-manifest-projection/candidate.patch",
+        "digest": "sha256:17019ca30c3128b8f51990653a5377d5a64f42739b5b14ff3f718fc89db99a28"
+      },
+      "evaluation": {
+        "path": "foundry/runs/proposal-impact/2026-08-30-record-a-case-manifest-projection/evaluation.json",
+        "result": "pass",
+        "variants": [
+          "candidate-skill",
+          "no-skill",
+          "released-skill"
+        ],
+        "summary": "Candidate passed 8 of 8 deterministic instruction-contract assertions while preserving the released procedure's evidence boundaries."
+      },
+      "decision": {
+        "outcome": "accepted",
+        "authority": "human",
+        "path": "foundry/runs/proposal-impact/2026-08-30-record-a-case-manifest-projection/decision.md",
+        "rationale": "Hunter approved implementing the friction-audit recommendations, and the candidate adds shared-state projection without weakening validation or promotion boundaries."
+      },
+      "active_skill": {
+        "path": "skills/record-a-case/SKILL.md",
+        "before_digest": "sha256:f6936a7f48ec672adfd7c888cb484e815ebd32416493ef62d371cf56547340ed",
+        "after_digest": "sha256:cccd6978e6aabff6976e4453bc1680dd1b411844af5b8339f6b76d7d258bb139"
+      },
+      "supersedes": []
     }
   ],
   "nodes": [
@@ -801,6 +840,12 @@
       "kind": "impact",
       "outcome": "rejected",
       "title": "Rejected an explicit disposition order that did not beat the released procedure and weakened validation status attribution."
+    },
+    {
+      "id": "impact.record-a-case.manifest-projection",
+      "kind": "impact",
+      "outcome": "accepted",
+      "title": "Accepted manifest-first case projection to reduce state reconstruction while preserving evidence and authority boundaries."
     }
   ],
   "edges": [
@@ -818,6 +863,19 @@
       "outcome": "rejected"
     },
     {
+      "from": "impact.record-a-case.manifest-projection",
+      "to": "pattern.drive-the-shipped-surface",
+      "relationship": "derived-from",
+      "status": "active"
+    },
+    {
+      "from": "impact.record-a-case.manifest-projection",
+      "to": "skill.record-a-case",
+      "relationship": "targets",
+      "status": "active",
+      "outcome": "accepted"
+    },
+    {
       "from": "pattern.drive-the-shipped-surface",
       "to": "skill.record-a-case",
       "relationship": "supports",
@@ -833,11 +891,27 @@
   "textual_matches": [
     {
       "skill": "before-after",
+      "path": "cases/portless/397-auto-start-child-exit-propagation.md",
+      "fingerprint": "c51a456621d938124847682d4369ab76985dd017138aee0c01f67c9d53e01435",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "before-after",
       "path": "foundry/rounds/008-register-before-after/README.md",
       "fingerprint": "33783bb382f38d1a295377f82efe66e5117217980e38c5c8f689f29ecde3f769",
       "classification": "decision",
       "rationale": "Reviewed matched lines: this file records registration, promotion, retirement, or lifecycle governance for the skill.",
       "supports_application": false
+    },
+    {
+      "skill": "factory-loop",
+      "path": "cases/ovation/pr8-repository-item-triage.md",
+      "fingerprint": "f9f6dffe1832ec4085eafa1488f13761196bd7158aa442bfe78c8bea05866891",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
     },
     {
       "skill": "factory-loop",
@@ -862,6 +936,22 @@
       "classification": "decision",
       "rationale": "Reviewed matched lines: this file records registration, promotion, retirement, or lifecycle governance for the skill.",
       "supports_application": false
+    },
+    {
+      "skill": "factory-loop",
+      "path": "foundry/runs/review-gate/2026-08-25-skills-f957cb1.json",
+      "fingerprint": "3bbdbc1b735d3e99d0e099e30b23f8862392364e44b49062e007ef3adc9aa7a7",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "factory-loop",
+      "path": "foundry/runs/review-gate/2026-08-25-skills-f957cb1.md",
+      "fingerprint": "43748a1b5cfe053b4c998c79a820f341f7d720aac49e2f09311204dbd7deba70",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
     },
     {
       "skill": "handoff",
@@ -941,6 +1031,14 @@
       "fingerprint": "a411e17a1f0df2f6ab2a09b48978f62fce279bcc77759692dd6b7fe316739f65",
       "classification": "reference",
       "rationale": "Reviewed matched lines: the name identifies a boundary, dependency, source artifact, catalog entry, or related method; this file does not prove application.",
+      "supports_application": false
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/proposal-impact/2026-08-30-record-a-case-manifest-projection/evaluation.json",
+      "fingerprint": "9215ef1dcbbe6e4a15d06b9ff99b9235753aca92d61ff1defc5dadf48af4d99c",
+      "classification": "reference",
+      "rationale": "Reviewed matched line: handoff names one field in the proposed close-cycle receipt; this evaluates record-a-case and does not execute the handoff skill.",
       "supports_application": false
     },
     {
@@ -1089,6 +1187,110 @@
     },
     {
       "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-21-crafter-research-website-86e026b.json",
+      "fingerprint": "94c2d42e5a5fd112aea7377003e05683b99d12056544a5e87c4d506d5425f2a8",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-24-skills-1331959.json",
+      "fingerprint": "84849f28f8fa9513b13e2189bf885f8f7e6c32b3f177f3f91d05fe77926a1602",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-24-skills-1331959.md",
+      "fingerprint": "4626b92433cfa18d21c11f484adbcb8df60bd6083d82eb9541ec0ad27e5ea0d0",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-25-native-cd171c9a-405.json",
+      "fingerprint": "0d3b1cbea2a81a066416a5ac1d2eba3b0e8f2162d956d9f299fd8f1950d370a2",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-25-native-cd171c9a-405.md",
+      "fingerprint": "841f1876879a6771b774aceb3f5a768a8445cf5735249a8d10d4125d8b927c0f",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-25-portless-397-2ac1519.json",
+      "fingerprint": "33bace2560c6b6ccb386e2d71a827d80372ce2aa1575e2bfe43dad06ad5eaa74",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-25-skills-f957cb1.json",
+      "fingerprint": "18dba9b544eac0d96d859b4c20c0dd44e8557ced659000a4d4c0d707f15b7383",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-25-vercel-labs-emulate-017803c.json",
+      "fingerprint": "f65a3d67c67b94bbe2e446d20fab146fedec8d17c6e5dd4e8d9e76f6327306d3",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-26-agent-browser-524c450.md",
+      "fingerprint": "a609578de91f801f6efc66cbe683035d218bf769a24235b3916bca6215dc1473",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-27-vercel-labs-emulate-214-3705e2b.json",
+      "fingerprint": "ad1547fe37e6e06e7c031a5f4f86f66f65d303949256a1d5b9e5e0358749bffd",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/2026-08-27-vercel-labs-emulate-214-3705e2b.md",
+      "fingerprint": "af7e44f7887084fea246b125f7c18ba650f0429d5928dcfa23e8ee0e2ff80448",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/review-gate/evidence/2026-08-27-emulate-214-3705e2b-substrate.md",
+      "fingerprint": "0c2de53040e6c73cb889861fe9d003ee151f61e4243f4f038de8ce2bcb79ee61",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/software-factory/2026-08-28-json-render-325-dc03573/stage-contract.md",
+      "fingerprint": "a5b8e5137455222ffd080dd747cf56d2d6ee8563f0aac230aa869bfe07ebc593",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
       "path": "foundry/runs/solution-gate/2026-08-08-wterm-106-01b7809.md",
       "fingerprint": "c79776ca84d3eb537b9231473c74a9cdeb279ad2a86b1f165e852b8e62ab73b9",
       "classification": "incidental",
@@ -1224,6 +1426,62 @@
       "supports_application": false
     },
     {
+      "skill": "handoff",
+      "path": "foundry/runs/solution-gate/2026-08-21-ovation-pr5-8f7ccf6/decision.md",
+      "fingerprint": "d581a481af0404edfdd2dfe1da5ef39287ed78f60799f38bff04de656880cacd",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/solution-gate/2026-08-21-vercel-desktop-cli-fx-native/packet.md",
+      "fingerprint": "0e6e222e89b7f791a99a3f25c02790b176f0ee36c963e1da851e13a9c986f0d8",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/solution-gate/2026-08-21-vercel-desktop-cli-fx-native/proposal-fable.md",
+      "fingerprint": "feaebddcb82fccc5e87c6392509da0f1bab9559084bba25fc0d2aef56a64d29a",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/solution-gate/2026-08-21-vercel-desktop-cli-fx-native/proposal-grok.md",
+      "fingerprint": "e322c0892dd6cf9d386280535d8b73e03e2152178b7c4aeb4047da15766065fa",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/solution-gate/2026-08-26-vercel-desktop-agent-reliability/decision.md",
+      "fingerprint": "fbc2195cb2f996abce773956c18932e504cdfaaa66e9a40d1d134ceb70c306c6",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/solution-gate/2026-08-26-vercel-desktop-cli-runtime-resolution/decision.md",
+      "fingerprint": "876348bb57bbac043f1edb6f1f40e6db5eefe7ad9d0f563d3efa23b69434aea3",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
+      "skill": "handoff",
+      "path": "foundry/runs/solution-gate/2026-08-28-json-render-325-dc03573/decision.md",
+      "fingerprint": "0e1f44fd27d3513db5cb300455a46249b99375cf71cc0aba73fd477e2a5c877d",
+      "classification": "incidental",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: the skill name appears incidentally and does not demonstrate its execution."
+    },
+    {
       "skill": "herdr-workstreams",
       "path": "foundry/rounds/012-register-herdr-workstreams/README.md",
       "fingerprint": "368330dec559293f43c36eeadaaac200837cd4b1c7e8864af5ea710059b22255",
@@ -1274,7 +1532,7 @@
     {
       "skill": "performance-proof",
       "path": "cases/README.md",
-      "fingerprint": "92d7c9a8a8a4923449a6552b65dcf15e57759f621cce2f939f168b3a5a1fb74b",
+      "fingerprint": "447c96f0117122cc6cff1c142c7639b2a483c76f37e3c01f96c85e4bdf1ee660",
       "classification": "reference",
       "rationale": "Reviewed matched lines: the name identifies a boundary, dependency, source artifact, catalog entry, or related method; this file does not prove application.",
       "supports_application": false
@@ -1473,6 +1731,30 @@
     },
     {
       "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-30-record-a-case-manifest-projection/decision.md",
+      "fingerprint": "480ca79673a2c6dba14ad3f5426018ef2d4a8c086277d0a4c0ae30f8de6f3ece",
+      "classification": "decision",
+      "rationale": "Reviewed matched line: this file records the human acceptance decision for a record-a-case procedure change.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-30-record-a-case-manifest-projection/evaluation.json",
+      "fingerprint": "6c484a89107906d511cfabb7a0582c2a3d4b5d8cc39bc897b60c8c3c81047f1f",
+      "classification": "evaluation",
+      "rationale": "Reviewed matched line: this file compares the released and candidate record-a-case instruction contracts.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
+      "path": "foundry/runs/proposal-impact/2026-08-30-record-a-case-manifest-projection/impact-record.json",
+      "fingerprint": "7a9b2a58996e161bad5ab39861421445de403ab982ab0d3b03f6e773c148d095",
+      "classification": "decision",
+      "rationale": "Reviewed matched lines: this is the durable accepted impact ledger record for the record-a-case procedure change.",
+      "supports_application": false
+    },
+    {
+      "skill": "record-a-case",
       "path": "foundry/runs/review-gate/2026-08-29-skills-a1289e8.json",
       "fingerprint": "1d3ed5e7fdaaf41be05dc1a10385121a560e4ee372130a17d9e2bd1790f57483",
       "classification": "evaluation",
@@ -1665,6 +1947,14 @@
     },
     {
       "skill": "review-gate",
+      "path": "cases/agent-browser/1707-global-env-tempdir-test-race.md",
+      "fingerprint": "3a57876848641cfdf333ad6f19adfad7087bcc34701fde60bb43d9cb8fd06b31",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
       "path": "cases/agent-browser/conventions.md",
       "fingerprint": "7201c60485ac854c9234f255899a19cabf8ed26243a7536876d3df8d0f5b87a1",
       "classification": "reference",
@@ -1678,6 +1968,22 @@
       "classification": "reference",
       "rationale": "Reviewed matched lines: the name identifies a boundary, dependency, source artifact, catalog entry, or related method; this file does not prove application.",
       "supports_application": false
+    },
+    {
+      "skill": "review-gate",
+      "path": "cases/ovation/conventions.md",
+      "fingerprint": "3e710865814cb7c04f95e58a042e3d7519fb439d97269e4c89a16c49f52e62c4",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "review-gate",
+      "path": "cases/ovation/pr8-repository-item-triage.md",
+      "fingerprint": "8426d839cf61adde8cccccf3eedd1f0ec09f880090ebc8ad08fd6a75dc522bf0",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
     },
     {
       "skill": "review-gate",
@@ -1746,10 +2052,18 @@
     {
       "skill": "review-gate",
       "path": "cases/portless/374-explicit-protocol-state.md",
-      "fingerprint": "582b9c7fd2f2933b08b853354cb2c07a5ec98d19cb5221ce311915accde26fcd",
+      "fingerprint": "6b3380447d3590e4db5f8fe2ad2435468872e7cabb7402b0804da059b51dd71f",
       "classification": "application",
       "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome.",
       "supports_application": true
+    },
+    {
+      "skill": "review-gate",
+      "path": "cases/portless/397-auto-start-child-exit-propagation.md",
+      "fingerprint": "91dcb6ac958c5a95e516221a17b1204b912e27f34ca6c0f4f3848a3f700d46bf",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
     },
     {
       "skill": "review-gate",
@@ -2097,6 +2411,118 @@
     },
     {
       "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-24-vercel-desktop-762da0f.json",
+      "fingerprint": "8237ef60782388c4b69f1ff01e8bbeac752d6322a2fdac91e7acaa710fa29f6c",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-24-vercel-desktop-f542231.json",
+      "fingerprint": "2043ed6f039c1dccd8615012b78042841445c88fc4df9135618ea5b09ad94366",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-24-vercel-desktop-fec95af.json",
+      "fingerprint": "111f14cdedd32759c58a90d4ca6b09a85e45f0a9935b600cd37f16830ec4f5ec",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-25-portless-397-2ac1519.json",
+      "fingerprint": "1478ffdddb98599a7e2cb97719a1cbb761969b0fc858821247727bfffd844a06",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-25-railly-3ba5e15.json",
+      "fingerprint": "b8b7be9209f7e82705e7d5a5abe7168c6f869759b080f24823b6b55fb42c80df",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-25-railly-b14f8d9.json",
+      "fingerprint": "86a6f16e26af3f72a782706782c7e90bdff459f7e8671aeb14368b360b6a99c1",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-25-skills-f957cb1.md",
+      "fingerprint": "43748a1b5cfe053b4c998c79a820f341f7d720aac49e2f09311204dbd7deba70",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-26-agent-browser-524c450-challenge.md",
+      "fingerprint": "20ed93fbc1d14a24f128e9326b3eaa22495761e7724addde2db5979550de608b",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-26-agent-browser-524c450.json",
+      "fingerprint": "3b9b928b43982a65aab017dd2a95f3600f7f57bce51e338ee65523319ded07e6",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-26-agent-browser-524c450.md",
+      "fingerprint": "61a2cc024aedbee0b9b7122fa9449b9c2d9d4c17fe5d57a8848d08c077fd0dad",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-26-vercel-desktop-cli-runtime-3408ce6.json",
+      "fingerprint": "9a5c65d6399a0195222932ff7fde2915740a43f8d7778479363d4bcdd7ccfb32",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-26-vercel-labs-emulate-9800e01.json",
+      "fingerprint": "acb80edb55031094059d83da63553d13651eba449a6cbe7aad3f64e66a15a482",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-26-vercel-labs-emulate-9800e01.md",
+      "fingerprint": "15ac1217b736ed8d014468a886aac2b6be3ae74e4f9ea3cea974fa68b3b7b136",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
+      "path": "foundry/runs/review-gate/2026-08-27-vercel-labs-emulate-214-3705e2b.md",
+      "fingerprint": "289fc44d093c77417bd9b334f4d91de6adf026898073ba6f7b581a03b754a82c",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "review-gate",
       "path": "foundry/runs/solution-gate/2026-08-08-agent-browser-1670-ba519cf.md",
       "fingerprint": "148e1dd3200906f33639088de4857ffefec668674b6dd60a80eaef94e83a7701",
       "classification": "reference",
@@ -2248,6 +2674,14 @@
       "supports_application": false
     },
     {
+      "skill": "software-factory",
+      "path": "foundry/runs/review-gate/2026-08-25-skills-f957cb1.md",
+      "fingerprint": "43748a1b5cfe053b4c998c79a820f341f7d720aac49e2f09311204dbd7deba70",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
       "skill": "solution-gate",
       "path": "cases/agent-browser/1068-real-world-browser-context-isolation.md",
       "fingerprint": "1cce8856b76ff4e9927bc419d7f89f7e502045658f30a4f58b7e35d805c2e5d8",
@@ -2313,16 +2747,8 @@
     },
     {
       "skill": "solution-gate",
-      "path": "cases/portless/374-explicit-protocol-state.md",
-      "fingerprint": "43dd176364d7b1103174388dbcdbb614acbdeb2e05474caf4e6396a0f520970c",
-      "classification": "application",
-      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome.",
-      "supports_application": true
-    },
-    {
-      "skill": "solution-gate",
       "path": "cases/README.md",
-      "fingerprint": "1bc003b01d7c1d838f4f1b47bd5d2123e70c098c7a71f0f7826fc1f8924e12d0",
+      "fingerprint": "ab2d89e3d86bf3a89fa6a282f690dfd4af291998f1ba123b3d8da8b9c7619ab1",
       "classification": "reference",
       "rationale": "Reviewed matched lines: the name identifies a boundary, dependency, source artifact, catalog entry, or related method; this file does not prove application.",
       "supports_application": false
@@ -2657,6 +3083,158 @@
     },
     {
       "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-20-vercel-labs-emulate-f07deb2.json",
+      "fingerprint": "604af49251dc5e1f637adf136c138324b6eb03d18b9aa5d5faadf30e300a8cdd",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-21-ovation-325aebc.json",
+      "fingerprint": "8a716f5477de9bb142cfb33bd8c52bacd78960e2a3eec5034783edb06ba56d24",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-21-ovation-45af42c.json",
+      "fingerprint": "fba095faba8f2b0858e0630b353b3bb9c31171689c43ed9a3577dd44f4d9da32",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-21-ovation-8f7ccf6.json",
+      "fingerprint": "fba095faba8f2b0858e0630b353b3bb9c31171689c43ed9a3577dd44f4d9da32",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-21-ovation-b91c4dc.json",
+      "fingerprint": "e5127d38c3b030c423e15cb201317250ea2d3e26701fefab8b1a41a9dd9b1856",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-21-ovation-work-enrichment-7a510dd.json",
+      "fingerprint": "c0e506718cae3e86d777860541771e5f8aeb278b00e46a9dedd77bcc65e9bb69",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-21-vercel-desktop-3b2b380.json",
+      "fingerprint": "6f38844ec0951f8e3c5696e21325b214345e61ef5170631a73a433beccc7818d",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-21-vercel-desktop-861f7d4.json",
+      "fingerprint": "6f38844ec0951f8e3c5696e21325b214345e61ef5170631a73a433beccc7818d",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-24-vercel-desktop-762da0f.json",
+      "fingerprint": "83e5c3f0299093ed53e85af182cfe2d3706f5e2887ce804a14e3ca8c55078032",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-24-vercel-desktop-f542231.json",
+      "fingerprint": "83e5c3f0299093ed53e85af182cfe2d3706f5e2887ce804a14e3ca8c55078032",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-24-vercel-desktop-fec95af.json",
+      "fingerprint": "83e5c3f0299093ed53e85af182cfe2d3706f5e2887ce804a14e3ca8c55078032",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-26-vercel-desktop-cli-runtime-3408ce6.json",
+      "fingerprint": "e310ead5d0850ba59ec7402faa96e5cc2af65b067229b7c371eaaaae63074542",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-26-vercel-desktop-dmg-d5994e4.json",
+      "fingerprint": "2163a1d62b5fc99eaeb651bbe9d1dbfdc118200367989d01520d104f880a2633",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-28-portless-374-8eb6a33-b92d8af.json",
+      "fingerprint": "3d928eb1b996e42ac5d2dba6e60f9f39fa8849ff697d7e5a1fa15ab033e14761",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-29-portless-374-ea90fc6.json",
+      "fingerprint": "41a70fdbcc40705235e683a8c89b35a3dffe4e30c9287f451ebd15d6a7062e21",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-30-agent-browser-6849461.json",
+      "fingerprint": "a08d5c2b78e435c58b0b3a95c3a1dbafaddcffa3d83c5e90c627c13734539b35",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/2026-08-30-agent-browser-8ccd1ee.json",
+      "fingerprint": "82b0cdb464e7fab5d8c20ed2acf4e893e640d8e8eb8c2f58a080d5f0e73ea680",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/review-gate/evidence/2026-08-30-agent-browser-8ccd1ee-cdp-transport.md",
+      "fingerprint": "8a68ccb13311ef455ea15dd1e9d003548762752bd1f04bf4988c2193cdd3c598",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
+      "path": "foundry/runs/software-factory/2026-08-28-json-render-325-dc03573/stage-contract.md",
+      "fingerprint": "50bf6de0ed34c1af0c32b0173d0d1db4dca5d646c260307b5e30fa70cc316737",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "solution-gate",
       "path": "foundry/runs/solution-gate/2026-07-29-portless-364-grill.md",
       "fingerprint": "0892ce280727512d566295abca661d529ed861e7bca48fcef39ebc063fb0d0a9",
       "classification": "application",
@@ -2699,14 +3277,6 @@
       "skill": "test-strength",
       "path": "cases/portless/366-framework-argument-ownership.md",
       "fingerprint": "f70b96f3c81f3b63449b5e737b61797317a09f065ba72abfb1f9db141c288188",
-      "classification": "application",
-      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome.",
-      "supports_application": true
-    },
-    {
-      "skill": "test-strength",
-      "path": "cases/portless/374-explicit-protocol-state.md",
-      "fingerprint": "83a06deae7a0813c895d068f1f38eba2ba88eb1e4e6cd176d04e34414f7997a9",
       "classification": "application",
       "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome.",
       "supports_application": true
@@ -2833,11 +3403,99 @@
     },
     {
       "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-24-skills-d4e874b.json",
+      "fingerprint": "33959cbf12e0b599bb5651cf3471dd6dd5edaa3835cd584a518a0961c401bc8b",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-25-agent-browser-1670-a45f1b6.md",
+      "fingerprint": "7c9088a79a7d14a153a52415c90d0e19af7ac7799b9a7f0435c800210f93c7ae",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-25-agent-browser-1682-8b3fb91.md",
+      "fingerprint": "eae3b740ab628e9afd9d5aff574600403eb09b683edafb92853b99bb80c49309",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-25-agent-browser-1683-e2607d6.md",
+      "fingerprint": "209e9ee9eb85df26e97cadd95aaf48dbf610dea6fd5e8afdb587cd30ffd34523",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-25-ovation-a2df03d.json",
+      "fingerprint": "09e3dccf2df70bc1cae49c86b0caf9e81516a5651d7376f71978a2d4372e4541",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-25-ovation-b58fa27.json",
+      "fingerprint": "09e3dccf2df70bc1cae49c86b0caf9e81516a5651d7376f71978a2d4372e4541",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-25-skills-f957cb1.json",
+      "fingerprint": "aaef1581403e34c042d3e8030e32c6e3ea612249469d990a6a4f38382de84bd9",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-26-agent-browser-524c450.md",
+      "fingerprint": "4251163e5d6be8ad99107aab54d2173da6a7c61c5c65608e42a64fb45a23fec1",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-26-vercel-labs-emulate-9800e01.json",
+      "fingerprint": "f8497df5cc5280b76e6ea616a035fd3fb1ebf18475c94509252f97419fb0b2ee",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "test-strength",
       "path": "foundry/runs/review-gate/2026-08-29-skills-a7e38d3.json",
       "fingerprint": "5b92243763d3b693a68a65248c6f7034308e4310fd1e1aa875588d7c9d9acc52",
       "classification": "application",
       "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome.",
       "supports_application": true
+    },
+    {
+      "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-30-agent-browser-6849461.json",
+      "fingerprint": "85d75134800028a6cf447595091b64d20e2f17d2a7bf7da7852d98d0bd542e2e",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "test-strength",
+      "path": "foundry/runs/review-gate/2026-08-30-agent-browser-6849461.md",
+      "fingerprint": "ef2ed3805060946f85bbd4beec0c2b1464df28d5be4746bed3b8f5f19da3667c",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
     },
     {
       "skill": "trail-decisions",
@@ -2896,6 +3554,22 @@
       "supports_application": false
     },
     {
+      "skill": "work-intake",
+      "path": "foundry/runs/review-gate/2026-08-24-skills-1331959.json",
+      "fingerprint": "6d00ce202918ea94454b789b51786c1ffbde694bc9f9fe580bafaeeb84e8af84",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "work-intake",
+      "path": "foundry/runs/review-gate/2026-08-24-skills-1331959.md",
+      "fingerprint": "991442c656d728b9bff98c5ba5c9491b77e5ec32344a6f0504e74e413ec2ed88",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
       "skill": "workstream-reconcile",
       "path": "foundry/rounds/011-register-workstream-reconcile/README.md",
       "fingerprint": "b6fe6c2019cd199b1ab85afa5a3f1fcb5c10bd20566bfd6874cfccea86cbc6a8",
@@ -2910,6 +3584,22 @@
       "classification": "reference",
       "rationale": "Reviewed matched lines: the name identifies a boundary, dependency, source artifact, catalog entry, or related method; this file does not prove application.",
       "supports_application": false
+    },
+    {
+      "skill": "workstream-reconcile",
+      "path": "foundry/runs/review-gate/2026-08-24-skills-1331959.json",
+      "fingerprint": "3c7b163a942661ea646dccaed0c2f913b527fd9cb7f032883a66a8f688d732d1",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "workstream-reconcile",
+      "path": "foundry/runs/review-gate/2026-08-24-skills-1331959.md",
+      "fingerprint": "4626b92433cfa18d21c11f484adbcb8df60bd6083d82eb9541ec0ad27e5ea0d0",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
     },
     {
       "skill": "xref",
@@ -3129,6 +3819,46 @@
     },
     {
       "skill": "xref",
+      "path": "foundry/runs/review-gate/2026-08-21-ovation-work-enrichment-7a510dd.json",
+      "fingerprint": "bf946534673c9638989776f95c3ecb26c50fa3c8f73a6ab92004955e2fb70b6d",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "xref",
+      "path": "foundry/runs/review-gate/2026-08-24-skills-1331959.json",
+      "fingerprint": "0b534c648f9b8d1bf75af3c97ec4b0b2c0089394f88a8f3a8a15b3020bc5ee45",
+      "classification": "application",
+      "supports_application": true,
+      "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome."
+    },
+    {
+      "skill": "xref",
+      "path": "foundry/runs/review-gate/2026-08-24-skills-1331959.md",
+      "fingerprint": "f9b3795f8c8571144e774f1e2ab8d6b4ae23f56c7472e687f4606b392c82e459",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "xref",
+      "path": "foundry/runs/review-gate/2026-08-25-agent-browser-1719-10b433b.json",
+      "fingerprint": "a533ee728825a440c68bbf98df2782a671a2e700e3a26726cff3bd3a0b4522d1",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "xref",
+      "path": "foundry/runs/review-gate/2026-08-25-agent-browser-1719-10b433b.md",
+      "fingerprint": "7d26541f07be374a6dc92d8056cf1cf93a3c45b542b3b9827e924a10e72fd66f",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "xref",
       "path": "foundry/runs/solution-gate/2026-08-12-wterm-osc8.md",
       "fingerprint": "783611e859cf8d5a0e921a23312bb7885a1b23a6bc30f1ae0093c154459510d8",
       "classification": "reference",
@@ -3158,6 +3888,22 @@
       "classification": "application",
       "rationale": "Reviewed matched lines: this file records the skill being executed, attempted, or its concrete outcome.",
       "supports_application": true
+    },
+    {
+      "skill": "xref",
+      "path": "foundry/runs/solution-gate/2026-08-21-ovation-work-enrichment-7a510dd/breadboard.md",
+      "fingerprint": "cef3d49944fd506e8475f767b7f9a59fc5ae7177f6f8a6794ff983a6d633ddf9",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
+    },
+    {
+      "skill": "xref",
+      "path": "foundry/runs/solution-gate/2026-08-21-ovation-work-enrichment-7a510dd/decision.md",
+      "fingerprint": "b5abe28f0fabca27ea9b353fd6581f761c449896556efb90aaaac0e6fe5deb8a",
+      "classification": "reference",
+      "supports_application": false,
+      "rationale": "Reviewed matched lines: this file mentions the skill as context or related evidence and does not demonstrate its execution."
     }
   ]
 }

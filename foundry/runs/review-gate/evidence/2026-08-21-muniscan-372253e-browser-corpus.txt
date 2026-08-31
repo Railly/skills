@@ -1,0 +1,25 @@
+Muniscan browser corpus for 372253efda03afb00280544e04d599cce28ccf36
+
+Source snapshot rows with already percent-encoded slugs: 3.
+
+- muniba%C3%B1os
+- muniichu%C3%B1a
+- munisanbuenaventura-mara%C3%B1on
+
+Counterexample:
+
+- encodeURIComponent("muniichu%C3%B1a") = "muniichu%25C3%25B1a"
+- direct HTML-escaped slug = "muniichu%C3%B1a"
+
+Real browser producer drive at 390 by 844:
+
+- Search input: Ichuña
+- Result count: 1 resultados
+- Result href: https://www.gob.pe/muniichu%C3%B1a
+- Meta+K active element: municipality-search
+- document scrollWidth: 390
+- document clientWidth: 390
+- axe-core 4.12.1 violations: 0
+
+The direct slug path is the only variant whose href matches the immutable source
+identifier exactly. Dynamic names and slugs still pass through HTML escaping.

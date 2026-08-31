@@ -45,7 +45,7 @@ Record commands, inputs, observations, cleanup, and limitations. An unavailable 
 
 ## 5. Classify each observation
 
-Read [the classification rules](references/classification.md). Use one primary class:
+Before classifying any observation, read [the classification rules](references/classification.md) to distinguish an exploitable boundary crossing from hardening, a non-security defect, or missing evidence. Use one primary class:
 
 - `confirmed_vulnerability`
 - `likely_vulnerability`

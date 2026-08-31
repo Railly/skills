@@ -456,4 +456,51 @@ describe("impact ledger", () => {
 			),
 		).toThrow("does not match the active skill digest");
 	});
+
+	test("allows one accepted record to reconcile intentional active skill drift", () => {
+		const { repository, registry, patterns, impact, activeDigest } = fixture();
+		const prior = structuredClone(impact);
+		const acceptedDirectory = join(
+			repository,
+			"foundry",
+			"runs",
+			"proposal-impact",
+			"accepted",
+		);
+		mkdirSync(acceptedDirectory, { recursive: true });
+		const acceptedPatch = join(acceptedDirectory, "candidate.patch");
+		writeFileSync(
+			acceptedPatch,
+			"diff --git a/skills/alpha/SKILL.md b/skills/alpha/SKILL.md\nindex 1111111..2222222 100644\n--- a/skills/alpha/SKILL.md\n+++ b/skills/alpha/SKILL.md\n@@ -1 +1 @@\n-# Alpha\n+# Candidate Alpha\n",
+		);
+		execFileSync("git", ["add", "."], { cwd: repository });
+		writeFileSync(
+			join(repository, "skills", "alpha", "SKILL.md"),
+			"# Candidate Alpha\n",
+		);
+		const nextDigest = fileDigest(
+			join(repository, "skills", "alpha", "SKILL.md"),
+		);
+		const accepted = structuredClone(impact);
+		accepted.id = "impact.alpha.accepted-candidate";
+		accepted.decision.outcome = "accepted";
+		accepted.decision.authority = "human";
+		accepted.evaluation.result = "pass";
+		accepted.candidate.path =
+			"foundry/runs/proposal-impact/accepted/candidate.patch";
+		accepted.candidate.digest = fileDigest(acceptedPatch);
+		accepted.active_skill.before_digest = activeDigest;
+		accepted.active_skill.after_digest = nextDigest;
+		const result = recordImpact(
+			repository,
+			{
+				maturity: { skills: registry },
+				patterns,
+				impacts: [prior],
+			},
+			accepted,
+		);
+		expect(result.appended).toBe(true);
+		expect(result.impacts.at(-1).active_skill.after_digest).toBe(nextDigest);
+	});
 });

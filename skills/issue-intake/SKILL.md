@@ -10,7 +10,7 @@ Protect the user's attention before expensive investigation begins. Survey cheap
 
 ## Canonical contract root
 
-After selection, resolve the canonical `Railly/skills` checkout through `RAILLY_SKILLS_REPO`, `~/Programming/railly/skills`, or `~/railly-skills`. The canonical resolver is `scripts/resolve-source-root.mjs`. Create the seed from `foundry/missions/_template.md` under `foundry/missions/<owner-repo>/`. Never write it into the target repo, `.agents/skills`, `.claude/skills`, or another installed copy. If the source root is unavailable, return the complete seed and report the blocked write.
+After selection, run the packaged `scripts/resolve-source-root.mjs`, which honors `RAILLY_SKILLS_REPO`. Create the Issue Contract from `foundry/missions/_template.md` and its machine-readable sidecar with the packaged `scripts/work-item.mjs init`. Store both under `foundry/missions/<owner-repo>/`. Never write them into the target repo, `.agents/skills`, `.claude/skills`, or another installed copy. If the source root is unavailable, return the complete seed and report the blocked write.
 
 ## 1. Define the selection boundary
 
@@ -73,6 +73,7 @@ unknowns: []
 risks: []
 deferred: []
 contract: foundry/missions/owner-repo/N.md
+manifest: foundry/missions/owner-repo/N.manifest.json
 state: selected
 next_phase: reproducing | implementing
 ```

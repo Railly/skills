@@ -1,0 +1,559 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-28",
+    "repo": "vercel-labs/json-render#325 working tree",
+    "base": "a4d033cf041e7b323ee10f196ef8a3ff2fc1f85f",
+    "head": "dc035735521d2b0eefd3dcc3913002fec8d6eaa7",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/tmp/json325-frozen-packet.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "JR325-A1",
+      "JR325-A2",
+      "JR325-A3",
+      "JR325-A4",
+      "JR325-A5",
+      "JR325-A6",
+      "JR325-A7",
+      "JR325-A8",
+      "JR325-A9",
+      "JR325-M1",
+      "JR325-M2",
+      "JR325-M3",
+      "JR325-M4",
+      "JR325-M5",
+      "JR325-M6",
+      "JR325-M7",
+      "JR325-M8"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "OpenAI Codex factory implementation",
+    "reviewer_model": "Google Gemini 3.7 Flash through fx, with Anthropic Claude Sonnet 5 Test Strength",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "React render invalidation and reference identity",
+      "validator side-effect signal from historical streaming-render test code in the base-to-HEAD commit diff"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "/tmp/json325-final-strengthen.md",
+      "evidence": "Anthropic Claude Sonnet 5 independently challenged the exact working tree through seven fix-absent mutations, snapshot restoration and public-boundary tests. It exited zero and preserved HEAD dc035735521d2b0eefd3dcc3913002fec8d6eaa7, production diff e6767688f6bc3a4305f56592ceec181156fbe8542e9dfc5418e2d021bd0c91d2 and probe 6af1f038acf37d1dbbbfefae8e6b88bcca29d67031df6f861aa0f6c82261030b."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/tmp/json325-frozen-packet.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The frozen contract records baseline failures E1-E6, acceptance JR325-A1-A9, must-not-change behavior JR325-M1-M8, frozen unknowns and exact proof commands."
+    },
+    {
+      "source": "design",
+      "location": "/tmp/json325-shape-claude-final.md and /tmp/json325-shape-gemini-final.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "Two blind shaping passes converged on accepted Shape F: serialization-free raw element comparison plus recursive copy-on-write sharing of resolved props at the existing React boundaries."
+    },
+    {
+      "source": "user_facing",
+      "location": "Two unresolved ctate threads on PR #325 and React package documentation surfaces",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "Live GitHub still has exactly the two non-outdated unresolved ctate threads. The docs-behavior pass confirmed the change restores the existing generic unknown prop-value contract without changing public prose."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/react/src/renderer.tsx at production diff SHA256 e6767688f6bc3a4305f56592ceec181156fbe8542e9dfc5418e2d021bd0c91d2 and packages/react/src/json325-contract-probe.test.tsx at SHA256 6af1f038acf37d1dbbbfefae8e6b88bcca29d67031df6f861aa0f6c82261030b",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The exact dirty state was reviewed through public-boundary tests, seven fix-absent mutations, full repository checks, Prove, Spec and nine focused lens passes."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Unchanged nested plain-object and array values in resolved catalog props retain reference identity across unrelated state writes, while changed ancestry is delivered fresh.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "actual nested object and array references delivered to a catalog component before and after state writes",
+        "layer": "public React JSONUIProvider and Renderer boundary",
+        "method": "capture catalog component props, perform unrelated and relevant state writes, then compare exact references and rendered values",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the effect executes once",
+        "counterexample": "an effect can execute once while unchanged sibling subtrees are still recreated if the test observes only one dependency or no sibling-changing update",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The probe separately captures options, layout and columns references across a sibling revision update, then requires fresh options, layout and columns when the nested gap changes. Disabling recursive sharing makes the identity and effect assertions fail."
+      },
+      "substrates": [
+        {
+          "name": "React 19 through Testing Library and the exported JSONUIProvider and Renderer components",
+          "status": "exercised",
+          "evidence": "/tmp/json325-current-focused.log and /tmp/json325-lens-dogfood-public-api.md exercise state writes, React reconciliation, memo boundaries, effects and catalog props without importing private helpers."
+        }
+      ],
+      "evidence": "JR325-A1-A3 pass at the public boundary. The focused suite passes 40/40 and mutations that disable recursive subtree reuse or reintroduce in-place writes fail at the intended assertions."
+    },
+    {
+      "id": "P2",
+      "claim": "Element invalidation is non-throwing and change-sensitive for nested undefined presence, function identity, symbol identity and BigInt, with SameValue behavior for NaN and signed zero.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "catalog renders, rendered values, render counts and thrown exceptions for each value transition",
+        "layer": "public React Renderer input and catalog output boundary",
+        "method": "rerender complete Specs containing the named values and observe output or component execution without calling the comparison implementation",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "BigInt no longer throws",
+        "counterexample": "a replacement fingerprint can avoid the BigInt exception while still erase undefined property presence, function identity or symbol identity",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The probe independently exercises both undefined directions, changed and unchanged functions, symbols and BigInts, unchanged nested NaN and negative-zero to zero. Disabling own-value, key-presence or Object.is comparisons fails the corresponding cells."
+      },
+      "substrates": [
+        {
+          "name": "React 19 complete-Spec rerender through Testing Library",
+          "status": "exercised",
+          "evidence": "/tmp/json325-current-focused.log records all value-class transitions through JSONUIProvider and Renderer, including a non-throwing BigInt mount."
+        }
+      ],
+      "evidence": "JR325-A4-A9 pass. The ECMAScript SameValue and own-enumerable-property oracle is independent of production, and the Test Strength pass killed every weakening mutation."
+    },
+    {
+      "id": "P3",
+      "claim": "The amended comparison and sharing mechanisms preserve untouched-render skips, complete-spec updates, reactive contexts, partial streamed elements and existing renderer subsystems.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "component execution counts, rendered values, callback freshness, graph termination, watch cleanup and corrective-patch recovery",
+        "layer": "React renderer integration behavior",
+        "method": "run existing renderer and streaming regression suites beside the new contract probes",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the new acceptance tests are green",
+        "counterexample": "the two requested fixes can pass while untouched elements rerender, contexts become stale, delayed props throw, graph traversal loops or error recovery breaks",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The 17 streaming regressions and 8 renderer regressions directly exercise JR325-M1-M7. Public exports, types and docs were inspected for JR325-M8."
+      },
+      "substrates": [
+        {
+          "name": "React renderer integration suite with streamed patches, state, contexts, DAGs, cycles and deep graphs",
+          "status": "exercised",
+          "evidence": "/tmp/json325-current-focused.log passes 40/40, and /tmp/json325-current-test.log passes 68 files and 1101 tests."
+        }
+      ],
+      "evidence": "JR325-M1-M8 pass in the independent Spec report. Full repository typecheck passes 59/59 tasks and lint passes 14/14 tasks."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "React lifecycle and structural invalidation compatibility layer"
+    ],
+    "dimensions": {
+      "values": [
+        "unchanged nested object",
+        "unchanged nested array",
+        "changed nested object",
+        "changed nested array",
+        "present undefined to absent",
+        "absent to present undefined",
+        "changed and unchanged function identity",
+        "changed and unchanged symbol identity",
+        "changed and unchanged BigInt",
+        "unchanged nested NaN",
+        "negative zero to positive zero",
+        "frozen caller-owned containers",
+        "partial props arrival",
+        "untouched streamed elements",
+        "state and registry refresh",
+        "DAG, cycle and deep element graphs"
+      ],
+      "exclusions": [
+        "cyclic raw prop graphs, which remain outside the core resolver contract",
+        "structural preservation of non-plain raw instances, which the base resolver does not preserve"
+      ],
+      "evidence": "/tmp/json325-final-strengthen.md defines the behavioral dimensions and exclusions; /tmp/json325-current-focused.log records 40/40 passing public-boundary and regression cells."
+    },
+    "oracle": {
+      "source": "ECMAScript SameValue, own enumerable property presence, exact JavaScript reference identity and public React observations",
+      "independent": true,
+      "evidence": "Expected results were derived from JavaScript language semantics and the frozen contract, not from structurallyEqual or shareResolvedValue."
+    },
+    "producer": {
+      "name": "public JSONUIProvider and Renderer with StateStore writes and complete Spec rerenders",
+      "status": "exercised",
+      "evidence": "All contract probes mount exported components and drive real state or Spec transitions. No private helper is imported."
+    },
+    "falsification": [
+      {
+        "mutation": "disable raw signature own-value comparison",
+        "red_evidence": "The changed function identity cell retains the first rendered value.",
+        "restored_green_evidence": "/tmp/json325-final-strengthen.md records restored focused 40/40."
+      },
+      {
+        "mutation": "remove own-key presence and length distinction",
+        "red_evidence": "The present undefined to absent cell retains stale output.",
+        "restored_green_evidence": "/tmp/json325-final-strengthen.md records both undefined directions green after restoration."
+      },
+      {
+        "mutation": "replace Object.is with strict equality at comparison and sharing seams",
+        "red_evidence": "Unchanged nested NaN rerenders or negative zero to zero remains stale, depending on the seam.",
+        "restored_green_evidence": "/tmp/json325-final-strengthen.md records the SameValue cells green after every restoration."
+      },
+      {
+        "mutation": "disable recursive subtree reuse",
+        "red_evidence": "The nested-prop effect executes three times instead of once.",
+        "restored_green_evidence": "/tmp/json325-final-strengthen.md records one effect execution and stable nested references."
+      },
+      {
+        "mutation": "write sharing results into the next caller-owned container",
+        "red_evidence": "The frozen and caller-ownership assertions fail.",
+        "restored_green_evidence": "/tmp/json325-final-strengthen.md records non-mutating restored green."
+      }
+    ],
+    "evidence": "/tmp/json325-final-strengthen.md used anthropic/claude-sonnet-5 with fx --add-dir /tmp ask --auto, killed 7/7 mutations and preserved the exact HEAD and both hashes."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "frozen contract E6 and public core types",
+      "claim": "The supported prop surface includes unknown primitive values and recursively resolved enumerable arrays and objects.",
+      "status": "verified",
+      "evidence": "packages/core/src/types.ts defaults props to Record<string, unknown>; packages/core/src/props.ts recursively resolves enumerable containers and passes literals through."
+    },
+    {
+      "id": "A2",
+      "source": "frozen unknowns",
+      "claim": "Cyclic raw prop graphs and structural preservation of non-plain raw instances are not broadened by this change.",
+      "status": "verified",
+      "evidence": "The implementation leaves core resolution unchanged, and every independent pass retains these as explicit scope boundaries rather than claiming support."
+    },
+    {
+      "id": "A3",
+      "source": "accepted Shape F",
+      "claim": "Raw element invalidation and resolved prop identity require distinct owners at the existing React signature and component-resolution boundaries.",
+      "status": "verified",
+      "evidence": "/tmp/json325-lens-invariant-ownership.md traces raw Spec changes through useElementSignatures and state-driven resolved changes through shareResolvedValue, finding no missing writer or consumer."
+    },
+    {
+      "id": "A4",
+      "source": "subsystem model",
+      "claim": "Signature snapshots must not alias streamed Spec objects that can be mutated by later patch assembly.",
+      "status": "verified",
+      "evidence": "The implementation snapshots raw element values before retaining them, while existing streamed patch, DAG, cycle and delayed-props regressions pass."
+    },
+    {
+      "id": "A5",
+      "source": "JR325-M8",
+      "claim": "No public documentation update is needed because the change removes internal violations of the existing generic prop contract.",
+      "status": "verified",
+      "evidence": "/tmp/json325-lens-docs-behavior.md inspected the React README, web docs, skill, exports and public types and returned PASS."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The acceptance path intentionally performs an in-memory StateStore write from a catalog effect. The production diff introduces no durable or remote write, but the post-write React lifecycle is the observable side-effect partition and was forced.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "A catalog component effect writes an unrelated value to the in-memory React StateStore.",
+        "owner": "StateProvider and React component lifetime",
+        "commit_event": "set('/unrelated', effects) updates the current store snapshot.",
+        "later_fallible_stages": [
+          "React rerender, prop resolution and effect dependency evaluation"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "React StateStore, renderer reconciliation and catalog effect",
+            "covers": [
+              "React rerender, prop resolution and effect dependency evaluation"
+            ],
+            "forced": true,
+            "residual_observed": "Without recursive sharing, the effect writes twice more and executes three times; with the reviewed state it settles after one execution and leaves only the intended in-memory update.",
+            "cleanup_owner": "React unmount and StateProvider lifetime",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "After every mutation restoration, the same public render operation completed with one effect execution and focused 40/40 green."
+            },
+            "evidence": "/tmp/json325-final-strengthen.md mutation 6 and /tmp/json325-current-focused.log."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "JSON serialization fingerprints were replaced by structural snapshots and comparison; the pass found no inverse compatibility loss."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The implementation newly reaches non-JSON values without serialization; arrays, holes, keys, undefined, functions, symbols, BigInt, SameValue cells and partial elements were reviewed."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No user-input discovery, precedence or resolution rule changed."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell-parsed command or argument rewriting changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No process channel, warning or one-shot latch changed."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No external binary shim or PATH-based test fixture changed."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "The diff restores the accepted prop contract rather than changing an intentional documented default."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "The diff does not patch a runtime or framework to expose a new signal."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "A focused value corpus compared public Renderer outcomes with JavaScript SameValue and own-enumerable semantics and found no mismatch."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "ECMAScript SameValue, property presence and JavaScript identity semantics supplied the independent reference."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No existing call gained a new returned failure outcome."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No flag, mode or configuration bit changed."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Every new comparison, snapshot, sharing and signature branch was challenged with reachable public Renderer cases."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No heuristic recovery action was added."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No async wait, timeout or cancellable request was added."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "skipped",
+      "reason": "No feature was extended across a process, protocol, frame or other new boundary."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "The properties were observed through React reconciliation, DOM output, effects, component props and render counts, not helper return values."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "The exported JSONUIProvider and Renderer package boundary was driven with real state and Spec transitions."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "All writers and consumers of raw signature state and resolved prop identity were traced; the distinct React owners are complete."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "React README, web docs, skill, public types and exports were checked against the restored behavior."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No documentation example was added or changed."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decisions.tsv trail was provided."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "The recursive raw-value and resolved-value work and iterative element graph traversal were evaluated in element, edge and nested-value terms with no actionable regression."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "This canonical report binds exact HEAD dc035735521d2b0eefd3dcc3913002fec8d6eaa7 and the two working-tree hashes."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "/tmp/json325-rg-style.log reports PASS."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "/tmp/json325-rg-surfaces.log reports PASS; docs behavior was also adjudicated by a focused lens."
+    },
+    {
+      "check": "stale",
+      "outcome": "acknowledged",
+      "reason": "No duplicated value, flag, action name or message was renamed or retired."
+    },
+    {
+      "check": "siblings",
+      "outcome": "acknowledged",
+      "reason": "No documentation behavior statement was added; the docs-behavior lens verified the M8 exemption."
+    },
+    {
+      "check": "callers",
+      "outcome": "acknowledged",
+      "reason": "No exported or existing function contract gained a new failure outcome or return field."
+    },
+    {
+      "check": "shellmeta",
+      "outcome": "acknowledged",
+      "reason": "No shell-metacharacter detector changed."
+    },
+    {
+      "check": "artifacts",
+      "outcome": "acknowledged",
+      "reason": "The production diff writes no persistent file."
+    },
+    {
+      "check": "rawinput",
+      "outcome": "acknowledged",
+      "reason": "No discovery or resolution rule was deepened."
+    },
+    {
+      "check": "execdeps",
+      "outcome": "acknowledged",
+      "reason": "No external executable invocation was added."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "/tmp/json325-rg-diff-check.log is empty with exit zero."
+    },
+    {
+      "check": "Prettier",
+      "outcome": "pass",
+      "reason": "/tmp/json325-rg-prettier.log reports all matched files use Prettier style."
+    },
+    {
+      "check": "focused tests",
+      "outcome": "pass",
+      "reason": "/tmp/json325-current-focused.log records 3 files and 40 tests passing."
+    },
+    {
+      "check": "repository tests",
+      "outcome": "pass",
+      "reason": "/tmp/json325-current-test.log records 68 files and 1101 tests passing."
+    },
+    {
+      "check": "repository typecheck",
+      "outcome": "pass",
+      "reason": "/tmp/json325-current-typecheck.log records 59/59 tasks successful."
+    },
+    {
+      "check": "repository lint",
+      "outcome": "pass",
+      "reason": "/tmp/json325-current-lint.log records 14/14 tasks successful."
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "/tmp/json325-final-strengthen.md records 7/7 mutations killed with snapshot and trap restoration and exact hashes preserved."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Unchanged nested resolved object props were recreated across unrelated state writes, leaving the update-depth loop reachable.",
+      "evidence": "Frozen baseline E1 observed three effect executions. Current public-boundary proof observes one, and the recursive-sharing mutation restores three.",
+      "layer": "resolved catalog prop identity across React state updates",
+      "source": "lens",
+      "path": "resolveElementProps -> shareResolvedValue -> CatalogComponentBoundary",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "JSON serialization signatures erased undefined, function and symbol distinctions and threw for BigInt.",
+      "evidence": "Frozen baseline E2-E5 observed stale output and the BigInt TypeError. Current public-boundary transitions pass, and signature comparison mutations fail at their intended cells.",
+      "layer": "raw element change invalidation",
+      "source": "lens",
+      "path": "useElementSignatures -> ElementRenderer -> catalog output",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No documentation update is required.",
+      "evidence": "Public types already accept unknown prop values and existing docs promise transparent prop resolution; the change removes internal violations without adding a new API or promise."
+    },
+    {
+      "claim": "Standalone @json-render/react tsc diagnostics do not block this state.",
+      "evidence": "The diagnostics are confined to unchanged test files and pre-exist this diff; the repository's dependency-aware typecheck passes all 59 tasks and no diagnostic references either changed file."
+    }
+  ],
+  "issue_candidates": []
+}

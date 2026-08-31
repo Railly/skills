@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-20",
+    "repo": "vercel-labs/emulate",
+    "base": "d0219d05818adca4c12bb76ec79a7562c1766a3d",
+    "head": "f07deb20f1ebbd339e73cc91551521055e4b7ccd",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Persist generated GitHub App identity across Next and Nuxt cold starts",
+      "Fail closed when canonical persistence omits a required generated identity",
+      "Keep PR additions below 1000"
+    ],
+    "gaps": ["No separate Issue Contract or Spec review result was provided."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "cursor-grok-4.6-xhigh",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["generated private keys", "durable identity", "concurrent persistence initialization"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "evidence/2026-08-20-emulate-205-f07deb2-grok-verification.json",
+      "evidence": "Grok 4.6 xhigh verified both prior findings closed and reported no new actionable findings on exact HEAD."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "PR #205 maintainer thread discussion_r3819470307",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "Maintainer required fail-closed behavior when initialize returns a canonical snapshot omitting the configured App identity."
+    },
+    {
+      "source": "design",
+      "location": ".decisions.tsv and foundry/runs/solution-gate/2026-08-19-emulate-github-app-adapters-d0219d0.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The design makes the persistence snapshot authoritative and requires atomic create-or-read initialization."
+    },
+    {
+      "source": "user_facing",
+      "location": "README, framework package docs, web docs, and skills changed by PR #205",
+      "status": "reviewed",
+      "properties": ["P2", "P3"],
+      "evidence": "Every surface claims generated App identity survives cold starts when initialize is atomic."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/@emulators/core/src/adapter-runtime.ts and tests/contracts/github-app-identity.js",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "Exact service, kind, id, and value membership is enforced on initialize and load, and the shared contract drives both adapters."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "A seeded:false canonical snapshot is accepted only when it contains every generated identity required by configured seeds.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "Whether preparation would introduce a generated identity absent from canonical persistence",
+        "layer": "adapter persistence contract",
+        "method": "Persist a wrong-service canonical secret and observe rejection on initialize and subsequent load",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Canonical and prepared generated-secret arrays have equal length",
+        "counterexample": "Replace the required GitHub row with a same-length row for another service",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Grok reproduced the length bypass; exact tuple membership rejects it in the final shared contract."
+      },
+      "substrates": [
+        { "name": "built Next adapter", "status": "exercised", "evidence": "15-case contract passed and repeated 10 times." },
+        { "name": "built Nuxt adapter", "status": "exercised", "evidence": "15-case contract passed and repeated 10 times." }
+      ],
+      "evidence": "Both initialize and later load call prepareFreshState with strict membership validation."
+    },
+    {
+      "id": "P2",
+      "claim": "An incomplete or malformed canonical snapshot never causes a replacement GitHub App private key to be served or saved.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "Handler rejection before request initialization or persistence save",
+        "layer": "server handler and durable snapshot",
+        "method": "Call generatedSecrets twice around a persisted incomplete snapshot and require both attempts to reject",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The first initialize response rejects",
+        "counterexample": "Retry after initialize stored the bad snapshot and the handler takes load instead of initialize",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Grok found the load bypass; the final two-attempt contract rejects on both independent handlers."
+      },
+      "substrates": [
+        { "name": "PersistenceAdapter initialize and load boundary", "status": "exercised", "evidence": "The shared contract persists the bad canonical body, then creates a new handler that loads it." },
+        { "name": "GitHub App JWT authentication boundary", "status": "exercised", "evidence": "Complete snapshots authenticate with the canonical PEM; incomplete snapshots never initialize a server." }
+      ],
+      "evidence": "Non-empty parsing and exact tuple membership close omitted, wrong-service, padded, duplicate-id, and empty-value bypasses."
+    },
+    {
+      "id": "P3",
+      "claim": "Concurrent cold starts converge on one canonical generated identity and recover deterministically from ambiguous persistence outcomes.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "All handlers return and authenticate with one persisted private key",
+        "layer": "concurrent adapter handlers",
+        "method": "Eight-way cold-start contract plus response-lost initialize and save cells",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Each individual handler authenticates successfully",
+        "counterexample": "Handlers authenticate using different generated keys while persistence contains only one winner",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The contract compares every returned key and authenticates every handler with the single winner."
+      },
+      "substrates": [
+        { "name": "Next concurrent handlers", "status": "exercised", "evidence": "Eight-way cold starts passed in all 10 resilience rounds." },
+        { "name": "Nuxt concurrent handlers", "status": "exercised", "evidence": "Eight-way cold starts passed in all 10 resilience rounds." }
+      ],
+      "evidence": "Atomic initialize, canonical re-read, fail-closed first save, and recoverable pending-save queue are covered."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["adapter lifecycle", "snapshot parser", "concurrent persistence state machine"],
+    "dimensions": {
+      "values": [
+        "snapshot source: load or initialize",
+        "seeded state: false or true",
+        "identity metadata: complete, omitted, wrong service, empty, malformed",
+        "persistence outcome: success, failure, response lost after commit",
+        "consumer: Next or Nuxt",
+        "concurrency: one or eight cold starts"
+      ],
+      "exclusions": ["Custom database clients are represented by the public PersistenceAdapter contract rather than vendor-specific clients."],
+      "evidence": "The shared 15-case contract spans every listed class and executes against both built adapters."
+    },
+    "oracle": {
+      "source": "Maintainer fail-closed requirement and persisted App identity equality",
+      "independent": true,
+      "evidence": "Expected identity comes from the persistence winner and JWT verification, not from runtime branch structure."
+    },
+    "producer": {
+      "name": "Public PersistenceAdapter initialize/load implementation",
+      "status": "exercised",
+      "evidence": "The contract's create-or-read adapter stores the canonical JSON and a new handler consumes it through load."
+    },
+    "falsification": [
+      {
+        "mutation": "Remove strict validation from both seeded:false paths",
+        "red_evidence": "/tmp/emulate-205-final-strength.mV8iv1/test-red.log: intended test resolved with a replacement key, 1 failed and 14 passed",
+        "restored_green_evidence": "/tmp/emulate-205-final-strength.mV8iv1/test-green.log: 15 passed"
+      }
+    ],
+    "evidence": "Fix-absent mutation failed for the intended replacement-key reason, then restored green through the built core package."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Solution Gate",
+      "claim": "Persistence initialize is atomic create-or-read and returns the canonical stored snapshot.",
+      "status": "verified",
+      "evidence": "filePersistence uses link plus EEXIST recovery; contract adapters model the same winner semantics."
+    },
+    {
+      "id": "A2",
+      "source": "Subsystem model",
+      "claim": "A required generated identity can be identified by service, kind, id, and exact value.",
+      "status": "verified",
+      "evidence": "GitHub prepareSeed restores by service and id, and JWT verification proves the exact private-key value."
+    },
+    {
+      "id": "A3",
+      "source": "Build boundary",
+      "claim": "Next and Nuxt consume the rebuilt core artifact rather than stale source resolution.",
+      "status": "verified",
+      "evidence": "Core was rebuilt before focused, mutation, resilience, and full-suite runs; removing the guard made the adapter test red."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The PR atomically publishes an initial identity snapshot and later saves seeded Store state.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "Canonical generated identity snapshot becomes durable",
+        "owner": "PersistenceAdapter.initialize",
+        "commit_event": "initialize stores or returns the create-or-read winner",
+        "later_fallible_stages": ["canonical validation", "seed preparation", "first seeded save", "request authentication"],
+        "failure_partitions": [
+          {
+            "ownership_region": "adapter preparation",
+            "covers": ["canonical validation", "seed preparation"],
+            "forced": true,
+            "residual_observed": "Incomplete canonical body remains durable but no replacement identity is served or saved.",
+            "cleanup_owner": "Persistence backend owner repairs invalid state; runtime remains fail closed.",
+            "retry": { "attempted": true, "outcome": "documented_recovery", "evidence": "Immediate second handler load rejects the same invalid canonical state deterministically." },
+            "evidence": "Persisted wrong-service regression invokes initialize then load."
+          },
+          {
+            "ownership_region": "seeded persistence and request boundary",
+            "covers": ["first seeded save", "request authentication"],
+            "forced": true,
+            "residual_observed": "Save failure rejects first request; ambiguous success preserves the published identity.",
+            "cleanup_owner": "Adapter pending-save queue and caller retry",
+            "retry": { "attempted": true, "outcome": "success", "evidence": "Save failure and response-lost tests retry and authenticate using the same key." },
+            "evidence": "Shared contract failure cells passed in 10 rounds per adapter."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "run", "reason": "Compared initialize and later load paths." },
+    { "name": "New-domain matrix", "status": "run", "reason": "Exercised complete, omitted, wrong-service, empty, and malformed metadata." },
+    { "name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No user-input resolution rule changed." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell parsing changed." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process emission channel changed." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No shim was introduced." },
+    { "name": "Deliberate-default check", "status": "run", "reason": "Legacy seeded snapshots without metadata and no-persistence defaults stayed green." },
+    { "name": "Fresh-seam scan", "status": "run", "reason": "Inspected core extraction and rebuilt package consumption." },
+    { "name": "Substrate differential corpus", "status": "skipped", "reason": "This is identity validation rather than a repeatedly failed detector substrate." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "The public PersistenceAdapter contract is internal rather than an external protocol." },
+    { "name": "New-failure-outcome propagation", "status": "run", "reason": "Every createAdapterRuntime and prepareFreshState consumer was enumerated." },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag changed." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Incomplete canonical identity was force-red and restored green." },
+    { "name": "Non-destructive recovery", "status": "run", "reason": "Initialize and save ambiguous-success retries preserve identity." },
+    { "name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No timeout or cancellation policy changed." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "Traced initialize, load, preparation, seed, save, and JWT authentication." },
+    { "name": "Substrate verification", "status": "run", "reason": "Built Next and Nuxt handlers exercised persistence and Web Request boundaries." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "Full build and adapter contracts consumed rebuilt core dist." },
+    { "name": "Newly-asserted invariant ownership", "status": "run", "reason": "Persistence winner owns generated identity completeness." },
+    { "name": "Docs-behavior parity", "status": "run", "reason": "Existing atomic initialize and cold-start claims remain accurate." },
+    { "name": "Demonstrative example", "status": "skipped", "reason": "The feedback adds a failure invariant, not a new documentation example." },
+    { "name": "Choice audit", "status": "run", "reason": "The untracked decision trail was read and remained excluded from the commit." },
+    { "name": "Complexity budget", "status": "run", "reason": "Membership uses one canonical Set and one linear prepared-secret pass." }
+  ],
+  "deterministic": [
+    { "check": "build, type-check, test, lint, format, diff-check", "outcome": "pass", "reason": "All repository commands passed on exact HEAD." },
+    { "check": "style", "outcome": "pass", "reason": "No prohibited punctuation was added." },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "The generic GitHub map requests CLI index, but this adapter persistence correction changes no CLI command, flag, help, or output." },
+    { "check": "callers createAdapterRuntime", "outcome": "pass", "reason": "Every caller is in the PR diff." },
+    { "check": "callers prepareFreshState", "outcome": "pass", "reason": "Every call site was inspected and both canonical snapshot paths use strict validation." },
+    { "check": "Test Strength", "outcome": "pass", "reason": "Removing both strict calls produced the intended replacement-key failure and restoration returned 15/15 green." },
+    { "check": "Resilience Audit", "outcome": "pass", "reason": "Ten sequential rounds passed for each built adapter." },
+    { "check": "Grok review", "outcome": "finding-fixed", "reason": "Grok found load-only and length-only bypasses; exact membership on initialize and load closed both." },
+    { "check": "Grok verification", "outcome": "pass", "reason": "Grok 4.6 xhigh explicitly closed both findings with no new actionable findings." }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Strict canonical identity validation was absent from the seeded:false load path.",
+      "evidence": "First Grok report reproduced retry through load after initialize persisted the incomplete snapshot.",
+      "layer": "persistence retry lifecycle",
+      "source": "lens",
+      "path": "initialize winner -> preparation rejection -> retry load -> replacement generation",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "List length allowed wrong-service padding or empty metadata to hide a replacement identity.",
+      "evidence": "First Grok report constructed same-length and empty-value counterexamples.",
+      "layer": "canonical identity validation",
+      "source": "lens",
+      "path": "canonical metadata -> service filter -> generated replacement -> length equality",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    { "claim": "CLI index need not change", "evidence": "The correction changes adapter persistence rejection only, with no CLI command, flag, help, or output change." },
+    { "claim": ".decisions.tsv remains untracked", "evidence": "It is an implementation audit trail read by Choice Audit and not a shipped repository surface." }
+  ],
+  "issue_candidates": []
+}

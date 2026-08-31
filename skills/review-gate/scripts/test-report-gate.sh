@@ -8,6 +8,7 @@ fixture="$skill_dir/evals/run-report-example.json"
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 cp "$skill_dir/evals/independent-challenge-example.txt" "$tmp_dir/"
+cp "$skill_dir/evals/fx-review-example.json" "$tmp_dir/"
 
 passes=0
 failures=0
@@ -57,15 +58,27 @@ NODE
 
 expect_pass "complete fixture passes through gate wrapper" "$script_dir/gate.sh" report "$fixture" --structural
 
+rendered="$tmp_dir/rendered.md"
+rendered_again="$tmp_dir/rendered-again.md"
+expect_pass "schema-v1 JSON renders one deterministic human report" "$script_dir/gate.sh" render "$fixture" "$rendered"
+"$script_dir/gate.sh" render "$fixture" "$rendered_again" >/dev/null
+expect_pass "rendered prose is byte-stable" cmp "$rendered" "$rendered_again"
+expect_pass "rendered prose carries exact state and receipts" grep -Fq '## Stage receipts' "$rendered"
+
 expect_finding \
 	"proxy-only evidence is rejected" \
 	"property P1 relies on proxy-only evidence" \
 	node "$validator" "$skill_dir/evals/proxy-only-report.json" --structural
 
+post_commit_gap="$tmp_dir/post-commit-gap.json"
+mutate_fixture "$post_commit_gap" '
+report.stage_receipts.resilience.commit_points[0].failure_partitions[0].retry.attempted = false;
+report.stage_receipts.resilience.commit_points[0].failure_partitions[0].retry.outcome = "failed";
+'
 expect_finding \
 	"post-commit coverage gaps are rejected" \
 	"commit point C1 has a failure partition without retry" \
-	node "$validator" "$skill_dir/evals/post-commit-gap-report.json" --structural
+	node "$validator" "$post_commit_gap" --structural
 
 open_finding="$tmp_dir/open-finding.json"
 mutate_fixture "$open_finding" 'report.findings[0].resolution = "open";'
@@ -157,10 +170,10 @@ expect_pass \
 	node "$validator" "$hardening_only" --structural
 
 missing_commit_point="$tmp_dir/missing-commit-point.json"
-mutate_fixture "$missing_commit_point" 'report.side_effects.commit_points = [];'
+mutate_fixture "$missing_commit_point" 'report.stage_receipts.resilience.commit_points = [];'
 expect_finding \
 	"present side effects need commit points" \
-	"side_effects assessment is present but no commit point is listed" \
+	"required resilience receipt needs commit points" \
 	node "$validator" "$missing_commit_point" --structural
 
 unverified_assumption="$tmp_dir/unverified-assumption.json"
@@ -188,14 +201,14 @@ expect_finding \
 	node "$validator" "$unverified_fixed_finding" --structural
 
 missing_dimensions="$tmp_dir/missing-dimensions.json"
-mutate_fixture "$missing_dimensions" 'report.behavioral_strength.dimensions.values = [];'
+mutate_fixture "$missing_dimensions" 'report.stage_receipts.test_strength.dimensions.values = [];'
 expect_finding \
 	"behavioral proof needs an explicit dimension table" \
 	"required behavioral strength must record explicit dimensions" \
 	node "$validator" "$missing_dimensions" --structural
 
 implementation_oracle="$tmp_dir/implementation-oracle.json"
-mutate_fixture "$implementation_oracle" 'report.behavioral_strength.oracle.independent = false;'
+mutate_fixture "$implementation_oracle" 'report.stage_receipts.test_strength.oracle.independent = false;'
 expect_finding \
 	"implementation-derived oracle is rejected" \
 	"required behavioral strength needs an oracle independent of production" \
@@ -203,8 +216,8 @@ expect_finding \
 
 synthetic_only="$tmp_dir/synthetic-only.json"
 mutate_fixture "$synthetic_only" '
-report.behavioral_strength.producer.status = "unverified";
-report.behavioral_strength.producer.evidence = "Only hand-built event objects were used.";
+report.stage_receipts.test_strength.producer.status = "unverified";
+report.stage_receipts.test_strength.producer.evidence = "Only hand-built event objects were used.";
 '
 expect_finding \
 	"synthetic-only producer evidence is rejected" \
@@ -212,7 +225,7 @@ expect_finding \
 	node "$validator" "$synthetic_only" --structural
 
 missing_falsification="$tmp_dir/missing-falsification.json"
-mutate_fixture "$missing_falsification" 'report.behavioral_strength.falsification = [];'
+mutate_fixture "$missing_falsification" 'report.stage_receipts.test_strength.falsification = [];'
 expect_finding \
 	"behavioral proof needs fix-absent falsification" \
 	"required behavioral strength needs at least one fix-absent falsification" \
@@ -220,6 +233,7 @@ expect_finding \
 
 standard_report="$tmp_dir/standard-report.json"
 mutate_fixture "$standard_report" '
+report.run.profile = "standard";
 report.risk = {
   level: "standard",
   triggers: [],
@@ -232,19 +246,17 @@ report.risk = {
   }
 };
 report.properties[0].kind = "correctness";
-report.side_effects = {
-  assessment: "none",
-  evidence: "The pure transformation creates no durable or externally visible state.",
-  commit_points: []
-};
-report.behavioral_strength = {
-  assessment: "not_required",
-  triggers: [],
-  dimensions: { values: [], exclusions: [], evidence: "" },
-  oracle: { source: "", independent: false, evidence: "" },
-  producer: { name: "", status: "not_applicable", evidence: "" },
-  falsification: [],
-  evidence: "The pure transformation is not a protocol, parser, serializer, state machine, lifecycle, event translation, adapter, or compatibility layer."
+report.stage_receipts = {
+  test_strength: {
+    required: false,
+    status: "not_triggered",
+    reason: "The pure transformation is not a behavioral translation boundary."
+  },
+  resilience: {
+    required: false,
+    status: "not_triggered",
+    reason: "The pure transformation creates no durable or externally visible state."
+  }
 };
 '
 expect_pass "standard risk without side effects passes" node "$validator" "$standard_report" --structural
@@ -255,6 +267,7 @@ parent="$(git rev-parse HEAD~1)"
 mutate_fixture "$head_mismatch" "
 report.run.base = \"$parent\";
 report.run.head = \"$parent\";
+report.run.profile = \"standard\";
 report.risk = {
   level: \"standard\",
   triggers: [],
@@ -267,19 +280,17 @@ report.risk = {
   }
 };
 report.properties[0].kind = \"correctness\";
-report.side_effects = {
-  assessment: \"none\",
-  evidence: \"The selected historical diff has no declared side effect.\",
-  commit_points: []
-};
-report.behavioral_strength = {
-  assessment: \"not_required\",
-  triggers: [],
-  dimensions: { values: [], exclusions: [], evidence: \"\" },
-  oracle: { source: \"\", independent: false, evidence: \"\" },
-  producer: { name: \"\", status: \"not_applicable\", evidence: \"\" },
-  falsification: [],
-  evidence: \"The selected historical diff is not a behavioral translation boundary.\"
+report.stage_receipts = {
+  test_strength: {
+    required: false,
+    status: \"not_triggered\",
+    reason: \"The selected historical diff is not a behavioral translation boundary.\"
+  },
+  resilience: {
+    required: false,
+    status: \"not_triggered\",
+    reason: \"The selected historical diff has no declared side effect.\"
+  }
 };
 "
 expect_finding \
@@ -292,6 +303,7 @@ mkdir -p "$behavioral_repo/src"
 git -C "$behavioral_repo" init -q
 git -C "$behavioral_repo" config user.name "Review Gate Fixture"
 git -C "$behavioral_repo" config user.email "fixture@example.com"
+git -C "$behavioral_repo" config commit.gpgsign false
 printf '%s\n' 'export const identity = (value) => value;' >"$behavioral_repo/src/base.ts"
 git -C "$behavioral_repo" add src/base.ts
 git -C "$behavioral_repo" commit -qm "base"
@@ -307,6 +319,7 @@ behavioral_report="$behavioral_repo/report.json"
 mutate_fixture "$behavioral_report" "
 report.run.base = \"$behavioral_base\";
 report.run.head = \"$behavioral_head\";
+report.run.profile = \"standard\";
 report.risk = {
   level: \"standard\",
   triggers: [],
@@ -319,28 +332,92 @@ report.risk = {
   }
 };
 report.properties[0].kind = \"correctness\";
-report.side_effects = {
-  assessment: \"none\",
-  evidence: \"The event encoder creates no durable or external side effect.\",
-  commit_points: []
-};
-report.behavioral_strength = {
-  assessment: \"not_required\",
-  triggers: [],
-  dimensions: { values: [], exclusions: [], evidence: \"\" },
-  oracle: { source: \"\", independent: false, evidence: \"\" },
-  producer: { name: \"\", status: \"not_applicable\", evidence: \"\" },
-  falsification: [],
-  evidence: \"Behavioral proof was incorrectly skipped.\"
+report.stage_receipts = {
+  test_strength: {
+    required: false,
+    status: \"not_triggered\",
+    reason: \"Behavioral proof was incorrectly skipped.\"
+  },
+  resilience: {
+    required: false,
+    status: \"not_triggered\",
+    reason: \"The event encoder creates no durable or external side effect.\"
+  }
 };
 "
 original_dir="$PWD"
 cd "$behavioral_repo"
 expect_finding \
 	"event-translation diff requires behavioral strength" \
-	"diff signals mandatory behavioral strength but assessment is not required" \
+	"diff signals mandatory behavioral strength but Test Strength receipt is not required" \
 	node "$validator" "$behavioral_report"
 cd "$original_dir"
+
+identical_retry="$tmp_dir/identical-retry.json"
+mutate_fixture "$identical_retry" '
+report.execution.schema_failures = 1;
+report.execution.operations = [{
+  operation: "independent review",
+  attempted_calls: 1,
+  schema_failures: 1,
+  identical_retry: true
+}];
+'
+expect_finding \
+	"identical invalid orchestration calls are rejected" \
+	"execution.operations[0].identical_retry must be false" \
+	node "$validator" "$identical_retry" --structural
+
+missing_fx_receipt="$tmp_dir/missing-fx-receipt.json"
+mutate_fixture "$missing_fx_receipt" 'report.execution.receipt = "";'
+expect_finding \
+	"FX execution requires an auditable receipt" \
+	"execution.receipt is required" \
+	node "$validator" "$missing_fx_receipt" --structural
+
+wrong_fx_auth="$tmp_dir/wrong-fx-auth.json"
+cp "$skill_dir/evals/fx-review-example.json" "$tmp_dir/wrong-fx-review.json"
+node - "$tmp_dir/wrong-fx-review.json" <<'NODE'
+const fs = require("node:fs");
+const path = process.argv[2];
+const receipt = JSON.parse(fs.readFileSync(path, "utf8"));
+receipt.auth = "fx login";
+fs.writeFileSync(path, `${JSON.stringify(receipt, null, 2)}\n`);
+NODE
+mutate_fixture "$wrong_fx_auth" 'report.execution.receipt = "wrong-fx-review.json";'
+expect_finding \
+	"FX execution rejects a non-Gateway auth receipt" \
+	"execution.receipt auth must equal \"AI_GATEWAY_API_KEY\"" \
+	node "$validator" "$wrong_fx_auth" --structural
+
+stale_receipt="$tmp_dir/stale-receipt.json"
+mutate_fixture "$stale_receipt" '
+report.stage_receipts.test_strength.fingerprint.head_sha = "older-head";
+report.stage_receipts.test_strength.fingerprint.reusable = false;
+'
+expect_finding \
+	"stale required receipts are rejected" \
+	"stage_receipts.test_strength is stale for the reviewed head" \
+	node "$validator" "$stale_receipt" --structural
+
+intersecting_reuse="$tmp_dir/intersecting-reuse.json"
+mutate_fixture "$intersecting_reuse" '
+report.stage_receipts.test_strength.fingerprint.head_sha = "older-head";
+report.stage_receipts.test_strength.fingerprint.reusable = true;
+report.stage_receipts.test_strength.fingerprint.reuse_evidence = "Claimed unaffected.";
+report.stage_receipts.test_strength.fingerprint.reuse = {
+  source_head_sha: "older-head",
+  target_head_sha: report.run.head,
+  changed_paths: ["src/auth.ts"],
+  contract_digest: report.stage_receipts.test_strength.fingerprint.contract_digest,
+  environment_digest: report.stage_receipts.test_strength.fingerprint.environment_digest,
+  skill_revision: report.stage_receipts.test_strength.fingerprint.skill_revision
+};
+'
+expect_finding \
+	"receipt reuse is rejected when the later diff intersects its dependency cone" \
+	"stage_receipts.test_strength reuse intersects relevant path src/auth.ts" \
+	node "$validator" "$intersecting_reuse" --structural
 
 echo "RESULT [test] $passes passed, $failures failed"
 [[ $failures -eq 0 ]]

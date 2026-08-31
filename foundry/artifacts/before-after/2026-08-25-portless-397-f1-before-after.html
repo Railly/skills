@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proxy auto-start failures return immediately</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet" referrerpolicy="no-referrer">
+  <link href="2026-08-25-portless-397-f1-before-after.assets/vercel-brand.css" rel="stylesheet">
+  <style>
+    .vbg-custom-opening {
+      padding-block-start: var(--vbg-space-10);
+    }
+
+    .vbg-custom-comparison {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      border-block: 1px solid var(--vbg-border-default);
+    }
+
+    .vbg-custom-peer {
+      min-width: 0;
+      padding-block: var(--vbg-space-8);
+    }
+
+    .vbg-custom-peer + .vbg-custom-peer {
+      border-inline-start: 1px solid var(--vbg-border-default);
+      padding-inline-start: var(--vbg-space-8);
+    }
+
+    .vbg-custom-peer:first-child {
+      padding-inline-end: var(--vbg-space-8);
+    }
+
+    .vbg-custom-evidence {
+      min-height: 270px;
+      margin-block-start: var(--vbg-space-6);
+      padding: var(--vbg-space-5);
+      border: 1px solid var(--vbg-border-subtle);
+      border-radius: var(--vbg-radius);
+      background: var(--vbg-surface-secondary);
+      color: var(--vbg-text-primary);
+      font-family: "Geist Mono", monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .vbg-custom-delta {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: var(--vbg-space-4);
+      align-items: baseline;
+      padding-block: var(--vbg-space-8);
+      border-block: 1px solid var(--vbg-border-default);
+    }
+
+    .vbg-custom-delta-value {
+      font-size: var(--vbg-type-title);
+      line-height: var(--vbg-leading-title);
+      font-weight: var(--vbg-weight-heading);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .vbg-custom-delta-value:last-child {
+      text-align: end;
+    }
+
+    .vbg-custom-arrow {
+      color: var(--vbg-text-secondary);
+    }
+
+    .vbg-custom-failure {
+      color: var(--vbg-error-text);
+    }
+
+    .vbg-custom-proof {
+      color: var(--vbg-text-secondary);
+    }
+
+    .vbg-custom-status {
+      display: flex;
+      gap: var(--vbg-space-4);
+      align-items: baseline;
+      margin-block-start: var(--vbg-space-4);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .vbg-custom-status strong {
+      font-size: var(--vbg-type-heading-24);
+    }
+
+    @media (max-width: 720px) {
+      .vbg-custom-comparison {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .vbg-custom-peer:first-child {
+        padding-inline-end: 0;
+      }
+
+      .vbg-custom-peer + .vbg-custom-peer {
+        border-inline-start: 0;
+        border-block-start: 1px solid var(--vbg-border-default);
+        padding-inline-start: 0;
+      }
+
+      .vbg-custom-delta {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .vbg-custom-delta-value:last-child {
+        text-align: start;
+      }
+
+      .vbg-custom-arrow {
+        transform: rotate(90deg);
+        transform-origin: left center;
+      }
+    }
+  </style>
+</head>
+<body class="vbg-report" data-theme="auto">
+  <div class="vbg-shell">
+    <a class="vbg-skip-link" href="#main">Skip to content</a>
+    <header class="vbg-header">
+      <div class="vbg-masthead">
+        <span class="vbg-identity"><span class="vbg-wordmark" role="img" aria-label="Vercel"></span></span>
+        <div class="vbg-document-meta">
+          <span>portless PR #397 F1 successor</span>
+          <time datetime="2026-08-25">2026-08-25</time>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="vbg-section vbg-custom-opening">
+        <h1 class="vbg-title">Proxy auto-start failures return immediately</h1>
+        <div class="vbg-lede"><p>The same failed sudo child now exits once in 493 ms instead of waiting about five seconds and duplicating the error.</p></div>
+
+        <div class="vbg-custom-comparison" role="group" aria-label="Before and after comparison">
+          <article class="vbg-custom-peer">
+            <p class="vbg-label">Before</p>
+            <h2 class="vbg-heading-20">Child fails, parent keeps waiting</h2>
+            <p>PR head <code>2ac1519</code>. Real child process, fake sudo status 23, interactive auto-start.</p>
+            <pre class="vbg-custom-evidence">Starting proxy...
+Port 80 requires elevated privileges. Requesting sudo...
+<span class="vbg-custom-failure">Error: Port 80 requires elevated privileges,
+but sudo elevation failed: exited with status 23.</span>
+Resolve the sudo error, then rerun the requested startup:
+  sudo portless proxy start --no-tls
+
+<span class="vbg-custom-proof">[20 readiness polls, about 5 seconds]</span>
+
+<span class="vbg-custom-failure">Failed to start proxy.</span>
+Try starting it manually:
+  sudo portless proxy start --no-tls</pre>
+            <div class="vbg-custom-status"><strong>5.15 s</strong><span>exit 1, two failures</span></div>
+          </article>
+
+          <article class="vbg-custom-peer">
+            <p class="vbg-label">After</p>
+            <h2 class="vbg-heading-20">Child fails, parent returns</h2>
+            <p>Reviewed head <code>2a7509a</code>. Same child input, same PTY, same machine.</p>
+            <pre class="vbg-custom-evidence">Starting proxy...
+Port 80 requires elevated privileges. Requesting sudo...
+<span class="vbg-custom-failure">Error: Port 80 requires elevated privileges,
+but sudo elevation failed: exited with status 23.</span>
+Resolve the sudo error, then rerun the requested startup:
+  sudo portless proxy start --no-tls
+
+<span class="vbg-custom-proof">[parent exits immediately]</span></pre>
+            <div class="vbg-custom-status"><strong>493 ms</strong><span>exit 1, one failure</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="vbg-section">
+        <h2>What changed</h2>
+        <div class="vbg-custom-delta" role="group" aria-label="Primary before and after delta">
+          <div>
+            <p class="vbg-label">Before</p>
+            <p class="vbg-custom-delta-value">5.15 s</p>
+          </div>
+          <span class="vbg-custom-arrow">to</span>
+          <div>
+            <p class="vbg-label">After</p>
+            <p class="vbg-custom-delta-value">493 ms</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="vbg-section">
+        <h2>Evidence</h2>
+        <p>Both sides ran the built CLI on macOS with a real child process and interactive terminal. The baseline measurement comes from the completed PR review; the changed measurement comes from exact-head dogfood.</p>
+        <div class="vbg-table-wrap">
+          <table>
+            <caption>Comparison on one shared measurement basis</caption>
+            <thead>
+              <tr>
+                <th scope="col">Metric</th>
+                <th scope="col" class="vbg-numeric">Before</th>
+                <th scope="col" class="vbg-numeric">After</th>
+                <th scope="col" class="vbg-numeric">Delta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Failure latency</th>
+                <td class="vbg-numeric">5.15 s</td>
+                <td class="vbg-numeric">493 ms</td>
+                <td class="vbg-numeric">4.66 s less</td>
+              </tr>
+              <tr>
+                <th scope="row">Failure messages</th>
+                <td class="vbg-numeric">2</td>
+                <td class="vbg-numeric">1</td>
+                <td class="vbg-numeric">1 removed</td>
+              </tr>
+              <tr>
+                <th scope="row">Exit status</th>
+                <td class="vbg-numeric">1</td>
+                <td class="vbg-numeric">1</td>
+                <td class="vbg-numeric">unchanged</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="vbg-section">
+        <h2>Acceptance evidence</h2>
+        <p>Removing the result guard restored the delayed duplicate and made the regression test fail. Restoring the reviewed source returned it green in 374 ms. The full repository passed 858 tests and 16 E2E tests. A fresh Linux build passed the focused matrix, and real loopback success returned <code>X-Portless: 1</code>.</p>
+      </section>
+
+      <section class="vbg-section">
+        <h2>Limit</h2>
+        <p class="vbg-note">This compares one deterministic sudo-failure input. It proves prompt nonzero propagation and preserved success on macOS and Linux. Windows cannot enter this sudo branch and remains covered by repository CI.</p>
+      </section>
+    </main>
+
+    <footer class="vbg-footer">
+      <span class="vbg-logo" role="img" aria-label="Vercel"></span>
+      <span>Before/after evidence</span>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-24",
+    "repo": "Railly/skills",
+    "base": "a81c11abf94f7be03c4a69bc584d864453e1c095",
+    "head": "1331959f3e2977887f398afc411014adac71d007",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "foundry/rounds/011-register-workstream-reconcile/README.md",
+    "spec_status": "not_applicable",
+    "acceptance_reviewed": [
+      "workstream reconciliation remains read-only",
+      "xref remains an optional graph backend rather than owning reconciliation",
+      "historical delta and current operating state remain separate",
+      "age alone never proves stalled",
+      "the installer exposes every registered skill"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "not_required",
+      "artifact": "",
+      "evidence": "The diff changes skill prose, metadata, validation, and tests without secrets, destructive operations, concurrency, remote writes, or durable runtime state."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "foundry/rounds/011-register-workstream-reconcile/README.md",
+      "status": "reviewed",
+      "properties": ["workstream-boundary", "distribution-completeness"],
+      "evidence": "The accepted decision defines ownership boundaries, read-only operation, evidence maturity, and experimental distribution."
+    },
+    {
+      "source": "design",
+      "location": "skills/.experimental/workstream-reconcile/SKILL.md and trigger evals",
+      "status": "reviewed",
+      "properties": ["workstream-boundary"],
+      "evidence": "The method separates checkpoint delta from operating state and supplies positive and negative activation cases."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, CHANGELOG.md, and marketplace groups",
+      "status": "reviewed",
+      "properties": ["distribution-completeness", "release-metadata"],
+      "evidence": "The catalog, release notes, installer group, and maturity registry describe the same experimental surface."
+    },
+    {
+      "source": "implementation",
+      "location": "a81c11a..1331959",
+      "status": "reviewed",
+      "properties": ["distribution-completeness", "frontmatter-rejection", "workstream-boundary", "release-metadata"],
+      "evidence": "The exact diff, validator, unit tests, trigger corpus, method evals, installer output, and release metadata were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "distribution-completeness",
+      "claim": "Every installable skill is registered in the maturity and marketplace surfaces and is discoverable by the real installer.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the names emitted by the production skills installer",
+        "layer": "distribution boundary",
+        "method": "bunx skills add . --list",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "bun scripts/validate-skills.mjs exits zero",
+        "counterexample": "The prior validator accepted xref while the production installer skipped it for invalid YAML.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Before the fix the installer found 15 skills and printed an xref YAML error; after the fix it found all 16, including work-intake, workstream-reconcile, and xref."
+      },
+      "substrates": [
+        {
+          "name": "skills CLI local-package discovery",
+          "status": "exercised",
+          "evidence": "bunx skills add . --list completed against exact HEAD and listed 16 skills."
+        }
+      ],
+      "evidence": "Repository validation and production installer discovery agree on all 16 skills."
+    },
+    {
+      "id": "frontmatter-rejection",
+      "claim": "The repository validator rejects the unquoted colon-space scalar shape that the production installer rejects.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "acceptance or rejection of representative frontmatter scalars",
+        "layer": "skill metadata parser",
+        "method": "unit test plus production installer differential",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the internal parser extracts name and compatibility fields",
+        "counterexample": "A line can be extractable by splitting at the first colon while remaining invalid YAML for the installer.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing the colon-space rejection made the regression test fail with a parsed object; restoring it returned 19 of 19 tests green."
+      },
+      "substrates": [
+        {
+          "name": "Bun test runtime and skills CLI YAML parser",
+          "status": "exercised",
+          "evidence": "The fix-absent unit mutation went red, restored green, and the installer stopped omitting xref."
+        }
+      ],
+      "evidence": "The validator now catches the exact invalid scalar class that escaped main."
+    },
+    {
+      "id": "workstream-boundary",
+      "claim": "Workstream Reconcile owns read-only cross-source reconciliation while handoff owns cycle closure and xref owns GitHub graph evidence.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "declared ownership, prohibited mutations, state model, and trigger separation",
+        "layer": "skill contract",
+        "method": "decision record, SKILL.md boundary, and positive and negative trigger corpus inspection",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the skill description mentions handoffs and GitHub",
+        "counterexample": "A broad description could still absorb handoff writing, one-off issue radar, xref graph mapping, or implementation.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Four positive and five negative trigger cases distinguish portfolio reconciliation from handoff writing, live-only queues, graph-only work, implementation, and case recording."
+      },
+      "substrates": [
+        {
+          "name": "two prior Vercel Labs portfolio reconciliations",
+          "status": "exercised",
+          "evidence": "Round 011 records the real transitions found and the generalized method; private workstream details remain outside the public repository."
+        }
+      ],
+      "evidence": "The accepted decision, operational method, and eval boundaries agree on one read-only orchestration owner."
+    },
+    {
+      "id": "release-metadata",
+      "claim": "The repository declares the next release as 0.0.5 and documents the complete public change set.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the machine release field and human changelog entry",
+        "layer": "release metadata",
+        "method": "direct JSON and changelog inspection",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CHANGELOG.md contains a 0.0.5 heading",
+        "counterexample": "The prose could name 0.0.5 while foundry/maturity.json still reports 0.0.4.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Both CHANGELOG.md and foundry/maturity.json report 0.0.5 on exact HEAD."
+      },
+      "substrates": [
+        {
+          "name": "repository release metadata",
+          "status": "exercised",
+          "evidence": "jq parsing and repository validation passed with release 0.0.5."
+        }
+      ],
+      "evidence": "The changelog covers the new skill, registration repair, xref fix, and validator regression."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": ""},
+    "oracle": {"source": "", "independent": true, "evidence": ""},
+    "producer": {"name": "", "status": "not_applicable", "evidence": ""},
+    "falsification": [],
+    "evidence": "The diff adds a prose coordination method and metadata validation, not a protocol, parser, serializer, state machine, lifecycle, event translation, adapter, or compatibility layer. The validator regression was nevertheless force-red and restored green."
+  },
+  "assumptions": [
+    {
+      "id": "separate-skill",
+      "source": "Round 011 decision",
+      "claim": "Cross-source reconciliation is broader than xref and different from writing a handoff.",
+      "status": "verified",
+      "evidence": "The source matrix includes GitHub, local Git, releases, deployments, registries, and prior handoffs; xref remains optional graph evidence."
+    },
+    {
+      "id": "age-not-stall",
+      "source": "Round 011 decision",
+      "claim": "Elapsed time alone cannot identify a stalled workstream.",
+      "status": "verified",
+      "evidence": "The operating-state contract requires a missed expected transition, its owner, last movement, and evidence that normal external waiting does not apply."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The shipped skill is explicitly read-only, and the validator and tests only read repository files and report errors; no production path writes durable or external state.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, lookup source, or semantic data source was replaced."},
+    {"name":"New-domain matrix","status":"run","reason":"Reviewed positive and negative activation domains plus all operating-state values."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Marketplace, maturity, README, changelog, validator, and installer all consume the distribution decision."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell string construction or append behavior changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No notifications, events, or latches changed."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No shim was introduced."},
+    {"name":"Deliberate-default check","status":"run","reason":"Unknown evidence remains unknown and age does not default to stalled."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Inspected the handoff to reconciliation, xref evidence, installer metadata, and release boundaries."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No guard has failed review twice on the same class."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"The production skills CLI supplied the distribution parser oracle that exposed xref omission."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No callable production contract gained a failure outcome."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No user-facing flag was added."},
+    {"name":"Error-path forcing","status":"run","reason":"Removed the frontmatter rejection and proved its regression test fails before restoration."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No recovery workflow or durable runtime state changed."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No asynchronous work, cancellation, or timeout changed."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced skill source through maturity and marketplace registration into production installer discovery."},
+    {"name":"Substrate verification","status":"run","reason":"Ran repository validation, Bun tests, eval fixtures, and the real installer against exact HEAD."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"bunx skills add . --list exercised the shipped package surface and found all 16 skills."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"Round 011 explicitly assigns reconciliation to the new skill and graph traversal to xref."},
+    {"name":"Docs-behavior parity","status":"run","reason":"README and changelog claims match marketplace, maturity, skill boundaries, and installer output."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example was added."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists for this change."},
+    {"name":"Complexity budget","status":"skipped","reason":"No per-element runtime algorithm or lookup path was added."}
+  ],
+  "deterministic": [
+    {"check":"bun scripts/validate-skills.mjs","outcome":"pass","reason":"All 16 skills are valid."},
+    {"check":"bun test scripts/lib/*.test.mjs","outcome":"pass","reason":"19 of 19 validator tests passed."},
+    {"check":"bun scripts/verify-eval-fixtures.mjs","outcome":"pass","reason":"All five executable fixtures passed."},
+    {"check":"Biome 2.5.1","outcome":"pass","reason":"All three changed JavaScript files passed formatting and lint checks."},
+    {"check":"git diff --check","outcome":"pass","reason":"No whitespace errors."},
+    {"check":"gate.sh style","outcome":"pass","reason":"No prohibited punctuation in added lines."},
+    {"check":"gate.sh surfaces","outcome":"pass","reason":"All repository distribution surfaces required by conventions are present."},
+    {"check":"gate.sh covered","outcome":"pass","reason":"This report covers exact HEAD 1331959."}
+  ],
+  "findings": [
+    {
+      "id": "main-work-intake-registration",
+      "state": "confirmed",
+      "claim": "origin/main failed validation because existing work-intake had no maturity entry or installer registration.",
+      "evidence": "GitHub Actions run 32514096119 and a clean local validation both reported the missing maturity entry; the exact-head validator now passes.",
+      "layer": "repository distribution registry",
+      "source": "gate",
+      "path": "foundry/maturity.json and .claude-plugin/marketplace.json",
+      "resolution": "fixed"
+    },
+    {
+      "id": "xref-invalid-yaml",
+      "state": "confirmed",
+      "claim": "The production installer omitted xref because its compatibility scalar was invalid YAML while the internal validator accepted it.",
+      "evidence": "bunx skills add . --list initially found 15 skills and printed the YAML error; quoting the scalar and adding validator regression coverage yields all 16.",
+      "layer": "production distribution parser",
+      "source": "lens",
+      "path": "skills/.experimental/xref/SKILL.md",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {"claim":"No Issue Contract or separate Spec review was required.","evidence":"This is an experimental skill registration and validator repair governed by the accepted Round 011 decision, with no application behavior implementation."},
+    {"claim":"No cross-family reviewer was used.","evidence":"The standard-risk diff has no secrets, auth, destructive behavior, durable runtime state, concurrency, process lifecycle, or remote side effects; same-family provenance remains visible."}
+  ],
+  "issue_candidates": []
+}
