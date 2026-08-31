@@ -35,7 +35,12 @@ if (!Array.isArray(report?.run?.gaps)) {
 	findings.push("a pass report cannot contain run gaps");
 }
 
-const diffSignals = { highRisk: [], sideEffects: [], behavioral: [] };
+const diffSignals = {
+	highRisk: [],
+	security: [],
+	sideEffects: [],
+	behavioral: [],
+};
 if (!structuralOnly) {
 	try {
 		const repositoryHead = execFileSync("git", ["rev-parse", "HEAD"], {
@@ -100,6 +105,7 @@ if (!structuralOnly) {
 				)
 			) {
 				diffSignals.highRisk.push(`${file}: security-sensitive state`);
+				diffSignals.security.push(`${file}: security-sensitive state`);
 			}
 			if (
 				/\b(writeFile(?:Sync)?|appendFile(?:Sync)?|createWriteStream|rename(?:Sync)?|link(?:Sync)?|symlink(?:Sync)?|unlink(?:Sync)?|mkdir(?:Sync)?|File::create|fs::write|std::fs::|INSERT\s+INTO|UPDATE\s+\w+|DELETE\s+FROM|\.persist\s*\(|\.save\s*\()\b/i.test(
@@ -205,6 +211,118 @@ if (
 	findings.push(
 		`diff signals high risk but risk.level is not high: ${[...new Set(diffSignals.highRisk)].join("; ")}`,
 	);
+}
+
+const securityPropertyKinds = new Set([
+	"confidentiality",
+	"integrity",
+	"authorization",
+]);
+const securityPropertySignals = (report?.properties || []).some((property) =>
+	securityPropertyKinds.has(property?.kind),
+);
+const securityRiskSignals = (risk?.triggers || []).some((trigger) =>
+	/\b(auth(?:entication|orization)?|credential|secret|token|password|confidentiality|integrity|origin|tenant|sandbox|privilege|injection|deserializ)/i.test(
+		String(trigger),
+	),
+);
+const securityReviewRequired =
+	diffSignals.security.length > 0 ||
+	securityPropertySignals ||
+	securityRiskSignals;
+const securityReview = report?.security_review;
+if (securityReviewRequired && !securityReview) {
+	findings.push("security-sensitive work requires a security_review receipt");
+}
+if (securityReview) {
+	const fingerprint = securityReview.fingerprint;
+	requireText(fingerprint?.repository, "security_review.fingerprint.repository");
+	requireText(
+		fingerprint?.dirty_digest,
+		"security_review.fingerprint.dirty_digest",
+	);
+	requireText(
+		fingerprint?.changed_path_digest,
+		"security_review.fingerprint.changed_path_digest",
+	);
+	requireText(
+		fingerprint?.skill_revision,
+		"security_review.fingerprint.skill_revision",
+	);
+	if (fingerprint?.base_sha !== report?.run?.base) {
+		findings.push("security_review receipt base does not match run.base");
+	}
+	if (fingerprint?.head_sha !== report?.run?.head) {
+		findings.push("security_review receipt head does not match run.head");
+	}
+	if (securityReview.status !== "pass") {
+		findings.push(
+			`security_review status is not pass: ${securityReview.status || "<missing>"}`,
+		);
+	}
+	requireText(securityReview.artifact, "security_review.artifact");
+	if (!Array.isArray(securityReview.verification?.gaps)) {
+		findings.push("security_review.verification.gaps must be an array");
+	} else if (securityReview.verification.gaps.length > 0) {
+		findings.push("security_review has unresolved verification gaps");
+	}
+	if (!Array.isArray(securityReview.merge_relevance?.security_blockers)) {
+		findings.push(
+			"security_review.merge_relevance.security_blockers must be an array",
+		);
+	} else if (securityReview.merge_relevance.security_blockers.length > 0) {
+		findings.push("security_review has unresolved security blockers");
+	}
+	if (!Array.isArray(securityReview.observations)) {
+		findings.push("security_review.observations must be an array");
+	} else {
+		const allowedClassifications = new Set([
+			"confirmed_vulnerability",
+			"likely_vulnerability",
+			"hardening",
+			"non_security_defect",
+			"informational",
+			"verification_gap",
+		]);
+		const allowedScopes = new Set([
+			"in_scope_security_regression",
+			"adjacent_security_blocker",
+			"out_of_scope_hardening",
+			"unrelated_bug",
+		]);
+		for (const observation of securityReview.observations) {
+			const label = `security observation ${observation?.id || "<missing-id>"}`;
+			requireText(observation?.id, `${label}.id`);
+			if (!allowedClassifications.has(observation?.classification)) {
+				findings.push(`${label} has an invalid classification`);
+			}
+			if (!allowedScopes.has(observation?.scope)) {
+				findings.push(`${label} has an invalid scope`);
+			}
+			if (!["high", "medium", "low"].includes(observation?.confidence)) {
+				findings.push(`${label} has an invalid confidence`);
+			}
+			if (
+				!Array.isArray(observation?.evidence) ||
+				observation.evidence.length === 0
+			) {
+				findings.push(`${label} has no evidence`);
+			}
+			if (observation?.classification === "verification_gap") {
+				findings.push(`${label} is an unresolved verification gap`);
+			}
+			if (
+				["confirmed_vulnerability", "likely_vulnerability"].includes(
+					observation?.classification,
+				) &&
+				["in_scope_security_regression", "adjacent_security_blocker"].includes(
+					observation?.scope,
+				)
+			) {
+				findings.push(`${label} is a blocking security finding`);
+			}
+		}
+	}
 }
 
 const requiredClaimSources = new Set([
@@ -588,5 +706,5 @@ if (findings.length > 0) {
 }
 
 console.log(
-	"PASS [report] verdict, claim inventory, proof ledger, assumptions, commit points, retries, and risk independence are complete",
+	"PASS [report] verdict, security receipt, claim inventory, proof ledger, assumptions, commit points, retries, and risk independence are complete",
 );

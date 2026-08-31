@@ -1,0 +1,1 @@
+No. It is a local reliability/cleanup bug—a startup race and stale PID file—not a security vulnerability without a lower-trust actor able to influence the port or trigger startup.

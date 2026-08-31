@@ -329,6 +329,41 @@
       }
     },
     {
+      "name": "security-review",
+      "channel": "experimental",
+      "maturity": "evaluated",
+      "summary": "Threat-boundary review that separates exploitable vulnerabilities from hardening, non-security defects, and verification gaps. One five-case baseline comparison passed 18/18 assertions versus 16/18 without the skill; transfer and repeated trials remain pending.",
+      "provenance": {
+        "schema_version": 1,
+        "kind": "skill",
+        "skill": "security-review",
+        "summary": "Security Review separates exploitability and trust-boundary evidence from merge policy, lifecycle defects, and defense-in-depth hardening.",
+        "patterns": [],
+        "evidence": [
+          {
+            "path": "foundry/runs/security-review-eval/2026-08-30-iteration-1/benchmark.md",
+            "relationship": "evaluation",
+            "visibility": "public",
+            "status": "active"
+          }
+        ],
+        "decisions": [
+          "foundry/rounds/014-register-security-review/README.md"
+        ],
+        "gaps": [
+          {
+            "id": "gap.security-review.real-application",
+            "description": "Record a complete real-work application whose exact-state receipt is consumed by Review Gate."
+          },
+          {
+            "id": "gap.security-review.transfer",
+            "description": "Repeat the comparison on a held-out repository and stack, then run multiple trials per configuration."
+          }
+        ],
+        "source": "foundry/knowledge/skills/security-review.md"
+      }
+    },
+    {
       "name": "signature-repro",
       "channel": "candidate",
       "maturity": "dogfooded",
@@ -699,6 +734,12 @@
       "id": "skill.review-gate",
       "kind": "skill",
       "channel": "stable",
+      "maturity": "evaluated"
+    },
+    {
+      "id": "skill.security-review",
+      "kind": "skill",
+      "channel": "experimental",
       "maturity": "evaluated"
     },
     {
@@ -2092,6 +2133,30 @@
       "fingerprint": "d7fb0ef4e9e05b4344feb654866ccf81ebc72ba52fd85548b2932a0b16f2a4e9",
       "classification": "reference",
       "rationale": "Reviewed matched lines: the name identifies a boundary, dependency, source artifact, catalog entry, or related method; this file does not prove application.",
+      "supports_application": false
+    },
+    {
+      "skill": "security-review",
+      "path": "foundry/rounds/014-register-security-review/README.md",
+      "fingerprint": "52111b00c5c8fcbaae29718bfb9b7fae651dbf5d1926c0c05ecb438edcc8951e",
+      "classification": "decision",
+      "rationale": "Reviewed matched lines: this Foundry round records the ownership, evidence, maturity, and distribution decision for the new skill.",
+      "supports_application": false
+    },
+    {
+      "skill": "security-review",
+      "path": "foundry/runs/security-review-eval/2026-08-30-iteration-1/benchmark.json",
+      "fingerprint": "e3353c02d928b451fc380ada3d857e9f2b854daa6523b54b0f3d3388de05bbce",
+      "classification": "evaluation",
+      "rationale": "Reviewed matched lines: this machine-readable benchmark compares the candidate against a no-skill baseline; it is evaluation evidence, not real-work application.",
+      "supports_application": false
+    },
+    {
+      "skill": "security-review",
+      "path": "foundry/runs/security-review-eval/2026-08-30-iteration-1/benchmark.md",
+      "fingerprint": "b9477650185ea8d07fa4a84aa40d97fc34f0ae5f8be692a853a39f0abc33ddf8",
+      "classification": "evaluation",
+      "rationale": "Reviewed matched lines: this human-readable benchmark summarizes the candidate and no-skill comparison; it is evaluation evidence, not real-work application.",
       "supports_application": false
     },
     {
