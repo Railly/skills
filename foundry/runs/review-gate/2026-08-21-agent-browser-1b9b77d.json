@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "vercel-labs/agent-browser",
+    "base": "b041bd4c9e71b0b1ea0727a9d9deb1e661615050",
+    "head": "1b9b77daa9de6fa8628bb6a4789696a23ef0423c",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "Slack customer feedback supplied in the task",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": ["discoverable-agent-browser-skill", "short-lived-oidc-default", "static-secret-fallback", "human-intervention-boundaries"],
+    "gaps": ["No separate Issue Contract or Spec review was supplied."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex with independent Vercel reference oracles",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["authentication token handling", "access-control guidance", "static credential fallback"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "evidence/2026-08-21-agent-browser-1b9b77d-oidc-oracles.txt",
+      "evidence": "The skill was challenged against Vercel's Trusted Sources docs, a merged Vercel plugin skill, a live-tested nine-page guide, a merged v0 implementation, current Vercel CLI source, and a shell substrate test."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Slack customer feedback supplied in the task",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The request asks for a discoverable agent-browser skill that combines existing OIDC and browser-header capabilities without distributing a static bypass secret."
+    },
+    {
+      "source": "design",
+      "location": "skill-data/protected-vercel-deployments/SKILL.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The design prefers a short-lived development OIDC token, scopes it to a subshell, names dashboard-only access-control changes, and retains the static bypass as an authorized fallback."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md; docs/src/app/skills/page.mdx; skill-data/core/SKILL.md; skills/agent-browser/SKILL.md; cli/src/output.rs",
+      "status": "reviewed",
+      "properties": ["P1", "P3"],
+      "evidence": "Every discovery surface points to the same bundled skill name, and the skill states the supported and human-only paths."
+    },
+    {
+      "source": "implementation",
+      "location": "commit 1b9b77daa9de6fa8628bb6a4789696a23ef0423c",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The exact commit adds one runtime skill and five discovery references without changing browser or authentication implementation code."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The bundled skill is discoverable and gives a working same-project development to protected Preview workflow.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Runtime skill discovery and the exact header received by agent-browser",
+        "layer": "built CLI plus shell command boundary",
+        "method": "Run skills list/get and execute the documented command against stub vc and agent-browser producers with an independently specified expected header.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The skill file exists and contains the expected header string.",
+        "counterexample": "A file can exist while CLI discovery omits it, or shell quoting can produce invalid JSON even when the literal appears in prose.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Runtime list/get discovery and JSON parsing at the stub agent-browser boundary directly tested both failure modes."
+      },
+      "substrates": [
+        {"name": "agent-browser Rust CLI skill discovery", "status": "exercised", "evidence": "skills list included protected-vercel-deployments and skills get returned its frontmatter and body."},
+        {"name": "zsh command boundary", "status": "exercised", "evidence": "The documented vc project token flow delivered the exact independently expected JWT header as valid JSON."}
+      ],
+      "evidence": "Skill validation passed, 11 Rust skills tests passed, runtime discovery passed, and the shell smoke passed."
+    },
+    {
+      "id": "P2",
+      "claim": "The preferred workflow does not print or persist the short-lived OIDC token and does not recommend broadening access control.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "Shell output, variable lifetime, filesystem instructions, and access-control guidance",
+        "layer": "process and documentation security boundary",
+        "method": "Capture stdout/stderr from the documented flow, inspect variable scope after completion, and compare every credential instruction against independent Vercel references.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The prose says never to print or save the token.",
+        "counterexample": "vc project token prints to stdout unless captured, and a parent-shell assignment would retain the token despite the warning.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The final command captures stdout into TOKEN inside a subshell; the smoke observed no output and no TOKEN in the parent shell."
+      },
+      "substrates": [
+        {"name": "zsh token flow", "status": "exercised", "evidence": "Captured command output was empty and TOKEN was unset after the subshell."},
+        {"name": "Vercel security references", "status": "exercised", "evidence": "Trusted Sources docs, plugin skill, PDF, and v0 implementation agree on short-lived OIDC as the preferred browser path."}
+      ],
+      "evidence": "No environment file is created; the token remains scoped to the launch subshell; static bypass use requires explicit authorization and credential handling guidance."
+    },
+    {
+      "id": "P3",
+      "claim": "The skill accurately distinguishes autonomous steps from actions that require a human or explicit authorization.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "Available Vercel CLI commands, public API surface, and documented dashboard-only management steps",
+        "layer": "Vercel control-plane management surface",
+        "method": "Inspect Vercel CLI 59.1.4 help and source, search the public REST and CLI surfaces, and compare with the official Trusted Sources procedure.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The official docs show dashboard steps.",
+        "counterexample": "A newer CLI could expose the same mutation even if the docs still emphasize the dashboard.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Current CLI help and source expose project token and protection bypass management but no Trusted Sources rule mutation; no public REST endpoint was found."
+      },
+      "substrates": [
+        {"name": "Vercel CLI 59.1.4", "status": "exercised", "evidence": "project token, project protection, link, login, update, and api help were inspected with matching source for token and protection."},
+        {"name": "Vercel Trusted Sources documentation", "status": "exercised", "evidence": "The procedure requires Settings, Deployment Protection, Trusted Sources and identifies permissions and OIDC Federation settings."}
+      ],
+      "evidence": "The skill lists only four human boundaries: interactive authentication, ambiguous project selection, dashboard-only Trusted Sources or OIDC Federation changes, and authorization for static bypass changes."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": "The diff adds documentation and bundled skill data; it does not implement or alter a protocol, parser, state machine, adapter, lifecycle, or browser event translation."},
+    "oracle": {"source": "not applicable", "independent": true, "evidence": "Security and command correctness are covered in the property ledger rather than a changed behavioral implementation."},
+    "producer": {"name": "not applicable", "status": "not_applicable", "evidence": "No production protocol producer changed."},
+    "falsification": [],
+    "evidence": "The changed Rust functions contain only help text, while the runtime skill is embedded markdown."
+  },
+  "assumptions": [
+    {"id": "A1", "source": "Vercel Trusted Sources docs", "claim": "Same-project development tokens can reach protected Preview deployments by default.", "status": "verified", "evidence": "The official default-access section and two independent implementations state this rule."},
+    {"id": "A2", "source": "Vercel CLI 59.1.4", "claim": "vc project token returns a development OIDC token for the linked or named project.", "status": "verified", "evidence": "CLI help and token.ts show the POST mint request and stdout result."},
+    {"id": "A3", "source": "agent-browser behavior", "claim": "Open --headers scopes the header to the target origin and applies it to page subresources and fetches.", "status": "verified", "evidence": "Existing agent-browser E2E coverage plus the live-tested PDF confirm same-origin document, asset, and in-page request behavior."},
+    {"id": "A4", "source": "Vercel management surfaces", "claim": "Trusted Sources rule mutation has no supported CLI or public REST management path.", "status": "verified", "evidence": "Current CLI help/source and public API search found no such command or endpoint; official docs prescribe dashboard management."}
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The exact diff adds documentation and embedded skill content only; it performs no runtime remote mutation or durable write when merged.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source was replaced."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No validator or trigger condition in production code was widened."},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No user-input resolution rule changed."},
+    {"name": "Shell re-parse append domain", "status": "run", "reason": "Reviewed both documented shell flows and executed the preferred flow through a zsh boundary with JSON parsing."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No diagnostic emitter or one-shot state changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No executable shim was added."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Verified that same-project development to Preview is the platform default and no configuration is requested for that case."},
+    {"name": "Fresh-seam scan", "status": "skipped", "reason": "No new runtime integration seam was implemented."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "The diff does not translate one semantic value across multiple implementation substrates."},
+    {"name": "Reference-implementation oracle", "status": "run", "reason": "Compared the skill with merged vercel-plugin and v0 implementations plus official Vercel documentation."},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "No function or command contract gained a failure outcome."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No agent-browser flag or dispatch path changed."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Reviewed missing auth, ambiguous link, environment mismatch, disabled federation, and static-fallback paths; each has an explicit boundary."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No recovery mechanism was added."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No asynchronous lifecycle changed."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced CLI identity to project token, shell capture, origin-scoped header, Deployment Protection, and application response."},
+    {"name": "Substrate verification", "status": "run", "reason": "Drove runtime skill discovery and the documented shell header construction."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Ran the built CLI's skills list/get commands and exercised the shell recipe with real command parsing and stub external effects."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Verified claims about default self-access, header direction, CLI support, and dashboard-only rule management against their owners."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Compared every discovery surface, CLI output, current Vercel CLI behavior, agent-browser header behavior, and independent references."},
+    {"name": "Demonstrative example", "status": "run", "reason": "The preferred example requires OIDC token minting and the Trusted Sources header; the smoke fails if either is absent or malformed."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was supplied."},
+    {"name": "Complexity budget", "status": "skipped", "reason": "No loop, collection, or per-candidate runtime path changed."}
+  ],
+  "deterministic": [
+    {"check": "style", "outcome": "acknowledged", "reason": "The generic detector rejects the one em dash, but repository AGENTS.md permits sparse em dashes, all six neighboring list entries use this separator, and Hunter explicitly approved this house style."},
+    {"check": "surfaces", "outcome": "pass", "reason": "All convention-mapped surfaces passed."},
+    {"check": "siblings Trusted Sources", "outcome": "pass", "reason": "Every matching file is included and no untouched matching passage remained."},
+    {"check": "siblings Deployment Protection", "outcome": "pass", "reason": "Every matching file is included and no untouched matching passage remained."},
+    {"check": "siblings protected-vercel-deployments", "outcome": "pass", "reason": "Every matching file is included and no untouched matching passage remained."},
+    {"check": "skill validator", "outcome": "pass", "reason": "Skill is valid."},
+    {"check": "cargo fmt", "outcome": "pass", "reason": "cargo fmt --manifest-path cli/Cargo.toml -- --check passed."},
+    {"check": "cargo clippy", "outcome": "pass", "reason": "cargo clippy --manifest-path cli/Cargo.toml -- -D warnings passed."},
+    {"check": "cargo skills tests", "outcome": "pass", "reason": "11 passed, 0 failed."},
+    {"check": "runtime skill discovery", "outcome": "pass", "reason": "The built CLI listed and returned protected-vercel-deployments."},
+    {"check": "shell OIDC smoke", "outcome": "pass", "reason": "Exact valid JWT header received, no output observed, and token scope ended."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "The exact base-to-head diff passed."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "Two help functions converge on main, but 2445 unresolved calls, 81 unmapped entries, and rust-analyzer duplicate-symbol warnings make the map under-covering."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {"claim": "The added em dash is exempt from the generic style detector.", "evidence": "Repository instructions permit sparse em dashes, the neighboring list consistently uses them, and Hunter explicitly approved this usage."},
+    {"claim": "No MCP parity update is required.", "evidence": "The diff adds bundled documentation and discovery text, not a CLI command, flag, behavior, environment variable, parser semantic, or dedicated MCP tool."},
+    {"claim": "No inline code comments are required.", "evidence": "No implementation behavior or public code API changed; output.rs only adds help discovery text."}
+  ],
+  "issue_candidates": []
+}

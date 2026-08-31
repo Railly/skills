@@ -1,0 +1,35 @@
+Review evidence for crafter-research/muniscan exact head 577a9cfb02b39a579dafe925bfa51d6e61ffe1b8
+
+Independent sampling oracle over published data/2026-08-08/index.json:
+- 1,794 scored municipalities
+- 381 municipalities with at least one sistemas_propios classification
+- expected rows reconstructed without calling selectHealthSample: 100
+- production rows: 100
+- mismatches between independent oracle and production: 0
+- 20 rows in each of five ranking bands
+- 100 unique municipalities and 100 unique domains in this snapshot
+- first row: munipuentepiedra, mail.munipuentepiedra.gob.pe
+- last row: muniuchuraccay, www.muniuchuraccay.gob.pe
+
+Real HTTP producer evidence:
+- Bun.serve issued a 302 redirect followed by a 204 final response
+- observeTarget recorded the final URL and status without a body field
+- a closed Bun server produced a connection failure row instead of aborting
+- three delayed Bun routes never exceeded one active request and emitted progress 1/3, 2/3, 3/3
+
+Force-red mutations restored from filesystem snapshots:
+- replacing even spacing with the first N rows failed the band-end assertion: expected rank 40, received 20
+- removing ranking and slug sorting failed the input-order determinism assertion
+
+Restored-green evidence:
+- bun test: 35 pass, 0 fail, 82 assertions
+- bun run typecheck: pass
+- Biome check on changed code: pass
+- focused sampler tests repeated 20 times: 160 pass, 0 fail, 780 assertions
+- git diff --check: pass
+
+Boundary and claim limits:
+- no live 100-domain result is claimed by this review
+- the first live result remains a post-merge V8 gate
+- sistemas_propios is a Muniscan hostname classification, not verified ownership
+- one HTTP response is not uptime, service quality, accessibility, security or compliance

@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-29",
+    "repo": "vercel-labs/agent-browser",
+    "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+    "head": "e5b37b8eba1f559963b6cf0f3ac772741aa2dfef",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/vercel-labs/agent-browser/issues/1734",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Root WebSocket query URLs connect without requiring an explicit slash",
+      "Existing paths and encoded query bytes remain unchanged",
+      "Daemon auto-connect failures identify CDP connection context",
+      "User-facing documentation and help remain aligned"
+    ],
+    "gaps": [
+      "No separate Issue Contract or Spec review was provided."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5.6-sol",
+    "reviewer_model": "substrate corpus and RFC 6455-compatible WebSocket server",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "Authentication tokens may appear in CDP query strings",
+      "WebSocket protocol compatibility"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "2026-08-29-agent-browser-e5b37b8-challenge.md",
+      "evidence": "A real WebSocket server observed the exact encoded request-target produced by the client, and the production call site was force-red without normalization."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "GitHub issue #1734",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "The issue identifies the missing root slash as the cause and gives the working slash-present endpoint."
+    },
+    {
+      "source": "design",
+      "location": "Narrow string normalization before into_client_request",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "The design inserts one slash only between authority and a directly following query, avoiding URL parse-reserialize changes to signed or encoded queries."
+    },
+    {
+      "source": "user_facing",
+      "location": "README, CLI help, docs, and packaged core skill",
+      "status": "reviewed",
+      "properties": [
+        "P3",
+        "P4"
+      ],
+      "evidence": "All required surfaces state port-or-URL support and optional root query slash behavior; daemon errors distinguish CDP connection context."
+    },
+    {
+      "source": "implementation",
+      "location": "cli/src/native/cdp/client.rs and cli/src/native/actions.rs",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "The complete base-to-head diff, callers, focused tests, full suite, clippy, formatting, and built help were reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "A WebSocket URL whose query begins immediately after the authority sends a slash-prefixed request-target.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "The HTTP request-target received during the WebSocket upgrade",
+        "layer": "WebSocket protocol boundary",
+        "method": "A real tokio-tungstenite server captures request.uri().path_and_query()",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The normalization helper returns a string containing /?",
+        "counterexample": "The helper can be correct while the production connection call still uses the original URL.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Bypassing normalization at connect_with_headers made the boundary test fail; restoring it produced /?token=... at the server."
+      },
+      "substrates": [
+        {
+          "name": "tokio-tungstenite WebSocket client and server on macOS",
+          "status": "exercised",
+          "evidence": "root_websocket_url_with_query_sends_slash_request_target observed /?token=a%2Fb&scope=browser%20test."
+        }
+      ],
+      "evidence": "Focused boundary test passed and repeated successfully five times."
+    },
+    {
+      "id": "P2",
+      "claim": "Existing paths and encoded query bytes remain unchanged while only a missing root slash is inserted.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "Byte-stable path and query text at the WebSocket request boundary",
+        "layer": "URI request-target",
+        "method": "Explicit matrix plus server-observed encoded path_and_query",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A parsed URL is semantically equivalent after reserialization",
+        "counterexample": "A parser may normalize escaping or signed query bytes while preserving semantic key-value pairs.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The implementation avoids parse-reserialize and the server observed %2F and %20 unchanged."
+      },
+      "substrates": [
+        {
+          "name": "Root, slash-present, path-present, IPv6, userinfo, empty-query, and encoded-query inputs",
+          "status": "exercised",
+          "evidence": "normalizes_only_root_websocket_queries and the real handshake boundary test passed."
+        }
+      ],
+      "evidence": "The matrix preserves / and /cdp paths and exact encoded query text."
+    },
+    {
+      "id": "P3",
+      "claim": "Auto-launch failures inside the daemon use CDP connection context when AGENT_BROWSER_CDP is configured.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "The JSON error returned by execute_command",
+        "layer": "Daemon command boundary",
+        "method": "Execute a snapshot command with an invalid CDP target and inspect result.error",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The error-context helper returns the expected label",
+        "counterexample": "The helper may return the correct label while execute_command continues formatting Auto-launch failed.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "test_execute_command_reports_cdp_connection_context drives execute_command and asserts the returned error prefix."
+      },
+      "substrates": [
+        {
+          "name": "Native daemon command pipeline",
+          "status": "exercised",
+          "evidence": "The execute_command test passed with AGENT_BROWSER_CDP=invalid-cdp-target."
+        }
+      ],
+      "evidence": "Both CDP and non-CDP helper cells pass, and the CDP daemon boundary is exercised."
+    },
+    {
+      "id": "P4",
+      "claim": "Required user-facing surfaces accurately describe port-or-URL CDP input and the optional root query slash.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Rendered built CLI help and repository documentation text",
+        "layer": "User-facing documentation",
+        "method": "Run the built binary help and deterministic surface and sibling sweeps",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Required documentation files appear in the diff",
+        "counterexample": "A required file can be changed while another passage in it still says --cdp <port>.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "A repo-wide search found the stale global help line; it was fixed, then the built CLI displayed --cdp <port|url>."
+      },
+      "substrates": [
+        {
+          "name": "Built CLI help, README, docs site source, and packaged skill source",
+          "status": "exercised",
+          "evidence": "style, surfaces, and root-WebSocket sibling gates passed; built help was inspected."
+        }
+      ],
+      "evidence": "All required surfaces align with the implemented behavior."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "WebSocket protocol compatibility",
+      "URI request-target adaptation"
+    ],
+    "dimensions": {
+      "values": [
+        "Authority plus encoded query without slash",
+        "Authority plus query with slash",
+        "Existing non-root path plus query",
+        "IPv6 authority plus query",
+        "Userinfo authority plus query",
+        "Empty query",
+        "Encoded slash and space query bytes",
+        "CDP and non-CDP error context"
+      ],
+      "exclusions": [
+        "Fragments are invalid in an HTTP WebSocket request-target and remain subject to tungstenite URL validation.",
+        "HTTP and HTTPS CDP discovery behavior is unchanged."
+      ],
+      "evidence": "The matrix is implemented in focused unit and WebSocket boundary tests."
+    },
+    "oracle": {
+      "source": "Real tokio-tungstenite WebSocket server request URI",
+      "independent": true,
+      "evidence": "The server captures the request-target independently of the production normalization helper."
+    },
+    "producer": {
+      "name": "tokio-tungstenite client handshake",
+      "status": "exercised",
+      "evidence": "CdpClient::connect drove an actual TCP WebSocket upgrade against a local server."
+    },
+    "falsification": [
+      {
+        "mutation": "Bypass normalization at the production connect_with_headers call site.",
+        "red_evidence": "root_websocket_url_with_query_sends_slash_request_target failed at the intended handshake boundary.",
+        "restored_green_evidence": "After restoring normalization, the test passed and then passed five consecutive repeats."
+      }
+    ],
+    "evidence": "The behavioral tests reject the original request-target bug and exercise the real protocol boundary."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Subsystem model",
+      "claim": "All WebSocket CDP connection paths converge on CdpClient::connect_with_headers.",
+      "status": "verified",
+      "evidence": "BrowserManager::connect_cdp_inner resolves the URL then delegates to connect_with_headers for direct, provider, and normal CDP connections."
+    },
+    {
+      "id": "A2",
+      "source": "URI design",
+      "claim": "Inserting one slash before a query is sufficient and must not parse-reserialize the URL.",
+      "status": "verified",
+      "evidence": "The real handshake server observes the required slash and exact encoded query bytes."
+    },
+    {
+      "id": "A3",
+      "source": "Error context",
+      "claim": "AGENT_BROWSER_CDP identifies the daemon auto-launch path as a CDP connection attempt.",
+      "status": "verified",
+      "evidence": "auto_launch reads the same environment variable and dispatches BrowserManager::connect_cdp; execute_command boundary coverage confirms the resulting message."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The changed production path emits a WebSocket upgrade request to an external CDP endpoint; it creates no durable local state.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "A WebSocket upgrade request with the normalized request-target is accepted by the endpoint.",
+        "owner": "CdpClient::connect_with_headers",
+        "commit_event": "tokio-tungstenite completes the WebSocket handshake",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      }
+    ]
+  },
+  "lenses": [
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The accepted root WebSocket URL domain was widened and its authority, path, and query partitions were exercised."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "The request-target was observed by a real WebSocket server."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Built CLI help and all required documentation surfaces were checked."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "The built binary help was executed and inspected; protocol behavior was driven through CdpClient."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "The documented slashless example is the input that fails without the normalization."
+    },
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No data source or parser was replaced."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No timeout, cancellation, or asynchronous wait contract changed."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "skipped",
+      "reason": "The change repairs an existing WebSocket boundary rather than extending the feature across a new boundary."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No per-element loop or scale-sensitive lookup was added."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was provided."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "No prohibited punctuation or formatting was added."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "All repository-required user-facing surfaces are included."
+    },
+    {
+      "check": "siblings: root WebSocket",
+      "outcome": "pass",
+      "reason": "Every matching documentation surface and passage is aligned."
+    },
+    {
+      "check": "callers: connect_with_headers",
+      "outcome": "acknowledged",
+      "reason": "BrowserManager::connect_cdp_inner delegates before constructing or mutating manager state, so the normalized connection outcome requires no caller repair."
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "Bypassing normalization at the production call site failed the boundary test for the intended handshake reason."
+    },
+    {
+      "check": "cargo fmt",
+      "outcome": "pass",
+      "reason": "cargo fmt --check passed."
+    },
+    {
+      "check": "cargo clippy",
+      "outcome": "pass",
+      "reason": "cargo clippy with warnings denied passed."
+    },
+    {
+      "check": "cargo test",
+      "outcome": "pass",
+      "reason": "1,161 tests executed with no failures; 107 ignored."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The global CLI help still described --cdp as port-only.",
+      "evidence": "Repo-wide search found cli/src/output.rs using --cdp <port>; the line was updated and the built help now shows --cdp <port|url>.",
+      "layer": "User-facing CLI help",
+      "source": "lens",
+      "path": "documentation sweep to built help",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No dedicated MCP change is required.",
+      "evidence": "MCP commands use the normal daemon connection state and expose no separate CDP URL parser or transport surface."
+    },
+    {
+      "claim": "The connect_with_headers caller outside the diff requires no state rollback change.",
+      "evidence": "BrowserManager::connect_cdp_inner awaits the connection before constructing or mutating BrowserManager state."
+    }
+  ],
+  "issue_candidates": []
+}

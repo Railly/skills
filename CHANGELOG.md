@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- A schema-v1 work-item manifest with risk profiles, wall-time budgets, transactional stage receipts, outcome telemetry, close-cycle status, and dependency-aware evidence reuse
+- A bounded orchestration contract that stops identical invalid Agent calls after the first schema failure and records degraded execution
+- Skill installation identity diagnostics for linked, exact-copy, diverged, and missing packages, including canonical package drift from the declared Git revision
+- Reversible development-link migration with source-revision preflight, backups, dry-run, and rollback
+- Deterministic Review Gate Markdown generation from the validated JSON report
+
+### Changed
+
+- Review Gate is a thin exact-state orchestrator that consumes Test Strength and Resilience Audit receipts instead of duplicating their procedures
+- Active Issue Contracts require a validated manifest sidecar, while historical closed missions remain compatible
+- Handoff and Record a Case project compact state and outcome annotations from the shared manifest
+- CI runs strict SkillKit package audits
+
 ## 0.0.10 - 2026-08-31
 
 Security-sensitive changes now have a dedicated threat-boundary review that keeps vulnerability classification separate from the final merge gate.

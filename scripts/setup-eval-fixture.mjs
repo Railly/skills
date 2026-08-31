@@ -40,6 +40,7 @@ const git = (...args) =>
 git("init", "-q");
 git("config", "user.name", "Skill Eval");
 git("config", "user.email", "eval@example.invalid");
+git("config", "commit.gpgsign", "false");
 git("add", ".");
 git("commit", "-qm", "fixture base");
 cpSync(changed, destination, { recursive: true });

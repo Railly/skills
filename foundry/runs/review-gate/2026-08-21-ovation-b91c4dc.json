@@ -1,0 +1,510 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "ovation",
+    "base": "04b41227dd5e5e20bdd74d9505656be8e7cc4870",
+    "head": "b91c4dcc329ff4ef42e9647717743605d189f24f",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-21-ovation-pr5-8f7ccf6/decision.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Issue Contract or Spec review was provided; the approved terminology, user requests, and completed Solution Gate supplied the delivery contract."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex with GPT-5.6 Sol and Cursor Grok 4.6 Solution Gate challenge",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "durable Postgres state",
+      "concurrent calculation and reset lifecycle",
+      "authenticated remote GitHub reads",
+      "destructive factory reset"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-21-ovation-pr5-8f7ccf6/decision.md",
+      "evidence": "GPT-5.6 Sol through Vercel AI Gateway and Cursor Grok 4.6 independently challenged the production boundary; exact implementation behavior was then falsified with mutations and exercised against GitHub, Postgres, and Chromium."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Approved user terminology and implementation thread",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "latest-good", "first-render", "absorbed-ui"],
+      "evidence": "The user approved Triage, Sort by triage, Triage score, Repository rank, local absorption, durable preferences, and complete-backlog ranking."
+    },
+    {
+      "source": "design",
+      "location": "Solution Gate decision and Ovation conventions",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "latest-good", "publication-authority", "reset-integrity", "access-control", "first-render", "absorbed-ui"],
+      "evidence": "The decision requires bounded resumable calculation, Postgres authority, immutable compact ranks, authorized route-local hydration, numeric rank ordering, and legacy-writer isolation."
+    },
+    {
+      "source": "user_facing",
+      "location": "Triage tab, sidebar filter, ranked rows, progress and empty states",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "latest-good", "first-render", "absorbed-ui"],
+      "evidence": "The live authenticated route renders the approved vocabulary, total item count, rank, score, formula breakdown, update action, and ranked pagination."
+    },
+    {
+      "source": "implementation",
+      "location": "Base 04b4122 to head b91c4dc",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "latest-good", "publication-authority", "reset-integrity", "access-control", "first-render", "absorbed-ui"],
+      "evidence": "The full PR diff and final 19-file amendment were reviewed across route, store, schema, migration, runner, hydration, client merge, tests, and cleanup."
+    }
+  ],
+  "properties": [
+    {
+      "id": "complete-ranking",
+      "claim": "Every discovered open issue and pull request receives one repository rank, including work beyond the first 100 items, while UI delivery remains paged.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "source count, contiguous persisted ranks, page boundaries, and rendered order",
+        "layer": "GitHub REST, Postgres, and browser DOM",
+        "method": "compare the provider run, report/rank SQL counts, report page responses, and rendered identities",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the first 100 rows look plausibly ranked",
+        "counterexample": "an item outside the first provider or delivery page can have the highest score",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The accepted report contains ranks 1 through 660; issue #120 renders at Repository rank #1 with score 74.3, and page two exposes ranks 101 through 200."
+      },
+      "substrates": [
+        {
+          "name": "live GitHub, local Postgres, authenticated Next.js UI",
+          "status": "exercised",
+          "evidence": "The real calculation fetched 11 provider pages, persisted 660 ranks, and browser delivery loaded 100 then 200 ranked items."
+        }
+      ],
+      "evidence": "Database integrity validation and the beyond-first-page unit test agree with real-producer dogfood."
+    },
+    {
+      "id": "latest-good",
+      "claim": "A failed rerun leaves the previous accepted report readable and visible.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "accepted report identity and GET output after a calculation error",
+        "layer": "Postgres authority and route-visible report",
+        "method": "seed an accepted report, record a rerun error, and read the accepted report",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the error is recorded",
+        "counterexample": "the control can store an error after clearing its accepted report pointer",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The DB integration test asserts the accepted report ID is unchanged, lastError is populated, and readTriageReportPage returns the previous generatedAt."
+      },
+      "substrates": [
+        {
+          "name": "Postgres integration database",
+          "status": "exercised",
+          "evidence": "The failed-rerun integration cell passes against real constraints and transactions."
+        }
+      ],
+      "evidence": "Publication creates a candidate report but advances authority only after generation and active-calculation predicates match."
+    },
+    {
+      "id": "publication-authority",
+      "claim": "Only the current generation's active calculation can publish, and successful publication replaces old reports without leaving completed staging.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "control pointer, report cardinality, and calculation/input residue",
+        "layer": "Postgres transaction",
+        "method": "exercise stale generation, replaced calculation, and successful replacement cells",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "a new report row was inserted",
+        "counterexample": "an obsolete calculation can insert a report even when it must not become accepted",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Old-generation and non-active publication return false with no accepted report; successful publication leaves one report and zero completed calculations or inputs."
+      },
+      "substrates": [
+        {
+          "name": "Postgres integration database with foreign keys",
+          "status": "exercised",
+          "evidence": "Six integration tests pass and the empty-database migration creates all four cascade foreign keys."
+        }
+      ],
+      "evidence": "Mutations removing generation, active-calculation, and contiguous-rank guards each produced the intended red before restoration."
+    },
+    {
+      "id": "reset-integrity",
+      "claim": "Factory reset invalidates in-flight calculations before clearing accepted and staging state, so stale work cannot republish.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "generation authority and publication outcome after authority advances",
+        "layer": "Postgres lifecycle",
+        "method": "advance generation, retain the old calculation object, and attempt publication",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "reset deleted existing report rows",
+        "counterexample": "a previously started request can publish after deletion",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The old-generation integration test attempts the late publish and receives false with zero report rows."
+      },
+      "substrates": [
+        {
+          "name": "Postgres generation fence and transactional cascade cleanup",
+          "status": "exercised",
+          "evidence": "Generation mismatch is driven against the database; migration verification confirms calculation/input and report/rank cascades."
+        }
+      ],
+      "evidence": "resetTriageAuthority increments generation, clears pointers, and deletes calculations/reports in one transaction."
+    },
+    {
+      "id": "access-control",
+      "claim": "Triage read, calculate, and reset operations require an authenticated session, and repository operations enforce the configured GitHub owner scope.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "authorization at the authoritative data-access boundary",
+        "layer": "server route and store entry points",
+        "method": "trace every exported operation to requireAuthSession or authorizeRepositoryAccess and verify anonymous route rejection evidence",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the UI hides the action",
+        "counterexample": "an anonymous caller can invoke the route directly",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The anonymous route probe was rejected with HTTP 401; GET and calculation call authorizeRepositoryAccess, while reset calls requireAuthSession."
+      },
+      "substrates": [
+        {
+          "name": "Next.js route boundary",
+          "status": "exercised",
+          "evidence": "Anonymous curl was rejected and authenticated browser requests succeeded for the allowed vercel-labs scope."
+        }
+      ],
+      "evidence": "Authorization is applied in the store boundary, not inferred from client state."
+    },
+    {
+      "id": "first-render",
+      "claim": "The persisted Triage sort and active repository report render on the first frame after a hard reload without a default-sort flash.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the first stable DOM after direct navigation",
+        "layer": "Next.js server rendering and React hydration",
+        "method": "clear browser error buffers, hard navigate to the item Triage route, and inspect sidebar and tab before interaction",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "localStorage contains sort=triage",
+        "counterexample": "the server can initially render Updated and switch after hydration",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The clean reload immediately showed Triage selected, issue #120 first, score 74.3, and Repository rank #1 of 660 with no new page errors."
+      },
+      "substrates": [
+        {
+          "name": "authenticated Chromium against Next.js 16 localhost",
+          "status": "exercised",
+          "evidence": "Cookie-backed server filters and route-local report hydration agreed on the first rendered state."
+        }
+      ],
+      "evidence": "The implementation follows the installed Next.js request-cookie and Server Component guidance and Vercel React first-render guidance."
+    },
+    {
+      "id": "absorbed-ui",
+      "claim": "Useful Xref signals are absorbed as local Repository Triage without an external package, dedicated panel, formula controls, or agent prompt injection.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "rendered product surfaces, prompt path, and package dependencies",
+        "layer": "browser UI and repository source",
+        "method": "drive item Triage and scan the full PR for retired Xref coupling",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the dedicated panel is absent",
+        "counterexample": "automatic prompt injection or a hidden package dependency can remain",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The full PR removes repository Xref prompt context and old graph modules; the final UI uses Triage labels and keeps Agents as the right sidebar."
+      },
+      "substrates": [
+        {
+          "name": "Ovation item workspace",
+          "status": "exercised",
+          "evidence": "Triage renders as an item tab and ranking option while the Agents pane remains unchanged."
+        }
+      ],
+      "evidence": "No Xref package is published or required by this implementation."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "durable calculation lifecycle",
+      "GitHub pagination adapter",
+      "Postgres publication protocol",
+      "Next.js hydration boundary"
+    ],
+    "dimensions": {
+      "values": [
+        "authority generation: current, stale",
+        "calculation identity: active, replaced",
+        "rerun outcome: success, provider failure",
+        "writer version: legacy, v2",
+        "item source: issue payload, pull payload",
+        "report shape: contiguous valid ranks, duplicate or gapped ranks",
+        "delivery: page one, page two, selected item outside page one",
+        "navigation: hard reload, client merge"
+      ],
+      "exclusions": [
+        "closed-item history is excluded because Repository Triage ranks the current open backlog",
+        "cross-repository normalization is excluded because Repository rank is repository-scoped",
+        "formula customization is excluded by the fixed local formula decision"
+      ],
+      "evidence": "The test and dogfood matrix crosses durable authority, failure, source payload, report integrity, page delivery, and navigation mode."
+    },
+    "oracle": {
+      "source": "GitHub REST payloads, direct Postgres state, explicit lifecycle model, and browser-visible rank",
+      "independent": true,
+      "evidence": "Expected authority transitions and counts are defined independently of the production store helpers."
+    },
+    "producer": {
+      "name": "GitHub REST through authenticated Next.js routes",
+      "status": "exercised",
+      "evidence": "A real 660-item repository was consumed over 11 pages, persisted, paged, and rendered."
+    },
+    "falsification": [
+      {
+        "mutation": "remove the generation predicate from conditional publication",
+        "red_evidence": "The old-generation integration test accepted stale publication and failed for the intended authority reason.",
+        "restored_green_evidence": "The predicate was restored and all six DB integration tests passed."
+      },
+      {
+        "mutation": "remove the active calculation predicate from conditional publication",
+        "red_evidence": "The replaced-calculation integration test accepted obsolete publication and failed for the intended authority reason.",
+        "restored_green_evidence": "The predicate was restored and all six DB integration tests passed."
+      },
+      {
+        "mutation": "weaken contiguous-rank validation",
+        "red_evidence": "The malformed rank contract test accepted a gapped report and failed its intended assertion.",
+        "restored_green_evidence": "Contiguous validation was restored and all nine unit tests passed."
+      }
+    ],
+    "evidence": "Mutations reject realistic wrong lifecycle implementations, integration tests reach Postgres, and dogfood reaches the user-visible boundary."
+  },
+  "assumptions": [
+    {
+      "id": "github-authoritative",
+      "source": "Ovation conventions and Solution Gate",
+      "claim": "GitHub remains authoritative for item state while Triage stores only a disposable projection.",
+      "status": "verified",
+      "evidence": "Inputs originate from GitHub pages, reports carry item display snapshots, and optional Triage failure does not remove native rows."
+    },
+    {
+      "id": "issue-list-metrics",
+      "source": "Implementation model",
+      "claim": "The issues endpoint supplies ranking metrics for pull requests that the pulls endpoint omits.",
+      "status": "verified",
+      "evidence": "Live GitHub comparison showed comments and reactions on /issues but null on /pulls; the integration test verifies PR display updates preserve issue-list metrics."
+    },
+    {
+      "id": "numeric-rank-authority",
+      "source": "Solution Gate",
+      "claim": "Persisted numeric rank, not rounded display score, is the ordering authority.",
+      "status": "verified",
+      "evidence": "compareTriageRank sorts on rank and the tie test verifies opposite direction behavior without recomputing score order."
+    },
+    {
+      "id": "bounded-request-work",
+      "source": "Solution Gate",
+      "claim": "Each calculation request performs at most one GitHub page read.",
+      "status": "verified",
+      "evidence": "calculateWorkEnrichment selects one phase and invokes exactly one paged GitHub method before returning progress or publishing."
+    },
+    {
+      "id": "route-local-hydration",
+      "source": "Solution Gate and Next.js guidance",
+      "claim": "Only the active repository's first report page belongs in SSR hydration.",
+      "status": "verified",
+      "evidence": "Root layout hydrates only filters; renderWorkspace reads page one for the route owner/repo and merges the selected item if outside that page."
+    },
+    {
+      "id": "legacy-isolation",
+      "source": "Solution Gate",
+      "claim": "Legacy repository_triage_runs writers cannot become v2 authority during rollout.",
+      "status": "verified",
+      "evidence": "The v2 reader follows only repository_triage_controls.accepted_report_id and the legacy-writer integration test returns no enrichment."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Calculation pages write resumable staging, publication advances an accepted report pointer, and factory reset deletes projections.",
+    "commit_points": [
+      {
+        "id": "calculation-page",
+        "effect": "persist one GitHub page of compact ranking inputs and advance the calculation cursor",
+        "owner": "persistIssueStep or persistPullRequestStep",
+        "commit_event": "the page transaction commits",
+        "later_fallible_stages": ["next provider page", "report calculation", "report publication"],
+        "failure_partitions": [
+          {
+            "ownership_region": "provider and later request boundary",
+            "covers": ["next provider page", "report calculation", "report publication"],
+            "forced": true,
+            "residual_observed": "completed page inputs and cursor remain resumable while the prior accepted report stays authoritative",
+            "cleanup_owner": "successful publication deletes completed staging; reset cascades unfinished staging",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The real 660-item run resumed through 11 request/page boundaries and published one accepted report."
+            },
+            "evidence": "The failed-rerun test records a provider failure without changing acceptedReportId, and the next request reuses the active calculation."
+          }
+        ]
+      },
+      {
+        "id": "accepted-report",
+        "effect": "atomically publish immutable ranks and advance acceptedReportId",
+        "owner": "publishTriageCalculation",
+        "commit_event": "the report/ranks/control transaction commits",
+        "later_fallible_stages": ["HTTP response delivery", "client report fetch and atom merge"],
+        "failure_partitions": [
+          {
+            "ownership_region": "delivery after durable publication",
+            "covers": ["HTTP response delivery", "client report fetch and atom merge"],
+            "forced": true,
+            "residual_observed": "the accepted report remains complete and independently readable from Postgres",
+            "cleanup_owner": "no rollback is needed for a complete immutable report; a reload rehydrates it",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "A clean hard navigation fetched the persisted page and rendered rank #1 of 660."
+            },
+            "evidence": "The publication integration test invokes the store without HTTP delivery, verifies one accepted report and no staging, then browser reload proves recovery."
+          }
+        ]
+      },
+      {
+        "id": "factory-reset",
+        "effect": "increment generation and remove accepted plus staging projections",
+        "owner": "resetTriageAuthority",
+        "commit_event": "the reset transaction commits",
+        "later_fallible_stages": ["HTTP reset response delivery", "late obsolete calculation attempts publication"],
+        "failure_partitions": [
+          {
+            "ownership_region": "late calculation and response boundary",
+            "covers": ["HTTP reset response delivery", "late obsolete calculation attempts publication"],
+            "forced": true,
+            "residual_observed": "generation remains advanced, projection tables remain empty, and obsolete publication returns false",
+            "cleanup_owner": "the reset transaction owns durable cleanup; retry is idempotent",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The authority test repeats publication after generation advances and observes a clean false outcome without manual repair."
+            },
+            "evidence": "The stale-generation mutation proves the generation predicate is the guard that rejects late work."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, or lookup data source was replaced."},
+    {"name": "New-domain matrix", "status": "run", "reason": "The domain expanded from one page to a durable multi-page backlog and all lifecycle partitions were modeled."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Normalized repository and item identities were checked across GitHub inputs, ranks, report pages, client maps, and selected routes."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command construction changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No daemon warning channel or latch exists in this subsystem."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No external executable shim was added."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Updated remains the product default, while cookie authority deliberately preserves an explicit Triage choice."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "The new authorization DAL, v2 control tables, route-local hydration, and client page merge seams were inspected."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "GitHub issue and pull payloads, Postgres state, and browser DOM were compared at their native boundaries."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "The fixed formula is product-defined and has no external normative implementation."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Database absence, auth failure, provider error, cancelled publication, and optional SSR read failure were traced to routes and UI."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No launch flag or dispatch mode changed."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Stale generation, inactive calculation, failed rerun, legacy writer, malformed ranks, and missing optional SSR data were forced or directly exercised."},
+    {"name": "Non-destructive recovery", "status": "run", "reason": "Failed reruns preserve the accepted report and calculation continuation is resumable."},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "Each request is bounded to one provider page and reset cancels publication by durable generation rather than process-local waiting."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "GitHub page, staging, formula, publication, route page, SSR/client merge, sidebar, and detail tab were traced end to end."},
+    {"name": "Substrate verification", "status": "run", "reason": "Claims were observed in GitHub, Postgres, migration constraints, production build, and authenticated Chromium."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "The running localhost application was driven through hard reload and ranked page delivery."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Complete rank integrity, publication authority, and reset invalidation each have one durable owner and rejecting tests."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Rendered labels and PR language match the fixed local Triage behavior and do not expose Xref internals."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added in the final amendment."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision-trail file was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "Provider work is one 100-row page per request, rank calculation is O(n log n), report delivery is fixed at 100 rows, and joins use maps."}
+  ],
+  "deterministic": [
+    {"check": "head coverage", "outcome": "pass", "reason": "This report targets exact HEAD b91c4dcc329ff4ef42e9647717743605d189f24f."},
+    {"check": "style", "outcome": "pass", "reason": "Review Gate style check passed."},
+    {"check": "surfaces runs to agent models", "outcome": "acknowledged", "reason": "The full PR only removes automatic Xref prompt prose from runs.ts; no agent model field, metadata, or run contract changed."},
+    {"check": "stale ovation.calculatedRepositories", "outcome": "pass", "reason": "The retired calculated-repository cookie has zero hits."},
+    {"check": "callers calculateWorkEnrichment", "outcome": "pass", "reason": "Every caller is in a reviewed diff file."},
+    {"check": "callers getWorkEnrichment", "outcome": "pass", "reason": "Every caller is in a reviewed diff file."},
+    {"check": "callers resetWorkEnrichments", "outcome": "pass", "reason": "Every caller is in a reviewed diff file."},
+    {"check": "web typecheck", "outcome": "pass", "reason": "Next typegen and TypeScript completed successfully."},
+    {"check": "unit tests", "outcome": "pass", "reason": "Nine unit tests passed; six DB tests skip unless the explicit integration URL is supplied."},
+    {"check": "database integration", "outcome": "pass", "reason": "Six lifecycle integration tests passed against Postgres."},
+    {"check": "production build", "outcome": "pass", "reason": "Next.js 16 production build completed successfully."},
+    {"check": "empty database migration", "outcome": "pass", "reason": "All migrations applied to a new temporary database with six repository triage tables and four foreign keys."},
+    {"check": "lint", "outcome": "pass", "reason": "Oxlint exited zero with existing warnings only."},
+    {"check": "root monorepo check", "outcome": "acknowledged", "reason": "The untouched Native package fails on repo.starValues; the changed Web package check passes."},
+    {"check": "diff-check", "outcome": "pass", "reason": "No whitespace errors were found."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "agent-models.ts is absent from the full PR diff even though runs.ts changed.",
+      "evidence": "The runs.ts delta only deletes Xref prompt composition; agent-models.ts carries no prompt context, run field, or affected model contract."
+    },
+    {
+      "claim": "The root monorepo check is not green.",
+      "evidence": "It fails in untouched apps/native/src/app.native on repo.starValues, while apps/web check and build pass."
+    },
+    {
+      "claim": "Existing lint warnings remain.",
+      "evidence": "Oxlint exits zero and the warnings are inherited repository findings rather than new Triage errors."
+    },
+    {
+      "claim": "Factory reset was not invoked against the preserved real localhost report.",
+      "evidence": "The destructive effect is verified through the exact generation-fence integration cell, migration cascades, and transactional reset implementation without deleting user dogfood data."
+    },
+    {
+      "claim": "The final commit was recreated through GitHub after the local 1Password signer failed.",
+      "evidence": "GitHub reports a valid web-flow signature, and both commits have the identical tree 7412dc8118a78296bf2a1ef8f2e11a364e5e3f0f."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Repair Native series binding for repo.starValues",
+      "evidence": "The root bun run check fails in apps/native/src/app.native because series requires a values binding to a numeric slice.",
+      "why_out_of_scope": "The file is untouched by the Repository Triage Web amendment and the failure predates it."
+    },
+    {
+      "title": "Silence local Vercel profile and status emulator warnings",
+      "evidence": "Clean browser navigation logs warnings from /api/vercel/status and accountInfo while Triage renders with zero page errors.",
+      "why_out_of_scope": "These existing emulator resources are unrelated to Repository Triage."
+    }
+  ]
+}

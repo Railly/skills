@@ -1,0 +1,118 @@
+{
+  "date": "2026-08-28",
+  "repo": "vercel-labs/mediadom",
+  "path": "/Users/raillyhugo/Programming/mediadom",
+  "branch": "main",
+  "head": "e425141b82b3585e2b1a30f3823eca8a3eb26ab9",
+  "workingTree": "dirty, intentionally uncommitted",
+  "treeIdentity": {
+    "trackedDiffSha256": "7a6f174431e449049246638dc83fd69e4bc007f92af8337627eb87d00bc9a97a",
+    "untrackedManifestSha256": "2cf17f74c566442cb8287afaf0e759d915703cc2cfe0d32c91807e93bf0d22e7",
+    "compositeSha256": "499028ce30bf34aaea7fe896c6fce6ded2f7e362c7e7df2a932b4d46149b8568"
+  },
+  "stack": {
+    "runtime": "Bun 1.3.14",
+    "language": "TypeScript",
+    "lintFormat": "Biome",
+    "media": "FFmpeg and ffprobe 8.1.2",
+    "supportedOs": "macOS"
+  },
+  "criticalPaths": [
+    {
+      "path": "doctor readiness",
+      "contract": "baseReady and doomReady reflect the complete advertised environment",
+      "control": "real CLI tests and fake ready providers",
+      "status": "controlled"
+    },
+    {
+      "path": "single-video doom edit",
+      "contract": "map, agent plan, one render, final transcription, terminal QA",
+      "control": "real CLI, real FFmpeg, filesystem artifacts, exact call counts",
+      "status": "controlled"
+    },
+    {
+      "path": "failure lifecycle",
+      "contract": "bounded processes, cancellation, cleanup, rollback, safe retry",
+      "control": "fault injection and repeated process tests",
+      "status": "controlled with provider gap"
+    },
+    {
+      "path": "durable store mutation",
+      "contract": "atomic publication and no lost concurrent updates",
+      "control": "multi-process writer, stale-holder, signal, and retry tests",
+      "status": "controlled; one historical timeout was not reproduced in 100 additional stress rounds"
+    },
+    {
+      "path": "repository delivery controls",
+      "contract": "required CI, least-privilege Actions, dependency alerts",
+      "control": "active strict ruleset, read-only Actions, Dependabot alerts and fixes",
+      "status": "controlled except secret scanning"
+    }
+  ],
+  "qualityMatrix": {
+    "correctness": "749 tests pass; real single-MP4 demo passes",
+    "reliability": "timeouts, cancellation, cleanup, rollback, retry, and concurrency exercised",
+    "security": "bun audit clean; Actions read-only; Dependabot enabled; secret scanning unavailable",
+    "maintainability": "five proven dead symbols removed; no TODO/FIXME/HACK markers; Knip remains advisory with 57 exports and 27 exported types",
+    "performance": "external output is bounded; PCM has a declared 1 GiB memory ceiling; no streaming benchmark",
+    "delivery": "strict required checks check (6) and check (latest) on main"
+  },
+  "rankedFindings": [
+    {
+      "rank": 1,
+      "id": "QB1",
+      "impact": "medium",
+      "confidence": "high",
+      "finding": "Real ElevenLabs and local PANNs runs remain unverified.",
+      "nextProof": "Run one disposable source through real trx and the real acoustic model, then repeat timeout and malformed-response handling where provider controls permit."
+    },
+    {
+      "rank": 2,
+      "id": "QB2",
+      "impact": "medium",
+      "confidence": "high",
+      "finding": "Secret scanning is disabled because Advanced Security is unavailable for this internal repository.",
+      "nextProof": "Obtain explicit organization authorization and licensing before enabling it."
+    },
+    {
+      "rank": 3,
+      "id": "QB4",
+      "impact": "low",
+      "confidence": "high",
+      "finding": "Long decoded PCM is buffered in memory up to 1 GiB.",
+      "nextProof": "Benchmark representative long recordings before deciding whether streaming decode is warranted."
+    },
+    {
+      "rank": 4,
+      "id": "QB5",
+      "impact": "low",
+      "confidence": "medium",
+      "finding": "Knip reports 57 unused exports and 27 exported types, mostly test or public seams.",
+      "nextProof": "Classify each export against the intended public API before removing any additional symbol."
+    }
+  ],
+  "rejectedFindings": [
+    {
+      "claim": "No stale commands or integration code remain.",
+      "reason": "No TODO/FIXME/HACK markers or ssrec integration were found; remaining uses of composition and zoom describe model or inspection concepts, not video composition."
+    },
+    {
+      "claim": "Large cli.ts is itself a defect.",
+      "reason": "Size and churn are prioritization signals, not a demonstrated contract failure."
+    },
+    {
+      "claim": "Every Knip result is dead code.",
+      "reason": "The repository intentionally exports test and public boundaries; only symbols with proven absence and no contract role were removed."
+    },
+    {
+      "claim": "The six-rescuer timeout establishes a lock defect.",
+      "reason": "The exact case passed alone, 78/78 across three file repetitions, in the final full suite, and 100/100 additional stress rounds."
+    }
+  ],
+  "nextPilot": {
+    "contract": "real provider behavior matches the already-proven process and artifact lifecycle",
+    "experiment": "run one disposable video through real trx ElevenLabs and the real local PANNs model",
+    "stopCondition": "one complete certified master or the first provider-specific failure with captured artifacts",
+    "expectedProof": "close or sharpen the remaining real-provider verification gap"
+  }
+}

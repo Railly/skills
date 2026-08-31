@@ -105,6 +105,32 @@
 				"Requires a successor admission before implementation"
 			],
 			"files": []
+		},
+		{
+			"id": 9,
+			"name": "manifest-resume-with-current-receipts",
+			"prompt": "Resume this compacted task. Its schema-v1 manifest has current intake, solution, implementation, and Test Strength receipts. Only Spec and review are pending.",
+			"expected_output": "The loop validates drift-prone identity, resumes at Spec, and reuses the manifest receipts without reconstructing or replaying completed work.",
+			"assertions": [
+				"Reads the manifest before surveying the repository",
+				"Verifies only drift-prone identity and receipt freshness",
+				"Resumes at Spec",
+				"Does not reconstruct completed stages from the transcript"
+			],
+			"files": []
+		},
+		{
+			"id": 10,
+			"name": "non-intersecting-receipt-reuse",
+			"prompt": "A follow-up commit changes only docs. Test Strength passed on the previous head for src/parser.ts with the same contract, command, environment, and skill revision. Decide what must rerun.",
+			"expected_output": "The loop records dependency-aware reuse for Test Strength, preserves the receipt because changed paths do not intersect its cone, and still runs final exact-head review checks.",
+			"assertions": [
+				"Checks changed paths against receipt relevant paths",
+				"Requires unchanged contract, environment, and skill revision",
+				"Records source head, target head, and reuse evidence",
+				"Still requires final exact-head verification"
+			],
+			"files": []
 		}
 	]
 }

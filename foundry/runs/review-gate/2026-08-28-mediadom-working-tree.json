@@ -1,0 +1,830 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-28",
+    "repo": "vercel-labs/mediadom working tree",
+    "base": "e425141b82b3585e2b1a30f3823eca8a3eb26ab9",
+    "head": "e425141b82b3585e2b1a30f3823eca8a3eb26ab9",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/mediadom/README.md and /Users/raillyhugo/Programming/mediadom/skills/mediadom/SKILL.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "single MP4 input",
+      "silence and semantic redundancy editing",
+      "no video composition or recorder integration",
+      "complete doom readiness",
+      "bounded dependency processes",
+      "source immutability",
+      "no uncertified output after failure",
+      "safe retry",
+      "concurrent durable store transitions"
+    ],
+    "gaps": [
+      "No separate Issue Contract or Spec review result was supplied; the repository's current README, skill, schema, CLI help, and tests define the reviewed contract."
+    ]
+  },
+  "provenance": {
+    "author_model": "OpenAI Codex",
+    "reviewer_model": "OpenAI Codex with independent substrate corpus",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "durable MP4 and receipt publication",
+      "external process lifecycle",
+      "signals and cancellation",
+      "filesystem cleanup",
+      "concurrent store transitions",
+      "remote repository controls"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-28-mediadom-working-tree-substrate.md",
+      "evidence": "Real Bun processes, SIGINT and SIGKILL, FFmpeg and ffprobe, MP4 files, receipts, filesystem state, injected dependency executables, partial output, retries, and concurrent writers directly exercised the claimed properties."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "README.md, INTERNAL.md, package.json, and the user-defined single-video scope",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5", "P6"],
+      "evidence": "The reviewed contract limits the product to one input video and defines readiness, editing, verification, source immutability, supported macOS execution, and CI delivery behavior."
+    },
+    {
+      "source": "design",
+      "location": "src/one-shot.ts, src/external-process.ts, src/process-lifecycle.ts, src/renderer.ts, and src/store-lock.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "The design assigns semantic decisions to the calling agent, process ownership to the shared lifecycle layer, artifact rollback to the render caller, and durable serialization to the store lock."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, skills/mediadom/SKILL.md, src/skills.ts, src/schema.ts, and CLI doctor output",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P4", "P6"],
+      "evidence": "The user and agent surfaces agree on the one-video editing boundary, doom-first flow, manual loop escape hatch, dependency readiness, exit codes, and no composition scope."
+    },
+    {
+      "source": "implementation",
+      "location": "working tree identified by tracked diff 7a6f174431e449049246638dc83fd69e4bc007f92af8337627eb87d00bc9a97a and composite hash 499028ce30bf34aaea7fe896c6fce6ded2f7e362c7e7df2a932b4d46149b8568",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5", "P6"],
+      "evidence": "The exact dirty tree passed typecheck, Biome, 749 tests, the real demo, dependency audit, repeated doom and lock suites, deterministic sweeps, mutation checks, and substrate inspection."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Doctor reports baseReady and doomReady from every dependency required by the advertised doom workflow and exits 5 when doom is not ready.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the complete machine-readable readiness object and process exit code",
+        "layer": "real CLI boundary",
+        "method": "run doctor with ready, missing, malformed, and unusable dependency configurations",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "ffmpeg and ffprobe are present",
+        "counterexample": "media binaries can be present while trx doctor, ElevenLabs configuration, or the acoustic classifier is unavailable",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The doctor tests require complete doom readiness and reject configurations where the media binaries alone are healthy."
+      },
+      "substrates": [
+        {
+          "name": "Bun CLI with real FFmpeg and executable provider fixtures",
+          "status": "exercised",
+          "evidence": "test/cli-v7.test.ts and test/cli-editor.test.ts drive doctor through the public command boundary; the demo also requires doctor success."
+        }
+      ],
+      "evidence": "Doctor-ready configurations exit 0; missing or unusable advertised dependencies reach exit 5 with the failing component named."
+    },
+    {
+      "id": "P2",
+      "claim": "Every external process used by the doom workflow is bounded, cancellable, output-bounded, and releases its owned child process and temporary directory.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "child process identity, termination, temp directory existence, exit code, and bounded output outcome",
+        "layer": "macOS process table and filesystem",
+        "method": "force hangs, malformed output, missing executables, SIGINT, and repeated invocation through the real CLI",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the command returned a timeout error",
+        "counterexample": "a timeout callback can reject the caller while leaving the detached child process and its temp directory alive",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Disabling process termination made the timeout test itself hang; disabling finally cleanup left a detected source transcription directory."
+      },
+      "substrates": [
+        {
+          "name": "real Bun subprocess groups, macOS signals, and temporary directories",
+          "status": "exercised",
+          "evidence": "The doom suite forces trx and acoustic hangs and SIGINT, then checks process and filesystem cleanup; 39/39 pass across three repetitions."
+        }
+      ],
+      "evidence": "Missing, hanging, malformed, and interrupted dependencies fail through their documented outcome and leave no matching process or transcription temp directory."
+    },
+    {
+      "id": "P3",
+      "claim": "A doom run publishes a master only when render, probe, hashing, receipt creation, final transcription, and terminal QA all complete; every later failure removes the uncertified master and receipt and permits immediate retry.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "actual MP4 and receipt existence, streams, hashes, source bytes, final verdict, and retry result",
+        "layer": "filesystem-backed render and certification boundary",
+        "method": "force one failure in each post-render ownership region, inspect residual files, then rerun the same operation",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "FFmpeg exited successfully",
+        "counterexample": "FFmpeg can succeed while ffprobe, hashing, receipt publication, final transcription, or QA fails, leaving an uncertified output",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "A forced post-render ffprobe failure and final-transcription and QA failures all occur after usable output exists, yet the direct filesystem oracle observes no residual master or receipt."
+      },
+      "substrates": [
+        {
+          "name": "FFmpeg and ffprobe 8.1.2 with real MP4 files",
+          "status": "exercised",
+          "evidence": "The real demo produces one verified MP4 with audio and video; forced partial and post-render failures exercise rollback and retry."
+        }
+      ],
+      "evidence": "The happy path renders once and transcribes the final once; source bytes remain identical. All forced later failures remove output and receipt, and retry succeeds."
+    },
+    {
+      "id": "P4",
+      "claim": "The public workflow accepts one video and edits temporal cuts for silence or semantic redundancy without adding camera composition, zooming, overlays, multi-input assembly, or recorder integration.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "accepted CLI inputs, generated FFmpeg filter topology, output stream types, and public contract text",
+        "layer": "CLI, renderer, produced MP4, README, schema, and skill surfaces",
+        "method": "drive one input MP4 end to end, inspect the output streams and filter construction, and sweep user-facing surfaces for the scope statement",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the README says MediaDOM is not a compositor",
+        "counterexample": "documentation can narrow scope while the renderer still applies camera transforms or accepts multiple video inputs",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The renderer tests and real demo use one source and only trim, fade, concatenate, and preserve audio-video streams; no recorder-specific integration is present."
+      },
+      "substrates": [
+        {
+          "name": "one generated audio-video MP4 through the public CLI and renderer",
+          "status": "exercised",
+          "evidence": "The demo reports inputVideos 1 and a verified output carrying video and audio while preserving the source."
+        }
+      ],
+      "evidence": "README, skill, schema, implementation, and built artifact agree on the narrow editing scope."
+    },
+    {
+      "id": "P5",
+      "claim": "Concurrent store writers and dead-holder rescuers preserve every durable transition, clean lock and write-temp artifacts, and release on polite cancellation.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "persisted EDL revision and entries, lock ownership, process exit, and residual lock or temp files",
+        "layer": "separate Bun processes and filesystem-backed store",
+        "method": "race writers, kill a holder, race six rescuers, interrupt a live holder, and inspect the final store",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "every writer exits 0 and the JSON parses",
+        "counterexample": "individually successful atomic writes can still overwrite peers and lose decisions",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The tests assert exact entry and revision counts, not only process exits or parseability."
+      },
+      "substrates": [
+        {
+          "name": "macOS filesystem, process signals, and six concurrent Bun CLI writers",
+          "status": "exercised",
+      "evidence": "test/cli-w2.test.ts passed 78/78 across three repetitions and the final full suite passed the same race."
+        }
+      ],
+      "evidence": "Four writers, a SIGKILLed holder, six rescuers, SIGINT release, atomic writes, stale recovery, and immediate failure release all preserve direct filesystem invariants."
+    },
+    {
+      "id": "P6",
+      "claim": "Main is protected by strict required MediaDOM CI checks, Actions has read-only default permissions, and dependency vulnerability controls are enabled.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "the effective GitHub repository ruleset and security configuration",
+        "layer": "GitHub REST API",
+        "method": "read the active repository ruleset, Actions workflow permissions, vulnerability alerts, and automated security fixes",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "a CI workflow file exists",
+        "counterexample": "the workflow can exist while main permits merges without it or Actions retains write permissions",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "GitHub reports an active strict ruleset requiring check (6) and check (latest), read-only workflow permissions, no PR approval permission, vulnerability alerts, and enabled automated security fixes."
+      },
+      "substrates": [
+        {
+          "name": "live GitHub repository configuration",
+          "status": "exercised",
+          "evidence": "The repository API was queried on 2026-08-28 and returned the active ruleset and enabled controls."
+        }
+      ],
+      "evidence": "The controls are effective repository configuration rather than inferred from checked-in YAML."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "external process lifecycle",
+      "signal translation",
+      "dependency adapters",
+      "durable artifact state machine",
+      "concurrent lock protocol"
+    ],
+    "dimensions": {
+      "values": [
+        "dependency present, missing, hanging, nonzero, and malformed",
+        "source transcription and final transcription",
+        "acoustic classifier success, timeout, and malformed output",
+        "SIGINT during active child work",
+        "render success, partial-output failure, and post-render probe failure",
+        "terminal QA pass and fail",
+        "empty output state and immediate retry",
+        "one writer, four writers, dead holder, and six rescuers"
+      ],
+      "exclusions": [
+        "Windows and Linux are outside the documented macOS support contract",
+        "real provider-specific ElevenLabs and PANNs behavior is not claimed by the lifecycle properties",
+        "video composition and multiple input media are outside the product contract"
+      ],
+      "evidence": "test/cli-doom.test.ts, test/cli-w2.test.ts, the real demo, and the substrate artifact exercise the matrix through process and filesystem boundaries."
+    },
+    "oracle": {
+      "source": "process identity and liveness, filesystem existence and hashes, exact EDL counts, MP4 stream inspection, and documented exit-code contracts",
+      "independent": true,
+      "evidence": "Expected outcomes are stated as external process, filesystem, and artifact invariants rather than derived from helper return values."
+    },
+    "producer": {
+      "name": "real Bun CLI, real FFmpeg and ffprobe, generated MP4 input, real macOS signals, and executable provider-shaped fixtures",
+      "status": "exercised",
+      "evidence": "The user-visible CLI and actual operating-system boundaries produce every tested event; fixtures replace provider semantics only where external service access is not part of the narrowed claim."
+    },
+    "falsification": [
+      {
+        "mutation": "disable DependencyError rethrow from runOneShot",
+        "red_evidence": "The missing-trx path changed from exit 5 to exit 7 and the target assertion failed.",
+        "restored_green_evidence": "Restoring the rethrow returned the target test and final suite to green."
+      },
+      {
+        "mutation": "disable transcription temp cleanup in finally",
+        "red_evidence": "The timeout test observed a leaked mediadom-source-scribe directory.",
+        "restored_green_evidence": "Restoring finally cleanup left no matching temp directory and the target test passed."
+      },
+      {
+        "mutation": "disable process termination in the timeout callback",
+        "red_evidence": "The timeout test hung until the harness killed a dangling process.",
+        "restored_green_evidence": "Restoring process-group termination made the bounded timeout test pass."
+      },
+      {
+        "mutation": "disable terminal QA rollback",
+        "red_evidence": "The QA-fail test observed the output MP4 still present.",
+        "restored_green_evidence": "Restoring rollback removed output and receipt and allowed retry."
+      }
+    ],
+    "evidence": "Four targeted fix-absent mutations failed at the intended external assertion; snapshots were restored and the final exact tree passed all checks."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "README product contract",
+      "claim": "The current supported product surface is one input video on macOS.",
+      "status": "verified",
+      "evidence": "README states one video input and no composition; CI runs on macOS and no broader operating-system claim is made."
+    },
+    {
+      "id": "A2",
+      "source": "agent workflow contract",
+      "claim": "The calling agent supplies semantic editorial judgment while MediaDOM compiles and verifies physical cuts.",
+      "status": "verified",
+      "evidence": "The CLI emits a frozen doom map and accepts an agent plan; no model backend is embedded, and tests verify the resume path."
+    },
+    {
+      "id": "A3",
+      "source": "artifact invariant",
+      "claim": "The source media must remain byte-identical across editing and rendering.",
+      "status": "verified",
+      "evidence": "The doom end-to-end test and real demo hash the source before and after and observe no change."
+    },
+    {
+      "id": "A4",
+      "source": "provider scope",
+      "claim": "The audit's provider fixtures prove executable, JSON, timeout, cancellation, and cleanup behavior but do not prove real ElevenLabs or PANNs model semantics.",
+      "status": "verified",
+      "evidence": "The report names real provider execution as an issue candidate and narrows lifecycle claims to the exercised process and artifact boundary."
+    },
+    {
+      "id": "A5",
+      "source": "resource model",
+      "claim": "Decoded PCM is intentionally bounded in memory rather than streamed.",
+      "status": "verified",
+      "evidence": "runExternalProcessBytes enforces a 1 GiB ceiling; the limitation is recorded as an issue candidate instead of an unbounded-memory claim."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The workflow spawns external processes and writes temporary transcription state, durable one-shot ledgers, an MP4 master, a receipt, final transcript data, and store transitions.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "An external dependency process group and its temporary transcription workspace exist.",
+        "owner": "src/external-process.ts and the calling adapter",
+        "commit_event": "Bun spawns the detached process and the adapter creates its temp directory.",
+        "later_fallible_stages": [
+          "process timeout or nonzero exit",
+          "malformed dependency output",
+          "SIGINT or SIGTERM during active work",
+          "adapter result parsing and persistence"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "external process runner",
+            "covers": [
+              "process timeout or nonzero exit",
+              "SIGINT or SIGTERM during active work"
+            ],
+            "forced": true,
+            "residual_observed": "The detached child group is gone and no matching temp directory remains.",
+            "cleanup_owner": "shared process lifecycle plus adapter finally",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The same timeout and signal operations pass across three fresh doom-suite repetitions with clean starting and ending process state."
+            },
+            "evidence": "Hanging trx, hanging acoustic, and SIGINT tests inspect child liveness and temp paths."
+          },
+          {
+            "ownership_region": "dependency adapter and store caller",
+            "covers": [
+              "malformed dependency output",
+              "adapter result parsing and persistence"
+            ],
+            "forced": true,
+            "residual_observed": "Malformed data is rejected with a documented result and no transcription workspace remains.",
+            "cleanup_owner": "adapter finally and one-shot failure ledger",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Malformed and missing dependency cases are rerun in the three repeated doom suites without residual state blocking later runs."
+            },
+            "evidence": "Malformed trx and acoustic outputs are injected at the executable boundary."
+          }
+        ]
+      },
+      {
+        "id": "CP2",
+        "effect": "FFmpeg creates or replaces the requested master MP4 and certification state begins.",
+        "owner": "src/renderer.ts and runOneShot",
+        "commit_event": "FFmpeg writes bytes at the output path.",
+        "later_fallible_stages": [
+          "FFmpeg exits nonzero after partial output",
+          "ffprobe stream and duration inspection",
+          "render hash and receipt creation",
+          "final master transcription",
+          "terminal QA verdict"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "FFmpeg render",
+            "covers": [
+              "FFmpeg exits nonzero after partial output"
+            ],
+            "forced": true,
+            "residual_observed": "No partial master or receipt exists.",
+            "cleanup_owner": "renderer",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The repeated doom suite begins the same operation from a clean output state and completes its happy path."
+            },
+            "evidence": "The FFmpeg fixture writes output and then exits nonzero."
+          },
+          {
+            "ownership_region": "render certification",
+            "covers": [
+              "ffprobe stream and duration inspection",
+              "render hash and receipt creation"
+            ],
+            "forced": true,
+            "residual_observed": "The uncertified master and receipt are absent.",
+            "cleanup_owner": "renderer",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The post-render probe failure test immediately retries the same CLI operation and receives a certified output."
+            },
+            "evidence": "A fake ffprobe fails after FFmpeg has created the master."
+          },
+          {
+            "ownership_region": "post-render one-shot workflow",
+            "covers": [
+              "final master transcription",
+              "terminal QA verdict"
+            ],
+            "forced": true,
+            "residual_observed": "The master and receipt are removed for both an exception and a red verdict.",
+            "cleanup_owner": "runOneShot",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Both tests immediately rerun the same operation and complete cleanly."
+            },
+            "evidence": "Final transcription failure and terminal QA fail are forced separately."
+          }
+        ]
+      },
+      {
+        "id": "CP3",
+        "effect": "A store read-modify-write publishes a new durable EDL or ledger generation.",
+        "owner": "withStoreLock and atomic store writers",
+        "commit_event": "the writer atomically renames the complete replacement over the target file",
+        "later_fallible_stages": [
+          "foreground process exits after durable publication",
+          "another writer races the same transition",
+          "holder receives SIGINT before normal release"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "atomic writer and caller retry",
+            "covers": [
+              "foreground process exits after durable publication"
+            ],
+            "forced": true,
+            "residual_observed": "The committed state remains complete and duplicate-safe on retry.",
+            "cleanup_owner": "store lock holder and idempotent command",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Existing post-commit retry tests retain one coherent entry and do not duplicate it."
+            },
+            "evidence": "The repository suite covers atomic publication and retry after output failure."
+          },
+          {
+            "ownership_region": "multi-process lock protocol",
+            "covers": [
+              "another writer races the same transition",
+              "holder receives SIGINT before normal release"
+            ],
+            "forced": true,
+            "residual_observed": "All expected entries and revisions persist; lock and write-temp files are absent.",
+            "cleanup_owner": "withStoreLock and shared signal cleanup",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Four-writer and six-rescuer cases pass repeatedly, and a later writer succeeds after SIGINT release."
+            },
+            "evidence": "test/cli-w2.test.ts drives separate processes and direct store inspection."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Centralized process lifecycle could erase adapter-specific failure behavior; missing, malformed, nonzero, timeout, and signal outcomes were all checked."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "The shared runner now owns several executables and both byte and text output; every reached output and lifecycle class was included."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "TRX_BIN, acoustic command, environment timeout, doctor, adapters, demo, schema, and skill resolution were traced together."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command-string concatenation or re-parsing behavior changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "Dependency errors must reach the CLI as exit 5 and terminal QA must remove output even when no exception is thrown."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "run",
+      "reason": "Executable fixtures are selected by explicit environment paths and the demo supplies its own ready trx and acoustic fixtures."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "The one-hour default external-process timeout and unbounded default store-lock wait were checked as separate deliberate contracts."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "The new shared lifecycle module connects adapters, FFmpeg, instruments, and locks; all new callers and cleanup ownership were inspected."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Process liveness, files, hashes, streams, receipts, and EDL counts were compared against CLI-reported outcomes."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No independent reference editor implements this repository-specific doom and receipt protocol."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "DependencyError, timeout, malformed output, incomplete verdict, and terminal QA outcomes were traced to CLI exits and cleanup."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "MEDIADOM_PROCESS_TIMEOUT_MS and executable environment overrides were traced through readiness and runtime consumers."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Every material dependency and post-render ownership region has a forced failure."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "Rollback removes only uncertified output and receipts; source bytes remain unchanged and immediate retry succeeds."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Real hangs and SIGINT verify process-group termination, handler coexistence, and temp cleanup."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "The single-video path was traced from readiness through source transcription, map, agent plan, render, final transcription, QA, and cleanup."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Claims were observed in the process table, filesystem, MP4 streams, hashes, and live GitHub configuration."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "The real demo produced and verified one audio-video MP4 through the CLI without API credentials."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Process cleanup, temp cleanup, output rollback, receipt certification, and lock release owners were enumerated."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "README, skill, schema, help, doctor, tests, and rendered artifact agree on the narrow one-video workflow."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "The internal demo now proves the intended ready environment and one-video output without real credentials."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decisions.tsv implementation trail was provided."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Process output buffers are bounded; decoded PCM has a named 1 GiB ceiling and is recorded as a scale issue rather than unbounded behavior."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "working-tree identity",
+      "outcome": "pass",
+      "reason": "Tracked diff, untracked manifest, and composite SHA-256 values freeze the exact uncommitted tree."
+    },
+    {
+      "check": "covered",
+      "outcome": "acknowledged",
+      "reason": "The standard exact-HEAD gate cannot represent an uncommitted tree; the report binds base HEAD plus tracked, untracked, and composite hashes."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "gate.sh style e425141 reports PASS."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "The MediaDOM conventions map reports PASS for CLI, one-shot, process, renderer, trx, docs, schema, skill, and doom tests."
+    },
+    {
+      "check": "siblings doom",
+      "outcome": "acknowledged",
+      "reason": "Untouched doom-map, QA, acoustic, and existing passages implement stable domain behavior; changed contract passages in README, CLI, schema, skill, and tests were inspected."
+    },
+    {
+      "check": "siblings timeout",
+      "outcome": "acknowledged",
+      "reason": "Existing lock timeout and autocut timeout passages describe the separate store-lock contract; new process timeout consumers and docs were inspected."
+    },
+    {
+      "check": "callers runOneShot",
+      "outcome": "pass",
+      "reason": "Every runOneShot call site is in a diffed file."
+    },
+    {
+      "check": "callers renderEdl",
+      "outcome": "pass",
+      "reason": "Every renderEdl call site is in a diffed file."
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": "gate.sh timings reports no added literal wait ceiling; the process default is derived through the shared runtime configuration."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "The exact source working tree has no whitespace errors."
+    },
+    {
+      "check": "repository check",
+      "outcome": "pass",
+      "reason": "TypeScript, Biome, and 749 tests pass."
+    },
+    {
+      "check": "real demo",
+      "outcome": "pass",
+      "reason": "One verified MP4 with video and audio was produced; sourceUnchanged is true."
+    },
+    {
+      "check": "doom repetition",
+      "outcome": "pass",
+      "reason": "test/cli-doom.test.ts passes 39/39 across three repetitions."
+    },
+    {
+      "check": "lock repetition",
+      "outcome": "pass",
+      "reason": "test/cli-w2.test.ts passes 78/78 across three repetitions."
+    },
+    {
+      "check": "six-rescuer stress",
+      "outcome": "pass",
+      "reason": "The exact dead-holder recovery race passes 100/100 additional repetitions."
+    },
+    {
+      "check": "dependency audit",
+      "outcome": "pass",
+      "reason": "bun audit reports no vulnerabilities."
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "Four fix-absent mutations failed at the intended assertions and the restored tree returned green."
+    },
+    {
+      "check": "process and temp residue",
+      "outcome": "pass",
+      "reason": "The final scan found no matching MediaDOM, trx fixture, FFmpeg test, or transcription temp residue."
+    },
+    {
+      "check": "Radius impact",
+      "outcome": "acknowledged",
+      "reason": "Radius indexed 105 files, 881 symbols, and 2,508 edges, but 6,015 unresolved calls materially limit coverage; it was used for orientation only."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Doctor previously reported only partial dependency readiness and could return success when the advertised doom workflow was unusable.",
+      "evidence": "The current doctor tests require complete baseReady and doomReady and fail missing dependency configurations with exit 5.",
+      "layer": "CLI readiness contract",
+      "source": "lens",
+      "path": "doctor -> doom readiness probes -> CLI exit",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Dependency errors and external-process hangs could escape the advertised exit and cleanup contract.",
+      "evidence": "Missing trx now exits 5; timeout and signal mutations proved the new child termination and temp cleanup assertions are load-bearing.",
+      "layer": "dependency process lifecycle",
+      "source": "lens",
+      "path": "adapter -> external process -> runOneShot -> CLI",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "Failures after output creation could leave a partial or uncertified master and receipt.",
+      "evidence": "Forced FFmpeg partial output, post-render ffprobe failure, final transcription failure, and terminal QA fail now leave no output or receipt and permit retry.",
+      "layer": "render certification state machine",
+      "source": "lens",
+      "path": "FFmpeg -> ffprobe/hash/receipt -> final transcription -> QA",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "Separate signal handlers for process cleanup and store locks could compete and leave one resource owner unhandled.",
+      "evidence": "The shared process-lifecycle registry now owns SIGINT and SIGTERM dispatch; lock and doom signal tests pass together in the full suite.",
+      "layer": "process-wide signal ownership",
+      "source": "lens",
+      "path": "process signal -> shared cleanup registry -> child groups and held locks",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F5",
+      "state": "refuted",
+      "claim": "One full-suite run timed out in the six-rescuer test and killed a dangling process.",
+      "evidence": "The event did not reproduce in the isolated case, 78/78 repeated file tests, the final 749-test suite, or 100/100 additional exact-case stress rounds.",
+      "layer": "suite-level process concurrency",
+      "source": "gate",
+      "path": "full Bun suite -> six-rescuer race -> process cleanup",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F6",
+      "state": "issue_candidate",
+      "claim": "Real ElevenLabs and local PANNs provider semantics were not executed.",
+      "evidence": "Provider-shaped fixtures prove the executable and artifact contract, not authentication, real latency, or model output.",
+      "layer": "external provider integration",
+      "source": "lens",
+      "path": "trx or acoustic provider -> adapter",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F7",
+      "state": "issue_candidate",
+      "claim": "Secret scanning remains disabled for the internal repository.",
+      "evidence": "The GitHub API reports secret scanning disabled; enabling organization-licensed Advanced Security is outside the authorized source change.",
+      "layer": "repository security control",
+      "source": "gate",
+      "path": "GitHub repository settings -> secret scanning",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F8",
+      "state": "issue_candidate",
+      "claim": "Decoded PCM is buffered in memory up to a 1 GiB ceiling.",
+      "evidence": "The buffer is bounded but very long recordings can fail at the ceiling; no representative long-video benchmark justified a streaming refactor.",
+      "layer": "resource scale",
+      "source": "lens",
+      "path": "FFmpeg PCM stdout -> runExternalProcessBytes -> in-memory envelope",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No Linux or Windows matrix is required.",
+      "evidence": "The repository documents macOS support and CI runs the supported FFmpeg matrix on macOS."
+    },
+    {
+      "claim": "No video-composition or recorder-integration tests are required.",
+      "evidence": "Those capabilities are explicitly outside the current one-input editor contract and no implementation path remains."
+    },
+    {
+      "claim": "Knip output is advisory rather than a blocking dead-code proof.",
+      "evidence": "The 57 exports and 27 exported types include intentional test and public seams; only independently proven unused symbols were removed."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Run real ElevenLabs and local PANNs provider dogfood",
+      "evidence": "This audit used provider-shaped executable fixtures and real process boundaries but no real provider model run.",
+      "why_out_of_scope": "Credentials and local model availability were not part of the disposable test environment."
+    },
+    {
+      "title": "Enable GitHub secret scanning when authorized",
+      "evidence": "GitHub reports secret scanning disabled for the internal repository.",
+      "why_out_of_scope": "Advanced Security licensing and organization policy require explicit authorization."
+    },
+    {
+      "title": "Benchmark streaming PCM for long recordings",
+      "evidence": "Current decoding is bounded at 1 GiB and held in memory.",
+      "why_out_of_scope": "No measured representative workload currently shows the ceiling is reached."
+    }
+  ]
+}

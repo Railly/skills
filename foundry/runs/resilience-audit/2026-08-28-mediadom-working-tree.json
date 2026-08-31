@@ -1,0 +1,143 @@
+{
+  "date": "2026-08-28",
+  "repo": "vercel-labs/mediadom",
+  "base": "e425141b82b3585e2b1a30f3823eca8a3eb26ab9",
+  "state": "uncommitted working tree",
+  "tree": {
+    "trackedDiffSha256": "7a6f174431e449049246638dc83fd69e4bc007f92af8337627eb87d00bc9a97a",
+    "untrackedManifestSha256": "2cf17f74c566442cb8287afaf0e759d915703cc2cfe0d32c91807e93bf0d22e7",
+    "compositeSha256": "499028ce30bf34aaea7fe896c6fce6ded2f7e362c7e7df2a932b4d46149b8568"
+  },
+  "verdict": "findings",
+  "boundaries": [
+    {
+      "boundary": "trx source and final transcription",
+      "timeout": "MEDIADOM_PROCESS_TIMEOUT_MS, default one hour",
+      "cancellation": "SIGINT and SIGTERM terminate the detached process group",
+      "cleanup": "temporary transcription directory removed in finally",
+      "outcome": "DependencyError, exit 5"
+    },
+    {
+      "boundary": "local acoustic classifier",
+      "timeout": "MEDIADOM_PROCESS_TIMEOUT_MS, default one hour",
+      "cancellation": "detached process group terminated",
+      "cleanup": "process and bounded output buffer released",
+      "outcome": "dependency failure or explicit incomplete verdict"
+    },
+    {
+      "boundary": "FFmpeg render and certification",
+      "timeout": "MEDIADOM_PROCESS_TIMEOUT_MS, default one hour",
+      "cancellation": "detached process group terminated",
+      "cleanup": "partial or uncertified master and receipt removed",
+      "outcome": "nonzero failure with safe retry"
+    },
+    {
+      "boundary": "filesystem store lock",
+      "timeout": "unbounded by default, optional caller timeout",
+      "cancellation": "signal cleanup releases a live lock",
+      "cleanup": "orphan write temps swept by the holder",
+      "outcome": "serialized durable transition or exit 5"
+    }
+  ],
+  "pressureMatrix": [
+    {
+      "fault": "missing trx",
+      "expected": "exit 5, persisted failure ledger, no temp leak",
+      "observed": "preserved",
+      "evidence": "test/cli-doom.test.ts"
+    },
+    {
+      "fault": "hanging trx",
+      "expected": "bounded timeout, child gone, temp removed",
+      "observed": "preserved",
+      "evidence": "test/cli-doom.test.ts repeated three times"
+    },
+    {
+      "fault": "malformed trx JSON",
+      "expected": "dependency failure, no temp leak",
+      "observed": "preserved",
+      "evidence": "test/cli-doom.test.ts"
+    },
+    {
+      "fault": "hanging acoustic classifier",
+      "expected": "bounded timeout and child termination",
+      "observed": "preserved",
+      "evidence": "test/cli-doom.test.ts"
+    },
+    {
+      "fault": "malformed acoustic output",
+      "expected": "explicit incomplete verdict",
+      "observed": "preserved",
+      "evidence": "test/cli-doom.test.ts"
+    },
+    {
+      "fault": "SIGINT during transcription",
+      "expected": "child process and temp directory removed",
+      "observed": "preserved",
+      "evidence": "real process signal in test/cli-doom.test.ts"
+    },
+    {
+      "fault": "FFmpeg writes output then exits nonzero",
+      "expected": "no partial master or receipt",
+      "observed": "preserved",
+      "evidence": "test/cli-doom.test.ts"
+    },
+    {
+      "fault": "ffprobe fails after render",
+      "expected": "uncertified master and receipt removed, retry succeeds",
+      "observed": "preserved",
+      "evidence": "test/cli-doom.test.ts"
+    },
+    {
+      "fault": "final transcription fails",
+      "expected": "master and receipt removed, retry succeeds",
+      "observed": "preserved",
+      "evidence": "test/cli-doom.test.ts"
+    },
+    {
+      "fault": "terminal QA rejects master",
+      "expected": "master and receipt removed, retry succeeds",
+      "observed": "preserved",
+      "evidence": "test/cli-doom.test.ts"
+    },
+    {
+      "fault": "six writers recover one dead lock holder",
+      "expected": "six durable entries, no overlap, no lock or temp residue",
+      "observed": "preserved",
+      "evidence": "78/78 in three file repetitions, green final full suite, and 100/100 additional exact-case stress repetitions"
+    }
+  ],
+  "verification": {
+    "check": "749 passed",
+    "doomRepeated": "39 passed",
+    "lockRepeated": "78 passed",
+    "lockStress": "100 passed",
+    "demo": "pass, one verified audio-video MP4, source unchanged",
+    "audit": "no vulnerabilities",
+    "diffCheck": "pass",
+    "residue": "no matching process or transcription temp directory"
+  },
+  "findings": [
+    {
+      "id": "RA1",
+      "severity": "medium",
+      "state": "verification gap",
+      "claim": "Real ElevenLabs and local PANNs provider executions were not exercised.",
+      "impact": "Provider-specific latency, model output, authentication, and malformed real-response behavior remain outside this run."
+    },
+    {
+      "id": "RA2",
+      "severity": "informational",
+      "state": "historical signal, not reproduced",
+      "claim": "One full-suite run timed out in the six-rescuer lock test and killed a dangling process.",
+      "impact": "The signal did not reproduce in isolation, three repeated file runs, the final full suite, or 100 additional exact-case stress rounds."
+    },
+    {
+      "id": "RA3",
+      "severity": "low",
+      "state": "scale limit",
+      "claim": "Decoded PCM is bounded by a 1 GiB process-output ceiling and held in memory.",
+      "impact": "Very long videos can fail at the declared ceiling rather than stream."
+    }
+  ]
+}

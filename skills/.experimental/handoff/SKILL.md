@@ -47,15 +47,15 @@ El handoff vive en el vault, no en el repo de codigo:
 - Trabajo de Vercel -> `05_Areas/vercel/<proyecto>-handoff.md`.
 - Otro -> junto a los docs del proyecto en el area que le corresponde.
 
-Si el archivo ya existe, **apila**: agrega una seccion nueva de nivel `#` al final, con el numero de sesion y la fecha (`# Segunda sesion — 2026-08-09`). Nunca reescribas ni borres lo anterior. La historia de un handoff es parte de su valor: muestra que decision se reabrio y por que.
+Si existe un work-item manifest, usalo como fuente primaria de estado y verifica solo los campos que pueden derivar. El handoff mantiene un `## Estado activo` compacto al inicio y un `## Historial` append-only al final. Actualiza el estado activo en cada cierre; agrega una entrada fechada al historial sin reescribir entradas anteriores.
 
-**Completo cuando:** el path esta resuelto y sabes si escribis un archivo nuevo o apilas.
+**Completo cuando:** el path esta resuelto, el snapshot activo refleja el manifest actual y sabes si agregas una entrada al historial.
 
 ## 3. Escribi las tres secciones obligatorias
 
 Nada mas es obligatorio. Estas tres van siempre, con el nombre que le calce al ciclo.
 
-**Que quedo andando.** Lo mergeado, publicado o funcionando *ahora*, con su evidencia: SHA, numero de PR, version en npm, URL viva. Si el hilo creia que algo estaba hecho y el disco dice que no, aca se dice.
+**Estado activo.** Resume lo mergeado, publicado o funcionando *ahora*, el manifest, el stage actual, exact HEAD, autorizacion, bloqueante, siguiente comando y evidencia. Si el hilo creia que algo estaba hecho y el disco dice que no, aca se dice.
 
 Para cada pieza, tres hechos **separados**. Cada uno avanza solo con evidencia propia, y ninguno arrastra a los otros:
 
@@ -73,7 +73,7 @@ Mergeado con tests verdes puede ser entrega mergeada, verificacion parcial y jui
 
 Las decisiones descartadas necesitan la razon anotada justamente para poder reabrirlas cuando la razon muere.
 
-**Completo cuando:** las tres existen y ninguna esta rellenada con generalidades.
+**Completo cuando:** el estado activo, donde retomar y decisiones del dueno existen y ninguna esta rellenada con generalidades.
 
 ## 4. Agrega solo las condicionales que tengan contenido real
 

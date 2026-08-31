@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-30",
+    "repo": "vercel-labs/agent-browser",
+    "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+    "head": "8ccd1ee814e213f34870edbfab2c70eda369b9b7",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-30-agent-browser-cdp-transport-1666-1726/slice.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Lone surrogate command responses complete promptly",
+      "Lone surrogate events remain usable",
+      "Valid surrogate pairs and ordinary Unicode are preserved",
+      "Malformed frames cannot resolve nested, negative, zero, or absent IDs",
+      "Closing external connections terminates transport without closing the browser",
+      "Close is bounded, repeated, concurrent, releases pending callers, and rejects later writes",
+      "Plain and Rustls transports force TCP EOF",
+      "Windows socket duplication and shutdown compile and execute"
+    ],
+    "gaps": [
+      "No separate Spec review was provided."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 family",
+    "reviewer_model": "Anthropic Claude Sonnet and GLM 5.3 Flash Solution Gate reviews plus local protocol substrates",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "Concurrent transport lifecycle",
+      "Protocol parser recovery",
+      "Cross-platform socket behavior",
+      "Externally visible connection shutdown"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "evidence/2026-08-30-agent-browser-8ccd1ee-cdp-transport.md",
+      "evidence": "Two frozen-checkout cross-family design reviews were challenged by independent Serde and socket probes, then the selected mechanisms were driven against plain WebSocket, Rustls, external manager, and real Chrome substrates."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "GitHub issues #1666 and #1726 plus the frozen Solution Gate packet",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5", "P6"],
+      "evidence": "Requirements R0 through R10 were reviewed, including Windows runtime execution through cuse."
+    },
+    {
+      "source": "design",
+      "location": "Solution Gate selected shape F",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5", "P6"],
+      "evidence": "The design requires repair then typed retry, structural positive top-level ID fallback, duplicated socket shutdown, bounded idempotent close, and manager ownership preservation."
+    },
+    {
+      "source": "user_facing",
+      "location": "Existing close and connection behavior exposed through daemon commands",
+      "status": "reviewed",
+      "properties": ["P4", "P5"],
+      "evidence": "No public command, flag, schema, output shape, or documented ownership rule changed; real Chrome close and external manager ownership were exercised."
+    },
+    {
+      "source": "implementation",
+      "location": "Exact base-to-head diff at 8ccd1ee",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5", "P6"],
+      "evidence": "The reader parser, pending map, write paths, close sequence, inspect handle, underlying plain and Rustls socket access, and BrowserManager integration were reviewed. Commit 8ccd1ee has the same tree b489bbc62ebf9ab7ce9d90a7d4b60742a82b6f1c as the tested commit 5a5ab7c; only the verified SSH signature changed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Lone UTF-16 surrogate escapes in CDP responses and events become U+FFFD while valid pairs, escaped backslashes, and ordinary Unicode retain meaning.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Typed response values and broadcast event values after real WebSocket serialization",
+        "layer": "CDP protocol consumer boundary",
+        "method": "Send literal JSON frames from a local WebSocket producer and inspect the CdpClient result and event subscriber",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The sanitizer helper returns a changed string",
+        "counterexample": "A correct helper could be unwired from the reader, or could repair responses while still dropping events.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The flow test reaches the reader, completes a response, delivers an event, and executes a subsequent command; removing repair from that call site makes it red."
+      },
+      "substrates": [
+        {
+          "name": "Local tokio-tungstenite CDP peer",
+          "status": "exercised",
+          "evidence": "Response, Fetch.requestPaused event, and subsequent valid command passed."
+        }
+      ],
+      "evidence": "Focused parser and flow tests passed at exact HEAD, and the fix-absent production mutation failed on malformed surrogate parsing."
+    },
+    {
+      "id": "P2",
+      "claim": "Typed parse failure can fail only the matching positive top-level pending command and cannot promote nested, negative, zero, or absent IDs.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "Which pending oneshot is resolved after malformed frames",
+        "layer": "Pending command correlation",
+        "method": "Send malformed top-level and nested-ID frames, then observe the first caller error and the second caller's valid result",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The envelope type declares id as Option<u64>",
+        "counterexample": "Text search or generic traversal could still promote a nested ID, or zero could match a reserved entry.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Nested, negative, zero, absent, and positive top-level cells were executed; only the matching positive top-level caller failed."
+      },
+      "substrates": [
+        {
+          "name": "Pending map with two sequential live commands",
+          "status": "exercised",
+          "evidence": "The malformed first response failed promptly and the nested-ID frame did not consume the second waiter."
+        }
+      ],
+      "evidence": "Serde IgnoredAny envelope and flow regressions passed."
+    },
+    {
+      "id": "P3",
+      "claim": "Close is idempotent and bounded, stops background tasks, releases pending callers, and rejects every command and raw write path after closure starts.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Task completion, pending caller result, pending-map size, close deadline, and post-close API results",
+        "layer": "CdpClient lifecycle boundary",
+        "method": "Hold the sink busy, run concurrent and repeated close, retain inspect handle, and call all write APIs after close",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The closed atomic is true",
+        "counterexample": "The flag could be true while a writer already waiting on the sink later sends, or while reader and keepalive tasks remain alive.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Writers recheck under the sink lock, busy-sink close returns within one second, pending is cleared, and every write surface returns CDP connection closed."
+      },
+      "substrates": [
+        {
+          "name": "Tokio tasks, mutex contention, pending oneshot, and inspect handle",
+          "status": "exercised",
+          "evidence": "Busy, concurrent, repeated, pending, and post-close cells passed five consecutive focused runs."
+        }
+      ],
+      "evidence": "Lifecycle tests and direct race inspection passed."
+    },
+    {
+      "id": "P4",
+      "claim": "Close forces underlying TCP EOF even when WebSocket sink ownership is shared by an inspect handle.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "A peer TCP read returning zero while the inspect handle remains alive",
+        "layer": "Operating-system TCP connection",
+        "method": "Read the peer socket after receiving a best-effort Close frame and before dropping the inspect handle",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The peer receives a WebSocket Close frame",
+        "counterexample": "A Close frame can arrive while a cloned split sink keeps the TCP connection open.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing shutdown(Both) preserved the Close frame but made the peer time out waiting for EOF."
+      },
+      "substrates": [
+        {
+          "name": "macOS plain TCP socket",
+          "status": "exercised",
+          "evidence": "Peer observed EOF with live inspect handle."
+        },
+        {
+          "name": "macOS TCP under Rustls",
+          "status": "exercised",
+          "evidence": "Rustls peer observed the Close frame and underlying TCP EOF."
+        },
+        {
+          "name": "Windows TCP socket",
+          "status": "exercised",
+          "evidence": "Microsoft Windows Server 2025 ran all 8 focused CDP tests through cuse; the live-inspect plain TCP and Rustls peers observed EOF."
+        }
+      ],
+      "evidence": "Plain and Rustls EOF properties are verified on macOS and Microsoft Windows Server 2025."
+    },
+    {
+      "id": "P5",
+      "claim": "BrowserManager closes its transport on every ownership path while sending Browser.close only for locally launched browsers.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "Peer command stream, TCP EOF, and real locally launched Chrome shutdown",
+        "layer": "Browser ownership and transport boundary",
+        "method": "Close an external manager against a recording peer and close a real locally launched Chrome through the command pipeline",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "browser_process.is_some gates Browser.close in source",
+        "counterexample": "The manager could preserve the gate but return before closing the external socket, or close transport before the local Browser.close command is written.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The external peer observed no Browser.close and did observe EOF; the real Chrome launch, navigate, evaluate, and close E2E passed."
+      },
+      "substrates": [
+        {
+          "name": "External local WebSocket browser peer",
+          "status": "exercised",
+          "evidence": "No Browser.close command and TCP EOF."
+        },
+        {
+          "name": "Real locally launched Chrome",
+          "status": "exercised",
+          "evidence": "e2e_launch_navigate_evaluate_close passed at exact HEAD."
+        }
+      ],
+      "evidence": "Ownership behavior is preserved while transport cleanup is added."
+    },
+    {
+      "id": "P6",
+      "claim": "The duplicated socket and shutdown sequence are supported on each claimed platform.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Successful connection, duplicated socket ownership, shutdown return, peer EOF, and task termination on each operating system",
+        "layer": "Platform socket runtime",
+        "method": "Run the focused lifecycle tests on macOS and Windows",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The socket2 and Tokio APIs cross-compile for Windows",
+        "counterexample": "Successful type checking does not prove Windows duplicated-handle shutdown produces peer EOF with Tokio and Rustls ownership alive.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The API compiled in the minimal Windows probe, then the exact project tests executed on Microsoft Windows Server 2025 and observed peer EOF plus task completion."
+      },
+      "substrates": [
+        {
+          "name": "macOS",
+          "status": "exercised",
+          "evidence": "Plain, Rustls, busy, concurrent, and external manager tests passed."
+        },
+        {
+          "name": "Microsoft Windows Server 2025",
+          "status": "exercised",
+          "evidence": "cuse scenario in GitHub Actions run 33336729007 passed all 8 CDP tests and the external manager ownership test with Rust 1.98.0."
+        }
+      ],
+      "evidence": "Compile and runtime support are established on both claimed operating-system families."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "CDP protocol parser",
+      "Pending response correlation",
+      "Concurrent connection lifecycle",
+      "Plain and Rustls transport adapter"
+    ],
+    "dimensions": {
+      "values": [
+        "Frame role: command response, event, inspect raw traffic",
+        "Surrogate form: lone high, lone low, valid pair, escaped backslash, ordinary multibyte text",
+        "ID location and value: positive top-level, nested, negative, zero, absent",
+        "Post-frame flow: matching caller, unrelated caller, event subscriber, subsequent command",
+        "Close state: open, close starting, closed, repeated close, concurrent close",
+        "Sink state: available and lock held by another task",
+        "Pending state: none and one live caller",
+        "Write surface: command, no-wait command, client raw, inspect raw, keepalive",
+        "Transport: plain WebSocket and Rustls WebSocket",
+        "Ownership: local browser and external browser",
+        "Platform: macOS and Windows executed"
+      ],
+      "exclusions": [
+        "Native TLS is not enabled by the current tokio-tungstenite feature set.",
+        "Negative inspect IDs remain raw-only because typed CdpMessage IDs are u64.",
+        "The hosted Windows run covers Microsoft Windows Server 2025 rather than the repository's documented Server 2022 SSM image."
+      ],
+      "evidence": "Focused tests execute every supported parser, correlation, lifecycle, transport, ownership, and platform class."
+    },
+    "oracle": {
+      "source": "Literal WebSocket producer frames, peer TCP EOF, pending oneshot outcomes, task deadlines, external peer command capture, and real Chrome",
+      "independent": true,
+      "evidence": "Expected protocol bytes and OS EOF are observed outside the production parser and close state."
+    },
+    "producer": {
+      "name": "Local tokio-tungstenite peers, local Rustls peer, real Chrome, and cuse on Microsoft Windows Server 2025",
+      "status": "exercised",
+      "evidence": "Protocol frames, TLS transport, ownership behavior, Chrome command pipeline, and Windows socket lifecycle were driven at exact HEAD."
+    },
+    "falsification": [
+      {
+        "mutation": "Remove lone-surrogate repair from the production reader call site.",
+        "red_evidence": "The response/event flow test returned Malformed CDP response: unexpected end of hex escape.",
+        "restored_green_evidence": "All eight focused tests passed at exact HEAD and repeated five consecutive times."
+      },
+      {
+        "mutation": "Remove shutdown(Both) from the production close sequence.",
+        "red_evidence": "The peer timed out waiting for TCP EOF while the inspect handle remained alive.",
+        "restored_green_evidence": "Plain and Rustls EOF tests passed at exact HEAD."
+      }
+    ],
+    "evidence": "The tests reject the two issue mechanisms at their real call sites on macOS and Windows."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Solution Gate",
+      "claim": "socket2 SockRef::try_clone and shutdown(Both) behave equivalently on Windows.",
+      "status": "verified",
+      "evidence": "Microsoft Windows Server 2025 executed the duplicated-socket plain and Rustls shutdown tests; peers observed EOF and all tasks completed."
+    },
+    {
+      "id": "A2",
+      "source": "Solution Gate",
+      "claim": "Shutting down duplicated TCP after a best-effort Close frame is acceptable for Rustls teardown.",
+      "status": "verified",
+      "evidence": "A local Rustls peer received the Close frame and observed underlying TCP EOF."
+    },
+    {
+      "id": "A3",
+      "source": "Solution Gate",
+      "claim": "U+FFFD replacement is acceptable for lone-surrogate CDP payloads.",
+      "status": "verified",
+      "evidence": "Both source issue reproductions require a usable response or event, both candidate authors use replacement behavior, and valid pairs plus ordinary Unicode remain unchanged."
+    },
+    {
+      "id": "A4",
+      "source": "Subsystem model",
+      "claim": "BrowserManager is the ownership boundary that decides whether Browser.close is allowed.",
+      "status": "verified",
+      "evidence": "All daemon CDP teardown reaches BrowserManager::close through close_current_browser, and the existing browser_process ownership gate remains before transport close."
+    },
+    {
+      "id": "A5",
+      "source": "Subsystem model",
+      "claim": "Inspect proxy send failures are terminal or best effort and do not require caller rollback.",
+      "status": "verified",
+      "evidence": "The forwarding loop breaks on send error, initial attach propagates error, and detach is explicitly best effort."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Transport close sends a best-effort WebSocket Close frame and irreversibly shuts down the TCP connection.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "The CDP connection enters closed state and no new writes may commit.",
+        "owner": "CdpClient::close",
+        "commit_event": "closed.store(true) before any sink wait",
+        "later_fallible_stages": [
+          "keepalive task termination",
+          "bounded WebSocket Close frame",
+          "socket shutdown",
+          "reader task termination",
+          "pending caller release"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "WebSocket sink and background tasks",
+            "covers": [
+              "keepalive task termination",
+              "bounded WebSocket Close frame",
+              "reader task termination"
+            ],
+            "forced": true,
+            "residual_observed": "A busy sink cannot extend close past the bound; tasks are aborted and later writes remain rejected.",
+            "cleanup_owner": "CdpClient::close",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Concurrent and repeated close calls complete within two seconds."
+            },
+            "evidence": "Busy-sink and concurrent-close tests passed."
+          },
+          {
+            "ownership_region": "Operating-system socket and pending callers",
+            "covers": [
+              "socket shutdown",
+              "pending caller release"
+            ],
+            "forced": true,
+            "residual_observed": "The peer observes EOF and the pending caller receives channel closed; pending length becomes zero.",
+            "cleanup_owner": "CdpClient::close with reader cleanup as backstop",
+            "retry": {
+              "attempted": true,
+              "outcome": "documented_recovery",
+              "evidence": "The same CdpClient deliberately remains closed; reconnect creates a new client rather than retrying the closed transport."
+            },
+            "evidence": "Pending release, post-close rejection, and live-inspect EOF tests passed."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "run", "reason": "Verified repaired traffic preserves valid pairs, escaped backslashes, multibyte text, raw inspect delivery, and subsequent valid commands."},
+    {"name": "New-domain matrix", "status": "run", "reason": "Enumerated frame roles, surrogate forms, ID positions, close states, write paths, transports, ownership, and platforms."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Compared typed response correlation, event broadcast, raw inspect broadcast, and malformed fallback correlation."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell string parsing or command append behavior changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No diagnostic emission channel or one-shot latch changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim, fake executable, or environment interception was added."},
+    {"name": "Deliberate-default check", "status": "skipped", "reason": "No public default or omission behavior changed."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Inspected typed parse to repair, envelope to pending map, closed flag to sink lock, socket duplicate to split ownership, and manager ownership to transport close seams."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Compared Close frame alone against Close plus shutdown, and repair absent against exact HEAD on local protocol substrates."},
+    {"name": "Reference-implementation oracle", "status": "run", "reason": "Used JSON surrogate semantics, Serde structural deserialization, WebSocket peer frames, and OS TCP EOF rather than implementation-derived expectations."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Traced malformed matching response and post-close errors through command and inspect callers; no caller mutates daemon state before the newly reachable close error."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag or configuration field was added."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Forced malformed response, nested ID, busy sink, pending command, concurrent close, and every post-close write path."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "The change adds deterministic parser recovery and explicit close, not heuristic recovery."},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "Verified PendingGuard exists before send, busy close is bounded, pending callers release, and disabling load-bearing lifecycle cleanup fails."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced WebSocket bytes through raw broadcast, repair, typed dispatch, pending or event consumer, manager ownership, Close frame, and TCP shutdown."},
+    {"name": "Substrate verification", "status": "run", "reason": "Observed peer TCP EOF, pending outcomes, external command stream, Rustls transport, and real Chrome behavior."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Drove launch, navigate, evaluate, and close against real Chrome at exact HEAD."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Enumerated all CdpClient write surfaces and the manager ownership gate for the new closed-state invariant."},
+    {"name": "Docs-behavior parity", "status": "skipped", "reason": "No user-facing command, flag, output, schema, or documented behavior changed; the reliability fix restores existing promises."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added or edited."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail file was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "Surrogate repair is linear in frame bytes and allocates only after finding a lone surrogate; no nested candidate scan was added."}
+  ],
+  "deterministic": [
+    {"check": "covered precheck", "outcome": "finding-fixed", "reason": "No exact-head report existed before this run; this report now records the exact SHA."},
+    {"check": "style", "outcome": "pass", "reason": "gate.sh style passed."},
+    {"check": "surfaces", "outcome": "acknowledged", "reason": "browser.rs changed only internal transport cleanup; README, command docs, and packaged skill expose no socket lifecycle contract requiring edits."},
+    {"check": "siblings: CDP connection", "outcome": "acknowledged", "reason": "Existing main.rs, browser.rs, and output.rs passages remain accurate and do not describe malformed frame recovery or socket teardown."},
+    {"check": "callers: BrowserManager::close", "outcome": "acknowledged", "reason": "close_current_browser removes the manager from daemon state before awaiting close and performs state cleanup afterward regardless of browser ownership."},
+    {"check": "callers: send_command and raw writes", "outcome": "acknowledged", "reason": "The new fail-fast outcome is limited to transport closure; command callers already propagate connection failure and inspect forwarding terminates or remains best effort."},
+    {"check": "timings", "outcome": "pass", "reason": "gate.sh timings found no larger producer cadence that can gate the 500 ms internal close attempt."},
+    {"check": "execdeps", "outcome": "pass", "reason": "No external executable was added."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "34 changed and 638 impacted symbols were mapped, but 2,447 unresolved calls and 83 unmapped entries make it orienting rather than complete."},
+    {"check": "force-red", "outcome": "pass", "reason": "Removing production surrogate repair and socket shutdown independently failed the intended assertions; restored exact HEAD passed."},
+    {"check": "cargo fmt", "outcome": "pass", "reason": "Stable rustc 1.98.0 cargo fmt --manifest-path cli/Cargo.toml -- --check passed at exact HEAD."},
+    {"check": "cargo clippy", "outcome": "pass", "reason": "cargo clippy --manifest-path cli/Cargo.toml -- -D warnings passed at exact HEAD."},
+    {"check": "cargo test", "outcome": "pass", "reason": "1,164 unit tests and 2 integration tests passed; 105 unit and 2 integration tests were ignored as configured."},
+    {"check": "focused determinism", "outcome": "pass", "reason": "All eight CDP tests passed five consecutive runs."},
+    {"check": "real Chrome E2E", "outcome": "pass", "reason": "e2e_launch_navigate_evaluate_close passed serially at exact HEAD."},
+    {"check": "Windows compile probe", "outcome": "pass", "reason": "The exact socket2 0.6.2 and Tokio 1.49.0 duplication and shutdown APIs compiled for x86_64-pc-windows-msvc in a minimal probe."},
+    {"check": "Windows runtime", "outcome": "pass", "reason": "cuse scenario agent-browser CDP transport Windows passed on Microsoft Windows Server 2025 in GitHub Actions run 33336729007 with Rust 1.98.0: 8 CDP tests and the external manager ownership test."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "refuted",
+      "claim": "Duplicated-socket shutdown may differ at runtime on Windows from the verified macOS behavior.",
+      "evidence": "Microsoft Windows Server 2025 executed the same plain and Rustls duplicated-socket shutdown tests; both observed peer EOF, and all 8 CDP tests plus external manager ownership passed.",
+      "layer": "Windows socket runtime",
+      "source": "lens",
+      "path": "CdpClient::connect_request to SockRef::try_clone to CdpClient::close to shutdown(Both)",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No public documentation surfaces need changes.",
+      "evidence": "The diff changes internal recovery and resource cleanup only; command names, flags, inputs, outputs, schemas, and documented browser ownership remain unchanged."
+    },
+    {
+      "claim": "Existing CDP connection text needs no update.",
+      "evidence": "The passages describe connection selection and errors, not the malformed-frame or socket-lifecycle implementation repaired here."
+    },
+    {
+      "claim": "Command and inspect callers need no rollback changes.",
+      "evidence": "Command callers already propagate transport failure, while inspect forwarding treats failure as terminal or best effort and mutates no durable caller state first."
+    }
+  ],
+  "issue_candidates": []
+}

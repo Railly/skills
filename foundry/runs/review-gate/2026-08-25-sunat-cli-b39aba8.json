@@ -1,0 +1,460 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-25",
+    "repo": "crafter-research/sunat-cli",
+    "base": "7f607033ecd94d241dd41b7039f2b01e3e61d053",
+    "head": "b39aba834469c6ce33521d6c7bb927d18cab18d0",
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "gaps": [
+      "High-risk secrets, authentication, durable-state, browser, and release-pipeline work has not received an independent human or cross-family review.",
+      "No authenticated real SUNAT producer or mutating tax workflow was exercised; doing so requires private credentials and explicit legal-act authorization.",
+      "The radius map under-covers this diff because 3,507 unresolved calls exceed its 1,458 resolved edges."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No Issue Contract or separate Spec review result was supplied; the user request was used only as the implementation scope."
+    ]
+  },
+  "provenance": {
+    "author_model": "OpenAI GPT-5 Codex",
+    "reviewer_model": "OpenAI GPT-5 Codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "secrets",
+      "authentication",
+      "durable local state",
+      "browser and OS process boundaries",
+      "remote errors",
+      "release and publishing integrity"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": false,
+      "method": "human_review",
+      "artifact": "",
+      "evidence": "No durable independent review artifact exists for exact HEAD b39aba834469c6ce33521d6c7bb927d18cab18d0."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "User request in the working thread",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "Scope requires no sensitive data or PII and production-ready behavior without live SUNAT actions."
+    },
+    {
+      "source": "design",
+      "location": "cases/sunat-cli/conventions.md and repository privacy boundaries",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "Subsystem invariants cover secret channels, storage, audit minimization, remote errors, and exact-tarball publishing."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, SECURITY.md, packages/cli/README.md, packages/cli/LIMITATIONS.md, bundled skill, and website legal/privacy copy",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "Privacy, persistence, credential, limitation, and release claims were compared with the changed code and package contents."
+    },
+    {
+      "source": "implementation",
+      "location": "Diff 7f607033ecd94d241dd41b7039f2b01e3e61d053..b39aba834469c6ce33521d6c7bb927d18cab18d0",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "Reviewed 70 changed files spanning storage, subprocesses, browser/CDP, workflows, tests, documentation, dependencies, and CI/release."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Secrets and browser field values do not cross child-process argv, inherited ambient environment, CLI output, or reflected remote errors.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "Effective child argv, stdin, environment, stdout, and stderr at process boundaries",
+        "layer": "OS process boundary",
+        "method": "Capture shims, force-red mutations, sanitized-error tests, and an offline real agent-browser stdin drive",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Production source calls stdin helpers and environment allowlists",
+        "counterexample": "A helper can exist while a call site still appends a secret to argv or inherits the parent environment",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing the browser/keychain stdin wiring and child environment allowlist made their focused tests fail at the captured process boundary."
+      },
+      "substrates": [
+        {
+          "name": "macOS subprocess and agent-browser boundary",
+          "status": "exercised",
+          "evidence": "Capture shims verified argv/env; a local data-page agent-browser fill accepted the value through stdin and the session was closed."
+        }
+      ],
+      "evidence": "Force-red logs: /tmp/sunat-force-red-browser-argv.log, /tmp/sunat-force-red-keychain-argv.log, and /tmp/sunat-force-red-child-env.log."
+    },
+    {
+      "id": "P2",
+      "claim": "Sensitive local state is owner-only, atomically replaced, and not exposed through inherited macOS ACL entries.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "Effective filesystem permissions, ACL entries, file publication, and content after repair",
+        "layer": "macOS filesystem substrate",
+        "method": "Create permissive files and inherited ACLs, load/repair them, inspect resulting mode and ACL, and verify atomic replacement",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Mode bits report 0600 or 0700",
+        "counterexample": "Mode bits remain restrictive while an inherited ACL grants another principal access",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The ACL-specific test created inherited access and verified its removal rather than relying only on stat mode."
+      },
+      "substrates": [
+        {
+          "name": "macOS APFS permissions and ACLs",
+          "status": "exercised",
+          "evidence": "Focused privacy tests exercised private directories, files, repairs, caller-owned output directories, and inherited ACL cleanup."
+        }
+      ],
+      "evidence": "Unit tests and force-red configuration sanitizer evidence passed on the exact implementation."
+    },
+    {
+      "id": "P3",
+      "claim": "Config and audit persistence discard unknown fields and do not durably retain taxpayer identifiers, documents, XML, screenshots, free-form arguments, or remote bodies.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "Bytes in active and archived config/audit files after writes and legacy migration",
+        "layer": "durable serialized data",
+        "method": "Seed synthetic PII and unknown fields, execute production writers/migrations, and inspect every resulting file",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "New write paths use allowlisted types",
+        "counterexample": "Legacy files or a downgrade can recreate sensitive fields after a one-time marker",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The after-marker mutation went red until legacy data was re-sanitized whenever sensitive content reappeared."
+      },
+      "substrates": [
+        {
+          "name": "Temporary filesystem with active and archived legacy records",
+          "status": "exercised",
+          "evidence": "Synthetic records containing tax IDs, email, XML, secrets, aliases, and unknown fields were removed from resulting bytes."
+        }
+      ],
+      "evidence": "Force-red logs: /tmp/sunat-force-red-audit-allowlist.log, /tmp/sunat-force-red-audit-marker.log, and /tmp/sunat-force-red-config-sanitizer.log."
+    },
+    {
+      "id": "P4",
+      "claim": "The package tested and attested is the exact package published, with npm provenance and registry verification.",
+      "kind": "integrity",
+      "status": "unverified",
+      "oracle": {
+        "observes": "Byte identity across local tarball, workflow artifact, npm registry bytes, npm provenance, and GitHub attestation",
+        "layer": "release pipeline and public registry",
+        "method": "Local reproducible pack and workflow inspection; post-publication registry comparison remains unavailable before merge/release",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Package version and workflow source match",
+        "counterexample": "A workflow can rebuild or publish different bytes despite matching version and source",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Release workflow now transports one tarball through tests, attestation, publish, and verification rather than rebuilding."
+      },
+      "substrates": [
+        {
+          "name": "Local npm 11.6.4 package tarball",
+          "status": "exercised",
+          "evidence": "Package allowlist produced 91 files and excluded tests, scripts, research, configs, and lockfiles."
+        },
+        {
+          "name": "npm registry and GitHub attestations for 0.8.1",
+          "status": "unverified",
+          "evidence": "Version 0.8.1 has not been merged or released."
+        }
+      ],
+      "evidence": "Two consecutive npm 11.6.4 packs were byte-identical with SHA-256 b653800351ea6112579e5e0f800e09c88300655893adcc3c12e58e541ba960f4."
+    },
+    {
+      "id": "P5",
+      "claim": "Browser/CDP and Keychain adapter changes preserve behavior while serializing untrusted values safely.",
+      "kind": "correctness",
+      "status": "unverified",
+      "oracle": {
+        "observes": "Values reaching real browser fields and OS credential storage without code/argument reinterpretation",
+        "layer": "browser and OS adapter boundary",
+        "method": "Real offline agent-browser fill plus synthetic Keychain and CDP capture shims; no real SUNAT/CDP iframe or Keychain item was mutated",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Generated JavaScript parses and shimmed commands receive expected stdin",
+        "counterexample": "A real portal iframe or Keychain backend can reject otherwise valid synthetic input or apply different event semantics",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Real agent-browser stdin fill succeeded, but real SUNAT CDP iframe and real credential storage were deliberately not exercised."
+      },
+      "substrates": [
+        {
+          "name": "offline real agent-browser data page",
+          "status": "exercised",
+          "evidence": "fill() used stdin successfully against a local data page."
+        },
+        {
+          "name": "real SUNAT portal iframe and real OS Keychain item",
+          "status": "unverified",
+          "evidence": "Excluded to avoid private credentials, PII, and external side effects."
+        }
+      ],
+      "evidence": "CDP serialization and Keychain argv force-red tests pass, but the real authenticated producer remains a named gap."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "browser adapter",
+      "OS Keychain adapter",
+      "CDP serializer",
+      "legacy storage migration",
+      "release compatibility layer"
+    ],
+    "dimensions": {
+      "values": [
+        "secret source: prompt, environment, config reference, Keychain",
+        "process channel: argv, stdin, allowlisted environment, stdout, stderr",
+        "storage state: absent, secure, permissive mode, inherited ACL, legacy active, legacy archived, recreated after marker",
+        "serialized input: quotes, slashes, line breaks, element IDs, field values",
+        "remote outcome: success, structured error, empty body, untrusted body and URL",
+        "package path: local pack, workflow artifact, registry tarball, installed smoke"
+      ],
+      "exclusions": [
+        "Authenticated SUNAT mutation excluded because it requires private credentials and explicit legal-act authorization.",
+        "Real Keychain write excluded to avoid touching the user's credential store.",
+        "Linux secret-service substrate not present on this macOS runner.",
+        "Registry version 0.8.1 excluded until merge and release."
+      ],
+      "evidence": "Focused unit/E2E suites, seven force-red logs, package inspection, mock smoke, and one real offline agent-browser drive cover the available cells."
+    },
+    "oracle": {
+      "source": "OS argv/env/file bytes and ACL inspection, JSON/JavaScript parsing semantics, npm tarball bytes, and the real agent-browser stdin interface",
+      "independent": true,
+      "evidence": "Expected confidentiality properties are observed outside production return values; release byte identity is independently hashed."
+    },
+    "producer": {
+      "name": "agent-browser real offline process plus macOS filesystem; authenticated SUNAT and real Keychain producers unavailable",
+      "status": "unverified",
+      "evidence": "The offline browser producer and filesystem were exercised, while authenticated portal/CDP and credential-store effects remain gaps."
+    },
+    "falsification": [
+      {
+        "mutation": "Restore raw audit argument persistence",
+        "red_evidence": "/tmp/sunat-force-red-audit-allowlist.log fails on durable tax identity and free-form values",
+        "restored_green_evidence": "privacy.test.ts passes after snapshot restoration"
+      },
+      {
+        "mutation": "Trust a one-time privacy marker after legacy sensitive data is recreated",
+        "red_evidence": "/tmp/sunat-force-red-audit-marker.log fails on active legacy PII",
+        "restored_green_evidence": "privacy.test.ts passes after snapshot restoration"
+      },
+      {
+        "mutation": "Pass browser and Keychain secret values through argv",
+        "red_evidence": "/tmp/sunat-force-red-browser-argv.log and /tmp/sunat-force-red-keychain-argv.log fail at captured argv",
+        "restored_green_evidence": "Focused browser and Keychain privacy suites pass after snapshot restoration"
+      },
+      {
+        "mutation": "Interpolate CDP values directly into JavaScript",
+        "red_evidence": "/tmp/sunat-force-red-cdp-serialization.log fails parsing adversarial quotes and line breaks",
+        "restored_green_evidence": "f616-declare.test.ts passes after snapshot restoration"
+      },
+      {
+        "mutation": "Inherit the full parent environment in child processes",
+        "red_evidence": "/tmp/sunat-force-red-child-env.log exposes SUNAT, certificate, npm, database, and unrelated token values",
+        "restored_green_evidence": "child-process-privacy.test.ts passes after snapshot restoration"
+      },
+      {
+        "mutation": "Preserve unknown config fields",
+        "red_evidence": "/tmp/sunat-force-red-config-sanitizer.log retains legacy secret and unknown-person fields",
+        "restored_green_evidence": "privacy.test.ts passes after snapshot restoration"
+      }
+    ],
+    "evidence": "The available mutations fail for the intended assertion and restore green; lack of real authenticated producers keeps this assessment incomplete."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "subsystem model",
+      "claim": "All secret-bearing subprocess launches use the centralized allowlist and stdin helpers.",
+      "status": "verified",
+      "evidence": "Repository subprocess call-site sweep and focused boundary tests found no changed secret-bearing bypass."
+    },
+    {
+      "id": "A2",
+      "source": "release design",
+      "claim": "GitHub Actions and npm trusted publishing preserve one exact tarball through publication.",
+      "status": "unverified",
+      "evidence": "Workflow is pinned and structurally transports one artifact, but exact-head CI and version 0.8.1 publication have not run."
+    },
+    {
+      "id": "A3",
+      "source": "platform boundary",
+      "claim": "The Linux secret-tool backend accepts the same stdin contract as the test shim.",
+      "status": "unverified",
+      "evidence": "No Linux secret-service substrate was available."
+    },
+    {
+      "id": "A4",
+      "source": "user scope",
+      "claim": "No live SUNAT mutation is required to approve this hardening diff.",
+      "status": "verified",
+      "evidence": "The request requires privacy hardening, and existing project rules prohibit live filing without explicit authorization."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The changed code writes local state and the release workflow publishes an externally visible package, although no live SUNAT or npm publication was performed during review.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "Private config or audit state replaces the prior file",
+        "owner": "private-storage and data writers",
+        "commit_event": "atomic rename of a secured temporary file",
+        "later_fallible_stages": ["post-rename ACL cleanup", "subsequent read and migration"],
+        "failure_partitions": [
+          {
+            "ownership_region": "local filesystem",
+            "covers": ["post-rename ACL cleanup", "subsequent read and migration"],
+            "forced": true,
+            "residual_observed": "Permissive and legacy fixtures were repaired or re-sanitized on the next production read.",
+            "cleanup_owner": "production load/migration path",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Focused privacy tests reload the same files after mutation and observe secure sanitized state."
+            },
+            "evidence": "privacy.test.ts and privacy-probe.ts"
+          }
+        ]
+      },
+      {
+        "id": "C2",
+        "effect": "Version 0.8.1 becomes public on npm",
+        "owner": "release workflow",
+        "commit_event": "npm publish of the attested tarball",
+        "later_fallible_stages": ["registry byte verification", "provenance verification", "GitHub attestation verification", "installed CLI smoke", "tag and release asset creation"],
+        "failure_partitions": []
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, or lookup data source was replaced."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "The diff narrows persistence and process exposure rather than widening an accepted input domain."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Credential resolution and persistence consumers were traced across prompt, environment, config, Keychain, login, and workflow paths."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell-parsed command string is rewritten or appended."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No detached daemon warning or one-shot latch was introduced."},
+    {"name": "Shim hermeticity", "status": "run", "reason": "Fake security, secret-tool, and agent-browser executables were checked for isolated capture paths and controlled environments."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Personal F616 defaults were removed and callers/docs were checked for a deliberate required-input contract."},
+    {"name": "Fresh-seam scan", "status": "skipped", "reason": "The diff does not patch a runtime or framework to expose a new event seam."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Process-channel and storage behavior was exercised across macOS security, Linux secret-tool shims, agent-browser, file modes, ACLs, and legacy-state variants; real Linux remains a gap."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No locally available normative implementation covers this repository-specific privacy and release composition; direct substrate oracles were used instead."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Fail-closed sanitization, storage repair, subprocess failure, and remote-error changes were traced through CLI callers and focused error tests."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No new user-facing flag or cross-dispatch configuration bit was introduced."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Storage repair, legacy migration, rejected subprocesses, Keychain failure, remote errors, empty bodies, and adversarial serialization were forced."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action was introduced."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No new cancellable request or timeout protocol was added by this hardening diff."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Secrets and identifiers were traced from CLI/config/prompt through process, browser, CDP, persistence, audit, and remote-error boundaries."},
+    {"name": "Substrate verification", "status": "run", "reason": "Filesystem bytes, effective ACLs, captured argv/env/stdin, tarball contents, and a real offline agent-browser field were observed directly."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "The package was packed, mock-smoked, built, and its browser stdin boundary driven; authenticated SUNAT behavior is an explicit gap."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Writers and call sites behind new privacy and exact-tarball claims were enumerated across code, docs, package metadata, and workflows."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "README, CLI docs, limitations, bundled skill, website, security policy, and actual persistence/package behavior were compared."},
+    {"name": "Demonstrative example", "status": "run", "reason": "Changed examples were checked to use placeholders or public SUNAT test identifiers and to avoid personal defaults."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No .decisions.tsv decision trail exists."},
+    {"name": "Complexity budget", "status": "run", "reason": "Recursive sanitization and log migration remain linear in serialized input size; no nested membership scan was introduced."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "This report covers exact HEAD b39aba834469c6ce33521d6c7bb927d18cab18d0."},
+    {"check": "style", "outcome": "pass", "reason": "gate.sh style passed on the exact-head diff."},
+    {"check": "surfaces", "outcome": "pass", "reason": "gate.sh surfaces passed with cases/sunat-cli/conventions.md."},
+    {"check": "timings", "outcome": "pass", "reason": "gate.sh timings found no invalid wait-ceiling relationship."},
+    {"check": "execdeps", "outcome": "pass", "reason": "gate.sh execdeps passed for newly centralized external executable paths."},
+    {"check": "stale values and PII sweep", "outcome": "pass", "reason": "Known personal identifiers and removed default values have zero current-tree hits; public SUNAT test identities and synthetic fixtures are documented exemptions."},
+    {"check": "force-red", "outcome": "pass", "reason": "Seven bug-specific mutations failed at their intended assertions and restored green from snapshots."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "Map saved for exact HEAD with 181 changed and 127 impacted symbols, but 3,507 unresolved calls versus 1,458 edges makes it strongly under-covering."},
+    {"check": "gitleaks", "outcome": "pass", "reason": "gitleaks 8.28.0 reported no leaks."},
+    {"check": "actionlint", "outcome": "pass", "reason": "actionlint 1.7.7 passed after replacing the organization-licensed gitleaks action with the checksum-pinned OSS binary."},
+    {"check": "CI secret-scan failure", "outcome": "finding-fixed", "reason": "GitHub run 32808739304 failed because gitleaks-action requires an organization license, not because it found a leak; exact-head CI now installs gitleaks 8.28.0 OSS after SHA-256 verification."},
+    {"check": "exact-head GitHub CI", "outcome": "pass", "reason": "Run 32808912754 passed on b39aba834469c6ce33521d6c7bb927d18cab18d0, including secret scan, dependency audit/signatures, privacy tests, unit, E2E, smoke, website build, and package contents."},
+    {"check": "npm audit", "outcome": "pass", "reason": "npm 11.6.4 audit reported zero vulnerabilities."},
+    {"check": "npm signatures", "outcome": "pass", "reason": "228 registry signatures and 77 attestations verified."},
+    {"check": "unit and E2E", "outcome": "pass", "reason": "353 unit tests and 32 E2E tests passed; two credentialed beta tests were explicitly skipped."},
+    {"check": "build and mock smoke", "outcome": "pass", "reason": "Astro build and mock CLI smoke passed."}
+  ],
+  "findings": [
+    {
+      "id": "G1",
+      "state": "unverified",
+      "claim": "The exact-head high-risk privacy hardening is independently challenge-reviewed.",
+      "evidence": "No human or cross-family review artifact exists. Same-family self-review cannot close this proof obligation.",
+      "layer": "review independence",
+      "source": "lens",
+      "path": "secrets/auth/storage/browser/release diff -> independent challenge",
+      "resolution": "open"
+    },
+    {
+      "id": "G2",
+      "state": "unverified",
+      "claim": "Authenticated SUNAT portal/CDP and OS Keychain behavior match the tested synthetic and offline boundaries.",
+      "evidence": "No real credential, Keychain item, taxpayer data, or live SUNAT operation was used; this is deliberate and requires separate authorized QA.",
+      "layer": "real producer and side-effect boundary",
+      "source": "lens",
+      "path": "CLI credentials -> Keychain/browser/CDP -> authenticated SUNAT portal",
+      "resolution": "open"
+    },
+    {
+      "id": "I1",
+      "state": "issue_candidate",
+      "claim": "Public historical Git and npm metadata still contains personal identifiers even though the current tree and 0.8.1 package are clean.",
+      "evidence": "Prior commits and immutable npm versions expose a personal phone/alias/email or maintainer email. Absolute removal requires history rewrite, npm Support withdrawal requests, and account metadata changes.",
+      "layer": "historical public distribution",
+      "source": "lens",
+      "path": "historical Git objects and npm versions -> public metadata",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No live SUNAT filing, payment, or production mutation was required or performed.",
+      "evidence": "Such operations are legal acts requiring explicit authorization; local tests, mocks, public read-only data, and offline browser boundaries were used."
+    },
+    {
+      "claim": "Public SUNAT test RUCs and clearly synthetic identifiers in fixtures are not personal PII.",
+      "evidence": "They identify SUNAT/public test entities or deliberately invalid synthetic records and are documented as such in their surrounding test context."
+    },
+    {
+      "claim": "No npm release was performed during review.",
+      "evidence": "Version 0.8.1 must first merge and pass exact-head CI; registry and provenance checks are post-publication gates."
+    },
+    {
+      "claim": "No choice audit was possible.",
+      "evidence": "The repository contains no .decisions.tsv trail."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Remediate personal identifiers in public Git and npm history",
+      "evidence": "Historical commits, npm maintainer metadata, and immutable prior versions expose identifiers outside the clean current tree.",
+      "why_out_of_scope": "History rewriting and npm withdrawal/account changes are destructive or externally coordinated actions requiring explicit owner approval."
+    }
+  ]
+}

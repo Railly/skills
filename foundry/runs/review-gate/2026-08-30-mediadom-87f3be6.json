@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-30",
+    "repo": "vercel-labs/mediadom",
+    "base": "origin/main",
+    "head": "87f3be6",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "docs/trx-independence-plan.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": ["R0", "R2", "R4", "R5", "R6", "R7", "R9", "R10", "R12"],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5.6-codex",
+    "reviewer_model": "gpt-5.6-codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "external transcription request",
+      "subprocess lifecycle and cancellation",
+      "durable master and receipt cleanup"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "evidence/2026-08-30-mediadom-87f3be6-reference-oracle.md",
+      "evidence": "Independent HTTP Scribe and executable trx boundaries were compared, while real FFmpeg and forced lifecycle failures challenged the implementation."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "docs/trx-independence-plan.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "Requirements define trx-free doom, structured parity, provider-neutral wiring, and safe cleanup."
+    },
+    {
+      "source": "design",
+      "location": "docs/trx-independence-plan.md decision and vertical slices",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The selected design owns a Transcriber contract, direct official provider adapters, and a temporary trx oracle."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, INTERNAL.md, src/schema.ts, src/skills.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "Public guidance names direct Scribe, selected-transcriber readiness, and no trx requirement for doom."
+    },
+    {
+      "source": "implementation",
+      "location": "src/transcriber.ts, src/adapters/elevenlabs-scribe.ts, src/one-shot.ts, src/doom-readiness.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The diff routes source, final, and seam transcription through one contract with bounded failure handling."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The default complete MediaDOM workflow does not require or invoke trx.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "doom reaches awaiting-agent and seam naming succeeds while TRX_BIN points to a missing executable",
+        "layer": "real CLI and FFmpeg boundary",
+        "method": "run doom map-only and seam transcription with a local Scribe server and broken trx path",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the selected transcriber name equals elevenlabs-scribe",
+        "counterexample": "the name is correct but doom or seam wiring still directly spawns trx",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Changing the default back to trx caused the missing-binary doom test to fail with exit 5."
+      },
+      "substrates": [
+        {
+          "name": "Bun CLI with real FFmpeg and local Scribe HTTP server",
+          "status": "exercised",
+          "evidence": "doom map-only reached awaiting-agent and the seam test returned elevenlabs/scribe_v2 with trx unavailable."
+        }
+      ],
+      "evidence": "Source, final, readiness, and seam paths all use the selected Transcriber contract."
+    },
+    {
+      "id": "P2",
+      "claim": "Direct Scribe preserves the editing evidence previously consumed through trx.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "normalized transcript cues, lexical words, and audio events from two independent adapters",
+        "layer": "adapter boundary",
+        "method": "differential comparison between local HTTP Scribe output and executable trx SRT plus JSON output",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the direct adapter returns non-empty transcript text",
+        "counterexample": "plain text is returned while words or audio events are silently dropped",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing events made both the adapter contract test and differential parity test fail."
+      },
+      "substrates": [
+        {
+          "name": "HTTP multipart request plus independent executable compatibility fixture",
+          "status": "exercised",
+          "evidence": "Cues, words, events, language, duration, provider, and model were checked at their external boundaries."
+        }
+      ],
+      "evidence": "Parity includes structured evidence, not only text, and incomplete responses fail closed."
+    },
+    {
+      "id": "P3",
+      "claim": "Failure after rendering leaves no uncertified master or receipt and permits a safe retry.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "filesystem presence of the master and receipt before failure and after immediate retry",
+        "layer": "filesystem-backed complete doom lifecycle",
+        "method": "force post-render probe, final transcription, and terminal QA failures, inspect residual state, then retry",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the command returns exit 5 or exit 7",
+        "counterexample": "the command reports failure while leaving a partial or uncertified deliverable",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Each forced failure asserted both master and receipt absence; retries then produced a verified master."
+      },
+      "substrates": [
+        {
+          "name": "real filesystem, FFmpeg process, ffprobe process, and local transcription server",
+          "status": "exercised",
+          "evidence": "Partial render, probe refusal, provider 503, QA rejection, timeout, and SIGINT were forced."
+        }
+      ],
+      "evidence": "The render ownership path removes partial outputs on every tested later fallible stage."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["provider adapter", "subprocess lifecycle", "compatibility translation"],
+    "dimensions": {
+      "values": [
+        "provider output: valid, missing words, missing timestamps, text-only, malformed JSON, HTTP 503",
+        "lifecycle: success, timeout, SIGINT, partial render, post-render probe failure",
+        "stage: source transcription, final transcription, seam naming",
+        "evidence: cues, words, audio events",
+        "provider selection: direct Scribe default, trx compatibility override"
+      ],
+      "exclusions": [
+        "real paid ElevenLabs network calls are excluded; the official HTTP request shape is exercised against a local server",
+        "non-macOS lifecycle behavior is outside the repository support contract"
+      ],
+      "evidence": "Tests cross malformed inputs, lifecycle transitions, every transcription consumer, structured evidence classes, and provider selection."
+    },
+    "oracle": {
+      "source": "trx SRT plus words/events fixture, filesystem state, and the written independence contract",
+      "independent": true,
+      "evidence": "Expected parity is produced by a separate executable boundary rather than the direct adapter helpers."
+    },
+    "producer": {
+      "name": "real Bun CLI, FormData HTTP requests, subprocess signals, filesystem, and FFmpeg",
+      "status": "exercised",
+      "evidence": "The suite drives multipart requests, SIGINT, spawned process groups, MP4 render, ffprobe, cleanup, and retry."
+    },
+    "falsification": [
+      {
+        "mutation": "drop audio events from the direct Scribe result",
+        "red_evidence": "The adapter and differential parity tests failed on the events collection.",
+        "restored_green_evidence": "Restoring events returned the focused suite to 22 passing tests."
+      },
+      {
+        "mutation": "change the default transcriber from elevenlabs-scribe to trx",
+        "red_evidence": "doom does not invoke trx failed with exit 5 against /definitely/missing/trx.",
+        "restored_green_evidence": "Restoring the direct default returned the test and full suite to green."
+      }
+    ],
+    "evidence": "Independent parity, real boundaries, failure partitions, repetition, and two killed mutations protect the changed behavior."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "product scope",
+      "claim": "One input video and direct cuts remain the only supported composition model.",
+      "status": "verified",
+      "evidence": "The demo uses one MP4, schema publishes no camera command, and render preserves synchronized audio and video."
+    },
+    {
+      "id": "A2",
+      "source": "provider contract",
+      "claim": "Editing requires structured timed lexical words rather than plain transcript text.",
+      "status": "verified",
+      "evidence": "Missing words, missing timestamps, and text-only output are rejected with dependency failures."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "A full doom run renders an MP4 and writes a receipt before final transcription and terminal QA finish.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "rendered master and receipt",
+        "owner": "runOneShot render lifecycle",
+        "commit_event": "renderEdl returns after writing the output and receipt",
+        "later_fallible_stages": ["post-render probe", "final transcription", "terminal QA"],
+        "failure_partitions": [
+          {
+            "ownership_region": "renderer probe validation",
+            "covers": ["post-render probe"],
+            "forced": true,
+            "residual_observed": "no master and no receipt remained",
+            "cleanup_owner": "runOneShot catch cleanup",
+            "retry": {
+              "attempted": true,
+              "outcome": "documented_recovery",
+              "evidence": "The same render lifecycle is covered by successful complete doom and demo runs after the failure fixture is removed."
+            },
+            "evidence": "A fake ffprobe rejected only the newly rendered master after FFmpeg completed."
+          },
+          {
+            "ownership_region": "selected Transcriber final stage",
+            "covers": ["final transcription"],
+            "forced": true,
+            "residual_observed": "no master and no receipt remained; ledger recorded fail",
+            "cleanup_owner": "runOneShot catch cleanup",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Immediate retry produced a passing QA result, master, and receipt."
+            },
+            "evidence": "The local Scribe server returned 503 on the second request only."
+          },
+          {
+            "ownership_region": "terminal QA verifier",
+            "covers": ["terminal QA"],
+            "forced": true,
+            "residual_observed": "QA returned fail and both master and receipt were removed",
+            "cleanup_owner": "runOneShot QA rejection path",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Immediate retry returned QA pass and recreated the master."
+            },
+            "evidence": "The second provider response used deliberately displaced word timings."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {
+      "name": "adapter-contract",
+      "status": "run",
+      "reason": "Reviewed strict structured validation, provider normalization, and compatibility parity."
+    },
+    {
+      "name": "lifecycle-cleanup",
+      "status": "run",
+      "reason": "Forced timeout, cancellation, partial output, later-stage failure, cleanup, and retry."
+    },
+    {
+      "name": "documentation-surface",
+      "status": "run",
+      "reason": "README, INTERNAL, schema, CLI hints, and served skill now teach direct Scribe."
+    },
+    {
+      "name": "security",
+      "status": "run",
+      "reason": "Checked credential readiness and confirmed no key or media was staged; API key is passed only as the provider header."
+    },
+    {
+      "name": "radius-impact-map",
+      "status": "skipped",
+      "reason": "radius returned zero edges with 6143 unresolved calls, so it under-covered the repository and was not used as evidence."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "finding-fixed",
+      "reason": "Removed em dashes from the added design table."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "All convention-mapped CLI, one-shot, process, renderer, and trx surfaces are present."
+    },
+    {
+      "check": "timings",
+      "outcome": "finding-fixed",
+      "reason": "Expressed the one-hour default as 3_600_000 so the gate evaluates the real ceiling."
+    },
+    {
+      "check": "diff-check",
+      "outcome": "pass",
+      "reason": "No whitespace errors remain."
+    },
+    {
+      "check": "staging-safety",
+      "outcome": "pass",
+      "reason": "No env files, credentials, customer media, generated MP4/WAV, or node_modules are committed."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The internal demo claimed no API keys while inheriting a real key and fabricating trx readiness.",
+      "evidence": "Running the demo after clearing the key made doctor exit 5; the harness now accepts that contract and verifies baseReady.",
+      "layer": "user-visible demo",
+      "source": "lens",
+      "path": "",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Historical trx examples remain in compatibility tests and provenance fixtures.",
+      "evidence": "They exercise the temporary parity oracle or stored instrument identity, not the default runtime path."
+    },
+    {
+      "claim": "No external executable installer gate was added.",
+      "evidence": "FFmpeg and ffprobe were existing documented dependencies; the new provider path removes the trx executable requirement."
+    }
+  ],
+  "issue_candidates": []
+}

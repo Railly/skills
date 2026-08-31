@@ -1,0 +1,18 @@
+Crafter Research website link corpus challenge
+Date: 2026-08-20
+Head: d97f34ba64483fe03a8943a6d4a3222dc45ab39a
+
+The expected property was defined at the HTTP substrate: each unique public evidence URL must produce an OK response after redirects, independently of the registry's own labels or rendering.
+
+Observed corpus:
+- 5 project records
+- 5 featured records
+- 16 unique public URLs
+- 16 OK responses under a 15 second per-request timeout
+
+Forced failure and retry corpus:
+- local Bun HTTP fixture, first GET: 503
+- immediate second GET to the same target: 200
+- fixture request count: 2
+
+The forced 503 proves status evaluation can reject after the request is externally visible. The immediate retry succeeded without cleanup or retained validator state.

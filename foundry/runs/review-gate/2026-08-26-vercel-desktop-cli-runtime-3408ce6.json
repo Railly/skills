@@ -1,0 +1,398 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-26",
+    "repo": "vercel-labs/vercel-desktop",
+    "base": "c77537352ec3b1afee0a0c8e53ac8d1052248fa8",
+    "head": "3408ce66b12adfbb078694188f5b4e80305c3d50",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-26-vercel-desktop-cli-runtime-resolution/decision.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "R0-R16 runtime discovery, classification, compatibility, safety, diagnostics, and cache lifecycle",
+      "A1-A8 selected launch-plan mechanism",
+      "V1-V3 acceptance checks"
+    ],
+    "gaps": ["No separate Issue Contract or Spec review result was supplied."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex with isolated Anthropic Solution Gate challenge",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["authentication classification", "process lifecycle", "concurrency", "diagnostic confidentiality", "remote command replay safety"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-26-vercel-desktop-cli-runtime-resolution/shaping-anthropic-initial.md",
+      "evidence": "An isolated Anthropic reviewer independently converged on executable plus runtime launch-plan validation, bounded discovery, candidate retry, and separate launch/auth states against the frozen packet before implementation. The final mechanism was additionally driven against the real installed Bun CLI and NVM Node substrate."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Solution Gate decision R0-R16",
+      "status": "reviewed",
+      "properties": ["runtime-plan", "state-classification", "cache-lifecycle", "safe-diagnostics"],
+      "evidence": "The reconciled contract defines common layouts, actual execution validation, state separation, one shared plan, bounded invalidation, no shell profiles, and sanitized diagnostics."
+    },
+    {
+      "source": "design",
+      "location": "Solution Gate selected shape A and V1-V3 plans",
+      "status": "reviewed",
+      "properties": ["runtime-plan", "state-classification", "cache-lifecycle", "safe-diagnostics"],
+      "evidence": "A1-A8 specify direct Process execution, semver-bounded PATH composition, controlled version probing, structured whoami, cache invalidation, and no unsafe replay."
+    },
+    {
+      "source": "user_facing",
+      "location": "Onboarding requirements UI and runtime-repair diagnostic",
+      "status": "reviewed",
+      "properties": ["state-classification", "safe-diagnostics"],
+      "evidence": "The UI now gives distinct install, runtime repair, login, and generic failure guidance, with a Recheck action and bounded selectable diagnostics."
+    },
+    {
+      "source": "implementation",
+      "location": "Seven changed Swift source and test files at 3408ce6",
+      "status": "reviewed",
+      "properties": ["runtime-plan", "state-classification", "cache-lifecycle", "safe-diagnostics"],
+      "evidence": "The exact base-to-head diff, all CLIState consumers, all VercelCLI.run callers, ProcessRunner callers, focused tests, full suite, real substrate, and release build were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "runtime-plan",
+      "claim": "A supported CLI and runtime in common macOS user layouts resolve to one validated executable and runtime-inclusive PATH without invoking shell startup files.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the executable that runs, the PATH visible to it, its version result, and the later authenticated identity",
+        "layer": "real macOS process and interpreter boundary",
+        "method": "Foundation.Process fixtures plus installed Bun CLI and NVM Node under env -i",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the vercel file exists and has executable permissions",
+        "counterexample": "the installed Bun symlink is executable but exits 127 when /usr/bin/env cannot find Node",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The real CLI exits 127 under Finder-like PATH and succeeds after the NVM bin directory is added; the resolver therefore requires version-shaped execution output."
+      },
+      "substrates": [
+        {
+          "name": "macOS Foundation.Process with symlinked env-node CLI",
+          "status": "exercised",
+          "evidence": "The fixture crosses the actual process boundary with spaces in paths and returns an authenticated username through the same launch plan."
+        },
+        {
+          "name": "installed Vercel CLI 59.1.4 and NVM Node v24.18.0",
+          "status": "exercised",
+          "evidence": "Sanitized env proof reproduced exit 127 without NVM and version success with the discovered NVM runtime."
+        }
+      ],
+      "evidence": "Candidate ordering, NVM cap, semver ordering, deduplication, retry, symlink, spaces, fresh HOME, and real process tests pass on exact HEAD."
+    },
+    {
+      "id": "state-classification",
+      "claim": "Missing CLI, unusable runtime, signed-out CLI, authenticated CLI, and later API failure remain distinct product states with correct guidance.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the resulting CLIState and onboarding message for each reachable process and authentication outcome",
+        "layer": "application state and user-visible onboarding",
+        "method": "structured runner outcomes, real JSON parsing, exhaustive Swift switches, and onboarding source assertions",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "whoami throws or returns a nonzero status",
+        "counterexample": "a runtime launch failure and a structured loggedIn false response can both be nonzero but require different user actions",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Exit 127 maps to unusable, loggedIn false with exit 1 maps to signedOut, and a later API failure maps to failed. Collapsing errors to signedOut made the regression red."
+      },
+      "substrates": [
+        {
+          "name": "Swift application state and onboarding view",
+          "status": "exercised",
+          "evidence": "All CLIState switches compile and tests assert installation-before-login, failure separation, repair guidance, and Recheck wiring."
+        }
+      ],
+      "evidence": "State classification and onboarding tests pass on exact HEAD."
+    },
+    {
+      "id": "cache-lifecycle",
+      "claim": "Concurrent callers share one bounded resolution, Recheck discards stale in-flight results without blocking, and launch failure re-resolves without replaying the service command.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "probe count, reset latency, selected executable, service command count, and explicit retry result",
+        "layer": "process-plan cache and command-call boundary",
+        "method": "deterministic semaphore transitions and injected runner call ledger",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the cache is protected by a lock",
+        "counterexample": "holding the lock across a ten-second process probe prevents races but blocks MainActor Recheck and permits stale publication",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The initial lock design was replaced with process work outside NSCondition plus generation invalidation. Disabling generation advancement made the stale-probe test red."
+      },
+      "substrates": [
+        {
+          "name": "concurrent Swift resolver and injected process runner",
+          "status": "exercised",
+          "evidence": "Thirty-two concurrent resolves produce one probe; Recheck returns under 100 ms during a blocked probe and causes a second probe; launch failure records one service call and an explicit retry succeeds through the second plan."
+        }
+      ],
+      "evidence": "Concurrent resolution, cache reset, runtime disappearance, no replay, and explicit recovery tests pass."
+    },
+    {
+      "id": "safe-diagnostics",
+      "claim": "Runtime diagnostics are bounded and redact token-bearing values before reaching selectable onboarding text.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "the exact user-visible diagnostic string after sanitization",
+        "layer": "UI diagnostic boundary",
+        "method": "adversarial token corpus and output-length assertion",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "stderr is shown only for failed launch attempts",
+        "counterexample": "failed-process stderr can contain --token, VERCEL_TOKEN, Bearer credentials, or vck secrets regardless of the failure category",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The adversarial diagnostic contains all four secret forms plus 3000 trailing characters; none of the secrets survives and the result is at most 2048 characters."
+      },
+      "substrates": [
+        {
+          "name": "sanitizer to onboarding Text boundary",
+          "status": "exercised",
+          "evidence": "The engine stores sanitized attempt errors and the runtime-repair view reads only diagnosticSummary, capped to eight attempts and five displayed lines."
+        }
+      ],
+      "evidence": "Secret-redaction and size-bound tests pass on exact HEAD."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["process compatibility adapter", "authentication state classification", "cache lifecycle", "timeout behavior"],
+    "dimensions": {
+      "values": [
+        "candidate source: PATH, PNPM_HOME, BUN_INSTALL, fnm, Homebrew, usr-local, pnpm, Bun, or bounded NVM",
+        "candidate outcome: absent, launch throw, timeout, exit 127, other exit, invalid output, or valid version",
+        "authentication: ready username, loggedIn false with exit 1, runtime disappearance, or later API failure",
+        "cache: cold, warm, concurrent cold, Recheck during probe, or invalidated after launch failure",
+        "service command: success, timeout, API exit, launch throw, or exit 127",
+        "path substrate: normal path, symlink, spaces, and env-node interpreter"
+      ],
+      "exclusions": ["No shell-profile or arbitrary shebang parsing cells are supported because the contract explicitly forbids shell startup execution and selects direct Foundation.Process launch."],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/evidence/2026-08-26-vercel-desktop-cli-runtime-3408ce6.md"
+    },
+    "oracle": {
+      "source": "Frozen Solution Gate requirements plus macOS direct-process behavior and installed Vercel CLI output",
+      "independent": true,
+      "evidence": "The requirements and real substrate establish expected process and state outcomes independently of the resolver branch structure."
+    },
+    "producer": {
+      "name": "Foundation.Process launching an env-node CLI under a Finder-like environment",
+      "status": "exercised",
+      "evidence": "Both hermetic fixtures and the installed Bun Vercel CLI were driven without shell startup files."
+    },
+    "falsification": [
+      {
+        "mutation": "remove NVM runtime directories from the launch PATH",
+        "red_evidence": "The Bun CLI plus NVM Node real-process test failed because env could not find node.",
+        "restored_green_evidence": "Restoring NVM PATH composition returned the focused suite green."
+      },
+      {
+        "mutation": "stop after the first broken candidate",
+        "red_evidence": "The broken-first later-usable regression failed at the selected executable.",
+        "restored_green_evidence": "Restoring candidate retry returned the focused suite green."
+      },
+      {
+        "mutation": "collapse authentication errors into signedOut",
+        "red_evidence": "The authentication-failure separation test failed because network failure became signedOut.",
+        "restored_green_evidence": "Restoring failed classification returned the focused suite green."
+      },
+      {
+        "mutation": "accept any non-empty version output",
+        "red_evidence": "The invalid-output test selected the first invalid candidate instead of the later versioned candidate.",
+        "restored_green_evidence": "Restoring version-shaped validation made the targeted test pass."
+      },
+      {
+        "mutation": "disable generation advancement during Recheck",
+        "red_evidence": "The stale in-flight probe published and the test observed one probe instead of two.",
+        "restored_green_evidence": "Restoring generation invalidation made the targeted test pass."
+      }
+    ],
+    "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/evidence/2026-08-26-vercel-desktop-cli-runtime-3408ce6.md"
+  },
+  "assumptions": [
+    {
+      "id": "nvm-cap",
+      "source": "Solution Gate carried assumption",
+      "claim": "Twenty-four semver-ordered NVM installations are sufficient for common supported layouts while keeping discovery bounded.",
+      "status": "verified",
+      "evidence": "A 31-directory fixture proves numeric order and an exact cap of 24; current user runtime v24.18.0 falls within that bounded set."
+    },
+    {
+      "id": "version-probe",
+      "source": "Solution Gate carried assumption",
+      "claim": "Supported Vercel CLI releases expose a version-shaped result from --version without requiring authentication.",
+      "status": "verified",
+      "evidence": "Installed CLI 59.1.4 and hermetic fixtures return semver; invalid non-empty output is rejected by a dedicated regression and mutation."
+    },
+    {
+      "id": "launch-only-reresolution",
+      "source": "Solution Gate carried assumption",
+      "claim": "Only launch-level failure invalidates the plan; timeout and ordinary API errors do not switch installations.",
+      "status": "verified",
+      "evidence": "Dedicated timeout and API-error tests observe one version probe and one service command, while exit 127 triggers re-resolution without replay."
+    },
+    {
+      "id": "probe-write-boundary",
+      "source": "Solution Gate carried assumption",
+      "claim": "The added controlled resolution probe does not mutate a fresh HOME, while whoami and arbitrary CLI commands retain CLI-owned behavior.",
+      "status": "verified",
+      "evidence": "A real Process probe against a fresh HOME leaves only the pre-created bin fixture; authentication is tested separately."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Resolution and service execution launch external processes. Service commands may have remote effects, so automatic replay is prohibited.",
+    "commit_points": [
+      {
+        "id": "resolution-probe-spawn",
+        "effect": "Launch a candidate Vercel CLI with --version.",
+        "owner": "VercelCLIEngine",
+        "commit_event": "Foundation.Process starts the candidate executable",
+        "later_fallible_stages": ["process timeout", "nonzero or invalid output", "plan publication after concurrent Recheck"],
+        "failure_partitions": [
+          {
+            "ownership_region": "candidate process and resolver",
+            "covers": ["process timeout", "nonzero or invalid output"],
+            "forced": true,
+            "residual_observed": "No plan is cached for the failed candidate and the attempt is retained as a bounded diagnostic.",
+            "cleanup_owner": "ProcessRunner terminates timed-out work; the resolver proceeds to the next candidate.",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Timeout, exit 127, launch throw, and invalid output fixtures all allow a later candidate to be selected."
+            },
+            "evidence": "Resolver failure and retry tests pass."
+          },
+          {
+            "ownership_region": "resolution cache concurrency",
+            "covers": ["plan publication after concurrent Recheck"],
+            "forced": true,
+            "residual_observed": "The stale probe result is discarded and no stale plan is published.",
+            "cleanup_owner": "Generation invalidation causes the resolver to perform a fresh probe.",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The semaphore test performs an immediate Recheck, releases the old probe, and observes a second successful probe."
+            },
+            "evidence": "Recheck returns in under 100 ms and stale publication is rejected."
+          }
+        ]
+      },
+      {
+        "id": "service-command-spawn",
+        "effect": "Launch one Vercel CLI service command that may reach a remote side effect.",
+        "owner": "VercelCLIEngine",
+        "commit_event": "Foundation.Process starts the validated CLI with service arguments",
+        "later_fallible_stages": ["launch-level exit after possible remote effect", "caller-visible explicit retry"],
+        "failure_partitions": [
+          {
+            "ownership_region": "service process and caller",
+            "covers": ["launch-level exit after possible remote effect", "caller-visible explicit retry"],
+            "forced": true,
+            "residual_observed": "The failed service command is observed exactly once; the plan is re-resolved but the command is not replayed automatically.",
+            "cleanup_owner": "The caller receives the original failure and decides whether to retry.",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "An explicit second engine.run uses the newly selected second CLI and returns deployed; the service call ledger is exactly first then second."
+            },
+            "evidence": "No-replay and explicit-retry tests pass on exact HEAD."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"Compared current PATH, Homebrew, usr-local, pnpm, fnm, Bun, and NVM acceptance against the new execution-validated source."},
+    {"name":"New-domain matrix","status":"run","reason":"Enumerated candidate sources, process outcomes, auth states, cache transitions, and command failures."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Onboarding, authentication, session boot, and all service callers consume the same central launch plan."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell string is parsed or appended; executable URL and argv remain separate."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No diagnostic channel or one-shot notification latch changed."},
+    {"name":"Shim hermeticity","status":"run","reason":"The fake env-node CLI and Node shim use only absolute system shell paths and were also checked against the installed real CLI."},
+    {"name":"Deliberate-default check","status":"run","reason":"Candidate priority is preserved explicitly and no fallback shell environment is inferred."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Reviewed discovery to validation to authentication to session to every service caller and repair UI."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No guard has failed two external review rounds on the same class."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"macOS env-node behavior and the installed Vercel CLI provide the process-level oracle independently of resolver branches."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"The new unusable state and typed timeout were traced through all switches and ProcessRunner callers."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"Existing command argv, no-color, non-interactive, scope flags, and timeouts remain at the central adapter boundary."},
+    {"name":"Error-path forcing","status":"run","reason":"Launch throw, timeout, exit 127, invalid output, signed-out exit 1, API failure, and runtime disappearance were forced."},
+    {"name":"Non-destructive recovery","status":"run","reason":"Recheck only clears derived cache; launch failure does not replay a potentially effectful command and explicit retry succeeds."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Typed timeout remains bounded, does not switch installations, and Recheck does not wait behind a probe."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced CLI discovery, direct process launch, env interpreter lookup, authentication, session APIs, and UI guidance."},
+    {"name":"Substrate verification","status":"run","reason":"The installed Bun CLI plus NVM Node and real Foundation.Process fixtures prove the actual interpreter boundary."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Built the release arm64 binary and drove the installed CLI in a Finder-like sanitized environment without sourcing profiles."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"The engine owns all launch-plan publication and every Vercel CLI command routes through VercelCLI.run."},
+    {"name":"Docs-behavior parity","status":"run","reason":"User guidance states only verified missing, runtime repair, login, and generic failure behavior."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example was added or changed."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists; the Solution Gate decision supplies the reviewed choices."},
+    {"name":"Complexity budget","status":"run","reason":"Discovery is capped at fixed candidates plus 24 NVM directories; diagnostic rendering is capped at eight attempts and 2048 characters each."}
+  ],
+  "deterministic": [
+    {"check":"git diff --check","outcome":"pass","reason":"No whitespace errors between c775373 and exact HEAD."},
+    {"check":"pnpm --dir apps/swift check","outcome":"pass","reason":"Version validation and debug Swift build passed on exact HEAD."},
+    {"check":"pnpm --dir apps/swift test","outcome":"acknowledged","reason":"11 of 11 Node tests and 88 of 89 Swift tests pass; the only failure is the unchanged base host-specific Geist fixed-pitch assertion."},
+    {"check":"swift test --filter VercelCLI","outcome":"pass","reason":"All 25 focused process, state, cache, safety, and recovery tests pass."},
+    {"check":"pnpm --dir apps/swift build","outcome":"pass","reason":"The release arm64 binary built and linked on exact HEAD."},
+    {"check":"gate.sh style","outcome":"pass","reason":"No prohibited punctuation appears in added source lines."},
+    {"check":"gate.sh surfaces","outcome":"pass","reason":"No touched path requires an absent paired surface under conventions.md."},
+    {"check":"gate.sh callers onboardingState","outcome":"pass","reason":"Every onboardingState call site is in a diffed file."},
+    {"check":"gate.sh callers VercelCLI.run and ProcessRunner.run","outcome":"acknowledged","reason":"All enumerated external callers were read; service callers already use the central adapter, and updater callers accept the typed timeout through unchanged throws contracts."},
+    {"check":"gate.sh timings","outcome":"pass","reason":"The diff adds no millisecond wait ceiling."},
+    {"check":"gate.sh covered","outcome":"pass","reason":"This JSON report covers exact HEAD 3408ce6."}
+  ],
+  "findings": [
+    {
+      "id": "weak-version-output",
+      "state": "confirmed",
+      "claim": "A zero exit with arbitrary non-empty output could be cached as a valid Vercel CLI plan.",
+      "evidence": "A mutation replacing version-shaped validation with non-empty validation selected the invalid first candidate.",
+      "layer": "process validation contract",
+      "source": "lens",
+      "path": "apps/swift/Sources/VercelDesktop/VercelCLI.swift",
+      "resolution": "fixed"
+    },
+    {
+      "id": "recheck-lock-block",
+      "state": "confirmed",
+      "claim": "Holding the resolution lock across a process probe could block MainActor Recheck for the probe timeout.",
+      "evidence": "Review of the initial lock topology found process execution inside the critical section; the replacement semaphore test proves immediate reset and stale-result rejection.",
+      "layer": "cache concurrency and UI call boundary",
+      "source": "lens",
+      "path": "apps/swift/Sources/VercelDesktop/VercelCLI.swift",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {"claim":"The pre-existing Geist fixed-pitch test failure does not block this CLI runtime change.","evidence":"It reproduces on base c775373, touches Typography only, and all 25 CLI-focused tests pass."},
+    {"claim":"README and changelog remain unchanged.","evidence":"The change restores promised installed-CLI recognition and repository policy reserves release notes and version changes for release preparation."},
+    {"claim":"The packaged app was not launched into the user's authenticated account.","evidence":"The exact release binary built, and the relevant process boundary was driven through real Foundation.Process and the installed CLI under sanitized environment without exposing account data."}
+  ],
+  "issue_candidates": [
+    {"title":"Make Geist fixed-pitch verification independent of host AppKit metadata","evidence":"geistFontsResolveAfterBundleRegistration reports GeistMono-Regular.isFixedPitch false on both base and exact HEAD on this Mac.","why_out_of_scope":"Typography and font registration are untouched by the CLI runtime diff."}
+  ]
+}

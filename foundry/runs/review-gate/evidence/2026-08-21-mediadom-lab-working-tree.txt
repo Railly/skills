@@ -1,0 +1,58 @@
+mediadom-lab autocut lexical safety evidence
+date: 2026-08-21
+base HEAD: 241cd0b9e0478728c75a76ba850cd98fcf5f069a
+working-tree composite sha256: 6ae55b212ffa7c7773940af14dab87432adbc732b0f870044a7f1136e4d987cd
+tracked diff sha256: cd0c79f5948a5fee41dca661003e80572d804c911584107542e4d93afd7bee85
+untracked-files sha256: 8ed4af3e62362baeb5edad5162bcf16cb4fa0a21ebe63b5868cec79971a5fd42
+
+Independent substrate corpus
+- Producer: ElevenLabs Scribe v2 over the private Fiorella source.
+- Producer records: 4,869.
+- Zero-length records rejected by the adapter: 65.
+- Persisted positive-length lexical observations: 4,804.
+- Original autocut candidates: 320.
+- Original complete containments: 5.
+- Original partial or complete overlaps: 175.
+- Final replay accepted: 315.
+- Final replay lexical skips: 5.
+- Final replay snap refusals: 0.
+- Protected durations in ms: 10, 120, 19, 10, 110.
+- Final runtime: 125 ms.
+- Final JSON result sha256: f504e77f8dc7bd01b20f5b40720c79d57fe8db7878420a762b056e0ae3c6767c.
+- Final EDL sha256: 7bdfd424d244cea63bc554342545974bd5ce1e464a27f64f53703dc69a278b06.
+- Grep over result and EDL found no text, word, or transcript fields.
+
+Independent design challenges
+- gpt-5.6-luna, reasoning high: review-autocut-lexical-a.md, sha256 407277d0c14e97c59e6422049cd73eaa30399b0985949d9f6e1b3674278f4b47.
+- gpt-5.6-sol, reasoning high: review-autocut-lexical-b.md, sha256 1e6681043d0c21039f2f78515004044f1017aea62dfa2b52bc86caf8e6331c54.
+- Reconciled gate: solution-gate-autocut-lexical.md, sha256 20d7bf0815bfd3e7f1be1751617e2306254a60590a577890c00e5d686772cf7e.
+- The reviewers disagreed on original versus final interval authority. A mechanical post-snap counterexample established final interval authority.
+
+Behavioral proof
+- Focused final suite: 17 pass, 0 fail, 104 assertions.
+- Full final suite in sandbox: 652 pass, 2 liveness failures caused by restricted ps.
+- Same six liveness tests outside sandbox: 6 pass, 0 fail.
+- Effective final result: 654 of 654.
+- Typecheck: pass.
+- Focused Biome: pass.
+- Manifest: matches disk.
+- git diff --check: pass.
+- Post-commit failure: forced stdout failure after EDL publication exited the child with 23; immediate retry added zero entries and reported duplicate-active-entry; one active EDL entry remained.
+- Lock contention: a real holder plus autocut --lock-timeout 0 exited 5 and wrote nothing.
+
+Falsification
+- Guarding original pre-snap bounds made the final-only containment test fail.
+- Changing inclusive containment to strict boundaries made the exact-edge 10 ms test fail.
+- Reporting available instead of degraded with zero lexical observations made the degraded test fail.
+- Each mutation was restored from a snapshot and the intended test returned green.
+
+Real Cueva dogfood
+- Source sha256 before/after: c6166f12df4b32d00530f52da4249c9ad5a41657d1a9ddf1150e57478b789d68.
+- Output sha256: 27ae9d5e99f2f83b4fa024834b6deba58b2c51cbad108146d3893b9ef41ab3bd.
+- Expected/measured duration: 301096/301096 ms.
+- Receipt and editorial review: match/pass.
+- Hollow spans: 0. Surviving ladders: 0.
+- Acoustic verify: fail, 17 flagged seams and 4820 ms retained silence.
+- Source evidence: /Users/raillyhugo/Programming/mediadom-lab/tmp/cueva-luna-high-20260821/final-report.md.
+
+No private audio, transcript text, or lexical token text is present in this evidence file.

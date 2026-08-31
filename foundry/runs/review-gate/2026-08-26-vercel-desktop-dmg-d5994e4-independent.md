@@ -1,0 +1,1 @@
+The DMG is restyled before signing and the final artifact is visually verified without altering the app or updater packaging paths. No actionable correctness defects were identified.

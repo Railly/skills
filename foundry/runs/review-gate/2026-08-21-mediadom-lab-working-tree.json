@@ -1,0 +1,473 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "Railly/mediadom-lab",
+    "base": "241cd0b9e0478728c75a76ba850cd98fcf5f069a",
+    "head": "241cd0b9e0478728c75a76ba850cd98fcf5f069a",
+    "status": "complete",
+    "verdict": "findings",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/kai/04_Projects/_shaping/mediadom-repair/solution-gate-autocut-lexical.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13"],
+    "gaps": ["A Solution Gate passed, but no separate Issue Contract or Spec review status was supplied."]
+  },
+  "provenance": {
+    "author_model": "gpt-5 Codex",
+    "reviewer_model": "gpt-5.6-luna and gpt-5.6-sol, reasoning high",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["durable EDL state", "store concurrency", "externally visible post-commit output failure"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-21-mediadom-lab-working-tree.txt",
+      "evidence": "The independently defined interval oracle was driven with 4,804 positive-length observations produced by ElevenLabs Scribe v2 over Fiorella, then replayed through the real store and CLI."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/Users/raillyhugo/kai/04_Projects/_shaping/mediadom-repair/solution-gate-autocut-lexical.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "R0 through R13 define final-interval containment, useful partial overlaps, machine-visible decisions, current generations, degraded mode, and locked EDL transitions."
+    },
+    {
+      "source": "design",
+      "location": "/Users/raillyhugo/kai/04_Projects/_shaping/mediadom-repair/shaping-autocut-lexical.md and breadboard-autocut-lexical.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "Selected shape C makes edlAppend provisional, inspects the final interval, skips per candidate, preserves existing EDL state, and locks the read-modify-write."
+    },
+    {
+      "source": "user_facing",
+      "location": "packages/mediadom/src/schema.ts and packages/mediadom/src/skills.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P5"],
+      "evidence": "Schema and core skill state final valley-snapped containment, partial-overlap eligibility, degraded operation, and candidate decision review."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/mediadom/src/autocut.ts, packages/mediadom/src/cli.ts, and packages/mediadom/test/autocut-lexical.test.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "The helper classifies final entries; cmdAutocut reads current layers and writes under the store lock; the real CLI tests cover topology, generations, degraded state, locking, audit output, and retry."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "With current lexical evidence, autocut never adopts a final valley-snapped interval that fully contains a positive-length lexical observation.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "the active persisted EDL interval set compared directly with current positive-length lexical intervals",
+        "layer": "filesystem-backed store after the real CLI returns",
+        "method": "run autocut, read edl --json, and test half-open complete containment against independently produced lexical timestamps",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the original silence candidate does not contain a word",
+        "counterexample": "original [1000,1800) snapped to [900,1700), newly containing [900,950)",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The post-snap spike and focused unit test reject the candidate only when the returned edlAppend entry is inspected."
+      },
+      "substrates": [
+        {
+          "name": "synthetic WAV plus captured Scribe sidecar through Bun CLI and filesystem store",
+          "status": "exercised",
+          "evidence": "Contained 120 ms and exact-edge 10 ms records produced lexical skips and no swallowing EDL entry."
+        },
+        {
+          "name": "ElevenLabs Scribe v2 Fiorella corpus",
+          "status": "exercised",
+          "evidence": "The real replay accepted 315 candidates and skipped all 5 complete containments across 4,804 current lexical observations."
+        }
+      ],
+      "evidence": "Final replay, persisted EDL inspection, exact-edge coverage, and the post-snap counterexample all verify the property directly."
+    },
+    {
+      "id": "P2",
+      "claim": "Lexical safety preserves useful autocut behavior: partial overlaps remain eligible, absent lexical state continues explicitly degraded, current generations win, and retries remain duplicate-free.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "entries added, active EDL state, lexical status, and per-candidate reasons at the CLI boundary",
+        "layer": "real command output plus persisted store",
+        "method": "drive partial-left and partial-right overlaps, no lexical layer, two lexical generations, repeated invocation, and a post-commit retry",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "rejecting every lexical overlap appears safer",
+        "counterexample": "Fiorella has 175 overlapping cuts but only 5 complete containments, so blanket overlap refusal suppresses 170 otherwise eligible candidates",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The corpus comparison counted 175 overlaps versus 5 containments; synthetic partial overlaps persisted one accepted cut."
+      },
+      "substrates": [
+        {
+          "name": "Bun CLI over isolated synthetic stores",
+          "status": "exercised",
+          "evidence": "Partial overlaps added one entry; zero lexical observations reported degraded; only the newest lexical generation affected the decision; repeat added zero."
+        },
+        {
+          "name": "Fiorella real store replay",
+          "status": "exercised",
+          "evidence": "315 of 320 candidates remained accepted with five targeted lexical skips."
+        }
+      ],
+      "evidence": "Every state and topology class has a direct CLI assertion or real-corpus measurement."
+    },
+    {
+      "id": "P3",
+      "claim": "Machine output makes duplicate, lexical, and snap decisions auditable without disclosing lexical token text.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "the serialized JSON key and value set emitted by autocut",
+        "layer": "foreground CLI stdout",
+        "method": "parse decision records, assert timing and reason fields, search output and real replay artifacts for lexical text fields and fixture token values",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the implementation maps only timing fields",
+        "counterexample": "a later serializer or spread could reintroduce props.text even when the helper returns safe timing fields",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The real emitted JSON, not the helper object, was inspected; synthetic private markers and text, word, or transcript fields were absent."
+      },
+      "substrates": [
+        {
+          "name": "foreground JSON CLI output",
+          "status": "exercised",
+          "evidence": "Decision records contained IDs, candidate and proposed bounds, lexical bounds, duration, action, and reason only."
+        },
+        {
+          "name": "Fiorella replay result and EDL",
+          "status": "exercised",
+          "evidence": "A field search found no text, word, or transcript fields; saved evidence contains metrics and hashes only."
+        }
+      ],
+      "evidence": "Both synthetic marker checks and real artifact inspection verify the emitted confidentiality boundary."
+    },
+    {
+      "id": "P4",
+      "claim": "Autocut performs the complete observation and EDL read-modify-write under the store lock, writes atomically, and retries safely after a later stdout failure.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "lock exclusion, active EDL contents, residual state after forced post-commit failure, and immediate retry outcome",
+        "layer": "separate processes and filesystem-backed store",
+        "method": "hold the real lock in a child, force timeout zero, then force stdout failure after writeEdl and immediately rerun autocut",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "accepting --lock-timeout and using atomic rename imply safe concurrency",
+        "counterexample": "the pre-existing cmdAutocut accepted --lock-timeout but never acquired the lock, so two writers could read the same EDL despite atomic file publication",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Review Gate reproduced the missing lock and fixed it; the holder child now makes autocut exit 5 without writing."
+      },
+      "substrates": [
+        {
+          "name": "macOS processes, store lock file, and atomic EDL writer",
+          "status": "exercised",
+          "evidence": "A holder blocked autocut; forced stdout failure left exactly one active entry; immediate retry succeeded with zero additions."
+        }
+      ],
+      "evidence": "The real concurrency and post-commit boundaries were forced, not inferred from code."
+    },
+    {
+      "id": "P5",
+      "claim": "The machine schema and core skill publish the same lexical-safety behavior implemented by the CLI.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "rendered core skill text, schemaForVerb autocut description, and driven CLI behavior",
+        "layer": "agent-facing contract surfaces",
+        "method": "assert the contract phrases on both surfaces and drive each stated behavior through autocut",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "both source files contain the expected phrases",
+        "counterexample": "matching prose can still advertise behavior the command does not deliver",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The same final-interval, partial-overlap, and degraded claims were exercised through the CLI and persisted EDL."
+      },
+      "substrates": [
+        {
+          "name": "renderSkill, schemaForVerb, and Bun CLI",
+          "status": "exercised",
+          "evidence": "Focused contract tests and end-to-end lexical tests passed together."
+        }
+      ],
+      "evidence": "Contract assertions protect the prose while CLI assertions independently protect the behavior."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["durable EDL state transition", "lexical-to-signal interval adapter", "CLI retry lifecycle"],
+    "dimensions": {
+      "values": [
+        "lexical availability: absent or present",
+        "interval topology: no overlap, partial-left, partial-right, complete containment, exact-edge containment, final-only post-snap containment",
+        "positive duration: 10, 19, 110, and 120 ms",
+        "generation: historical containment versus current partial overlap",
+        "EDL state: empty, active duplicate, held lock, and durable write followed by stdout failure",
+        "output: available, degraded, duplicate, lexical skip, snap refusal, and text-free JSON"
+      ],
+      "exclusions": [
+        "zero-length provider records are rejected before persistence and are not valid Observation spans",
+        "pre-existing EDL entries are historical intent and are not re-evaluated or revoked by autocut",
+        "blanket partial-overlap refusal is excluded by the 175 versus 5 Fiorella comparison"
+      ],
+      "evidence": "packages/mediadom/test/autocut-lexical.test.ts executes the topology, generation, state, output, concurrency, and retry classes; the Fiorella replay supplies the real duration and scale boundary."
+    },
+    "oracle": {
+      "source": "Solution Gate R0 through R13 plus independently produced Scribe word intervals and direct EDL containment",
+      "independent": true,
+      "evidence": "The oracle is half-open complete containment of the final persisted interval, defined before implementation and challenged by the post-snap counterexample."
+    },
+    "producer": {
+      "name": "ElevenLabs Scribe v2 and the captured Scribe sidecar consumed by the registered instrument",
+      "status": "exercised",
+      "evidence": "Scribe produced 4,869 records over Fiorella; the adapter persisted 4,804 positive-length observations; the captured shape drove the real CLI without network in regression tests."
+    },
+    "falsification": [
+      {
+        "mutation": "classify against original silence bounds instead of the final edlAppend interval",
+        "red_evidence": "the final-only [900,950) post-snap containment test failed for the intended reason",
+        "restored_green_evidence": "restoring final-entry containment made the focused lexical suite pass"
+      },
+      {
+        "mutation": "replace inclusive complete containment with strict boundary comparisons",
+        "red_evidence": "the exact-edge 10 ms containment test accepted a cut and failed",
+        "restored_green_evidence": "restoring inclusive half-open containment made the exact-edge test pass"
+      },
+      {
+        "mutation": "report lexical safety available when the lexical count is zero",
+        "red_evidence": "the degraded-state assertion failed",
+        "restored_green_evidence": "restoring count-based degraded status made the focused suite pass"
+      }
+    ],
+    "evidence": "All mutations were applied and restored from snapshots; the final focused suite passed 17 of 17 and the effective full suite passed 654 of 654."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Solution Gate C2 and R9",
+      "claim": "The final valley-snapped interval, not the original candidate, is the interval safety must inspect.",
+      "status": "verified",
+      "evidence": "The [1000,1800) to [900,1700) mechanical counterexample creates a final-only contained word and the regression catches it."
+    },
+    {
+      "id": "A2",
+      "source": "Solution Gate R12",
+      "claim": "Every persisted positive-length lexical observation is protected without a duration or score threshold.",
+      "status": "verified",
+      "evidence": "Scribe persists 10 and 19 ms records; exact-edge 10 ms and the Fiorella duration set are protected."
+    },
+    {
+      "id": "A3",
+      "source": "Solution Gate R2",
+      "claim": "Partial overlap alone remains eligible.",
+      "status": "verified",
+      "evidence": "Partial-left and partial-right CLI fixtures add the cut; Fiorella shows 175 overlaps versus only 5 containments."
+    },
+    {
+      "id": "A4",
+      "source": "Solution Gate R6",
+      "claim": "No lexical layer preserves cutting with an explicit degraded report.",
+      "status": "verified",
+      "evidence": "The no-lexical CLI run adds one entry, reports degraded with zero observations, and repeats without duplication."
+    },
+    {
+      "id": "A5",
+      "source": "Solution Gate R10",
+      "claim": "New decisions use only the current visible generation of each layer.",
+      "status": "verified",
+      "evidence": "A historical contained word followed by a current partial-overlap generation remains cuttable and reports one current lexical observation."
+    },
+    {
+      "id": "A6",
+      "source": "Solution Gate R11",
+      "claim": "Autocut never silently rewrites or revokes pre-existing EDL entries.",
+      "status": "verified",
+      "evidence": "Duplicate and retry tests preserve the existing active entry and add none; the implementation only replaces the in-memory EDL with accepted edlAppend results."
+    },
+    {
+      "id": "A7",
+      "source": "Solution Gate R13",
+      "claim": "Lexical protection is a per-candidate skip under exit 0.",
+      "status": "verified",
+      "evidence": "Contained lexical CLI runs exit 0, report skippedLexical, and Fiorella still adopts 315 independent candidates."
+    },
+    {
+      "id": "A8",
+      "source": "Solution Gate R4",
+      "claim": "Autocut reads persisted observations and never invokes a network adapter.",
+      "status": "verified",
+      "evidence": "The command path calls readObservations only; captured sidecar regressions run with no network and succeed."
+    },
+    {
+      "id": "A9",
+      "source": "Solution Gate C8",
+      "claim": "The complete observation and EDL read-modify-write occurs under the per-store lock.",
+      "status": "verified",
+      "evidence": "cmdAutocut encloses loadProject, readObservations, readEdl, classification, and writeEdl in withStoreLock; a real holder forces exit 5 before mutation."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Accepted candidates publish a new durable edl.json revision before foreground output is emitted.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "accepted autocut decisions become durable in edl.json",
+        "owner": "cmdAutocut through writeEdl and writeAtomic",
+        "commit_event": "the atomic EDL replacement completes inside the store lock",
+        "later_fallible_stages": ["foreground summary emission"],
+        "failure_partitions": [
+          {
+            "ownership_region": "foreground CLI output after store publication",
+            "covers": ["foreground summary emission"],
+            "forced": true,
+            "residual_observed": "stdout failed after publication; exactly one accepted active EDL entry remained durable",
+            "cleanup_owner": "no rollback is required because the EDL decision committed successfully; duplicate suppression owns retry safety",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "the immediate identical autocut retry exited 0, added zero entries, reported duplicate-active-entry, and left one active entry"
+            },
+            "evidence": "The regression replaces process.stdout.write with a callback error, observes child exit 23, retries through the real CLI, and inspects edl --json."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source was replaced."},
+    {"name": "New-domain matrix", "status": "run", "reason": "The new lexical guard was exercised across final-only, exact-edge, partial, short-duration, absent-layer, generation, duplicate, and retry cells."},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No user-input resolution or discovery rule changed."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell string or argument injection changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "run", "reason": "Lexical decisions emit from the attached foreground CLI; post-commit stdout failure and retry were forced."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No external binary shim was added."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "The default changes only when current lexical evidence fully fits a final candidate; degraded stores preserve the prior default and the contract states both cases."},
+    {"name": "Fresh-seam scan", "status": "skipped", "reason": "The change does not patch a runtime or framework to expose a new signal."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "The guard compares mediadom-owned half-open intervals rather than modeling an external substrate grammar; the real Scribe corpus was still exercised as producer evidence."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No normative reference implementation or protocol specification defines this editorial policy."},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "Lexical protection is an explicit exit-0 candidate skip, not a new error outcome for edlAppend or its callers."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag, mode, or configuration bit was introduced."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Held-lock timeout, snap refusals, lexical skips, degraded operation, and post-commit stdout failure were forced."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action was added."},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "The previously inert autocut lock timeout now reaches the existing lock primitive; a real holder with timeout zero exits 5 without writing."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "The full path from current lexical observations through provisional valley snapping, guard decision, EDL publication, foreground output, and retry was traced and driven."},
+    {"name": "Substrate verification", "status": "run", "reason": "The active EDL, lock behavior, and emitted JSON were inspected directly rather than trusting autocut counts."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "The Bun CLI was driven on synthetic WAVs and the real Fiorella store; the final replay completed in 125 ms with 315 accepts and 5 lexical skips."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "The new invariant is scoped to cmdAutocut, whose only adoption path now passes through proposeAutocutCandidate; other explicit EDL writers retain their separate contracts."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Final interval, partial overlap, and degraded behavior were asserted in schema and core skill and independently driven through the CLI."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added or changed."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No .decisions.tsv trail was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "The guard is O(silence candidates times current lexical observations); the real 320 by 4,804 replay completed in 125 ms, so no optimization is justified in this repair."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "acknowledged", "reason": "The requested result remains uncommitted, so HEAD cannot represent the two new files; three frozen diff hashes and their composite identify the exact reviewed working tree."},
+    {"check": "style", "outcome": "pass", "reason": "The deterministic style gate passed."},
+    {"check": "surfaces", "outcome": "acknowledged", "reason": "The gate flags packages/mediadom/test because git diff cannot see untracked test/autocut-lexical.test.ts; that file drives the required real CLI surface and test/skills.test.ts protects the guide."},
+    {"check": "stale", "outcome": "pass", "reason": "Not triggered; no duplicated contract token was renamed or retired."},
+    {"check": "siblings autocut", "outcome": "acknowledged", "reason": "Untouched cli and schema mentions are command registration or usage labels; autocut.test.ts retains the independent degenerate-floor contract; the new lexical test is untracked and therefore invisible to git diff."},
+    {"check": "callers edlAppend", "outcome": "acknowledged", "reason": "edlAppend itself did not change contract; the new untracked wrapper consumes its existing immutable return shape and all established call sites retain their behavior."},
+    {"check": "timings", "outcome": "pass", "reason": "Not triggered; no new timeout or timing ceiling was added."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered; no shell detector changed."},
+    {"check": "artifacts", "outcome": "pass", "reason": "Not triggered; the change writes the existing edl.json through the existing writer and introduces no persistent filename."},
+    {"check": "rawinput", "outcome": "pass", "reason": "Not triggered; no resolution rule deepened."},
+    {"check": "flagsweep", "outcome": "pass", "reason": "Not triggered; no user-facing flag was added."},
+    {"check": "execdeps", "outcome": "pass", "reason": "Not triggered; no external executable was added."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "Map saved with 5 git-visible changed symbols, 2,216 edges, and 5,282 unresolved calls; it under-covers, especially because new untracked source is absent from the changed set, and was used only for orientation."},
+    {"check": "typecheck", "outcome": "pass", "reason": "bun run typecheck completed with no errors."},
+    {"check": "focused Biome", "outcome": "pass", "reason": "Biome checked all six changed source and test files with no fixes or findings."},
+    {"check": "focused tests", "outcome": "pass", "reason": "17 tests passed with 104 assertions across autocut-lexical.test.ts and skills.test.ts."},
+    {"check": "full tests", "outcome": "pass", "reason": "The repaired complete suite passed 671 tests with zero failures."},
+    {"check": "manifest", "outcome": "pass", "reason": "scripts/manifest.sh --check reported manifest matches disk."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "No whitespace errors were reported."},
+    {"check": "force-red", "outcome": "pass", "reason": "Pre-snap, strict-boundary, and false-available mutations each failed the intended assertion and returned green after snapshot restoration."},
+    {"check": "real Cueva dogfood", "outcome": "acknowledged", "reason": "Render, receipt fidelity, editorial review, banned phrase, hollow, and ladder checks pass; acoustic verify remains red with 17 flagged seams and 4820 ms retained silence, recorded as open RG-4."}
+  ],
+  "findings": [
+    {
+      "id": "RG-1",
+      "state": "confirmed",
+      "claim": "cmdAutocut accepted --lock-timeout without acquiring the store lock.",
+      "evidence": "The pre-existing path read and wrote the EDL outside withStoreLock; a holder-child probe established the missing exclusion. The final implementation locks the complete transition and the regression exits 5 without mutation.",
+      "layer": "cross-process EDL read-modify-write",
+      "source": "lens",
+      "path": "cmdAutocut to withStoreLock to readEdl and writeEdl",
+      "resolution": "fixed"
+    },
+    {
+      "id": "RG-2",
+      "state": "refuted",
+      "claim": "Original silence bounds are sufficient for lexical safety.",
+      "evidence": "The mechanical [1000,1800) to [900,1700) snap newly contains [900,950), so original-bound classification misses a persisted defect.",
+      "layer": "final EDL interval",
+      "source": "lens",
+      "path": "edlAppend returned entry to proposeAutocutCandidate containment",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "RG-3",
+      "state": "refuted",
+      "claim": "Rejecting every partial lexical overlap is an acceptable conservative policy.",
+      "evidence": "Fiorella has 175 overlaps but only 5 complete containments; synthetic left and right partial overlaps remain safely cuttable.",
+      "layer": "editorial candidate policy",
+      "source": "lens",
+      "path": "current lexical observations to per-candidate containment",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "RG-4",
+      "state": "confirmed",
+      "claim": "The repaired editor cannot certify a real five-minute Cueva master after the bounded repair cycle.",
+      "evidence": "The 301096 ms render matches receipt, EDL revision 418, and SHA256 27ae9d5e99f2f83b4fa024834b6deba58b2c51cbad108146d3893b9ef41ab3bd; review passes with zero findings and zero ladders, but final verify exits 7 with 17 flagged seams and 4820 ms retained silence.",
+      "layer": "real end-to-end edit, render, receipt, and acoustic verification",
+      "source": "lens",
+      "path": "stable word plan and autocut to EDL to render receipt to verify",
+      "resolution": "open"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Exact HEAD coverage is unavailable before a commit.",
+      "evidence": "HEAD remains 241cd0b while two implementation files are untracked; three diff hashes and composite 88baaa3e320216f087e495f34a2e7a610b2dd5549acc38cfa83bdb83cfbd0cb4 identify the reviewed working tree."
+    },
+    {
+      "claim": "Untouched autocut registration and degenerate-floor passages do not need rewriting.",
+      "evidence": "They name the command or preserve an independent floor refusal and make no contradictory lexical-safety claim."
+    },
+    {
+      "claim": "Existing edlAppend callers do not need changes.",
+      "evidence": "edlAppend retains its input, return, snapping, overlap, and failure contracts; only the new autocut wrapper conditionally adopts the returned immutable EDL."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Make intentional lexical edits and autocut compose into a certifiable EDL",
+      "evidence": "The exact 5:01.096 Cueva render matches receipt and editorial review but verify flags 17 seams plus 4820 ms retained silence.",
+      "why_out_of_scope": "The current repair fixed the published verifier and planning contracts; resolving edit-policy composition requires another implementation cycle."
+    },
+    {
+      "title": "Bound agent inspection before mutation",
+      "evidence": "The Cueva run consumed roughly 16.6M input tokens after repeated transcript, store, and code rescans plus shell-quoting retries.",
+      "why_out_of_scope": "This is workflow and skill architecture, not the MediaDom correctness repair itself."
+    }
+  ]
+}

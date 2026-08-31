@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "crafter-research/website",
+    "base": "origin/main",
+    "head": "eeb30b195a14ce4c6821262af229c76f3ae1f19e",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "not provided",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5-codex",
+    "reviewer_model": "gpt-5-codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["externally visible HTTP GET requests during build validation"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-21-crafter-research-website-eeb30b1-portfolio.txt",
+      "evidence": "The exact-head validator exercised 33 public HTTP targets, and a local HTTP fixture forced a 503 response followed by a successful immediate retry."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user request in the working session",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The request calls for maturity based on activity, consistency, and real output, presented through a creative website UI."
+    },
+    {
+      "source": "design",
+      "location": "cases/crafter-research-website/conventions.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The conventions require one audit registry, public evidence, bilingual claims, visible limitations, and fail-closed scope checks."
+    },
+    {
+      "source": "user_facing",
+      "location": "src/components/PortfolioPage.astro",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The observatory promises 20 ranked projects, three visible signals, filters, public evidence, scope, and explicit locale fallback."
+    },
+    {
+      "source": "implementation",
+      "location": "src/data/portfolio-audit.ts, src/components/PortfolioPage.astro, scripts/validate-projects.ts, and package.json",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The implementation centralizes 20 records, renders all locale routes, implements client filtering, and runs validation before check and build."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Every locale route publishes exactly 20 evidence-backed audit records with visible signals, sources, dates, and limitations.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the final static HTML and browser-rendered observatory",
+        "layer": "built user-facing artifact",
+        "method": "build all routes, count project record articles, inspect locale copy, and drive desktop and mobile browsers",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the source registry contains 20 entries",
+        "counterexample": "20 records can exist while a route omits them or renders the wrong locale policy",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Built EN, ES, PT, and ZH HTML was inspected independently and each contains exactly 20 project record articles; PT and ZH expose the fallback notice."
+      },
+      "substrates": [
+        {
+          "name": "Astro static output and local browser",
+          "status": "exercised",
+          "evidence": "Twenty pages built; desktop EN and mobile ES QA found 20 records, no horizontal overflow, no console errors, and zero Axe violations."
+        }
+      ],
+      "evidence": "The four built project routes contain 20 records each and preserve visible evidence, limitations, dates, scores, and source links."
+    },
+    {
+      "id": "P2",
+      "claim": "Search and combined family and maturity filters update the records, count, empty state, and reset behavior consistently.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "visible DOM records and control state after real input and click events",
+        "layer": "browser interaction boundary",
+        "method": "drive search, combined filters, a zero-result state, and reset in the built page",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the filter functions compute matching booleans in source",
+        "counterexample": "correct booleans can still leave stale hidden attributes, counts, aria-pressed state, or empty-state visibility",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Browser QA observed the actual visible records, count, pressed controls, empty state, and restored 20-record view."
+      },
+      "substrates": [
+        {
+          "name": "browser DOM at desktop and 390x844 mobile",
+          "status": "exercised",
+          "evidence": "Search, combined family and maturity filters, empty state, and reset all produced the expected visible DOM."
+        }
+      ],
+      "evidence": "The driven feature behaved consistently in both desktop and mobile layouts."
+    },
+    {
+      "id": "P3",
+      "claim": "Audit scope, bilingual evidence, score bounds, uniqueness, and public links are checked before the site can build.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the build pipeline executing and enforcing the audit validator before Astro",
+        "layer": "repository build boundary",
+        "method": "run check and build, inspect the script chain, and force an out-of-range score",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the validator passes when run directly",
+        "counterexample": "a standalone validator can pass while production build omits it or invalid data is not rejected",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Both repository commands invoked validation before Astro, and an in-memory activity score of 5 exited 1 with the expected bounds error."
+      },
+      "substrates": [
+        {
+          "name": "Bun repository scripts and public HTTP targets",
+          "status": "exercised",
+          "evidence": "Check and build validated 5 featured records, 20 audited projects, and 33 public URLs; the invalid-score mutation was rejected."
+        }
+      ],
+      "evidence": "The exact HEAD passes, while the deliberate score violation fails closed before Astro."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": ""},
+    "oracle": {"source": "", "independent": true, "evidence": ""},
+    "producer": {"name": "", "status": "not_applicable", "evidence": ""},
+    "falsification": [],
+    "evidence": "The diff adds a typed static registry, presentation, simple DOM filtering, and validation; it does not change a protocol, parser, serializer, state machine, lifecycle, adapter, compatibility layer, or browser or OS event translation."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "subsystem model",
+      "claim": "Portfolio audit facts have one source consumed by every locale route and the validator.",
+      "status": "verified",
+      "evidence": "PortfolioPage.astro and validate-projects.ts both import src/data/portfolio-audit.ts; route files only select locale."
+    },
+    {
+      "id": "A2",
+      "source": "implementation",
+      "claim": "The declared scope arithmetic is 24 public repositories, 20 audited records, and 4 explicit exclusions.",
+      "status": "verified",
+      "evidence": "A direct Bun assertion and the build validator confirmed 20 + 4 = 24 with exclusions website, .github, brand, and govhack."
+    },
+    {
+      "id": "A3",
+      "source": "implementation",
+      "claim": "Public source and homepage links are reachable at review time.",
+      "status": "verified",
+      "evidence": "The exact-head validator followed redirects and received successful responses for all 33 unique public URLs."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The static site has no runtime mutation, but build validation sends externally visible HTTP GET requests to public evidence URLs.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "outbound HTTP GET observed by the target server",
+        "owner": "scripts/validate-projects.ts link validator",
+        "commit_event": "the target server accepts the request",
+        "later_fallible_stages": ["HTTP response status evaluation"],
+        "failure_partitions": [
+          {
+            "ownership_region": "remote response and validator",
+            "covers": ["HTTP response status evaluation"],
+            "forced": true,
+            "residual_observed": "The first local fixture request returned 503; the validator retained no local application state.",
+            "cleanup_owner": "AbortSignal and fetch lifecycle",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "An immediate second GET returned 200 and the fixture observed exactly two requests."
+            },
+            "evidence": "Local Bun HTTP fixture output: {first:503, second:200, attempts:2}."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source was replaced."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No validator was relaxed and no existing trigger domain was widened."},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No user-input resolution or discovery rule changed."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell construction changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No background process channel or latch exists in this change."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No test shim changed."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Reviewed and drove the explicit English fallback for PT and ZH; EN and ES behavior remains intentional."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Reviewed registry to component, route, locale, validator, and build seams; no competing repository seam was found."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "No guard models an external substrate and no repeated guard failure exists."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No protocol or reference implementation applies."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Validator failures propagate through check:projects into both check and build; the invalid score exited nonzero before Astro."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag, mode, or config bit was introduced."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Forced an out-of-range score and observed the exact validation error and nonzero exit."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action exists."},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "All 33 link checks completed under the existing per-request 15 second AbortSignal timeout; no pending state remains."},
+    {"name": "Boundary pipeline trace", "status": "skipped", "reason": "The change does not extend an existing action across a frame, process, or protocol boundary."},
+    {"name": "Substrate verification", "status": "run", "reason": "Verified generated HTML, browser DOM, interactions, accessibility scan, and links instead of relying on command output alone."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Drove desktop EN, mobile ES, search, combined filters, reset, themes, and all four built locale routes."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Confirmed the audit registry owns facts and the validator owns scope and score enforcement for every route."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "The rendered methodology, score components, scope, limitations, and locale fallback agree with registry and validator behavior."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "Rendering and interaction are bounded by the declared 20-record audit; the O(n squared) collision offset scan is bounded to 20 items and filters are linear per interaction."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "This report records exact HEAD eeb30b195a14ce4c6821262af229c76f3ae1f19e."},
+    {"check": "style", "outcome": "pass", "reason": "No prohibited prose punctuation was added."},
+    {"check": "surfaces", "outcome": "pass", "reason": "Every dependent audit registry, component, route, locale, style, validation, and package surface is present in the diff."},
+    {"check": "stale", "outcome": "pass", "reason": "Not triggered; no duplicated contract value was renamed or retired."},
+    {"check": "siblings", "outcome": "pass", "reason": "The public audit and Portfolio observatory sweeps found every matching surface in the diff with no untouched matching passage."},
+    {"check": "callers", "outcome": "pass", "reason": "Not triggered; no existing function contract changed."},
+    {"check": "timings", "outcome": "pass", "reason": "Not triggered; no timing ceiling was added."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered; no shell detector changed."},
+    {"check": "artifacts", "outcome": "pass", "reason": "Not triggered; no persistent runtime artifact is written."},
+    {"check": "rawinput", "outcome": "pass", "reason": "Not triggered; no resolution rule deepened."},
+    {"check": "flagsweep", "outcome": "pass", "reason": "Not triggered; no user-facing flag was added."},
+    {"check": "execdeps", "outcome": "pass", "reason": "Not triggered; no external executable was added."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "Map saved with 14 changed symbols and 10 impacted symbols; 138 unresolved calls versus 100 edges means it under-covers and was used only for orientation."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "The four Biome noImportantStyles warnings do not block this change.",
+      "evidence": "The reduced-motion declarations predate this diff and intentionally override animation cascade for accessibility."
+    },
+    {
+      "claim": "The empty blog collection warnings do not block this change.",
+      "evidence": "The warning predates the diff and all 20 static pages complete successfully."
+    },
+    {
+      "claim": "src/data/projects.ts need not change for the observatory sibling sweep.",
+      "evidence": "Its observatory mention describes LatamBench's product category, while the new portfolio audit contract lives in src/data/portfolio-audit.ts."
+    }
+  ],
+  "issue_candidates": []
+}

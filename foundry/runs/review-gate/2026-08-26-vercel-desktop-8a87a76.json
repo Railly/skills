@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-26",
+    "repo": "vercel-labs/vercel-desktop",
+    "base": "c8ee1bcc441cdbaa0e213c5b0d26270945eb7642",
+    "head": "8a87a762c2e7c8abceda85debbc6c7aa4182fe5f",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "User-reported Settings screenshots in the active session",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": ["Settings titles use native detail navigation titles", "Sidebar has one native divider"],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "not_required",
+      "artifact": "",
+      "evidence": "The diff only changes SwiftUI presentation and a structural regression test; it does not touch state, secrets, persistence, processes, or remote effects."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Active-session screenshots and user feedback",
+      "status": "reviewed",
+      "properties": ["native-title", "single-divider"],
+      "evidence": "Screenshots showed labels clipped inside the navigation control and a redundant sidebar border."
+    },
+    {
+      "source": "design",
+      "location": "SwiftUI NavigationSplitView detail column",
+      "status": "reviewed",
+      "properties": ["native-title", "single-divider"],
+      "evidence": "The detail column owns its navigationTitle, while NavigationSplitView owns the column separator."
+    },
+    {
+      "source": "user_facing",
+      "location": "Packaged Vercel.app Settings window",
+      "status": "reviewed",
+      "properties": ["native-title", "single-divider"],
+      "evidence": "The user exercised General, Scopes, and Coding Agents in the packaged application and supplied screenshots of the affected surface."
+    },
+    {
+      "source": "implementation",
+      "location": "apps/swift/Sources/VercelDesktop/SettingsView.swift",
+      "status": "reviewed",
+      "properties": ["native-title", "single-divider"],
+      "evidence": "The diff moves activePane.title to the detail navigationTitle and removes the manual trailing Rectangle overlay."
+    }
+  ],
+  "properties": [
+    {
+      "id": "native-title",
+      "claim": "Every Settings pane title is rendered by the native detail navigation-title mechanism and is not grouped into the back-forward control capsule.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "The title placement and toolbar grouping in the packaged macOS Settings window.",
+        "layer": "SwiftUI/AppKit rendered UI",
+        "method": "User-driven packaged app inspection plus source-level structural regression test.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The app compiles and SettingsView contains the title text.",
+        "counterexample": "The prior implementation compiled but placed Text(activePane.title) inside ToolbarItemGroup(.navigation), producing clipped or crowded labels.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Screenshots showed General, Coding Agents, and Scopes rendering incorrectly despite successful builds."
+      },
+      "substrates": [
+        {
+          "name": "macOS 26 packaged arm64 app",
+          "status": "exercised",
+          "evidence": "Vercel.app was built, ad-hoc signed, opened, and exercised by the user across multiple Settings panes."
+        }
+      ],
+      "evidence": "Focused settingsUsesANativeSidebarLayout test passes on 8a87a76 and fails against base when only the new expectations are applied."
+    },
+    {
+      "id": "single-divider",
+      "claim": "The Settings sidebar uses the NavigationSplitView-owned divider without a duplicate manual trailing border.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "The number and ownership of visible separators between sidebar and detail.",
+        "layer": "SwiftUI/AppKit rendered UI",
+        "method": "Rendered screenshot inspection plus absence of the explicit separator overlay in SettingsView.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A one-pixel Rectangle appears visually subtle in isolation.",
+        "counterexample": "NavigationSplitView already draws the split separator, so adding a one-pixel Rectangle produces a redundant second border while still compiling.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The original screenshot and source showed both the native split and explicit trailing overlay."
+      },
+      "substrates": [
+        {
+          "name": "macOS 26 packaged arm64 app",
+          "status": "exercised",
+          "evidence": "The affected sidebar/detail boundary was inspected in the packaged Settings window."
+        }
+      ],
+      "evidence": "The focused regression test requires the Settings-specific separator fill to be absent and passes on the final commit."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": "No protocol, parser, state machine, lifecycle, adapter, or event translation changed."},
+    "oracle": {"source": "Packaged UI inspection", "independent": true, "evidence": "User screenshots expose the rendered behavior directly."},
+    "producer": {"name": "SwiftUI toolbar layout", "status": "not_applicable", "evidence": "No behavioral producer contract changed."},
+    "falsification": [],
+    "evidence": "This is a bounded declarative layout correction; regression strength is covered by force-red and rendered-app inspection."
+  },
+  "assumptions": [
+    {
+      "id": "detail-owns-title",
+      "source": "NavigationSplitView structure",
+      "claim": "The detail ScrollView is the correct owner of the active pane navigation title.",
+      "status": "verified",
+      "evidence": "Settings panes render in the detail column and selection drives activePane; the Swift check and packaged app confirm the modifier is accepted and rendered."
+    },
+    {
+      "id": "split-owns-divider",
+      "source": "NavigationSplitView rendered layout",
+      "claim": "NavigationSplitView supplies the sidebar/detail separator without the manual overlay.",
+      "status": "verified",
+      "evidence": "The native split remains after removing the overlay, while the source no longer adds another separator."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The diff changes only declarative view composition and test assertions; it performs no writes, remote operations, state mutation, or lifecycle transitions.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source changed."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No guard or accepted input domain changed."},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No resolution rule changed."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell logic changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process communication or latch changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim changed."},
+    {"name": "Deliberate-default check", "status": "skipped", "reason": "No default value changed."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Inspected the toolbar/detail seam; title ownership and split separator ownership are now singular."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "No repeatedly failing detector or substrate classifier exists."},
+    {"name": "Reference-implementation oracle", "status": "run", "reason": "Used native NavigationSplitView detail navigationTitle semantics instead of a custom toolbar Text item."},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "No failure outcome changed."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flags changed."},
+    {"name": "Error-path forcing", "status": "skipped", "reason": "No error path changed."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No durable state or recovery path changed."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No async lifecycle changed."},
+    {"name": "Boundary pipeline trace", "status": "skipped", "reason": "No data pipeline crossed a boundary."},
+    {"name": "Substrate verification", "status": "run", "reason": "Built and packaged the arm64 macOS app and verified its ad-hoc signature."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "The user exercised the packaged Settings UI and supplied iterative screenshots."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "IdentityTests now assigns title ownership to the detail navigationTitle and separator ownership to NavigationSplitView."},
+    {"name": "Docs-behavior parity", "status": "skipped", "reason": "No documentation or user-facing behavior prose changed."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No example changed."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was provided."},
+    {"name": "Complexity budget", "status": "skipped", "reason": "No loop, membership check, or lookup changed."}
+  ],
+  "deterministic": [
+    {"check": "gate.sh style", "outcome": "pass", "reason": "No prohibited punctuation in added lines."},
+    {"check": "gate.sh surfaces", "outcome": "pass", "reason": "No required mapped sibling surface is missing."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "No whitespace errors."},
+    {"check": "force-red", "outcome": "pass", "reason": "New IdentityTests expectations fail with three issues against base SettingsView."},
+    {"check": "restored-green", "outcome": "pass", "reason": "settingsUsesANativeSidebarLayout passes on exact head 8a87a76."},
+    {"check": "pnpm check", "outcome": "pass", "reason": "Swift and web checks pass."},
+    {"check": "pnpm build", "outcome": "pass", "reason": "Swift and web release builds pass."},
+    {"check": "pnpm package:swift", "outcome": "pass", "reason": "v0.0.21 app, DMG, and updater ZIP package; codesign verification passes."},
+    {"check": "pnpm test", "outcome": "acknowledged", "reason": "108 of 109 Swift tests pass; the sole GeistMono isFixedPitch failure reproduces unchanged on clean origin/main c8ee1bc. Script tests pass 11 of 11."}
+  ],
+  "findings": [
+    {
+      "id": "geist-mono-fixed-pitch",
+      "state": "issue_candidate",
+      "claim": "Typography.appKitMono(13).isFixedPitch is false on this macOS 26 environment.",
+      "evidence": "The focused test fails identically in a clean detached worktree at origin/main c8ee1bc.",
+      "layer": "Pre-existing typography test/environment compatibility",
+      "source": "gate",
+      "path": "apps/swift/Tests/VercelDesktopTests/TypographyTests.swift:17",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "The pre-existing Geist Mono test failure does not block this layout-only PR.",
+      "evidence": "The exact failure reproduces on clean origin/main c8ee1bc and the diff does not touch typography or font registration."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Stabilize Geist Mono fixed-pitch assertion on macOS 26",
+      "evidence": "TypographyTests.swift:17 fails on both origin/main c8ee1bc and this branch because NSFont reports GeistMono-Regular.isFixedPitch as false.",
+      "why_out_of_scope": "This PR only corrects Settings toolbar and sidebar layout and does not alter typography."
+    }
+  ]
+}

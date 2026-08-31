@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "crafter-research/muniscan",
+    "base": "origin/main",
+    "head": "4bbf6cf019a50484d2de311b1bacbe54b1929669",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "04_Projects/_shaping/crafter-public-systems-observatory/evidence/muniscan-recurrence-repair-v1.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": ["completeness passes without --force", "false large delta cannot publish"],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5-codex",
+    "reviewer_model": "gpt-5-codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["remote side effects", "externally visible dataset state"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-21-muniscan-4bbf6cf-corpus.txt",
+      "evidence": "The published census and two archived GitHub Actions artifacts independently exercise the repaired union over real collector output."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Observatory V7 recurrence brief",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "V7 requires explaining the missing-entity path and a second snapshot that cannot bypass completeness."
+    },
+    {
+      "source": "design",
+      "location": "cases/muniscan/conventions.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The subsystem invariants define the published census as memory, current-record precedence and explicit non-2xx errors."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, METHOD.md, LIMITATIONS.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The docs disclose stateful discovery, restored counts, failed-directory exclusion and review of genuine removals."
+    },
+    {
+      "source": "implementation",
+      "location": "src/discover.ts, src/history.ts, src/fetch.ts and src/cli.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The implementation restores prior municipalities, selects only published indices and rejects non-2xx responses."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "A nondeterministic current sweep cannot silently remove municipalities from the newest earlier published universe.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the municipality slug set after union",
+        "layer": "collector data boundary",
+        "method": "apply the real union to both archived incomplete-run artifacts and the published index",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the restored counter is nonzero",
+        "counterexample": "a counter can increment while output remains duplicated or omits baseline slugs",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The corpus check validates final unique municipality counts of 1,853 and 1,881, not only restored counters."
+      },
+      "substrates": [{"name": "published index plus two GitHub Actions artifacts", "status": "exercised", "evidence": "Real JSON and JSONL outputs were parsed by the production union function."}],
+      "evidence": "Current discovery wins by slug and every missing prior municipality is restored exactly once."
+    },
+    {
+      "id": "P2",
+      "claim": "Failed intermediate run directories cannot become the baseline for restoration or completeness.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "which dated directory supplies the baseline",
+        "layer": "filesystem history boundary",
+        "method": "create an earlier published index followed by a newer failed directory and resolve history",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the newest directory has a date before the current run",
+        "counterexample": "the newest dated directory exists but has no index.json",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The fixture includes 2026-08-08/index.json and failed 2026-08-09; the resolver returns 2026-08-08."
+      },
+      "substrates": [{"name": "temporary filesystem tree", "status": "exercised", "evidence": "history tests create real directories and files."}],
+      "evidence": "Restoration and completeness share previousMunicipalities and therefore the same published baseline."
+    },
+    {
+      "id": "P3",
+      "claim": "A carried-forward municipality that returns non-2xx is represented as an error rather than successful evidence.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the FetchResult discriminant for HTTP 404",
+        "layer": "HTTP adapter boundary",
+        "method": "drive get through a real Response object with status 404",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the response has a numeric HTTP status",
+        "counterexample": "status 404 previously had a parseable body and was returned as ok:true",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The force-red mutation reproduced ok:true for 404; restored code returns ok:false and HTTP 404."
+      },
+      "substrates": [{"name": "Bun Fetch Response", "status": "exercised", "evidence": "src/fetch.test.ts uses the runtime Response producer."}],
+      "evidence": "enrichAll already turns every get failure into an ERR row, and completeness counts only HTTP 200."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["HTTP adapter", "stateful discovery compatibility layer"],
+    "dimensions": {
+      "values": ["current slug present or omitted", "prior entity municipal or non-municipal", "overlap or new slug", "earlier published, failed, current or future directory", "HTTP 2xx, non-2xx or block marker"],
+      "exclusions": ["live full scan is a post-merge producer validation because it takes about 85 minutes"],
+      "evidence": "Unit fixtures cover each equivalence class; archived artifacts exercise real current and prior populations."
+    },
+    "oracle": {
+      "source": "published 2026-08-08 index, archived workflow artifacts and Fetch Response semantics",
+      "independent": true,
+      "evidence": "Expected populations and HTTP status semantics do not come from the repair implementation."
+    },
+    "producer": {
+      "name": "GitHub Actions scan artifacts and Bun Response",
+      "status": "exercised",
+      "evidence": "Both archived scans were driven through the real union, and 404 was produced by the runtime Response class."
+    },
+    "falsification": [
+      {"mutation": "return current discovery without previous municipalities", "red_evidence": "discover test expected restored 1 and received 0", "restored_green_evidence": "27 tests pass"},
+      {"mutation": "accept non-2xx response as success", "red_evidence": "fetch test received ok:true body for 404", "restored_green_evidence": "27 tests pass"},
+      {"mutation": "select newest directory even without index.json", "red_evidence": "history test failed ENOENT on failed directory", "restored_green_evidence": "27 tests pass"}
+    ],
+    "evidence": "Focused tests repeated five times without failure."
+  },
+  "assumptions": [
+    {"id": "A1", "source": "design", "claim": "Published index slugs are the best available memory of the known municipal universe.", "status": "verified", "evidence": "Each incomplete run and even their union omit published baseline slugs; the published index is versioned and reviewable."},
+    {"id": "A2", "source": "implementation", "claim": "Current discovery data should win on a slug overlap.", "status": "verified", "evidence": "The overlap test preserves the updated current name."},
+    {"id": "A3", "source": "subsystem model", "claim": "enrichAll propagates non-2xx get results into explicit error rows.", "status": "verified", "evidence": "src/enrich.ts maps result.ok false to http ERR:<error>; callers were read directly."}
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "A scan writes entities.json before enrichment and then appends enriched.jsonl. Existing same-date resume is the documented recovery path.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "write the current and restored entity universe to data/YYYY-MM-DD/entities.json",
+        "owner": "src/cli.ts scan",
+        "commit_event": "writeJson completes",
+        "later_fallible_stages": ["entity enrichment", "score completeness gate"],
+        "failure_partitions": [
+          {
+            "ownership_region": "collector and scoring pipeline",
+            "covers": ["entity enrichment", "score completeness gate"],
+            "forced": true,
+            "residual_observed": "The archived failed runs retain entities.json and enriched.jsonl while no incomplete index is published.",
+            "cleanup_owner": "same-date scan resume and completeness gate",
+            "retry": {
+              "attempted": true,
+              "outcome": "documented_recovery",
+              "evidence": "README and CLI contract document rerunning scan for the same date; readDone skips completed slugs."
+            },
+            "evidence": "Both 2026-08-09 workflow artifacts demonstrate retained partial state and the later score gate preventing publication."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "run", "reason": "Current-discovery precedence and new municipalities were verified alongside restoration."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No validator or accepted input domain was widened."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Restoration and completeness now share the published-history resolver."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell construction changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process channel or latch changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "The fetch shim is restored in afterEach and focused tests pass repeatedly."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Current discovery deliberately wins on overlaps; previous data only fills omissions."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Reviewed history to discovery to enrichment to completeness and docs seams."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Both incomplete CI artifacts were compared against the published census."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No normative reference implementation exists for gob.pe nondeterministic discovery."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Non-2xx get failures propagate through enrichAll into ERR rows and exclusion from answered municipalities."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag or config bit changed."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Forced HTTP 404 and missing index directory paths."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic action mutates upstream or user state."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No timeout or cancellation behavior changed."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced current and restored entities through enrichment and completeness."},
+    {"name": "Substrate verification", "status": "run", "reason": "Used actual published and archived artifacts, not only function output fixtures."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Ran the production union against both archived workflow artifacts."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "All baseline selection now lives in history.ts and both consumers use it."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "README, METHOD and LIMITATIONS match current-record precedence, restoration and error behavior."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "Union and history selection are linear or n log n over bounded census directories and entities."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "This report records exact head 4bbf6cf019a50484d2de311b1bacbe54b1929669."},
+    {"check": "style", "outcome": "pass", "reason": "gate.sh style passed."},
+    {"check": "surfaces", "outcome": "acknowledged", "reason": "Only src/enrich.ts was absent; direct inspection proves its existing error branch consumes the new non-2xx outcome without an edit."},
+    {"check": "stale", "outcome": "acknowledged", "reason": "previousCount remains a legitimate parameter name in checkCompleteness; the retired filesystem resolver has zero hits."},
+    {"check": "siblings", "outcome": "acknowledged", "reason": "DATA-LICENSE.md and score.ts do not describe discovery; untouched METHOD and LIMITATIONS passages remain correct."},
+    {"check": "callers", "outcome": "acknowledged", "reason": "Relevant fetch callers in discover.ts and enrich.ts were read; Map.get false positives in diff.ts and score.ts are unrelated."},
+    {"check": "timings", "outcome": "pass", "reason": "Not triggered; no timing constant changed."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered."},
+    {"check": "artifacts", "outcome": "pass", "reason": "No new persistent runtime filename was introduced."},
+    {"check": "rawinput", "outcome": "pass", "reason": "Not triggered; no raw user-input resolution deepened."},
+    {"check": "flagsweep", "outcome": "pass", "reason": "Not triggered."},
+    {"check": "execdeps", "outcome": "pass", "reason": "Not triggered."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "Map saved with 247 unresolved calls against 121 edges, so it under-covers and was orientation only."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {"claim": "src/enrich.ts does not require an edit.", "evidence": "Its existing result.ok false branch writes ERR:<error>, exactly consuming the new FetchResult outcome."},
+    {"claim": "DATA-LICENSE.md and src/score.ts are unaffected.", "evidence": "Neither file defines or describes discovery, history selection or HTTP success."},
+    {"claim": "A live full scan is not required before opening the repair PR.", "evidence": "The real archived artifacts exercise the repaired population transform; the workflow run is the explicit post-merge validation gate and remains pending."}
+  ],
+  "issue_candidates": [
+    {"title": "Resume partial scans across workflow attempts", "evidence": "The workflow uploads partial enriched.jsonl artifacts but does not download them on rerun.", "why_out_of_scope": "Published-universe memory fixes correctness; cross-run artifact hydration is a runtime optimization."}
+  ]
+}

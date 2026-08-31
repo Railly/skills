@@ -1,0 +1,774 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-28",
+    "repo": "vercel-labs/emulate",
+    "base": "e4d665715f2b6ccdd28dc3f1dccd2be5ea223caa",
+    "head": "e4d665715f2b6ccdd28dc3f1dccd2be5ea223caa",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/tmp/emulate-installation-token-factory-contract.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5",
+      "R6",
+      "R7",
+      "R8",
+      "R9",
+      "R10",
+      "R11",
+      "R12",
+      "C1",
+      "C2",
+      "C3",
+      "C4",
+      "C5",
+      "C6",
+      "C7"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "OpenAI Codex factory implementation",
+    "reviewer_model": "anthropic/claude-sonnet-4.6 through Fx",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "authentication and authorization state",
+      "secret confidentiality",
+      "durable adapter snapshots",
+      "reset lifecycle",
+      "legacy snapshot compatibility"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "/tmp/emulate-installation-token-standards.md",
+      "evidence": "An independent Anthropic Standards pass reconstructed the subsystem, inspected the exact frozen diff and live sources, adjudicated all deterministic findings and lens triggers, and returned PASS. Fx exited 0 and the dirty-worktree checksum remained 7a15fafdb8da92e7f0bc77467f3b4fbaa62f8688336841f60bc61747d12c6e44 before and after."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/tmp/emulate-installation-token-inspection-frozen-packet.md and /tmp/emulate-installation-token-factory-contract.md",
+      "status": "reviewed",
+      "properties": [
+        "metadata-cardinality",
+        "confidentiality",
+        "expiry-lifecycle",
+        "copy-isolation",
+        "reset-lifecycle",
+        "adapter-persistence",
+        "legacy-compatibility",
+        "authorization-separation"
+      ],
+      "evidence": "The separate Spec report reviewed R0-R12 and the C1-C7 selected shape on the exact checksum and passed every requirement and must-not-change workflow."
+    },
+    {
+      "source": "design",
+      "location": "/tmp/emulate-installation-token-solution-gate.md",
+      "status": "reviewed",
+      "properties": [
+        "metadata-cardinality",
+        "confidentiality",
+        "expiry-lifecycle",
+        "copy-isolation",
+        "reset-lifecycle",
+        "adapter-persistence",
+        "legacy-compatibility",
+        "authorization-separation"
+      ],
+      "evidence": "The selected GitHub-local metadata ledger shape fixes write order, route projection, reset ownership, generic snapshot participation, legacy behavior and the explicit non-enforcement of expiry."
+    },
+    {
+      "source": "user_facing",
+      "location": "root README, GitHub and adapter package READMEs, web docs, service skills and public API JSDoc in the reviewed diff",
+      "status": "reviewed",
+      "properties": [
+        "confidentiality",
+        "expiry-lifecycle",
+        "reset-lifecycle",
+        "adapter-persistence",
+        "legacy-compatibility"
+      ],
+      "evidence": "The docs-behavior lens checked standalone and adapter paths, secret-free response wording, persistence, reset and expiry semantics against the implementation and built HTTP proof."
+    },
+    {
+      "source": "implementation",
+      "location": "/tmp/emulate-installation-token.diff at SHA-256 3b8b799aa10f0409218d0c4dbefb115de848c4cae0ac04ecde2bd8cf03f95a21",
+      "status": "reviewed",
+      "properties": [
+        "metadata-cardinality",
+        "confidentiality",
+        "expiry-lifecycle",
+        "copy-isolation",
+        "reset-lifecycle",
+        "adapter-persistence",
+        "legacy-compatibility",
+        "authorization-separation"
+      ],
+      "evidence": "The exact 25-modified-file plus one-untracked-file state was reviewed through source inspection, four focused suites, full build and test checks, seven mutations, adapter cold starts and a real built HTTP drive."
+    }
+  ],
+  "properties": [
+    {
+      "id": "metadata-cardinality",
+      "claim": "Every successful installation-token mint records exactly one metadata row while rejected mints and seeded tokens record none.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "inspection collection cardinality after successful and rejected mint transitions",
+        "layer": "GitHub HTTP mint and inspection routes",
+        "method": "mint through the real route and count GET /_emulate/installation-tokens rows",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the mint response returned HTTP 201",
+        "counterexample": "a mint can return 201 while the ledger insertion is removed or repeated mints collapse to one row",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The ledger and cardinality mutants preserved the mint path but caused the inspection assertions to fail with zero or one row instead of the required cardinality."
+      },
+      "substrates": [
+        {
+          "name": "GitHub plugin HTTP routes",
+          "status": "exercised",
+          "evidence": "webhook-installation tests drive POST /app/installations/:id/access_tokens and GET /_emulate/installation-tokens through the Hono application."
+        }
+      ],
+      "evidence": "Successful, repeated and rejected mint tests pass; the ledger and cardinality mutants both failed for the intended reason and restored green."
+    },
+    {
+      "id": "confidentiality",
+      "claim": "Inspection never exposes a token value, token prefix, token-derived identifier or Store entity ID.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "the serialized HTTP response bytes",
+        "layer": "user-visible inspection JSON",
+        "method": "search JSON.stringify(response) for the actual minted token and its first 12 characters and inspect the projected keys",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the metadata entity type has no token field",
+        "counterexample": "the route could still join against tokenMap or expose a token-derived lookup key despite the entity type",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The leak mutant injected the actual token into the response projection and the direct serialized-response oracle failed. Source inspection also confirmed no tokenMap join and no entity ID spread."
+      },
+      "substrates": [
+        {
+          "name": "built standalone emulator HTTP response",
+          "status": "exercised",
+          "evidence": "/tmp/emulate-installation-token-http-proof.json records inspection_secret_free true using the actual minted secret."
+        },
+        {
+          "name": "GitHub plugin test application",
+          "status": "exercised",
+          "evidence": "The focused test rejects both full-token and 12-character-prefix disclosure and mutates returned nested values before re-reading."
+        }
+      ],
+      "evidence": "Entity, mint write and route projection contain no secret field; direct response oracles and the leak mutation pass."
+    },
+    {
+      "id": "expiry-lifecycle",
+      "claim": "Inspection status is active before expires_at and expired at or after expires_at without changing authorization behavior.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "status at controlled timestamps and authorization response after expiry",
+        "layer": "inspection and authenticated GitHub HTTP routes",
+        "method": "fake time at issuance and exact expiry, then use the same token after expiry",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the source predicate uses a less-than comparison",
+        "counterexample": "a less-than-or-equal comparison would incorrectly report active at exact expiry while source still appears close to the intended rule",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The expiry mutant changed the boundary to <= and the exact-expiry test failed active versus expired."
+      },
+      "substrates": [
+        {
+          "name": "GitHub plugin with controlled clock",
+          "status": "exercised",
+          "evidence": "The focused test observes active at issuance, expired at exact expiry and HTTP 200 authorization afterward."
+        }
+      ],
+      "evidence": "EX-1 through EX-3 pass and the boundary mutant is killed."
+    },
+    {
+      "id": "copy-isolation",
+      "claim": "Token-map and inspection consumers cannot mutate stored metadata through shared permissions or repository arrays.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "stored metadata on a second inspection after mutating the first response",
+        "layer": "HTTP response and Store collection boundary",
+        "method": "mutate returned permissions and repository_ids, then inspect again",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "spread syntax appears in the response projection",
+        "counterexample": "projection-only copying would not prove that tokenMap and ledger do not share nested references at write time",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Source inspection confirms independent copies at metadata insertion, tokenMap insertion and response projection; the second HTTP read retains original values."
+      },
+      "substrates": [
+        {
+          "name": "GitHub Store plus HTTP serialization",
+          "status": "exercised",
+          "evidence": "The focused immutability test modifies the deserialized first response and observes unchanged values on the second request."
+        }
+      ],
+      "evidence": "Write-time and read-time copy ownership is explicit and the direct mutation oracle passes."
+    },
+    {
+      "id": "reset-lifecycle",
+      "claim": "Standalone reset clears minted installation metadata and authorization while preserving seeded fallback behavior and generated App identity.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "inspection rows, private repository authorization, fallback user resolution and generated key identity after reset",
+        "layer": "public createEmulator reset and HTTP boundary",
+        "method": "mint, use, reset, re-inspect and re-use both old installation and fallback credentials",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Store.reset clears the metadata collection",
+        "counterexample": "the Store could be empty while the separate tokenMap still authorizes the old installation token or fallback identity is lost",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The reset mutation suppressed tokenMap deletion and the test failed because the stale installation entry survived. The built proof separately observes empty metadata, 403 old-token access, 200 fallback access and stable key."
+      },
+      "substrates": [
+        {
+          "name": "built createEmulator standalone runtime",
+          "status": "exercised",
+          "evidence": "/tmp/emulate-installation-token-http-proof.json drives the public reset method and real HTTP routes."
+        }
+      ],
+      "evidence": "RS-1 through RS-5 pass, the reset mutant is killed and the built HTTP proof returns PASS."
+    },
+    {
+      "id": "adapter-persistence",
+      "claim": "Next.js and Nuxt cold starts restore both installation-token metadata and authorization from adapter persistence.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "inspection equality and authenticated repository access from a new adapter instance",
+        "layer": "adapter snapshot, cold-start and mounted service HTTP boundary",
+        "method": "persist from the first instance, construct a second instance and drive inspection and authorization",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the serialized snapshot contains the new collection name",
+        "counterexample": "metadata can be serialized while tokenMap authorization is not restored, or vice versa",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The adapter mutant disabled tokenMap restoration; the snapshot still existed but private repository access returned 401. Both adapter suites require inspection equality and working authorization."
+      },
+      "substrates": [
+        {
+          "name": "Next.js adapter contract",
+          "status": "exercised",
+          "evidence": "github-app-identity.test.ts passes 17/17 and includes cold-start metadata plus authorization restoration."
+        },
+        {
+          "name": "Nuxt adapter contract",
+          "status": "exercised",
+          "evidence": "The shared contract passes 17/17 through the Nuxt adapter mount."
+        }
+      ],
+      "evidence": "Both adapter suites pass; the built Core-boundary restore mutant fails and restores green."
+    },
+    {
+      "id": "legacy-compatibility",
+      "claim": "A snapshot without the metadata collection restores authorization without fabricating rows, and a later mint uses a newly recreated collection.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "empty initial inspection, restored old-token authorization, new mint inspection and subsequent snapshot contents",
+        "layer": "legacy adapter snapshot restore and mounted GitHub routes",
+        "method": "remove the collection from a real snapshot, cold-start, inspect, authorize and mint again",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Store.restore accepts arbitrary collection sets",
+        "counterexample": "the mint route could retain a stale pre-restore collection reference and write metadata to an object no longer owned by Store",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The legacy stale-collection mutant changed the live collection resolution and the post-restore mint failed to create an inspection row. The restored implementation resolves getGitHubStore(store) at mint time and passes."
+      },
+      "substrates": [
+        {
+          "name": "Next.js and Nuxt legacy snapshot contracts",
+          "status": "exercised",
+          "evidence": "Both adapters restore a snapshot lacking github.installation_token_metadata, preserve old authorization, show no fabricated row and persist a new row after mint."
+        }
+      ],
+      "evidence": "Legacy contract tests pass in both adapters and the built GitHub-boundary mutant is killed."
+    },
+    {
+      "id": "authorization-separation",
+      "claim": "Inspection metadata does not grant authorization and metadata write failure cannot leave a usable minted token.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "tokenMap membership and authenticated HTTP behavior when metadata insertion is forced to throw",
+        "layer": "mint write ordering and GitHub auth middleware",
+        "method": "force Collection.insert failure, assert HTTP 500, no ghs_ tokenMap entry and empty inspection",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the source lists metadata insertion before tokenMap.set",
+        "counterexample": "an error could be swallowed or authorization could be written through another path despite apparent statement order",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "The forced exception propagates as 500 and direct tokenMap inspection confirms no installation token entry. No second authorization writer exists in the mint route."
+      },
+      "substrates": [
+        {
+          "name": "GitHub mint route and tokenMap",
+          "status": "exercised",
+          "evidence": "The resilience PW-1 test spies on the real collection insert and observes the route, tokenMap and inspection residual state."
+        }
+      ],
+      "evidence": "Metadata-first ordering is owned by apps.ts and the forced failure leaves no usable secret-bearing authorization."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "authentication lifecycle",
+      "adapter persistence compatibility",
+      "reset state transition",
+      "legacy snapshot restoration"
+    ],
+    "dimensions": {
+      "values": [
+        "ledger insertion present versus absent",
+        "one row per successful mint versus cardinality collapse",
+        "secret-free projection versus actual token leak",
+        "active-before-expiry and expired-at-equality",
+        "installation authorization deletion versus stale entry after reset",
+        "tokenMap restoration versus metadata-only restoration",
+        "legacy missing collection followed by a new mint",
+        "successful versus rejected mints",
+        "all-repository versus selected-repository installation tokens",
+        "standalone, Next.js and Nuxt runtime boundaries"
+      ],
+      "exclusions": [
+        "authorization expiry enforcement is explicitly deferred",
+        "OAuth and seeded-token inspection are out of scope",
+        "per-token lookup and revocation UI are out of scope",
+        "concurrent mint load is not introduced by the synchronous single-process Store path"
+      ],
+      "evidence": "/tmp/emulate-installation-token-test-strength.md sections 2 through 10 enumerate the matrix, oracle provenance, producer boundaries and seven mutation observations."
+    },
+    "oracle": {
+      "source": "test-controlled seed data, fake time, actual minted secrets and independently observed HTTP status and snapshot transitions",
+      "independent": true,
+      "evidence": "Expected App, installation, account and timestamp values come from fixtures and controlled time, while confidentiality searches for the actual runtime token. Adapter equality compares independently obtained cold-start responses."
+    },
+    "producer": {
+      "name": "real GitHub App mint HTTP route, createEmulator reset and adapter persistence dispatch",
+      "status": "exercised",
+      "evidence": "The GitHub suite drives live Hono routes, the built proof imports packages/emulate/dist/api.js, and adapter mutations build Core or GitHub before exercising mounted runtime paths."
+    },
+    "falsification": [
+      {
+        "mutation": "remove metadata ledger insertion",
+        "red_evidence": "/tmp/emulate-strength-ledger.log exits 1 because inspection is empty after a successful mint.",
+        "restored_green_evidence": "/tmp/emulate-strength-ledger-green.log exits 0 after hash-verified restoration."
+      },
+      {
+        "mutation": "collapse repeated mint cardinality to at most one row",
+        "red_evidence": "/tmp/emulate-strength-cardinality.log exits 1 because two mints return one row.",
+        "restored_green_evidence": "/tmp/emulate-strength-cardinality-green.log exits 0 after restoration."
+      },
+      {
+        "mutation": "inject the actual token into the inspection projection",
+        "red_evidence": "/tmp/emulate-strength-leak.log exits 1 on the strict response shape and confidentiality oracle.",
+        "restored_green_evidence": "/tmp/emulate-strength-leak-green.log exits 0 after restoration."
+      },
+      {
+        "mutation": "change expiry comparison from less-than to less-than-or-equal",
+        "red_evidence": "/tmp/emulate-strength-expiry.log exits 1 because exact expiry is reported active.",
+        "restored_green_evidence": "/tmp/emulate-strength-expiry-green.log exits 0 after restoration."
+      },
+      {
+        "mutation": "suppress installation-token deletion during reset",
+        "red_evidence": "/tmp/emulate-strength-reset.log exits 1 because a stale installation entry breaks the expected post-reset fallback path.",
+        "restored_green_evidence": "/tmp/emulate-strength-reset-green.log exits 0 after restoration."
+      },
+      {
+        "mutation": "restore an empty tokenMap at the built adapter boundary",
+        "red_evidence": "/tmp/emulate-strength-adapter.log exits 1 because restored authorization returns 401.",
+        "restored_green_evidence": "/tmp/emulate-strength-adapter-green.log exits 0 after restoration."
+      },
+      {
+        "mutation": "use a stale or invalid metadata collection reference after legacy restore",
+        "red_evidence": "/tmp/emulate-strength-legacy.log exits 1 because a post-restore mint creates no inspectable row.",
+        "restored_green_evidence": "/tmp/emulate-strength-legacy-green.log exits 0 after restoration."
+      }
+    ],
+    "evidence": "All seven mutants exited 1 for the intended assertion, all restorations returned the historical factory checksum, all restored targeted suites exited 0, and the current checksum equivalence is documented in /tmp/emulate-test-strength-equivalence.md."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Solution Gate dual-write probe",
+      "claim": "Collection.insert is synchronous and propagates an exception before tokenMap.set can execute.",
+      "status": "verified",
+      "evidence": "Core Collection source was inspected and the PW-1 forced insertion failure returns 500 with no tokenMap entry."
+    },
+    {
+      "id": "A2",
+      "source": "Solution Gate route composition probe",
+      "claim": "The shared GitHub plugin route is reachable in standalone, Next.js and Nuxt with adapter prefix stripping.",
+      "status": "verified",
+      "evidence": "Standalone HTTP proof and both adapter contract suites reach the documented paths."
+    },
+    {
+      "id": "A3",
+      "source": "Solution Gate persistence probe",
+      "claim": "Generic Store snapshots include a newly named collection without a schema-specific branch.",
+      "status": "verified",
+      "evidence": "Adapter tests observe github.installation_token_metadata in persistence and restore it on cold start."
+    },
+    {
+      "id": "A4",
+      "source": "Subsystem model",
+      "claim": "Legacy restore removes a missing collection and a later getGitHubStore call recreates the current empty collection.",
+      "status": "verified",
+      "evidence": "Store.restore source, both legacy adapter tests and the stale-collection mutation verify this seam."
+    },
+    {
+      "id": "A5",
+      "source": "Issue Contract confidentiality boundary",
+      "claim": "The inspection response can satisfy its use case without accepting, returning or deriving any token identifier.",
+      "status": "verified",
+      "evidence": "The parameterless collection route returns required App, installation, account, permission, repository and lifecycle fields and the direct secret search passes."
+    },
+    {
+      "id": "A6",
+      "source": "Solution Gate reset seam",
+      "claim": "Installation credentials are distinguishable in tokenMap without deleting seeded or fallback behavior.",
+      "status": "verified",
+      "evidence": "Reset filters entries carrying user.installation; the built proof observes old installation access 403, fallback access 200 and a stable generated key."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The slice creates externally observable in-memory metadata and authorization state, participates in durable adapter snapshots, restores legacy state and clears state on reset. Each operation is synchronous within one JS turn; commit events are defined at the point the completed state becomes observable.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "A successful mint publishes one metadata row and one installation authorization entry.",
+        "owner": "GitHub installation access-token route",
+        "commit_event": "The synchronous route completes both metadata insert and tokenMap.set and returns HTTP 201.",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      },
+      {
+        "id": "CP2",
+        "effect": "Adapter persistence publishes Store collections and token maps for a later cold start.",
+        "owner": "existing adapter-runtime snapshot pipeline",
+        "commit_event": "The persistence backend contains the snapshot produced after the mutating mint request.",
+        "later_fallible_stages": [
+          "restore a snapshot that predates the metadata collection",
+          "first post-restore mint resolves the live metadata collection"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "generic Store restore and GitHub collection resolution",
+            "covers": [
+              "restore a snapshot that predates the metadata collection",
+              "first post-restore mint resolves the live metadata collection"
+            ],
+            "forced": true,
+            "residual_observed": "Old installation authorization is restored, inspection is empty without fabricated rows, and the next mint creates one live metadata row.",
+            "cleanup_owner": "Store.restore removes absent collections; getGitHubStore recreates the collection on demand.",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The same legacy-restored adapter instance immediately mints a new token, inspects it and persists the new collection."
+            },
+            "evidence": "Both adapter legacy tests pass and the legacy stale-collection mutant fails at the first post-restore mint before restoration."
+          }
+        ]
+      },
+      {
+        "id": "CP3",
+        "effect": "Standalone reset publishes a clean post-reset state with installation metadata and authorization removed.",
+        "owner": "createEmulator reset method",
+        "commit_event": "The synchronous reset method completes tokenMap cleanup, Store reset and reseeding and returns.",
+        "later_fallible_stages": [
+          "reuse fallback identity after reset",
+          "mint and inspect a new installation token after reset"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "public standalone reset lifecycle",
+            "covers": [
+              "reuse fallback identity after reset",
+              "mint and inspect a new installation token after reset"
+            ],
+            "forced": true,
+            "residual_observed": "Inspection is empty, old installation access is 403, fallback /user is 200, generated key is unchanged and a new mint is inspectable.",
+            "cleanup_owner": "createEmulator reset owns tokenMap deletion, Store clearing and reseeding.",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The API test and resilience RS-5 immediately mint and use a new installation token after reset."
+            },
+            "evidence": "/tmp/emulate-installation-token-http-proof.json and the reset tests exercise the complete post-reset partition; the reset mutant proves stale authorization is rejected."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Mint and reset paths changed; existing response shape, seeded tokens, fallback behavior and generated key identity were checked."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Installation metadata introduced new successful, rejected, repository-selection, expiry, reset and restore state cells."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Metadata writers and readers must resolve the same live Store collection, especially after legacy restore."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell string construction, execution or metacharacter detector changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No emitter, process channel or one-shot latch exists in this slice."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No shim, polyfill or compatibility wrapper was added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Empty repository_ids for all-repository selection, batch clock capture and the emulator-only unauthenticated inspection route were reviewed."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Ledger-to-tokenMap ordering, legacy collection recreation and reset cleanup seams were independently pressured."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Core Store, adapter persistence and built package boundaries were exercised with source mutations and cold-start contracts."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "The endpoint is emulator-specific and has no GitHub production API equivalent."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Forced ledger failure propagates as HTTP 500 and leaves no authorization entry or metadata row."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No feature flag or conditional dispatch option was introduced."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Metadata insertion failure, rejected mints, exact expiry, reset, persistence and legacy restore paths were forced."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "Failed pre-authorization metadata write, legacy restore and post-reset immediate reuse were checked."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No async wait, timeout, retry, queue or cancellation mechanism was added."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Mint validation, metadata insert, tokenMap insert, inspection projection, reset and adapter restore were traced end to end."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Core Collection and Store behavior, adapter snapshot restore and actual HTTP outputs were observed at their substrates."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "A real built createEmulator instance was minted, inspected, authorized, reset and reused."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "All metadata writers, authorization writers, reset owners and response projectors were enumerated."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Standalone and mounted paths plus confidentiality, expiry, reset and persistence prose were checked against behavior."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "The curl and path documentation is backed by the built HTTP proof."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No .decisions.tsv decision trail exists, which is the lens trigger."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Projection and reset loops are linear and no new helper exceeds cyclomatic complexity 2."
+    },
+    {
+      "name": "Mandatory Test Strength",
+      "status": "run",
+      "reason": "The lifecycle and compatibility changes required Test Strength; seven of seven fix-absent mutants were killed and restored green."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "acknowledged",
+      "reason": "Hunter explicitly confirmed on 2026-08-28 that em dashes are valid in this repository's prose style; the GitHub package README usage is intentional."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "Every compiled GitHub, emulate, Next.js and Nuxt documentation surface is included."
+    },
+    {
+      "check": "siblings installation-token",
+      "outcome": "acknowledged",
+      "reason": "The only absent sibling is Core auth.test.ts, which tests unchanged generic token-map serialization rather than the new metadata route."
+    },
+    {
+      "check": "callers createEmulator",
+      "outcome": "acknowledged",
+      "reason": "The public return contract is unchanged and non-GitHub callers have no installation entries; only internal reset cleanup changes."
+    },
+    {
+      "check": "callers getGitHubStore",
+      "outcome": "acknowledged",
+      "reason": "The additional named collection is backward-compatible for existing callers and introduces no new failure outcome."
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": "The diff introduces no wait ceiling, timeout or producer cadence."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "The map reports 16 changed and 258 impacted symbols but materially under-covers with 20,937 unresolved calls versus 4,966 edges; review inspected beyond it."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "refuted",
+      "claim": "Generic createEmulator callers require changes because reset semantics changed.",
+      "evidence": "The public API surface is unchanged; non-GitHub token maps contain no installation credentials and GitHub reset now better matches clean-state semantics.",
+      "layer": "public API caller contract",
+      "source": "gate",
+      "path": "",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F2",
+      "state": "exempted",
+      "claim": "Core auth.test.ts must change because it mentions installation-token.",
+      "evidence": "It tests unchanged serialization of an existing installation credential discriminant, not metadata recording, inspection or reset.",
+      "layer": "generic token-map serialization test",
+      "source": "gate",
+      "path": "",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F3",
+      "state": "exempted",
+      "claim": "The em dash in the GitHub package README violates style.",
+      "evidence": "Hunter explicitly approved em dashes for this repository on 2026-08-28 and neighboring package documentation uses the same prose style.",
+      "layer": "repository documentation style",
+      "source": "gate",
+      "path": "",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F4",
+      "state": "refuted",
+      "claim": "Adding installationTokenMetadata to getGitHubStore breaks existing callers.",
+      "evidence": "The return object gains one property; existing callers access named existing collections and receive no changed semantics or failure outcome.",
+      "layer": "typed Store facade caller contract",
+      "source": "gate",
+      "path": "getGitHubStore to existing route consumers",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F5",
+      "state": "refuted",
+      "claim": "Legacy restore can leave the mint path writing to a stale metadata collection.",
+      "evidence": "Store.restore removes the absent collection, getGitHubStore constructs a fresh facade per call, both adapter legacy tests pass and the stale-collection mutant fails as intended.",
+      "layer": "adapter restore and subsequent mint",
+      "source": "lens",
+      "path": "Store.restore to getGitHubStore to appsRoutes mint",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "The GitHub package README may use an em dash.",
+      "evidence": "Hunter explicitly approved repository-style em dashes on 2026-08-28."
+    },
+    {
+      "claim": "Core auth.test.ts does not need a metadata-inspection update.",
+      "evidence": "It covers unchanged generic token-map serialization, not the new GitHub Store collection or route."
+    },
+    {
+      "claim": "Expiry enforcement, OAuth inspection, per-token lookup and revocation UI are absent.",
+      "evidence": "They are explicit non-goals and carried limits in the accepted contract and Solution Gate."
+    },
+    {
+      "claim": "The emulator-only inspection route has no auth guard.",
+      "evidence": "It accepts no token input and the direct serialized-response oracle proves that it returns no token or token-derived identifier."
+    }
+  ],
+  "issue_candidates": []
+}

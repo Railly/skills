@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-24",
+    "repo": "vercel-labs/agent-browser",
+    "base": "origin/main",
+    "head": "a846348e66dae240f456b1e5e55d9912e9667925",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "user request: create a release PR after #1707 merged",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5.6-sol",
+    "reviewer_model": "reference oracles and deterministic Review Gate",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "merging the version bump activates the repository release workflow and remote package publication"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "evidence/2026-08-24-agent-browser-v0.35.0-reference-oracles.txt",
+      "evidence": "The frozen diff was compared against the v0.34.0 release PR, the current npm registry versions, the release workflow, and every merged PR since the last tag."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user request in this thread",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The requested artifact is a release PR for the merged work."
+    },
+    {
+      "source": "design",
+      "location": "no separate Solution Gate or Issue Contract",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "The repository release precedent and workflow provide the applicable shape."
+    },
+    {
+      "source": "user_facing",
+      "location": "CHANGELOG.md and docs/src/app/changelog/page.mdx",
+      "status": "reviewed",
+      "properties": ["P2"],
+      "evidence": "Both release-note surfaces were read against the merged PR descriptions."
+    },
+    {
+      "source": "implementation",
+      "location": "nine-file version and changelog diff at a846348",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The exact base-to-head diff matches the prior release shape and contains no product logic change."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Every published package, Rust crate, dashboard package, and runtime install constant resolves to version 0.35.0.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the version values consumed by build and publication surfaces",
+        "layer": "repository manifests and generated runtime constant",
+        "method": "run scripts/check-version-sync.js and inspect the exact nine-file diff",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "package.json alone says 0.35.0",
+        "counterexample": "leave Cargo.toml, Eve, sandbox, dashboard, or the sandbox runtime constant at 0.34.0",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The sync checker reads all version surfaces and would reject any mismatched counterexample; it passed at 0.35.0."
+      },
+      "substrates": [
+        {
+          "name": "checked-out manifests and generated source",
+          "status": "exercised",
+          "evidence": "scripts/check-version-sync.js reported Versions are in sync: 0.35.0."
+        },
+        {
+          "name": "sandbox package build and test runtime",
+          "status": "exercised",
+          "evidence": "The sandbox suite passed 18 tests including the default install-spec version assertion."
+        }
+      ],
+      "evidence": "All version surfaces changed from 0.34.0 to 0.35.0 and package builds consumed them successfully."
+    },
+    {
+      "id": "P2",
+      "claim": "The v0.35.0 release notes faithfully summarize the user-facing work merged after v0.34.0 without presenting the CI-only fix as a product feature.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the correspondence between release-note claims and merged mainline changes",
+        "layer": "Git history, merged PR descriptions, and both release-note surfaces",
+        "method": "enumerate v0.34.0..origin/main and compare #1669, #1705, and #1707 to the extracted release section",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the release section is non-empty",
+        "counterexample": "write a non-empty section that omits #1705, overstates #1669 platform support, or lists #1707 as user-facing behavior",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The extracted section was checked claim by claim against the three merged PR bodies and the v0.34.0 tag range."
+      },
+      "substrates": [
+        {
+          "name": "GitHub merged PR metadata and repository history",
+          "status": "exercised",
+          "evidence": "The tag range contains exactly #1669, #1707, and #1705."
+        },
+        {
+          "name": "CHANGELOG.md release marker extraction and docs changelog build",
+          "status": "exercised",
+          "evidence": "The extracted release notes contain 13 lines and both docs and dashboard production builds passed."
+        }
+      ],
+      "evidence": "#1669 is listed as a Linux Chromium feature, #1705 as an improvement, and #1707 remains validation evidence only."
+    },
+    {
+      "id": "P3",
+      "claim": "After merge, the existing release workflow will recognize 0.35.0 as a new version and has non-empty notes to publish.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "the inputs that the release workflow itself compares and extracts",
+        "layer": "npm registry state and .github/workflows/release.yml",
+        "method": "query all three npm package versions, inspect the workflow comparison, and execute its release-marker extraction locally",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "local package.json differs from npm",
+        "counterexample": "the workflow could compare another manifest, skip a package, or extract an empty marker range",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The workflow reads package.json and the two package manifests, while the exact awk extraction produced a non-empty release section."
+      },
+      "substrates": [
+        {
+          "name": "npm registry",
+          "status": "exercised",
+          "evidence": "agent-browser, @agent-browser/sandbox, and @agent-browser/eve each report 0.34.0."
+        },
+        {
+          "name": "repository release workflow",
+          "status": "exercised",
+          "evidence": "The workflow comparison and marker extraction were read and the extraction command was executed successfully."
+        }
+      ],
+      "evidence": "The local 0.35.0 values differ from registry 0.34.0 values and the workflow's release-note input is non-empty."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {
+      "values": [],
+      "exclusions": [],
+      "evidence": "The diff changes release metadata and prose, not a protocol, parser, serializer, state machine, lifecycle, adapter, or compatibility layer."
+    },
+    "oracle": {
+      "source": "not applicable",
+      "independent": true,
+      "evidence": "No behavioral model changed."
+    },
+    "producer": {
+      "name": "not applicable",
+      "status": "not_applicable",
+      "evidence": "No runtime producer changed."
+    },
+    "falsification": [],
+    "evidence": "Version synchronization and release workflow qualification are covered by direct deterministic oracles."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "release precedent",
+      "claim": "v0.35.0 is the correct semantic version because the unreleased range contains the new --ca-cert feature.",
+      "status": "verified",
+      "evidence": "v0.34.0..origin/main contains feat(cli): trust proxy CAs through Chromium NSS (#1669), requiring a minor bump."
+    },
+    {
+      "id": "A2",
+      "source": "release workflow",
+      "claim": "package.json remains the source version used to decide whether to release.",
+      "status": "verified",
+      "evidence": ".github/workflows/release.yml reads package.json and compares it with npm before building and publishing."
+    },
+    {
+      "id": "A3",
+      "source": "release-note scope",
+      "claim": "The test-race fix has no user-facing behavior that requires a changelog bullet.",
+      "status": "verified",
+      "evidence": "#1707 only extracts a pure resolver and replaces an environment/filesystem test; product behavior is unchanged."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The reviewed diff only changes version metadata and release prose. Package publication occurs only after a separate human merge and the existing main-branch workflow, so this exact diff has no direct commit point during review.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "no matcher, parser, lookup, or data source changed"},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "no validator or input domain changed"},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "no input resolution rule changed"},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "no shell command construction changed"},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "no process messaging or latch changed"},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "no shim or subprocess fixture changed"},
+    {"name": "Deliberate-default check", "status": "skipped", "reason": "no behavior default changed"},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "compared the nine-file release seam against v0.34.0 and found the same required surfaces"},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "no parser or substrate-dependent input handling changed"},
+    {"name": "Reference-implementation oracle", "status": "run", "reason": "v0.34.0 release PR #1678 and the current release workflow were used as independent shape oracles"},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "no function gains a new failure outcome"},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "the release note mentions an already-merged flag but the diff adds or propagates no flag"},
+    {"name": "Error-path forcing", "status": "skipped", "reason": "no error path changed"},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "no recovery action changed"},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "no wait, timeout, or cancellation changed"},
+    {"name": "Boundary pipeline trace", "status": "skipped", "reason": "no feature boundary changed"},
+    {"name": "Substrate verification", "status": "run", "reason": "queried npm, ran version sync checks, built packages and docs, and exercised the workflow's note extraction"},
+    {"name": "Dogfood the built artifact", "status": "skipped", "reason": "the diff ships metadata and prose rather than a new runnable feature; the underlying features were already verified in their merged PRs"},
+    {"name": "Newly-asserted invariant ownership", "status": "skipped", "reason": "the release notes summarize existing scoped behavior and assert no new always or never invariant"},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "each release-note claim was checked against #1669 and #1705, including Linux-only scope and explicit CA clearing"},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "no documentation example was added"},
+    {"name": "Choice audit", "status": "skipped", "reason": "no decision trail exists and no implementation choice changed"},
+    {"name": "Complexity budget", "status": "skipped", "reason": "no executable loop, lookup, or per-element path changed"}
+  ],
+  "deterministic": [
+    {"check": "style", "outcome": "pass", "reason": "no em dash or prohibited comment punctuation in added lines"},
+    {"check": "surfaces", "outcome": "pass", "reason": "the release diff does not trigger a missing product surface"},
+    {"check": "version sync", "outcome": "pass", "reason": "scripts/check-version-sync.js reports 0.35.0 everywhere"},
+    {"check": "release markers", "outcome": "pass", "reason": "the workflow's awk extraction produces 13 lines"},
+    {"check": "registry delta", "outcome": "pass", "reason": "all publishable npm packages remain at 0.34.0"},
+    {"check": "CI Rust format and clippy", "outcome": "pass", "reason": "the exact repository CI commands pass"},
+    {"check": "Rust suite", "outcome": "pass", "reason": "1,145 unit tests and 2 doctor integration tests passed"},
+    {"check": "package and docs builds", "outcome": "pass", "reason": "sandbox, Eve, dashboard, and docs checks passed"},
+    {"check": "siblings --ca-cert", "outcome": "acknowledged", "reason": "matched files carry the already-merged #1669 implementation and documentation; this release diff changes no behavior on those surfaces"},
+    {"check": "siblings protected Vercel", "outcome": "acknowledged", "reason": "matched files carry the already-merged #1705 skill; the release diff only adds its changelog entry"},
+    {"check": "head coverage", "outcome": "pass", "reason": "this report records exact HEAD a846348e66dae240f456b1e5e55d9912e9667925"}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "issue_candidate",
+      "claim": "Rust 1.98 `cargo clippy --all-targets -- -D warnings` rejects a pre-existing unbounded test range in cli/src/native/browser.rs.",
+      "evidence": "The additional non-CI command failed at browser.rs:3494 while the exact CI clippy command passed.",
+      "layer": "repository test-target lint coverage",
+      "source": "lens",
+      "path": "",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Product files mentioning --ca-cert are absent from the release diff.",
+      "evidence": "They already contain the merged #1669 behavior; the release PR only changes version and changelog surfaces."
+    },
+    {
+      "claim": "Product files mentioning protected Vercel deployments are absent from the release diff.",
+      "evidence": "They already contain the merged #1705 skill; the release PR only changes version and changelog surfaces."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Run Clippy across all Rust targets or fix the Rust 1.98 unbounded-range lint",
+      "evidence": "`cargo clippy --all-targets -- -D warnings` fails at cli/src/native/browser.rs:3494; the exact CI command passes.",
+      "why_out_of_scope": "The source predates and is untouched by the release metadata diff; mixing it into the release PR would obscure the release-only scope."
+    }
+  ]
+}

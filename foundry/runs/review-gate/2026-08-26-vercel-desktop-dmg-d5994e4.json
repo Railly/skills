@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-26",
+    "repo": "vercel-labs/vercel-desktop",
+    "base": "c77537352ec3b1afee0a0c8e53ac8d1052248fa8",
+    "head": "d5994e4f111a917f451a46fba5a4e7d9a845fb86",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-26-vercel-desktop-dmg-presentation-c775373.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12"],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "Codex root runtime",
+    "reviewer_model": "gpt-5.6-sol via Vercel AI Gateway",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["cross-platform guarantee", "release artifact lifecycle"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "2026-08-26-vercel-desktop-dmg-d5994e4-independent.md",
+      "evidence": "Published broken v0.0.18 bytes, fixed artifacts, GitHub macOS 14/15 runners, and macOS 15 producer to macOS 14 consumer were exercised; an exact-head reviewer found no actionable defects."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "PR #21 and the frozen Solution Gate contract",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "R0 through R12 were reconciled and the full discriminator matrix was executed."
+    },
+    {
+      "source": "design",
+      "location": "2026-08-26-vercel-desktop-dmg-presentation-c775373.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "Solution Gate selected Finder authoring plus result-level visual verification and rejected new packaging dependencies."
+    },
+    {
+      "source": "user_facing",
+      "location": "PR #21 body",
+      "status": "reviewed",
+      "properties": ["P1", "P3"],
+      "evidence": "The PR promises restored branded presentation while retaining layout and release behavior."
+    },
+    {
+      "source": "implementation",
+      "location": "d5994e4 base-to-head diff",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The exact five-file diff was reviewed statically, packaged, mounted, rendered, and independently reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The final read-only DMG renders the repository artwork and exact installer layout in Finder.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Finder's rendered final DMG window, geometry, icon size, and item positions",
+        "layer": "user-visible Finder window",
+        "method": "read-only mount, Finder open, window screencapture, distinctive-pixel comparison, and geometry readback",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Artwork file and background-related metadata strings exist in the DMG",
+        "counterexample": "Published v0.0.18 contains those proxies but Finder renders a plain white background",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Broken artifact produced 24.2% distinctive-pixel match and mean channel difference 108.4; fixed artifacts produced 100.0%."
+      },
+      "substrates": [
+        {"name": "local macOS 26 Finder", "status": "exercised", "evidence": "Full package and two fixed DMGs passed at 100.0%; published v0.0.18 failed."},
+        {"name": "GitHub macOS 14 Finder", "status": "exercised", "evidence": "Runs 32999502003 and 33000899153 captured and accepted the final artwork."},
+        {"name": "GitHub macOS 15 Finder", "status": "exercised", "evidence": "Run 32999502003 authored and captured the final artwork noninteractively."}
+      ],
+      "evidence": "Good artifacts passed at 100.0% with exact positions 190,185 and 570,185, 128-point icons, and 760-point content width."
+    },
+    {
+      "id": "P2",
+      "claim": "The same final bytes remain presentable across machines, supported macOS versions, suffixed mounts, and quarantine provenance.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Finder rendering of checksum-identical transferred bytes under the compatibility conditions",
+        "layer": "cross-machine consumer Finder",
+        "method": "macOS 15 production, artifact transfer and SHA-256 equality, quarantine xattr, forced /Volumes/Vercel 1 mount, macOS 14 visual gate",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Same-machine detach and remount succeeds",
+        "counterexample": "Builder-specific metadata could pass same-machine remount but fail after artifact transfer to another host",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "The stronger cross-machine probe passed: run 33000899153 reported 100.0% match on macOS 14 after transfer and quarantine."
+      },
+      "substrates": [
+        {"name": "macOS 15 producer to macOS 14 consumer", "status": "exercised", "evidence": "GitHub Actions run 33000899153."},
+        {"name": "suffixed mount /Volumes/Vercel 1", "status": "exercised", "evidence": "A checksum-identical first copy occupied /Volumes/Vercel before visual verification mounted the consumer copy."},
+        {"name": "quarantined downloaded copy", "status": "exercised", "evidence": "The consumer copy received com.apple.quarantine before Finder verification."}
+      ],
+      "evidence": "Transferred bytes retained SHA-256 and passed the same repository comparator at 100.0%."
+    },
+    {
+      "id": "P3",
+      "claim": "Styling completes before signing and final verification does not alter app, updater, feed, or release publication behavior.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Packaging stage order and existing artifact checks",
+        "layer": "release packaging pipeline",
+        "method": "source trace, full pnpm package, pnpm check/build, codesign verification, and hdiutil verify",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The new scripts are referenced by package-macos.sh",
+        "counterexample": "A referenced styling script could still run after DMG signing or modify the updater ZIP",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Source order places style immediately after create-dmg and before codesign/notary; updater ZIP is completed first and never consumed by the new scripts."
+      },
+      "substrates": [
+        {"name": "local ad-hoc package", "status": "exercised", "evidence": "pnpm --dir apps/swift package completed and created app, DMG, and updater ZIP."},
+        {"name": "release workflow source", "status": "exercised", "evidence": "release.yml still runs the same release:check and post-package signature, stapler, Gatekeeper, hdiutil, feed, and publication checks."}
+      ],
+      "evidence": "Exact-head independent review confirmed styling-before-signing and final artifact verification without changing app or updater packaging paths."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["Finder OS interaction", "packaging compatibility layer"],
+    "dimensions": {
+      "values": [
+        "artifact: published broken vs fixed",
+        "OS: macOS 14, macOS 15, local macOS 26",
+        "display: 1x and 2x capture",
+        "mount: normal and suffixed",
+        "provenance: local and transferred quarantined",
+        "format: final read-only UDZO",
+        "result: expected artwork vs plain Finder background"
+      ],
+      "exclusions": ["macOS older than the declared 14.0 consumer floor"],
+      "evidence": "Every supported equivalence class was exercised by local or GitHub runner probes."
+    },
+    "oracle": {
+      "source": "Repository artwork and the published broken release artifact",
+      "independent": true,
+      "evidence": "Expected pixels come from source artwork, while the negative fixture predates the implementation and visibly reproduces the reported defect."
+    },
+    "producer": {
+      "name": "Finder rendering a mounted final DMG",
+      "status": "exercised",
+      "evidence": "Finder authored, opened, and rendered real HFS+ UDZO artifacts on local and GitHub-hosted macOS systems."
+    },
+    "falsification": [
+      {
+        "mutation": "Use the published v0.0.18 DMG, which lacks effective Finder-authored presentation while retaining artwork and metadata proxies.",
+        "red_evidence": "Visual gate exited 1 with 24.2% match and mean channel difference 108.4.",
+        "restored_green_evidence": "Fixed local package and known-good candidate DMG each exited 0 with 100.0% match."
+      },
+      {
+        "mutation": "Classify Retina captures only by the earlier narrow 17xx width range.",
+        "red_evidence": "A valid 1656-pixel Retina Finder capture failed with Unexpected DMG window screenshot width.",
+        "restored_green_evidence": "Selecting @2x at width >= 1520 accepted the same artifact at 100.0% while the broken artifact remained rejected."
+      }
+    ],
+    "evidence": "The visual gate rejects realistic wrong artifacts and survives the observed display and portability matrix."
+  },
+  "assumptions": [
+    {"id": "A1", "source": "Solution Gate F2/F6", "claim": "Finder authoring and capture work noninteractively in protected-runner-shaped sessions.", "status": "verified", "evidence": "Run 32999502003 passed on macOS 14 and 15 without prompt or hang; AppleScript now has a 30-second timeout."},
+    {"id": "A2", "source": "Solution Gate F7", "claim": "Finder-authored metadata survives cross-machine transfer, quarantine, final UDZO compression, and a suffixed mount.", "status": "verified", "evidence": "Run 33000899153 passed the full chain at 100.0%."},
+    {"id": "A3", "source": "Solution Gate R7", "claim": "Distinctive-pixel comparison rejects the reported plain-background class rather than merely checking dominant black pixels.", "status": "verified", "evidence": "Published broken artifact failed at 24.2%; fixed artifacts passed at 100.0%."}
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The packaging invocation replaces the generated DMG after successful UDZO conversion; temporary mounts and work directories are trap-cleaned.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "Replace the generated DMG with Finder-authored final UDZO bytes",
+        "owner": "apps/swift/scripts/style-dmg.sh",
+        "commit_event": "mv final.dmg to the requested DMG path after detach and conversion",
+        "later_fallible_stages": ["DMG signing or notarization", "final visual verification"],
+        "failure_partitions": [
+          {
+            "ownership_region": "packaging and final verification",
+            "covers": ["DMG signing or notarization", "final visual verification"],
+            "forced": true,
+            "residual_observed": "A broken final DMG failed visual verification with status 1; both style and verification work directories returned to their pre-probe sets and no probe mount remained.",
+            "cleanup_owner": "style-dmg.sh and verify-dmg.sh EXIT traps; package-macos.sh set -e aborts publication",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The same operation was immediately retried after reauthoring and passed at 100.0% visual match."
+            },
+            "evidence": "/tmp/vercel-dmg-recovery.1LtmjO contains forced-failure and retry-success logs; command reported style_failure=1 verify_failure=1 cleanup=pass retry=pass."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source was replaced."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No validator or trigger domain was widened."},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No shared resolution rule changed."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command string is reparsed or appended."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No detached-process message or latch changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim was introduced."},
+    {"name": "Deliberate-default check", "status": "skipped", "reason": "No new default or fallback behavior was added."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Checked create-dmg to Finder authoring to conversion to signing to visual verification seams; no finding."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Compared published broken and fixed DMGs across local and runner Finder substrates."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "Finder output and repository artwork are the direct product oracle."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "package-macos.sh owns both new failure outcomes under set -e and fails packaging clearly."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flags were added or changed."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Forced plain-background rejection and narrow-Retina-classification rejection."},
+    {"name": "Non-destructive recovery", "status": "run", "reason": "Temporary mounts and directories are trap-cleaned; source DMG replacement happens only after successful conversion."},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "Finder authoring and verification have bounded 30-second AppleScript timeouts and cleanup traps."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced presentation before signing and verification after signing/notarization/stapling."},
+    {"name": "Substrate verification", "status": "run", "reason": "Exercised real Finder, hdiutil, screencapture, CoreGraphics, macOS 14/15/26, and final UDZO bytes."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "pnpm package produced and visually verified the shipped DMG boundary."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "package-macos.sh owns the visual gate and IdentityTests asserts its wiring."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "README and AGENTS claims remain accurate; no public command or artifact contract changed."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example changed."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision-trail artifact was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "Pixel comparison is linear over image pixels plus bounded vertical alignment search; inputs are fixed at 760x660 or 1520x1320."}
+  ],
+  "deterministic": [
+    {"check": "style", "outcome": "pass", "reason": "No banned punctuation in added lines."},
+    {"check": "surfaces", "outcome": "pass", "reason": "All DMG pipeline surfaces required by conventions are present."},
+    {"check": "timings", "outcome": "pass", "reason": "No millisecond timing constant or producer cadence conflict."},
+    {"check": "siblings DMG", "outcome": "acknowledged", "reason": "AGENTS, README files, CHANGELOG, untouched IdentityTests lines, and create-dmg.mjs describe unchanged general packaging or staging behavior; none claims the obsolete metadata-only mechanism."},
+    {"check": "execdeps", "outcome": "pass", "reason": "No new installable dependency was added; macOS system executables are used inside the existing macOS-only package path."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "Exact-head diff is clean."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {"claim": "The full pnpm test failure is outside this diff.", "evidence": "geistFontsResolveAfterBundleRegistration fails identically on base c775373 because AppKit reports Geist Mono as non-fixed-pitch; the new DMG test passes."},
+    {"claim": "DMG documentation siblings require no edits.", "evidence": "They describe unchanged commands, artifact set, or release process, not Finder metadata or verification behavior."}
+  ],
+  "issue_candidates": [
+    {"title": "Geist Mono fixed-pitch assertion fails on this machine", "evidence": "The focused test fails identically on c775373 and d5994e4.", "why_out_of_scope": "Typography/AppKit behavior is unrelated to DMG presentation and untouched by the diff."}
+  ]
+}

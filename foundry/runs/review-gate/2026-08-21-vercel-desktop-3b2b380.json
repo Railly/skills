@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "vercel-labs/vercel-desktop",
+    "base": "1c3d4c76dd47043945ae3362cc7f7dc05533d84e",
+    "head": "3b2b38006f6df22f5022e64e32e9df494c1378ad",
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Exact-head Fable 5 and Grok 4.6 processes exited successfully but emitted empty reports, so neither counts as a review.",
+      "The final packaged app was signed and its DMG verified, but it was not reopened for a final visual dogfood pass."
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-21-vercel-desktop-cli-agents-fx-1c3d4c7.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Vercel CLI owns coding-agent discovery, preview, warnings, migrations, and writes",
+      "Desktop has no separate fx install, OAuth, status, or configuration path",
+      "legacy Desktop-managed configs retain restore and delete cleanup",
+      "association persists only after every approved CLI phase and Keychain save succeeds"
+    ],
+    "gaps": ["No separate Issue Contract or Spec review result was supplied."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "Fable 5 and Grok 4.6 exact-head attempts emitted no report",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["secrets", "durable state", "remote side effects", "process lifecycle"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "/private/tmp/vercel-desktop-native-gate.bfS4nZ/grok/candidate-audit.md",
+      "evidence": "Grok 4.6 audited the candidate lifecycle and its verified association findings were fixed before this HEAD. Exact-head review remains a separate named gap."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Owner decision in the AI Gateway spend-management thread and revised task scope",
+      "status": "reviewed",
+      "properties": ["cli-authority", "association-lifecycle", "legacy-cleanup", "no-fx-special-path"],
+      "evidence": "The owner team chose AI Gateway API-key setup for fx through the shared CLI path."
+    },
+    {
+      "source": "design",
+      "location": "Solution Gate and revised owner direction",
+      "status": "reviewed",
+      "properties": ["cli-authority", "association-lifecycle", "legacy-cleanup", "no-fx-special-path"],
+      "evidence": "The revised shape removes Desktop-owned fx behavior and keeps the CLI adapter plus legacy cleanup."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md and src/setup.native",
+      "status": "reviewed",
+      "properties": ["cli-authority", "legacy-cleanup", "no-fx-special-path"],
+      "evidence": "README and Settings describe CLI ownership and contain no fx-specific card or installer."
+    },
+    {
+      "source": "implementation",
+      "location": "src/app.zig, src/integrations.zig, src/setup.native, src/tests.zig",
+      "status": "reviewed",
+      "properties": ["cli-authority", "association-lifecycle", "legacy-cleanup", "no-fx-special-path"],
+      "evidence": "Full origin/main...HEAD diff, unchanged callers, deterministic gates, 174 tests, build, package, signature, and DMG were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "cli-authority",
+      "claim": "Desktop previews and applies the installed CLI's detected coding-agent plan without a local runtime agent catalog or write recipe.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "argv and accepted machine envelope at the CLI process boundary",
+        "layer": "process adapter",
+        "method": "effect tests and upstream CLI source contract",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "preview text contains agent names",
+        "counterexample": "display names are not stable IDs and explicit IDs replace automatic detection",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Desktop passes no agent ID for detected setup and forwards only validated consent IDs returned by the CLI."
+      },
+      "substrates": [
+        {
+          "name": "Native SDK subprocess harness",
+          "status": "exercised",
+          "evidence": "Tests assert dry-run, detected apply, consent-only apply, serial consent order, malformed output, truncation, and terminal reasons."
+        }
+      ],
+      "evidence": "The exact argv and machine-response transitions pass in the 174-test suite."
+    },
+    {
+      "id": "association-lifecycle",
+      "claim": "agents_key_id becomes durable only after every approved CLI phase succeeds and the Keychain save succeeds.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "persisted association and in-memory state after each phase and failure",
+        "layer": "application persistence",
+        "method": "forced phase failures and forced credential-store failure",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "one CLI phase returned status ok",
+        "counterexample": "base apply succeeds but consent or the later Keychain save fails",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Both cases leave the association empty or restore its previous value and expose Try Again."
+      },
+      "substrates": [
+        {
+          "name": "Native SDK effect and credential-store harness",
+          "status": "exercised",
+          "evidence": "FakeStore refusal and serial EffectExit transitions were driven."
+        }
+      ],
+      "evidence": "Force-red mutations rejected early association, lost idempotent success, replacement-key association, and ignored save failure."
+    },
+    {
+      "id": "legacy-cleanup",
+      "claim": "Only configs marked as managed by an earlier Desktop release are offered for restore or deletion.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "managed-mask selection and exact backup restore or created-file delete",
+        "layer": "filesystem cleanup",
+        "method": "existing cleanup tests and new ownership predicates",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "a config currently routes through Gateway",
+        "counterexample": "a CLI-owned configured file was never created by Desktop",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Configured state without config_managed is not offered as legacy cleanup."
+      },
+      "substrates": [
+        {
+          "name": "Native SDK filesystem harness",
+          "status": "exercised",
+          "evidence": "Exact backup restore, app-created delete, shell cleanup, and failed cleanup retry passed."
+        }
+      ],
+      "evidence": "Legacy rows are filtered by config_managed and remain outside the CLI write path."
+    },
+    {
+      "id": "no-fx-special-path",
+      "claim": "Desktop contains no fx-specific installer, OAuth inspection, status parser, effect, command, or UI path.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "complete exact-head source and rendered setup markup",
+        "layer": "application and UI source",
+        "method": "stale-value searches, diff inspection, markup assertion, and force-red mutation",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the visible fx card was removed",
+        "counterexample": "hidden fx effects, parsers, commands, or state could remain after removing only markup",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Search and diff inspection confirm removal across app state, integrations, markup, and tests."
+      },
+      "substrates": [
+        {
+          "name": "compiled Native markup and exact-head source tree",
+          "status": "exercised",
+          "evidence": "Strict markup check passes and the no-fx assertion rejects a restored fx label."
+        }
+      ],
+      "evidence": "The removal commit deletes 415 lines and the exact-head tree contains no special fx symbols or UI label."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["JSON protocol parser", "multi-phase lifecycle", "external-process adapter"],
+    "dimensions": {
+      "values": [
+        "preview valid, wrong reason, malformed, truncated, or empty",
+        "ordinary changes, migrations, consent-only, mixed, duplicate consent, unmatched warning, or invalid ID",
+        "configured, already configured, top-level error, or non-zero exit",
+        "base only, base then consent, multiple consent, later phase failure, or persistence failure",
+        "legacy managed, legacy created, cleanup failure, or CLI-owned untracked config"
+      ],
+      "exclusions": ["Live mutation of real agent config files was excluded to avoid overwriting user-owned local harness configuration."],
+      "evidence": "174 tests exercise the modeled classes and upstream CLI source defines the excluded real-write semantics."
+    },
+    "oracle": {
+      "source": "Vercel CLI machine contract, frozen product decision, and pre-existing legacy cleanup fixtures",
+      "independent": true,
+      "evidence": "Expected reasons, ID ownership, and cleanup ownership come from upstream and durable pre-change fixtures."
+    },
+    "producer": {
+      "name": "Vercel CLI machine JSON",
+      "status": "exercised",
+      "evidence": "Upstream CLI source and captured machine envelopes were checked against the parser."
+    },
+    "falsification": [
+      {
+        "mutation": "restore an fx label in Settings",
+        "red_evidence": "/private/tmp/vercel-desktop-fx-removal-red.JZ7hOh/red.log failed the intended no-fx assertion",
+        "restored_green_evidence": "/private/tmp/vercel-desktop-fx-removal-red.JZ7hOh/restored-green.log passed 174 tests"
+      },
+      {
+        "mutation": "persist association after the base phase",
+        "red_evidence": "/private/tmp/vercel-desktop-force-red.r5lTPB/reject-partial-association.log failed the phase tests",
+        "restored_green_evidence": "/private/tmp/vercel-desktop-force-red.r5lTPB/restored-green.log passed"
+      },
+      {
+        "mutation": "persist association during replacement-key resolution",
+        "red_evidence": "/private/tmp/vercel-desktop-force-red.r5lTPB/reject-key-replacement-association-v3.log failed the regression test",
+        "restored_green_evidence": "/private/tmp/vercel-desktop-force-red.r5lTPB/restored-green-v3.log passed"
+      }
+    ],
+    "evidence": "The decisive removal and lifecycle guards were falsified and restored independently."
+  },
+  "assumptions": [
+    {
+      "id": "cli-explicit-id",
+      "source": "Solution Gate",
+      "claim": "An explicit --agent value replaces automatic detection and represents consent for that CLI-returned ID.",
+      "status": "verified",
+      "evidence": "Vercel CLI resolve and setup source at the recorded snapshot."
+    },
+    {
+      "id": "legacy-owner",
+      "source": "subsystem model",
+      "claim": "config_managed is the durable authority for whether Desktop may restore or delete a legacy config.",
+      "status": "verified",
+      "evidence": "Existing persistence and cleanup machinery use managed and created masks; CLI-owned configured state is excluded."
+    },
+    {
+      "id": "fx-upstream",
+      "source": "owner team decision",
+      "claim": "fx will use an AI Gateway API key through Vercel CLI coding-agents setup.",
+      "status": "verified",
+      "evidence": "Samarth stated this is the current plan and Joe and Pranit agreed to use it as the immediate path."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "CLI setup mutates agent configs and Desktop persists agents_key_id in Keychain.",
+    "commit_points": [
+      {
+        "id": "agent-config-write",
+        "effect": "Vercel CLI writes detected or explicitly consented agent configuration.",
+        "owner": "Vercel CLI",
+        "commit_event": "accepted coding_agents_configured or already_configured response",
+        "later_fallible_stages": ["later consent apply", "Desktop association Keychain save"],
+        "failure_partitions": [
+          {
+            "ownership_region": "CLI follow-up",
+            "covers": ["later consent apply"],
+            "forced": true,
+            "residual_observed": "Earlier CLI writes remain, association stays empty, and UI shows failure.",
+            "cleanup_owner": "Vercel CLI backups; Desktop retries idempotently from preview",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Try Again starts a new dry-run and already_configured is accepted on replay."
+            },
+            "evidence": "failed consent follow-up regression test"
+          },
+          {
+            "ownership_region": "Desktop persistence",
+            "covers": ["Desktop association Keychain save"],
+            "forced": true,
+            "residual_observed": "CLI writes remain, in-memory association rolls back, and UI shows a save-specific failure.",
+            "cleanup_owner": "Desktop",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "After removing the FakeStore refusal, Try Again starts a new preview."
+            },
+            "evidence": "association save failure regression test and force-red mutation"
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"Compared Desktop catalog ownership with CLI machine ownership and preserved legacy cleanup."},
+    {"name":"New-domain matrix","status":"run","reason":"Machine envelopes, consent records, terminal reasons, and failure transitions were enumerated."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"All runtime setup IDs come from the strict machine parser."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"The final diff adds no shell command construction or re-parsing."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No one-shot notification channel or fx Terminal path remains."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No production shim or fake executable was added."},
+    {"name":"Deliberate-default check","status":"run","reason":"Visible warnings require Apply and only reviewed CLI-returned consent IDs are forwarded."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Reviewed CLI output to parser to phase state to Keychain association and legacy cleanup."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No guard in this change has failed review twice on the same input class."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Vercel CLI source supplied the independent machine contract."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Malformed, truncated, non-terminal, partial-phase, and save failures were traced to UI and retry."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"--dry-run, --non-interactive, --key, and CLI-returned --agent IDs were checked at every phase."},
+    {"name":"Error-path forcing","status":"run","reason":"Non-zero exits, malformed output, truncation, follow-up failure, and Keychain refusal were forced."},
+    {"name":"Non-destructive recovery","status":"run","reason":"Retry starts from preview and rolls back unpersisted association state."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Preview can be dismissed; apply cannot be canceled mid-process and has no polling loop."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced Desktop UI through subprocess argv, machine response, phase sequencing, persistence, and displayed status."},
+    {"name":"Substrate verification","status":"run","reason":"The packaged app signature and DMG were verified, and the process adapter was exercised in tests."},
+    {"name":"Dogfood the built artifact","status":"skipped","reason":"The packaged UI was not reopened; this is a named run gap."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"CLI owns new writes and config_managed owns legacy cleanup."},
+    {"name":"Docs-behavior parity","status":"run","reason":"README and Settings state CLI ownership and no longer advertise special fx behavior."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example was added."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists and decisions.tsv is intentionally absent."},
+    {"name":"Complexity budget","status":"run","reason":"Consent and warning loops are bounded to 32 entries and process argv budgets are bounded."}
+  ],
+  "deterministic": [
+    {"check":"pnpm check","outcome":"pass","reason":"Strict Native manifest and markup checks passed."},
+    {"check":"pnpm test","outcome":"pass","reason":"174 of 174 tests passed on exact HEAD."},
+    {"check":"pnpm build","outcome":"pass","reason":"ReleaseFast macOS binary built on exact HEAD."},
+    {"check":"pnpm package","outcome":"pass","reason":"Ad-hoc signed app and compressed DMG were created."},
+    {"check":"codesign --verify --deep --strict","outcome":"pass","reason":"The packaged app signature verified."},
+    {"check":"hdiutil verify","outcome":"pass","reason":"The 0.0.11 DMG checksum is valid."},
+    {"check":"git diff --check","outcome":"pass","reason":"No whitespace errors."},
+    {"check":"gate.sh style","outcome":"pass","reason":"No prohibited punctuation in added lines."},
+    {"check":"gate.sh surfaces","outcome":"pass","reason":"App and Native markup changes include executable tests."},
+    {"check":"gate.sh stale","outcome":"pass","reason":"Retired Desktop catalog and fx-special symbols have zero hits."},
+    {"check":"gate.sh callers","outcome":"pass","reason":"Changed setup lifecycle callers are inside reviewed files."},
+    {"check":"gate.sh siblings","outcome":"acknowledged","reason":"Historical changelog, credential workflow, and CLI discovery references do not describe setup ownership or fx behavior; unchanged same-file passages remain accurate."},
+    {"check":"gate.sh covered","outcome":"pass","reason":"This report covers exact HEAD 3b2b380."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {"claim":"CHANGELOG.md remains unchanged.","evidence":"Version and current release notes move only in a separate release PR."},
+    {"claim":"General CLI and credential references remain unchanged.","evidence":"They do not describe coding-agent setup ownership or fx behavior."},
+    {"claim":"src/agents.zig remains.","evidence":"Earlier Desktop-managed configs still require exact backup restoration and created-file deletion."}
+  ],
+  "issue_candidates": [
+    {"title":"Ship fx support in Vercel CLI coding-agents setup","evidence":"The owner team selected AI Gateway API-key setup through the shared CLI path.","why_out_of_scope":"Owned by the Vercel CLI coding-agent catalog and setup implementation, not Desktop."},
+    {"title":"Complete exact-head visual and external review","evidence":"The package verified, but the app was not reopened and both reviewer processes emitted empty reports.","why_out_of_scope":"Verification follow-up, not a code defect found in this run."}
+  ]
+}

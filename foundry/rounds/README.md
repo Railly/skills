@@ -15,4 +15,3 @@ Each directory records one candidate, the evidence considered, benchmark variant
 | [011](011-register-software-factory/README.md) | staged execution protocol between the solution and review gates | register as experimental with the overlap question open |
 | [012](012-register-herdr-workstreams/README.md) | visible Herdr topology for selected engineering workstreams | register as experimental with one end-to-end dogfood run owed |
 | [013](013-register-factory-loop/README.md) | master router across the gated engineering lifecycle | register as experimental and preserve phase ownership |
-| [014](014-register-security-review/README.md) | threat-boundary classification for security-sensitive changes | register as evaluated experimental; preserve Review Gate and Resilience ownership |

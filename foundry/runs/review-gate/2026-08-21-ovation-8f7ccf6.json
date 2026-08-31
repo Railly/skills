@@ -1,0 +1,374 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "ovation",
+    "base": "04b41227dd5e5e20bdd74d9505656be8e7cc4870",
+    "head": "8f7ccf65a59caa7d27fe0bc8f9ec866fef3e1143",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-21-ovation-work-enrichment-7a510dd/decision.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Issue Contract or Spec review was provided; the approved terminology and implementation request supplied the delivery contract."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "durable Postgres projection",
+      "remote GitHub reads",
+      "concurrent calculation and reset lifecycle"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "2026-08-21-ovation-8f7ccf6.md",
+      "evidence": "Exact HEAD was challenged with a real 660-item GitHub backlog, persisted Postgres projection, authenticated hard reload, and isolated fix-absent mutation."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Approved user terminology and implementation request",
+      "status": "reviewed",
+      "properties": ["complete-triage", "durable-reload", "absorbed-ui"],
+      "evidence": "The user approved Triage, Sort by triage, Triage score and Repository rank, requested implementation and a PR."
+    },
+    {
+      "source": "design",
+      "location": "Solution Gate decision and Ovation conventions",
+      "status": "reviewed",
+      "properties": ["complete-triage", "durable-reload", "failure-preservation", "reset-integrity", "absorbed-ui"],
+      "evidence": "GitHub remains authoritative, enrichment remains optional, Agents owns the right sidebar, and local projections cannot hide native rows."
+    },
+    {
+      "source": "user_facing",
+      "location": "Triage tab, filter dialog, sidebar rows and apps/web/README.md",
+      "status": "reviewed",
+      "properties": ["complete-triage", "durable-reload", "failure-preservation", "absorbed-ui"],
+      "evidence": "Authenticated exact-HEAD browser snapshots match the approved vocabulary and show the complete result."
+    },
+    {
+      "source": "implementation",
+      "location": "Base 04b4122 to head 8f7ccf6",
+      "status": "reviewed",
+      "properties": ["complete-triage", "durable-reload", "failure-preservation", "reset-integrity", "absorbed-ui"],
+      "evidence": "The full diff, modular consumers, pagination adapter, schema validation, store, reset lifecycle, hydration and tests were reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "complete-triage",
+      "claim": "Every discovered open issue and pull request is ranked, including important work beyond the first 100 items.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "complete open-backlog coverage and repository order",
+        "layer": "GitHub REST, Postgres, and rendered inbox",
+        "method": "compare paginated source count, persisted projection count, and rendered identity",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the first 100 items contain plausible results",
+        "counterexample": "item #120 can outrank every item while lying outside the former 100-item seed",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The live projection contains 660 open items and exact HEAD renders #120 at #1 with score 74.3."
+      },
+      "substrates": [
+        {
+          "name": "GitHub REST plus local Postgres plus authenticated localhost UI",
+          "status": "exercised",
+          "evidence": "The persisted schema-v2 projection reported 660 items and the exact-HEAD DOM showed #120 first."
+        }
+      ],
+      "evidence": "Real-producer dogfood and the beyond-first-page deterministic test agree."
+    },
+    {
+      "id": "durable-reload",
+      "claim": "Triage preference and completed projections render immediately after navigation or reload without reverting then flickering.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "the first post-reload DOM and selected filter state",
+        "layer": "Next.js server render and browser UI",
+        "method": "hard reload the direct Triage route, then inspect tab, card, sidebar, and filter before mutation",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "browser storage contains sort=triage",
+        "counterexample": "the server can render Updated first and switch only after hydration",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The first exact-HEAD snapshot after reload already showed Triage selected and #1 · 74.3 in the sidebar."
+      },
+      "substrates": [
+        {
+          "name": "Next.js 16 authenticated localhost reload",
+          "status": "exercised",
+          "evidence": "Direct reload of /vercel-labs/agent-browser/120/triage preserved the tab, sort, rank, score, and Agents pane."
+        }
+      ],
+      "evidence": "Server-hydrated preferences and Postgres projection agree before interaction."
+    },
+    {
+      "id": "failure-preservation",
+      "claim": "A failed recalculation does not replace or hide the previous completed projection or GitHub-native row.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "rank, score, and sidebar row after a failed POST",
+        "layer": "browser-visible end-to-end state",
+        "method": "abort the enrichment request and inspect the prior result and error text",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the POST reports an error",
+        "counterexample": "the request can fail after clearing client or persisted state",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The prior forced browser failure retained Repository rank, score 74.3, and the native row; the merge changes no ownership in this path."
+      },
+      "substrates": [
+        {
+          "name": "authenticated Chromium with intercepted localhost POST",
+          "status": "exercised",
+          "evidence": "The prior result remained visible and the UI reported that the previous calculation was unchanged."
+        }
+      ],
+      "evidence": "Client state is committed only after persisted calculation succeeds."
+    },
+    {
+      "id": "reset-integrity",
+      "claim": "Factory reset cannot allow an in-flight calculation to republish a deleted projection.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "ordering between calculation drain and projection deletion",
+        "layer": "server lifecycle ownership",
+        "method": "inspect the reset gate, active promise registry, and sole projection remover",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "reset deletes the table row",
+        "counterexample": "an earlier calculation can complete its upsert after deletion",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "resetInProgress blocks new work and Promise.allSettled drains active work before clearWorkEnrichments."
+      },
+      "substrates": [
+        {
+          "name": "server reset and calculator control flow",
+          "status": "exercised",
+          "evidence": "Caller sweep and source inspection confirm one registry, one reset gate, and one remover."
+        }
+      ],
+      "evidence": "The merge preserved the lifecycle ownership and exact-HEAD checks compile it."
+    },
+    {
+      "id": "absorbed-ui",
+      "claim": "Xref is absorbed as local Triage enrichment without a dedicated panel, prompt injection, or package dependency.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "rendered layout, routes, prompts, and dependency surface",
+        "layer": "browser UI and source tree",
+        "method": "drive the item route and scan user-facing vocabulary and retired modules",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the old panel component was deleted",
+        "counterexample": "old prompt injection, routes, or package coupling can remain without the component",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Old graph modules and prompt injection are absent, Agents remains the right sidebar, and no Xref dependency exists."
+      },
+      "substrates": [
+        {
+          "name": "localhost modular item workspace",
+          "status": "exercised",
+          "evidence": "Triage renders as an internal item tab and Agents remains visible in the right pane."
+        }
+      ],
+      "evidence": "The approved labels render and old product vocabulary has zero relevant hits."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "GitHub pagination adapter",
+      "durable projection lifecycle",
+      "Next.js browser persistence boundary"
+    ],
+    "dimensions": {
+      "values": [
+        "backlog: one page, more than 100 items",
+        "item kind: issue, pull request",
+        "ranking: high score on page one, high score beyond page one, stable tie",
+        "projection: absent, complete, stale schema, incomplete count",
+        "navigation: client transition, direct reload",
+        "calculation: success, network failure, persistence refusal, reset overlap"
+      ],
+      "exclusions": [
+        "closed-item historical ranking is excluded because the contract ranks the current open backlog",
+        "cross-repository score normalization is excluded because Repository rank is repository-scoped"
+      ],
+      "evidence": "The model crosses source pagination, item kind, ranking edge, persisted state, navigation mode, and failure stage."
+    },
+    "oracle": {
+      "source": "GitHub REST counts, direct Postgres projection, and browser-visible rank",
+      "independent": true,
+      "evidence": "Expected source count and rendered identity came from the live producer and database, not production helper output."
+    },
+    "producer": {
+      "name": "GitHub REST through the authenticated Next.js route",
+      "status": "exercised",
+      "evidence": "A real 660-open-item repository was paginated, persisted, and rendered on exact HEAD."
+    },
+    "falsification": [
+      {
+        "mutation": "remove age points from calculateTriageEnrichment in an isolated exact-HEAD worktree",
+        "red_evidence": "The intended formula assertion failed: Expected 24, Received 12.",
+        "restored_green_evidence": "The temporary worktree was removed and the branch returned 7 pass, 0 fail."
+      }
+    ],
+    "evidence": "Real-producer pagination, reload, forced error, and exact-HEAD formula mutation exercise the critical partitions."
+  },
+  "assumptions": [
+    {
+      "id": "rest-list-metrics",
+      "source": "Solution Gate",
+      "claim": "GitHub list payloads provide comments, reactions, and created_at for formula v1.",
+      "status": "verified",
+      "evidence": "The live #120 payload produced 13 comments, 14 reactions, 217 days, and score 74.3."
+    },
+    {
+      "id": "github-authoritative",
+      "source": "Ovation conventions",
+      "claim": "Optional enrichment never replaces native GitHub work item state.",
+      "status": "verified",
+      "evidence": "UI merges enrichment by normalized identity and a forced failure retained the native row."
+    },
+    {
+      "id": "table-reuse",
+      "source": "Implementation model",
+      "claim": "The existing JSONB table can store schema-v2 WorkEnrichment without a migration.",
+      "status": "verified",
+      "evidence": "Physical columns are unchanged and the persisted schema-v2 660-item projection remains readable after the merge."
+    },
+    {
+      "id": "bounded-cookie",
+      "source": "React persistence design",
+      "claim": "A bounded repository-key cookie is sufficient for server-first hydration without serializing reports into the browser.",
+      "status": "verified",
+      "evidence": "Postgres supplied the report and exact-HEAD reload rendered rank and score immediately."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "An explicit calculation publishes a Postgres projection and a bounded browser repository-key preference.",
+    "commit_points": [
+      {
+        "id": "projection-upsert",
+        "effect": "publish a complete schema-v2 WorkEnrichment row",
+        "owner": "writeWorkEnrichment",
+        "commit_event": "Postgres upsert resolves successfully",
+        "later_fallible_stages": ["HTTP response delivery", "client atom merge"],
+        "failure_partitions": [
+          {
+            "ownership_region": "HTTP and browser delivery",
+            "covers": ["HTTP response delivery", "client atom merge"],
+            "forced": true,
+            "residual_observed": "the complete database row remained readable and prior UI state remained coherent",
+            "cleanup_owner": "no cleanup is needed for a complete idempotently readable projection",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "A subsequent hard reload recovered the 660-item completion."
+            },
+            "evidence": "The browser request was forced to fail after a known completion and the prior rank remained visible."
+          }
+        ]
+      },
+      {
+        "id": "calculated-repository-cookie",
+        "effect": "remember up to 32 repository keys for server-first report hydration",
+        "owner": "successful Triage UI action",
+        "commit_event": "document.cookie assignment after persisted POST response",
+        "later_fallible_stages": ["Next.js reload reads cookie", "Postgres report lookup"],
+        "failure_partitions": [
+          {
+            "ownership_region": "Next.js server render and database read",
+            "covers": ["Next.js reload reads cookie", "Postgres report lookup"],
+            "forced": true,
+            "residual_observed": "the cookie held only the repository key while Postgres supplied the report",
+            "cleanup_owner": "factory reset expires the cookie and clears the projection",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Direct exact-HEAD reload rendered the saved filter and report on the first snapshot."
+            },
+            "evidence": "Post-reload DOM inspection showed Triage, Repository rank, Triage score, and the ranked sidebar."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher or lookup source replacement."},
+    {"name": "New-domain matrix", "status": "run", "reason": "Pagination and persisted-state dimensions were modeled and driven."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Normalized repository and item identities were checked in rank, map, filter, and modular UI joins."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command composition."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No daemon warning or one-shot latch."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No external executable shim."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Updated remains the default and unknown sort values normalize safely."},
+    {"name": "Fresh-seam scan", "status": "skipped", "reason": "No framework patch or vendored workaround."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Live GitHub, Postgres projection, and exact-HEAD browser DOM were compared."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "The formula is product-defined rather than copied from an external standard."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Persistence refusal, network failure, and reset-in-progress outcomes were traced to callers."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No new launch flag."},
+    {"name": "Error-path forcing", "status": "run", "reason": "The enrichment POST was forcibly aborted and prior state verified."},
+    {"name": "Non-destructive recovery", "status": "run", "reason": "Failed recalculation preserves the completed projection and native row."},
+    {"name": "Cancellation and timeout hygiene", "status": "run", "reason": "Calculations deduplicate, reset blocks new work, and active promises drain before deletion."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "GitHub pagination, formula, DB upsert, route, atom merge, hydration, and DOM were traced."},
+    {"name": "Substrate verification", "status": "run", "reason": "The live producer, Postgres, and authenticated browser were exercised."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "The existing localhost Next.js app was driven from the committed tree without restart."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Complete coverage is owned by schema-v2 validation and completed-only publication."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Reset prose and rendered labels match behavior and approved vocabulary."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "Ranking is O(n log n), joins use Maps, and remote reads are paginated in bounded pages."}
+  ],
+  "deterministic": [
+    {"check": "head coverage", "outcome": "pass", "reason": "This report targets exact HEAD 8f7ccf6."},
+    {"check": "style", "outcome": "pass", "reason": "No added em dash or prohibited comment punctuation remains."},
+    {"check": "stale repository-ranking terminology", "outcome": "pass", "reason": "Sort by priority, Priority score, and Repository position have zero hits."},
+    {"check": "callers", "outcome": "pass", "reason": "All callers of changed enrichment, pagination, and reset contracts are in reviewed files."},
+    {"check": "surface db migration", "outcome": "acknowledged", "reason": "No migration is required because the physical table and JSONB column are unchanged."},
+    {"check": "surface agent models", "outcome": "acknowledged", "reason": "Removing internal Xref prompt context changes no RunSnapshot field or model contract."},
+    {"check": "triage sibling sweep", "outcome": "acknowledged", "reason": "Remaining generic triage hits describe the existing Triage agent role or migration history, not repository ranking."},
+    {"check": "typecheck", "outcome": "pass", "reason": "Next typegen and tsc completed successfully on exact HEAD."},
+    {"check": "unit tests", "outcome": "pass", "reason": "Seven tests passed and the exact-HEAD formula mutation produced the intended red."},
+    {"check": "lint", "outcome": "pass", "reason": "Oxlint exited zero with inherited warnings only."},
+    {"check": "diff-check", "outcome": "pass", "reason": "No whitespace errors."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {"claim": "No Drizzle migration accompanies schema v2.", "evidence": "The table, columns, and JSONB storage are physically unchanged and schema v2 remains readable."},
+    {"claim": "agent-models.ts is absent from the diff.", "evidence": "No run data shape changed; only internal Xref prompt context was removed."},
+    {"claim": "Generic triage sibling files remain unchanged.", "evidence": "Those passages describe the existing Triage agent role or immutable migration history, not repository ranking."},
+    {"claim": "Inherited lint warnings remain.", "evidence": "Lint exits zero and no warning originates from the repository-ranking behavior."}
+  ],
+  "issue_candidates": []
+}

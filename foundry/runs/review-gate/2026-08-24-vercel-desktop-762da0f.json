@@ -1,0 +1,368 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-24",
+    "repo": "vercel-labs/vercel-desktop",
+    "base": "1c3d4c76dd47043945ae3362cc7f7dc05533d84e",
+    "head": "762da0f0bcdd5104261d24779c9f40eb53ee088d",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-24-vercel-desktop-usage-report/decision.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "one key-filtered 30-day usage-report snapshot is numeric authority",
+      "CLI and OAuth transports share one parser and publisher",
+      "publication requires the active generation and durable keyId",
+      "UTC-day semantics remain unchanged",
+      "last-good state and managed key survive report failures",
+      "legacy hourly chart, model breakdown, and top spenders remain available"
+    ],
+    "gaps": ["No separate Issue Contract or Spec review result was supplied."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex with Fable 5 design challenge",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["authentication", "secrets", "durable state", "remote reporting boundary"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-24-vercel-desktop-usage-report/proposal-fable.md",
+      "evidence": "Fable 5 independently challenged transport, authority, identity, failure, and compatibility choices against a frozen packet before implementation. The selected hybrid shape was reconciled with a separate Gemini proposal and production API probes."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Solution Gate requirements R0 through R17",
+      "status": "reviewed",
+      "properties": ["transport-secrecy", "snapshot-authority", "identity-and-recovery", "compatibility", "bounded-auth-lifecycle"],
+      "evidence": "The reconciled requirements define transport ownership, UTC dates, key identity, atomic publication, failure preservation, and retained legacy detail."
+    },
+    {
+      "source": "design",
+      "location": "Solution Gate selected shape H",
+      "status": "reviewed",
+      "properties": ["transport-secrecy", "snapshot-authority", "identity-and-recovery", "compatibility", "bounded-auth-lifecycle"],
+      "evidence": "The selected hybrid design was checked against production response probes and merged API source."
+    },
+    {
+      "source": "user_facing",
+      "location": "Existing spend cards, range charts, stale state, model rows, and top-spender rows",
+      "status": "reviewed",
+      "properties": ["snapshot-authority", "identity-and-recovery", "compatibility"],
+      "evidence": "The public UI and README make no endpoint-specific claim; visible totals, ranges, details, and stale behavior remain the contract."
+    },
+    {
+      "source": "implementation",
+      "location": "src/app.zig, src/spend.zig, and src/tests.zig at 762da0f",
+      "status": "reviewed",
+      "properties": ["transport-secrecy", "snapshot-authority", "identity-and-recovery", "compatibility", "bounded-auth-lifecycle"],
+      "evidence": "The exact base-to-head diff, all callers, parser, state transitions, persistence, 171 tests, deterministic gates, and ReleaseFast build were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "transport-secrecy",
+      "claim": "OAuth sends only the Vercel access token to api.vercel.com, while CLI sessions delegate auth to vercel api and the Gateway secret never reaches api.vercel.com.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "destination, argv, and Authorization header at each transport boundary",
+        "layer": "network and subprocess adapter",
+        "method": "exact effect assertions and production auth probe",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the endpoint returns a successful response",
+        "counterexample": "a successful request could still leak the Gateway secret to the Vercel account endpoint",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Tests assert the OAuth Bearer token and CLI argv separately; the Gateway secret appears only on legacy ai-gateway.vercel.sh requests."
+      },
+      "substrates": [
+        {
+          "name": "Native SDK fetch and subprocess effects",
+          "status": "exercised",
+          "evidence": "Tests inspect exact URL, header, scope slug, raw flag, and key-filtered path."
+        }
+      ],
+      "evidence": "Transport assertions passed in the 171-test exact-head suite."
+    },
+    {
+      "id": "snapshot-authority",
+      "claim": "One validated 30-day report atomically supplies Today, 7-day, and 30-day spend, requests, tokens, and daily buckets with inclusive UTC dates.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "published window values and buckets for a known upstream report envelope",
+        "layer": "report protocol and application state",
+        "method": "captured production envelope, merged API reference source, and derivation tests",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the JSON parses and the HTTP request succeeds",
+        "counterexample": "valid JSON with missing days, inconsistent totals, duplicate dates, oversized metrics, or truncation could publish torn numbers",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Each inconsistent class is rejected before state mutation; valid, optional-field, and empty-zero reports publish expected windows."
+      },
+      "substrates": [
+        {
+          "name": "Production usage-report contract and Zig parser",
+          "status": "exercised",
+          "evidence": "The production shape was captured during Solution Gate and replayed through the exact parser and publisher."
+        }
+      ],
+      "evidence": "Window derivation and parser regressions passed; malformed and inconsistent envelopes were rejected."
+    },
+    {
+      "id": "identity-and-recovery",
+      "claim": "Only the active generation for the current durable keyId may publish, and every report failure preserves the last-good snapshot and managed key.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "current key, totals, stale bit, generation, and persisted report after forced faults",
+        "layer": "application lifecycle and persistence",
+        "method": "state-transition regressions, forced Keychain refusal, retry, and fix-absent mutations",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "effect key matches the current request",
+        "counterexample": "the key target can change while an effect with a reusable generation-shaped key is still in flight",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "A matching effect key with a changed durable keyId is rejected, and removing that target guard makes the regression fail."
+      },
+      "substrates": [
+        {
+          "name": "Native SDK state and credential-store harness",
+          "status": "exercised",
+          "evidence": "Old generation, changed key, transport failure, malformed response, deadline, and Keychain refusal were forced."
+        }
+      ],
+      "evidence": "Last-good mutation failed with expected 500000 versus 0; restored suite passed 171/171."
+    },
+    {
+      "id": "compatibility",
+      "claim": "The hourly Today chart, range-specific model rows, and top spenders remain available while usage-report owns numeric totals.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "legacy requests, chart buckets, numeric authority, and retained grouped rows",
+        "layer": "UI data model and external request boundary",
+        "method": "effect and state assertions against pre-existing behavior",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "legacy requests are still emitted",
+        "counterexample": "a late hourly response could overwrite authoritative totals or grouped rows could be cleared during refresh",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Hourly data copies only 24 chart buckets; requests and tokens remain from usage-report, and grouped caches retain last-good rows while loading."
+      },
+      "substrates": [
+        {
+          "name": "Native SDK UI model and effect harness",
+          "status": "exercised",
+          "evidence": "Tests assert legacy hourly, model, and top-spender requests plus authoritative usage-report totals."
+        }
+      ],
+      "evidence": "Compatibility assertions passed on exact HEAD."
+    },
+    {
+      "id": "bounded-auth-lifecycle",
+      "claim": "An OAuth 401 triggers at most one refresh and retry, while failure or deadline terminates the report cycle without clearing the managed key or allowing a late restart.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "refresh count, retry request, active state, deadline cancellation, and managed-key state",
+        "layer": "OAuth and report state machine",
+        "method": "forced 401, refresh success, refresh failure, and late-response transitions",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "refresh_retry_used is set",
+        "counterexample": "a late successful refresh could restart a cycle after its report deadline",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The deadline increments generation and clears report_active; the late refresh produces no new usage-report request."
+      },
+      "substrates": [
+        {
+          "name": "Native SDK fetch, timer, and cancellation effects",
+          "status": "exercised",
+          "evidence": "401, connect failure, deadline, and late refresh were driven as real effect messages."
+        }
+      ],
+      "evidence": "OAuth retry and deadline regressions passed."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["JSON protocol parser", "network and CLI adapter", "OAuth lifecycle", "report state machine"],
+    "dimensions": {
+      "values": [
+        "transport: CLI or OAuth",
+        "response: valid, empty zero, optional billing fields, malformed, truncated, duplicate date, invalid date, oversized, or totals mismatch",
+        "identity: current generation and key, old generation, or changed durable keyId",
+        "auth: success, one 401 plus refresh, refresh failure, or refresh after deadline",
+        "publication order: usage first, hourly first, cache write success, or cache write failure"
+      ],
+      "exclusions": ["Live calls with a real managed key were not repeated during final verification because Solution Gate already captured the production response and the final pass must not expose customer spend or mutate credentials."],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/evidence/2026-08-24-vercel-desktop-usage-report-762da0f.md"
+    },
+    "oracle": {
+      "source": "Merged vercel/api usage-report implementation and production envelope captured during Solution Gate",
+      "independent": true,
+      "evidence": "API PRs 87131, 87132, and 87145 define the query, filtering, inclusive range, daily rows, totals, truncation, and optional billing fields independently of Desktop."
+    },
+    "producer": {
+      "name": "Production /ai-gateway/usage-report and Vercel CLI transport",
+      "status": "exercised",
+      "evidence": "Solution Gate captured the production envelope; exact CLI argv and both terminal forms were exercised through Native SDK effects."
+    },
+    "falsification": [
+      {
+        "mutation": "remove durable key-target publication guard",
+        "red_evidence": "The changed-key target regression failed for the intended stale publication.",
+        "restored_green_evidence": "After snapshot restoration, the full suite passed."
+      },
+      {
+        "mutation": "accept a truncated usage-report envelope",
+        "red_evidence": "The parser truncation regression failed for the intended acceptance defect.",
+        "restored_green_evidence": "After snapshot restoration, the full suite passed."
+      },
+      {
+        "mutation": "clear total_micros on report failure",
+        "red_evidence": "The last-good regression failed with expected 500000, found 0.",
+        "restored_green_evidence": "After snapshot restoration, 168/168 passed before the two resilience tests and persistence test were added; final exact HEAD passed 171/171."
+      }
+    ],
+    "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/evidence/2026-08-24-vercel-desktop-usage-report-762da0f.md"
+  },
+  "assumptions": [
+    {
+      "id": "optional-billing-fields",
+      "source": "Solution Gate carried assumption",
+      "claim": "billedSpend and succeededRequests may be absent or present, and this slice intentionally continues using spend, requests, and totalTokens.",
+      "status": "verified",
+      "evidence": "Merged API source declares the billing fields optional and tests cover both shapes; Desktop ignores unknown fields."
+    },
+    {
+      "id": "inclusive-utc-range",
+      "source": "Solution Gate and API reference",
+      "claim": "The endpoint accepts inclusive UTC start and end dates, with a 30-day request from today minus 29 through today.",
+      "status": "verified",
+      "evidence": "Merged API range source and Desktop exact-path assertion agree on 2026-07-04 through 2026-08-02."
+    },
+    {
+      "id": "key-filter-authority",
+      "source": "Solution Gate production probe",
+      "claim": "keyId filters the entire report to the durable managed key under scope=team.",
+      "status": "verified",
+      "evidence": "Merged API endpoint threads keyId into the warehouse query and echoes it in filters; endpoint tests cover matching, other, and missing keys."
+    },
+    {
+      "id": "legacy-detail-needed",
+      "source": "Solution Gate selected shape",
+      "claim": "usage-report does not replace hourly Today buckets or range-specific model rows in this slice.",
+      "status": "verified",
+      "evidence": "The new endpoint supplies daily totals, while the existing UI requires hourly Today buckets and separate model rows for each selected range."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "An accepted report becomes visible in memory and is then persisted in the app vault.",
+    "commit_points": [
+      {
+        "id": "report-publication",
+        "effect": "Replace the visible last-good report for the current durable keyId.",
+        "owner": "Vercel Desktop",
+        "commit_event": "applyUsageSnapshot completes after validation",
+        "later_fallible_stages": ["app-vault Keychain persistence"],
+        "failure_partitions": [
+          {
+            "ownership_region": "Desktop persistence",
+            "covers": ["app-vault Keychain persistence"],
+            "forced": true,
+            "residual_observed": "The coherent report remains visible in memory, the existing key remains intact, and no partial vault is written.",
+            "cleanup_owner": "Desktop retries persistence after the next accepted refresh.",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "After clearing FakeStore refusal, the next refresh persisted report_total_micros 500000 for key_abc123."
+            },
+            "evidence": "a failed report cache write recovers on the next refresh"
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"Compared legacy report detail with the new usage-report authority and retained missing hourly and grouped dimensions."},
+    {"name":"New-domain matrix","status":"run","reason":"Enumerated transports, report shapes, identity states, auth outcomes, and publication order."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"All numeric consumers read the same published snapshot; legacy hourly responses update buckets only."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No new shell string is parsed or appended; the existing spawn wrapper receives fixed argv entries."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No notification channel or one-shot latch changed."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No production shim or fake executable was added."},
+    {"name":"Deliberate-default check","status":"run","reason":"No transport or report default publishes data without explicit session, team, keyId, and validation."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Reviewed dispatcher to transport to parser to target guard to publisher to persistence."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No guard has failed review twice on the same class."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Merged vercel/api source and tests supplied the independent endpoint contract."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Malformed, truncated, transport, auth-refresh, timeout, stale-generation, changed-key, and persistence failures were traced."},
+    {"name":"Flag-propagation dispatch sweep","status":"run","reason":"teamId, scope, keyId, dates, sections, series, raw, and scope slug were asserted at transport boundaries."},
+    {"name":"Error-path forcing","status":"run","reason":"OAuth refresh failure, truncation, deadline, stale target, CLI failure, and Keychain refusal were forced."},
+    {"name":"Non-destructive recovery","status":"run","reason":"Failures preserve the last-good report and managed key; persistence succeeds on immediate retry."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"A model deadline cancels both report effects, advances generation, and blocks a late auth refresh restart."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced both auth modes through exact transport, parsing, atomic publication, chart decoration, and persistence."},
+    {"name":"Substrate verification","status":"run","reason":"Production response shape, Native SDK effects, credential-store harness, and exact-head ReleaseFast macOS build were exercised."},
+    {"name":"Dogfood the built artifact","status":"skipped","reason":"This is the author's diff; launching the app would read the user's real Keychain and account, while the shipped boundary was covered by the exact build and effect harness."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"usage-report owns numeric totals; the legacy report owns only hourly decoration and grouped detail."},
+    {"name":"Docs-behavior parity","status":"run","reason":"No public endpoint-specific prose changed; an obsolete internal window comment was found and corrected."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example was added or changed."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists and decisions.tsv is intentionally absent."},
+    {"name":"Complexity budget","status":"run","reason":"The parser is bounded to 30 rows; date matching is at most 900 comparisons per refresh and all storage is fixed-size."}
+  ],
+  "deterministic": [
+    {"check":"zig fmt --check","outcome":"pass","reason":"All three changed Zig files are formatted."},
+    {"check":"git diff --check","outcome":"pass","reason":"No whitespace errors between base and exact HEAD."},
+    {"check":"pnpm check","outcome":"pass","reason":"Strict Native manifest and markup checks passed."},
+    {"check":"pnpm test","outcome":"pass","reason":"171 of 171 tests passed on exact HEAD."},
+    {"check":"pnpm build","outcome":"pass","reason":"ReleaseFast macOS binary built on exact HEAD."},
+    {"check":"gate.sh style","outcome":"pass","reason":"No prohibited punctuation in added lines."},
+    {"check":"gate.sh surfaces","outcome":"pass","reason":"Application state changes include executable tests."},
+    {"check":"gate.sh stale","outcome":"pass","reason":"Retired three-window state-machine symbols have zero hits."},
+    {"check":"gate.sh siblings","outcome":"pass","reason":"Every usage-report mention is in the diff with no untouched stale passage."},
+    {"check":"gate.sh callers","outcome":"pass","reason":"All callers of fetchReport, requestUsageReport, and failUsageReport are in reviewed files."},
+    {"check":"gate.sh timings","outcome":"pass","reason":"The diff adds no new wait ceiling."},
+    {"check":"gate.sh covered","outcome":"pass","reason":"This report covers exact HEAD 762da0f."}
+  ],
+  "findings": [
+    {
+      "id": "stale-window-comment",
+      "state": "confirmed",
+      "claim": "The window helper comment still said only Today was refetched.",
+      "evidence": "Review found the old incremental-fetch statement after the implementation switched to one 30-day snapshot.",
+      "layer": "implementation documentation",
+      "source": "lens",
+      "path": "src/app.zig",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {"claim":"README.md remains unchanged.","evidence":"The visible capability remains spend monitoring; endpoint selection is internal and no README behavior statement changed."},
+    {"claim":"CHANGELOG.md and version remain unchanged.","evidence":"Repository policy reserves version and current release notes for a separate release PR."},
+    {"claim":"The exact app was not launched against the real account during final review.","evidence":"The production response was already captured during Solution Gate, and the exact build plus effect harness verifies this diff without exposing customer spend or touching real credentials."}
+  ],
+  "issue_candidates": [
+    {"title":"Add timezone-aware local-day spend reporting","evidence":"This migration intentionally retains inclusive UTC-day semantics, so Today still resets at UTC midnight.","why_out_of_scope":"The selected endpoint contract and this PR preserve UTC semantics; local-day support requires an upstream timezone or timestamp contract."}
+  ]
+}

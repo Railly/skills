@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "ovation",
+    "base": "325aebc4160eb820a57df16a1ddba4900e52cbb9",
+    "head": "e401b618ee274e3971ce6d93c2cf7c9fc2ee45f4",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "User-reported hard-reload screenshot in the implementation thread",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No separate Issue Contract was provided; the observed active and unselected repository ordering supplied the regression contract."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex Review Gate plus deterministic checks",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "not_required",
+      "artifact": "2026-08-21-ovation-e401b61.md",
+      "evidence": "The delta only reads existing immutable reports during SSR and creates no durable or remote side effect."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "User screenshot and report",
+      "status": "reviewed",
+      "properties": ["all-groups-first-render", "bounded-loading"],
+      "evidence": "The active wterm group was ranked while the unselected agent-browser group used native order after hard reload."
+    },
+    {
+      "source": "design",
+      "location": "Ovation conventions and Vercel React best practices",
+      "status": "reviewed",
+      "properties": ["all-groups-first-render", "bounded-loading", "failure-isolation"],
+      "evidence": "Initial authoritative data is assembled server-side, independent reads start early, and optional enrichment failure preserves native work items."
+    },
+    {
+      "source": "user_facing",
+      "location": "Sidebar Sort by triage",
+      "status": "reviewed",
+      "properties": ["all-groups-first-render"],
+      "evidence": "A global Triage sort must apply within every repository group visible from the initial workspace payload."
+    },
+    {
+      "source": "implementation",
+      "location": "apps/web/app/workspace.tsx and apps/web/lib/workspace/initial-triage.ts",
+      "status": "reviewed",
+      "properties": ["all-groups-first-render", "bounded-loading", "failure-isolation"],
+      "evidence": "The persisted filter cookie selects the initial repository set, report reads run in parallel, and all returned ranks and items are passed through the first client boundary."
+    }
+  ],
+  "properties": [
+    {
+      "id": "all-groups-first-render",
+      "claim": "A hard reload with Sort by triage hydrates ranking data for the active and unselected repository groups in the initial workspace payload before the first client render.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the repository keys selected for initial report reads and merged into initialWorkEnrichments",
+        "layer": "Next.js server render data boundary",
+        "method": "exercise active wterm plus unselected agent-browser under persisted Triage selection and inspect the returned repository set",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the filter cookie says sort=triage",
+        "counterexample": "the cookie is correct while only the active repository report is loaded",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "That counterexample is the reported old behavior. Removing workspace repository inclusion makes the regression test fail because agent-browser disappears."
+      },
+      "substrates": [
+        {
+          "name": "Next.js 16 server render selection and production bundle",
+          "status": "exercised",
+          "evidence": "The force-red test failed without unselected repository inclusion, passed after restoration, and the production build compiled the server data path."
+        }
+      ],
+      "evidence": "The exact head passes the active plus unselected repository regression and supplies every resolved report through initialWorkEnrichments."
+    },
+    {
+      "id": "bounded-loading",
+      "claim": "The broader initial hydration remains bounded to the existing workspace repository limit and one 100-item report page per repository.",
+      "kind": "availability",
+      "status": "verified",
+      "oracle": {
+        "observes": "repository target count and getWorkEnrichment page argument",
+        "layer": "server query fan-out",
+        "method": "trace workspace MAX_WORKSPACE_REPOSITORIES and each getInitialTriagePage call",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "reads use Promise.all",
+        "counterexample": "parallel reads are still unbounded if the repository source is unbounded",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The source is getInitialWorkspaceData, whose live path caps repositories at 8, and every initial read requests page 1."
+      },
+      "substrates": [
+        {
+          "name": "Ovation server workspace and report paging contracts",
+          "status": "exercised",
+          "evidence": "Typecheck and production build validate the composed contracts; report delivery remains pageSize 100."
+        }
+      ],
+      "evidence": "No loop follows delivery.hasMore during SSR and no provider calculation is started."
+    },
+    {
+      "id": "failure-isolation",
+      "claim": "One missing or failed optional repository report cannot remove native work items or prevent other repository groups from hydrating.",
+      "kind": "availability",
+      "status": "verified",
+      "oracle": {
+        "observes": "per-repository fallback value and final native item map",
+        "layer": "server render fallback",
+        "method": "trace getInitialTriagePage catch behavior and item merge authority",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Promise.all completes",
+        "counterexample": "one rejected optional read rejects the whole render",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Every report promise resolves through getInitialTriagePage to an empty optional page on failure before entering Promise.all."
+      },
+      "substrates": [
+        {
+          "name": "Next.js SSR fallback path",
+          "status": "exercised",
+          "evidence": "The production build and existing fallback contract preserve baseWorkspaceData when report pages are empty."
+        }
+      ],
+      "evidence": "The base work item map is created first and optional report items only add or refresh identities."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {
+      "values": [],
+      "exclusions": [],
+      "evidence": "The diff changes initial data selection, not a protocol, parser, serializer, lifecycle, adapter, or compatibility layer."
+    },
+    "oracle": {
+      "source": "User-observed repository grouping and persisted filter contract",
+      "independent": true,
+      "evidence": "Expected repository identities come from the reported UI state, not the helper implementation."
+    },
+    "producer": {
+      "name": "Next.js server workspace data",
+      "status": "not_applicable",
+      "evidence": "Behavioral-strength testing is not triggered."
+    },
+    "falsification": [],
+    "evidence": "A focused force-red regression still proves the changed selection property."
+  },
+  "assumptions": [
+    {
+      "id": "cookie-authority",
+      "source": "Existing layout and shell persistence",
+      "claim": "The persisted ovation.filters cookie is the first-render authority for Sort by triage.",
+      "status": "verified",
+      "evidence": "RootLayout already reads the same STORAGE_KEYS.filters cookie and the shell writes it whenever filters change."
+    },
+    {
+      "id": "workspace-groups",
+      "source": "Initial workspace model",
+      "claim": "Repository groups present at SSR are represented by baseWorkspaceData.repositories.",
+      "status": "verified",
+      "evidence": "The sidebar derives initial groups from work items and monitored values resolved against workspaceData.repositories; the reported wterm and agent-browser repositories are in the initial workspace."
+    },
+    {
+      "id": "sort-consumer",
+      "source": "Sidebar implementation",
+      "claim": "Once each report is in workEnrichments, the existing sidebar comparator applies its persisted numeric ranks within all groups.",
+      "status": "verified",
+      "evidence": "triageMap consumes every enrichment value and compareTriageRank is applied before repository grouping."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The new path only reads existing workspace data, cookies, and immutable accepted report pages; it performs no writes, calculations, or remote mutations.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher, parser, or lookup source is replaced."},
+    {"name":"New-domain matrix","status":"skipped","reason":"No validator or accepted input domain is widened."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Filter cookie authority and repository identity normalization were traced from layout through renderWorkspace and Sidebar."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell construction changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No channel or latch changed."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No executable shim exists."},
+    {"name":"Deliberate-default check","status":"skipped","reason":"No default changed."},
+    {"name":"Fresh-seam scan","status":"run","reason":"The new cookie to repository set to report map seam was inspected end to end."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"This is not a repeatedly failing detector or platform substrate change."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"The repository grouping contract is local product behavior."},
+    {"name":"New-failure-outcome propagation","status":"skipped","reason":"No function contract gains a failure outcome."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No flag changed."},
+    {"name":"Error-path forcing","status":"run","reason":"Per-repository failures were traced to empty optional pages that preserve native data."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action was added."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No timeout or cancellable operation was added."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Cookie, workspace repository set, report read, item merge, atom hydration, comparator, and grouping were traced."},
+    {"name":"Substrate verification","status":"run","reason":"The force-red test exercised the exact missing repository identity and the production Next.js bundle compiled."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The old behavior was directly observed on localhost; isolated production startup reached auth but could not reuse the OAuth callback configured for port 3000, so deterministic first-render selection supplied the exact-head proof."},
+    {"name":"Newly-asserted invariant ownership","status":"skipped","reason":"No new broad invariant is documented."},
+    {"name":"Docs-behavior parity","status":"skipped","reason":"This restores the already advertised global Triage sort and changes no prose contract."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No example changed."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists for this delta."},
+    {"name":"Complexity budget","status":"run","reason":"Fan-out is O(R) with R capped at 8 and each read capped to one 100-row page; reads run concurrently."}
+  ],
+  "deterministic": [
+    {"check":"head coverage","outcome":"pass","reason":"This report targets exact head e401b618ee274e3971ce6d93c2cf7c9fc2ee45f4."},
+    {"check":"style","outcome":"pass","reason":"Review Gate style passed."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"Full-PR findings in GitHub mapping and agent model surfaces predate this three-file fix and do not consume initial workspace enrichment."},
+    {"check":"siblings triage","outcome":"acknowledged","reason":"Agent configuration and migration hits use triage as a role or schema term and do not describe sidebar initial ordering."},
+    {"check":"force-red","outcome":"pass","reason":"Disabling workspace repository inclusion removed agent-browser and failed the new regression; restoring it returned two green tests."},
+    {"check":"tests","outcome":"pass","reason":"11 tests passed, 7 Postgres-only tests skipped, and 0 failed."},
+    {"check":"typecheck","outcome":"pass","reason":"Next type generation and TypeScript completed successfully."},
+    {"check":"production build","outcome":"pass","reason":"Next.js 16 production build completed with the required local BETTER_AUTH_SECRET."},
+    {"check":"lint","outcome":"pass","reason":"Oxlint exited zero with pre-existing warnings only."},
+    {"check":"diff-check","outcome":"pass","reason":"The exact commit has no whitespace errors."}
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "Full-PR surface and sibling hits remain outside this fix.",
+      "evidence": "The flagged files concern GitHub item mapping, agent roles, run schema, or migrations and do not consume initialWorkEnrichments or repository group sorting."
+    },
+    {
+      "claim": "Exact-head authenticated browser drive used deterministic coverage instead.",
+      "evidence": "The existing OAuth callback is configured for localhost:3000 while the clean exact-head worktree ran on 3001; changing auth or replacing the user's server would not be a valid review step."
+    },
+    {
+      "claim": "Existing lint warnings remain.",
+      "evidence": "Oxlint exits zero and none originate in the three changed files."
+    }
+  ],
+  "issue_candidates": []
+}

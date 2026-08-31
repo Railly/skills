@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 0,
+  "run": {"date":"2026-08-25","repo":"vercel-labs/agent-browser#1683","base":"bf3c85f4b6fd08c43c01627dc28502d37b2a330a","head":"e2607d6a511cb7757a4d3e412e4284d9971f5133","status":"complete","verdict":"pass","gaps":[]},
+  "contract": {"path":"foundry/runs/spec/2026-08-25-agent-browser-1683-e2607d6.md","spec_status":"pass","acceptance_reviewed":["context-owned-targets","storage-isolation","restart-persistence","owner-scoped-close"],"gaps":[]},
+  "provenance": {"author_model":"GPT-5 Codex","reviewer_model":"GPT-5 Codex with independent Solution Gate proposers","same_family":true},
+  "risk": {"level":"high","triggers":["browser storage isolation","process lifecycle","durable context binding","concurrency"],"independent_challenge":{"required":true,"satisfied":true,"method":"substrate_corpus","artifact":"evidence/2026-08-25-agent-browser-1683-e2607d6.txt","evidence":"Independent Solution Gate proposals and a real Chrome ownership corpus challenge the implementation."}},
+  "claim_inventory": [
+    {"source":"contract","location":"issue #1068 and exact-head Spec","status":"reviewed","properties":["P1"],"evidence":"Opted-in sessions sharing Chrome must own separate BrowserContexts and cleanup."},
+    {"source":"design","location":"2026-08-11 Solution Gate","status":"reviewed","properties":["P1"],"evidence":"Two proposer families selected explicit ownership across producers, observers, persistence, restart, and destructors."},
+    {"source":"user_facing","location":"README, CDP docs, sessions docs, CLI help, schemas, skill","status":"reviewed","properties":["P1"],"evidence":"Surfaces consistently describe opt-in context isolation and attach requirements."},
+    {"source":"implementation","location":"native browser, actions, state, recording, binding, daemon, and integration test","status":"reviewed","properties":["P1"],"evidence":"All target and storage lifecycle surfaces use the owned context."}
+  ],
+  "properties": [{
+    "id":"P1","claim":"Each isolated session sharing Chrome owns a disjoint target and storage lifecycle that survives daemon restart and is removed only by owner close.","kind":"lifecycle","status":"verified",
+    "oracle":{"observes":"Chrome target IDs, five browser storage types, saved state, restart continuity, and target removal","layer":"compiled CLI daemons through real Chrome","method":"run concurrent owners across tabs, windows, popups, saves, restart, and close","proxy_only":false},
+    "proxy_challenge":{"proxy":"manager stores a primary browserContextId","counterexample":"the field exists while a target producer omits it or discovery accepts foreign targets","attempted":true,"outcome":"separated","evidence":"Removing browserContextId made the popup disappear from the owner; prior foreign-target mutation shared a target."},
+    "substrates":[{"name":"macOS arm64, one real Chrome, three CLI daemons, loopback origins","status":"exercised","evidence":"20 exact-tree rounds passed and restored force-red passed."}],
+    "evidence":"1,154 serial tests, clippy, formatting, 20 real rounds, and representative mutation pass."
+  }],
+  "behavioral_strength": {"assessment":"required","triggers":["ownership state machine","process restart lifecycle","browser storage isolation"],"dimensions":{"values":["owner: A, B, host","target: tab, window, popup","storage: cookie, local, session, IndexedDB, Cache","lifecycle: attach, save, restart, close"],"exclusions":["non-isolated default sessions intentionally keep shared behavior"],"evidence":"The campaign crosses every material owner and lifecycle dimension."},"oracle":{"source":"real Chrome targets and storage plus persisted state files","independent":true,"evidence":"Assertions observe browser and filesystem outcomes, not ownership fields."},"producer":{"name":"compiled agent-browser CLI and real Chrome","status":"exercised","evidence":"Three daemons attach over real CDP and generate real targets and storage."},"falsification":[{"mutation":"omit browserContextId from target creation","red_evidence":"round zero could not discover the owner popup","restored_green_evidence":"restored exact line passed"},{"mutation":"accept foreign discovered targets","red_evidence":"prior campaign found shared targetId","restored_green_evidence":"ownership predicate restored green"},{"mutation":"omit owned-context disposal","red_evidence":"prior campaign found closed owner targets remaining","restored_green_evidence":"disposal restored green"}],"evidence":"Three independent enforcement points are test-sensitive."},
+  "assumptions": [{"id":"A1","source":"Chrome CDP contract","claim":"BrowserContext IDs partition target storage and can be persisted across daemon-only restart.","status":"verified","evidence":"Real storage stayed disjoint and agent A reattached without interrupting B."}],
+  "side_effects": {"assessment":"present","evidence":"The feature creates and disposes Chrome BrowserContexts and persists their binding.","commit_points":[{"id":"C1","effect":"owned BrowserContext and binding","owner":"isolated daemon session","commit_event":"context created and binding persisted","later_fallible_stages":["daemon restart","explicit close"],"failure_partitions":[{"ownership_region":"daemon restart","covers":["daemon restart"],"forced":true,"residual_observed":"context and storage remained owned while neighbor stayed active","cleanup_owner":"restarted daemon reconnect","retry":{"attempted":true,"outcome":"success","evidence":"agent A reconnected and read its prior storage"},"evidence":"SIGTERM was forced mid-campaign."},{"ownership_region":"explicit close","covers":["explicit close"],"forced":true,"residual_observed":"owner targets and binding removed while neighbor remained","cleanup_owner":"handle_close","retry":{"attempted":true,"outcome":"success","evidence":"neighbor continued and host partition settled"},"evidence":"Both isolated owners were closed independently."}]}]},
+  "lenses": [
+    {"name":"New-domain matrix","status":"run","reason":"Targets, storage, owners, persistence, restart, and cleanup crossed."},
+    {"name":"Error-path forcing","status":"run","reason":"Three ownership mutations forced."},
+    {"name":"Non-destructive recovery","status":"run","reason":"One daemon restart preserved neighbor and owner state."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Every poll is bounded and reports the failed lifecycle state."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"CLI, daemon, binding, CDP, Chrome, storage, and close traced."},
+    {"name":"Docs-behavior parity","status":"run","reason":"All public isolation surfaces align."},
+    {"name":"Complexity budget","status":"run","reason":"Ownership is one context set and bounded lifecycle operations."}
+  ],
+  "deterministic": [
+    {"check":"style and surfaces","outcome":"pass","reason":""},
+    {"check":"flagsweep","outcome":"acknowledged","reason":"Changelogs are historical; e2e, parity, binding, and pin-tab tests document pin-only behavior and are not global flag surfaces."},
+    {"check":"siblings isolate-context","outcome":"pass","reason":"All feature-specific passages are diffed."},
+    {"check":"callers owns_target","outcome":"pass","reason":"Every caller is in the diff."},
+    {"check":"cargo test serial","outcome":"pass","reason":"1,154 passed, 0 failed."},
+    {"check":"cargo clippy and fmt","outcome":"pass","reason":""},
+    {"check":"real Chrome and mutations","outcome":"pass","reason":"20 exact-tree rounds and representative force-red/restored-green pass."}
+  ],
+  "findings": [],
+  "exemptions": [{"claim":"Pin-tab-only tests and historical changelogs need not mention isolate-context.","evidence":"They are not global option catalogs and their described behavior is unchanged."}],
+  "issue_candidates": []
+}

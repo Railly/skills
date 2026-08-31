@@ -1,0 +1,55 @@
+Portless PR #397 F1 successor substrate evidence
+Date: 2026-08-25
+Base: 2ac15191f438f8b3064b73453b60ff702b15d0f8
+Head: 2a7509aea2c2f3b9a07b205db22b380c83e71d1f
+
+Independent oracle
+
+A synchronous child process with a nonzero exit status is terminal. Its parent must exit nonzero without entering readiness polling or adding a second generic failure. A child exit status 0 remains eligible for readiness discovery. Spawn errors and signals must remain immediate failures with the existing parent diagnosis.
+
+Before
+
+- Exact PR head 2ac1519, fake sudo exit 23, interactive app auto-start.
+- The child printed the actionable privilege error.
+- The parent then waited through 20 readiness polls and printed `Failed to start proxy.`.
+- Observed elapsed time: 5.15 seconds in the completed PR review and 5.70 seconds in the regression birth run.
+
+After
+
+- Exact head 2a7509a, built CLI, real macOS PTY from `/usr/bin/expect`, fake sudo executable exit 23.
+- Exit status: 1.
+- Elapsed time: 493 milliseconds.
+- Output preserved the child privilege error and recovery command.
+- Output did not contain `Failed to start proxy.`.
+- No proxy.pid or proxy.port remained.
+
+Real loopback success
+
+- Built exact-head CLI started an HTTP proxy on an OS-assigned loopback port.
+- A real HTTP request returned `X-Portless: 1`.
+- `proxy stop` stopped the same listener cleanly.
+
+Linux
+
+- Fresh ordinary clone with the exact diff, Docker Linux arm64, Debian bookworm, Node 24, pnpm 11.1.3.
+- Package build passed.
+- Three privileged-startup tests passed in 253 milliseconds, including the interactive auto-start regression.
+
+Test Strength
+
+- Mutation at the executed call site changed the decisive guard from nonzero status to null status.
+- The regression failed at the intended no-duplicate assertion after entering the delayed parent path.
+- Source was restored from a filesystem snapshot.
+- Restored regression passed in 374 milliseconds.
+
+Full Spec
+
+- Repository test: 858 passed, 1 documented skip.
+- Repository E2E: 16 passed, 2 documented Python-fixture skips.
+- Root lint, type-check, and build passed.
+- Changed files passed Prettier and ESLint.
+
+Platform boundary
+
+- macOS and Linux process lifecycle paths were exercised.
+- Windows does not use sudo or the changed privileged-port branch, and the regression suite is explicitly skipped there by product definition. Windows CI remains required after push for repository-wide compatibility.

@@ -1,0 +1,437 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-30",
+    "repo": "vercel-labs/agent-browser",
+    "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+    "head": "684946184733d91e5610842ffb5b6efc03ef1c76",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-29-agent-browser-1701-select-option/frozen-packet.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Snapshot option names preserve word boundaries across non-breaking spaces",
+      "Exact case-sensitive values and labels take precedence",
+      "Whitespace-normalized visible labels resolve",
+      "Misses and normalized ambiguity do not mutate selection",
+      "Multiple requested values and the existing change event remain supported",
+      "CLI, MCP, help, README, docs, and packaged skill remain aligned"
+    ],
+    "gaps": [
+      "No separate Spec review was provided; the Solution Gate packet supplied the reviewed requirements."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5.6-sol",
+    "reviewer_model": "Real Chrome substrate corpus plus community PR review history",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "Externally visible browser DOM mutation",
+      "Atomicity of failure and ambiguity paths",
+      "Browser compatibility boundary"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-30-agent-browser-6849461-select-option-challenge.md",
+      "evidence": "A real Chrome run observed snapshot text, selected DOM values, multi-select state, ambiguity and miss preservation, and the page-generated change event. The source community PR and its review finding were compared separately."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "GitHub issue #1700 and the frozen Solution Gate packet",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "Requirements R0 through R8 were reviewed against the issue reproduction, base behavior, and discriminator cells."
+    },
+    {
+      "source": "design",
+      "location": "Solution Gate decision, shape C: readable snapshot plus bounded fallback",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "The selected shape excludes case folding, preserves exact precedence, rejects normalized ambiguity, and delays all mutation until complete resolution."
+    },
+    {
+      "source": "user_facing",
+      "location": "CLI help, README, docs command page, core skill, and command reference",
+      "status": "reviewed",
+      "properties": ["P3", "P6"],
+      "evidence": "Each contract-carrying surface describes selection by value or visible label; detailed help and command reference state the whitespace behavior."
+    },
+    {
+      "source": "implementation",
+      "location": "Exact base-to-head diff at 6849461",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5", "P6"],
+      "evidence": "The snapshot renderer, native selector, action caller, MCP delegation, tests, and every changed documentation surface were reviewed and exercised."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Snapshot rendering converts non-breaking spaces to ordinary spaces while still removing true zero-width characters.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "The serialized interactive snapshot name produced from Chrome's accessibility tree",
+        "layer": "User-visible snapshot boundary",
+        "method": "Drive a real Chrome page containing NBSP and U+200B option labels and inspect the snapshot string",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The Rust helper returns the expected normalized string",
+        "counterexample": "The helper can be correct while render_tree still serializes the original name or deletes NBSP at another call site.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The Chrome E2E asserts the complete snapshot output; the helper unit test supplements rather than replaces it."
+      },
+      "substrates": [
+        {
+          "name": "Chrome accessibility tree through the native snapshot pipeline",
+          "status": "exercised",
+          "evidence": "The E2E observed `option \"Capital Federal\"`, rejected `CapitalFederal`, and observed `ZeroWidth`."
+        }
+      ],
+      "evidence": "Focused unit and Chrome E2E tests passed at exact HEAD; restoring NBSP deletion made the snapshot assertion red."
+    },
+    {
+      "id": "P2",
+      "claim": "Exact case-sensitive value, label, and text matches run before any normalized fallback.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "The selected option value in the browser DOM",
+        "layer": "Native select DOM state",
+        "method": "Use colliding ASCII-space and NBSP labels plus case-distinct option values, then inspect select.value",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The injected function contains an exact-match branch before its normalized branch",
+        "counterexample": "A later union of exact and normalized candidates could still select a different or additional option.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Exact `Alpha Beta` selected only `ascii`, and exact `us` selected lowercase value `us` in Chrome."
+      },
+      "substrates": [
+        {
+          "name": "Real Chrome native single-select",
+          "status": "exercised",
+          "evidence": "Exact-precedence and case-sensitive value cells passed in the command pipeline."
+        }
+      ],
+      "evidence": "Direct DOM state confirms exact semantics, without relying on the command's success response."
+    },
+    {
+      "id": "P3",
+      "claim": "Visible labels differing only by collapsible whitespace or removable zero-width characters resolve through a bounded fallback.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "The browser-selected opaque value for a human-readable label input",
+        "layer": "Snapshot-to-action compatibility boundary",
+        "method": "Pass the readable snapshot spelling back through the native select command and inspect DOM state",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "JavaScript normalization produces equal strings",
+        "counterexample": "Equivalent normalized strings do not prove that the native command reaches the matcher or applies the selected option.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The real command selected opaque value `C` for `Capital Federal` and value `Z` for `ZeroWidth`."
+      },
+      "substrates": [
+        {
+          "name": "Native daemon command pipeline and Chrome DOM",
+          "status": "exercised",
+          "evidence": "Both NBSP and zero-width label variants were driven end to end."
+        }
+      ],
+      "evidence": "The fix-absent fallback mutation failed on the intended DOM-state assertion and restored green."
+    },
+    {
+      "id": "P4",
+      "claim": "A total miss, partial multi-value miss, or normalized ambiguity returns an error without changing selection.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "The complete selected option set and change-event counter after a failed command",
+        "layer": "Browser DOM post-state",
+        "method": "Seed selection, force each failure class, then inspect selectedOptions and the page event counter",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The matcher returns an error before the final mutation loop",
+        "counterexample": "A prior branch or per-value iteration could mutate some options before returning an error.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Chrome retained `C` after a miss, retained `ascii` after ambiguity, and retained `[a,b]` after a partial multi-value miss; no extra change event fired."
+      },
+      "substrates": [
+        {
+          "name": "Real Chrome single-select and multiple-select post-state",
+          "status": "exercised",
+          "evidence": "All three failure partitions were forced through execute_command."
+        }
+      ],
+      "evidence": "The original PR review finding is covered at the browser state layer and extended to ambiguity and partial multi-value failure."
+    },
+    {
+      "id": "P5",
+      "claim": "Successful multi-value selection remains supported and dispatches the existing bubbling change event.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Chrome selectedOptions and a page-owned change-event counter",
+        "layer": "Browser DOM and event boundary",
+        "method": "Select one normalized label and one exact value on a multiple select, then read both selected values and event count",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The returned matched count equals the requested count",
+        "counterexample": "A count can be correct while the wrong options are selected or the change event is absent.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The test reads `[...multi.selectedOptions].map(option => option.value)` and separately observes the page event counter on successful selection."
+      },
+      "substrates": [
+        {
+          "name": "Real Chrome multiple-select and DOM event system",
+          "status": "exercised",
+          "evidence": "The selected set was exactly `[\"a\",\"b\"]`; successful single selection incremented the bubbling change listener once."
+        }
+      ],
+      "evidence": "Selection state and the page-owned event observable both passed."
+    },
+    {
+      "id": "P6",
+      "claim": "CLI, MCP, help, README, docs, and packaged skill expose one aligned select behavior.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "User-facing prose and the actual shared dispatch path",
+        "layer": "Product surface parity",
+        "method": "Repository-wide surface sweep plus source trace from MCP call_select through the CLI parser to native handle_select",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "All expected documentation files appear in the diff",
+        "counterexample": "A touched file can retain stale prose, and MCP can carry an independent parser despite docs alignment.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Every matching passage was read, and MCP `call_select` constructs the canonical CLI argv before the shared native command reaches select_option."
+      },
+      "substrates": [
+        {
+          "name": "CLI help source, README, docs MDX, packaged core skill, command reference, and MCP source",
+          "status": "exercised",
+          "evidence": "Surface gate passed; repo-wide prose and dispatch searches were inspected."
+        }
+      ],
+      "evidence": "No independent MCP transport or parser duplicates the changed option-matching semantics."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "Browser interaction compatibility layer",
+      "Accessibility snapshot serialization",
+      "DOM state transition and event dispatch"
+    ],
+    "dimensions": {
+      "values": [
+        "Snapshot character: ordinary space, NBSP, U+200B",
+        "Match source: option value, label, textContent",
+        "Resolution tier: exact, normalized fallback, miss",
+        "Collision: none, exact winner, normalized ambiguity",
+        "Case: exact upper/lower pair without case folding",
+        "Cardinality: single-select and multiple-select",
+        "Request completeness: all values resolve and one value misses",
+        "Prior state: existing selection retained on failure",
+        "Event outcome: one bubbling change on success and none on failure"
+      ],
+      "exclusions": [
+        "Locale-aware case folding is deliberately unsupported.",
+        "Normalization of opaque option values is deliberately unsupported.",
+        "Non-select controls are outside the native select action."
+      ],
+      "evidence": "The E2E fixture and assertions explicitly cover each equivalence class and the exclusions follow the frozen requirements."
+    },
+    "oracle": {
+      "source": "Chrome DOM selected state, Chrome accessibility snapshot output, and a page-owned event counter",
+      "independent": true,
+      "evidence": "Expected values are read from browser state rather than generated by the production normalization helpers."
+    },
+    "producer": {
+      "name": "Real Chrome accessibility tree and native HTMLSelectElement",
+      "status": "exercised",
+      "evidence": "The ignored E2E launches Chrome, creates real option elements, snapshots them, invokes the command, and reads DOM post-state."
+    },
+    "falsification": [
+      {
+        "mutation": "Restore snapshot behavior that deletes U+00A0 instead of converting it to an ordinary space.",
+        "red_evidence": "The snapshot assertion failed because `CapitalFederal` reappeared.",
+        "restored_green_evidence": "The focused snapshot unit test and real-Chrome E2E passed after restoring exact HEAD."
+      },
+      {
+        "mutation": "Remove normalized fallback from the production select call path.",
+        "red_evidence": "The Chrome E2E failed because `Capital Federal` could not select opaque value `C`.",
+        "restored_green_evidence": "The focused E2E passed after restoration and passed four consecutive repetitions."
+      },
+      {
+        "mutation": "Restore mutation-before-resolution behavior.",
+        "red_evidence": "The miss-preservation assertion failed because the current selection was cleared.",
+        "restored_green_evidence": "Single, ambiguity, and partial multi-select failure cells passed after restoration."
+      }
+    ],
+    "evidence": "The tests reject the reported defect, the contributor review defect, case-folding expansion, collision selection, and partial multi-value mutation at the real browser boundary."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Solution Gate",
+      "claim": "CLI and MCP select operations converge on the same native select_option implementation.",
+      "status": "verified",
+      "evidence": "MCP call_select constructs canonical CLI arguments; execute_command dispatches select to handle_select, which calls select_option."
+    },
+    {
+      "id": "A2",
+      "source": "Subsystem model",
+      "claim": "Chrome exposes NBSP and zero-width label variants through the accessibility and DOM producers exercised by the fixture.",
+      "status": "verified",
+      "evidence": "The real Chrome snapshot and DOM state showed both variants at exact HEAD."
+    },
+    {
+      "id": "A3",
+      "source": "Selected design",
+      "claim": "Whitespace normalization can be bounded to labels and text without changing opaque value semantics.",
+      "status": "verified",
+      "evidence": "The code normalizes only option.label and textContent in fallback; exact case-distinct values remained distinct in Chrome."
+    },
+    {
+      "id": "A4",
+      "source": "Selected design",
+      "claim": "Exact precedence and ambiguity rejection prevent normalized fallback from silently choosing a different option.",
+      "status": "verified",
+      "evidence": "Exact ASCII label selected its own option, while double-space normalized input returned a multiple-match error without mutation."
+    },
+    {
+      "id": "A5",
+      "source": "Community PR review history",
+      "claim": "The only recorded review finding on #1701 was mutation on a miss.",
+      "status": "verified",
+      "evidence": "The full pull review comments contained one logic finding, followed by Mauricio's fix and the bot's resolved response."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "A successful command changes selection and dispatches a page-visible event; failure paths are explicitly non-mutating.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "The resolved option set becomes selected and a bubbling change event is synchronously dispatched.",
+        "owner": "The injected select_option JavaScript function",
+        "commit_event": "The function applies the complete wanted set, then dispatches change in the same JavaScript task.",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "run", "reason": "Checked prior exact value/text behavior against the new label fallback and verified exact case-sensitive precedence."},
+    {"name": "New-domain matrix", "status": "run", "reason": "Enumerated NBSP, zero-width, collisions, case pairs, misses, and multi-value inputs."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Compared snapshot rendering, select matching, errors, CLI dispatch, and MCP dispatch."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell string parsing or command append behavior changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process channel or one-shot diagnostic behavior changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim, fake executable, or environment interception was added."},
+    {"name": "Deliberate-default check", "status": "skipped", "reason": "No default value or omission behavior changed."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Inspected the new exact-to-normalized seam, snapshot-to-action seam, and resolution-to-mutation seam."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Compared base behavior, contributor behavior, and exact-head behavior on the Chrome corpus."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "The product contract is directly observable in native HTMLSelectElement state; no external implementation defines the intentional exact-first policy."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Traced ambiguity and per-value miss errors through handle_select and the command response."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag or configuration field was added."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Forced total miss, normalized ambiguity, and partial multi-value miss and inspected post-state."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "The change adds deterministic resolution, not heuristic recovery."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No timeout, cancellation, wait, or task lifecycle changed."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced Chrome accessibility discovery through snapshot text, command resolution, DOM mutation, and event dispatch."},
+    {"name": "Substrate verification", "status": "run", "reason": "Observed snapshot output, DOM selected values, selectedOptions, and page event count in Chrome."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "The native command pipeline was driven against real Chrome with user-reachable inputs."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Verified the new visible-label and whitespace claims against both writers: snapshot rendering and native selection."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Checked all contract-carrying help, README, docs, and skill passages against Chrome behavior."},
+    {"name": "Demonstrative example", "status": "run", "reason": "The visible-label examples require behavior absent on base when opaque values and NBSP labels are used."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail file was emitted."},
+    {"name": "Complexity budget", "status": "run", "reason": "The exact and fallback option scans are linear per requested value and introduce no nested candidate membership scan beyond O(values × options)."}
+  ],
+  "deterministic": [
+    {"check": "covered precheck", "outcome": "finding-fixed", "reason": "No exact-head report existed before this run; this report closes that required pre-push finding."},
+    {"check": "style", "outcome": "pass", "reason": "No prohibited punctuation or formatting was added."},
+    {"check": "surfaces", "outcome": "pass", "reason": "All mapped user-facing surfaces required by AGENTS.md are included."},
+    {"check": "siblings: visible label", "outcome": "acknowledged", "reason": "The only absent hit is vendored axe.min.js, whose unrelated accessibility-rule text contains the phrase and carries no agent-browser select contract."},
+    {"check": "callers: select_option", "outcome": "acknowledged", "reason": "handle_select reads browser, session, selector, and values before the call but mutates no daemon state; it propagates the new error unchanged."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "The map ranked take_snapshot, execute_command, handle_select, and main; duplicate-symbol diagnostics and 2,445 unresolved calls make it orienting rather than complete."},
+    {"check": "force-red", "outcome": "pass", "reason": "Snapshot deletion, missing fallback, and mutation-before-resolution faults each failed an intended browser-state assertion and restored green."},
+    {"check": "cargo fmt", "outcome": "pass", "reason": "cargo fmt --manifest-path cli/Cargo.toml -- --check passed at exact HEAD."},
+    {"check": "cargo clippy", "outcome": "pass", "reason": "cargo clippy --manifest-path cli/Cargo.toml -- -D warnings passed at exact HEAD."},
+    {"check": "cargo test --profile ci", "outcome": "pass", "reason": "1,156 tests passed and 106 were ignored at exact HEAD."},
+    {"check": "real-Chrome E2E", "outcome": "pass", "reason": "The complete 105-test E2E suite passed in 141 seconds; the focused test passed again and four consecutive repetitions were green."},
+    {"check": "version sync and launcher tests", "outcome": "pass", "reason": "Version synchronization passed and all four launcher tests passed."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The contributor's first revision mutated selection before determining that no value matched.",
+      "evidence": "PR #1701 review comment 3816248245 identified the mutation; the recreated E2E forces single, ambiguity, and partial multi-value failures and observes unchanged DOM state.",
+      "layer": "Browser DOM post-state",
+      "source": "lens",
+      "path": "select_option resolution to DOM mutation",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Deleting NBSP in snapshot output joins words and makes the displayed option name misleading.",
+      "evidence": "Base rendered `CapitalFederal`; exact HEAD renders `Capital Federal`, and restoring deletion makes the E2E red.",
+      "layer": "User-visible snapshot output",
+      "source": "lens",
+      "path": "normalize_snapshot_name to render_tree to take_snapshot",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "The contributor design widened selection to case-insensitive fallback and did not reject normalized collisions.",
+      "evidence": "The source PR's wantedFor(true) case-folds all candidate forms and accumulates matching options. The recreated design removes case folding and errors when fallback yields more than one option.",
+      "layer": "Option resolution contract",
+      "source": "lens",
+      "path": "community candidate comparison to exact-head matcher",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No dedicated MCP implementation change is required.",
+      "evidence": "MCP call_select forwards canonical select arguments through the normal CLI parser and shared native select_option path."
+    },
+    {
+      "claim": "Vendored cli/src/native/a11y/axe.min.js is not a select documentation sibling.",
+      "evidence": "Its `visible label` text belongs to bundled axe accessibility rules and neither advertises nor implements the agent-browser select command."
+    },
+    {
+      "claim": "The handle_select caller needs no rollback repair.",
+      "evidence": "It mutates no daemon state before awaiting select_option and returns success only after the browser operation completes."
+    },
+    {
+      "claim": "No separate test-strength artifact is required.",
+      "evidence": "The mandatory behavioral model, independent oracle, real producer, falsification sites, repeat evidence, and exclusions are embedded in this exact-head report and its independent challenge artifact."
+    }
+  ],
+  "issue_candidates": []
+}

@@ -1,0 +1,238 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-25",
+    "repo": "vercel-labs/emulate",
+    "base": "d0219d05818adca4c12bb76ec79a7562c1766a3d",
+    "head": "017803c9c1486ad616d6dba958a0c7132efd23eb",
+    "status": "complete",
+    "verdict": "findings",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Raw GitHub media types return exact file bytes",
+      "Ordinary requests, directories, and submodules preserve JSON",
+      "Symlink-aware raw resolution is consistent",
+      "Content-negotiated file responses vary on Accept"
+    ],
+    "gaps": ["No separate Issue Contract or Spec review result was provided."]
+  },
+  "provenance": {
+    "author_model": "human external author",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": false
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": ["HTTP protocol parsing and response negotiation"],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "evidence/2026-08-25-emulate-209-accept-media-corpus.md",
+      "evidence": "GitHub's live REST API and OpenAPI description independently defined the media-type behavior."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "PR #209 title, body, and frozen target handoff",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The PR promises exact raw bytes while preserving JSON for ordinary requests, directories, and submodules."
+    },
+    {
+      "source": "design",
+      "location": "not provided",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "No Solution Gate, design contract, or decision trail was supplied."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, packages/@emulators/github/README.md, apps/web/app/docs/github/page.mdx, packages/emulate/src/index.ts, skills/github/SKILL.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "All changed surfaces claim normal JSON unless a GitHub raw media type is accepted."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/@emulators/github/src/routes/contents.ts and contents-commits.test.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The route adds Accept classification, raw blob resolution, raw responses, and Vary metadata."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Only a genuine supported GitHub raw media range selects exact raw file bytes.",
+      "kind": "correctness",
+      "status": "unverified",
+      "oracle": {
+        "observes": "Selected representation and exact response bytes for the complete Accept grammar",
+        "layer": "external HTTP protocol boundary",
+        "method": "Differential requests to GitHub and the built emulator",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A comma-delimited token equals a known raw media type",
+        "counterexample": "A raw-looking token appears between commas inside one quoted JSON parameter",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "GitHub returned JSON while the emulator returned raw bytes for the same valid header."
+      },
+      "substrates": [
+        {"name": "GitHub REST API", "status": "exercised", "evidence": "Live request returned JSON."},
+        {"name": "built emulate TCP server", "status": "exercised", "evidence": "Live local request returned raw bytes."}
+      ],
+      "evidence": "Confirmed finding F1 prevents verification."
+    },
+    {
+      "id": "P2",
+      "claim": "Directories, root listings, README, submodules, missing paths, wildcards, and default requests remain JSON.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Status, JSON shape, and response Content-Type at the external HTTP boundary",
+        "layer": "built server over TCP",
+        "method": "Public HTTP matrix seeded through GitHub REST endpoints",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The unit route returns a parseable response",
+        "counterexample": "A submodule with raw Accept falls through blob lookup and returns 404",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing the blob-only guard killed the submodule HTTP regression; restoration passed."
+      },
+      "substrates": [
+        {"name": "built emulate TCP server", "status": "exercised", "evidence": "Directory, root, README, submodule, missing, wildcard, and default cells returned JSON."}
+      ],
+      "evidence": "All matrix cells passed and the submodule mutant died at the intended assertion."
+    },
+    {
+      "id": "P3",
+      "claim": "Raw file and symlink responses contain exact resolved bytes, correct length, and cache variance on Accept.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Byte identity, Content-Length, and Vary at the external HTTP boundary",
+        "layer": "built server over TCP",
+        "method": "Binary payload and symlink corpus with direct byte comparison",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The route returns status 200",
+        "counterexample": "A symlink route returns stored link text rather than target bytes",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing resolveSymlinkEntry returned target.txt instead of target bytes and killed the test."
+      },
+      "substrates": [
+        {"name": "built emulate TCP server", "status": "exercised", "evidence": "Binary and symlink bytes matched exactly; length and Vary were present."}
+      ],
+      "evidence": "Raw negotiation and symlink mutations died; restored exact head passed."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["HTTP Accept parser", "content negotiation", "GitHub compatibility layer"],
+    "dimensions": {
+      "values": [
+        "resource: regular file, symlink, broken symlink, submodule, directory, root, README, missing",
+        "Accept: absent, four raw vendor aliases, case variant, comma list, parameters, q=0, competing q values, application/*, */*, unknown vendor, quoted-comma parameter",
+        "payload: UTF-8 and binary",
+        "output: status, exact bytes or JSON, Content-Type, Content-Length, Vary"
+      ],
+      "exclusions": ["HTML and object GitHub media types are outside this PR's claimed scope."],
+      "evidence": "evidence/2026-08-25-emulate-209-accept-media-corpus.md"
+    },
+    "oracle": {
+      "source": "GitHub live REST API and official OpenAPI operation description",
+      "independent": true,
+      "evidence": "The oracle revealed the quoted-parameter false positive and confirmed GitHub's q=0 behavior."
+    },
+    "producer": {
+      "name": "HTTP client to built emulate CLI server",
+      "status": "exercised",
+      "evidence": "All state and requests crossed a real TCP listener through public REST routes."
+    },
+    "falsification": [
+      {"mutation": "Disable acceptsRawContent", "red_evidence": "Raw test received application/json instead of raw.", "restored_green_evidence": "Both changed tests passed after restoration."},
+      {"mutation": "Remove entry.type blob guard", "red_evidence": "Raw-Accept submodule returned 404 instead of 200 JSON.", "restored_green_evidence": "Both changed tests passed after restoration."},
+      {"mutation": "Remove symlink target resolution", "red_evidence": "Raw symlink returned target.txt instead of target bytes.", "restored_green_evidence": "Both changed tests passed after restoration."}
+    ],
+    "evidence": "The modeled matrix was driven, the real producer boundary was exercised, and three call-path mutants were killed."
+  },
+  "assumptions": [
+    {"id": "A1", "source": "PR body", "claim": "GitHub treats a recognized raw token as raw even at q=0 or below JSON quality.", "status": "verified", "evidence": "Live GitHub requests selected raw in all such cells."},
+    {"id": "A2", "source": "Subsystem model", "claim": "Submodules must not enter raw blob lookup.", "status": "verified", "evidence": "External matrix stayed JSON and the guard-removal mutant failed 404."},
+    {"id": "A3", "source": "Implementation", "claim": "Splitting Accept on commas identifies media ranges.", "status": "refuted", "evidence": "Quoted parameter commas created a false raw media range."}
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The changed GET representation is read-only and introduces no durable or remote commit point.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"Compared JSON inputs and raw inputs, including false-positive parser forms."},
+    {"name":"New-domain matrix","status":"run","reason":"Enumerated resource, Accept, and payload classes."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Checked contents files, advertised raw URLs, symlinks, submodules, directories, README, and missing paths."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell parsing changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No process diagnostic or latch changed."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No shim was introduced."},
+    {"name":"Deliberate-default check","status":"run","reason":"Absent Accept, wildcards, and default vendor JSON remained JSON."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Inspected Accept tokenization, route registration, Hono response construction, and built artifact wiring."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Compared GitHub and the built emulator across Accept cells; found F1."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"GitHub live API and OpenAPI operation were the independent oracle."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Raw blob lookup 404 behavior was forced for submodules and missing blobs."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No CLI flag changed."},
+    {"name":"Error-path forcing","status":"run","reason":"Missing content, submodule misdispatch, and unresolved symlink paths were forced."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action changed."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No async wait, timeout, or cancellation changed."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced header parsing through route dispatch, blob resolution, and HTTP serialization."},
+    {"name":"Substrate verification","status":"run","reason":"Observed bytes and headers on a real TCP listener."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Built CLI server was driven through public HTTP endpoints."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"Enumerated every response class covered by the new raw-only claim."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Docs correctly describe raw file bytes and default JSON, but do not cover the parser defect."},
+    {"name":"Demonstrative example","status":"run","reason":"The raw curl example requires this PR behavior and would return JSON without it."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists."},
+    {"name":"Complexity budget","status":"skipped","reason":"Header scanning is bounded by request-header length and adds no scale-sensitive nested work."}
+  ],
+  "deterministic": [
+    {"check":"covered before report","outcome":"acknowledged","reason":"Expected initial red; no exact-head report existed before this run."},
+    {"check":"style","outcome":"acknowledged","reason":"Gate bans em dashes, while repository AGENTS.md explicitly requires an em dash instead of prose double hyphens."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"All GitHub service surfaces changed; generic emulate skill and landing docs contain no per-endpoint coverage contract."},
+    {"check":"siblings raw media","outcome":"pass","reason":"Every repository hit is in the diff; the earlier mis-scoped Kai hits were discarded."},
+    {"check":"callers contentsRoutes","outcome":"acknowledged","reason":"Single registration in githubPlugin was enumerated and inspected; gate invocation could not accept absolute target cwd, so git grep supplied the caller list."},
+    {"check":"stale","outcome":"acknowledged","reason":"No contract value was renamed or retired."},
+    {"check":"shellmeta artifacts rawinput execdeps timings flagsweep producers","outcome":"acknowledged","reason":"No trigger applies."},
+    {"check":"build sync-versions format type-check lint test diff-check","outcome":"pass","reason":"All repository CI-equivalent commands passed; lint had only pre-existing warnings."},
+    {"check":"focused GitHub suite","outcome":"pass","reason":"4 files and 87 tests passed."},
+    {"check":"focused repetition","outcome":"pass","reason":"contents-commits.test.ts passed 5/5 consecutive runs."},
+    {"check":"Test Strength","outcome":"acknowledged","reason":"Three intended mutants died and restoration passed; quoted-parameter differential exposed open F1."},
+    {"check":"six live PR checks","outcome":"pass","reason":"build-and-test, Vercel, Vercel Agent Review, Vercel Preview Comments, Socket Project Report, and Socket Pull Request Alerts all remained successful."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Accept parsing treats raw-looking text inside a quoted parameter as a real raw media range.",
+      "evidence": "For Accept: application/json; profile=\"foo,application/vnd.github.raw+json,bar\", GitHub returned JSON and the built emulator returned raw README bytes.",
+      "layer": "external HTTP content-negotiation parser",
+      "source": "lens",
+      "path": "Accept header -> split comma -> acceptsRawContent -> raw response branch",
+      "resolution": "open"
+    }
+  ],
+  "exemptions": [
+    {"claim":"Generic emulate skill and landing docs need no raw media statement","evidence":"They document startup and configuration only; GitHub endpoint semantics live on the five changed service surfaces."},
+    {"claim":"The package README em dash is not a style defect","evidence":"Repository AGENTS.md requires an em dash when prose punctuation needs a dash."},
+    {"claim":"Exact negotiated raw Content-Type echo is not required","evidence":"GitHub's documented property is raw file contents; the PR claims exact bytes and common consumers use the body."}
+  ],
+  "issue_candidates": []
+}

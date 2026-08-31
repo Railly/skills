@@ -1,0 +1,52 @@
+agent-browser release recovery reference oracle
+Date: 2026-08-24
+Target HEAD: 4cb6c1634736f91bfad34a2521b76ad72d8e4c88
+Base: 8ec2bb06769fa3ab90717499d2ec86aa3f8f2a06
+
+Failure evidence
+
+- Release run 32778098524 failed only Build Linux ARM64 and Build Linux musl ARM64 among build jobs.
+- The GNU ARM64 log invokes cargo-zigbuild 0.22.3 and passes -Wl,--fix-cortex-a53-843419 to Zig, which exits with "unsupported linker arg".
+- CI run 32778098465 failed only Rust (macos-latest - x86_64-apple-darwin).
+- That job reports test_child_try_wait_detects_exit_without_sigchld_handler failed because try_wait returned None after the fixed 200 ms sleep. The suite result was 1,144 passed, 1 failed, 101 ignored.
+
+Independent compatibility oracle
+
+- rust-cross/cargo-zigbuild commit 7e791b4be71b9870e0abccedf7885486803cd923 is titled "fix: filter unsupported AArch64 Cortex-A53 linker arg (#452)".
+- Its src/zig.rs patch filters exactly -Wl,--fix-cortex-a53-843419 and adds that exact value to test_filter_unsupported_linker_args.
+- Published cargo-zigbuild 0.23.2 source contains the filter at src/zig.rs:541 and the unit-test vector at src/zig.rs:2394. Its crate VCS commit is 9ef2a444f09723f1b205017f241005819d4c0587.
+
+Cross-toolchain substrate corpus
+
+- rustc 1.98.0 (88d9e12ae 2026-08-18)
+- Zig 0.16.0
+- cargo-zigbuild 0.23.2 was used for the builds.
+- aarch64-unknown-linux-gnu.2.28 built successfully. The artifact is a dynamic AArch64 ELF and its highest referenced GLIBC symbol is GLIBC_2.28.
+- aarch64-unknown-linux-musl built successfully. The artifact is a static AArch64 ELF.
+- x86_64-unknown-linux-gnu.2.28 built successfully. The artifact is a dynamic x86-64 ELF and its highest referenced GLIBC symbol is GLIBC_2.28.
+- x86_64-unknown-linux-musl built successfully. The artifact is a static x86-64 ELF.
+
+Process-lifecycle behavioral proof
+
+- Real producer: std::process::Command spawned /bin/sh.
+- Force-red mutation: the child command became "sleep 1; exit 42" while the old fixed 200 ms implementation was restored. The test failed at the intended assertion: "try_wait() returned None but child should have exited".
+- Restored-green mutation: the same delayed child passed with deadline polling.
+- The delayed-child variant passed 100 of 100 x86_64 repetitions.
+- The final immediate "exit 42" source passed the narrow test again on 2026-08-24.
+- The full macOS x64 CI-equivalent suite passed with 1,145 tests passed, 101 ignored, and 2 doctor integration tests passed. Pin-tab integrations remained ignored as expected.
+- The final assertion checks the exact exit code 42. On deadline, the harness kills and waits for the child before failing, so it does not intentionally leave a child behind.
+
+Deterministic checks
+
+- cargo fmt --manifest-path cli/Cargo.toml -- --check: pass
+- cargo clippy --manifest-path cli/Cargo.toml -- -D warnings: pass
+- git diff --check origin/main...HEAD: pass
+- gate.sh style: pass
+- gate.sh surfaces: pass
+- gate.sh timings: pass, no product wait ceiling was introduced
+
+Impact-map limitation
+
+- radius found 2 changed symbols and 0 impacted symbols, with 8,019 indexed edges.
+- visibilityBoundary reports 2,445 unresolved calls and 81 SCIP-unmapped entries.
+- The map therefore under-covers this Rust diff and is not evidence that adjacent risk is absent.

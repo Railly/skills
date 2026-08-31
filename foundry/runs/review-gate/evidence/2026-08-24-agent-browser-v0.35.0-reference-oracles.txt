@@ -1,0 +1,37 @@
+agent-browser v0.35.0 release PR reference oracles
+Date: 2026-08-24
+Head: a846348e66dae240f456b1e5e55d9912e9667925
+
+Release precedent
+- v0.34.0 release PR #1678 changed the same nine files as this release PR.
+- The release workflow treats package.json as the source version and scripts/sync-version.js propagates it to Cargo, dashboard, sandbox, Eve, and the sandbox runtime constant.
+
+Registry oracle
+- agent-browser: 0.34.0
+- @agent-browser/sandbox: 0.34.0
+- @agent-browser/eve: 0.34.0
+- Local synchronized version: 0.35.0
+
+Included mainline changes since v0.34.0
+- #1669 feat(cli): trust proxy CAs through Chromium NSS
+- #1707 fix(cli): avoid CA config test race
+- #1705 docs(skills): add protected Vercel deployment access
+
+Release-note decisions
+- #1669 is the user-facing feature and is listed under New Features.
+- #1705 adds a bundled user-facing skill and is listed under Improvements.
+- #1707 changes test reliability only and is covered in the release PR validation, not promoted as a user-facing release-note item.
+
+Direct checks
+- scripts/check-version-sync.js: Versions are in sync: 0.35.0
+- release marker extraction: 13 non-empty section lines, SHA-256 a040f9e8855f1dc3904c64a203fbf231798064d82a68dd6df47a2f6e139fe0f3
+- exact CI cargo fmt and clippy commands: pass
+- Rust suite: 1,145 passed, 101 ignored; doctor integration: 2 passed
+- sandbox: 18 passed
+- Eve: typecheck passed, 42 passed
+- dashboard production build: passed
+- docs production build: passed
+
+Known out-of-scope signal
+- `cargo clippy --all-targets -- -D warnings` fails on a pre-existing unbounded-range test loop in cli/src/native/browser.rs under Rust 1.98.
+- The repository CI command omits `--all-targets` and passes. The release diff does not touch that source.

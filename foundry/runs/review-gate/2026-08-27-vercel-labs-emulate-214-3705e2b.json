@@ -1,0 +1,519 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-27",
+    "repo": "vercel-labs/emulate",
+    "pr": 214,
+    "base": "d0219d05818adca4c12bb76ec79a7562c1766a3d",
+    "head": "3705e2b7a0c726c85c4a529697d5c067afda73c3",
+    "root": "/Users/raillyhugo/Programming/vercel/emulate-214-review",
+    "status": "complete",
+    "verdict": "findings",
+    "gaps": []
+  },
+  "contract": {
+    "path": "PR #214 title and body; Resend public idempotency documentation and OpenAPI",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Equivalent keyed sends replay the original successful response for 24 hours without duplicate captured emails or webhooks",
+      "Keys are scoped by credential and endpoint and changed or overlapping requests return Resend-compatible errors",
+      "Failed execution releases the reservation and permits a safe retry",
+      "SIGINT and SIGTERM during startup remove an invocation-owned generated-secret file"
+    ],
+    "gaps": [
+      "No separate Issue Contract or Spec review result was provided; Standards review used the PR body and Resend's public contract."
+    ]
+  },
+  "provenance": {
+    "author_model": "not provided; commits authored by ctate and yonatangross",
+    "reviewer_model": "OpenAI Codex GPT-5",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "External webhook side effects",
+      "Durable adapter snapshots",
+      "Process lifecycle and OS signals",
+      "Invocation-owned secret artifacts"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-27-emulate-214-3705e2b-substrate.md",
+      "evidence": "The corpus uses Resend's public contract, real TCP listeners, a real webhook receiver, real SIGTERM delivery, a process-kill/restart adapter drive, and fix-absent mutations."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "PR #214 body and Resend public idempotency contract",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "The contract promises one processing of an equivalent request, 24-hour replay, conflict errors, safe failure retry, and cleanup for catchable startup signals."
+    },
+    {
+      "source": "design",
+      "location": "not provided",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "No Solution Gate, design document, or decision trail accompanied the PR."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, package README, web docs, service skills, and CLI help",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The changed surfaces promise exact replay without duplicate capture or webhooks and removal for SIGINT or SIGTERM during startup."
+    },
+    {
+      "source": "implementation",
+      "location": "Resend idempotency/store/email routes and emulate startup signal guard",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "The implementation adds reservation/completion state, canonical fingerprints, rollback of local rows, a startup shutdown guard, and persistent Store participation."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "An equivalent keyed request is processed once across captured email rows, webhook deliveries, and the returned response.",
+      "kind": "integrity",
+      "status": "unverified",
+      "oracle": {
+        "observes": "All user-visible effects of the send",
+        "layer": "real HTTP emulator plus real webhook receiver",
+        "method": "Count rows and delivered webhook payloads across failure and identical retry",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Local email row count and idempotency record count",
+        "counterexample": "Rows and reservation roll back while earlier webhook HTTP requests remain delivered",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "F1: after a forced second batch insertion failure, local counts were zero but two webhooks for the first email had already arrived."
+      },
+      "substrates": [
+        {
+          "name": "Built Resend emulator over TCP with an external webhook HTTP receiver",
+          "status": "exercised",
+          "evidence": "The identical keyed retry redelivered both first-recipient webhooks, producing six total deliveries for a two-email batch."
+        }
+      ],
+      "evidence": "F1 prevents verification."
+    },
+    {
+      "id": "P2",
+      "claim": "Key validation, credential and endpoint scoping, canonical equivalence, conflicts, concurrency, replay, and 24-hour expiry match the declared protocol.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "HTTP statuses, response bodies, email count, and key isolation",
+        "layer": "built CLI and package HTTP boundary",
+        "method": "Drive JSON and form payloads, auth scheme variants, boundary lengths, changed payloads, endpoint scopes, and TTL suite cells",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Unit helper fingerprints compare equal",
+        "counterexample": "A real request is parsed differently or credential headers normalize differently at middleware",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "Real TCP requests with reordered JSON, explicit defaults, form encoding, and Bearer/token casing replayed the same response; changed payloads returned 409."
+      },
+      "substrates": [
+        {
+          "name": "Built CLI Resend listener on macOS",
+          "status": "exercised",
+          "evidence": "Equivalent live requests replayed byte-identical bodies with one captured email."
+        },
+        {
+          "name": "Vitest with controlled clock",
+          "status": "exercised",
+          "evidence": "59/59 Resend tests passed, including expiry immediately before and at 24 hours."
+        }
+      ],
+      "evidence": "The independent Resend docs and OpenAPI agree on endpoints, response classes, 24 hours, and maximum 256 characters."
+    },
+    {
+      "id": "P3",
+      "claim": "A failed keyed execution can be retried without duplicating any external effect.",
+      "kind": "atomicity",
+      "status": "unverified",
+      "oracle": {
+        "observes": "Residual external effects after failure and after the same-operation retry",
+        "layer": "webhook receiver and email store",
+        "method": "Force failure after one batch item has dispatched, inspect residuals, immediately retry",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Inserted rows and reservation are deleted in the catch block",
+        "counterexample": "Webhook deliveries escape before the later failure and cannot be rolled back",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "F1 reproduces the separation and the immediate retry duplicates the first recipient's webhooks."
+      },
+      "substrates": [
+        {
+          "name": "Real webhook receiver plus built package server",
+          "status": "exercised",
+          "evidence": "The failed request left two delivered webhook payloads despite zero local rows."
+        }
+      ],
+      "evidence": "F1 prevents verification."
+    },
+    {
+      "id": "P4",
+      "claim": "SIGINT or SIGTERM at any time after an invocation-owned generated-secret file becomes visible removes that file and permits immediate retry.",
+      "kind": "lifecycle",
+      "status": "unverified",
+      "oracle": {
+        "observes": "Process exit status, destination existence, and immediate retry",
+        "layer": "real child process and filesystem",
+        "method": "Send SIGTERM after the destination link is visible but before the caller installs its guard",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The Portless mock has started and a signal listener exists",
+        "counterexample": "The publisher has made the path visible but has not returned the rollback handle, so no listener exists yet",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "F2: the process exited 143, left the complete file, and the next invocation failed because the destination already existed."
+      },
+      "substrates": [
+        {
+          "name": "macOS process signals and APFS filesystem",
+          "status": "exercised",
+          "evidence": "A real SIGTERM hit the widened existing post-link publication window."
+        }
+      ],
+      "evidence": "F2 prevents verification."
+    },
+    {
+      "id": "P5",
+      "claim": "An in-progress idempotency reservation cannot outlive the request or process that owns it.",
+      "kind": "lifecycle",
+      "status": "unverified",
+      "oracle": {
+        "observes": "Retry result after the owner process is killed and a persisted snapshot is restored",
+        "layer": "Next adapter persistence across real process restart",
+        "method": "Persist an in-progress record through a concurrent POST, SIGKILL the owner, restart, and retry",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "In-memory catch/final completion will release or complete the reservation",
+        "counterexample": "Adapter persistence saves the reservation while the owner is blocked, then the process dies before cleanup",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "F3: after SIGKILL and restart, the identical retry still returned concurrent_idempotent_requests with no original request alive."
+      },
+      "substrates": [
+        {
+          "name": "Next adapter handler, filesystem persistence, two Node processes, and real SIGKILL",
+          "status": "exercised",
+          "evidence": "The saved snapshot contained state=in_progress and the restarted handler returned 409."
+        }
+      ],
+      "evidence": "F3 prevents verification."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "Idempotency protocol",
+      "Persistent lifecycle state",
+      "OS signal lifecycle"
+    ],
+    "dimensions": {
+      "values": [
+        "endpoint: single or batch",
+        "key: absent, empty, 1, 256, 257 characters",
+        "credential: same, different, Bearer/token scheme variants, anonymous",
+        "payload: equivalent forms, reordered objects, changed fields, batch order",
+        "record state: absent, in_progress, completed, expired, persisted in_progress",
+        "execution stage: validation, insertion, webhook delivery, response serialization",
+        "signal stage: before publication, inside publication after link, Portless, listener startup, steady state",
+        "retry: immediate, before expiry, at expiry, after process restart"
+      ],
+      "exclusions": [
+        "SIGKILL cleanup is explicitly excluded by the user-facing contract because it is uncatchable.",
+        "SMTP idempotency is outside this PR because only the HTTP endpoints are implemented."
+      ],
+      "evidence": "The corpus covers protocol partitions with tests and real-boundary drives; the publication-window and process-restart cells produced findings."
+    },
+    "oracle": {
+      "source": "Resend public idempotency documentation/OpenAPI plus OS process and filesystem semantics",
+      "independent": true,
+      "evidence": "Resend defines one processing, same response, error classes, endpoint set, TTL, and key length independently of the PR."
+    },
+    "producer": {
+      "name": "Built CLI, real HTTP clients, real webhook receiver, real adapter persistence, and real OS signals",
+      "status": "exercised",
+      "evidence": "Evidence artifact records TCP, filesystem, SIGTERM, SIGKILL, restart, and retry observations."
+    },
+    "falsification": [
+      {
+        "mutation": "Change in_progress handling to replay 200/null instead of returning the concurrent conflict",
+        "red_evidence": "The focused Resend test failed at the expected 409 assertion.",
+        "restored_green_evidence": "After restoration, 59/59 Resend tests passed."
+      },
+      {
+        "mutation": "Revert exact-head startup handlers from process.on to process.once",
+        "red_evidence": "No red: the new signal test still passed, proving a surviving mutant and finding F4.",
+        "restored_green_evidence": "The source was restored to exact HEAD and the focused test passed."
+      }
+    ],
+    "evidence": "The protocol suite kills a core concurrency mutant but misses external webhook atomicity, persistence ownership, publication timing, and the final repeated-signal fix."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "PR body and docs",
+      "claim": "Deleting inserted rows and releasing the reservation makes a failed send safe to retry.",
+      "status": "refuted",
+      "evidence": "F1: webhook HTTP effects already escaped and were duplicated by retry."
+    },
+    {
+      "id": "A2",
+      "source": "Startup implementation",
+      "claim": "Installing the signal guard immediately after publishGeneratedSecretsFile returns covers the whole visible-file interval.",
+      "status": "refuted",
+      "evidence": "F2: the destination is linked before the publisher returns, leaving a catchable-signal gap."
+    },
+    {
+      "id": "A3",
+      "source": "Idempotency state model",
+      "claim": "Every in_progress record has a live request owner that will eventually complete or release it.",
+      "status": "refuted",
+      "evidence": "F3: adapter persistence survives owner-process SIGKILL and restores a stranded record."
+    },
+    {
+      "id": "A4",
+      "source": "Exact-head test",
+      "claim": "The startup signal regression test protects the process.on handoff fix.",
+      "status": "refuted",
+      "evidence": "F4: reverting process.on to process.once leaves the test green."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The diff controls captured email rows, external webhook HTTP requests, persistent adapter snapshots, and a filesystem artifact.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "Email row inserted and webhook HTTP deliveries emitted",
+        "owner": "Resend email route and WebhookDispatcher",
+        "commit_event": "insertEmail followed by dispatchEmailWebhooks",
+        "later_fallible_stages": [
+          "later batch item insertion",
+          "later webhook delivery",
+          "response serialization",
+          "idempotency completion"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "batch operation after an earlier external dispatch",
+            "covers": ["later batch item insertion", "later webhook delivery"],
+            "forced": true,
+            "residual_observed": "Zero local rows and reservation, but two webhook deliveries remained.",
+            "cleanup_owner": "No owner can retract delivered HTTP requests.",
+            "retry": {
+              "attempted": true,
+              "outcome": "failed",
+              "evidence": "Retry returned 200 but duplicated first-recipient webhook events."
+            },
+            "evidence": "F1 substrate drive."
+          },
+          {
+            "ownership_region": "response and record completion",
+            "covers": ["response serialization", "idempotency completion"],
+            "forced": true,
+            "residual_observed": "The author's circular-response test removed the row and released the reservation.",
+            "cleanup_owner": "executeSend catch block",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "The focused suite retries successfully after serialization failure."
+            },
+            "evidence": "resend.test.ts response-serialization failure cell."
+          }
+        ]
+      },
+      {
+        "id": "CP2",
+        "effect": "Generated-secret destination becomes visible",
+        "owner": "publishGeneratedSecretsFile and startCommand",
+        "commit_event": "Hard link to target.path",
+        "later_fallible_stages": [
+          "publisher post-link verification",
+          "Portless check",
+          "alias registration",
+          "seeding",
+          "listener startup"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "publisher before rollback handle returns",
+            "covers": ["publisher post-link verification"],
+            "forced": true,
+            "residual_observed": "SIGTERM exited 143 and left the complete destination.",
+            "cleanup_owner": "No signal handler was installed.",
+            "retry": {
+              "attempted": true,
+              "outcome": "failed",
+              "evidence": "Immediate retry failed with Generated secrets path already exists."
+            },
+            "evidence": "F2 child-process drive."
+          },
+          {
+            "ownership_region": "caller-owned startup after publisher return",
+            "covers": ["Portless check", "alias registration", "seeding", "listener startup"],
+            "forced": true,
+            "residual_observed": "Existing tests observe destination removal, aliases/listeners cleanup, and no stranded file.",
+            "cleanup_owner": "StartupShutdownGuard and rollbackStartup",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "Existing Portless and listener-failure tests retry the same operation successfully."
+            },
+            "evidence": "start-generated-secrets.test.ts and start-generated-secrets-signal.test.ts."
+          }
+        ]
+      },
+      {
+        "id": "CP3",
+        "effect": "Adapter persists an in_progress idempotency reservation",
+        "owner": "adapter-next enqueueSave",
+        "commit_event": "Persistence save after concurrent POST returns 409",
+        "later_fallible_stages": [
+          "owner request completion",
+          "owner process survival"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "process lifecycle after snapshot",
+            "covers": ["owner request completion", "owner process survival"],
+            "forced": true,
+            "residual_observed": "Snapshot retained in_progress after owner SIGKILL.",
+            "cleanup_owner": "No cleanup owner after restart; expiry is 24 hours.",
+            "retry": {
+              "attempted": true,
+              "outcome": "failed",
+              "evidence": "Restarted handler returned concurrent_idempotent_requests."
+            },
+            "evidence": "F3 two-process adapter drive."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"Checked non-keyed sends, scheduled sends, GET routes, adapter persistence, and normal shutdown behavior."},
+    {"name":"New-domain matrix","status":"run","reason":"Enumerated endpoint, key, credential, payload, state, failure-stage, signal-stage, and retry dimensions."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Traced Store snapshots and every getResendStore consumer; the adapter persistence consumer produced F3."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell parsing or command construction changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"run","reason":"Traced SIGINT/SIGTERM listener topology, repeated delivery, handoff, and process exit."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No shim was introduced."},
+    {"name":"Deliberate-default check","status":"run","reason":"Challenged 24-hour TTL, omitted payload defaults, anonymous namespace, and in_progress persistence."},
+    {"name":"Fresh-seam scan","status":"run","reason":"Inspected new crypto serialization, Store indexes, webhook ordering, adapter snapshots, and signal ownership."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Compared built behavior with Resend's public contract using real HTTP, webhook, filesystem, and process substrates."},
+    {"name":"Reference-implementation oracle","status":"run","reason":"Resend docs and OpenAPI supplied an independent contract oracle."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Traced 409 and execution failure outcomes through retries, persistence, and external webhook effects."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No new CLI flag or flag dispatch changed."},
+    {"name":"Error-path forcing","status":"run","reason":"Forced invalid keys, changed payloads, overlap, batch insertion failure, response serialization failure, SIGTERM, and SIGKILL."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery detector was introduced."},
+    {"name":"Cancellation and timeout hygiene","status":"skipped","reason":"No new wait ceiling or cancellable request was added."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced request to Store to webhook to response and file publication to signal guard to rollback."},
+    {"name":"Substrate verification","status":"run","reason":"Observed actual webhook payloads, files, process signals, exit status, restart, and HTTP responses."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"Built the workspace and drove the shipped CLI and package listeners."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"Enumerated all owners of idempotency state, external effects, persistent snapshots, and generated-secret cleanup."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Verified changed claims and found two unchanged generated-secret passages that omit the new signal behavior."},
+    {"name":"Demonstrative example","status":"run","reason":"Drove the documented curl-style Resend request and verified successful replay."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists."},
+    {"name":"Complexity budget","status":"run","reason":"Fingerprint sorting is O(total keys log keys) and lazy expiry performs one indexed lookup; no scale blocker found."}
+  ],
+  "deterministic": [
+    {"check":"covered before report","outcome":"acknowledged","reason":"Expected initial red because no exact-head report existed."},
+    {"check":"style","outcome":"acknowledged","reason":"Two em dashes are endpoint list separators in the package README and match repository house style."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"The Resend surface set passed after compiling the missing conventions rule; generic emulate rules flag apps/web/app/docs/page.mdx, confirmed as F5."},
+    {"check":"siblings Idempotency-Key","outcome":"pass","reason":"Every occurrence is in the diff and no untouched same-file passage remains."},
+    {"check":"siblings generated-secrets-file","outcome":"acknowledged","reason":"Code/test hits are unaffected; apps/web/app/docs/page.mdx and packages/@emulators/github/README.md are confirmed stale contract passages in F5."},
+    {"check":"callers idempotency helpers","outcome":"pass","reason":"Every direct caller is in the changed email route."},
+    {"check":"callers getResendStore","outcome":"acknowledged","reason":"All five outside-diff consumers were read; adapter persistence beyond direct callers produced F3."},
+    {"check":"callers startCommand","outcome":"acknowledged","reason":"All existing generated-secret startup tests were read; their convergence item informed F2 and F4."},
+    {"check":"stale","outcome":"pass","reason":"No contract value was renamed or retired."},
+    {"check":"timings","outcome":"pass","reason":"No new wait ceiling."},
+    {"check":"shellmeta","outcome":"pass","reason":"No shell-metacharacter detector."},
+    {"check":"artifacts","outcome":"acknowledged","reason":"No new persistent filename is introduced; the existing generated-secret destination changes lifecycle handling."},
+    {"check":"rawinput","outcome":"acknowledged","reason":"No resolution or discovery rule was deepened."},
+    {"check":"execdeps","outcome":"pass","reason":"No new external executable and no execdeps map applies."},
+    {"check":"diff --check","outcome":"pass","reason":"No whitespace errors."},
+    {"check":"workspace CI","outcome":"pass","reason":"Build, test, type-check, lint, and format check all passed."},
+    {"check":"radius impact","outcome":"acknowledged","reason":"46 changed, 19 impacted, 4980 edges, 21101 unresolved calls; used for orientation and treated as under-covering."},
+    {"check":"covered after report","outcome":"pass","reason":"The exact-head report exists for 3705e2b."},
+    {"check":"report validator","outcome":"acknowledged","reason":"The validator is pass-only and correctly reports the five open findings, refuted assumptions, unverified properties, and unsafe retry outcomes for this completed findings verdict."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "A failed keyed batch can deliver webhooks and then release the key, so the identical retry delivers those webhooks again.",
+      "evidence": "Forced failure on the second insertion left zero local rows but two delivered webhooks; retry delivered the first pair again and completed with six deliveries total.",
+      "layer": "end-to-end idempotency across external side effects",
+      "source": "lens",
+      "path": "packages/@emulators/resend/src/routes/emails.ts:58",
+      "resolution": "open"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "SIGINT or SIGTERM can arrive after the generated-secret file is linked but before the startup guard is installed, leaving the file and blocking retry.",
+      "evidence": "Real SIGTERM in the post-link publisher window exited 143, left the file, and immediate retry failed already exists.",
+      "layer": "OS signal and filesystem publication boundary",
+      "source": "lens",
+      "path": "packages/emulate/src/commands/start.ts:399",
+      "resolution": "open"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "Adapter persistence can restore an orphaned in_progress reservation after the owner process dies, trapping the key as concurrent until expiry.",
+      "evidence": "A concurrent POST persisted state=in_progress; after owner SIGKILL and process restart, the identical retry returned 409 concurrent_idempotent_requests.",
+      "layer": "persistent lifecycle ownership across process restart",
+      "source": "map",
+      "path": "getResendStore → resendPlugin via call → adapter persistence save",
+      "resolution": "open"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "The new startup signal test does not protect the exact-head process.on fix against a second signal during asynchronous cleanup.",
+      "evidence": "Reverting the startup handlers to process.once left the new test green.",
+      "layer": "regression test strength at the OS-signal call site",
+      "source": "lens",
+      "path": "packages/emulate/src/__tests__/start-generated-secrets-signal.test.ts:64",
+      "resolution": "open"
+    },
+    {
+      "id": "F5",
+      "state": "confirmed",
+      "claim": "Two required generated-secret documentation passages still omit the new SIGINT/SIGTERM cleanup behavior.",
+      "evidence": "apps/web/app/docs/page.mdx:89 and packages/@emulators/github/README.md:205 still use the old generic hard-termination text while sibling contract surfaces were updated.",
+      "layer": "user-facing documentation contract",
+      "source": "gate",
+      "path": "packages/emulate/src/commands/start.ts → documentation surface map",
+      "resolution": "open"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "The package README's two added em dashes do not violate house style.",
+      "evidence": "They are existing endpoint-list separators and AGENTS.md requires em dash when a prose dash is needed."
+    },
+    {
+      "claim": "Unchanged generated-secret implementation and test files named by the sibling grep do not require text updates.",
+      "evidence": "They contain code identifiers or existing behavior tests, not stale user-facing contract prose."
+    }
+  ],
+  "issue_candidates": []
+}

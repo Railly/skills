@@ -1,5 +1,9 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
+import {
+	readWorkItemManifest,
+	validateWorkItemManifest,
+} from "./work-item-manifest.mjs";
 
 const requiredHeadings = [
 	"Outcome",
@@ -111,6 +115,43 @@ export function validateIssueContracts(repository, inputs = []) {
 			for (const id of acceptance) {
 				if (!new RegExp(`\\b${id}\\b`).test(verification)) {
 					errors.push(`${file}: ${id} has no verification mapping`);
+				}
+			}
+			const manifestReference = text.match(/^Manifest: (.+)$/m)?.[1]?.trim();
+			if (!manifestReference && state !== "closed") {
+				errors.push(`${file}: active mission missing Manifest sidecar`);
+			}
+			if (manifestReference) {
+				const manifestPath = resolve(dirname(file), manifestReference);
+				if (!existsSync(manifestPath) || !statSync(manifestPath).isFile()) {
+					errors.push(
+						`${file}: missing Manifest sidecar "${manifestReference}"`,
+					);
+				} else {
+					try {
+						const manifest = readWorkItemManifest(manifestPath);
+						for (const error of validateWorkItemManifest(manifest).errors) {
+							errors.push(`${manifestPath}: ${error}`);
+						}
+						const source = text.match(/^Source: (.+)$/m)?.[1]?.trim();
+						const repository = text
+							.match(/^Target repository: (.+)$/m)?.[1]
+							?.trim();
+						if (manifest.work_item?.source !== source) {
+							errors.push(
+								`${manifestPath}: work_item.source does not match Issue Contract`,
+							);
+						}
+						if (manifest.work_item?.repository !== repository) {
+							errors.push(
+								`${manifestPath}: work_item.repository does not match Issue Contract`,
+							);
+						}
+					} catch (error) {
+						errors.push(
+							`${manifestPath}: cannot read manifest: ${error.message}`,
+						);
+					}
 				}
 			}
 		}

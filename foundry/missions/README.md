@@ -8,9 +8,25 @@ Copy [_template.md](_template.md) to:
 
 ```text
 foundry/missions/<owner-repo>/<issue-or-mission>.md
+foundry/missions/<owner-repo>/<issue-or-mission>.manifest.json
 ```
 
 Resolve the canonical source root with `scripts/resolve-source-root.mjs`. Never create the contract in the target repository or an installed skill directory.
+
+Create the sidecar with:
+
+```bash
+bun scripts/work-item.mjs init foundry/missions/<owner-repo>/<issue-or-mission>.manifest.json \
+  --source owner/repo#N \
+  --repository owner/repo \
+  --cwd /absolute/path/to/checkout \
+  --base <sha> \
+  --head <sha> \
+  --profile standard \
+  --authorization read-only
+```
+
+The Markdown contract carries human-readable claims. The schema-v1 sidecar is the transactional source for exact state, profile and budget, stage receipts, orchestration failures, evidence reuse, outcomes, and close-cycle status. Active missions must declare a valid sidecar. Historical closed missions without one remain valid and must not be backfilled with invented receipts.
 
 ## State transitions
 
@@ -41,4 +57,4 @@ Return to an earlier state when runtime evidence changes scope or invalidates a 
 bun scripts/validate-issue-contracts.mjs
 ```
 
-The validator checks the retrospective pilot and all live contracts. Live missions must map every acceptance ID to verification evidence.
+The validator checks the retrospective pilot, all live contracts, and each declared schema-v1 sidecar. Live missions must map every acceptance ID to verification evidence and match the sidecar's source and repository.

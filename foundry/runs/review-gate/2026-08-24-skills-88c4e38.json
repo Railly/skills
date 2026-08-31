@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-24",
+    "repo": "Railly/skills",
+    "base": "9a5e72c262609ea3a7e5deb616f257735d02fac2",
+    "head": "88c4e38510a0581315560e5ead8bfe3be17250d6",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No Issue Contract or separate Spec review was supplied; the presentation requirements in the conversation were reviewed directly."
+    ]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "The exact-diff scanner mechanically treats source-link and skill-links selectors as durable-state signals because they contain the token link.",
+      "The Astro production build publishes generated static files under www/dist."
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-24-skills-88c4e38-browser-corpus.txt",
+      "evidence": "A durable browser corpus independently records rendered geometry, real interactions, dark/light accessibility, reduced motion, repository checks, and production build results."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Conversation requirements",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "Compact developer-tool registry, Railly identity, Vercel design.md-inspired information architecture, and preserved behavior were explicitly requested."
+    },
+    {
+      "source": "design",
+      "location": "/Users/raillyhugo/kai/06_Content/v0-templates/2026-08-24/hunt-railly-dev-compact/visual-reference.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "Persisted railly.dev visual reference and tokens reviewed against the rendered result."
+    },
+    {
+      "source": "user_facing",
+      "location": "www/src/components and www/src/styles/global.css",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "Headings, labels, registry rows, workflow, theme, search, copy controls, metadata, favicon, and OG image reviewed."
+    },
+    {
+      "source": "implementation",
+      "location": "git diff origin/main...88c4e38",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "Full 11-file diff reviewed after checks and browser dogfood."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The registry is materially more compact while remaining legible on desktop and mobile.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Rendered layout density and legibility",
+        "layer": "browser rendering",
+        "method": "Measured DOM geometry and visually inspected full-page screenshots at 1440x1000 and 390x844.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Smaller CSS spacing values",
+        "counterexample": "CSS values can shrink while content still overflows or remains tall due to wrapping.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Rendered geometry directly measured 49 px header, 403 px hero, 112 px desktop row, 3,289 px desktop page, and no mobile body overflow."
+      },
+      "substrates": [
+        {"name": "Chromium desktop 1440x1000", "status": "exercised", "evidence": "/tmp/railly-skills-compact-desktop-final-aa.png"},
+        {"name": "Chromium mobile 390x844", "status": "exercised", "evidence": "/tmp/railly-skills-compact-mobile-final-aa.png"}
+      ],
+      "evidence": "Full-page screenshots and DOM measurements verify density and responsive layout."
+    },
+    {
+      "id": "P2",
+      "claim": "The page uses railly.dev identity and the supplied real logo without an invented mark.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Rendered brand mark, typography, palette, and metadata",
+        "layer": "browser rendering and document metadata",
+        "method": "Inspected screenshots, DOM favicon path, generated metadata, and OG SVG.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The favicon file exists in public assets",
+        "counterexample": "An asset can exist while the header or metadata still references the old invented SVG.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Rendered header img and document icon both reference /favicon.png; favicon.svg is deleted."
+      },
+      "substrates": [
+        {"name": "Chromium rendered page", "status": "exercised", "evidence": "Header mark visually inspected and DOM returned mark=/favicon.png."},
+        {"name": "Astro static output", "status": "exercised", "evidence": "Production build generated /index.html and /og.svg successfully."}
+      ],
+      "evidence": "Reference palette, Geist typography, real favicon, and monochrome OG image are present."
+    },
+    {
+      "id": "P3",
+      "claim": "Existing search, filters, URL state, copy, theme, keyboard, motion, and accessibility behavior remains usable.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "User-visible browser behavior",
+        "layer": "end-to-end browser interaction",
+        "method": "Exercised real controls, URL hydration, clipboard feedback, theme persistence, keyboard shortcut, reduced motion, and axe audits.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Astro build and static checks pass",
+        "counterexample": "A static build can pass while client-side event handlers or responsive accessibility fail.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Browser dogfood returned 4 query results, 4 stable results, focused #skill-search with /, displayed copy feedback, persisted light theme, disabled motion, and found zero axe violations."
+      },
+      "substrates": [
+        {"name": "Chromium dark mode", "status": "exercised", "evidence": "Functional interactions and axe WCAG A/AA audit with zero violations."},
+        {"name": "Chromium light mode", "status": "exercised", "evidence": "axe WCAG A/AA audit with zero violations."},
+        {"name": "Chromium reduced motion", "status": "exercised", "evidence": "scrollBehavior=auto and card/toast transitionDuration=0s."}
+      ],
+      "evidence": "All requested retained interactions were driven at the browser surface."
+    },
+    {
+      "id": "P4",
+      "claim": "The repository remains valid and production-buildable.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Repository contracts, tests, diagnostics, and production output",
+        "layer": "toolchain",
+        "method": "Ran repository validators, tests, frozen install, Astro check, Biome, and Astro build.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "One successful local dev render",
+        "counterexample": "A dev server can render while registry contracts or production static generation fail.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "16 skills and 5 contracts validate; 19 tests and five fixtures pass; frozen install is unchanged; production build succeeds."
+      },
+      "substrates": [
+        {"name": "Bun 1.3.11", "status": "exercised", "evidence": "Validators, tests, install, checks, and build all succeeded."}
+      ],
+      "evidence": "Full repository and www validation suite is green."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": "Presentation and layout only; no protocol, parser, serializer, state machine, lifecycle, event translation, adapter, or compatibility layer changed."},
+    "oracle": {"source": "not_applicable", "independent": true, "evidence": "No behavioral-strength trigger."},
+    "producer": {"name": "not_applicable", "status": "not_applicable", "evidence": "No producer boundary changed."},
+    "falsification": [],
+    "evidence": "Browser dogfood covers retained UI behavior outside the mandatory Test Strength class."
+  },
+  "assumptions": [
+    {"id": "A1", "source": "design", "claim": "Compact means materially less vertical space without making the registry unreadable.", "status": "verified", "evidence": "Desktop height fell from roughly 6,949 px to 3,289 px and visual inspection confirmed legibility."},
+    {"id": "A2", "source": "visual reference", "claim": "The supplied railly.dev favicon and extracted palette are the intended identity.", "status": "verified", "evidence": "User supplied the favicon and explicitly requested railly.dev identity."},
+    {"id": "A3", "source": "subsystem model", "claim": "The redesign can preserve existing client-side behavior without changing its scripts.", "status": "verified", "evidence": "Search, filters, URL state, copy, theme, shortcut, and reduced motion were exercised successfully."}
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The diff has no runtime durable mutation. The mechanically flagged source-link and skill-links strings are CSS and markup names. The relevant durable effect is Astro publishing generated static files to www/dist during the production build.",
+    "commit_points": [
+      {
+        "id": "CP1",
+        "effect": "Generated static registry files are written under www/dist.",
+        "owner": "Astro production build",
+        "commit_event": "astro build completes static route generation",
+        "later_fallible_stages": [
+          "serve generated artifact",
+          "browser interaction verification",
+          "accessibility verification"
+        ],
+        "failure_partitions": [
+          {
+            "ownership_region": "post-build browser verification",
+            "covers": [
+              "serve generated artifact",
+              "browser interaction verification",
+              "accessibility verification"
+            ],
+            "forced": true,
+            "residual_observed": "The first generated artifact served correctly but axe exposed low-contrast microcopy, so that artifact was rejected before publication.",
+            "cleanup_owner": "The next Astro build atomically replaces the generated dist output used by preview and deployment.",
+            "retry": {
+              "attempted": true,
+              "outcome": "success",
+              "evidence": "After correcting the text token, the production build, preview interactions, and dark/light axe audits were rerun successfully."
+            },
+            "evidence": "The browser corpus records the rebuilt artifact and its exact-head verification."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source replaced."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No trigger condition widened or validator relaxed."},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No input resolution rule changed."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command re-parsing logic changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process emission channel or latch changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim or subprocess harness changed."},
+    {"name": "Deliberate-default check", "status": "skipped", "reason": "No default behavior changed."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Reviewed component, stylesheet, asset, metadata, and client-script seams; browser dogfood cleared them."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "No twice-failed guard or substrate classifier exists."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No algorithm or protocol claims reference equivalence."},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "No new failure outcome introduced."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag introduced or propagated."},
+    {"name": "Error-path forcing", "status": "skipped", "reason": "No error path changed; retained copy success feedback was exercised."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No stateful destructive operation changed."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No async cancellation or timeout path changed."},
+    {"name": "Boundary pipeline trace", "status": "skipped", "reason": "No data pipeline contract changed."},
+    {"name": "Substrate verification", "status": "run", "reason": "Exercised desktop, mobile, dark, light, and reduced-motion Chromium substrates."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Drove the Astro preview as a user after a production build."},
+    {"name": "Newly-asserted invariant ownership", "status": "skipped", "reason": "No new runtime invariant asserted."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "UI copy and labels were compared with actual registry counts, maturity data, links, and controls."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No new documentation example added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "skipped", "reason": "No loop, lookup, or per-candidate algorithm changed."}
+  ],
+  "deterministic": [
+    {"check": "style", "outcome": "pass", "reason": "No prohibited prose punctuation in added lines."},
+    {"check": "surfaces", "outcome": "pass", "reason": "No mapped repository contract surface was omitted."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "No whitespace errors."},
+    {"check": "repository validators", "outcome": "pass", "reason": "16 skills and 5 Issue Contracts valid."},
+    {"check": "tests and eval fixtures", "outcome": "pass", "reason": "19 tests and five fixtures passed."},
+    {"check": "Astro check and Biome", "outcome": "pass", "reason": "0 errors, warnings, or hints; Biome clean."},
+    {"check": "Astro production build", "outcome": "pass", "reason": "Static generation succeeded."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Tiny labels initially used a foreground color below WCAG AA contrast.",
+      "evidence": "axe reported 139 color-contrast nodes at #525252 on #111111; changed the faint text token to #858585 and the exact-head rerun reported zero violations.",
+      "layer": "rendered accessibility",
+      "source": "lens",
+      "path": "www/src/styles/global.css",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {"claim": "No separate Spec pass is claimed.", "evidence": "No Issue Contract or Spec review was supplied; contract.spec_status remains not_provided."},
+    {"claim": "Seven axe incomplete nodes do not block the accessibility result.", "evidence": "They are decorative arrow/search glyphs marked aria-hidden; axe cannot calculate semantic text contrast for non-text characters."},
+    {"claim": "Radius impact absence is not safety evidence.", "evidence": "The saved map has 42 unresolved calls versus 19 edges and is explicitly treated as under-covering."}
+  ],
+  "issue_candidates": []
+}

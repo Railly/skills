@@ -43,9 +43,9 @@ A wrong call gets a **new row that supersedes it**, never an edit or a delete. T
 
 ## 4. Self-audit before handing back
 
-Before returning the work, spawn a reviewer on a **different model family** than the writer to read `.decisions.tsv` against the transcript and the diff, and flag decisions that look risky, suboptimal, or unsupported by their stated evidence — flag, do not redo. A same-family auditor shares the writer's blind spots and will wave through the same bad call (the review-gate lesson: the reviewer model must differ from the author). Its output is a short list of rows worth a second look, handed to whoever reviews next; it does not gate the work.
+Before returning the work, request a reviewer on a **different model family** than the writer to read `.decisions.tsv` against the transcript and the diff, and flag decisions that look risky, suboptimal, or unsupported by their stated evidence. On the first Agent schema or capability error, inspect capability once and never retry the identical invalid call. Fall back to a visible Herdr worker, then a sequential isolated pass, then record the audit as unavailable. A sequential self-audit does not satisfy model-family independence.
 
-**Complete when:** the trail has been read by a different-family auditor and its flagged rows are attached to the handoff, or the absence of an auditor runtime is stated.
+**Complete when:** the trail has been read by a different-family auditor and its flagged rows are attached to the handoff, or `execution_mode`, `degraded_from`, and the precise independence gap are recorded.
 
 ## Where this connects
 

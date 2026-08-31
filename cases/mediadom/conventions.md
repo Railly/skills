@@ -1,51 +1,37 @@
-# MediaDom review conventions
+# MediaDOM review conventions
 
-Bootstrapped 2026-08-28 for the internal V1 extraction from `railly/mediadom-lab`.
+Compiled from `README.md`, `INTERNAL.md`, `package.json`, CLI help, and repository behavior.
 
 ## Surface map
 
 ```surfaces
-packages/mediadom/src/cli.ts :: packages/mediadom/src/schema.ts, packages/mediadom/README.md, packages/mediadom/skills/mediadom/SKILL.md, packages/mediadom/test/camera-cli-contract.test.ts
-packages/mediadom/src/schema.ts :: packages/mediadom/src/cli.ts, packages/mediadom/README.md, packages/mediadom/skills/mediadom/SKILL.md, packages/mediadom/test/camera-cli-contract.test.ts
-packages/mediadom/src/ffmpeg.ts :: packages/mediadom/src/renderer.ts, packages/mediadom/test/ffmpeg-compat.test.ts, packages/mediadom/scripts/internal-demo.ts
-packages/mediadom/src/renderer.ts :: packages/mediadom/src/ffmpeg.ts, packages/mediadom/scripts/internal-demo.ts
-packages/mediadom/src/camera-receipt.ts :: packages/mediadom/src/camera-command.ts, packages/mediadom/src/cli.ts, packages/mediadom/src/schema.ts, packages/mediadom/README.md, packages/mediadom/skills/mediadom/SKILL.md, packages/mediadom/test/camera-receipt.test.ts, packages/mediadom/scripts/internal-demo.ts
-packages/mediadom/src/camera-command.ts :: packages/mediadom/src/camera-receipt.ts, packages/mediadom/src/cli.ts, packages/mediadom/src/schema.ts, packages/mediadom/README.md, packages/mediadom/skills/mediadom/SKILL.md, packages/mediadom/test/camera-command.test.ts, packages/mediadom/test/camera-receipt.test.ts, packages/mediadom/scripts/internal-demo.ts
-packages/mediadom/src/pointer.ts :: packages/mediadom/src/pointer-track-file.ts, packages/mediadom/README.md, packages/mediadom/test/pointer-track-file.test.ts
-packages/mediadom/src/pointer-track-file.ts :: packages/mediadom/src/pointer.ts, packages/mediadom/src/cli.ts, packages/mediadom/README.md, packages/mediadom/skills/mediadom/SKILL.md, packages/mediadom/test/pointer-track-file.test.ts, packages/mediadom/test/camera-cli-contract.test.ts
-packages/mediadom/scripts/internal-demo.ts :: packages/mediadom/README.md, packages/mediadom/INTERNAL.md, packages/mediadom/.github/workflows/ci.yml
-packages/mediadom/package.json :: packages/mediadom/src/name.ts, packages/mediadom/README.md, packages/mediadom/INTERNAL.md, packages/mediadom/.github/workflows/ci.yml
+src/cli.ts :: src/schema.ts, src/skills.ts, README.md, test/cli-doom.test.ts
+src/one-shot.ts :: src/cli.ts, src/schema.ts, src/skills.ts, README.md, test/cli-doom.test.ts
+src/external-process.ts :: src/ffmpeg.ts, src/instrument.ts, test/cli-doom.test.ts
+src/renderer.ts :: README.md, test/cli-doom.test.ts
+src/adapters/trx.ts :: src/skills.ts, README.md, test/cli-doom.test.ts
 ```
 
 ## House norms
 
 - Runtime and package manager: Bun.
 - Lint and format: Biome.
-- The package remains private until an explicit publication decision.
-- Base internal evaluation requires no API keys and uses only synthetic or redistributable fixtures.
-- MediaDom consumes producer-neutral pointer tracks. SSRec is not a package dependency or part of the release.
+- Supported operating system: macOS.
+- JSON stdout stays parseable. Diagnostics go to stderr.
+- The input is one video. The product edits cuts, silence, and semantic redundancy. It does not compose or reframe video.
 
 ## Subsystem invariants
 
-- The source media is immutable. Renders always target a different path.
-- JSON stdout remains parseable independently from stderr diagnostics.
-- The schema, parser, scoped help, and dispatcher publish the same verbs and flags.
-- Pointer tracks require `version: 1`; missing and unknown versions fail with migration guidance.
-- The SSRec TypeScript exporter emits `version: 1`, but SSRec remains outside the MediaDom release.
-- FFmpeg script-file compatibility is selected from the executable's observed capability, not inferred from a version string.
-- A camera receipt binds source, pointer track, settings, generated script, render plan, FFmpeg arguments, and output bytes.
-- Camera verification returns exit 7 for drift, never mutates the inputs, and render refuses existing outputs or sidecars.
-- Demo run directories are unique so both FFmpeg matrix jobs can execute without colliding.
-- A successful demo proves the audio edit, receipt, FFmpeg option, camera plan, camera render, camera verification, source integrity, and measured output durations.
+- Source media is immutable.
+- A successful doom run leaves one certified MP4 and its receipt.
+- A failed render, probe, final transcription, or terminal QA leaves no uncertified master or receipt.
+- External processes are bounded, cancellable, and cleaned up with their temporary directories.
+- The store lock owns read-modify-write transitions and survives concurrent writers without lost updates.
+- The calling agent owns semantic editorial judgment. MediaDOM owns physical cut safety and final verification.
 
 ## Verification norms
 
-- Run `bun run check` and `bun run demo` from the package root.
-- Falsify compatibility and protocol tests at the production definition and real call site, then restore green.
-- Inspect the clean exported tree separately from the private monorepo.
-- Scan tracked release files for local paths, private fixtures, credentials, and generated media before pushing.
-
-## Gate-miss ledger
-
-- 2026-08-28: ordinary text scans skipped TypeScript files containing literal NUL separators. Release scans must classify tracked files first and search remaining content byte-aware.
-- 2026-08-28: timestamp-only demo directories collided during parallel FFmpeg compatibility runs. Demo runs must use an atomic unique-directory primitive.
+- CLI contract changes drive the real Bun CLI across filesystem-backed stores.
+- Render changes use real FFmpeg and inspect the produced MP4.
+- Dependency refusal, malformed output, timeout, cancellation, partial output, post-render failure, QA failure, and immediate retry are forced.
+- `bun run check`, `bun run demo`, `bun audit`, `git diff --check`, and repeated doom lifecycle tests are required.

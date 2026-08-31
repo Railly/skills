@@ -1,0 +1,48 @@
+{
+  "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+  "head": "684946184733d91e5610842ffb5b6efc03ef1c76",
+  "changed": 13,
+  "impacted": 150,
+  "convergence": [
+    {
+      "symbol": "cli/src/native/snapshot.rs#take_snapshot",
+      "confidence": 1,
+      "reachedBy": [
+        "cli/src/native/snapshot.rs#normalize_snapshot_name",
+        "cli/src/native/snapshot.rs#render_tree"
+      ]
+    },
+    {
+      "symbol": "cli/src/native/actions.rs#execute_command",
+      "confidence": 1,
+      "reachedBy": [
+        "cli/src/native/interaction.rs#select_option",
+        "cli/src/native/snapshot.rs#normalize_snapshot_name",
+        "cli/src/native/snapshot.rs#render_tree"
+      ]
+    },
+    {
+      "symbol": "cli/src/main.rs#main",
+      "confidence": 1,
+      "reachedBy": [
+        "cli/src/output.rs#print_command_help",
+        "cli/src/output.rs#print_help"
+      ]
+    }
+  ],
+  "visibilityBoundary": {
+    "unresolvedCalls": 2445,
+    "dynamicImports": 0,
+    "macroBodies": 0,
+    "scipUnmapped": 81
+  },
+  "stats": {
+    "filesIndexed": 282,
+    "symbols": 4533,
+    "edges": 8137,
+    "reconciledFiles": 2,
+    "elapsedMs": 19059,
+    "scipReindexMs": 18574
+  },
+  "coverageNote": "The map ranks the expected snapshot, command dispatcher, and CLI help consumers. Rust analyzer reported duplicate-symbol diagnostics, and 2,445 unresolved calls mean the map under-covers; caller and repository sweeps were also run."
+}

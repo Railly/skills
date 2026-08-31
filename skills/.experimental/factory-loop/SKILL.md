@@ -19,6 +19,8 @@ allowed-tools:
 
 Route one work item through the smallest complete evidence path. The loop owns phase order, admission, evidence freshness, re-entry, and human gates. Each delegated skill owns its method.
 
+The canonical Issue Contract has a machine-readable manifest sidecar. Read it before repository inspection, verify only drift-prone fields, and update it transactionally at every phase boundary. The manifest is the source for stage status, exact state, skill revisions, orchestration mode, elapsed time, promotion, close-cycle state, and outcome annotation.
+
 ```text
 select? → admit → contract → shape → execute → Spec → review → show → human promote → deliver → record
                        ↑          │                                        │
@@ -31,7 +33,7 @@ select? → admit → contract → shape → execute → Spec → review → sho
 
 ## 1. Locate the earliest incomplete state
 
-Inventory the selected source, source revision, Issue Contract, accepted shape or Formula, repository HEAD, diff, stage evidence, review report, acceptance artifact, promotion state, and case. Treat remembered or agent-reported completion as a lead.
+Inventory the selected source and manifest. Verify source revision, repository HEAD, dirty digest, authorization, and referenced evidence. Treat remembered or agent-reported completion as a lead. Do not rebuild stable stage state from the transcript.
 
 If no item is selected, invoke `issue-intake` and stop for the user's choice. If a handoff exists, invoke `workstream-reconcile` and route from its current evidence, not its historical stage label. Do not rerun a complete phase unless later changes invalidated it.
 
@@ -51,7 +53,16 @@ Follow the admitted Formula's minimum path. Support, investigation, bug reproduc
 
 For an unverified bug, reproduce the claim at the user-visible layer before proposing a fix. Freeze acceptance IDs, must-not-change behavior, non-goals, risks, and proof commands in the Issue Contract.
 
-For a non-mechanical change, invoke `solution-gate`; let it orchestrate `shaping`, and require a passing fit check plus an independently mergeable accepted slice. A mechanical change records why its mechanism is determined and skips Solution Gate without silently skipping later proof or review.
+Classify one profile before orchestration:
+
+| Profile | Default budget | Path |
+|---|---:|---|
+| `mechanical` | 20 min | determined implementation, narrow proof, Review Gate lite |
+| `standard` | 60 min | focused implementation, triggered proof, focused Review Gate |
+| `high-risk` | 180 min | Solution Gate, Software Factory, Test Strength and Resilience when triggered, full Review Gate |
+| `external-pr` | 90 min | Work Intake, exact-head dogfood, focused verdict or successor |
+
+For a non-mechanical change with multiple material shapes, invoke `solution-gate`; let it orchestrate `shaping`, and require a passing fit check plus an independently mergeable accepted slice. Crossing the default budget requires a newly evidenced risk recorded in the manifest.
 
 **Complete when:** an executable contract and accepted slice exist, or the run stops with the unresolved contract decision.
 
@@ -89,12 +100,12 @@ Promotion applies only to the exact reviewed state. Never infer one external act
 
 ## 8. Re-enter without stale evidence
 
-Any code or contract change invalidates every downstream artifact that depended on it. Contract or shape changes return to Solution Gate. Code-only corrections start a successor Software Factory run, then repeat Spec, Review Gate, and Before After. Presentation-only edits may preserve code evidence only when their compared source identities remain unchanged.
+Any code or contract change invalidates downstream artifacts that depended on it. Use each receipt's head, changed paths, relevant paths, contract digest, command, environment, and skill revision to compute the dependency cone. Contract or shape changes return to Solution Gate. Code-only corrections start at the earliest intersecting stage. Full exact-head final verification still runs.
 
 When the cycle ends open, invoke `handoff`. On resume, reconcile and enter at the earliest incomplete state.
 
 ## 9. Close and compound
 
-After the authorized outcome is delivered, declined, disproved, or otherwise closed, invoke `record-a-case`. Keep technical validation, human review, maintainer acceptance, and delivery independent. An open interruption uses Handoff instead. A case may propose a Foundry lesson; it does not automatically change a skill or gate.
+After the authorized outcome is delivered, declined, disproved, or otherwise closed, invoke `record-a-case` from the manifest. Keep technical validation, human review, maintainer acceptance, and delivery independent. An open interruption uses Handoff from the same manifest. Generate one close-cycle receipt containing handoff, case, git, promotion, and outcome status. Apply reviewed SkillKit outcome annotations from the manifest. A case may propose a Foundry lesson; it does not automatically change a skill or gate.
 
 **Complete when:** the durable case reconstructs the cycle and the next state is closed or explicitly handed off.

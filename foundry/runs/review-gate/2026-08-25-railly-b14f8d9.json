@@ -1,0 +1,299 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-25",
+    "repo": "railly",
+    "base": "3ba5e1557f69a35d589fcbd10ec87924bc140344",
+    "head": "b14f8d951617629e086490d344ccaeb3c45cc76b",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No separate Issue Contract or Spec review was provided; the user's audit findings are the delivery contract."]
+  },
+  "provenance": {
+    "author_model": "gpt-5-codex",
+    "reviewer_model": "gpt-5-codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["conservative gate signals from explicit OpenAPI security declaration and externally visible HTTP responses"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-08-25-railly-b14f8d9-reference.txt",
+      "evidence": "Redocly validated the built OpenAPI 3.1 artifact and the Astro HTTP integration exercised the real response boundary."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user-provided Is Agentic audit and fresh report scanned 2026-08-25T05:18:13.181Z",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P4"],
+      "evidence": "The fresh audit requested OpenAPI, JSON errors, function-call compatibility, and developer-resource discovery."
+    },
+    {
+      "source": "design",
+      "location": "implementation notes in this run",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The design limits the contract to the existing read-only project catalog and keeps endpoint-owned JSON errors intact."
+    },
+    {
+      "source": "user_facing",
+      "location": "developers, llms.txt, agent-instructions.md, agent Markdown",
+      "status": "reviewed",
+      "properties": ["P1", "P4"],
+      "evidence": "Every agent-facing surface describes the same read-only scope and links /openapi.json."
+    },
+    {
+      "source": "implementation",
+      "location": "src/lib/openapi.ts, src/pages/openapi.json.ts, src/middleware.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The full exact-head diff and all API error producers were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The published OpenAPI 3.1 document accurately describes the existing public project catalog and is usable for function calling.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "OpenAPI structure, operation identity, schemas, security declaration, and route correspondence",
+        "layer": "built serialized artifact",
+        "method": "Redocly lint plus direct comparison with the Astro route and project catalog response",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the /openapi.json route returns HTTP 200",
+        "counterexample": "serve syntactically valid JSON with a missing operationId",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The route can stay 200 while the operationId mutation makes openapi.test.ts fail."
+      },
+      "substrates": [
+        {
+          "name": "Astro-built dist/client/openapi.json",
+          "status": "exercised",
+          "evidence": "Redocly reported the generated API description valid with zero warnings."
+        }
+      ],
+      "evidence": "OpenAPI unit test, Astro integration test, production build, and Redocly all pass."
+    },
+    {
+      "id": "P2",
+      "claim": "Unknown /api routes return a real 404 JSON envelope with recovery guidance and OpenAPI discovery.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "HTTP status, media type, error code, resolution, documentation URL, and Link header",
+        "layer": "HTTP integration boundary",
+        "method": "fetch an unknown API route through a real Astro development server",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the response status is 404",
+        "counterexample": "return the existing HTML 404 with status 404",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Disabling the middleware handler retained 404 but failed JSON parsing in the intended integration test."
+      },
+      "substrates": [
+        {
+          "name": "Astro HTTP server",
+          "status": "exercised",
+          "evidence": "GET /api/does-not-exist returned the asserted JSON contract."
+        }
+      ],
+      "evidence": "The handler-removal mutation failed only the actionable JSON test; restoration returned 9/9 green."
+    },
+    {
+      "id": "P3",
+      "claim": "Existing endpoint-specific JSON 404 responses remain unchanged.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "ownership of JSON 404 response bodies",
+        "layer": "middleware-to-route response boundary",
+        "method": "inspect every API 404 producer and the middleware content-type guard",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "unknown API routes return the new envelope",
+        "counterexample": "middleware overwrites route-owned JSON 404 responses",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The content-type guard returns existing application/json responses before conversion; comments.ts owns both existing JSON 404s."
+      },
+      "substrates": [
+        {
+          "name": "Astro middleware response flow",
+          "status": "exercised",
+          "evidence": "The full API test suite passes and the guard was inspected against all 404 producers."
+        }
+      ],
+      "evidence": "No endpoint-specific error contract is replaced."
+    },
+    {
+      "id": "P4",
+      "claim": "Agents can discover the API contract from the developer index, llms.txt, instructions, and Markdown homepage.",
+      "kind": "availability",
+      "status": "verified",
+      "oracle": {
+        "observes": "presence of canonical /openapi.json links on each promised discovery surface",
+        "layer": "rendered and machine-readable public content",
+        "method": "integration and content tests plus full diff inspection",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the OpenAPI file exists",
+        "counterexample": "publish /openapi.json without linking it from agent discovery surfaces",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "agent-content.test.ts independently asserts the discovery link and docs surfaces were inspected."
+      },
+      "substrates": [
+        {
+          "name": "Astro rendered pages and text endpoints",
+          "status": "exercised",
+          "evidence": "The integration suite retrieved developer resources, llms.txt, and agent instructions."
+        }
+      ],
+      "evidence": "All canonical discovery surfaces carry the same scoped contract."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["OpenAPI serialization protocol", "HTTP error compatibility layer"],
+    "dimensions": {
+      "values": [
+        "route: documented project catalog, unknown API route, existing route-owned JSON 404",
+        "method: GET, HEAD for generated unknown-route body behavior",
+        "representation: application/vnd.oai.openapi+json, application/json, pre-existing application/json",
+        "contract field: operationId, description, typed 200 schema, typed error schema, explicit public security"
+      ],
+      "exclusions": [
+        "Mutation endpoints are intentionally absent because railly.dev exposes no public mutation API",
+        "Authentication is explicitly excluded by root security: [] because the catalog is public"
+      ],
+      "evidence": "The matrix covers the public success route, fallback error route, preservation path, serialization fields, and media types."
+    },
+    "oracle": {
+      "source": "OpenAPI 3.1 validation by Redocly and direct HTTP semantics",
+      "independent": true,
+      "evidence": "Expected structural validity comes from Redocly rather than the production object; status and media types come from HTTP responses."
+    },
+    "producer": {
+      "name": "Astro build and development HTTP server",
+      "status": "exercised",
+      "evidence": "Astro serialized /openapi.json and served both the spec and unknown API response through the real middleware."
+    },
+    "falsification": [
+      {
+        "mutation": "remove listRaillyProjects operationId",
+        "red_evidence": "/tmp/railly-openapi-mutation-red.txt shows 0 pass, 1 fail with Received: empty string",
+        "restored_green_evidence": "/tmp/railly-openapi-restored-green.txt shows 1 pass, 0 fail"
+      },
+      {
+        "mutation": "disable the unknown API JSON middleware branch",
+        "red_evidence": "/tmp/railly-api404-mutation-red.txt shows the actionable JSON integration test failing to parse the HTML 404",
+        "restored_green_evidence": "/tmp/railly-api404-restored-green.txt shows 9 pass, 0 fail"
+      }
+    ],
+    "evidence": "Both definition-level and real call-site mutations were killed and restored green."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "subsystem model",
+      "claim": "The project catalog is public and requires no authentication.",
+      "status": "verified",
+      "evidence": "The existing /api/projects.json handler has no auth gate and production already serves it publicly."
+    },
+    {
+      "id": "A2",
+      "source": "subsystem model",
+      "claim": "Astro's unknown API route response arrives as non-JSON 404 and can be safely converted by middleware.",
+      "status": "verified",
+      "evidence": "Disabling the conversion exposed the HTML response in the real HTTP integration test."
+    },
+    {
+      "id": "A3",
+      "source": "implementation",
+      "claim": "Existing API-owned JSON errors must retain their original envelopes.",
+      "status": "verified",
+      "evidence": "Middleware exits early for application/json and every API 404 producer was enumerated."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The only externally visible effect is publication of a read-only HTTP response; it performs no writes, remote mutations, authentication changes, or durable state transitions.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "read-only OpenAPI or JSON error response emitted to a caller",
+        "owner": "Astro route and middleware",
+        "commit_event": "Response object returned from the request handler",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      }
+    ]
+  },
+  "lenses": [
+    { "name": "new-domain matrix", "status": "skipped", "reason": "No validator or trigger domain was widened." },
+    { "name": "inverse regression surface", "status": "skipped", "reason": "No matcher or data source was replaced." },
+    { "name": "resolution-rule consistency", "status": "skipped", "reason": "No user-input resolution rule changed." },
+    { "name": "error-path integrity", "status": "run", "reason": "Unknown API errors and preservation of route-owned JSON errors were inspected and driven." },
+    { "name": "boundary pipeline trace", "status": "run", "reason": "Spec serialization, route publication, middleware response, discovery links, and built artifact were traced." },
+    { "name": "substrate verification", "status": "run", "reason": "The Astro HTTP server and serialized dist artifact were exercised directly." },
+    { "name": "dogfood the built artifact", "status": "run", "reason": "The generated OpenAPI document was validated from dist and HTTP endpoints were fetched through Astro." },
+    { "name": "docs-behavior parity", "status": "run", "reason": "All discovery prose was checked against the one existing read-only API operation." },
+    { "name": "newly-asserted invariant ownership", "status": "run", "reason": "All API error producers were enumerated before claiming middleware preserves owned JSON errors." },
+    { "name": "cancellation and timeout hygiene", "status": "skipped", "reason": "No async wait, retry, timeout, or cancellation behavior was added." },
+    { "name": "complexity budget", "status": "skipped", "reason": "No per-element loop or new lookup path was added." },
+    { "name": "choice audit", "status": "skipped", "reason": "No decision-trail artifact was supplied." }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "pass", "reason": "gate.sh style passed on exact-head diff." },
+    { "check": "surfaces", "outcome": "pass", "reason": "gate.sh surfaces passed and conventions gained OpenAPI surfaces." },
+    { "check": "siblings OpenAPI", "outcome": "acknowledged", "reason": "src/content/blog/webctl.mdx is a historical article about another project's generated SDK workflow; it does not describe railly.dev's public API." },
+    { "check": "Biome", "outcome": "pass", "reason": "All 10 changed code files passed." },
+    { "check": "bun test", "outcome": "pass", "reason": "89 tests passed, 0 failed." },
+    { "check": "Astro production build", "outcome": "pass", "reason": "Server build and /openapi.json prerender passed." },
+    { "check": "Redocly OpenAPI validation", "outcome": "pass", "reason": "Built OpenAPI description is valid with zero warnings." },
+    { "check": "force-red", "outcome": "pass", "reason": "OperationId and middleware-removal mutations failed for their intended assertions and restored green." },
+    { "check": "git diff --check", "outcome": "pass", "reason": "No whitespace errors." }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "src/content/blog/webctl.mdx does not need an update despite mentioning OpenAPI",
+      "evidence": "It is a historical tutorial about generating an SDK for the external Webctl product and makes no claim about railly.dev's API."
+    },
+    {
+      "claim": "No official railly.dev CLI is added",
+      "evidence": "The site is a personal portfolio with a read-only catalog; publishing a synthetic CLI would add unsupported product scope."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Is Agentic crawler reports missing H1 and Markdown 404 despite direct production evidence",
+      "evidence": "Fresh report says no H1 and incomplete Markdown recovery, while followed production responses contain one H1 and a text/markdown 404 with llms.txt and sitemap links.",
+      "why_out_of_scope": "This is evaluator behavior; changing correct HTTP semantics would regress the site."
+    },
+    {
+      "title": "Brand and developer-resource search ranking require recrawl and external mentions",
+      "evidence": "Fresh audit still places railly.dev ninth for Railly Hugo and search does not surface the newly published developer page.",
+      "why_out_of_scope": "Search indexing and backlinks are external systems and cannot be fixed synchronously in this code change."
+    }
+  ]
+}

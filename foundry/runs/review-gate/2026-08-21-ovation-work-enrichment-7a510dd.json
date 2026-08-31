@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "ovation",
+    "base": "7a510dd71dd7c98b8db8fc61b75ea83dcffd7541",
+    "head": "7a510dd71dd7c98b8db8fc61b75ea83dcffd7541",
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "gaps": [
+      "The implementation is an uncommitted working tree, so Review Gate cannot bind this report to an exact reviewed HEAD without creating an unauthorized commit."
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-21-ovation-work-enrichment-7a510dd/decision.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No separate Issue Contract or Spec review was provided."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["durable Postgres projection", "remote GitHub reads", "concurrent calculation deduplication"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "2026-08-21-ovation-work-enrichment-7a510dd.md",
+      "evidence": "A real 660-item GitHub backlog, Postgres rehydration, browser UI and a forced remote failure were driven independently of unit fixtures."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Solution Gate decision and breadboard",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "explicit-calculation", "failure-preservation", "absorbed-ui"],
+      "evidence": "The selected Absorb and recreate candidate and V1 UX refinement were implemented."
+    },
+    {
+      "source": "design",
+      "location": "Solution Gate shaping and breadboard",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "explicit-calculation", "absorbed-ui"],
+      "evidence": "Priority remains inside Filters and Agents owns the right sidebar."
+    },
+    {
+      "source": "user_facing",
+      "location": "Filters dialog, sidebar rows and apps/web/README.md",
+      "status": "reviewed",
+      "properties": ["explicit-calculation", "absorbed-ui", "reset-cleanup"],
+      "evidence": "Browser snapshots and reset documentation agree with the implemented behavior."
+    },
+    {
+      "source": "implementation",
+      "location": "Working tree diff from 7a510dd",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "failure-preservation", "explicit-calculation", "absorbed-ui", "reset-cleanup"],
+      "evidence": "The full diff, Radius orientation map, APIs, store, UI joins and tests were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "complete-ranking",
+      "claim": "Every discovered open issue and pull request is ranked using the V1 formula.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Complete open-backlog coverage and priority order",
+        "layer": "GitHub REST and rendered inbox",
+        "method": "Compare paginated item counts, persisted projection count and first rendered identities",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The first 100 items contain plausible priorities",
+        "counterexample": "Items #120, #25, #107, #279 and #483 are high priority but absent from the former 100-seed prototype.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The 660-item run ranked those five first and the sidebar rendered them in that order."
+      },
+      "substrates": [{"name": "GitHub REST plus localhost UI", "status": "exercised", "evidence": "660 open payloads, 660 rankings, #120 first."}],
+      "evidence": "Real repository drive and unit tests for page 101, formula, age cap and stable tie-break."
+    },
+    {
+      "id": "failure-preservation",
+      "claim": "A failed recalculation does not replace the previous completed projection.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {"observes": "Persisted completion identity before and after failure", "layer": "Postgres-backed API", "method": "Compare generatedAt and count around a forced 502 POST", "proxy_only": false},
+      "proxy_challenge": {"proxy": "The POST reports an error", "counterexample": "The POST could fail after overwriting the row.", "attempted": true, "outcome": "separated", "evidence": "generatedAt remained 2026-08-21T14:52:04.428Z and count remained 660 after the 502."},
+      "substrates": [{"name": "Local Postgres and Next.js API", "status": "exercised", "evidence": "GET before and after failed POST returned the same completion."}],
+      "evidence": "Only completed calculations call writeWorkEnrichment, and failed remote work leaves the prior row untouched."
+    },
+    {
+      "id": "explicit-calculation",
+      "claim": "GET, reload and repository switching do not dispatch calculations; POST is explicit.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {"observes": "Whether generatedAt changes after GET", "layer": "HTTP API", "method": "Perform repeated GET and compare persisted generatedAt", "proxy_only": false},
+      "proxy_challenge": {"proxy": "The UI labels the CTA Calculate priority", "counterexample": "A GET could still dispatch in the background.", "attempted": true, "outcome": "separated", "evidence": "Repeated GET preserved generatedAt exactly."},
+      "substrates": [{"name": "Localhost Next.js route", "status": "exercised", "evidence": "GET returned the stored projection without timestamp mutation."}],
+      "evidence": "Only the POST route invokes calculateWorkEnrichment."
+    },
+    {
+      "id": "absorbed-ui",
+      "claim": "Xref is absorbed as Priority without a dedicated panel or package dependency.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {"observes": "Rendered repository layout and dependency graph", "layer": "Browser UI and repository", "method": "Drive repository surface and stale-value scans", "proxy_only": false},
+      "proxy_challenge": {"proxy": "The RepositoryTriagePane component was deleted", "counterexample": "Shell conditionals or package references could still expose Xref.", "attempted": true, "outcome": "separated", "evidence": "Repository-wide scans returned zero Xref hits and Agents rendered in the right sidebar."},
+      "substrates": [{"name": "localhost:3000 repository surface", "status": "exercised", "evidence": "Agents empty state rendered and Priority appeared in Filters."}],
+      "evidence": "Dependency, graph modules, APIs, prompt injection and panel were removed."
+    },
+    {
+      "id": "reset-cleanup",
+      "claim": "Factory reset clears saved priority projections.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {"observes": "Reset route wiring to the projection table", "layer": "Server reset boundary", "method": "Inspect clearWorkEnrichments call and shared table identity", "proxy_only": false},
+      "proxy_challenge": {"proxy": "README says saved priority is cleared", "counterexample": "The reset route could omit the store cleanup.", "attempted": true, "outcome": "not_separated", "evidence": "The route directly awaits clearWorkEnrichments and the store deletes the physical projection table rows."},
+      "substrates": [{"name": "Server reset implementation", "status": "exercised", "evidence": "Route and store were type-checked and inspected; destructive invocation was not needed after a live persistence run."}],
+      "evidence": "Factory reset atom clears in-memory workEnrichments and the API clears persisted rows."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": "No protocol, parser, serializer, lifecycle adapter or event translation was added."},
+    "oracle": {"source": "not applicable", "independent": true, "evidence": "Pure ranking and API/UI composition."},
+    "producer": {"name": "GitHub REST", "status": "exercised", "evidence": "Real paginated GitHub responses were used."},
+    "falsification": [],
+    "evidence": "The ranking algorithm has direct deterministic unit tests and real producer dogfood."
+  },
+  "assumptions": [
+    {"id": "rest-list-metrics", "source": "Solution Gate", "claim": "GitHub list payloads provide comments, reactions and created_at for formula V1.", "status": "verified", "evidence": "The real 660-item payload contained all formula inputs and produced expected scores."},
+    {"id": "complete-only", "source": "Solution Gate", "claim": "Priority is selectable only when every monitored repository has a coherent completion.", "status": "verified", "evidence": "hasCompletePriorityCoverage checks repository presence and priority count equals openItems."},
+    {"id": "table-reuse", "source": "Implementation model", "claim": "The existing JSONB table can store WorkEnrichment without a migration.", "status": "verified", "evidence": "The physical schema is unchanged and the completion survived hot reload and subsequent GET."}
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "A completed explicit calculation writes one Postgres projection.",
+    "commit_points": [
+      {
+        "id": "projection-upsert",
+        "effect": "Publish the completed WorkEnrichment row",
+        "owner": "writeWorkEnrichment",
+        "commit_event": "Postgres upsert resolves successfully",
+        "later_fallible_stages": ["HTTP response serialization and delivery"],
+        "failure_partitions": [
+          {
+            "ownership_region": "HTTP delivery",
+            "covers": ["HTTP response serialization and delivery"],
+            "forced": true,
+            "residual_observed": "The durable completion remains coherent and a GET recovers it.",
+            "cleanup_owner": "No cleanup required because the published result is complete and idempotently readable.",
+            "retry": {"attempted": true, "outcome": "success", "evidence": "Subsequent GET returned all 660 persisted rankings."},
+            "evidence": "The persisted row was directly rehydrated after hot reload and failure tests."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher or lookup source replacement."},
+    {"name":"New-domain matrix","status":"skipped","reason":"No validator or trigger domain was widened."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Normalized repository item identity was checked in rank, map and UI joins."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell command composition."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No daemon warning or latch."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No external binary shim."},
+    {"name":"Deliberate-default check","status":"run","reason":"Updated remains the default and unavailable saved Priority falls back."},
+    {"name":"Fresh-seam scan","status":"skipped","reason":"No framework patch."},
+    {"name":"Substrate differential corpus","status":"skipped","reason":"No detector modeling an external grammar."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"Formula is product-defined, not reimplemented from a standard."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Persistence failure now rejects POST and callers preserve prior UI state."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No flag or mode propagated through multiple launch paths."},
+    {"name":"Error-path forcing","status":"run","reason":"A real failed POST returned 502 and preserved the prior completion."},
+    {"name":"Non-destructive recovery","status":"skipped","reason":"No heuristic recovery action."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Concurrent calculations are deduplicated and no polling loop was added."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"GitHub pagination, calculation, DB publication, API response, atom join and row rendering were traced end to end."},
+    {"name":"Substrate verification","status":"run","reason":"Counts and order were observed in GitHub payloads, Postgres-backed GET and browser DOM."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The existing localhost app was driven without restarting it."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"Complete coverage is owned by the explicit calculator and validated on read and selection."},
+    {"name":"Docs-behavior parity","status":"run","reason":"Factory reset documentation now includes saved priority calculations."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No documentation example added."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail was emitted."},
+    {"name":"Complexity budget","status":"run","reason":"Ranking is O(n log n), priority joins use Maps, and independent remote reads run in parallel."}
+  ],
+  "deterministic": [
+    {"check":"style","outcome":"pass","reason":"No added em dashes or prohibited comment punctuation."},
+    {"check":"stale xref terminology","outcome":"pass","reason":"Zero repository hits for xref, RepositoryTriage and package dependency."},
+    {"check":"surface db migration","outcome":"acknowledged","reason":"No migration is required because the physical JSONB table shape is unchanged."},
+    {"check":"surface agent models","outcome":"acknowledged","reason":"Prompt enrichment was removed; no RunSnapshot field or agent model contract changed."},
+    {"check":"typecheck","outcome":"pass","reason":"Next typegen and tsc passed."},
+    {"check":"unit tests","outcome":"pass","reason":"4 tests passed."},
+    {"check":"lint","outcome":"pass","reason":"Oxlint exited zero with existing repository warnings."}
+  ],
+  "findings": [
+    {"id":"persistence-success","state":"confirmed","claim":"POST could report success when optional DB persistence silently failed.","evidence":"Review of withDatabase fallback showed writeWorkEnrichment returned false without being checked.","layer":"durable publication","source":"lens","path":"calculateWorkEnrichment -> writeWorkEnrichment","resolution":"fixed"},
+    {"id":"schema-hot-reload","state":"confirmed","claim":"Renaming the Drizzle schema export made localhost GET return null after hot reload.","evidence":"Reproduced GET null while direct DB read returned 660; restoring canonical export fixed GET.","layer":"Next.js hot reload and Drizzle schema identity","source":"lens","path":"schema export -> getDatabase cached schema -> readWorkEnrichment","resolution":"fixed"},
+    {"id":"mobile-shared-enrichment","state":"confirmed","claim":"The mobile sidebar could fall back from Priority because it does not perform its own GET.","evidence":"enableRemoteData=false instance shared atoms but previously required loadedEnrichmentKeys.","layer":"responsive sidebar state sharing","source":"lens","path":"desktop GET -> shared atom -> mobile Sidebar","resolution":"fixed"}
+  ],
+  "exemptions": [
+    {"claim":"No Drizzle migration accompanies the WorkEnrichment type.","evidence":"The table, columns and JSONB storage are physically unchanged."},
+    {"claim":"agent-models.ts is absent from the diff.","evidence":"No run data shape changed; Xref prompt injection was deleted."}
+  ],
+  "issue_candidates": []
+}

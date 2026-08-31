@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-25",
+    "repo": "ovation",
+    "base": "842ed01365687206499489a1013c3355bd0e5ff7",
+    "head": "b58fa273ab0de0a5f6c7248dae080c325375a2af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/spec/2026-08-25-ovation-pr8-b58fa27.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10", "S11", "S12"],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "GPT-5 Codex",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["durable PostgreSQL projection", "concurrent item publication", "generation and active-calculation lifecycle", "remote GitHub reads"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "evidence/2026-08-25-ovation-pr8-b58fa27-postgres-challenge.md",
+      "evidence": "Real PostgreSQL, a live GitHub REST fixture, three fix-absent mutations, a 25-run concurrency repetition, and a forced post-commit retry challenge the publication contract independently of implementation output."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Live PR #8 body and Hunter's 2026-08-25 authorization",
+      "status": "reviewed",
+      "properties": ["item-publication", "coverage-truth", "publication-authority", "failure-preservation", "compatibility"],
+      "evidence": "The current contract selects repository and item triage, serial publication, partial versus complete coverage, preserved accepted data, and unchanged existing workflows."
+    },
+    {
+      "source": "design",
+      "location": "2026-08-21 Ovation Shape E, PR #5 boundary audit, and Ovation conventions",
+      "status": "reviewed",
+      "properties": ["github-authority", "coverage-truth", "publication-authority", "failure-preservation", "compatibility"],
+      "evidence": "The older pane prohibition is explicitly superseded; GitHub authority, complete-coverage honesty, durable accepted-report ownership, reset fencing, and optional enrichment compatibility remain active."
+    },
+    {
+      "source": "user_facing",
+      "location": "Repository Triage route, item Triage surface, filter dialog, and PR #8 body",
+      "status": "reviewed",
+      "properties": ["item-publication", "coverage-truth", "compatibility"],
+      "evidence": "Copy distinguishes partial from complete coverage, item update from repository calculation, and retains Updated, Created, Number, and Triage sorting."
+    },
+    {
+      "source": "implementation",
+      "location": "Diff from 842ed01 to b58fa27",
+      "status": "reviewed",
+      "properties": ["item-publication", "coverage-truth", "publication-authority", "failure-preservation", "github-authority", "compatibility"],
+      "evidence": "The full 16-file diff, callers, Radius convergence targets, PostgreSQL store, API route, client boundary, UI consumers, migration, and tests were reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "item-publication",
+      "claim": "Concurrent item-level triage updates preserve every accepted item and publish one coherent rank set.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "accepted report row count, identities, and ranks after overlapping writes",
+        "layer": "PostgreSQL transaction and report reader",
+        "method": "seed one accepted item, issue two concurrent updates, then read all three identities",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "both concurrent promises resolve",
+        "counterexample": "both writers can resolve after reading the same previous report while the later pointer loses one item",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing FOR UPDATE leaves both operations resolved but the direct report oracle observes 2 items instead of 3."
+      },
+      "substrates": [{"name": "PostgreSQL 5433", "status": "exercised", "evidence": "11 store tests passed and the concurrency suite passed in 25 repetitions."}],
+      "evidence": "The exact-head row-lock mutation lost accepted rows under the bad interleaving and restored green."
+    },
+    {
+      "id": "coverage-truth",
+      "claim": "Item triage reports partial coverage unless updating an item already present in a complete accepted report.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "persisted coverage_state and the report reader's coverage contract",
+        "layer": "PostgreSQL schema and returned report",
+        "method": "exercise absent, partial, and complete prior reports and inspect returned state",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the report contains a rank for the selected item",
+        "counterexample": "one ranked item exists while other repository items are unknown, so rank presence does not imply complete coverage",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "A first item publication returns one rank with coverage state partial; only an existing item in a complete report preserves complete."
+      },
+      "substrates": [{"name": "49-migration PostgreSQL schema", "status": "exercised", "evidence": "coverage_state is non-null with default complete and the store cases pass."}],
+      "evidence": "Migration, schema, pure coverage helpers, PostgreSQL tests, and UI copy agree on partial versus complete."
+    },
+    {
+      "id": "publication-authority",
+      "claim": "Only the current generation and active repository calculation can publish a complete report, and stale pages cannot overwrite newer accepted fields.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "accepted-report pointer, report residue, and accepted pull-request display fields",
+        "layer": "PostgreSQL publication and page continuation transactions",
+        "method": "force old-generation, replaced-calculation, and stale-page states and inspect durable rows",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the stale calculation or page request completed successfully",
+        "counterexample": "a stale request can complete after reset or after a newer page and overwrite current authority",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Removing publication fences returns true for an old generation; removing the page fence erases the accepted PR branch."
+      },
+      "substrates": [{"name": "PostgreSQL generation, control, staging, and report tables", "status": "exercised", "evidence": "Old generation, replaced active calculation, and stale page tests pass on exact HEAD."}],
+      "evidence": "Two exact-head mutations fail for the intended authority and continuation reasons, then restore green."
+    },
+    {
+      "id": "failure-preservation",
+      "claim": "A failed repository rerun leaves the previous accepted report readable and an immediate retry after caller failure remains coherent.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "accepted report identity and report contents after forced failures and retry",
+        "layer": "PostgreSQL accepted-report pointer and reader",
+        "method": "force provider failure before replacement and caller failure after commit, then read and retry",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the operation reports an error",
+        "counterexample": "an error can be returned after the accepted report was cleared or after a commit the caller did not observe",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Provider failure retains the previous generatedAt; a simulated post-commit delivery failure followed by retry returns one report with the latest comments value."
+      },
+      "substrates": [{"name": "PostgreSQL accepted pointer plus immediate retry", "status": "exercised", "evidence": "Failed-rerun and disposable post-commit retry tests pass."}],
+      "evidence": "Both pre-publication failure preservation and post-publication retry behavior are verified directly."
+    },
+    {
+      "id": "github-authority",
+      "claim": "Item triage derives identity and current state from GitHub and optional report items merge without replacing unrelated native work.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "live GitHub item number and kind after PostgreSQL publication and report readback",
+        "layer": "GitHub REST to WorkItem conversion to PostgreSQL reader",
+        "method": "fetch a live open Ovation item, publish it through the store, and compare the returned source identity",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the client supplies a plausible item number and kind",
+        "counterexample": "the client can label a pull request as an issue or supply stale display data",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The server fetches GitHub by number, derives actualKind from the response, rejects a mismatch, and the live REST drive returns the producer's number."
+      },
+      "substrates": [{"name": "GitHub REST and PostgreSQL", "status": "exercised", "evidence": "A live vercel-labs/ovation item was fetched, converted, persisted, and read back."}],
+      "evidence": "The producer drive and source inspection verify authority at the external and durable layers."
+    },
+    {
+      "id": "compatibility",
+      "claim": "Repository and item triage coexist with existing sorts, filters, routes, GitHub actions, run flows, and Agents surfaces.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "compiled route set, retained sort controls, and workspace ownership",
+        "layer": "Next.js production build and full web suite",
+        "method": "build all routes, run 396 tests, and inspect unchanged consumers including Agents and sidebar sorting",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the new triage route compiles",
+        "counterexample": "the route can compile while replacing Agents or removing an existing sort or filter",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The compiled route list includes old and new routes; filter source retains Updated, Created, Number, and Triage; OvationWorkspace still mounts Agents on desktop and mobile."
+      },
+      "substrates": [{"name": "Next.js 16 production build and Bun web suite", "status": "exercised", "evidence": "Build passes and 396 tests pass with no failures."}],
+      "evidence": "Radius convergence targets OvationWorkspace and ItemDetail were read before free exploration beyond the map."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["durable report lifecycle", "concurrent publication protocol", "GitHub-to-WorkItem adapter"],
+    "dimensions": {
+      "values": ["coverage: absent, partial, complete", "write: item, concurrent items, repository report", "kind: issue, pull request", "authority: active, old generation, replaced calculation", "page order: current, stale continuation", "failure: provider, post-commit caller", "producer: fixture, live GitHub REST"],
+      "exclusions": ["closed items are excluded by the open-work contract", "cross-repository score normalization is excluded because rank is repository-scoped"],
+      "evidence": "The canonical test-strength report maps every modeled partition to a PostgreSQL test, mutation, or live producer drive."
+    },
+    "oracle": {
+      "source": "PostgreSQL row identities and accepted pointers, the fixed contract, and live GitHub REST",
+      "independent": true,
+      "evidence": "Expected row counts, authority states, and producer identities are observed outside production helper output."
+    },
+    "producer": {
+      "name": "GitHub REST open-item response",
+      "status": "exercised",
+      "evidence": "A live vercel-labs/ovation item was published through exact-head conversion and read from PostgreSQL."
+    },
+    "falsification": [
+      {"mutation": "remove the item publication row lock", "red_evidence": "Expected 3, Received 1 under the bad interleaving in the concurrent item test.", "restored_green_evidence": "The same exact-head narrow test passed with 3 identities."},
+      {"mutation": "continue a stale issue page after its compare-and-set loses", "red_evidence": "Expected PR branch feature, Received undefined.", "restored_green_evidence": "The stale-page test passed and retained branch and head SHA."},
+      {"mutation": "remove generation and active-calculation publication fences", "red_evidence": "Expected false, Received true for an old generation.", "restored_green_evidence": "The exact-head old-generation test passed and left no report."}
+    ],
+    "evidence": "Three critical mutants are killed at the intended assertion, the store suite repeats 25 times, and real producer and post-commit retry boundaries pass."
+  },
+  "assumptions": [
+    {"id": "github-list-shape", "source": "design and implementation", "claim": "GitHub issue and pull responses supply number, timestamps, comments, reactions, and kind data required by formula v1.", "status": "verified", "evidence": "The live Ovation REST fixture passed through the exact-head converter and report reader."},
+    {"id": "row-lock-serialization", "source": "subsystem model", "claim": "PostgreSQL SELECT FOR UPDATE serializes item writers for one repository control row.", "status": "verified", "evidence": "The real database concurrency case retains all rows; removing the lock deterministically loses one."},
+    {"id": "legacy-default", "source": "migration design", "claim": "Existing complete reports may safely default coverage_state to complete.", "status": "verified", "evidence": "The migration applies on the full current history with non-null default complete and existing reader integrity checks remain active."},
+    {"id": "github-authoritative", "source": "Ovation conventions", "claim": "Client payload data is not trusted as the authoritative item record.", "status": "verified", "evidence": "The runner refetches the item from GitHub, derives actual kind, and rejects request-kind mismatch before publication."},
+    {"id": "pane-contract", "source": "contract reconciliation", "claim": "The live PR body and current explicit authorization supersede only the older prohibition on a repository Triage pane.", "status": "verified", "evidence": "Hunter explicitly authorized continuation and promotion of PR #8 whose current summary names repository-level and item-level triage."}
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Item and repository publication transactionally write immutable report rows and switch the accepted-report pointer.",
+    "commit_points": [
+      {
+        "id": "accepted-report-publication",
+        "effect": "A transaction publishes a new accepted repository triage report and removes the prior report.",
+        "owner": "publishTriageItem and publishTriageCalculation",
+        "commit_event": "PostgreSQL transaction commits the acceptedReportId update with its report and rank rows.",
+        "later_fallible_stages": ["route response serialization or delivery", "client report GET and workspace merge"],
+        "failure_partitions": [
+          {
+            "ownership_region": "server response and client continuation after database commit",
+            "covers": ["route response serialization or delivery", "client report GET and workspace merge"],
+            "forced": true,
+            "residual_observed": "The first accepted item report remains coherent after a simulated response-delivery failure.",
+            "cleanup_owner": "No rollback is required; accepted report publication is the durable commit point and the same operation is idempotently retryable.",
+            "retry": {"attempted": true, "outcome": "success", "evidence": "Immediate retry returns one report, one item, and the latest comments value 2."},
+            "evidence": "/tmp/ovation-b58fa27-live-boundary.txt"
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source is replaced."},
+    {"name": "New-domain matrix", "status": "run", "reason": "Item mode and partial coverage widen the reachable triage domain; absent, partial, complete, issue, pull, current, and stale cells were exercised."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Coverage semantics were checked in repository view, item view, filter enablement, sidebar availability, and report reader."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command parsing or flag append behavior changes."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process-channel diagnostic or one-shot latch is introduced."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim or process-level compatibility wrapper changes."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "The migration default complete was checked against the meaning of all legacy accepted reports."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "API, GitHub adapter, PostgreSQL publication, report read, client merge, repository view, item view, and sidebar seams were inspected."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Exact implementation and three broken variants were compared on real PostgreSQL."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No external normative implementation defines this product-specific publication protocol."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "Item validation, active-calculation refusal, GitHub failure, publication failure, and client error presentation were traced through callers."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No new CLI or protocol flag is introduced."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Provider failure, stale authority, concurrent loss, and post-commit caller failure were forced and retried."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action is added."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No new timeout, cancellation primitive, or wait ceiling is introduced."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "The new item path was traced from client request through GitHub authority, database publication, report GET, atom update, and rendered consumers."},
+    {"name": "Substrate verification", "status": "run", "reason": "Claims were observed in PostgreSQL rows, live GitHub identity, production build routes, and report reads rather than command self-report."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "The production web artifact builds and the live GitHub-to-PostgreSQL user data path was driven; the acceptance comparison is separately browser-verified."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Complete and partial coverage claims were checked against every report writer and consumer."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "PR behavior claims and UI copy were matched to item and repository execution and coverage states."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example is added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision-trail artifact exists for this diff."},
+    {"name": "Complexity budget", "status": "run", "reason": "Per-item publication re-ranks the accepted repository set in memory and repository rendering sorts the paged rank set; work remains bounded by accepted report size and page delivery."}
+  ],
+  "deterministic": [
+    {"check": "style", "outcome": "pass", "reason": "No em dash or prohibited comment punctuation in added lines."},
+    {"check": "surfaces", "outcome": "pass", "reason": "All mapped Ovation surfaces are present or unaffected."},
+    {"check": "callers publishTriageItem", "outcome": "pass", "reason": "Every caller is in the diff."},
+    {"check": "callers calculateWorkItemEnrichment", "outcome": "pass", "reason": "Every caller is in the diff."},
+    {"check": "callers hasTriageCoverage", "outcome": "acknowledged", "reason": "The unchanged sidebar caller was read fully; partial coverage intentionally enables sorting only ranked identities, and unranked rows retain the existing updated-date fallback after ranked rows."},
+    {"check": "siblings repository triage", "outcome": "acknowledged", "reason": "The sole untouched hit is the store test describe label, not user-facing behavior prose."},
+    {"check": "execdeps", "outcome": "pass", "reason": "The change introduces no external executable dependency."},
+    {"check": "radius impact", "outcome": "pass", "reason": "42 changed and 147 impacted symbols were mapped; 14,721 unresolved calls versus 5,514 edges means the map under-covers and was used only for orientation."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "No whitespace errors."},
+    {"check": "head coverage", "outcome": "pass", "reason": "This report names exact HEAD b58fa27."}
+  ],
+  "findings": [
+    {"id": "D1", "state": "exempted", "claim": "The unchanged sidebar hasTriageCoverage caller does not require a diff.", "evidence": "The caller was read at its own layer; it gates availability, then triageMap ranks known identities while existing updated-date fallback handles unranked rows.", "layer": "sidebar sort availability and ordering", "source": "gate", "path": "", "resolution": "not_applicable"},
+    {"id": "D2", "state": "exempted", "claim": "The untouched repository triage test label is not a stale behavior contract.", "evidence": "The line is a Bun describe name for the store suite and carries no user-visible scope or behavior promise.", "layer": "test organization label", "source": "gate", "path": "", "resolution": "not_applicable"},
+    {"id": "I1", "state": "issue_candidate", "claim": "The Vercel factory preview lacks required Better Auth production configuration.", "evidence": "Deployment dpl_BZMkRZxdeEKxgPKseY45iwR2okyu fails with BETTER_AUTH_SECRET required; local production build passes with disposable BETTER_AUTH_SECRET and BETTER_AUTH_URL.", "layer": "external preview environment", "source": "lens", "path": "", "resolution": "not_applicable"}
+  ],
+  "exemptions": [
+    {"claim": "The unchanged sidebar hasTriageCoverage caller is unaffected.", "evidence": "It intentionally treats any persisted ranks as sort availability, while unranked identities retain the existing updated-date fallback."},
+    {"claim": "The untouched repository triage test label needs no update.", "evidence": "It is a test suite label, not user-facing or contract-bearing prose."}
+  ],
+  "issue_candidates": [
+    {"title": "Configure Better Auth secrets for the factory Vercel preview", "evidence": "The prior factory preview fails during production configuration while the same source builds locally with disposable required values.", "why_out_of_scope": "This is project environment configuration; the authorized boundary forbids Vercel configuration mutation and deployment."}
+  ]
+}

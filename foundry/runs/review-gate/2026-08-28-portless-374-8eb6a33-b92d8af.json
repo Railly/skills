@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-28",
+    "repo": "vercel/portless",
+    "pr": 374,
+    "base": "8eb6a33779b452ee56626c8e17d4eee6308c8a82",
+    "head": "8eb6a33779b452ee56626c8e17d4eee6308c8a82",
+    "reviewed_tree": "b92d8af3b4c80f9aeedd6c45d9c0846182253837",
+    "preserved_index_tree": "66539593335ad22d1bafa840cfa8dca294383166",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/tmp/portless374-security-frozen-packet.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9",
+      "A10", "A11", "A12", "A13", "A14", "A15", "A16", "A17", "A18"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "OpenAI Codex GPT-5",
+    "reviewer_model": "Anthropic Claude Sonnet 4.5",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "Authorization",
+      "Secret state",
+      "Process lifecycle",
+      "Filesystem publication",
+      "Privileged callback"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "evidence/2026-08-28-portless-374-b92d8af-independent-challenge.md",
+      "evidence": "Packet-only Anthropic review of exact tree b92d8af3 found no blocking issue and verified authorization, lifecycle, cleanup, compatibility, timeout, and stub-test boundaries."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/tmp/portless374-security-frozen-packet.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "Acceptance IDs A0 through A18 and the temporal contract define direct response, callback, lifecycle, and compatibility observables."
+    },
+    {
+      "source": "design",
+      "location": "foundry/runs/solution-gate/2026-08-28-portless-374-b92d8af.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "Solution Gate selected per-daemon authorization with challenge proof, atomic post-bind publication, fail-closed compatibility, and cleanup."
+    },
+    {
+      "source": "user_facing",
+      "location": "No public command, flag, configuration, or documentation surface changed",
+      "status": "not_applicable",
+      "properties": [],
+      "evidence": "The change authenticates an existing internal daemon protocol and preserves existing CLI result mapping."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/portless/src/hosts-sync-auth.ts, proxy.ts, cli-utils.ts, cli.ts, clean-utils.ts and tests",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4", "P5"],
+      "evidence": "The exact exported tree diff and all changed callers, state writers, cleanup owners, and protocol tests were reviewed."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Only an authorized internal client can invoke the hosts-sync callback.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "HTTP response class and stub callback invocation count",
+        "layer": "Real loopback HTTP server",
+        "method": "Send valid, missing, malformed, duplicate, stale, browser-provenance, deceptive-authority, and non-loopback requests",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Loopback peer and absent browser headers",
+        "counterexample": "A browser-shaped loopback POST has those network properties but lacks authorization",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Baseline returned 204 with callback count 1; successor returned 401 with callback count 0."
+      },
+      "substrates": [
+        {
+          "name": "Node HTTP loopback server on macOS",
+          "status": "exercised",
+          "evidence": "Security reproduction and proxy route suites passed with stub callbacks."
+        }
+      ],
+      "evidence": "Authorization and provenance bypass mutations failed focused tests."
+    },
+    {
+      "id": "P2",
+      "claim": "The client discloses the bearer token only to a daemon that proves possession of the matching secret.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "Whether a token-bearing POST reaches a marker-copying or malformed-proof service",
+        "layer": "Real HTTP client and server boundary",
+        "method": "Count POSTs after public-marker, wrong-proof, duplicate-proof, and older-daemon responses",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "X-Portless and version headers",
+        "counterexample": "An unrelated service copies public markers without knowing the token",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The marker-copying service received zero POSTs; duplicate proof also received zero POSTs."
+      },
+      "substrates": [
+        {
+          "name": "Node HTTP and HTTPS clients",
+          "status": "exercised",
+          "evidence": "Current HTTP and HTTPS paths passed; older and marker-copying services received no privileged POST."
+        }
+      ],
+      "evidence": "Challenge-bound HMAC proof is validated with fixed format and timing-safe comparison."
+    },
+    {
+      "id": "P3",
+      "claim": "Authorization state publishes only for the listening daemon, rotates, replaces atomically, and preserves active state on failed replacement.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Token file content, publication result, rotation, and callback availability",
+        "layer": "Temporary filesystem plus daemon lifecycle",
+        "method": "Create, rotate, obstruct temporary publication, inspect retained token, then retry",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A successful write call",
+        "counterexample": "Deleting the active token before a replacement write makes failed startup disable the running daemon",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The destructive replacement mutation failed the retained-token assertion; restored atomic publication passed."
+      },
+      "substrates": [
+        {
+          "name": "APFS temporary directories on macOS",
+          "status": "exercised",
+          "evidence": "Owner mode, rotation, failed replacement, and restored read were observed."
+        }
+      ],
+      "evidence": "Publication moved to the successful listen callback and uses owner-fixed temporary file plus rename."
+    },
+    {
+      "id": "P4",
+      "claim": "Unavailable, stale, malformed, delayed, or mixed-version authorization fails closed within one 500 ms deadline.",
+      "kind": "availability",
+      "status": "verified",
+      "oracle": {
+        "observes": "Result mapping, elapsed time, POST count, and callback count",
+        "layer": "Real HTTP and HTTPS integration",
+        "method": "Drive absent, stale, older, delayed, acted, and disabled producers",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A daemon or X-Portless marker is reachable",
+        "counterexample": "An older or unrelated listener is alive but cannot prove capability",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Upgraded client returned mute and sent zero POSTs to the older daemon."
+      },
+      "substrates": [
+        {
+          "name": "HTTP and TLS loopback integration on macOS",
+          "status": "exercised",
+          "evidence": "Acted and disabled results passed over current paths; stale and delayed paths failed closed."
+        }
+      ],
+      "evidence": "One AbortSignal bounds both round trips and the timeout mutation was killed."
+    },
+    {
+      "id": "P5",
+      "claim": "Shutdown and clean remove both final and temporary authorization artifacts without broadening cleanup.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {
+        "observes": "Existence of both authorization files and preservation of an unrelated file",
+        "layer": "Filesystem cleanup boundary",
+        "method": "Create both files plus user-notes.txt, run cleanup, and inspect every path",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The final token filename appears in the cleanup allowlist",
+        "counterexample": "Atomic publication leaves a temporary sibling not known to cleanup",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Both filenames are now asserted absent while user-notes.txt remains."
+      },
+      "substrates": [
+        {
+          "name": "Temporary filesystem cleanup on macOS",
+          "status": "exercised",
+          "evidence": "Authorization, cleanup, and removePortlessStateFiles tests passed."
+        }
+      ],
+      "evidence": "Cleanup omission mutation failed before restoration; final and temporary artifacts are registered."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "Authorization protocol",
+      "Cross-process lifecycle",
+      "Compatibility layer"
+    ],
+    "dimensions": {
+      "values": [
+        "authorization: valid, absent, malformed, duplicate, stale, incorrect",
+        "provenance: Origin; Sec-Fetch-Site cross-site, same-site, same-origin, none, absent",
+        "peer and authority: IPv4, IPv6, mapped IPv4, deceptive authority, non-loopback",
+        "transport: HTTP and HTTPS",
+        "producer: acted, disabled, absent, older, unrelated",
+        "lifecycle: unpublished, published, rotated, failed replacement, shutdown, clean",
+        "timing: immediate, delayed discovery, expired shared deadline"
+      ],
+      "exclusions": [
+        "Protection from processes running as the same operating-system user is outside the contract."
+      ],
+      "evidence": "Focused tests execute each equivalence class, with direct response, POST-count, callback-count, file-state, and elapsed-time oracles."
+    },
+    "oracle": {
+      "source": "Frozen contract and independent blind shaping",
+      "independent": true,
+      "evidence": "Expected outcomes were fixed before implementation and do not copy production branch results."
+    },
+    "producer": {
+      "name": "Node HTTP/HTTPS clients, servers, raw duplicate headers, and APFS state files",
+      "status": "exercised",
+      "evidence": "Tests use real loopback sockets and filesystem operations with stub callbacks."
+    },
+    "falsification": [
+      {
+        "mutation": "Restore destructive active-token deletion before replacement",
+        "red_evidence": "The retained-active-token test failed at the intended publication result assertion.",
+        "restored_green_evidence": "Filesystem snapshot restoration returned the focused test to green."
+      },
+      {
+        "mutation": "Remove authorization or token comparison before callback",
+        "red_evidence": "The security reproduction accepted an unauthorized request or incremented the stub callback.",
+        "restored_green_evidence": "The restored security suite passed 12 tests."
+      },
+      {
+        "mutation": "Remove client capability proof or attach token without proof",
+        "red_evidence": "The marker-copying or older service observed a privileged POST.",
+        "restored_green_evidence": "The restored client suite observed zero POSTs."
+      }
+    ],
+    "evidence": "No protection claim relies only on a green suite; each material mechanism has a force-red or direct discriminator."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Solution Gate",
+      "claim": "Daemon and client resolve the same default state directory.",
+      "status": "verified",
+      "evidence": "The default configured-state-directory triggerHostsSync test passed."
+    },
+    {
+      "id": "A2",
+      "source": "Subsystem model",
+      "claim": "All production createProxyServer callers that expose the callback also provide the daemon token.",
+      "status": "verified",
+      "evidence": "Repository call-site search found one production wiring site in startProxyServer and it supplies both values."
+    },
+    {
+      "id": "A3",
+      "source": "Frozen contract",
+      "claim": "Owner-only state is sufficient against different-user callers; same-user callers remain in the trust boundary.",
+      "status": "verified",
+      "evidence": "Mode 0600 is asserted on Unix and the residual same-user boundary is documented."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The daemon atomically publishes one authorization file after listener ownership and removes it during shutdown or clean.",
+    "commit_points": [
+      {
+        "id": "C1",
+        "effect": "The current daemon token becomes visible to intended clients.",
+        "owner": "startProxyServer through writeHostsSyncToken",
+        "commit_event": "Atomic rename of the owner-fixed temporary token file to proxy.hosts-sync-token after bind.",
+        "later_fallible_stages": [],
+        "failure_partitions": []
+      }
+    ]
+  },
+  "lenses": [
+    { "name": "Inverse regression surface", "status": "skipped", "reason": "No matcher or data source was replaced." },
+    { "name": "New-domain matrix", "status": "run", "reason": "Authorization adds a new accepted internal-client domain and rejects all untrusted variants." },
+    { "name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Daemon publication and client state-directory resolution were checked together." },
+    { "name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell parsing changed." },
+    { "name": "Emission channel and one-shot latch reachability", "status": "run", "reason": "Publication failure warning is emitted by the attached startup process." },
+    { "name": "Shim hermeticity", "status": "skipped", "reason": "No external binary shim was added." },
+    { "name": "Deliberate-default check", "status": "run", "reason": "The third stateDir parameter defaults to the same configured resolver used by production." },
+    { "name": "Fresh-seam scan", "status": "run", "reason": "Client, daemon, filesystem publication, and cleanup seams were inspected." },
+    { "name": "Substrate differential corpus", "status": "run", "reason": "Raw duplicate headers, browser provenance, HTTP, HTTPS, IPv4, IPv6, and filesystem states were compared." },
+    { "name": "Reference-implementation oracle", "status": "skipped", "reason": "The frozen contract supplies the independent oracle; no external protocol standard applies." },
+    { "name": "New-failure-outcome propagation", "status": "run", "reason": "Mute, absent, disabled, acted, and unauthorized outcomes were traced through callers." },
+    { "name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No CLI flag changed." },
+    { "name": "Error-path forcing", "status": "run", "reason": "Missing, stale, malformed, duplicate, delayed, and failed-publication paths were forced." },
+    { "name": "Non-destructive recovery", "status": "run", "reason": "Failed token replacement preserves the active token and immediate retry succeeds." },
+    { "name": "Cancellation and timeout hygiene", "status": "run", "reason": "One AbortSignal bounds probe and POST; delayed requests were exercised." },
+    { "name": "Boundary pipeline trace", "status": "run", "reason": "State publication, discovery, proof, POST authorization, callback, and cleanup were traced." },
+    { "name": "Substrate verification", "status": "run", "reason": "Real loopback sockets, TLS, and temporary filesystem operations were used." },
+    { "name": "Dogfood the built artifact", "status": "run", "reason": "The package built successfully and real HTTP/HTTPS clients exercised the changed boundary." },
+    { "name": "Newly-asserted invariant ownership", "status": "run", "reason": "Daemon owns live token state; clean and shutdown own artifact removal." },
+    { "name": "Docs-behavior parity", "status": "skipped", "reason": "No public user or agent workflow changed." },
+    { "name": "Demonstrative example", "status": "run", "reason": "Before/after uses the same browser-shaped stub request and callback counter." },
+    { "name": "Choice audit", "status": "skipped", "reason": "No decision trail file exists and none was created." },
+    { "name": "Complexity budget", "status": "run", "reason": "The protocol uses one helper module, built-in crypto and filesystem APIs, and no dependency or public configuration." }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "pass", "reason": "No prohibited added-line punctuation." },
+    { "check": "surfaces", "outcome": "acknowledged", "reason": "Internal authentication changes no public command, flag, configuration, or usage workflow." },
+    { "check": "callers triggerHostsSync", "outcome": "acknowledged", "reason": "Only the new untracked integration test was outside git diff name enumeration; every call was read and exercised." },
+    { "check": "timings", "outcome": "pass", "reason": "No new wait ceiling was added; the existing 500 ms contract remains bounded." },
+    { "check": "artifacts", "outcome": "pass", "reason": "Final and temporary token files are registered and directly tested in cleanup." },
+    { "check": "shellmeta", "outcome": "pass", "reason": "Not triggered." },
+    { "check": "execdeps", "outcome": "pass", "reason": "No external executable was added." },
+    { "check": "type-check", "outcome": "pass", "reason": "tsc --noEmit passed." },
+    { "check": "lint", "outcome": "pass", "reason": "eslint src passed." },
+    { "check": "build", "outcome": "pass", "reason": "tsup and declarations passed." },
+    { "check": "format", "outcome": "pass", "reason": "Prettier check passed." },
+    { "check": "full package suite", "outcome": "pass", "reason": "Final neutral run passed 938 tests with one platform skip across 23 test files." },
+    { "check": "diff integrity", "outcome": "pass", "reason": "Working and cached diff checks passed." }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Pre-bind deletion could disable the already-running daemon and replacement was non-atomic.",
+      "evidence": "Independent tree-25ac review plus retained-token force-red.",
+      "layer": "Daemon lifecycle and filesystem publication",
+      "source": "lens",
+      "path": "startProxyServer to writeHostsSyncToken",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Atomic publication introduced a temporary sibling that also required cleanup ownership.",
+      "evidence": "Cleanup model and direct existence assertions.",
+      "layer": "Persistent artifact lifecycle",
+      "source": "gate",
+      "path": "writeHostsSyncToken to removeHostsSyncToken and removePortlessStateFiles",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F3",
+      "state": "exempted",
+      "claim": "User-facing documentation surfaces are absent from the diff.",
+      "evidence": "The external command, flag, configuration, result mapping, and usage workflow are unchanged.",
+      "layer": "Documentation contract",
+      "source": "gate",
+      "path": "",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "README and skill documentation need no update.",
+      "evidence": "The change is an internal authorization protocol and preserves all public CLI behavior."
+    },
+    {
+      "claim": "Same-user token access is not a promotion blocker.",
+      "evidence": "The frozen contract explicitly retains the operating-system user as the trust boundary."
+    }
+  ],
+  "issue_candidates": []
+}

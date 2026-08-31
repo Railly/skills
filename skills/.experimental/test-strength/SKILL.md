@@ -8,6 +8,8 @@ compatibility: Requires runnable tests. Mutating production or test files requir
 
 Execution is not protection. A strong test turns red when the guarded behavior is broken and exercises the layer where the claim lives.
 
+Read the work-item manifest first when one exists. Verify the current head, contract digest, relevant paths, environment, and executing `skill_revision`. Reuse prior evidence only when its fingerprint proves the later diff cannot affect the guarded behavior.
+
 ## 1. Build the behavioral model
 
 State the invariant, failure family, runtime boundary, and existing tests that claim protection.
@@ -70,4 +72,6 @@ Repeat new tests, control clocks, randomness, ports, and external state, and rec
 
 Report the behavioral dimensions and exclusions, oracle provenance, fixture provenance, fix-absent red and restored green evidence, the falsification site when definition and call site differ, per-cell falsifier coverage, mutation or property results, real producer and boundary exercised, remaining survivors, and verification gaps.
 
-**Complete when:** no claim of protection relies on a green suite, implementation-derived expectations, an implicit matrix, or semantically invalid synthetic input.
+Emit a stage receipt containing status, head, command, relevant paths, contract digest, environment digest, skill revision, elapsed time, report path, and a reusable flag with dependency-cone evidence. Update the manifest atomically.
+
+**Complete when:** no claim of protection relies on a green suite, implementation-derived expectations, an implicit matrix, or semantically invalid synthetic input, and the manifest points to the exact receipt.

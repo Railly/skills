@@ -1,0 +1,442 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-28",
+    "repo": "vercel-labs/portless#374",
+    "base": "2cd0719e152abe72e4e45700fdf9119b1cad4f1b",
+    "head": "a14bcb0321d822478d8d15b7911689b6a9a13060",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/tmp/portless374-frozen-packet.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": ["A1", "A2", "A3", "A4", "A5", "A6", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9"],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "unknown contributor authorship; root amendment by Codex",
+    "reviewer_model": "anthropic/claude-sonnet-5, openai/gpt-5.6-luna, Codex root adjudication",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["process lifecycle", "cross-platform resolver behavior", "durable hosts-file and route state"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "evidence/2026-08-28-portless-374-a14bcb0-independent-challenge.md",
+      "evidence": "Independent Anthropic Test Strength, domain, topology, and authority passes challenged the immutable staged tree; an OpenAI-family Spec pass independently checked every acceptance and must-not-change ID."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/tmp/portless374-frozen-packet.md",
+      "status": "reviewed",
+      "properties": ["resolver-loopback", "warning-boundary", "merge-preservation"],
+      "evidence": "A1-A6 and M1-M9 were reviewed individually by the independent Spec pass."
+    },
+    {
+      "source": "design",
+      "location": "/tmp/portless374-solution-gate.md",
+      "status": "reviewed",
+      "properties": ["resolver-loopback", "single-address-contract"],
+      "evidence": "Two blind shaping passes converged after probes on one system-selected address with exact two-literal acceptance."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, skills/portless/SKILL.md, apps/docs/src/app/page.mdx, apps/docs/src/app/commands/page.mdx, packages/portless/src/cli.ts",
+      "status": "reviewed",
+      "properties": ["warning-boundary", "listener-parity"],
+      "evidence": "Canonical warning and loopback passages were walked. The docs-lens duplication request was refuted because the contract is already stated in the canonical CLI help passages."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/portless/src/hosts.ts, cli-utils.ts, cli.ts, proxy.ts and focused tests",
+      "status": "reviewed",
+      "properties": ["resolver-loopback", "single-address-contract", "warning-boundary", "listener-parity", "merge-preservation"],
+      "evidence": "Source, exact staged diff, full suite, mutations, real resolver calls, real listener tests, and merge invariants were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "resolver-loopback",
+      "claim": "The system-selected resolver address is accepted only when it is exact IPv4 or IPv6 loopback.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the selected address and the helper boolean",
+        "layer": "real Node resolver and helper boundary",
+        "method": "literal resolver probes on macOS and Linux plus focused helper tests",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the hostname resolves successfully",
+        "counterexample": "198.51.100.7 and 2001:db8::1 resolve successfully but are not proxy loopback listeners",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/tmp/portless374-cross-platform-dns.txt and the non-loopback IPv6 mutation prove successful resolution alone is insufficient."
+      },
+      "substrates": [
+        {
+          "name": "macOS Node 24 resolver",
+          "status": "exercised",
+          "evidence": "/tmp/portless374-cross-platform-dns.txt accepts ::1 and 127.0.0.1 and rejects both tested non-loopbacks."
+        },
+        {
+          "name": "Linux Node 24 bookworm resolver",
+          "status": "exercised",
+          "evidence": "/tmp/portless374-cross-platform-dns.txt records the same tested decisions in Docker."
+        }
+      ],
+      "evidence": "hosts.ts uses dns.lookup(hostname, callback) and exact comparisons; focused tests and mutants prove positive, negative, and error partitions."
+    },
+    {
+      "id": "single-address-contract",
+      "claim": "The fix preserves one system-selected address and introduces neither all-record nor sequential-family policy.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the resolver overload and number of lookup calls",
+        "layer": "production source and runtime primitive",
+        "method": "source inspection plus bare callback versus all:true probe",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "all tested literal hostnames produce the expected boolean",
+        "counterexample": "an all:true implementation can pass literal examples while changing mixed-record policy",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Solution Gate P2 showed all:true returns an array and was rejected; the final source contains one bare dns.lookup call."
+      },
+      "substrates": [
+        {
+          "name": "Node dns.lookup callback API",
+          "status": "exercised",
+          "evidence": "Real resolver probes and helper tests execute the callback overload."
+        }
+      ],
+      "evidence": "No all:true, second lookup, or family-specific fallback exists in the accepted implementation."
+    },
+    {
+      "id": "warning-boundary",
+      "claim": "A selected ::1 result remains silent while a selected non-loopback result reaches the registering CLI warning boundary.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the warning callback output at reportHostsSync",
+        "layer": "CLI-attached caller boundary",
+        "method": "focused reportHostsSync tests through its production default resolver",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the helper itself returns the correct boolean",
+        "counterexample": "replace reportHostsSync's default resolver with async true while leaving checkHostResolution correct",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Test Strength mutant 3 leaves helper tests green and makes the caller warning assertion fail."
+      },
+      "substrates": [
+        {
+          "name": "reportHostsSync production-default wiring",
+          "status": "exercised",
+          "evidence": "/tmp/portless374-rerun-test-strength.md kills the default-wiring mutant at the warning assertion."
+        },
+        {
+          "name": "spawned CLI DNS preload boundary",
+          "status": "exercised",
+          "evidence": "Mutant 4 reverts the overload fixture and makes the spawned CLI exit 1 instead of emitting the intended warning."
+        }
+      ],
+      "evidence": "The user-facing warning is emitted by the attached CLI, not the detached daemon, and the daemon latch cannot consume it."
+    },
+    {
+      "id": "listener-parity",
+      "claim": "Resolver acceptance matches the non-LAN proxy's exact IPv4 and IPv6 loopback listeners without widening LAN authority.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "actual listener binds and internal-route peer and authority checks",
+        "layer": "network socket and HTTP endpoint",
+        "method": "real net.Server listener tests and proxy route integration tests",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the accepted literals appear in source constants",
+        "counterexample": "a non-loopback peer can send a loopback Host header while the proxy is exposed in LAN mode",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "proxy tests force a non-loopback peer with canonical loopback authority and receive 403."
+      },
+      "substrates": [
+        {
+          "name": "real IPv4 and IPv6 local listeners",
+          "status": "exercised",
+          "evidence": "proxy listener interface tests bind the generated targets, including ::1 when the machine IPv6 stack is available."
+        },
+        {
+          "name": "internal hosts-sync HTTP endpoint",
+          "status": "exercised",
+          "evidence": "proxy integration tests exercise loopback authority, loopback peer, mapped IPv4, and non-loopback refusal."
+        }
+      ],
+      "evidence": "Authority, listener, and resolver predicates were traced separately; exact DNS acceptance does not grant LAN peer authority."
+    },
+    {
+      "id": "merge-preservation",
+      "claim": "The uncommitted merge preserves current-main descendant cleanup, PR hosts-sync flow, all staged changes, and the forbidden-artifact boundary.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "HEAD, MERGE_HEAD, staged tree, unmerged index entries, unstaged diff, required symbols, and forbidden artifact",
+        "layer": "Git index and working tree",
+        "method": "git rev-parse, git write-tree, git diff, git ls-files -u, source grep, and filesystem check",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "cli-utils.ts compiles and tests pass",
+        "counterexample": "one conflict side can be silently dropped while the remaining code still compiles",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Direct symbol checks require execFileSync and trackProcessTree plus HOSTS_SYNC_PATH, checkHostResolution, getManagedHostnames, and syncHostsFile in the same staged file."
+      },
+      "substrates": [
+        {
+          "name": "uncommitted Git merge index",
+          "status": "exercised",
+          "evidence": "HEAD 5b536e9, MERGE_HEAD 2cd0719, write-tree a14bcb0, zero unmerged entries, and zero unstaged changes."
+        }
+      ],
+      "evidence": "The immutable tree, review worktree, and every supervised pass finished without source mutation or .decisions.tsv."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["resolver compatibility layer", "CLI warning adapter", "Node dns.lookup overload fixture"],
+    "dimensions": {
+      "values": ["IPv4 loopback", "IPv6 loopback", "non-loopback IPv4", "non-loopback IPv6", "resolver error", "localhost", "default caller wiring", "two-argument lookup preload"],
+      "exclusions": ["Mixed-record all-address policy is explicitly outside the frozen single-selected-address contract."],
+      "evidence": "/tmp/portless374-rerun-test-strength.md records the full dimension table and four fix-absent mutations."
+    },
+    "oracle": {
+      "source": "Node resolver semantics, exact proxy listener targets, and frozen A1-A5 contract",
+      "independent": true,
+      "evidence": "Expected decisions were defined before reading the final implementation and compared with real resolver and listener substrates."
+    },
+    "producer": {
+      "name": "Node dns.lookup and spawned CLI process",
+      "status": "exercised",
+      "evidence": "Literal resolver calls, real ::1 listener tests, and the spawned CLI preload test cross the producer and user-visible boundaries."
+    },
+    "falsification": [
+      {
+        "mutation": "Reject ::1 while retaining IPv4 loopback.",
+        "red_evidence": "IPv6 helper and reportHostsSync silence assertions failed for the intended reason.",
+        "restored_green_evidence": "6 helper and 15 caller/listener tests passed after byte-identical restoration."
+      },
+      {
+        "mutation": "Accept any IPv6-shaped address.",
+        "red_evidence": "2001:db8::1 helper rejection and caller warning assertions failed.",
+        "restored_green_evidence": "Both focused suites passed after restoration."
+      },
+      {
+        "mutation": "Bypass reportHostsSync's production default resolver.",
+        "red_evidence": "Helper stayed green while the caller warning assertion failed.",
+        "restored_green_evidence": "Caller suite and type-check passed after restoration."
+      },
+      {
+        "mutation": "Revert the DNS preload to a three-argument-only callback.",
+        "red_evidence": "The spawned CLI crashed and the integration status assertion failed.",
+        "restored_green_evidence": "The integration test passed after restoration."
+      }
+    ],
+    "evidence": "No mutant survived; the restored package suite passed 903 tests with 1 skipped."
+  },
+  "assumptions": [
+    {
+      "id": "system-selection",
+      "source": "Solution Gate U1",
+      "claim": "Bare callback lookup preserves one system-selected address rather than an all-address policy.",
+      "status": "verified",
+      "evidence": "Primitive probe and final source inspection distinguish bare callback from all:true."
+    },
+    {
+      "id": "loopback-parity",
+      "source": "Solution Gate and subsystem model",
+      "claim": "The accepted literals are the exact non-LAN proxy listener addresses.",
+      "status": "verified",
+      "evidence": "getProxyBindTargets(false), real listener tests, and resolver tests agree on 127.0.0.1 and ::1."
+    },
+    {
+      "id": "platform-parity",
+      "source": "Solution Gate carried assumption",
+      "claim": "The tested Node 24 callback resolver behavior is consistent on macOS and Linux.",
+      "status": "verified",
+      "evidence": "/tmp/portless374-cross-platform-dns.txt records identical tested literal decisions on both substrates; no Windows claim is made."
+    },
+    {
+      "id": "merge-intents",
+      "source": "Frozen M6",
+      "claim": "Conflict resolution preserved descendant cleanup and hosts-sync behavior together.",
+      "status": "verified",
+      "evidence": "Direct source symbols, staged tree identity, full suite, and independent topology review verify both intents."
+    }
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "The integrated PR flow owns route registration and an existing managed hosts-file write, although the IPv6 amendment itself adds no new side effect.",
+    "commit_points": [
+      {
+        "id": "route-registration",
+        "effect": "Persist the registered route before reporting hostname resolution.",
+        "owner": "CLI RouteStore caller",
+        "commit_event": "addRoutes updates routes.json",
+        "later_fallible_stages": ["hosts-sync trigger", "resolver verification and warning"],
+        "failure_partitions": [
+          {
+            "ownership_region": "daemon trigger and compatibility protocol",
+            "covers": ["hosts-sync trigger"],
+            "forced": true,
+            "residual_observed": "The route remains registered; acted, disabled, absent, and mute produce bounded, explicit reporting behavior.",
+            "cleanup_owner": "RouteStore removal or prune remains the existing cleanup owner.",
+            "retry": {
+              "attempted": true,
+              "outcome": "documented_recovery",
+              "evidence": "The same registered route can be repaired with portless hosts sync, which is the warning's documented recovery path."
+            },
+            "evidence": "Focused tests force acted, disabled, absent, and mute partitions, including the legacy watcher window."
+          },
+          {
+            "ownership_region": "CLI resolver and warning",
+            "covers": ["resolver verification and warning"],
+            "forced": true,
+            "residual_observed": "A resolver error or non-loopback answer leaves the route intact and emits one warning naming the manual recovery.",
+            "cleanup_owner": "The attached CLI reports; route cleanup ownership is unchanged.",
+            "retry": {
+              "attempted": true,
+              "outcome": "documented_recovery",
+              "evidence": "Manual portless hosts sync is the documented immediate recovery; subsequent resolver verification is idempotent."
+            },
+            "evidence": "Resolver error and non-loopback mutations reach the warning boundary without another durable write."
+          }
+        ]
+      },
+      {
+        "id": "managed-hosts-write",
+        "effect": "Rewrite the existing managed hosts block to the exact current route hostname set.",
+        "owner": "syncHostsFile",
+        "commit_event": "fs.writeFileSync writes the managed hosts block",
+        "later_fallible_stages": ["post-write reread and exact-match verification"],
+        "failure_partitions": [
+          {
+            "ownership_region": "hosts-file writer and verifier",
+            "covers": ["post-write reread and exact-match verification"],
+            "forced": true,
+            "residual_observed": "A failed write or failed reread returns false and does not claim success; stale and duplicate entries are rejected by exact matching.",
+            "cleanup_owner": "cleanHostsFile owns removal of the managed block.",
+            "retry": {
+              "attempted": true,
+              "outcome": "documented_recovery",
+              "evidence": "portless hosts sync is idempotent and retries the exact-set rewrite; portless hosts clean removes the managed block."
+            },
+            "evidence": "M1 tests cover exact match, stale entries, duplicate entries, successful rewrite verification, and unchanged IPv4 entries."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"inverse regression surface","status":"run","reason":"Changing resolver API source was checked in both directions and across macOS/Linux Node 24."},
+    {"name":"new-domain matrix","status":"run","reason":"IPv4/IPv6 loopback, IPv4/IPv6 non-loopback, error, localhost, caller warning, and exclusion policy were enumerated."},
+    {"name":"resolution-rule consistency across consumers","status":"run","reason":"All static checkHostResolution consumers and separate loopback authority rules were enumerated."},
+    {"name":"shell re-parse append domain","status":"skipped","reason":"The IPv6 amendment does not change shell-composed arguments; current-main parser behavior passed the full suite."},
+    {"name":"emission channel and one-shot latch reachability","status":"run","reason":"CLI and daemon channels plus warm-up latch behavior were independently traced."},
+    {"name":"shim hermeticity","status":"run","reason":"The DNS preload overload was mutated at the spawned CLI boundary and restored."},
+    {"name":"deliberate-default check","status":"run","reason":"The former IPv4-only acceptance was shown inconsistent with the proxy's existing IPv6 listener."},
+    {"name":"fresh-seam scan","status":"skipped","reason":"No runtime or framework signal channel was newly exposed."},
+    {"name":"substrate differential corpus","status":"run","reason":"Real Node resolvers on macOS and Linux were compared on loopback and non-loopback literals."},
+    {"name":"reference-implementation oracle","status":"skipped","reason":"Node dns.lookup and the product's proxy listener contract are the governing primitives; no separate reference implementation exists."},
+    {"name":"new-failure-outcome propagation","status":"skipped","reason":"The resolver helper retains its boolean outcomes and introduces no new failure class."},
+    {"name":"flag-propagation dispatch sweep","status":"skipped","reason":"No flag, mode, or config bit is introduced by the amendment."},
+    {"name":"error-path forcing","status":"run","reason":"Resolver error, non-loopback answers, absent daemon, disabled daemon, and legacy mute were forced."},
+    {"name":"non-destructive recovery","status":"skipped","reason":"No heuristic recovery action was added."},
+    {"name":"cancellation and timeout hygiene","status":"run","reason":"500 ms HTTP timeout, 3500 ms legacy window, request destruction, and unrelated timers were traced."},
+    {"name":"boundary pipeline trace","status":"run","reason":"Route registration, daemon trigger, managed-host observation, resolver decision, warning, and cleanup were traced."},
+    {"name":"substrate verification","status":"run","reason":"Real resolver, listener, socket-peer, HTTP endpoint, Git index, and spawned CLI boundaries were exercised."},
+    {"name":"dogfood the built artifact","status":"run","reason":"The spawned CLI integration and immutable full package suite exercised the shipped surface locally."},
+    {"name":"newly-asserted invariant ownership","status":"run","reason":"The exact listener and warning claims were checked against all owners and consumers."},
+    {"name":"docs-behavior parity","status":"run","reason":"Canonical passages were walked and the duplicate-doc candidate was refuted at the documentation layer."},
+    {"name":"demonstrative example","status":"skipped","reason":"No new documentation example was introduced by the IPv6 amendment."},
+    {"name":"choice audit","status":"skipped","reason":"No .decisions.tsv exists, by explicit requirement."},
+    {"name":"complexity budget","status":"skipped","reason":"The amendment adds no loop or per-element lookup; Reduce confirmed the one-lookup, one-predicate floor."}
+  ],
+  "deterministic": [
+    {"check":"build and full package suite","outcome":"pass","reason":"20 test files passed; 903 tests passed and 1 skipped."},
+    {"check":"lint and type-check","outcome":"pass","reason":"Both exited 0 on the immutable exact tree."},
+    {"check":"git diff --check and merge index","outcome":"pass","reason":"Diff check passed, zero unmerged entries, and zero unstaged changes."},
+    {"check":"style","outcome":"pass","reason":"Portless house-style exception was applied."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"clean-utils.ts is exempt because the amendment creates no new persistent artifact; the artifact gate independently passed."},
+    {"check":"siblings hosts","outcome":"acknowledged","reason":"Historical and distinct-topic passages were inspected; current canonical warning and listener passages agree."},
+    {"check":"callers checkHostResolution","outcome":"pass","reason":"Every production call site is in a diffed file and was directly inspected."},
+    {"check":"artifacts clean-utils.ts","outcome":"pass","reason":"Every filename written by the integrated diff is known to cleanup; the amendment adds none."},
+    {"check":"timings","outcome":"acknowledged","reason":"500 ms bounds local HTTP response; 3500 ms clears the 3000 ms watcher fallback; process cleanup timers are off-path."},
+    {"check":"Test Strength","outcome":"pass","reason":"Four required mutants were killed and the restored suite passed."},
+    {"check":"immutable identity","outcome":"pass","reason":"Every fx report names model anthropic/claude-sonnet-5 and exact tree a14bcb0 with exit 0 and a nonempty artifact."}
+  ],
+  "findings": [
+    {
+      "id": "docs-duplicate-request",
+      "state": "refuted",
+      "claim": "CLI How it works and LAN mode must duplicate the hosts-sync warning.",
+      "evidence": "The canonical Safari / DNS passage and portless hosts help already state automatic sync and registering-command warning delivery; one canonical declaration per file is the stated rule.",
+      "layer": "documentation contract",
+      "source": "lens",
+      "path": "",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "doctor-consumer-coverage",
+      "state": "issue_candidate",
+      "claim": "portless doctor lacks a dedicated IPv6-loopback consumer test.",
+      "evidence": "The caller is pre-existing, uses the same verified shared helper, and is outside frozen A5, which explicitly requires helper plus reportHostsSync. No incorrect doctor behavior was reproduced.",
+      "layer": "pre-existing test coverage",
+      "source": "lens",
+      "path": "checkHostResolution → handleDoctor via direct call",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "clean-utils-surface",
+      "state": "exempted",
+      "claim": "cli-utils.ts changes require a clean-utils.ts edit.",
+      "evidence": "The amendment writes no new state-directory artifact and gate.sh artifacts passed.",
+      "layer": "persistent artifact registration",
+      "source": "gate",
+      "path": "",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "clean-utils.ts need not change",
+      "evidence": "No new persistent state artifact is introduced and the artifact cleanup gate passed."
+    },
+    {
+      "claim": "CLI help need not repeat the hosts warning in every feature section",
+      "evidence": "The warning contract is already stated in the canonical Safari / DNS and hosts-help passages."
+    },
+    {
+      "claim": "Process-management timers do not constrain hosts-sync publication",
+      "evidence": "Direct call-path tracing shows only the 3000 ms watcher fallback is relevant to the 3500 ms compatibility ceiling."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Add a dedicated portless doctor IPv6-loopback resolution test",
+      "evidence": "handleDoctor is a pre-existing checkHostResolution consumer and has no test that observes the ::1 acceptance through doctor output.",
+      "why_out_of_scope": "Frozen acceptance A5 deliberately requires the helper and route-warning caller boundary; both are directly falsified, and no doctor defect was reproduced."
+    }
+  ]
+}

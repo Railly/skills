@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-25",
+    "repo": "vercel-labs/native",
+    "base": "064ca9890cc0cf8adc198215bd0ddaeb586c220a",
+    "head": "cd171c9a2f8f27e201ddd5c446db715e4efcd602",
+    "status": "complete",
+    "verdict": "findings",
+    "gaps": []
+  },
+  "contract": {
+    "path": "https://github.com/vercel-labs/native/issues/404",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No separate Issue Contract or Spec review was supplied; issue #404 and the PR body were treated as claim sources, not as a Spec pass."
+    ]
+  },
+  "provenance": {
+    "author_model": "not_provided",
+    "reviewer_model": "OpenAI GPT-5 Codex",
+    "same_family": false
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "not_required",
+      "artifact": "",
+      "evidence": "The change reads local package layout and has no secrets, authorization, durable state, concurrency, process lifecycle mutation, or remote side effect."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "GitHub issue #404",
+      "status": "reviewed",
+      "properties": ["P1"],
+      "evidence": "Issue #404 reports that a normal installed CLI cannot serve native-ui and emits the skills-root lookup error."
+    },
+    {
+      "source": "design",
+      "location": "PR #405 body and tools/native-sdk/skills.zig resolver comments",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The design claims ordered environment resolution, invalid-candidate fallthrough, and checkout, flat, hoisted, and nested executable discovery."
+    },
+    {
+      "source": "user_facing",
+      "location": "docs/src/app/docs/skills/page.mdx and packages/native-sdk/README.md",
+      "status": "reviewed",
+      "properties": ["P1", "P3"],
+      "evidence": "Docs promise that native skills works from the installed CLI offline; the package README describes the split platform-binary/main-payload install."
+    },
+    {
+      "source": "implementation",
+      "location": "build.zig and tools/native-sdk/skills.zig at cd171c9a",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "Reviewed the resolver entry point, environment candidates, executable walk, sibling lookup, test registration, and all eight new unit tests."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The shipped CLI serves skills from normal split npm installs.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Skill content is returned through the installed command surface.",
+        "layer": "built CLI plus Node package dispatcher",
+        "method": "Construct hoisted and nested package trees from the real package manifests and run both bin/native.js and the platform binary.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The resolver helper returns the expected path.",
+        "counterexample": "Break the production findPackageRoot environment handoff while leaving the helper intact.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The helper suite remained green after the production handoff was removed, while the installed-shape binary returned the original lookup error."
+      },
+      "substrates": [
+        {
+          "name": "macOS arm64 hoisted npm layout",
+          "status": "exercised",
+          "evidence": "Node wrapper and direct platform binary both returned the six bundled skills."
+        },
+        {
+          "name": "macOS arm64 nested optional-dependency layout",
+          "status": "exercised",
+          "evidence": "Node wrapper and direct platform binary both returned the six bundled skills."
+        }
+      ],
+      "evidence": "Real package-boundary drives pass for the two npm layouts named by the PR."
+    },
+    {
+      "id": "P2",
+      "claim": "NATIVE_SDK_SKILLS_ROOT wins, then NATIVE_SDK_PATH, and empty or invalid candidates fall through.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "The first valid candidate's unique skill is printed by the built CLI.",
+        "layer": "process environment and filesystem",
+        "method": "Use disjoint skills and skill-data roots with unique skill names and run the built binary for each precedence/fallthrough cell.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A candidate directory exists.",
+        "counterexample": "Point the higher-priority variable at an existing directory without skills while the lower-priority candidate is valid.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Invalid explicit and framework candidates were skipped and the next valid candidate's unique skill was printed."
+      },
+      "substrates": [
+        {
+          "name": "macOS filesystem and process environment",
+          "status": "exercised",
+          "evidence": "Explicit precedence, empty explicit, invalid explicit, empty SDK path, invalid SDK path, and no-valid-candidate cells were driven."
+        }
+      ],
+      "evidence": "All environment precedence and fallthrough cells behaved as claimed."
+    },
+    {
+      "id": "P3",
+      "claim": "Existing executable-ancestor discovery remains compatible while adding split-package layouts.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Whether a previously working executable layout still prints its skill payload.",
+        "layer": "built base and PR binaries over the same filesystem tree",
+        "method": "Differentially run base v0.10.1 and PR binaries from a valid root five directories above the executable.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "All newly listed checkout, flat, hoisted, and nested examples pass.",
+        "counterexample": "Place a valid root above the new fixed four-ancestor ceiling, a layout accepted by the base ancestor walk.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Base printed demo; PR exited 1 with the original lookup error. Finding F1 records the regression."
+      },
+      "substrates": [
+        {
+          "name": "macOS filesystem, deep valid bundle",
+          "status": "exercised",
+          "evidence": "The exact same tree was driven with base 064ca989 and head cd171c9."
+        }
+      ],
+      "evidence": "The compatibility property was directly tested and refuted for deep valid ancestor layouts."
+    },
+    {
+      "id": "P4",
+      "claim": "The new resolver tests reject realistic regressions at the shipped call site.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "A call-site fault makes the advertised focused suite fail for the intended reason.",
+        "layer": "production resolver entry point and built CLI",
+        "method": "Remove the production environment handoff, run test-skills-cli, then run the installed-shape built binary.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Eight helper-level tests pass.",
+        "counterexample": "Keep findPackageRootFromExecutable correct but make production findPackageRoot ignore env_map.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The focused suite stayed green while the built installed-shape CLI failed. Finding F2 records the protection gap."
+      },
+      "substrates": [
+        {
+          "name": "isolated mutation worktree and built macOS CLI",
+          "status": "exercised",
+          "evidence": "Production-entry mutation: suite rc 0; copied binary rc 1 with zero stdout and the original lookup error."
+        }
+      ],
+      "evidence": "The claimed protection was falsified at the actual call site."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["compatibility layer", "filesystem package-layout resolver"],
+    "dimensions": {
+      "values": [
+        "environment source: explicit skills root, framework root, executable layout, none",
+        "candidate validity: valid skills, valid skill-data, empty, invalid",
+        "precedence: explicit over framework over executable",
+        "layout: checkout, flat bundle, hoisted npm, nested optional dependency, deep legacy ancestor",
+        "entry point: helper, built binary, Node package dispatcher",
+        "outcome: selected unique payload or actionable failure"
+      ],
+      "exclusions": [
+        "Windows and Linux binaries were not locally executed; path joins and ancestor semantics are covered by Zig unit tests and exact-head CI, while the user-visible package boundary was exercised on the available macOS arm64 release shape."
+      ],
+      "evidence": "All listed equivalence classes were run or explicitly excluded; the deep legacy cell produced F1."
+    },
+    "oracle": {
+      "source": "Base v0.10.1 binary for compatibility, unique filesystem payloads for precedence, and the real package dispatcher for installed behavior.",
+      "independent": true,
+      "evidence": "Expected outputs came from unique fixture skill names and base behavior, not from the PR resolver's branch structure."
+    },
+    "producer": {
+      "name": "@native-sdk/cli bin/native.js resolving and spawning the platform binary",
+      "status": "exercised",
+      "evidence": "The copied real dispatcher and package manifests drove hoisted and nested platform-package binaries end to end."
+    },
+    "falsification": [
+      {
+        "mutation": "Delete sibling main-package discovery from packageRootFromExecutablePath.",
+        "red_evidence": "test-skills-cli failed in executable search finds hoisted sibling main package.",
+        "restored_green_evidence": "After restoring from the isolated worktree patch, test-skills-cli passed."
+      },
+      {
+        "mutation": "Delete the production findPackageRoot environment handoff while leaving test helper logic intact.",
+        "red_evidence": "Built installed-shape CLI exited 1 with the issue #404 lookup error, but test-skills-cli incorrectly stayed green.",
+        "restored_green_evidence": "Unmodified exact-head CLI returned six skills and test-skills-cli passed five consecutive runs."
+      }
+    ],
+    "evidence": "The matrix, independent oracle, real producer drive, fix-absent mutation, restored green, and deterministic repeat were all completed."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "PR design",
+      "claim": "The main npm package owns skills and skill-data while platform packages own only bin.",
+      "status": "verified",
+      "evidence": "Verified against packages/native-sdk/package.json, all platform manifests, and copy-framework.js."
+    },
+    {
+      "id": "A2",
+      "source": "subsystem model",
+      "claim": "The Node dispatcher sets NATIVE_SDK_PATH to the main package when its framework payload exists.",
+      "status": "verified",
+      "evidence": "Read bin/native.js and drove both hoisted and nested real dispatcher fixtures successfully."
+    },
+    {
+      "id": "A3",
+      "source": "implementation",
+      "claim": "Four ancestors cover the newly named npm layouts.",
+      "status": "verified",
+      "evidence": "Hoisted and nested direct platform-binary layouts both resolved successfully."
+    },
+    {
+      "id": "A4",
+      "source": "inverse regression model",
+      "claim": "Capping the old unbounded ancestor walk preserves all prior accepted layouts.",
+      "status": "refuted",
+      "evidence": "Base accepted a deep valid bundle that head rejected; recorded as F1."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The diff only reads environment variables, executable paths, and directories, and registers tests; it creates no durable or externally visible commit point.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "run", "reason": "The old unbounded ancestor lookup was replaced by a capped lookup plus sibling rule; confirmed F1."},
+    {"name": "New-domain matrix", "status": "run", "reason": "Accepted environment and executable layout domains widened; all modeled classes were driven."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Compared skills resolution with buildgraph resolution and the Node dispatcher's raw package root."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell command string or argv rewriting changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No daemon, warning channel, or latch changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "The diff adds no external-binary shim."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Compared preserved base ancestor behavior and found the new four-level default cap regresses it."},
+    {"name": "Fresh-seam scan", "status": "skipped", "reason": "No runtime signal or event channel is being exposed."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Filesystem package layouts were grouped and driven against the real macOS filesystem and package dispatcher."},
+    {"name": "Reference-implementation oracle", "status": "run", "reason": "The base v0.10.1 binary supplied an independent compatibility oracle for the replaced lookup behavior."},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "No existing callee gained a new failure outcome; invalid candidates now fall through."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag, mode, or config bit was introduced."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Forced invalid explicit root, invalid framework root, no valid root, and the production-entry mutation."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No recovery action or heuristic mutation is added."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No async operation, cancellation, wait, or timeout changed."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced Node main package to environment to platform binary to filesystem discovery to printed skill content."},
+    {"name": "Substrate verification", "status": "run", "reason": "Observed printed skill payloads and exit status from built artifacts rather than trusting helper outputs."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Built the exact-head CLI and drove list/get, precedence, failure, hoisted, nested, and deep layouts."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Checked the new direct-invocation layout claim against both resolver entry points and package ownership."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Read all contract-carrying skills/install docs and drove their installed-offline claim."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added or edited."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No .decisions.tsv or decision trail exists."},
+    {"name": "Complexity budget", "status": "run", "reason": "The resolver performs at most two directory probes per level; the new bound is constant time but causes F1 rather than a performance concern."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "acknowledged", "reason": "No exact-head report existed before this requested review; this report establishes coverage for cd171c9a."},
+    {"check": "repo scripts/gate.sh fast", "outcome": "acknowledged", "reason": "Code-relevant Zig suites passed; overall local gate failed only because the fresh checkout lacked packages/core dev dependencies. Exact-head GitHub CI is fully green, including Zig Core and npm Package."},
+    {"check": "style", "outcome": "pass", "reason": "No em dash or forbidden comment punctuation in added lines."},
+    {"check": "surfaces", "outcome": "pass", "reason": "Current live repo instructions require no companion surface for build.zig or tools/native-sdk/skills.zig after removing the stale changelog.d convention."},
+    {"check": "siblings skills", "outcome": "acknowledged", "reason": "Broad keyword hits are listings, payload packaging, or unrelated skill references; contract-carrying install docs were read and remain accurate because installed behavior was driven."},
+    {"check": "callers findPackageRoot", "outcome": "pass", "reason": "Every call site is in the diffed resolver file."},
+    {"check": "callers packageRootFromExecutablePath", "outcome": "pass", "reason": "Every call site is in the diffed resolver file."},
+    {"check": "rawinput executable_path", "outcome": "acknowledged", "reason": "The reported line is the resolver's own dirname operation, not an independent re-derivation consumer."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "No whitespace errors."},
+    {"check": "stale", "outcome": "pass", "reason": "No contract value was renamed or retired."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered; no shell-metacharacter detector changed."},
+    {"check": "artifacts", "outcome": "pass", "reason": "Not triggered; no persistent file writer was added."},
+    {"check": "execdeps", "outcome": "pass", "reason": "Not triggered; no external executable invocation was added."},
+    {"check": "radius impact", "outcome": "pass", "reason": "Skipped silently because radius was not on PATH, as allowed by the gate."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The new four-ancestor ceiling regresses valid direct-executable layouts that the base resolver accepted.",
+      "evidence": "In one tree with skills at the root and the executable at a/b/c/d/e/bin, base 064ca989 printed demo and exited 0; head cd171c9 exited 1 with the issue #404 lookup error.",
+      "layer": "built CLI compatibility behavior",
+      "source": "lens",
+      "path": "packageRootFromExecutablePath level cap -> native skills list",
+      "resolution": "open"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The new resolver suite does not protect the production findPackageRoot entry point.",
+      "evidence": "After removing findPackageRoot's environment handoff, test-skills-cli still passed, but the installed-shape built binary exited 1 with the original lookup error; all new tests call the test-only findPackageRootFromExecutable helper.",
+      "layer": "production resolver wiring and behavioral test protection",
+      "source": "lens",
+      "path": "findPackageRoot -> packageRootFromEnvironment -> packageRootFromExecutablePath",
+      "resolution": "open"
+    },
+    {
+      "id": "E1",
+      "state": "exempted",
+      "claim": "Skills documentation files do not need edits for this implementation fix.",
+      "evidence": "The contract-carrying docs promise installed offline access without specifying lookup internals, and that promise passed through real hoisted and nested package drives.",
+      "layer": "documentation contract",
+      "source": "gate",
+      "path": "docs/src/app/docs/skills/page.mdx and packages/native-sdk/README.md",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Skills documentation files do not need edits for this implementation fix.",
+      "evidence": "The contract-carrying docs remain true under real hoisted and nested package drives and do not describe resolver internals."
+    }
+  ],
+  "issue_candidates": []
+}

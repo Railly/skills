@@ -11,6 +11,9 @@ src/*.native :: src/app.zig, src/tests.zig
 src/macos.zig :: src/app.zig, src/tests.zig
 patches/@native-sdk__cli@*.patch :: pnpm-lock.yaml, src/tests.zig
 package.json#version :: app.zon, CHANGELOG.md
+apps/swift/scripts/package-macos.sh :: apps/swift/Tests/VercelDesktopTests/IdentityTests.swift
+apps/swift/scripts/style-dmg.sh :: apps/swift/scripts/package-macos.sh, apps/swift/Tests/VercelDesktopTests/IdentityTests.swift
+apps/swift/scripts/verify-dmg.sh :: apps/swift/scripts/package-macos.sh, apps/swift/Tests/VercelDesktopTests/IdentityTests.swift
 ```
 
 Application state, commands, windows, timers, and menu-bar presentation live in `src/app.zig` and require executable coverage in `src/tests.zig`. Native markup bindings are paired with their Zig model and markup assertions. Native SDK patches and their lockfile hashes move together.
@@ -29,6 +32,7 @@ Application state, commands, windows, timers, and menu-bar presentation live in 
 - The spend amount uses the regular macOS system Sans path when its presentation is not monospaced.
 - The Vercel CLI runs from a probed absolute path with an explicit runtime `PATH`. Shell startup files, prompts, ZLE, and interactive shell workers must not run inside GUI-owned subprocesses.
 - Removing a window-backed feature also removes its commands, model state, effects, timers, markup, platform helpers, fixtures, and tests.
+- DMG presentation is complete before signing and notarization. Verification must observe Finder's rendered final read-only image because background files, metadata strings, and AppleScript background readback do not prove effective presentation.
 
 ## Gate-miss ledger
 

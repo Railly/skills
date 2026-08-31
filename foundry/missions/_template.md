@@ -5,6 +5,7 @@ Source: https://github.com/owner/repo/issues/N
 Target repository: owner/repo
 Base: branch-or-sha
 Branch: pending
+Manifest: N.manifest.json
 
 ## Outcome
 

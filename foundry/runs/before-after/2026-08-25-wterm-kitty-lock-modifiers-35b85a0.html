@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kitty lock modifiers keep legacy functional bytes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet" referrerpolicy="no-referrer">
+  <link href="2026-08-25-wterm-kitty-lock-modifiers-35b85a0.assets/vercel-brand.css" rel="stylesheet">
+  <style>
+    .vbg-custom-opening {
+      padding-block-start: var(--vbg-space-10);
+    }
+
+    .vbg-custom-comparison {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      border-block: 1px solid var(--vbg-border-default);
+    }
+
+    .vbg-custom-peer {
+      min-width: 0;
+      padding-block: var(--vbg-space-8);
+    }
+
+    .vbg-custom-peer + .vbg-custom-peer {
+      border-inline-start: 1px solid var(--vbg-border-default);
+      padding-inline-start: var(--vbg-space-8);
+    }
+
+    .vbg-custom-peer:first-child {
+      padding-inline-end: var(--vbg-space-8);
+    }
+
+    .vbg-custom-evidence {
+      min-height: 240px;
+      margin-block-start: var(--vbg-space-6);
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--vbg-border-subtle);
+      border-radius: var(--vbg-radius);
+      background: var(--vbg-surface-secondary);
+      color: var(--vbg-text-secondary);
+      text-align: center;
+    }
+
+    .vbg-custom-delta {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: var(--vbg-space-4);
+      align-items: baseline;
+      padding-block: var(--vbg-space-8);
+      border-block: 1px solid var(--vbg-border-default);
+    }
+
+    .vbg-custom-delta-value {
+      font-size: var(--vbg-type-title);
+      line-height: var(--vbg-leading-title);
+      font-weight: var(--vbg-weight-heading);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .vbg-custom-delta-value:last-child {
+      text-align: end;
+    }
+
+    .vbg-custom-arrow {
+      color: var(--vbg-text-secondary);
+    }
+
+    .vbg-custom-run {
+      border-color: var(--vbg-text-primary);
+      background: var(--vbg-text-primary);
+      color: var(--vbg-surface-primary);
+    }
+
+    .vbg-custom-stack {
+      width: 100%;
+      padding: var(--vbg-space-5);
+      display: grid;
+      gap: var(--vbg-space-4);
+      text-align: start;
+    }
+
+    .vbg-custom-case {
+      display: grid;
+      gap: var(--vbg-space-2);
+    }
+
+    .vbg-custom-bytes {
+      font-family: var(--vbg-font-mono);
+      font-size: var(--vbg-type-body);
+      color: var(--vbg-text-primary);
+      overflow-wrap: anywhere;
+    }
+
+    .vbg-custom-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--vbg-space-3);
+    }
+
+    .vbg-custom-result {
+      min-height: 2.75rem;
+      margin-block-start: var(--vbg-space-4);
+      padding: var(--vbg-space-4);
+      border: 1px solid var(--vbg-border-subtle);
+      border-radius: var(--vbg-radius);
+      font-family: var(--vbg-font-mono);
+      background: var(--vbg-surface-secondary);
+    }
+
+    @media (max-width: 720px) {
+      .vbg-custom-comparison {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .vbg-custom-peer:first-child {
+        padding-inline-end: 0;
+      }
+
+      .vbg-custom-peer + .vbg-custom-peer {
+        border-inline-start: 0;
+        border-block-start: 1px solid var(--vbg-border-default);
+        padding-inline-start: 0;
+      }
+
+      .vbg-custom-delta {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .vbg-custom-delta-value:last-child {
+        text-align: start;
+      }
+
+      .vbg-custom-arrow {
+        transform: rotate(90deg);
+        transform-origin: left center;
+      }
+    }
+  </style>
+</head>
+<body class="vbg-report" data-theme="auto">
+  <div class="vbg-shell">
+    <a class="vbg-skip-link" href="#main">Skip to content</a>
+    <header class="vbg-header">
+      <div class="vbg-masthead">
+        <span class="vbg-identity"><span class="vbg-wordmark" role="img" aria-label="Vercel"></span></span>
+        <div class="vbg-document-meta">
+          <span>wterm PR #120</span>
+          <time datetime="2026-08-25">2026-08-25</time>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="vbg-section vbg-custom-opening">
+        <h1 class="vbg-title">Kitty lock modifiers keep legacy functional bytes</h1>
+        <div class="vbg-lede"><p>Caps Lock and Num Lock now preserve the same legacy F-key and DECCKM bytes as an unlocked keyboard, while Ctrl plus lock still uses the complete CSI modifier value.</p></div>
+
+        <div class="vbg-custom-comparison" role="group" aria-label="Before and after comparison">
+          <article class="vbg-custom-peer">
+            <p class="vbg-label">Before</p>
+            <h2 class="vbg-heading-20">Locks forced CSI encoding</h2>
+            <p>The former predicate treated lock bits as ordinary modifiers when selecting a legacy functional sequence.</p>
+            <div class="vbg-custom-evidence">
+              <div class="vbg-custom-stack">
+                <div class="vbg-custom-case">
+                  <span>Caps Lock + F1</span>
+                  <strong class="vbg-custom-bytes">CSI 1;65P</strong>
+                </div>
+                <div class="vbg-custom-case">
+                  <span>Num Lock + ArrowUp, DECCKM</span>
+                  <strong class="vbg-custom-bytes">CSI 1;129A</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="vbg-custom-peer">
+            <p class="vbg-label">After</p>
+            <h2 class="vbg-heading-20">Lock-only input stays legacy</h2>
+            <p>The corrected predicate removes lock bits only for legacy eligibility and leaves full modifier serialization intact.</p>
+            <div class="vbg-custom-evidence">
+              <div class="vbg-custom-stack">
+                <div class="vbg-custom-case">
+                  <span>Caps Lock + F1</span>
+                  <strong class="vbg-custom-bytes">ESC OP</strong>
+                </div>
+                <div class="vbg-custom-case">
+                  <span>Num Lock + ArrowUp, DECCKM</span>
+                  <strong class="vbg-custom-bytes">ESC OA</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="vbg-section">
+        <h2>What changed</h2>
+        <div class="vbg-custom-delta" role="group" aria-label="Primary before and after delta">
+          <div>
+            <p class="vbg-label">Before</p>
+            <p class="vbg-custom-delta-value">Lock bit blocks legacy</p>
+          </div>
+          <span class="vbg-custom-arrow">to</span>
+          <div>
+            <p class="vbg-label">After</p>
+            <p class="vbg-custom-delta-value">Only unlocked modifiers block legacy</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="vbg-section">
+        <h2>Evidence</h2>
+        <p>All outputs are exact terminal byte mnemonics for the same pure alternate-reporting mode.</p>
+        <div class="vbg-table-wrap">
+          <table>
+            <caption>Comparison on one shared measurement basis</caption>
+            <thead>
+              <tr>
+                <th scope="col">Input</th>
+                <th scope="col">Before</th>
+                <th scope="col">After</th>
+                <th scope="col">Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Caps Lock + F1</th>
+                <td><code>CSI 1;65P</code></td>
+                <td><code>ESC OP</code></td>
+                <td>Legacy F1 restored</td>
+              </tr>
+              <tr>
+                <th scope="row">Num Lock + ArrowUp, DECCKM</th>
+                <td><code>CSI 1;129A</code></td>
+                <td><code>ESC OA</code></td>
+                <td>Application cursor restored</td>
+              </tr>
+              <tr>
+                <th scope="row">Ctrl + Caps Lock + F1</th>
+                <td><code>CSI 1;69P</code></td>
+                <td><code>CSI 1;69P</code></td>
+                <td>Non-lock modifier and lock bit preserved</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="vbg-section">
+        <h2>Try it</h2>
+        <p>Select an input to reveal its exact before and after bytes.</p>
+        <div class="vbg-custom-controls" role="group" aria-label="Keyboard input comparison">
+          <button type="button" class="vbg-button vbg-custom-run" data-case="f1">Caps Lock + F1</button>
+          <button type="button" class="vbg-button" data-case="arrow">Num Lock + ArrowUp</button>
+          <button type="button" class="vbg-button" data-case="ctrl">Ctrl + Caps Lock + F1</button>
+        </div>
+        <p class="vbg-custom-result" id="comparison-result" aria-live="polite">Before: CSI 1;65P | After: ESC OP</p>
+      </section>
+
+      <section class="vbg-section">
+        <h2>Limits</h2>
+        <p class="vbg-note">The exact-head Chromium suite passed 19 of 19 and the rebuilt artifact emitted the legacy bytes, but headless Chromium could not activate OS lock state. Active lock behavior is proven by direct <code>getModifierState</code> events, the fix-absent mutation, and the official Kitty reference oracle.</p>
+      </section>
+    </main>
+
+    <footer class="vbg-footer">
+      <span class="vbg-logo" role="img" aria-label="Vercel"></span>
+      <span>Before/after evidence</span>
+    </footer>
+  </div>
+  <script>
+    const comparisons = {
+      f1: "Before: CSI 1;65P | After: ESC OP",
+      arrow: "Before: CSI 1;129A | After: ESC OA",
+      ctrl: "Before: CSI 1;69P | After: CSI 1;69P",
+    };
+    const result = document.querySelector("#comparison-result");
+    document.querySelectorAll("[data-case]").forEach((button) => {
+      button.addEventListener("click", () => {
+        result.textContent = comparisons[button.dataset.case];
+        document.querySelectorAll("[data-case]").forEach((candidate) => {
+          candidate.classList.toggle("vbg-custom-run", candidate === button);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

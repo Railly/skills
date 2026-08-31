@@ -1,0 +1,409 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-26",
+    "repo": "vercel-labs/emulate",
+    "pr": 210,
+    "base": "d0219d05818adca4c12bb76ec79a7562c1766a3d",
+    "head": "9800e0104de0922cf80205fc35f5e9e46ef2e459",
+    "root": "/Users/raillyhugo/Programming/vercel/emulate-210-review",
+    "status": "complete",
+    "verdict": "findings",
+    "gaps": [
+      "pnpm and bash were unavailable, so the repository CI commands (build, format, type-check, lint, vitest) were not run and gate.sh could not be executed; gate.sh was read in full and each triggered check was reproduced by hand with git.",
+      "The PR suite was executed under bun:test through a vitest forwarding module, not under vitest itself.",
+      "python3 was unavailable, so the google-api-python-client TypeError in F2 is confirmed from library source and not from an executed client call.",
+      "No source-level mutation red/green pass was performed on calendar-discovery.ts; the assertion-absence audit was static plus wire observation.",
+      "Reachability of the pre-existing OIDC double-slash endpoints was not demonstrated; only their emission is confirmed.",
+      "No radius dogfood map was produced for this run."
+    ]
+  },
+  "contract": {
+    "path": "",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "A Google API Discovery v1 document is served for the emulated Calendar v3 API",
+      "The document advertises the base URL configured for the running emulator, including any adapter mount path",
+      "Discovery-based clients can be configured against the emulator",
+      "Unsupported Calendar operations are not advertised"
+    ],
+    "gaps": [
+      "No Issue Contract, Solution Gate, or design document was provided; the PR body is the only contract."
+    ]
+  },
+  "provenance": {
+    "author_model": "ctate, single commit, no human reviews on the PR",
+    "reviewer_model": "Claude Opus 5, xhigh",
+    "same_family": false
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [
+      "A machine-readable service contract is published to third-party client generators",
+      "Unauthenticated public endpoint"
+    ],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "evidence/2026-08-26-emulate-210-9800e01-substrate.txt",
+      "evidence": "The live Google Calendar v3 discovery document and the google-api-python-client source supplied an oracle independent of this implementation; both differentials appear in section 6 and 7 of the evidence file."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "PR #210 title and body",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3"],
+      "evidence": "The PR promises a discovery document for the emulated Calendar API that advertises the running emulator's base URL without advertising unsupported Calendar operations."
+    },
+    {
+      "source": "design",
+      "location": "not provided",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "No Solution Gate, design contract, or decision trail was supplied with the PR."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, packages/@emulators/google/README.md, apps/web/app/docs/google/page.mdx, skills/google/SKILL.md, packages/emulate/src/index.ts, packages/emulate/src/registry.ts",
+      "status": "reviewed",
+      "properties": ["P2", "P3"],
+      "evidence": "All five surfaces teach a google-api-python-client build() against the emulator's discovery URL and repeat the mount-path claim; the CLI help epilogue and the registry endpoint string were updated to name discovery."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/@emulators/google/src/calendar-discovery.ts and packages/@emulators/google/src/routes/calendar.ts",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "A new 337-line zero-import builder returns the document literal; the calendar route registers the unauthenticated discovery endpoint."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The document advertises only operations the emulator actually serves.",
+      "kind": "correctness",
+      "status": "unverified",
+      "oracle": {
+        "observes": "Whether every path the document advertises resolves to a registered route",
+        "layer": "external HTTP boundary of the running emulator",
+        "method": "Read each advertised path out of the served document and request it",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The document's resources block lists only implemented methods",
+        "counterexample": "A top-level advertised path outside the resources block is unrouted",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The resources block is accurate, yet POST /batch/calendar/v3 returns core's catch-all 404; the proxy passes while the property fails."
+      },
+      "substrates": [
+        {
+          "name": "emulator over a real TCP listener at a root base URL",
+          "status": "exercised",
+          "evidence": "port 45102, production wiring from api.ts:44-84; POST /batch/calendar/v3 -> 404 {\"message\":\"Not Found\",\"documentation_url\":\"https://emulate.dev/google\"}"
+        },
+        {
+          "name": "emulator over a real TCP listener at an adapter mount path",
+          "status": "exercised",
+          "evidence": "port 45103, baseUrl http://localhost:45103/emulate/google/; POST /emulate/google/batch/calendar/v3 -> 404"
+        }
+      ],
+      "evidence": "Confirmed finding F1 prevents verification: batchPath is advertised and unrouted under both base-URL shapes."
+    },
+    {
+      "id": "P2",
+      "claim": "A discovery-based client configured as the new docs instruct can build and execute the documented Calendar calls.",
+      "kind": "correctness",
+      "status": "unverified",
+      "oracle": {
+        "observes": "Whether the client accepts the documented standard query parameters and issues the request",
+        "layer": "google-api-python-client argmap construction, before any HTTP request",
+        "method": "Differential against the live Calendar v3 document plus the library's parameter-merge source",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The document parses and the emulator answers the resource paths over HTTP",
+        "counterexample": "The client raises TypeError while constructing the call, so no request is ever issued",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "All resource paths answer 200 over the wire, yet _fix_up_parameters merges only the root parameters block plus STACK_QUERY_PARAMETERS, so with parameters == {} a documented kwarg such as fields raises at discovery.py:1104-1106."
+      },
+      "substrates": [
+        {
+          "name": "emulator over a real TCP listener",
+          "status": "exercised",
+          "evidence": "GET /calendar/v3/users/me/calendarList with Bearer local-test-token -> 200; events, freebusy, and the discovery endpoint all answered."
+        },
+        {
+          "name": "live Google Calendar v3 discovery document",
+          "status": "exercised",
+          "evidence": "Upstream carries alt, fields, key, oauth_token, prettyPrint, quotaUser, userIp in the root parameters block; the emulated document carries none."
+        }
+      ],
+      "evidence": "Finding F2 prevents verification. The failing layer is the client library's argmap, confirmed from library source; execution of a python client was not possible in this environment and is recorded as a run gap."
+    },
+    {
+      "id": "P3",
+      "claim": "The document advertises the base URL configured for the running emulator, including any adapter mount path.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "rootUrl, baseUrl, basePath, and servicePath in the served document against the configured base URL",
+        "layer": "external HTTP boundary of the running emulator",
+        "method": "Boot with a mount-path base URL carrying a trailing slash and read the served document",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The unit assertion at google.test.ts:1240 uses a mount-path literal",
+        "counterexample": "A trailing slash on the configured base URL yields a double slash in the advertised paths",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The trailing slash was forced through resolveBaseUrl into a live boot; calendar-discovery.ts:2 strips it, so basePath came back /emulate/google/calendar/v3/ with no double slash, while the pre-existing OIDC consumer in the same plugin emitted five double-slash endpoints from the same input."
+      },
+      "substrates": [
+        {
+          "name": "emulator over a real TCP listener at an adapter mount path with a trailing slash",
+          "status": "exercised",
+          "evidence": "port 45103; rootUrl http://localhost:45103/emulate/google/, basePath /emulate/google/calendar/v3/"
+        }
+      ],
+      "evidence": "The mount-path claim in the new docs holds at the wire, including the trailing-slash input the sibling consumer mishandles."
+    },
+    {
+      "id": "P4",
+      "claim": "The document is internally consistent: every $ref resolves to a declared schema.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "The set of $ref names collected from the document minus the set of declared schema keys",
+        "layer": "served document structure",
+        "method": "Closed-graph assertion over the document fetched from the running emulator",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The document is valid JSON and the schemas block is non-empty",
+        "counterexample": "A method response names a schema that was never declared",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The PR's own assertion at google.test.ts:1140 collects every $ref and subtracts the declared keys, so a dangling reference would fail while JSON validity alone would not."
+      },
+      "substrates": [
+        {
+          "name": "emulator over a real TCP listener",
+          "status": "exercised",
+          "evidence": "The document served at port 45102 was fetched and consumed by the assertion path; 18 tests and 201 expect() calls passed at the frozen head."
+        }
+      ],
+      "evidence": "This is the one place the new suite carries a genuine structural invariant rather than a literal echo."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": [
+      "A new machine-readable contract document is published to third-party client generators",
+      "A new unauthenticated public endpoint",
+      "New user-facing docs teach an exact client workflow"
+    ],
+    "dimensions": {
+      "values": [
+        "base URL shape: root, root with trailing slash, root with double slash, adapter mount path, adapter mount path with trailing slash, {service} template",
+        "advertised surface: resources block methods, root-level batchPath, root parameters block, $ref graph",
+        "advertised parameter behavior: singleEvents true and false, orderBy startTime and updated, fields projection, alt",
+        "authentication: discovery endpoint unauthenticated, Calendar resource endpoints with and without a bearer token",
+        "consumer: raw HTTP client, google-api-python-client argmap construction, pre-existing sibling OIDC consumer of the same baseUrl"
+      ],
+      "exclusions": [
+        "Drive, OAuth token issuance, and JWKS behavior are outside this diff.",
+        "Recurring-event expansion semantics are excluded because the emulator has no recurrence model at all (no hits for recurrence, recurringEventId, RRULE, or originalStartTime)."
+      ],
+      "evidence": "evidence/2026-08-26-emulate-210-9800e01-substrate.txt"
+    },
+    "oracle": {
+      "source": "Live Google Calendar v3 discovery document and google-api-python-client source (googleapiclient/discovery.py:130, 813, 837-845, 1104-1106)",
+      "independent": true,
+      "evidence": "The oracle produced both actionable findings. Neither is derivable from the PR's own expected values, which are the same literals the builder hardcodes."
+    },
+    "producer": {
+      "name": "emulate CLI production wiring driven over a real TCP listener",
+      "status": "exercised",
+      "evidence": "Two boots reproducing packages/emulate/src/api.ts:44-84 verbatim, including the explicit plugin.seed call that createServer does not perform (core/src/server.ts:92)."
+    },
+    "falsification": [
+      {
+        "mutation": "not performed as a source mutation",
+        "red_evidence": "No source-level mutation red/green pass was run; editing the frozen checkout was outside the read-only mandate for this run.",
+        "restored_green_evidence": "Not applicable. In place of mutation, assertion absence was established statically and the consequence was observed at the wire: grep -c 'batchPath' on the new test file returns 0, and the advertised path returns 404 on a live listener, so no possible mutation of that field could turn the suite red."
+      }
+    ],
+    "evidence": "The suite is green and complete at the frozen head (18 pass, 0 fail, 201 expect() calls, all 18 it() blocks of the 1414-line file), but it is self-referential: expected values are the literals the implementation hardcodes, the field the PR introduces at the root of the document is never asserted, and no assertion connects a document-advertised path to a reachable route. Line 993 actively pins the defect in F2 by asserting parameters equals the empty object."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "PR body",
+      "claim": "The document does not advertise unsupported Calendar operations.",
+      "status": "refuted",
+      "evidence": "batchPath advertises a batch endpoint that no route serves; the author's deliberate exclusion of showDeleted shows the intent this field violates."
+    },
+    {
+      "id": "A2",
+      "source": "Implementation and the new test at line 993",
+      "claim": "An empty root parameters block is a correct discovery document.",
+      "status": "refuted",
+      "evidence": "Upstream carries seven standard query parameters there, and the python client derives its accepted kwargs from exactly that block."
+    },
+    {
+      "id": "A3",
+      "source": "New docs and README",
+      "claim": "The advertised base URL follows the emulator's configuration through an adapter mount path.",
+      "status": "verified",
+      "evidence": "Live boot at http://localhost:45103/emulate/google/ produced basePath /emulate/google/calendar/v3/."
+    },
+    {
+      "id": "A4",
+      "source": "Repository convention",
+      "claim": "baseUrl is always an absolute URL, so new URL(baseUrl) needs no guard.",
+      "status": "verified",
+      "evidence": "vercel/src/routes/blob.ts:169 and deployments.ts:47 already assume it, the CLI documents --base-url <url>, and adapter-next always builds ${origin}${servicePrefix} (index.ts:191-197, 248)."
+    },
+    {
+      "id": "A5",
+      "source": "Implementation",
+      "claim": "Advertising singleEvents and an orderBy enum constrains emulator behavior.",
+      "status": "refuted",
+      "evidence": "singleEvents true and false returned byte-identical bodies, orderBy=updated was accepted although unadvertised, and orderBy=startTime without singleEvents returned 200 where upstream returns 400."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The diff adds a pure builder function with zero imports and one read-only GET route. No durable write, no external call, no state transition.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name": "New-domain matrix", "status": "run", "reason": "Enumerated base-URL shapes, advertised surfaces, advertised parameter behavior, authentication, and consumer classes."},
+    {"name": "Substrate differential corpus", "status": "run", "reason": "Compared the emulated document against the live Calendar v3 document; produced F2."},
+    {"name": "Reference-implementation oracle", "status": "run", "reason": "google-api-python-client parameter merge and argmap construction were the independent oracle for the client-facing claim."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Enumerated every field the new document introduces and asked which route owns it; batchPath has no owner."},
+    {"name": "Resolution-rule consistency across consumers", "status": "run", "reason": "Compared the new baseUrl consumer against the pre-existing OIDC consumer in the same plugin under identical input."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Two boots of the production wiring over a real TCP listener; every claim graded at the wire."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "The mount-path claim holds; the taught python workflow breaks on the standard query parameters."},
+    {"name": "Demonstrative example", "status": "run", "reason": "The docs example's port 4002 and discovery URL were verified consistent with the CLI default and the registered route."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "parameters: {} and the orderBy enum were tested as deliberate choices; the empty parameters block is asserted as correct at line 993."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "The new file has zero imports; the only seam is the route registration and the baseUrl string contract."},
+    {"name": "Error-path forcing", "status": "run", "reason": "Unauthenticated resource access (401), the advertised batch path (404), and non-absolute baseUrl inputs (TypeError) were all forced."},
+    {"name": "Boundary pipeline trace", "status": "run", "reason": "Traced resolveBaseUrl through the builder, the route, core's router, and the catch-all 404."},
+    {"name": "Substrate verification", "status": "run", "reason": "All wire claims observed on a real listener, not through app.request alone."},
+    {"name": "Inverse regression surface", "status": "run", "reason": "Checked that the pre-existing OIDC discovery document and the Calendar resource routes are unchanged by the new endpoint."},
+    {"name": "Complexity budget", "status": "skipped", "reason": "The builder is a constant-size literal with no scale-sensitive work."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No CLI flag semantics changed; only the help epilogue text."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell parsing or command construction changed."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim was introduced by the PR."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No diagnostic channel or latch changed."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No async wait, timeout, or cancellation changed."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery action changed."},
+    {"name": "New-failure-outcome propagation", "status": "run", "reason": "The only new failure outcome reachable through the diff is the catch-all 404 on the advertised batch path; it propagates to the client as a generic Not Found with a docs URL."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail exists for this PR."}
+  ],
+  "deterministic": [
+    {"check": "covered before report", "outcome": "acknowledged", "reason": "Expected initial red; no exact-head report existed for 9800e01 before this run."},
+    {"check": "gate.sh execution", "outcome": "acknowledged", "reason": "bash is not available in this environment. gate.sh was read in full (738 lines) and every triggered check was reproduced by hand with git; validate-run-report.mjs was run with bun in place of gate.sh report."},
+    {"check": "style", "outcome": "acknowledged", "reason": "One em dash in the added line of packages/@emulators/google/README.md. Exempt as house style: the same file already carries 48 em dashes, and sibling service READMEs carry 65, 58, and 48. The ' -- ' half of the check passed."},
+    {"check": "surfaces", "outcome": "acknowledged", "reason": "packages/emulate/src/index.ts changed without skills/emulate/SKILL.md or apps/web/app/docs/page.mdx. Exempt: neither file mirrors the CLI help epilogue for any pre-existing block; zero hits for 'GitHub API coverage', 'Webhook signatures', 'Framework adapters', or 'discovery'."},
+    {"check": "surfaces coverage of the changed package", "outcome": "acknowledged", "reason": "The case conventions carry no rule for packages/@emulators/google/src/**, so the gate is blind to the package this PR actually changes. The author nonetheless updated all five analogous surfaces. Logged as a gate miss."},
+    {"check": "siblings", "outcome": "pass", "reason": "Every repository occurrence of the changed contract strings is inside the diff."},
+    {"check": "callers", "outcome": "pass", "reason": "buildCalendarDiscoveryDocument has exactly one caller, the discovery route in routes/calendar.ts; enumerated and inspected."},
+    {"check": "stale", "outcome": "pass", "reason": "No contract value was renamed or retired."},
+    {"check": "diff --check", "outcome": "pass", "reason": "exit 0, no whitespace errors."},
+    {"check": "shellmeta artifacts rawinput execdeps timings flagsweep producers", "outcome": "acknowledged", "reason": "No trigger applies. The case conventions carry no execdeps block."},
+    {"check": "repository CI commands", "outcome": "acknowledged", "reason": "pnpm is unavailable, so build, sync-versions, format, type-check, lint, and the full vitest run were not executed. Recorded as a run gap."},
+    {"check": "focused google suite", "outcome": "pass", "reason": "18 pass, 0 fail, 201 expect() calls, 84ms; all 18 it() blocks of the 1414-line file ran. Executed under bun:test through a vitest forwarding module."},
+    {"check": "Test Strength", "outcome": "acknowledged", "reason": "Mandatory and run. The suite is green but self-referential; batchPath is asserted zero times and line 993 pins the F2 defect as correct. No source mutation was performed; assertion absence was established statically and its consequence observed at the wire."},
+    {"check": "no-mutation", "outcome": "pass", "reason": "git status --porcelain in the frozen worktree is empty; no source edited, nothing committed, pushed, commented, reviewed, resolved, merged, or deployed; PR state untouched."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "severity": "actionable",
+      "claim": "The discovery document advertises batchPath: \"batch/calendar/v3\", and no route serves it.",
+      "evidence": "POST http://localhost:45102/batch/calendar/v3 with a valid bearer token returns 404 {\"message\":\"Not Found\",\"documentation_url\":\"https://emulate.dev/google\"} from core's catch-all (core/src/server.ts:94-102). It reproduces under an adapter mount: POST /emulate/google/batch/calendar/v3 -> 404. The string occurs exactly once in the repository, at calendar-discovery.ts:19, with no consumer and no route; git grep finds no /batch registration anywhere in packages. The new test file asserts batchPath zero times.",
+      "layer": "external HTTP boundary of the running emulator",
+      "source": "lens",
+      "path": "buildCalendarDiscoveryDocument -> served document -> client derives rootUrl + batchPath -> POST -> core catch-all 404",
+      "impact": "A discovery-driven client that batches (the documented reason batchPath exists) is told the endpoint is there. This is the precise thing the PR body says it avoids: 'without advertising unsupported Calendar operations'. The same PR deliberately omits showDeleted for that reason, so the omission standard is the author's own.",
+      "resolution": "open"
+    },
+    {
+      "id": "F2",
+      "state": "unverified",
+      "severity": "actionable",
+      "claim": "The empty root parameters block breaks the exact python client workflow the new docs teach.",
+      "evidence": "Upstream Calendar v3 carries alt, fields, key, oauth_token, prettyPrint, quotaUser, and userIp in the root parameters block; the emulated document ships {} (calendar-discovery.ts:20). google-api-python-client builds each method's accepted kwargs from the root parameters block plus STACK_QUERY_PARAMETERS only (discovery.py:130, 813, 837-845), and raises TypeError(\"Got an unexpected keyword argument\") at discovery.py:1104-1106 before issuing any request. So service.events().list(calendarId='primary', fields='items(id)') raises client-side against the emulator and succeeds against Google. Aggravating: google.test.ts:993 asserts document.parameters toEqual({}), pinning the omission as correct.",
+      "layer": "google-api-python-client argmap construction, before any HTTP request",
+      "source": "lens",
+      "path": "root parameters {} -> _fix_up_parameters -> method argmap -> unknown kwarg -> TypeError",
+      "impact": "Every standard query parameter is unusable through the client the README, docs site, and SKILL.md all instruct the user to build. The failure is client-side, so no emulator log shows it.",
+      "resolution": "open",
+      "verification_gap": "python3 was unavailable in this environment, so the TypeError is confirmed from library source rather than from an executed call. The document-level differential against the live upstream document is executed and confirmed."
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "severity": "informational",
+      "claim": "singleEvents and the orderBy enum are advertised but never read, and the emulator accepts values the document excludes.",
+      "evidence": "singleEvents=true and singleEvents=false returned byte-identical bodies on a live listener. orderBy=updated returned 200 although the advertised enum is [\"startTime\"]. orderBy=startTime without singleEvents=true returned 200 where upstream returns 400. The emulator has no recurrence model at all: no hits for recurrence, recurringEventId, RRULE, or originalStartTime anywhere in the google package.",
+      "layer": "external HTTP boundary of the running emulator",
+      "source": "lens",
+      "path": "advertised parameter -> route handler ignores it -> unchanged response",
+      "impact": "Low. Advertising an inert parameter is a weaker version of F1: the document overstates fidelity, but a client passing it gets a plausible answer rather than a 404. Worth a decision, not necessarily a change.",
+      "resolution": "open"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "severity": "informational",
+      "claim": "The new suite cannot fail for the reasons this document can be wrong.",
+      "evidence": "Expected values are the same literals the builder hardcodes, so no assertion has an oracle independent of the implementation. batchPath, the one field introduced at the root of the document, is asserted zero times. No assertion connects a document-advertised path to a reachable route. Line 993 pins parameters == {} as correct, so a fix for F2 would turn the suite red. The genuine exception is line 1140, a closed-graph check over $refs.",
+      "layer": "test suite design",
+      "source": "test-strength",
+      "path": "document literal -> test expectation copied from the same literal",
+      "impact": "The 18 green tests certify that the builder returns what the builder returns. They are a change detector, not a correctness oracle, which is why both actionable findings required an external document to surface.",
+      "resolution": "open"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "The em dash in the added README line is not a style defect.",
+      "evidence": "House style: the same file already carries 48 em dashes and sibling service READMEs carry 65 (github), 58 (slack), and 48 (okta). The gate's ' -- ' prose-punctuation half passed."
+    },
+    {
+      "claim": "skills/emulate/SKILL.md and apps/web/app/docs/page.mdx need no update for the CLI help epilogue change.",
+      "evidence": "Neither file mirrors the epilogue for any pre-existing block: zero hits for 'GitHub API coverage', 'Webhook signatures', or 'Framework adapters'. The convention they encode is that per-service endpoint semantics live on the service surfaces, all five of which this PR updated."
+    },
+    {
+      "claim": "new URL(baseUrl) throwing on a non-absolute base URL is not a finding against this PR.",
+      "evidence": "Pre-existing repo-wide precondition: vercel/src/routes/blob.ts:169 and deployments.ts:47 assume it, the CLI documents --base-url <url> as a URL, and adapters always synthesize an absolute origin (adapter-next/src/index.ts:191-197, 248)."
+    },
+    {
+      "claim": "The docs example's port 4002 is correct.",
+      "evidence": "Verified consistent with the CLI default and the registered discovery route."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "id": "IC1",
+      "claim": "The pre-existing OIDC discovery consumer emits double slashes when the configured base URL ends in a slash.",
+      "evidence": "routes/oauth.ts:98-103 interpolates baseUrl bare, so a base URL of http://localhost:45103/emulate/google/ yields authorization_endpoint http://localhost:45103/emulate/google//o/oauth2/v2/auth and four more. Out of this diff, and PR 210's new consumer is the one that normalizes correctly (calendar-discovery.ts:2). Reachability of those URLs was not demonstrated in this run; only the emission is confirmed.",
+      "scope": "pre-existing, outside PR 210"
+    },
+    {
+      "id": "IC2",
+      "claim": "The case conventions surface map has no rule for packages/@emulators/google/src/**.",
+      "evidence": "cases/vercel-labs-emulate/conventions.md carries surface rules for stripe, github, emulate index and commands, adapter-next, and adapter-nuxt, but not google. The surfaces gate is therefore blind to the package this PR changes. Gate miss, harness side.",
+      "scope": "review-gate harness"
+    }
+  ]
+}

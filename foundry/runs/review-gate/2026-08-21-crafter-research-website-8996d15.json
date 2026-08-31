@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "crafter-research/website",
+    "base": "feb2e19017454c2ad6425f4296fa21552f7934b8",
+    "head": "8996d15190f11e201c6b80860e8a55f3e09deb89",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "user request and 04_Projects/_shaping/crafter-public-systems-observatory",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "do not create a separate Muniscan website yet",
+      "advance beyond the completed V10 package",
+      "make the observatory program and next funded milestone legible",
+      "preserve responsive spacing and side-greca clearance"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-5-codex",
+    "reviewer_model": "gpt-5-codex focused exact-head pass",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "not_required",
+      "artifact": "",
+      "evidence": "Static Astro content and responsive CSS only. No secrets, authentication, destructive operations, durable runtime writes, concurrency, process lifecycle, or remote side effects."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "user request in the working session",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The request asks whether Muniscan needs a site and authorizes autonomous continuation after V10. The selected outcome keeps /muniscan integrated and advances the Observatory program surface."
+    },
+    {
+      "source": "design",
+      "location": "04_Projects/_shaping/crafter-public-systems-observatory and 05_Areas/research/2026-08-21-crafter-next-fundable-projects-shaping.md",
+      "status": "reviewed",
+      "properties": ["P1", "P2"],
+      "evidence": "The program docs define Follow, Test, Audit, V1-V10 state, the USD 25k milestone, USD 5k fallback, compute ask, and strict claim boundaries."
+    },
+    {
+      "source": "user_facing",
+      "location": "src/components/SystemsPage.astro",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "The rendered page exposes three linked tracks, shipped evidence, next gates, a 90-day contract, localized links, and existing alpha limitations."
+    },
+    {
+      "source": "implementation",
+      "location": "src/components/SystemsPage.astro",
+      "status": "reviewed",
+      "properties": ["P1", "P2", "P3", "P4"],
+      "evidence": "One shared static Astro component owns EN/ES copy, PT/ZH English fallback, localized paths, responsive track layout, and milestone contract."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The Observatory program presents Follow, Test, and Audit as distinct evidence tracks without overstating what each has shipped.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the public statements against durable source artifacts",
+        "layer": "public content contract",
+        "method": "compare track values and gates with the merged Kai ledger, fixture artifacts, Muniscan PR #6, and the published Muniscan page",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the expected values exist in the component source",
+        "counterexample": "correct values could still imply completed review, stable uptime, or a unified quality score when rendered without boundaries",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Browser inspection shows shipped evidence and next gate separately for each track; the page explicitly rejects a combined score and retains the existing documentation-only limitations."
+      },
+      "substrates": [
+        {
+          "name": "rendered EN and ES Observatory pages",
+          "status": "exercised",
+          "evidence": "Both routes display 6 first-pass records, 10 fixtures and 2 trajectories, and 1,871 municipalities with two public snapshots under distinct track states."
+        }
+      ],
+      "evidence": "Muniscan scan, score, and diff passed without force; PR #6 published the recurrent snapshot. Test remains protocol-ready with eight trajectories explicitly pending. Follow remains a first-pass alpha."
+    },
+    {
+      "id": "P2",
+      "claim": "The 90-day contract accurately maps USD 25k, USD 5k, and 300-600 A100-equivalent hours to bounded public outputs.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "the rendered ask, outputs, and status against the approved funding package",
+        "layer": "public funding contract",
+        "method": "compare every displayed ask and output with evidence/funding-package-v1.md and /support",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the three funding values match source text",
+        "counterexample": "matching values could be presented as awarded resources or guarantee outputs beyond the package",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The rendered section is labeled next release and contract, links to /support, and states that support buys a release, never the result."
+      },
+      "substrates": [
+        {
+          "name": "rendered milestone contract at desktop, tablet, and mobile",
+          "status": "exercised",
+          "evidence": "All three asks, outputs, disclaimer, and localized /support link were visible and legible at 1440, 768, and 390 CSS pixels."
+        }
+      ],
+      "evidence": "The page uses the exact V10 package values and does not imply an application, award, or completed release."
+    },
+    {
+      "id": "P3",
+      "claim": "The new program map and milestone use available space without collisions, crushed cards, or horizontal overflow across supported widths and themes.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "actual browser geometry and screenshots",
+        "layer": "browser layout substrate",
+        "method": "inspect EN/ES at 1440, 768, and 390 pixels in light and dark, and compare document scrollWidth with viewport width",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CSS defines responsive grids and max widths",
+        "counterexample": "a three-column tablet grid can avoid overflow while remaining visibly crushed",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The first 768px drive exposed three 224px tracks as too dense. Exact HEAD switches below 900px to 652px vertical tracks and was re-screenshot."
+      },
+      "substrates": [
+        {
+          "name": "Chromium at 1440, 768, and 390 CSS pixels in light and dark",
+          "status": "exercised",
+          "evidence": "All inspected routes reported scrollWidth equal to viewport width; screenshots show content inside the grecas and mobile patterns hidden."
+        }
+      ],
+      "evidence": "Desktop uses the connected three-column map; tablet and mobile use a connected vertical sequence; the milestone expands to full tablet width."
+    },
+    {
+      "id": "P4",
+      "claim": "The Observatory preserves localized paths, unique landmarks, readable contrast, and accessible link semantics.",
+      "kind": "other",
+      "status": "verified",
+      "oracle": {
+        "observes": "rendered DOM language, link targets, Axe output, and calculated token contrast",
+        "layer": "browser accessibility substrate",
+        "method": "inspect ES route targets, run Axe on EN and ES, and calculate contrast ratios for all foreground tokens against both theme backgrounds",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "semantic section markup and localized path helper exist",
+        "counterexample": "composed sections can share accessible names and localized CTAs can point to canonical English routes",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Axe initially found a duplicate landmark name. Exact HEAD gives the records section its own localized label; both Axe runs now report zero violations, and ES links resolve to /es/muniscan and /es/support."
+      },
+      "substrates": [
+        {
+          "name": "local browser DOM and Axe 4.12.1",
+          "status": "exercised",
+          "evidence": "EN and ES each report zero Axe violations. Color contrast remains incomplete only because Axe cannot infer the global gradient; direct token calculations range from 4.82:1 to 18.43:1."
+        }
+      ],
+      "evidence": "Localized routes, unique landmark names, no browser console errors, and WCAG AA token contrast were directly observed."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "not_required",
+    "triggers": [],
+    "dimensions": {"values": [], "exclusions": [], "evidence": ""},
+    "oracle": {"source": "", "independent": true, "evidence": ""},
+    "producer": {"name": "", "status": "not_applicable", "evidence": ""},
+    "falsification": [],
+    "evidence": "The diff adds static content and responsive presentation. It does not change a protocol, parser, serializer, state machine, lifecycle, adapter, compatibility layer, or browser or OS event translation."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "program ledger",
+      "claim": "V10 was already complete and should be surfaced rather than rebuilt.",
+      "status": "verified",
+      "evidence": "Kai PR #25 records V10 complete with funding-package-v1.md and https://crafter.ing/support."
+    },
+    {
+      "id": "A2",
+      "source": "Muniscan producer evidence",
+      "claim": "The second public snapshot establishes recurrence without proving stable automation or historical reliability.",
+      "status": "verified",
+      "evidence": "Run 32494601944 passed Scan, Score, and Diff; PR #6 published the data. Branch autopublication failed afterward on workflow permission, and the page asks for more observations before historical reliability claims."
+    },
+    {
+      "id": "A3",
+      "source": "locale model",
+      "claim": "Spanish receives native content while Portuguese and Chinese may retain explicit English fallback.",
+      "status": "verified",
+      "evidence": "The existing SystemsPage locale contract remains unchanged; ES renders native copy and localized targets, while PT/ZH continue the established English fallback."
+    },
+    {
+      "id": "A4",
+      "source": "layout model",
+      "claim": "Horizontal track cards are appropriate only where each receives enough width to breathe.",
+      "status": "verified",
+      "evidence": "The first 768px screenshot rejected 224px cards; the exact-head breakpoint now switches the map to a 652px vertical sequence below 900px."
+    }
+  ],
+  "side_effects": {
+    "assessment": "none",
+    "evidence": "The diff changes one static Astro component. It creates no runtime write, remote mutation, or partial externally visible commit point.",
+    "commit_points": []
+  },
+  "lenses": [
+    {"name": "Inverse regression surface", "status": "skipped", "reason": "No matcher, parser, lookup, or data source was replaced."},
+    {"name": "New-domain matrix", "status": "skipped", "reason": "No validator or trigger domain was widened."},
+    {"name": "Resolution-rule consistency across consumers", "status": "skipped", "reason": "No user-input resolution rule changed."},
+    {"name": "Shell re-parse append domain", "status": "skipped", "reason": "No shell composition changed."},
+    {"name": "Emission channel and one-shot latch reachability", "status": "skipped", "reason": "No process channel or latch exists in this static page."},
+    {"name": "Shim hermeticity", "status": "skipped", "reason": "No shim changed."},
+    {"name": "Deliberate-default check", "status": "run", "reason": "Verified native EN/ES content, established PT/ZH fallback, and localized routes."},
+    {"name": "Fresh-seam scan", "status": "run", "reason": "Reviewed page-to-locale, track-to-artifact, route, layout, and funding-contract seams."},
+    {"name": "Substrate differential corpus", "status": "skipped", "reason": "No substrate detector or repeatedly failing guard changed."},
+    {"name": "Reference-implementation oracle", "status": "skipped", "reason": "No protocol or normative implementation applies."},
+    {"name": "New-failure-outcome propagation", "status": "skipped", "reason": "No function contract gained a failure outcome."},
+    {"name": "Flag-propagation dispatch sweep", "status": "skipped", "reason": "No flag or mode was added."},
+    {"name": "Error-path forcing", "status": "skipped", "reason": "No new runtime error path exists."},
+    {"name": "Non-destructive recovery", "status": "skipped", "reason": "No heuristic recovery behavior changed."},
+    {"name": "Cancellation and timeout hygiene", "status": "skipped", "reason": "No wait, cancellation, or timeout changed."},
+    {"name": "Boundary pipeline trace", "status": "skipped", "reason": "No runtime boundary was extended."},
+    {"name": "Substrate verification", "status": "run", "reason": "Verified rendered DOM, URLs, geometry, screenshots, contrast, and Axe output rather than source declarations."},
+    {"name": "Dogfood the built artifact", "status": "run", "reason": "Drove the local Astro site at desktop, tablet, and mobile sizes in EN and ES, light and dark."},
+    {"name": "Newly-asserted invariant ownership", "status": "run", "reason": "Checked owners for track maturity, recurrence, funding values, and localized route statements."},
+    {"name": "Docs-behavior parity", "status": "run", "reason": "Rendered program states and asks agree with the merged Observatory ledger and funding package."},
+    {"name": "Demonstrative example", "status": "skipped", "reason": "No documentation example was added."},
+    {"name": "Choice audit", "status": "skipped", "reason": "No decision trail was emitted."},
+    {"name": "Complexity budget", "status": "skipped", "reason": "No runtime per-element lookup or algorithmic path was added."}
+  ],
+  "deterministic": [
+    {"check": "covered", "outcome": "pass", "reason": "This report records exact HEAD 8996d15190f11e201c6b80860e8a55f3e09deb89."},
+    {"check": "style", "outcome": "pass", "reason": "gate.sh style passed on the exact diff."},
+    {"check": "surfaces", "outcome": "pass", "reason": "gate.sh surfaces passed against the Crafter Research website conventions."},
+    {"check": "stale", "outcome": "pass", "reason": "Not triggered because no contract value was retired."},
+    {"check": "siblings", "outcome": "pass", "reason": "The new program-map statement is owned by the Systems page and links to existing canonical Muniscan and support surfaces without redefining them."},
+    {"check": "callers", "outcome": "pass", "reason": "Not triggered because no function contract changed."},
+    {"check": "timings", "outcome": "pass", "reason": "Not triggered because no runtime timing was added."},
+    {"check": "shellmeta", "outcome": "pass", "reason": "Not triggered because no shell detector changed."},
+    {"check": "artifacts", "outcome": "pass", "reason": "Not triggered because no persistent runtime artifact is written."},
+    {"check": "rawinput", "outcome": "pass", "reason": "Not triggered because no resolver changed."},
+    {"check": "flagsweep", "outcome": "pass", "reason": "Not triggered because no user-facing flag was added."},
+    {"check": "execdeps", "outcome": "pass", "reason": "Not triggered because no external executable was added."},
+    {"check": "radius impact", "outcome": "acknowledged", "reason": "Radius indexed 83 symbols and 110 edges but reported zero changed symbols with 156 unresolved calls, so it under-covers Astro and was not used as proof."},
+    {"check": "bun run check", "outcome": "pass", "reason": "Project claims and URLs validate; Astro reports zero diagnostics; Biome only reports four pre-existing reduced-motion warnings."},
+    {"check": "bun run build", "outcome": "pass", "reason": "Exact HEAD builds 32 static pages including all localized Systems, Muniscan, and Support routes."},
+    {"check": "git diff --check", "outcome": "pass", "reason": "Exact diff has no whitespace errors."},
+    {"check": "Axe", "outcome": "pass", "reason": "EN and ES each report zero violations after the duplicate-landmark fix."}
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The initial 768px layout kept three 224px track columns and was visibly too dense despite having no overflow.",
+      "evidence": "Agent-browser geometry and screenshot showed three 224px cards. Exact HEAD switches below 900px to three 652px vertical tracks and the second screenshot confirms the spacing.",
+      "layer": "rendered tablet layout",
+      "source": "lens",
+      "path": "src/components/SystemsPage.astro",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "The evidence index and records list initially exposed duplicate section landmark names.",
+      "evidence": "Axe landmark-unique reported one violation in EN and ES. Exact HEAD adds a distinct localized recordListLabel and both reruns report zero violations.",
+      "layer": "rendered accessibility tree",
+      "source": "lens",
+      "path": "src/components/SystemsPage.astro",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Axe color contrast remains incomplete rather than passed automatically.",
+      "evidence": "Axe cannot infer the background behind the global page gradient. Direct WCAG calculations for every foreground token against each theme background range from 4.82:1 to 18.43:1."
+    },
+    {
+      "claim": "Four Biome noImportantStyles warnings do not block this change.",
+      "evidence": "They are pre-existing reduced-motion overrides in global.css and the diff does not touch them."
+    },
+    {
+      "claim": "The empty blog collection warning does not block this change.",
+      "evidence": "It predates V11 and all 32 static routes build successfully."
+    },
+    {
+      "claim": "No formal Issue Contract or separate Spec pass was supplied.",
+      "evidence": "The reviewed user request, merged V1-V10 ledger, and funding package supply the content contract without implying a separate Spec approval."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Muniscan monthly scan cannot autopublish branches that include workflow changes",
+      "evidence": "Run 32494601944 passed Scan, Score, and Diff, then create-pull-request failed because the GitHub App token lacked workflows permission. The data was recovered and merged manually in PR #6.",
+      "why_out_of_scope": "This PR changes only the Crafter Research website. Muniscan workflow credentials and branch publication belong to a separate maintenance cycle."
+    }
+  ]
+}

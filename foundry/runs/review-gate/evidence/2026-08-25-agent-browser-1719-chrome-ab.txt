@@ -1,0 +1,35 @@
+PR: vercel-labs/agent-browser#1719
+Base: 585e740fcef069d74e21f0e88e8bf4ea7df34385
+Head: 10b433b110ba56653d5000ed580b6d0f2fe28163
+Host: macOS arm64
+Producer: real headless Chrome driven through the built agent-browser CLI
+
+Scenario
+
+1. Open a data URL with a checkbox and button.
+2. Take a snapshot. Chrome emits checkbox ref e1.
+3. Run `diff snapshot --selector '[' --baseline ignored` to force selector resolution failure.
+4. Run `click @e1`.
+5. Read checkbox state from the DOM with `is checked '#box'`.
+
+Base result
+
+- Diff exits 1 with the expected invalid-selector error.
+- `click @e1` exits 0.
+- DOM checkbox state is true.
+
+Head result
+
+- Diff exits 1 with the same invalid-selector error.
+- `click @e1` exits 1 with `Unknown ref: e1`.
+- DOM checkbox state remains false.
+
+Conclusion
+
+The PR introduces externally visible ref loss on a failed diff. The new `state.ref_map.clear()` runs before `take_snapshot` can fail. A fresh local RefMap should be populated first and committed to `state.ref_map` only after snapshot capture succeeds.
+
+Test-strength evidence
+
+- Removing the new diff_snapshot reset makes `e2e_diff_snapshot` fail because an unchanged page reports `changed: true`.
+- Removing the new first-page diff_url reset makes `e2e_diff_url_aligns_refs_after_snapshot` fail because identical URLs report `identical: false`.
+- Restoring both resets makes both E2Es pass. Each passed three repeated runs and one combined run.

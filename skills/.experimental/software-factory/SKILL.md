@@ -25,9 +25,11 @@ accepted shape or Formula
 
 It is a protocol, not a runtime. Any control plane may execute it. Bind nothing to a specific provider, harness, or model.
 
+Read the work-item manifest before inspecting the repository. Verify only drift-prone fields and append one atomic receipt per stage. Every pass records `skill_revision`, head, command, environment, relevant paths, duration, and evidence fingerprint.
+
 ## 0. Decide whether this fires
 
-Run it when a change is accepted, touches more than one behavior, and a single agent would otherwise write, clean, test, and judge it in one context.
+Run it for `standard` and `high-risk` changes when a single agent would otherwise write, clean, test, and judge the change in one context. `external-pr` normally enters Review Gate instead. `mechanical` skips the staged factory when one narrow implementation pass and deterministic proof are sufficient.
 
 Skip it when the change is fully mechanical, when its mechanism is determined and one check proves it, or when no shape was accepted yet. A skip is recorded with its reason, never assumed.
 
@@ -45,7 +47,7 @@ Fix the thresholds now, before any diff exists. A threshold chosen after seeing 
 
 ## 2. Run stages as independent passes
 
-Each stage receives the change contract and the prior stage's evidence. It does not receive the prior stage's reasoning. An agent that must defend its own choices will preserve them.
+Each stage receives the change contract and the prior stage's evidence. It does not receive the prior stage's reasoning. An agent that must defend its own choices will preserve them. Apply the shared circuit breaker: prefer the packaged Review Gate FX worker, then fall back through the native Agent surface, Herdr, sequential isolated execution, and unavailable. After the first schema or capability error, inspect capability once and never retry the identical invalid call. Cursor and `cursor-agent` are not supported factory runtimes. Record the execution mode and independence gap.
 
 | Stage | Owns | Required evidence |
 |---|---|---|
@@ -81,7 +83,7 @@ Thrashing is not a stage failure to retry. It means the change surface is wrong,
 
 ## 5. Hand off
 
-Produce the diff, the per-stage evidence, the unavailable stages with their owed evidence, and the thresholds with their basis. Review Gate receives evidence, not assurances.
+Produce the diff, the per-stage receipts, the unavailable stages with their owed evidence, and the thresholds with their basis. Review Gate receives receipts, not reconstructed assurances.
 
 Findings that survive review return as successors, not as edits to a closed run.
 

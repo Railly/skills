@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 0,
+  "run": {"date":"2026-08-25","repo":"vercel-labs/agent-browser#1682","base":"bf3c85f4b6fd08c43c01627dc28502d37b2a330a","head":"8b3fb91c3836fb87a8579f439dcf8deee5d7182d","status":"complete","verdict":"pass","gaps":[]},
+  "contract": {"path":"foundry/runs/spec/2026-08-25-agent-browser-1682-8b3fb91.md","spec_status":"pass","acceptance_reviewed":["active-main-frame-url","externally-activated-tab-rebind","old-session-rejection"],"gaps":[]},
+  "provenance": {"author_model":"GPT-5 Codex","reviewer_model":"GPT-5 Codex plus Tate human review","same_family":false},
+  "risk": {"level":"high","triggers":["browser event translation","externally visible stream state","concurrency"],"independent_challenge":{"required":true,"satisfied":true,"method":"human_review","artifact":"evidence/2026-08-25-agent-browser-1682-8b3fb91.txt","evidence":"Tate identified the allowlist gap; real Chrome rejected the old implementation and passed the successor."}},
+  "claim_inventory": [
+    {"source":"contract","location":"issue #1677 and Tate review","status":"reviewed","properties":["P1"],"evidence":"The stream must follow the manager active page after CDP drains."},
+    {"source":"design","location":"solution gate and prior review gate","status":"reviewed","properties":["P1"],"evidence":"Session ownership and main-frame identity are the selected publication boundary."},
+    {"source":"user_facing","location":"README, streaming docs, CLI output, bundled skill","status":"reviewed","properties":["P1"],"evidence":"The documented URL message describes the active main frame."},
+    {"source":"implementation","location":"cli/src/native/actions.rs and cli/src/native/e2e_tests.rs","status":"reviewed","properties":["P1"],"evidence":"Every post-command drain binds the stream to the manager active session."}
+  ],
+  "properties": [{
+    "id":"P1","claim":"After CDP event draining changes the manager active page, the stream binds to that page before later URL events publish.","kind":"lifecycle","status":"verified",
+    "oracle":{"observes":"the URL delivered over the real WebSocket stream","layer":"real Chrome through CDP, daemon, and stream","method":"create an external target, adopt it during unrelated url, then perform History navigation","proxy_only":false},
+    "proxy_challenge":{"proxy":"manager.active_session_id equals the new tab","counterexample":"manager adopts the tab while the stream remains bound to the prior session","attempted":true,"outcome":"separated","evidence":"The old allowlist had the correct manager URL but timed out on the stream assertion."},
+    "substrates":[{"name":"macOS arm64, real Chrome, loopback HTTP and WebSocket","status":"exercised","evidence":"Targeted E2E and 20-iteration stress campaign passed."}],
+    "evidence":"The restored exact tree emitted /external-spa and passed 1,157 serial tests."
+  }],
+  "behavioral_strength": {"assessment":"required","triggers":["browser event translation","active-owner lifecycle"],"dimensions":{"values":["owner: current, background, externally adopted, stale","frame: main, child","navigation: full, history, fragment","consumer: connected, reconnect, slow"],"exclusions":["multi-page Lightpanda remains unavailable in its current runtime"],"evidence":"Real and deterministic campaigns cover the meaningful cross-product."},"oracle":{"source":"real Chrome URL messages and browser URL","independent":true,"evidence":"Expected URL comes from the loopback workload, not stream internals."},"producer":{"name":"real Chrome CDP event producer","status":"exercised","evidence":"Target.createTarget and Runtime.evaluate generated the events."},"falsification":[{"mutation":"restore the old action-name rebind allowlist","red_evidence":"the adopted tab History URL timed out","restored_green_evidence":"unconditional post-drain rebind emitted /external-spa"}],"evidence":"The test rejects the exact reviewed defect and the restored tree remains green."},
+  "assumptions": [{"id":"A1","source":"browser manager contract","claim":"CDP draining can change the manager active page during any command.","status":"verified","evidence":"External Target.createTarget followed by url adopted the new target."}],
+  "side_effects": {"assessment":"present","evidence":"The stream publishes externally visible URL and tab state.","commit_points":[{"id":"C1","effect":"stream session binding and URL publication","owner":"stream server","commit_event":"bind_cdp_session_and_broadcast_tabs completes","later_fallible_stages":[],"failure_partitions":[]}]},
+  "lenses": [
+    {"name":"Inverse regression surface","status":"run","reason":"Checked child, background, stale, and external-owner cases."},
+    {"name":"New-domain matrix","status":"run","reason":"Crossed owner, frame, navigation, and consumer states."},
+    {"name":"Error-path forcing","status":"run","reason":"Forced old allowlist timeout."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"Existing bounded seed and stream waits remain covered."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"Traced Chrome event to manager, binding, cache, and WebSocket."},
+    {"name":"Docs-behavior parity","status":"run","reason":"No documented behavior drift after reconciliation."},
+    {"name":"Complexity budget","status":"run","reason":"The successor removes an allowlist and adds no state."}
+  ],
+  "deterministic": [
+    {"check":"style","outcome":"pass","reason":""},
+    {"check":"surfaces","outcome":"acknowledged","reason":"actions.rs changes binding timing, not command syntax or command documentation."},
+    {"check":"callers bind_cdp_session_and_broadcast_tabs","outcome":"pass","reason":"Every caller is in the diff."},
+    {"check":"timings","outcome":"pass","reason":"No wait ceiling was added."},
+    {"check":"cargo test serial","outcome":"pass","reason":"1,157 passed, 0 failed."},
+    {"check":"real Chrome and mutation","outcome":"pass","reason":"Targeted green, force-red timeout, restored green, stress 20 passed."},
+    {"check":"clippy","outcome":"acknowledged","reason":"All-target clippy reaches inherited main lint native/browser.rs:3494; changed targets and formatting pass."}
+  ],
+  "findings": [{"id":"F1","state":"confirmed","claim":"The action-name allowlist failed to rebind after unrelated commands adopted an external tab.","evidence":"Tate review and force-red timeout.","layer":"real stream lifecycle","source":"lens","path":"CDP drain to manager active page to stream binding","resolution":"fixed"}],
+  "exemptions": [{"claim":"Command documentation surfaces are unaffected.","evidence":"No command, flag, payload, or documented URL semantics changed."}],
+  "issue_candidates": []
+}

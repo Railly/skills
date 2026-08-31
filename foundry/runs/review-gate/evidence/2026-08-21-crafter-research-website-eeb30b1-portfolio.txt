@@ -1,0 +1,29 @@
+Crafter Research portfolio observatory evidence
+Date: 2026-08-21
+Head: eeb30b195a14ce4c6821262af229c76f3ae1f19e
+
+Direct artifact checks
+- bun run check passed: 0 Astro errors, warnings, or hints
+- bun run build passed: 20 static pages
+- validator observed 5 featured records, 20 audited projects, and 33 unique public URLs
+- EN, ES, PT, and ZH built pages each contain exactly 20 project record articles
+- PT and ZH explicitly disclose English project-copy fallback; ES renders localized copy
+- scope assertion passed: 24 public repositories = 20 audited + 4 explicitly excluded
+- ranking assertion passed and every score remained inside the declared 0 to 4 range
+
+Browser substrate
+- desktop EN, mobile ES at 390x844, dark theme, and light theme were driven locally
+- search, combined family and maturity filters, empty state, and reset were exercised
+- no horizontal overflow or console errors were observed
+- Axe reported 0 violations
+- screenshots are retained in /tmp/crafter-portfolio-qa/screenshots for this workstation session
+
+Forced validation failure
+- an in-memory mutation changed sismo-abierto activity from 4 to 5
+- scripts/validate-projects.ts exited 1 with: sismo-abierto: audit scores must be between 0 and 4
+- the unmodified exact HEAD returned green on bun run check and bun run build
+
+Externally visible request boundary
+- the exact-head validator followed redirects and received OK responses for 33 unique public URLs
+- a local Bun HTTP fixture returned 503 for the first GET and 200 for the immediate retry
+- the fixture observed exactly two requests and the validator retained no application state

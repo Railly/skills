@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 0,
+  "run": {
+    "date": "2026-08-21",
+    "repo": "ovation",
+    "base": "fbda0c27b33e6b494c558d0d8669b10344ec7208",
+    "head": "325aebc4160eb820a57df16a1ddba4900e52cbb9",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-08-21-ovation-pr5-8f7ccf6/decision.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": ["No separate Issue Contract or Spec review was provided; the approved terminology and completed Solution Gate supplied the delivery contract."]
+  },
+  "provenance": {
+    "author_model": "GPT-5 Codex",
+    "reviewer_model": "Cursor Grok 4.6 Extra High and Vercel Agent Review",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": ["durable Postgres state", "concurrent page lifecycle", "remote GitHub reads"],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "evidence/2026-08-21-ovation-95c84f0-cursor-grok-4.6-xhigh.jsonl",
+      "evidence": "Cursor Grok 4.6 Extra High independently converged on the stale page-write race; the exact final head then passed Vercel Agent Review and direct Postgres falsification."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "Approved Repository Triage implementation thread",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "latest-good", "page-write-authority", "first-render", "absorbed-ui"],
+      "evidence": "The user approved complete-backlog ranking, durable reports, local absorption, Triage vocabulary, and persistent sorting."
+    },
+    {
+      "source": "design",
+      "location": "Solution Gate decision and Ovation conventions",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "latest-good", "publication-authority", "page-write-authority", "reset-integrity", "first-render"],
+      "evidence": "The design requires bounded resumable calculation, Postgres authority, immutable accepted reports, and route-local hydration."
+    },
+    {
+      "source": "user_facing",
+      "location": "Triage tab, sidebar sort, ranked rows, progress and empty states",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "latest-good", "first-render", "absorbed-ui"],
+      "evidence": "The authenticated surface was previously dogfooded with 660 items, persisted sorting, page expansion, rank, score, and formula data."
+    },
+    {
+      "source": "implementation",
+      "location": "Base fbda0c2 to head 325aebc, including final delta 95c84f0 to 325aebc",
+      "status": "reviewed",
+      "properties": ["complete-ranking", "latest-good", "publication-authority", "page-write-authority", "reset-integrity", "first-render", "absorbed-ui"],
+      "evidence": "The full PR and final transactional fence were reviewed; the final head passed tests, build, deterministic checks, and external review."
+    }
+  ],
+  "properties": [
+    {
+      "id": "complete-ranking",
+      "claim": "Every discovered open item receives one repository rank beyond the first 100 while UI delivery remains paged.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {"observes": "source count, contiguous ranks, and rendered order", "layer": "GitHub, Postgres, browser", "method": "compare provider pages, SQL rank count, and rendered identities", "proxy_only": false},
+      "proxy_challenge": {"proxy": "the first 100 rows look ranked", "counterexample": "an item after page one has the highest score", "attempted": true, "outcome": "separated", "evidence": "The accepted dogfood report contains ranks 1 through 660 and page two exposes ranks 101 through 200."},
+      "substrates": [{"name": "live GitHub, Postgres, authenticated Next.js UI", "status": "exercised", "evidence": "A real 660-item calculation fetched 11 provider pages and rendered paged ranks."}],
+      "evidence": "The final concurrency fence does not change ranking or pagination semantics."
+    },
+    {
+      "id": "latest-good",
+      "claim": "A failed rerun preserves the previous accepted report.",
+      "kind": "durability",
+      "status": "verified",
+      "oracle": {"observes": "accepted report identity after failure", "layer": "Postgres", "method": "seed, fail rerun, and read accepted report", "proxy_only": false},
+      "proxy_challenge": {"proxy": "lastError is populated", "counterexample": "lastError exists after acceptedReportId is cleared", "attempted": true, "outcome": "separated", "evidence": "The integration test asserts both unchanged acceptedReportId and readable prior generatedAt."},
+      "substrates": [{"name": "Postgres integration database", "status": "exercised", "evidence": "The failed-rerun lifecycle cell passes against real constraints."}],
+      "evidence": "Seven Postgres lifecycle tests pass on the exact final tree."
+    },
+    {
+      "id": "publication-authority",
+      "claim": "Only the current generation's active calculation can publish a complete immutable report.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {"observes": "control pointer, report count, and staging residue", "layer": "Postgres transaction", "method": "exercise stale generation, replaced calculation, and successful replacement", "proxy_only": false},
+      "proxy_challenge": {"proxy": "a report row was inserted", "counterexample": "an obsolete calculation inserts but must not become accepted", "attempted": true, "outcome": "separated", "evidence": "Stale and inactive publications return false; successful publication leaves one accepted report and no completed staging."},
+      "substrates": [{"name": "Postgres transactions and foreign keys", "status": "exercised", "evidence": "Publication and cleanup integration cells pass."}],
+      "evidence": "Generation and active-calculation force-red mutations were previously restored green."
+    },
+    {
+      "id": "page-write-authority",
+      "claim": "A stale phase/page request cannot mutate ranking inputs or overwrite newer item snapshots.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {"observes": "stored branch and headSha after a stale issue request", "layer": "Postgres transaction", "method": "advance issues, enrich pull data, repeat stale issues write, then read the row", "proxy_only": false},
+      "proxy_challenge": {"proxy": "the stale cursor update affects zero rows", "counterexample": "inputs are written before that no-op and still clobber newer data", "attempted": true, "outcome": "separated", "evidence": "On 95c84f0 the cursor no-op was true while branch/headSha became undefined; on 325aebc both remain enriched."},
+      "substrates": [{"name": "Postgres integration database with concurrent-state sequence", "status": "exercised", "evidence": "The new regression test failed on the old head and passes on the exact final tree."}],
+      "evidence": "The compare-and-swap now precedes inputs inside one transaction; stale requests return before writes and insert failures roll back the cursor."
+    },
+    {
+      "id": "reset-integrity",
+      "claim": "Reset advances generation so obsolete calculations cannot republish.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {"observes": "publication result after generation advances", "layer": "Postgres", "method": "retain old calculation and attempt late publication", "proxy_only": false},
+      "proxy_challenge": {"proxy": "reset deleted current rows", "counterexample": "in-flight work republishes after deletion", "attempted": true, "outcome": "separated", "evidence": "Old-generation publication returns false with no report."},
+      "substrates": [{"name": "Postgres generation fence", "status": "exercised", "evidence": "The stale-generation integration cell passes."}],
+      "evidence": "The final page fence composes with generation authority and does not weaken reset."
+    },
+    {
+      "id": "first-render",
+      "claim": "Persisted Triage sorting and report data render without a default-sort flash.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {"observes": "first stable DOM after direct navigation", "layer": "Next.js SSR and hydration", "method": "hard navigate and inspect selected sort and first rank", "proxy_only": false},
+      "proxy_challenge": {"proxy": "storage contains sort=triage", "counterexample": "SSR renders Updated before hydration", "attempted": true, "outcome": "separated", "evidence": "Dogfood reload immediately showed Triage and rank #1 without a flash."},
+      "substrates": [{"name": "authenticated Chromium on Next.js 16", "status": "exercised", "evidence": "Cookie authority and route-local hydration agreed on first render."}],
+      "evidence": "The final store-only delta cannot alter rendering behavior."
+    },
+    {
+      "id": "absorbed-ui",
+      "claim": "Repository Triage remains local without an Xref package, dedicated panel, or prompt injection.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {"observes": "dependencies, prompts, and rendered surfaces", "layer": "source and browser", "method": "scan package graph and drive Triage UI", "proxy_only": false},
+      "proxy_challenge": {"proxy": "no dedicated panel is visible", "counterexample": "a hidden package or prompt coupling remains", "attempted": true, "outcome": "separated", "evidence": "The PR removes graph prompt coupling and uses local Triage vocabulary and persistence."},
+      "substrates": [{"name": "Ovation workspace", "status": "exercised", "evidence": "Triage is an item tab and sort while Agents remains the right sidebar."}],
+      "evidence": "No external Xref dependency is required."
+    }
+  ],
+  "behavioral_strength": {
+    "assessment": "required",
+    "triggers": ["durable calculation lifecycle", "Postgres publication protocol", "GitHub pagination adapter"],
+    "dimensions": {
+      "values": ["phase: issues, pullRequests", "cursor: current, stale", "generation: current, stale", "calculation: active, replaced", "rerun: success, failure", "payload: issue, pull", "delivery: page one, later page"],
+      "exclusions": ["closed history is excluded because the feature ranks the current open backlog", "formula customization is excluded by the fixed local formula decision"],
+      "evidence": "The matrix covers authority, state transitions, payload sources, failure, and delivery boundaries."
+    },
+    "oracle": {"source": "GitHub REST payloads, direct Postgres state, and the independently written lifecycle sequence", "independent": true, "evidence": "Expected transitions and retained PR metadata are defined without calling production helpers."},
+    "producer": {"name": "GitHub REST through authenticated Next.js routes", "status": "exercised", "evidence": "The real 660-item run consumed 11 pages; the race fixture uses captured GitHub payload shapes against Postgres."},
+    "falsification": [
+      {"mutation": "run the stale issue write with the old write-before-fence implementation", "red_evidence": "The new test receives undefined for branch instead of feature on 95c84f0.", "restored_green_evidence": "The compare-and-swap-first implementation retains branch=feature and headSha=head; all 7 DB tests pass."},
+      {"mutation": "remove generation or active-calculation publication predicates", "red_evidence": "Prior force-red runs accepted obsolete publication for the intended authority reason.", "restored_green_evidence": "Predicates restored and lifecycle suite green."}
+    ],
+    "evidence": "The fix-absent implementation fails at the claimed Postgres layer and the exact final implementation is green."
+  },
+  "assumptions": [
+    {"id": "github-authoritative", "source": "Ovation conventions", "claim": "GitHub remains authoritative while Triage stores a disposable projection.", "status": "verified", "evidence": "Inputs originate from GitHub pages and optional enrichment failure preserves native work items."},
+    {"id": "issue-list-metrics", "source": "Implementation model", "claim": "Issue-list metrics for pull requests survive later pull display enrichment.", "status": "verified", "evidence": "The integration test retains comments=2 and reactions=1 while adding pull metadata."},
+    {"id": "stale-noop", "source": "Final concurrency fix", "claim": "A zero-row phase/page compare-and-swap must prevent all writes from that request.", "status": "verified", "evidence": "The stale issue sequence preserves branch and headSha; the same fence is applied to both phases."},
+    {"id": "transaction-rollback", "source": "Postgres transaction model", "claim": "A failure after cursor acquisition rolls back cursor and input writes together.", "status": "verified", "evidence": "Both operations execute in the same database.transaction callback and no error is caught inside it."},
+    {"id": "caller-reloads", "source": "Subsystem model", "claim": "A later POST obtains fresh calculation state rather than trusting the stale progress response as authority.", "status": "verified", "evidence": "calculateWorkEnrichment calls getOrCreateTriageCalculation at the start of every POST; callers mutate no durable state before store persistence."}
+  ],
+  "side_effects": {
+    "assessment": "present",
+    "evidence": "Each provider page advances a durable cursor and writes ranking inputs; publication advances accepted-report authority.",
+    "commit_points": [
+      {
+        "id": "calculation-page",
+        "effect": "atomically claim one phase/page and persist its inputs",
+        "owner": "persistIssueStep or persistPullRequestStep",
+        "commit_event": "the page transaction commits",
+        "later_fallible_stages": ["input upsert after cursor claim", "next provider page", "report publication"],
+        "failure_partitions": [
+          {
+            "ownership_region": "page transaction and later request boundary",
+            "covers": ["input upsert after cursor claim", "next provider page", "report publication"],
+            "forced": true,
+            "residual_observed": "stale claims write nothing; transaction-local failures roll back; later failures retain resumable staging and the prior accepted report",
+            "cleanup_owner": "transaction rollback, successful publication, or reset cascade",
+            "retry": {"attempted": true, "outcome": "success", "evidence": "The stale sequence is immediately followed by a durable read that retains enriched metadata; the real run resumed across 11 page boundaries."},
+            "evidence": "Postgres red/green evidence verifies the stale partition and existing lifecycle tests verify later-request recovery."
+          }
+        ]
+      },
+      {
+        "id": "accepted-report",
+        "effect": "publish immutable ranks and advance acceptedReportId",
+        "owner": "publishTriageCalculation",
+        "commit_event": "the report/ranks/control transaction commits",
+        "later_fallible_stages": ["HTTP response delivery", "client report fetch"],
+        "failure_partitions": [
+          {
+            "ownership_region": "delivery after durable publication",
+            "covers": ["HTTP response delivery", "client report fetch"],
+            "forced": true,
+            "residual_observed": "the accepted report remains complete and independently readable",
+            "cleanup_owner": "no rollback is needed; reload rehydrates the immutable report",
+            "retry": {"attempted": true, "outcome": "success", "evidence": "A hard reload fetched and rendered the persisted 660-item report."},
+            "evidence": "Publication integration and browser reload evidence agree."
+          }
+        ]
+      }
+    ]
+  },
+  "lenses": [
+    {"name":"Inverse regression surface","status":"skipped","reason":"No matcher or lookup domain was narrowed."},
+    {"name":"New-domain matrix","status":"run","reason":"Current and stale phase/page states were modeled for both phases."},
+    {"name":"Resolution-rule consistency across consumers","status":"run","reason":"Cursor authority was checked in both persistence functions and their runner callers."},
+    {"name":"Shell re-parse append domain","status":"skipped","reason":"No shell construction changed."},
+    {"name":"Emission channel and one-shot latch reachability","status":"skipped","reason":"No channel or latch changed."},
+    {"name":"Shim hermeticity","status":"skipped","reason":"No executable shim exists."},
+    {"name":"Deliberate-default check","status":"skipped","reason":"No default changed in the final delta."},
+    {"name":"Fresh-seam scan","status":"run","reason":"The new compare-and-swap-before-write seam was inspected with rollback and stale-request ordering."},
+    {"name":"Substrate differential corpus","status":"run","reason":"Old and final implementations were driven against the same Postgres sequence."},
+    {"name":"Reference-implementation oracle","status":"skipped","reason":"Postgres state transitions, not an external reference algorithm, define the contract."},
+    {"name":"New-failure-outcome propagation","status":"run","reason":"Stale no-op and transaction rollback outcomes were traced through both callers."},
+    {"name":"Flag-propagation dispatch sweep","status":"skipped","reason":"No flag changed."},
+    {"name":"Error-path forcing","status":"run","reason":"The stale request path was forced red and green at Postgres."},
+    {"name":"Non-destructive recovery","status":"run","reason":"Stale requests preserve newer data and later requests reload durable state."},
+    {"name":"Cancellation and timeout hygiene","status":"run","reason":"The existing one-page request bound remains and stale requests terminate without writes."},
+    {"name":"Boundary pipeline trace","status":"run","reason":"GitHub page, cursor claim, input write, publication, and reload were traced."},
+    {"name":"Substrate verification","status":"run","reason":"The final sequence ran against Postgres and the app built for production."},
+    {"name":"Dogfood the built artifact","status":"run","reason":"The complete feature was previously driven in authenticated Chromium; the final store-only delta was exercised at its real database boundary."},
+    {"name":"Newly-asserted invariant ownership","status":"run","reason":"Each persistence transaction now owns both page authority and inputs."},
+    {"name":"Docs-behavior parity","status":"skipped","reason":"The final internal concurrency fix changes no documented behavior."},
+    {"name":"Demonstrative example","status":"skipped","reason":"No example changed."},
+    {"name":"Choice audit","status":"skipped","reason":"No decision trail exists for the final delta."},
+    {"name":"Complexity budget","status":"run","reason":"The fix adds one indexed conditional update per existing page transaction and no new loop."}
+  ],
+  "deterministic": [
+    {"check":"head coverage","outcome":"pass","reason":"This report targets exact head 325aebc4160eb820a57df16a1ddba4900e52cbb9."},
+    {"check":"style","outcome":"pass","reason":"Review Gate style passed for the full PR."},
+    {"check":"surfaces","outcome":"acknowledged","reason":"The three full-PR surface findings were read and verified as contract-neutral removals."},
+    {"check":"callers persistIssueStep","outcome":"acknowledged","reason":"The only runner caller mutates no state before await and reloads calculation authority on the next POST."},
+    {"check":"callers persistPullRequestStep","outcome":"acknowledged","reason":"The only runner caller mutates no state before await; stale last-page publication remains guarded by active calculation authority."},
+    {"check":"monorepo check","outcome":"pass","reason":"bun run check completed successfully on the final tree."},
+    {"check":"tests","outcome":"pass","reason":"Sixteen tests passed, including seven Postgres integration tests."},
+    {"check":"production build","outcome":"pass","reason":"The Web production build completed with the required local BETTER_AUTH_SECRET."},
+    {"check":"lint","outcome":"pass","reason":"Oxlint exited zero with inherited warnings only."},
+    {"check":"diff-check","outcome":"pass","reason":"The full base-to-head diff has no whitespace errors."},
+    {"check":"external checks","outcome":"acknowledged","reason":"Vercel Agent Review, Socket, preview comments, webhooks, and Ovation pass; separate factory fails only for missing BETTER_AUTH_SECRET."}
+  ],
+  "findings": [
+    {"id":"RG-1","state":"confirmed","claim":"A stale issues request can overwrite newer pull-request display metadata even though its page update no-ops.","evidence":"Reproduced on 95c84f0 against Postgres: branch expected feature, received undefined.","layer":"transactional caller ordering","source":"lens","path":"persistIssueStep input upsert → pull enrichment → stale issue upsert","resolution":"fixed"},
+    {"id":"RG-2","state":"issue_candidate","claim":"The separate factory deployment lacks BETTER_AUTH_SECRET.","evidence":"The exact-head Vercel factory status fails and local production collection fails without the required secret; supplying it makes the Web build pass.","layer":"deployment configuration","source":"gate","path":"factory production environment","resolution":"not_applicable"},
+    {"id":"RG-3","state":"issue_candidate","claim":"Compact Triage snapshots can replace full item prose in existing consumers.","evidence":"Snapshots intentionally store empty descriptions and comments arrays; this behavior predates the final concurrency delta.","layer":"client projection merge","source":"lens","path":"triage report snapshot → client item replacement","resolution":"not_applicable"}
+  ],
+  "exemptions": [
+    {"claim":"Three full-PR surface-map companions are absent.","evidence":"The affected deltas remove wrappers or Xref prompt prose without changing the mapped contracts."},
+    {"claim":"Final-delta callers are outside the two changed files.","evidence":"Both callers were read; neither mutates pre-call state and every subsequent POST reloads durable calculation authority."},
+    {"claim":"Vercel factory is red.","evidence":"The separate project lacks BETTER_AUTH_SECRET; the Ovation status and secret-supplied local production build pass."},
+    {"claim":"Existing lint warnings remain.","evidence":"Oxlint exits zero and neither final-delta file introduces a warning."}
+  ],
+  "issue_candidates": [
+    {"title":"Configure BETTER_AUTH_SECRET for Vercel factory","evidence":"The exact-head factory deployment fails during production configuration collection while the secret-supplied Web build passes.","why_out_of_scope":"It is separate project configuration, not Repository Triage code."},
+    {"title":"Preserve full item prose when merging compact Triage snapshots","evidence":"Persisted snapshots intentionally blank description and comments arrays and existing consumers can replace full items with them.","why_out_of_scope":"The behavior predates the final concurrency fix and was not introduced by 325aebc."}
+  ]
+}

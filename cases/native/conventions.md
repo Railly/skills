@@ -1,6 +1,6 @@
 # vercel-labs/native review conventions
 
-Bootstrapped 2026-07-17 from AGENTS.md, CONTRIBUTING.md, changelog.d/README.md.
+Bootstrapped 2026-07-17 from AGENTS.md and CONTRIBUTING.md. Refreshed 2026-08-25 against PR #405 instructions.
 
 ## Deterministic layer
 
@@ -18,7 +18,6 @@ Automation protocol pins CLI to runtime: after pulling main, rebuild the CLI (`z
 ## Surfaces
 
 ```surfaces
-* => changelog.d/<slug>.md (user-visible changes only; feature:/improvement:/fix: tag, CHANGELOG voice, never edit CHANGELOG.md directly)
 src/primitives/canvas/** => skill-data/native-ui/SKILL.md (the authoring guide mirrors engine behavior)
 src/runtime/ts_* => skill-data/ts-core/SKILL.md (the TS-tier guide mirrors adapter channels)
 src/runtime/ui_app.zig#Options => the Options field doc comments (behavior prose lives in-code)
