@@ -1,0 +1,11 @@
+{
+  "eval_id": 2,
+  "eval_name": "real-secret-cross-tenant-leak",
+  "prompt": "A multi-tenant webhook worker passes tenant A's API credential in the environment of a transform executable uploaded and controlled by tenant B. Tenant B cannot otherwise execute as the worker user or read tenant A's configuration. Classify the finding and explain the merge consequence.",
+  "assertions": [
+    "Names tenant B as the lower-trust attacker principal",
+    "Identifies the new authority granted by tenant A's credential",
+    "Classifies the observation as a vulnerability",
+    "Treats the cross-tenant leak as blocking"
+  ]
+}

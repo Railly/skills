@@ -1,0 +1,1 @@
+**Critical cross-tenant credential disclosure.** Tenant B’s executable can read and exfiltrate tenant A’s inherited environment credential. This bypasses tenant isolation despite lacking worker-user access. **Block the merge** until untrusted transforms receive no other tenant’s secrets and run in an isolated environment.

@@ -1,0 +1,1 @@
+Cannot confirm. The bypass depends on proxy behavior and the application’s trusted host source. Test both direct and proxied paths, including `Host` and forwarded-host headers, under the actual deployment configuration.

@@ -59,7 +59,7 @@ Read [references/gates.md](references/gates.md). Each **lens** declares a trigge
 When a guard has now failed review twice on the same class, stop selecting lenses for it and build a substrate differential corpus instead (see the catalog entry). A third imagination pass is evidence that the input space is larger than the reviewer's model of it.
 
 **Run `test-strength` as a mandatory behavioral proof obligation** when the diff implements or changes a protocol, parser, serializer, state machine, lifecycle, browser or OS event translation, adapter, or compatibility layer. This is not satisfied by selecting the new-domain matrix, reference-oracle, substrate, and dogfood lenses independently. Record one explicit behavioral model with its dimensions and exclusions, an oracle independent of the implementation, semantically valid producer transitions, fix-absent mutations, and a real-producer boundary drive. If any item is absent, the run is incomplete.
-
+**Run `security-review` as a mandatory security proof obligation** when the diff or stated claim touches authentication, authorization, confidentiality, integrity, credentials, secrets, origin validation, tenant isolation, sandboxing, privilege, injection, or unsafe deserialization. Record its exact-state receipt in the Review Gate report. A stale receipt, unresolved security blocker, or material verification gap makes the run incomplete. Hardening and non-security observations remain visible but do not become blockers.
 **Complete when:** every lens in the catalog is classified as triggered-and-run or skipped-with-reason.
 
 ## 5. Verify findings before reporting
@@ -78,7 +78,7 @@ Two rules bound what counts as a refutation:
 
 The report is written twice from the same content: the prose report for the human, and a run report JSON at `foundry/runs/review-gate/<date>-<repo>-<shortsha>.json` under the canonical source root, per the schema in [references/run-report.md](references/run-report.md). The JSON is the ledger's view: risk classification, properties and their oracles, carried assumptions, commit points and retry evidence, findings, lens dispositions, deterministic outcomes, and provenance. A run whose lens runtime dies or whose proof obligation is incomplete reports `run.status: incomplete` with each gap named; an incomplete run is never presented as a pass.
 
-Run `scripts/gate.sh report <run-report.json>` before writing `Status: pass`. The validator fails closed when a complete report contains proxy-only evidence, an unexercised substrate, an unverified assumption, an uncovered post-commit failure stage, a retry that was not attempted, or high-risk work without an independent challenge source.
+Run `scripts/gate.sh report <run-report.json>` before writing `Status: pass`. The validator fails closed when a complete report contains proxy-only evidence, an unexercised substrate, an unverified assumption, an uncovered post-commit failure stage, a retry that was not attempted, high-risk work without an independent challenge source, or a triggered security review without a current passing receipt.
 
 The prose report ends with two mandatory sections beyond the findings themselves:
 

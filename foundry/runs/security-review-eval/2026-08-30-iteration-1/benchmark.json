@@ -1,0 +1,432 @@
+{
+  "metadata": {
+    "skill_name": "security-review",
+    "skill_path": "skills/.experimental/security-review",
+    "executor_model": "gpt-5.6-sol",
+    "analyzer_model": "inline rubric grader",
+    "timestamp": "2026-08-31T01:13:26Z",
+    "evals_run": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 13.64,
+        "tokens": 16355,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Identifies hostile-origin or DNS-rebinding access as the security boundary",
+          "passed": true,
+          "evidence": "Calls the original browser/DNS-rebinding path the confirmed in-scope vulnerability."
+        },
+        {
+          "text": "Classifies same-user configured plugin token inheritance as hardening",
+          "passed": true,
+          "evidence": "Classifies it as informational or out_of_scope_hardening because no new authority crosses a trust boundary."
+        },
+        {
+          "text": "Classifies false startup success as a non-security lifecycle defect",
+          "passed": true,
+          "evidence": "Classifies premature startup success as non_security_defect and unrelated_bug."
+        },
+        {
+          "text": "Separates adjacent observations from the original issue scope",
+          "passed": true,
+          "evidence": "Separates both plugin inheritance and startup behavior from the original browser boundary."
+        },
+        {
+          "text": "Recommends approval when the in-scope security fix is sound",
+          "passed": true,
+          "evidence": "Explicitly recommends approval if Origin, Host, and cookie enforcement are correct."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 14.09,
+        "tokens": 16307,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Names tenant B as the lower-trust attacker principal",
+          "passed": true,
+          "evidence": "Names tenant B's executable as the recipient across the tenant boundary."
+        },
+        {
+          "text": "Identifies the new authority granted by tenant A's credential",
+          "passed": true,
+          "evidence": "Identifies new cross-tenant confidentiality and authorization capability."
+        },
+        {
+          "text": "Classifies the observation as a vulnerability",
+          "passed": true,
+          "evidence": "Uses confirmed_vulnerability."
+        },
+        {
+          "text": "Treats the cross-tenant leak as blocking",
+          "passed": true,
+          "evidence": "Explicitly blocks merge until fixed."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 12.85,
+        "tokens": 16247,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Requires an attacker-controlled path for security availability impact",
+          "passed": true,
+          "evidence": "Says security relevance would require a lower-trust principal able to trigger the failure."
+        },
+        {
+          "text": "Classifies the behavior as a non-security lifecycle defect",
+          "passed": true,
+          "evidence": "Uses non_security_defect and startup/lifecycle race."
+        },
+        {
+          "text": "Does not inflate stale local state into a vulnerability",
+          "passed": true,
+          "evidence": "Explicitly answers no and routes the stale state to lifecycle."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 14.41,
+        "tokens": 16361,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does not invent reverse-proxy behavior",
+          "passed": true,
+          "evidence": "Refuses to confirm the bypass without proxy behavior."
+        },
+        {
+          "text": "Classifies the missing deployment fact as a verification gap",
+          "passed": true,
+          "evidence": "Explicitly uses verification_gap."
+        },
+        {
+          "text": "Names the boundary evidence needed to decide exploitability",
+          "passed": true,
+          "evidence": "Requests Host and forwarded-host behavior plus application proxy-trust configuration."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 14.28,
+        "tokens": 16360,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does not treat security-shaped terminology as evidence",
+          "passed": true,
+          "evidence": "Ignores token-cache naming and evaluates actual behavior."
+        },
+        {
+          "text": "Checks whether a security-sensitive sink exists",
+          "passed": true,
+          "evidence": "States the value reaches no security-sensitive sink."
+        },
+        {
+          "text": "Classifies the issue as non-security",
+          "passed": true,
+          "evidence": "Uses non_security_defect with severity none."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 7.47,
+        "tokens": 13522,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Identifies hostile-origin or DNS-rebinding access as the security boundary",
+          "passed": true,
+          "evidence": "Calls DNS-rebinding and cross-origin access the vulnerability."
+        },
+        {
+          "text": "Classifies same-user configured plugin token inheritance as hardening",
+          "passed": false,
+          "evidence": "Correctly says it is not a vulnerability, but never assigns the requested hardening class."
+        },
+        {
+          "text": "Classifies false startup success as a non-security lifecycle defect",
+          "passed": true,
+          "evidence": "Calls it a reliability/correctness bug outside the security boundary."
+        },
+        {
+          "text": "Separates adjacent observations from the original issue scope",
+          "passed": true,
+          "evidence": "States neither adjacent observation should block the security fix."
+        },
+        {
+          "text": "Recommends approval when the in-scope security fix is sound",
+          "passed": true,
+          "evidence": "Opens with an approval recommendation conditional on correct enforcement."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 6.66,
+        "tokens": 13380,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Names tenant B as the lower-trust attacker principal",
+          "passed": true,
+          "evidence": "Names tenant B's controlled executable as the credential recipient."
+        },
+        {
+          "text": "Identifies the new authority granted by tenant A's credential",
+          "passed": true,
+          "evidence": "States tenant B can read and exfiltrate tenant A's credential and bypass tenant isolation."
+        },
+        {
+          "text": "Classifies the observation as a vulnerability",
+          "passed": true,
+          "evidence": "Classifies it as critical cross-tenant credential disclosure."
+        },
+        {
+          "text": "Treats the cross-tenant leak as blocking",
+          "passed": true,
+          "evidence": "Explicitly says block the merge."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 4.62,
+        "tokens": 13238,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Requires an attacker-controlled path for security availability impact",
+          "passed": true,
+          "evidence": "Conditions security relevance on a lower-trust actor influencing the port or startup."
+        },
+        {
+          "text": "Classifies the behavior as a non-security lifecycle defect",
+          "passed": true,
+          "evidence": "Calls it a local reliability/cleanup bug and startup race."
+        },
+        {
+          "text": "Does not inflate stale local state into a vulnerability",
+          "passed": true,
+          "evidence": "Explicitly says it is not a security vulnerability."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6667,
+        "passed": 2,
+        "failed": 1,
+        "total": 3,
+        "time_seconds": 4.31,
+        "tokens": 13236,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does not invent reverse-proxy behavior",
+          "passed": true,
+          "evidence": "Says the bypass cannot be confirmed because it depends on proxy behavior."
+        },
+        {
+          "text": "Classifies the missing deployment fact as a verification gap",
+          "passed": false,
+          "evidence": "Correctly preserves uncertainty but does not assign an explicit verification-gap classification."
+        },
+        {
+          "text": "Names the boundary evidence needed to decide exploitability",
+          "passed": true,
+          "evidence": "Requests direct and proxied tests for Host and forwarded-host headers under the actual deployment."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 4.2,
+        "tokens": 13250,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Does not treat security-shaped terminology as evidence",
+          "passed": true,
+          "evidence": "Does not infer impact from token-cache naming."
+        },
+        {
+          "text": "Checks whether a security-sensitive sink exists",
+          "passed": true,
+          "evidence": "States the label does not affect any security-sensitive operation."
+        },
+        {
+          "text": "Classifies the issue as non-security",
+          "passed": true,
+          "evidence": "Calls it a correctness/UI defect with informational or no security severity."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 13.854,
+        "stddev": 0.6325,
+        "min": 12.85,
+        "max": 14.41
+      },
+      "tokens": {
+        "mean": 16326.0,
+        "stddev": 49.558,
+        "min": 16247,
+        "max": 16361
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.8933,
+        "stddev": 0.1535,
+        "min": 0.6667,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 5.452,
+        "stddev": 1.5079,
+        "min": 4.2,
+        "max": 7.47
+      },
+      "tokens": {
+        "mean": 13325.2,
+        "stddev": 125.448,
+        "min": 13236,
+        "max": 13522
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.11",
+      "time_seconds": "+8.4",
+      "tokens": "+3001"
+    }
+  },
+  "notes": [
+    "The candidate passed all 18 assertions; the baseline passed 16 of 18.",
+    "The measurable uplift came from explicit evidence-state taxonomy: hardening for equivalent-authority plugin inheritance and verification_gap for unknown proxy behavior.",
+    "Cross-tenant leakage, local lifecycle classification, and the security-keyword near miss passed in both configurations, so those cases currently act as safety regression controls rather than differentiators.",
+    "The skill added about 8.4 seconds and 3,001 tokens per response because each run loaded the classification and receipt references."
+  ]
+}

@@ -40,6 +40,35 @@ While `schemaVersion` is 0 the schema mutates freely during dogfood: record fric
       "evidence": ""
     }
   },
+  "security_review": {
+    "status": "pass|findings|incomplete",
+    "fingerprint": {
+      "repository": "owner/repo",
+      "base_sha": "full sha",
+      "head_sha": "full sha",
+      "dirty_digest": "digest or clean",
+      "changed_path_digest": "digest",
+      "skill_revision": "revision"
+    },
+    "observations": [
+      {
+        "id": "",
+        "classification": "confirmed_vulnerability|likely_vulnerability|hardening|non_security_defect|informational|verification_gap",
+        "scope": "in_scope_security_regression|adjacent_security_blocker|out_of_scope_hardening|unrelated_bug",
+        "confidence": "high|medium|low",
+        "evidence": []
+      }
+    ],
+    "verification": {
+      "gaps": []
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": []
+    },
+    "artifact": ""
+  },
   "claim_inventory": [
     {
       "source": "contract|design|user_facing|implementation",
@@ -179,6 +208,7 @@ These restate the SKILL.md rules as data constraints: a report violating them is
 - **`provenance.same_family: true`**: author and reviewer share a model family. Recorded, not blocking, but the prose report must carry a visible warning: a same-family reviewer shares the author's priors and blind spots.
 - **`risk.level: high`**: use when the change handles secrets, auth, destructive operations, durable or externally visible state, concurrency, process lifecycle, cross-platform guarantees, or remote side effects. High risk requires `independent_challenge.satisfied: true`.
 - **`risk.independent_challenge.artifact`**: a non-empty local file containing the durable review output, trace, corpus, or report. Relative paths resolve from the run report. An unchecked URL or a claim that another reviewer was used is not auditable evidence.
+- **`security_review`**: required when the diff or stated risk touches authentication, authorization, confidentiality, integrity, credentials, secrets, origin validation, tenant isolation, sandboxing, privilege, injection, or unsafe deserialization. Its base and head must match the Review Gate run. A pass requires `status: pass`, no verification gaps, no security blockers, and no blocking vulnerability or verification-gap observation. `hardening`, `non_security_defect`, and `informational` observations remain visible without blocking promotion.
 - **`claim_inventory`**: contains exactly the four source classes `contract`, `design`, `user_facing`, and `implementation`. Each is reviewed and maps its material claims to property IDs, or records `not_provided` or `not_applicable` with evidence. This makes omission visible before proof begins.
 - **`properties`**: the proof ledger. Every material changed property appears once. `oracle.observes` names the property, not the implementation signal used as a proxy. A complete run requires every property to be `verified`, `proxy_only: false`, and every listed substrate to be `exercised` with evidence.
 - **`properties[].proxy_challenge`**: names the convenient implementation observable, constructs a state where it could hold while the property fails, and executes that counterexample. `separated` means the proxy was falsified as an oracle and cannot be the property evidence. `not_separated` means this attempt did not distinguish them; the direct oracle is still required.

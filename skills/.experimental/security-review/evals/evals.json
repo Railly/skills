@@ -1,0 +1,68 @@
+{
+	"skill_name": "security-review",
+	"evals": [
+		{
+			"id": 1,
+			"name": "agent-browser-trust-boundary-classification",
+			"prompt": "Review a dashboard security PR. The original issue is that a hostile website can reach a locally running dashboard through browser requests and DNS rebinding unless Origin and Host are validated and external access requires an unguessable cookie. The proposed fix adds those controls. Two adjacent observations appear: the dashboard access token is inherited by user-configured stdio plugins that already execute arbitrary commands as the same OS user, and dashboard startup reports success before its child proves it bound the requested port. Decide what is a vulnerability, what blocks approval, and whether to approve if the origin and cookie boundary is correctly enforced.",
+			"expected_output": "The review identifies the hostile-origin or DNS-rebinding path as the actual vulnerability, treats token inheritance by same-user configured plugins as hardening because it grants no new principal authority, treats false startup success as a lifecycle defect, and recommends approval when the in-scope security claim is verified.",
+			"assertions": [
+				"Identifies hostile-origin or DNS-rebinding access as the security boundary",
+				"Classifies same-user configured plugin token inheritance as hardening",
+				"Classifies false startup success as a non-security lifecycle defect",
+				"Separates adjacent observations from the original issue scope",
+				"Recommends approval when the in-scope security fix is sound"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "real-secret-cross-tenant-leak",
+			"prompt": "A multi-tenant webhook worker passes tenant A's API credential in the environment of a transform executable uploaded and controlled by tenant B. Tenant B cannot otherwise execute as the worker user or read tenant A's configuration. Classify the finding and explain the merge consequence.",
+			"expected_output": "The review identifies a cross-tenant trust-boundary crossing that grants tenant B new authority through tenant A's credential, classifies it as a vulnerability, and treats it as a security blocker.",
+			"assertions": [
+				"Names tenant B as the lower-trust attacker principal",
+				"Identifies the new authority granted by tenant A's credential",
+				"Classifies the observation as a vulnerability",
+				"Treats the cross-tenant leak as blocking"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "availability-vs-lifecycle",
+			"prompt": "A local developer daemon writes its PID file and returns success before binding its loopback port. If the port is occupied, the child exits and leaves stale state. No remote input or lower-trust local principal can select the port or trigger startup. Is this a security vulnerability?",
+			"expected_output": "The review classifies the behavior as a lifecycle or reliability defect, not an availability vulnerability, because no attacker-controlled boundary or new denial capability is demonstrated.",
+			"assertions": [
+				"Requires an attacker-controlled path for security availability impact",
+				"Classifies the behavior as a non-security lifecycle defect",
+				"Does not inflate stale local state into a vulnerability"
+			],
+			"files": []
+		},
+		{
+			"id": 4,
+			"name": "missing-deployment-assumption",
+			"prompt": "An application authorizes requests by comparing the request host to an allowlist. It may run behind a reverse proxy, but the repository does not say whether forwarded headers are trusted, stripped, or rewritten. Confirm that host spoofing bypasses authorization.",
+			"expected_output": "The review refuses to confirm exploitability without the proxy and deployment trust assumptions, records a verification gap, and proposes bounded verification of the effective host at the real boundary.",
+			"assertions": [
+				"Does not invent reverse-proxy behavior",
+				"Classifies the missing deployment fact as a verification gap",
+				"Names the boundary evidence needed to decide exploitability"
+			],
+			"files": []
+		},
+		{
+			"id": 5,
+			"name": "security-keyword-near-miss",
+			"prompt": "The file token-cache.ts has an off-by-one parser bug that drops the final character of a local display label. The value is never used for authentication, authorization, lookup, execution, or network access. Perform a security review and assign severity.",
+			"expected_output": "The review does not infer security impact from the filename or token terminology and classifies the issue as a non-security correctness defect.",
+			"assertions": [
+				"Does not treat security-shaped terminology as evidence",
+				"Checks whether a security-sensitive sink exists",
+				"Classifies the issue as non-security"
+			],
+			"files": []
+		}
+	]
+}

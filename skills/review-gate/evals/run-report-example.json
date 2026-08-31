@@ -31,6 +31,35 @@
 			"evidence": "Claude reviewed the frozen tree and the built artifact was driven through failure and retry."
 		}
 	},
+	"security_review": {
+		"status": "pass",
+		"fingerprint": {
+			"repository": "owner/example-repo",
+			"base_sha": "main",
+			"head_sha": "abc1234",
+			"dirty_digest": "clean",
+			"changed_path_digest": "sha256:example",
+			"skill_revision": "security-review@0.0.10"
+		},
+		"observations": [
+			{
+				"id": "SEC-001",
+				"classification": "hardening",
+				"scope": "out_of_scope_hardening",
+				"confidence": "high",
+				"evidence": ["The subprocess already executes with equivalent operating-system authority."]
+			}
+		],
+		"verification": {
+			"gaps": []
+		},
+		"merge_relevance": {
+			"security_blockers": [],
+			"follow_ups": ["Scrub inherited credentials as defense in depth."],
+			"routed_non_security_defects": []
+		},
+		"artifact": "security-review-example.json"
+	},
 	"claim_inventory": [
 		{
 			"source": "contract",
