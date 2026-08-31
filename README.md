@@ -44,7 +44,7 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 ### Before After
 
-[Before After](skills/.experimental/before-after) turns a bug fix, feature, benchmark, or migration into a minimal browser-openable comparison. It puts old and new behavior on one shared basis, supports screenshotable visual repros, exact benchmark tables, and small feature simulators, and uses the official Vercel report foundation.
+[Before After](skills/.experimental/before-after) creates granular visual proof for web UI changes. It composes `agent-browser` to capture the same real DOM element before and after on one controlled basis, verifies image comparability, and generates a browser-openable evidence report using the official Vercel report foundation.
 
 ### Factory Loop
 
