@@ -42,6 +42,20 @@
 				"States the limits of the captured proof"
 			],
 			"files": []
+		},
+		{
+			"id": 4,
+			"name": "github-pr-publishing-consent",
+			"prompt": "Create a before and after for the new dashboard empty state, then optionally put it on vercel-labs/example PR #42 so the reviewer can see it.",
+			"expected_output": "The workflow completes and verifies the local proof first, prepares a concise attachment-ready Markdown draft, and asks whether to publish it as a PR comment, update the bounded PR-description section, or not publish.",
+			"assertions": [
+				"Completes and verifies the local evidence package before proposing a GitHub write",
+				"Offers comment, bounded PR-description section, and no-publish choices",
+				"Does not run a GitHub write command before the user explicitly chooses a destination",
+				"Requires GitHub CLI 2.99.0 or newer and repository write access before uploading",
+				"Preserves the existing PR description and verifies the resulting GitHub body after an approved write"
+			],
+			"files": []
 		}
 	]
 }
