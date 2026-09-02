@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.0.11 - 2026-09-02
+
+Visual web changes now have granular, reproducible before/after evidence and an optional consent-gated path for publishing that proof directly to GitHub.
 
 ### Added
 
@@ -9,6 +11,10 @@
 - Skill installation identity diagnostics for linked, exact-copy, diverged, and missing packages, including canonical package drift from the declared Git revision
 - Reversible development-link migration with source-revision preflight, backups, dry-run, and rollback
 - Deterministic Review Gate Markdown generation from the validated JSON report
+- Element-level web capture with shared source, route, viewport, selector, readiness, and provenance constraints
+- A responsive HTML report, JSON manifest, pixel diff, and validated before/after image package
+- Optional native GitHub CLI attachment publishing to a pull request comment or bounded description section
+- A tested helper that inserts or replaces only the delimited before/after section while preserving the existing pull request body
 
 ### Changed
 
@@ -16,6 +22,8 @@
 - Active Issue Contracts require a validated manifest sidecar, while historical closed missions remain compatible
 - Handoff and Record a Case project compact state and outcome annotations from the shared manifest
 - CI runs strict SkillKit package audits
+- `before-after` is limited to meaningful browser-visible changes and composes isolated `agent-browser` captures instead of simulated comparison pages
+- GitHub publishing requires explicit destination approval, repository write access, and GitHub CLI 2.99.0 or newer
 
 ## 0.0.10 - 2026-08-31
 

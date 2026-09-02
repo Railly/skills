@@ -1,14 +1,14 @@
 ---
 name: before-after
-description: "Create granular, browser-openable visual proof for a web UI change by capturing the same real DOM element or page state before and after with agent-browser. Use when a web bug fix, component change, responsive adjustment, loading state, interaction, or styling change has a visible browser result worth demonstrating, including show me, prove the visual fix, before and after, antes y despues, screenshot the change, or make it reviewable. Do not use for backend-only changes, migrations, benchmarks, performance claims, native desktop UI, code explanations, or changes with no meaningful visible web delta."
-compatibility: "Requires agent-browser, Bun, a writable artifact directory, and browser-accessible baseline and changed states."
+description: "Create granular, browser-openable visual proof for a web UI change by capturing the same real DOM element or page state before and after with agent-browser. Use when a web bug fix, component change, responsive adjustment, loading state, interaction, or styling change has a visible browser result worth demonstrating, including show me, prove the visual fix, before and after, antes y despues, screenshot the change, make it reviewable, or attach the before and after to a GitHub pull request. Do not use for backend-only changes, migrations, benchmarks, performance claims, native desktop UI, code explanations, or changes with no meaningful visible web delta."
+compatibility: "Requires agent-browser, Bun, a writable artifact directory, and browser-accessible baseline and changed states. Optional GitHub attachment publishing requires GitHub CLI 2.99.0 or newer."
 ---
 
 # Before after
 
 Produce honest, element-level evidence for a visible web change by composing existing `agent-browser` commands.
 
-Read [the capture protocol](references/capture-protocol.md), [the visual proof patterns](references/patterns.md), and [the Vercel visual system](references/vercel-visual-system.md) completely before acting. Load the installed `agent-browser` core skill before running browser commands.
+Read [the capture protocol](references/capture-protocol.md), [the visual proof patterns](references/patterns.md), and [the Vercel visual system](references/vercel-visual-system.md) completely before acting. Load the installed `agent-browser` core skill before running browser commands. Read [GitHub publishing](references/github-publishing.md) only when the user wants the proof shared on a GitHub issue or pull request.
 
 ## Visual gate
 
@@ -69,3 +69,15 @@ subject/
 Open the generated HTML with `agent-browser`. Inspect desktop and narrow viewports plus light and dark OS themes. Confirm that the first viewport presents both captures, labels and provenance stand alone, images are sharp and unclipped, and limits are explicit.
 
 Open the report for the user and return links to the HTML, `before.png`, and `after.png`, plus validation status. Do not commit, push, deploy, or mutate the baseline solely because this skill ran.
+
+## Optional GitHub publishing
+
+Finish and verify the local evidence package before offering to publish it. Prepare a concise Markdown block that references the local `before.png` and `after.png`, then ask the user where to put it:
+
+- A new pull request comment.
+- A bounded section in the pull request description.
+- Do not publish.
+
+Treat the answer as approval for that exact repository, pull request, body, and destination only. Show the draft before asking when its wording is not already obvious from the artifact.
+
+Do not run a GitHub write command without an explicit choice. Do not infer approval from a request to create, open, or inspect the before/after. If the user chooses the description, preserve the existing body and replace only the delimited before/after section. Follow [GitHub publishing](references/github-publishing.md) for version checks, attachment syntax, access checks, and safe body handling.
