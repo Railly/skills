@@ -271,6 +271,14 @@ check_producers() {
 # Provenance: portless #367 round 4 (ctate-confirmed): a 1500ms CLI poll ceiling
 # sized against DEBOUNCE_MS=100 while the daemon's watcher fallback ran at
 # POLL_INTERVAL_MS=3000, same file, 550 lines away.
+# Rewrite Rust `NAME: Duration = Duration::from_secs(N)` / `from_millis(N)` as
+# `NAME = <ms>` so Duration ceilings take the same path as integer ones.
+normalize_durations() {
+	sed -E \
+		-e 's/([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*:[[:space:]]*([a-z:]*::)?Duration[[:space:]]*=[[:space:]]*([a-z:]*::)?Duration::from_secs\(([0-9_]+)\)/\1 = \4000/' \
+		-e 's/([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*:[[:space:]]*([a-z:]*::)?Duration[[:space:]]*=[[:space:]]*([a-z:]*::)?Duration::from_millis\(([0-9_]+)\)/\1 = \4/'
+}
+
 check_timings() {
 	local ref=""
 	if [[ -n "${1:-}" ]] && git rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then
@@ -292,7 +300,7 @@ check_timings() {
 	changed_files=$(git diff --name-only "$base" -- "${@:-.}" 2>/dev/null | grep -vE '(test|spec)\.' || true)
 	local added_consts
 	added_consts=$(git diff "$base" --unified=0 -- "${@:-.}" 2>/dev/null |
-		grep -E '^\+' | grep -vE '^\+\+\+' |
+		grep -E '^\+' | grep -vE '^\+\+\+' | normalize_durations |
 		grep -oE "${ceiling_re}[[:space:]]*[:=][[:space:]]*[0-9_]+" |
 		sed -E 's/[[:space:]]*[:=][[:space:]]*/ /' | sort -u || true)
 	# A ceiling bound to an expression over other constants is the shape this
@@ -317,7 +325,7 @@ check_timings() {
 	local all_consts=""
 	while IFS= read -r f; do
 		[[ -z "$f" || ! -f "$f" ]] && continue
-		all_consts+=$(grep -hoE "$any_re" "$f" 2>/dev/null |
+		all_consts+=$(normalize_durations <"$f" 2>/dev/null | grep -hoE "$any_re" |
 			sed -E 's/[[:space:]]*[:=][[:space:]]*/ /' | tr -d '_')$'\n'
 	done <<<"$changed_files"
 	all_consts=$(printf '%s' "$all_consts" | sort -u)
@@ -335,7 +343,10 @@ check_timings() {
 			findings=1
 		fi
 	done <<<"$added_consts"
-	[[ $findings -eq 0 ]] && echo "PASS [timings] every added ceiling clears the timing constants in the changed files"
+	if [[ $findings -eq 0 ]]; then
+		echo "NOTE [timings] no larger timing constant in the changed files. Name the consumer's timeout (the caller or client waiting on this path, often in an unchanged file) and confirm each ceiling stays below it:"
+		sed -E 's/^([^ ]+) (.*)$/    \1 = \2/' <<<"$added_consts"
+	fi
 	return $findings
 }
 
