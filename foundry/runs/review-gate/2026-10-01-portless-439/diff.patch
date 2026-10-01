@@ -1,0 +1,109 @@
+diff --git a/README.md b/README.md
+index a0b39fc..609de9b 100644
+--- a/README.md
++++ b/README.md
+@@ -191,7 +191,7 @@ portless docs.myapp next dev
+ # -> https://docs.myapp.localhost
+ ```
+ 
+-By default, only explicitly registered subdomains are routed (strict mode). Use `--wildcard` when starting the proxy to allow any subdomain of a registered route to fall back to that app (e.g. `tenant1.myapp.localhost` routes to the `myapp` app without extra registration).
++By default, only explicitly registered subdomains are routed (strict mode). Use `--wildcard` when starting the proxy to allow any subdomain of a registered route to fall back to that app (e.g. `tenant1.myapp.localhost` routes to the `myapp` app without extra registration). When several registered routes are parents of the host, the most specific one wins (`admin.api.myapp.localhost` routes to `api.myapp`, not `myapp`).
+ 
+ ## Git Worktrees
+ 
+diff --git a/packages/portless/src/proxy.test.ts b/packages/portless/src/proxy.test.ts
+index 4aa2407..9be2749 100644
+--- a/packages/portless/src/proxy.test.ts
++++ b/packages/portless/src/proxy.test.ts
+@@ -186,6 +186,33 @@ describe("createProxyServer", () => {
+       expect(res.body).toBe("hello from ipv6 backend");
+     });
+ 
++    it("routes a wildcard subdomain to the most specific parent in any order (issue #380)", async () => {
++      const backends = await Promise.all(
++        ["parent", "child"].map(async (name) => {
++          const backend = trackServer(http.createServer((_req, res) => res.end(name)));
++          await listen(backend);
++          const addr = backend.address();
++          if (!addr || typeof addr === "string") throw new Error("no addr");
++          return addr.port;
++        })
++      );
++      const parent = { hostname: "acme.localhost", port: backends[0] };
++      const child = { hostname: "api.acme.localhost", port: backends[1] };
++
++      for (const routes of [
++        [parent, child],
++        [child, parent],
++      ]) {
++        const server = trackServer(
++          createProxyServer({ getRoutes: () => routes, proxyPort: TEST_PROXY_PORT, strict: false })
++        );
++        await listen(server);
++        expect((await request(server, { host: "admin.api.acme.localhost" })).body).toBe("child");
++        expect((await request(server, { host: "tenant.acme.localhost" })).body).toBe("parent");
++        expect((await request(server, { host: "api.acme.localhost" })).body).toBe("child");
++      }
++    });
++
+     it("routes wildcard subdomain to matching parent route when strict is false", async () => {
+       const backend = trackServer(
+         http.createServer((_req, res) => {
+diff --git a/packages/portless/src/proxy.ts b/packages/portless/src/proxy.ts
+index ea8b27f..9d31155 100644
+--- a/packages/portless/src/proxy.ts
++++ b/packages/portless/src/proxy.ts
+@@ -186,12 +186,30 @@ function normalizeAuthority(host: string): string {
+   return lower.endsWith(":443") ? lower.slice(0, -":443".length) : lower;
+ }
+ 
++function findMostSpecificParent<T extends { hostname: string }>(
++  routes: T[],
++  hostname: string
++): T | undefined {
++  let best: T | undefined;
++  for (const r of routes) {
++    if (
++      hostname.endsWith("." + r.hostname.toLowerCase()) &&
++      (!best || r.hostname.length > best.hostname.length)
++    ) {
++      best = r;
++    }
++  }
++  return best;
++}
++
+ /**
+  * Find the route matching a request's host, which may include a port. Match
+  * order: local hostname, tailscale authority (hostname and port), tailscale
+  * hostname ignoring port, then wildcard subdomain. The authority tier
+  * disambiguates apps sharing a `.ts.net` hostname on different ports; the
+- * hostname tier keeps other-port requests resolving. `strict` drops the wildcard.
++ * hostname tier keeps other-port requests resolving. The wildcard tier picks the
++ * longest registered parent, so nested routes resolve regardless of storage
++ * order. `strict` drops the wildcard.
+  * All comparisons run against the normalized authority so they are
+  * case-insensitive and treat an explicit `:443` as the default HTTPS port.
+  */
+@@ -206,7 +224,7 @@ function findRoute(
+     routes.find((r) => r.hostname.toLowerCase() === hostname) ||
+     routes.find((r) => tailscaleAuthority(r.tailscaleUrl) === authority) ||
+     routes.find((r) => tailscaleAuthority(r.tailscaleUrl)?.split(":")[0] === hostname) ||
+-    (strict ? undefined : routes.find((r) => hostname.endsWith("." + r.hostname.toLowerCase())))
++    (strict ? undefined : findMostSpecificParent(routes, hostname))
+   );
+ }
+ 
+diff --git a/skills/portless/SKILL.md b/skills/portless/SKILL.md
+index e6ba2d5..f23bdd7 100644
+--- a/skills/portless/SKILL.md
++++ b/skills/portless/SKILL.md
+@@ -133,7 +133,7 @@ portless api.myapp pnpm start    # https://api.myapp.localhost
+ portless docs.myapp next dev     # https://docs.myapp.localhost
+ ```
+ 
+-By default, only explicitly registered subdomains are routed (strict mode). Start the proxy with `--wildcard` to allow any subdomain of a registered route to fall back to that app (e.g. `tenant1.myapp.localhost` routes to the `myapp` app). Exact matches always take priority over wildcards.
++By default, only explicitly registered subdomains are routed (strict mode). Start the proxy with `--wildcard` to allow any subdomain of a registered route to fall back to that app (e.g. `tenant1.myapp.localhost` routes to the `myapp` app). Exact matches always take priority over wildcards. When several registered routes are parents of the host, the most specific one wins (`admin.api.myapp.localhost` routes to `api.myapp`, not `myapp`).
+ 
+ ### Git worktrees
+ 

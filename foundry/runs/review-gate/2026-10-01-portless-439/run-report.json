@@ -1,0 +1,212 @@
+{
+ "schemaVersion": 1,
+ "run": {
+  "date": "2026-10-01",
+  "repo": "vercel-labs/portless",
+  "pr": 446,
+  "base": "ef41e79ea0e87c32e98be1ffd0cbea017d195d1d",
+  "head": "2d14f20b78b6fe3f68d1cc6888f0754876d78be6",
+  "profile": "standard",
+  "skill_revision": "git:cecfda005fbcb8760d619a4314cb2a620837568f",
+  "status": "complete",
+  "verdict": "pass",
+  "gaps": []
+ },
+ "execution": {
+  "mode": "fx_worker",
+  "degraded_from": null,
+  "independence_gap": null,
+  "receipt": "fx-review.json",
+  "schema_failures": 0,
+  "operations": [
+   {
+    "operation": "FX worker review",
+    "attempted_calls": 1,
+    "schema_failures": 0,
+    "identical_retry": false
+   }
+  ]
+ },
+ "contract": {
+  "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-10-01-portless-439/contract.json",
+  "spec_status": "pass",
+  "acceptance_reviewed": [
+   "A1",
+   "A2",
+   "A3",
+   "A4"
+  ],
+  "gaps": []
+ },
+ "provenance": {
+  "author_model": "claude-opus-5.5 (recreating Knat-Dev #439)",
+  "reviewer_model": "moonshotai/kimi-k3-fast (FX)",
+  "same_family": false,
+  "note": "Cross-family FX review."
+ },
+ "risk": {
+  "level": "standard",
+  "triggers": [
+   "route resolution order"
+  ],
+  "independent_challenge": {
+   "required": false,
+   "satisfied": true,
+   "method": "cross_family_review",
+   "artifact": "fx-review.json",
+   "evidence": "FX ran a 10-case adversarial suite (case, ports, label boundary, multi-TLD, 3-level nesting) and confirmed red on origin/main."
+  }
+ },
+ "claim_inventory": [
+  {
+   "source": "contract",
+   "location": "contract.json",
+   "status": "reviewed",
+   "properties": [
+    "P1"
+   ],
+   "evidence": "A1-A4."
+  },
+  {
+   "source": "design",
+   "location": "PR #439 body",
+   "status": "reviewed",
+   "properties": [
+    "P1"
+   ],
+   "evidence": "Longest matching parent wins."
+  },
+  {
+   "source": "user_facing",
+   "location": "README, SKILL.md, cli.ts --help",
+   "status": "reviewed",
+   "properties": [
+    "P1"
+   ],
+   "evidence": "All three say the most specific parent wins."
+  },
+  {
+   "source": "implementation",
+   "location": "packages/portless/src/proxy.ts findMostSpecificParent/findRoute",
+   "status": "reviewed",
+   "properties": [
+    "P1"
+   ],
+   "evidence": "Only the wildcard tier changed; single consumer findRoute."
+  }
+ ],
+ "properties": [
+  {
+   "id": "P1",
+   "claim": "Wildcard fallback resolves to the most specific registered parent regardless of storage order.",
+   "kind": "contract",
+   "status": "verified",
+   "oracle": {
+    "observes": "which backend answers each Host",
+    "layer": "built CLI end to end",
+    "method": "register acme/api.acme in both orders, curl four hosts, wildcard and strict",
+    "proxy_only": false
+   },
+   "proxy_challenge": {
+    "proxy": "unit test with in-memory routes",
+    "counterexample": "unit test passes while CLI route storage order still decides",
+    "attempted": true,
+    "outcome": "separated",
+    "evidence": "Built CLI: main acme-first gives acme, fix gives api.acme in both orders."
+   },
+   "substrates": [
+    {
+     "name": "built CLI macOS --no-tls port 1397",
+     "status": "exercised",
+     "evidence": "Both orders plus strict control."
+    },
+    {
+     "name": "vitest proxy.test.ts",
+     "status": "exercised",
+     "evidence": "Red on main (Received parent), green on fix."
+    }
+   ],
+   "evidence": "E2E and unit test agree."
+  }
+ ],
+ "stage_receipts": {
+  "test_strength": {
+   "required": false,
+   "status": "not_triggered",
+   "reason": "Single comparison mechanism; removing it (main) turns the test red."
+  },
+  "resilience": {
+   "required": false,
+   "status": "not_triggered",
+   "reason": "Pure in-memory route selection; no side effects."
+  }
+ },
+ "assumptions": [
+  {
+   "id": "AS1",
+   "source": "utils.ts parseHostname",
+   "claim": "Route hostnames are stored lowercase ASCII, so raw length equals lowercased length",
+   "status": "verified",
+   "evidence": "parseHostname lowercases and validates /^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$/ (FX check)."
+  }
+ ],
+ "lenses": [
+  {
+   "name": "correctness",
+   "status": "run",
+   "evidence": "FX adversarial suite."
+  },
+  {
+   "name": "docs-behavior-parity",
+   "status": "run",
+   "evidence": "README, SKILL.md, --help updated; docs site only lists the flag."
+  },
+  {
+   "name": "security",
+   "status": "skipped",
+   "reason": "No auth, origin or secret surface."
+  }
+ ],
+ "deterministic": [
+  {
+   "check": "style",
+   "outcome": "pass"
+  },
+  {
+   "check": "surfaces",
+   "outcome": "pass"
+  },
+  {
+   "check": "siblings",
+   "outcome": "acknowledged",
+   "reason": "Other wildcard mentions are flag listings or changelog; none describe parent resolution."
+  },
+  {
+   "check": "format/lint/type-check/build",
+   "outcome": "pass"
+  },
+  {
+   "check": "test",
+   "outcome": "acknowledged",
+   "reason": "Failures identical to origin/main baseline (comm diff 0); detectPackageManager is flaky."
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "state": "confirmed",
+   "severity": "note",
+   "summary": "--help did not mention most-specific-parent rule",
+   "resolution": "fixed"
+  },
+  {
+   "id": "F2",
+   "state": "refuted",
+   "severity": "note",
+   "summary": "Raw vs lowercased length could diverge for non-ASCII",
+   "resolution": "not_applicable"
+  }
+ ],
+ "exemptions": [],
+ "issue_candidates": []
+}
