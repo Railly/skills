@@ -16,3 +16,6 @@ Stub logging received headers: http URL and numeric port both carried `authoriza
 
 ## Lesson
 A secret-bearing flag needs an errors-never-echo test, like the existing curl-cookies one.
+
+## Escaped from this fix (caught by a later session, 24729a2a)
+Threading headers into discovery made them leak in plaintext: discovery hardcoded `http://`/`ws://`, so `--cdp https://host:port/...` sent `Authorization` unencrypted to `/json/version`. Fixed by carrying `secure` from the input scheme through every discovery request, with no plaintext fallback. Lesson: when a fix starts sending a secret on an existing path, check that path's transport, not only that the secret arrives. The stub in the dogfood was plain HTTP, so it could not see this.
