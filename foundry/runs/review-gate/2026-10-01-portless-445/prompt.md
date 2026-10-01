@@ -1,0 +1,7 @@
+You are an independent code reviewer. Review the uncommitted+committed diff of this repo against origin/main (run: git diff origin/main). Repo: vercel-labs/portless proxy. Change: plain (non-upgrade) proxied requests now delete client hop-by-hop request headers connection, keep-alive, proxy-connection, upgrade before forwarding to the HTTP/1.1 backend (packages/portless/src/proxy.ts). Claim: forwarded Connection: keep-alive left the backend socket open after the response with no error listener (http.request with createConnection, no agent), so a backend reset crashed the proxy with unhandled ECONNRESET (issue #434).
+Check adversarially and report only confirmed problems with file:line:
+1. Is the root-cause claim correct? Could the socket still linger without an error listener in any path (e.g. HTTP/2 client requests through the same handler, chunked bodies, 1xx/100-continue, response without body)?
+2. Does stripping these headers break anything: Expect: 100-continue, TE: trailers, request smuggling, websocket upgrade paths (must be unchanged), SSE/streaming.
+3. Should headers named in the Connection header value tokens also be stripped (RFC 9110 7.6.1)? Is omitting that a real defect here or a hardening note?
+4. Test quality: do the new tests in proxy.test.ts fail without the fix and pin each removed header?
+Output JSON: {"verdict":"pass|findings","findings":[{"severity":"blocker|major|minor|note","file":"","line":0,"claim":"","evidence":""}]}

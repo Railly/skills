@@ -1,0 +1,279 @@
+{
+ "schemaVersion": 1,
+ "run": {
+  "date": "2026-10-01",
+  "repo": "vercel-labs/portless",
+  "pr": 445,
+  "base": "ef41e79ea0e87c32e98be1ffd0cbea017d195d1d",
+  "head": "8cbb6e413400e7e0826ffedaff42a0701fcb2d71",
+  "profile": "standard",
+  "skill_revision": "git:04391dd0d7ff0ce439baf2591f1db1a9a04666e7",
+  "status": "complete",
+  "verdict": "pass",
+  "gaps": []
+ },
+ "execution": {
+  "mode": "fx_worker",
+  "degraded_from": null,
+  "independence_gap": null,
+  "receipt": "fx-review.json",
+  "schema_failures": 1,
+  "operations": [
+   {
+    "operation": "FX wrapper (pre-fix, auth parser rejected fx 0.0.12 stored key)",
+    "attempted_calls": 1,
+    "schema_failures": 1,
+    "identical_retry": false
+   },
+   {
+    "operation": "Inspect fx status once",
+    "attempted_calls": 1,
+    "schema_failures": 0,
+    "identical_retry": false
+   },
+   {
+    "operation": "occam native review",
+    "attempted_calls": 1,
+    "schema_failures": 0,
+    "identical_retry": false
+   },
+   {
+    "operation": "FX worker after wrapper fix",
+    "attempted_calls": 1,
+    "schema_failures": 0,
+    "identical_retry": false
+   }
+  ]
+ },
+ "contract": {
+  "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-10-01-portless-445/contract.json",
+  "spec_status": "pass",
+  "acceptance_reviewed": [
+   "A1",
+   "A2",
+   "A3",
+   "A4"
+  ],
+  "gaps": []
+ },
+ "provenance": {
+  "author_model": "claude-opus-5.5 (recreating Knat-Dev #440)",
+  "reviewer_model": "moonshotai/kimi-k3-fast (FX, cross-family) plus claude-opus-5.5 (occam)",
+  "same_family": false,
+  "note": "Cross-family FX pass; occam is a same-family second pass."
+ },
+ "risk": {
+  "level": "high",
+  "triggers": [
+   "proxy request forwarding",
+   "P1 is a socket-lifecycle property (validator highRiskKinds)"
+  ],
+  "independent_challenge": {
+   "required": true,
+   "satisfied": true,
+   "method": "cross_family_review",
+   "artifact": "fx-review.json",
+   "evidence": "kimi-k3-fast reproduced the pre-fix ECONNRESET and confirmed tests fail on origin/main; verdict pass, two notes."
+  }
+ },
+ "claim_inventory": [
+  {
+   "source": "contract",
+   "location": "conversation A1-A4",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "A1-A4 cover crash, survival, header stripping, chunked body."
+  },
+  {
+   "source": "design",
+   "location": "PR #440 body",
+   "status": "reviewed",
+   "properties": [
+    "P1"
+   ],
+   "evidence": "Root cause: forwarded keep-alive leaves agentless socket without error listener."
+  },
+  {
+   "source": "user_facing",
+   "location": "PR #445 body",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "Body claims match observed behavior."
+  },
+  {
+   "source": "implementation",
+   "location": "packages/portless/src/proxy.ts:39-44,355-357",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "Plain-request path only; upgrade paths untouched."
+  }
+ ],
+ "properties": [
+  {
+   "id": "P1",
+   "claim": "Proxy survives a backend resetting a kept-alive connection.",
+   "kind": "lifecycle",
+   "status": "verified",
+   "oracle": {
+    "observes": "proxy listener and next response after backend reset",
+    "layer": "built CLI end to end",
+    "method": "isolated proxy on 1399, keep-alive request, backend resetAndDestroy, next curl",
+    "proxy_only": false
+   },
+   "proxy_challenge": {
+    "proxy": "unit test uncaughtException capture",
+    "counterexample": "test passes while real CLI still dies",
+    "attempted": true,
+    "outcome": "separated",
+    "evidence": "Built CLI: main DOWN with read ECONNRESET, fix UP and next request ok."
+   },
+   "substrates": [
+    {
+     "name": "built CLI macOS --no-tls",
+     "status": "exercised",
+     "evidence": "main vs fix table"
+    },
+    {
+     "name": "Windows Server 2025 real console (run 36924262063)",
+     "status": "exercised",
+     "evidence": "main: after=NO-RESPONSE proxy_up=False, console shows read ECONNRESET (windows-main.png); fix: after=ok proxy_up=True (windows-fix.png); 434 unit tests green on Windows."
+    }
+   ],
+   "evidence": "Test red on main, green on fix; E2E confirms."
+  },
+  {
+   "id": "P2",
+   "claim": "Client hop-by-hop headers are not forwarded; chunked bodies intact.",
+   "kind": "contract",
+   "status": "verified",
+   "oracle": {
+    "observes": "headers and body received by backend",
+    "layer": "backend request",
+    "method": "record req.headers and body",
+    "proxy_only": false
+   },
+   "proxy_challenge": {
+    "proxy": "test assertions",
+    "counterexample": "one header dropped from list with tests still green",
+    "attempted": true,
+    "outcome": "separated",
+    "evidence": "Each of 4 headers removed individually turns tests red (upgrade after adding assertion)."
+   },
+   "substrates": [
+    {
+     "name": "vitest proxy.test.ts",
+     "status": "exercised",
+     "evidence": "84 pass, 1 known pre-existing failure"
+    }
+   ],
+   "evidence": "Force-red per header by author and occam."
+  }
+ ],
+ "stage_receipts": {
+  "test_strength": {
+   "required": false,
+   "status": "not_triggered",
+   "reason": "Single list-based mechanism; per-element force-red performed in-gate."
+  },
+  "resilience": {
+   "required": false,
+   "status": "not_triggered",
+   "reason": "No production side-effect signal once *.test.* files are excluded; the change removes a lingering-socket path and adds no commit points."
+  }
+ },
+ "assumptions": [
+  {
+   "id": "AS1",
+   "source": "Node http ClientRequest defaults",
+   "claim": "Agentless createConnection requests send Connection: close when no client header is forwarded",
+   "status": "verified",
+   "evidence": "Backend received connection: close in the A3 test."
+  }
+ ],
+ "lenses": [
+  {
+   "status": "run",
+   "evidence": "occam root-cause analysis incl. 100-continue, aborted clients, HTTP/2.",
+   "name": "correctness"
+  },
+  {
+   "status": "run",
+   "evidence": "No docs describe header forwarding.",
+   "name": "docs-behavior-parity"
+  },
+  {
+   "status": "skipped",
+   "reason": "No auth/origin/secret surface; smuggling checked by occam, no new exposure.",
+   "name": "security"
+  }
+ ],
+ "deterministic": [
+  {
+   "check": "style",
+   "outcome": "pass"
+  },
+  {
+   "check": "surfaces",
+   "outcome": "acknowledged",
+   "reason": "README, SKILL.md, cli.ts contain no header-forwarding behavior (grep keep-alive/hop-by-hop empty)."
+  },
+  {
+   "check": "siblings",
+   "outcome": "acknowledged",
+   "reason": "Unadded hop-by-hop lines describe existing response stripping, still accurate."
+  },
+  {
+   "check": "format/lint/type-check/build",
+   "outcome": "pass"
+  },
+  {
+   "check": "test",
+   "outcome": "acknowledged",
+   "reason": "Failures match origin/main or are flaky (2 pass 3/3 isolated)."
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "severity": "minor",
+   "summary": "upgrade header removal unpinned by tests",
+   "resolution": "fixed",
+   "state": "confirmed"
+  },
+  {
+   "id": "F2",
+   "severity": "note",
+   "summary": "Headers named in Connection tokens still forwarded (RFC 9110 7.6.1)",
+   "state": "exempted",
+   "resolution": "not_applicable"
+  },
+  {
+   "id": "F3",
+   "severity": "note",
+   "summary": "Expect: 100-continue path re-adds keep-alive; no lingering socket observed on patch or main",
+   "state": "refuted",
+   "resolution": "not_applicable"
+  }
+ ],
+ "exemptions": [
+  {
+   "item": "surfaces",
+   "evidence": "No user-facing behavior or flag changed."
+  }
+ ],
+ "issue_candidates": [
+  {
+   "title": "Proxy forwards headers named in Connection tokens",
+   "evidence": "occam raw request: backend received x-secret."
+  }
+ ]
+}
