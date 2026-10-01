@@ -5,7 +5,7 @@ Repository: vercel-labs/portless
 Base: `ef41e79ea0e87c32e98be1ffd0cbea017d195d1d`
 Head: `8cbb6e413400e7e0826ffedaff42a0701fcb2d71`
 Profile: standard
-Skill revision: `git:04391dd0d7ff0ce439baf2591f1db1a9a04666e7`
+Skill revision: `git:0567ddf3f5ce4783b63f401e0d1f1e486da358de`
 Verdict: pass
 
 ## Execution
