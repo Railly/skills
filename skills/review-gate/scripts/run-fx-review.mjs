@@ -1,11 +1,27 @@
 #!/usr/bin/env bun
 import { execFileSync, spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { homedir } from "node:os";
+import { dirname, join, resolve } from "node:path";
 
 const KEYCHAIN_SERVICE = "Vercel AI Gateway";
 const KEYCHAIN_ACCOUNT = "vercel-ai-gateway";
 const DEFAULT_TIMEOUT_MS = 20 * 60 * 1000;
+// fx 0.0.12+ ignores AI_GATEWAY_API_KEY once a stored key is selected and
+// reports it this way; it is accepted only when that key is the Gateway one.
+const STORED_GATEWAY_AUTH = "stored API key (macOS Keychain)";
+
+function storedGatewayKeySelected(settingsPath) {
+	try {
+		const settings = JSON.parse(readFileSync(settingsPath, "utf8"));
+		return (
+			settings.provider === "gateway" &&
+			settings.credential_source === "stored_key"
+		);
+	} catch {
+		return false;
+	}
+}
 
 function option(args, name) {
 	const index = args.indexOf(name);
@@ -37,6 +53,8 @@ export function runFxReview({
 	fxBin = process.env.FX_BIN ?? "fx",
 	securityBin = process.env.SECURITY_BIN ?? "/usr/bin/security",
 	timeoutMs = Number(process.env.FX_REVIEW_TIMEOUT_MS ?? DEFAULT_TIMEOUT_MS),
+	fxSettingsPath = process.env.FX_SETTINGS ??
+		join(homedir(), ".fx", "settings.json"),
 }) {
 	if (!Number.isInteger(timeoutMs) || timeoutMs <= 0) {
 		throw new Error("FX review timeout must be a positive integer");
@@ -66,7 +84,6 @@ export function runFxReview({
 	const env = {
 		...process.env,
 		AI_GATEWAY_API_KEY: key,
-		FX_DISABLE_KEYCHAIN: "1",
 	};
 	const statusCall = spawnSync(fxBin, ["status", "--json"], {
 		cwd,
@@ -85,7 +102,11 @@ export function runFxReview({
 		);
 	}
 	const status = parseJson(statusCall.stdout, "fx status");
-	if (status.auth !== "AI_GATEWAY_API_KEY") {
+	const gatewayAuth =
+		status.auth === "AI_GATEWAY_API_KEY" ||
+		(status.auth === STORED_GATEWAY_AUTH &&
+			storedGatewayKeySelected(fxSettingsPath));
+	if (!gatewayAuth) {
 		throw new Error(
 			`fx reported unsupported auth mode: ${status.auth ?? "missing"}`,
 		);

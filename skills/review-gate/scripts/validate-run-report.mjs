@@ -195,7 +195,8 @@ if (!structuralOnly) {
 				(file) =>
 					file &&
 					!/(^|\/)(__tests__|tests?|spec|fixtures?|docs?)(\/|$)/i.test(file) &&
-					!/\.(md|mdx|json|lock|snap|map)$/.test(file),
+					!/\.(md|mdx|json|lock|snap|map)$/.test(file) &&
+					!/\.(test|spec)\.[cm]?[jt]sx?$/.test(file),
 			);
 		for (const file of files) {
 			const added = execFileSync(

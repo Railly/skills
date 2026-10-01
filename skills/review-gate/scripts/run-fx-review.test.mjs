@@ -27,9 +27,6 @@ fi
 if [ "$AI_GATEWAY_API_KEY" != "test-secret" ]; then
   exit 9
 fi
-if [ "$FX_DISABLE_KEYCHAIN" != "1" ]; then
-  exit 10
-fi
 printf '{"final_output":"finding without key; accidental test-secret"}\\n'
 `,
 		);
@@ -73,6 +70,46 @@ printf '{"final_output":"finding without key; accidental test-secret"}\\n'
 				securityBin: security,
 			}),
 		).toThrow("unsupported auth mode");
+	});
+
+	test("accepts fx's stored key only when it is the Gateway provider", () => {
+		const root = mkdtempSync(join(tmpdir(), "fx-review-stored-"));
+		const security = join(root, "security");
+		const fx = join(root, "fx");
+		const promptFile = join(root, "prompt.md");
+		const settings = join(root, "settings.json");
+		executable(security, "#!/bin/sh\nprintf 'test-secret\\n'\n");
+		executable(
+			fx,
+			`#!/bin/sh
+if [ "$1" = "status" ]; then
+  printf '{"auth":"stored API key (macOS Keychain)","model":"test/reviewer"}\\n'
+  exit 0
+fi
+printf '{"final_output":"ok"}\\n'
+`,
+		);
+		writeFileSync(promptFile, "Review this diff.");
+		const run = () =>
+			runFxReview({
+				promptFile,
+				output: join(root, "review.json"),
+				cwd: root,
+				fxBin: fx,
+				securityBin: security,
+				fxSettingsPath: settings,
+			});
+
+		writeFileSync(
+			settings,
+			'{"provider":"codex","credential_source":"stored_key"}',
+		);
+		expect(run).toThrow("unsupported auth mode");
+		writeFileSync(
+			settings,
+			'{"provider":"gateway","credential_source":"stored_key"}',
+		);
+		expect(run().status).toBe("complete");
 	});
 
 	test("writes a failed receipt when FX exits with partial non-JSON output", () => {

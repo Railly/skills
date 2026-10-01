@@ -1,0 +1,4 @@
+{"item":"vercel-labs/portless#434 via PR #445 (recreates #440 by @Knat-Dev)","profile":"standard","admitted":"2026-10-01, Hunter in session",
+ "acceptance":{"A1":"On origin/main ef41e79, a keep-alive request followed by a backend socket reset crashes the proxy","A2":"With the fix the proxy survives and the next request responds","A3":"Client hop-by-hop request headers (connection, keep-alive, proxy-connection, upgrade) do not reach the backend","A4":"A chunked DELETE body arrives intact"},
+ "must_not_change":["WebSocket upgrade paths","HTTP/2 handling"],"non_goals":["Stripping headers nominated by Connection tokens (RFC 9110 7.6.1)"],
+ "proof":["pnpm --filter portless exec vitest run src/proxy.test.ts","built CLI E2E on macOS (port 1399) and Windows (run 36924262063)"]}
