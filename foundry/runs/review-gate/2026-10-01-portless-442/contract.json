@@ -1,0 +1,3 @@
+{"item":"vercel-labs/portless#241 via PR #448 (recreates #442 by @Knat-Dev, supersedes #247 by @octo-patch)","profile":"standard","admitted":"2026-10-01, Hunter in session",
+ "acceptance":{"A1":"On origin/main a version-manager node first on PATH is shadowed by portless's node","A2":"With the fix the caller's node wins","A3":"With no node on PATH the child still finds portless's node, including .cmd wrappers on Windows"},
+ "must_not_change":["node_modules/.bin precedence","Path vs PATH handling on Windows"],"proof":["vitest cli-utils.test.ts -t 'issue #241'","built CLI E2E macOS","CI run 36955436832 windows main vs fix"]}
