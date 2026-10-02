@@ -54,11 +54,6 @@ packages/vue/src/renderer.ts -> packages/vue/README.md skills/vue/SKILL.md
   must test partial element states at every downstream consumer it precedes,
   not only at the first operation that throws.
 
-- TanStack pathname normalization must preserve encoded percent signs until
-  per-parameter decoding. Verify `%25`, `%2525`, encoded slashes, and
-  `staticParams` round trips through the real Router. Static-path normalization
-  must not consume the escape layer owned by parameter extraction.
-
 ## Gate-miss ledger
 
 - 2026-08-19, PR #325: Vercel Agent Review found that the new signature pass
@@ -68,9 +63,3 @@ packages/vue/src/renderer.ts -> packages/vue/README.md skills/vue/SKILL.md
   element. The literal suggestion also under-reached because `resolveBindings`
   was the next consumer. Closed by a type-first then props integration test and
   force-red mutations at both consumers.
-
-- 2026-09-08, PR #334: Vercel Agent Review caught double decoding of literal
-  percent parameters in intermediate fix `70d7383`. Commit `8ada149` shields
-  `%25` during pathname normalization. Re-review confirmed browser values
-  `100%` and `%25` and static-parameter round trips. This intermediate commit
-  was not covered by the prior `bfab0c4` report.
