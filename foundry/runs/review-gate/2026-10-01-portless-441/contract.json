@@ -1,0 +1,3 @@
+{"item":"vercel-labs/portless#288 via PR #447 (recreates #441 by @Knat-Dev, builds on #302 by @EfeDurmaz16)","profile":"standard","admitted":"2026-10-01, Hunter in session",
+ "acceptance":{"A1":"On origin/main a port held on 127.0.0.1, ::1 or 0.0.0.0 is still assigned","A2":"With the fix a port held on any of the four addresses is skipped","A3":"On a host without IPv6, free ports are still found"},
+ "must_not_change":["random-then-sequential strategy","BLOCKED_PORTS","range errors","explicit appPort bypass"],"proof":["vitest cli-utils.test.ts -t findFreePort","built CLI E2E holding 4000-4999 per address","CI run 36934544913 (linux ipv6 off, linux, windows)"]}
