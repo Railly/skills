@@ -1,7 +1,7 @@
 # 288: free-port probe missed listeners on specific addresses
 
 - PR: vercel-labs/portless#447 (recreates #441 by @Knat-Dev, builds on #302 by @EfeDurmaz16; both credited). Head 47e2cc9.
-- Gate run: `foundry/runs/review-gate/2026-10-01-portless-441/` (pass, cross-family FX review).
+- Gate run: `foundry/runs/review-gate/2026-10-01-portless-441/` (pass, cross-family FX review, forced-failure Resilience receipt).
 
 ## Defect
 `findFreePort` bound hostless. On macOS that succeeds while 127.0.0.1, ::1 or 0.0.0.0 already holds the port, so an occupied port was assigned and the proxy dialed the old listener.
