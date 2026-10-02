@@ -1,0 +1,242 @@
+{
+ "schemaVersion": 1,
+ "run": {
+  "date": "2026-10-01",
+  "repo": "vercel-labs/portless",
+  "pr": 448,
+  "base": "ef41e79ea0e87c32e98be1ffd0cbea017d195d1d",
+  "head": "9a886b9c506769d2443f52d527ddaea188ef82c1",
+  "profile": "standard",
+  "skill_revision": "git:640f3b260cfe0cdaa2fc002c5f0a140353f02cb1",
+  "status": "complete",
+  "verdict": "pass",
+  "gaps": []
+ },
+ "execution": {
+  "mode": "fx_worker",
+  "degraded_from": null,
+  "independence_gap": null,
+  "receipt": "fx-review.json",
+  "schema_failures": 0,
+  "operations": [
+   {
+    "operation": "FX worker review",
+    "attempted_calls": 1,
+    "schema_failures": 0,
+    "identical_retry": false
+   }
+  ]
+ },
+ "contract": {
+  "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-10-01-portless-442/contract.json",
+  "spec_status": "pass",
+  "acceptance_reviewed": [
+   "A1",
+   "A2",
+   "A3",
+   "A4"
+  ],
+  "gaps": []
+ },
+ "provenance": {
+  "author_model": "claude-opus-5.5 (recreating Knat-Dev #442)",
+  "reviewer_model": "zai/glm-5.3 (FX)",
+  "same_family": false,
+  "note": "Cross-family FX review."
+ },
+ "risk": {
+  "level": "standard",
+  "triggers": [
+   "child process runtime selection"
+  ],
+  "independent_challenge": {
+   "required": false,
+   "satisfied": true,
+   "method": "cross_family_review",
+   "artifact": "fx-review.json",
+   "evidence": "FX checked Path/PATH casing, all augmentedPath callers, empty segments, and #247 vs #442; verdict pass."
+  }
+ },
+ "claim_inventory": [
+  {
+   "source": "contract",
+   "location": "contract.json",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "A1-A3."
+  },
+  {
+   "source": "design",
+   "location": "PR #442 body and #247",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "Append node dir as fallback rather than skip it."
+  },
+  {
+   "source": "user_facing",
+   "location": "PR #448 body",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "Matches observed behavior."
+  },
+  {
+   "source": "implementation",
+   "location": "packages/portless/src/cli-utils.ts augmentedPath",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "Order and empty-segment filter only."
+  }
+ ],
+ "properties": [
+  {
+   "id": "P1",
+   "claim": "The caller's node wins over portless's node in child commands.",
+   "kind": "contract",
+   "status": "verified",
+   "oracle": {
+    "observes": "which node a child command runs",
+    "layer": "built CLI end to end",
+    "method": "stand-in version-manager node first on PATH, portless run node --version",
+    "proxy_only": false
+   },
+   "proxy_challenge": {
+    "proxy": "unit test on PATH string order",
+    "counterexample": "string order right but spawn env uses another key",
+    "attempted": true,
+    "outcome": "separated",
+    "evidence": "Built CLI on macOS and Windows: main ran portless node, fix ran VERSION-MANAGER-NODE."
+   },
+   "substrates": [
+    {
+     "name": "built CLI macOS",
+     "status": "exercised",
+     "evidence": "vm-first VERSION-MANAGER-NODE"
+    },
+    {
+     "name": "Windows CI run 36955436832",
+     "status": "exercised",
+     "evidence": "main vm_first=v24.14.0, fix vm_first=VERSION-MANAGER-NODE"
+    }
+   ],
+   "evidence": "Unit tests red on main."
+  },
+  {
+   "id": "P2",
+   "claim": "Without node on PATH the child still finds portless's node.",
+   "kind": "contract",
+   "status": "verified",
+   "oracle": {
+    "observes": "node resolution with PATH stripped of node",
+    "layer": "built CLI end to end",
+    "method": "PATH without node, run node --version and a node_modules/.bin .cmd wrapper",
+    "proxy_only": false
+   },
+   "proxy_challenge": {
+    "proxy": "fallback entry present in string",
+    "counterexample": ".cmd wrapper cannot resolve node",
+    "attempted": true,
+    "outcome": "separated",
+    "evidence": "Windows no_node_wrapper=wrapper-found-node v24.14.0 on fix."
+   },
+   "substrates": [
+    {
+     "name": "built CLI macOS",
+     "status": "exercised",
+     "evidence": "no-node v24.18.0"
+    },
+    {
+     "name": "Windows CI run 36955436832",
+     "status": "exercised",
+     "evidence": "wrapper-found-node"
+    }
+   ],
+   "evidence": "Fallback observed on both platforms."
+  }
+ ],
+ "stage_receipts": {
+  "test_strength": {
+   "required": false,
+   "status": "not_triggered",
+   "reason": "Single ordering expression; main order turns both tests red."
+  },
+  "resilience": {
+   "required": false,
+   "status": "not_triggered",
+   "reason": "Pure string construction; no side effects."
+  }
+ },
+ "assumptions": [
+  {
+   "id": "AS1",
+   "source": "spawnCommand Windows env cleanup",
+   "claim": "spawnCommand passes the augmented value under a single PATH key on Windows",
+   "status": "verified",
+   "evidence": "cli-utils.ts deletes non-PATH casings when isWindows (FX scratch-run)."
+  }
+ ],
+ "lenses": [
+  {
+   "name": "correctness",
+   "status": "run",
+   "evidence": "FX casing, callers and empty-segment analysis."
+  },
+  {
+   "name": "docs-behavior-parity",
+   "status": "run",
+   "evidence": "No docs describe PATH augmentation."
+  },
+  {
+   "name": "security",
+   "status": "skipped",
+   "reason": "Dropping empty PATH segments removes implicit cwd; no new surface."
+  }
+ ],
+ "deterministic": [
+  {
+   "check": "style",
+   "outcome": "pass"
+  },
+  {
+   "check": "surfaces",
+   "outcome": "acknowledged",
+   "reason": "clean-utils.ts is the state-file allowlist; no state file written."
+  },
+  {
+   "check": "format/lint/type-check/build",
+   "outcome": "pass"
+  },
+  {
+   "check": "test",
+   "outcome": "acknowledged",
+   "reason": "Non-baseline failure only the flaky detectPackageManager; five cli.test failures come from the worktree branch prefix."
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "state": "exempted",
+   "severity": "minor",
+   "summary": "Multi-app spawn on Windows keeps stale Path beside augmented PATH (cli.ts:3653, 3719); pre-existing, overlaps #438",
+   "resolution": "not_applicable"
+  }
+ ],
+ "exemptions": [],
+ "issue_candidates": [
+  {
+   "title": "Multi-app spawn leaves stale Path key on Windows",
+   "evidence": "cli.ts:3652-3653 and 3718-3719 set pkgEnv.PATH without deleting Path; spawnCommand does delete it."
+  }
+ ]
+}
