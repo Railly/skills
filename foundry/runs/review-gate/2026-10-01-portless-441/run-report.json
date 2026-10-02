@@ -1,0 +1,238 @@
+{
+ "schemaVersion": 1,
+ "run": {
+  "date": "2026-10-01",
+  "repo": "vercel-labs/portless",
+  "pr": 447,
+  "base": "ef41e79ea0e87c32e98be1ffd0cbea017d195d1d",
+  "head": "47e2cc93175d05049f2850c790125ac7335cb521",
+  "profile": "standard",
+  "skill_revision": "git:0bdd081acd7fd45c7f924c4240e50f252b6474f1",
+  "status": "complete",
+  "verdict": "pass",
+  "gaps": []
+ },
+ "execution": {
+  "mode": "fx_worker",
+  "degraded_from": null,
+  "independence_gap": null,
+  "receipt": "fx-review.json",
+  "schema_failures": 0,
+  "operations": [
+   {
+    "operation": "FX worker review",
+    "attempted_calls": 1,
+    "schema_failures": 0,
+    "identical_retry": false
+   }
+  ]
+ },
+ "contract": {
+  "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-10-01-portless-441/contract.json",
+  "spec_status": "pass",
+  "acceptance_reviewed": [
+   "A1",
+   "A2",
+   "A3",
+   "A4"
+  ],
+  "gaps": []
+ },
+ "provenance": {
+  "author_model": "claude-opus-5.5 (recreating Knat-Dev #441)",
+  "reviewer_model": "moonshotai/kimi-k3-fast (FX)",
+  "same_family": false,
+  "note": "Cross-family FX review."
+ },
+ "risk": {
+  "level": "standard",
+  "triggers": [
+   "port allocation across address families"
+  ],
+  "independent_challenge": {
+   "required": false,
+   "satisfied": true,
+   "method": "cross_family_review",
+   "artifact": "fx-review.json",
+   "evidence": "FX checked errno mapping, sequential probe collisions over 200x4 binds, all callers; verdict pass."
+  }
+ },
+ "claim_inventory": [
+  {
+   "source": "contract",
+   "location": "contract.json",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "A1-A3."
+  },
+  {
+   "source": "design",
+   "location": "PR #441 body and #302",
+   "status": "reviewed",
+   "properties": [
+    "P1"
+   ],
+   "evidence": "Probe every address the proxy or a consumer may bind."
+  },
+  {
+   "source": "user_facing",
+   "location": "PR #447 body",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "Matches observed behavior."
+  },
+  {
+   "source": "implementation",
+   "location": "packages/portless/src/cli-utils.ts findFreePort",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "Only tryPort changed."
+  }
+ ],
+ "properties": [
+  {
+   "id": "P1",
+   "claim": "A port held on 127.0.0.1, ::1, 0.0.0.0 or :: is never assigned.",
+   "kind": "contract",
+   "status": "verified",
+   "oracle": {
+    "observes": "port the CLI assigns while 4000-4999 is held on one address",
+    "layer": "built CLI end to end",
+    "method": "hold the full range per address, run portless run",
+    "proxy_only": false
+   },
+   "proxy_challenge": {
+    "proxy": "unit test with a single held port",
+    "counterexample": "unit passes while the CLI path still assigns a held port",
+    "attempted": true,
+    "outcome": "separated",
+    "evidence": "Built CLI: main assigned 4084/4998/4733 for 127.0.0.1/::1/0.0.0.0; fix errors No free port for all four."
+   },
+   "substrates": [
+    {
+     "name": "built CLI macOS",
+     "status": "exercised",
+     "evidence": "per-address table"
+    },
+    {
+     "name": "CI linux and windows",
+     "status": "exercised",
+     "evidence": "run 36934544913 findFreePort tests green"
+    }
+   ],
+   "evidence": "Unit test red on main for 3 of 4 hosts."
+  },
+  {
+   "id": "P2",
+   "claim": "A missing address family does not make every port busy.",
+   "kind": "contract",
+   "status": "verified",
+   "oracle": {
+    "observes": "findFreePort result with IPv6 disabled",
+    "layer": "real kernel",
+    "method": "sysctl disable_ipv6 on ubuntu CI, then findFreePort",
+    "proxy_only": false
+   },
+   "proxy_challenge": {
+    "proxy": "errno reasoning",
+    "counterexample": "platform returns another errno for the absent family",
+    "attempted": true,
+    "outcome": "separated",
+    "evidence": "ipv6_bind=EADDRNOTAVAIL and free_port=4970 observed."
+   },
+   "substrates": [
+    {
+     "name": "ubuntu-latest with IPv6 disabled",
+     "status": "exercised",
+     "evidence": "run 36934544913 linux-ipv6-off"
+    }
+   ],
+   "evidence": "CI log lines."
+  }
+ ],
+ "stage_receipts": {
+  "test_strength": {
+   "required": false,
+   "status": "not_triggered",
+   "reason": "Single probe loop; removing it (main) turns 3 of 4 tests red."
+  },
+  "resilience": {
+   "required": false,
+   "status": "not_triggered",
+   "reason": "Probe binds are closed before the next; no durable state."
+  }
+ },
+ "assumptions": [
+  {
+   "id": "AS1",
+   "source": "Node net errno mapping",
+   "claim": "Absent families surface as EADDRNOTAVAIL or EAFNOSUPPORT",
+   "status": "verified",
+   "evidence": "Linux IPv6-off gave EADDRNOTAVAIL in CI; FX verified macOS."
+  }
+ ],
+ "lenses": [
+  {
+   "name": "correctness",
+   "status": "run",
+   "evidence": "FX errno and collision analysis."
+  },
+  {
+   "name": "docs-behavior-parity",
+   "status": "run",
+   "evidence": "No docs describe the probe; nothing to update."
+  },
+  {
+   "name": "security",
+   "status": "skipped",
+   "reason": "No auth, origin or secret surface."
+  }
+ ],
+ "deterministic": [
+  {
+   "check": "style",
+   "outcome": "pass"
+  },
+  {
+   "check": "surfaces",
+   "outcome": "acknowledged",
+   "reason": "clean-utils.ts is the state-file allowlist; this change writes no state file."
+  },
+  {
+   "check": "format/lint/type-check/build",
+   "outcome": "pass"
+  },
+  {
+   "check": "test",
+   "outcome": "acknowledged",
+   "reason": "Only non-baseline failure is the known flaky detectPackageManager."
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "state": "confirmed",
+   "severity": "note",
+   "summary": "Hardcoded port 9997 could make the test skip silently",
+   "resolution": "fixed"
+  },
+  {
+   "id": "F2",
+   "state": "refuted",
+   "severity": "note",
+   "summary": "Probe cost 4x per port; measured 0.2ms vs 0.05ms",
+   "resolution": "not_applicable"
+  }
+ ],
+ "exemptions": [],
+ "issue_candidates": []
+}
