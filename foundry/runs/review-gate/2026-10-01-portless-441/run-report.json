@@ -45,16 +45,16 @@
   "note": "Cross-family FX review."
  },
  "risk": {
-  "level": "standard",
+  "level": "high",
   "triggers": [
-   "port allocation across address families"
+   "production listen() in the port probe"
   ],
   "independent_challenge": {
-   "required": false,
+   "required": true,
    "satisfied": true,
    "method": "cross_family_review",
    "artifact": "fx-review.json",
-   "evidence": "FX checked errno mapping, sequential probe collisions over 200x4 binds, all callers; verdict pass."
+   "evidence": "kimi-k3-fast checked errno mapping, 200x4 sequential binds with 0 collisions, and all callers; verdict pass."
   }
  },
  "claim_inventory": [
@@ -166,9 +166,54 @@
    "reason": "Single probe loop; removing it (main) turns 3 of 4 tests red."
   },
   "resilience": {
-   "required": false,
-   "status": "not_triggered",
-   "reason": "Probe binds are closed before the next; no durable state."
+   "required": true,
+   "status": "pass",
+   "skill_revision": "git:6a07ee78a4f8cdcdcbb0448bcac8d93c2e80248f",
+   "artifact": "resilience.log",
+   "evidence": "Forced a probe to fail after an earlier address bound: no residual listener, immediate retry after release returns the same port.",
+   "fingerprint": {
+    "head_sha": "47e2cc93175d05049f2850c790125ac7335cb521",
+    "changed_paths_digest": "sha256:c83c3f7ab1fb7a411eeca929ee683d02fc064f1d6b1a967e60f01034c44542cb",
+    "contract_digest": "sha256:a917d3913f3a550b3401e6215b1bfe04afc8d7fc34ba1f748c9475241c86ef74",
+    "command": "vitest run src/zz-resilience.test.ts (scratch, removed)",
+    "environment_digest": "sha256:38bb1c9e195d542c5b26a26935a8bdbb296175cea7fa0f0a8e66a37a69f36d21",
+    "skill_revision": "git:6a07ee78a4f8cdcdcbb0448bcac8d93c2e80248f",
+    "relevant_paths": [
+     "packages/portless/src/cli-utils.ts"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+   },
+   "commit_points": [
+    {
+     "id": "CP1",
+     "effect": "probe socket bound on one address",
+     "owner": "isFreeOn",
+     "commit_event": "server.listen callback",
+     "later_fallible_stages": [
+      "probe on a later address fails",
+      "close"
+     ],
+     "failure_partitions": [
+      {
+       "covers": [
+        "probe on a later address fails",
+        "close"
+       ],
+       "forced": true,
+       "ownership_region": "isFreeOn closes before resolving true, so tryPort moves on only after release",
+       "residual_observed": "none: 127.0.0.1 bindable after ::1-busy rejection",
+       "cleanup_owner": "isFreeOn (server.close before resolve)",
+       "evidence": "resilience.log busy=::1 residual_127=none",
+       "retry": {
+        "attempted": true,
+        "outcome": "success",
+        "evidence": "retry returned the same port for ::1, 0.0.0.0 and :: holders after release"
+       }
+      }
+     ]
+    }
+   ]
   }
  },
  "assumptions": [

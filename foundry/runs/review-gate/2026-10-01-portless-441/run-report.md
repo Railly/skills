@@ -25,7 +25,7 @@ Verdict: pass
 ## Stage receipts
 
 - Test Strength: not_triggered. Single probe loop; removing it (main) turns 3 of 4 tests red.
-- Resilience Audit: not_triggered. Probe binds are closed before the next; no durable state.
+- Resilience Audit: pass at `git:6a07ee78a4f8cdcdcbb0448bcac8d93c2e80248f`. Forced a probe to fail after an earlier address bound: no residual listener, immediate retry after release returns the same port.
 - Security Review: missing
 
 ## Verified properties
@@ -60,4 +60,4 @@ None.
 - Author model: claude-opus-5.5 (recreating Knat-Dev #441)
 - Reviewer model: moonshotai/kimi-k3-fast (FX)
 - Same family: no
-- Independent challenge: satisfied. FX checked errno mapping, sequential probe collisions over 200x4 binds, all callers; verdict pass.
+- Independent challenge: satisfied. kimi-k3-fast checked errno mapping, 200x4 sequential binds with 0 collisions, and all callers; verdict pass.
