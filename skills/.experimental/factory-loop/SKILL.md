@@ -62,6 +62,8 @@ Classify one profile before orchestration:
 | `high-risk` | 180 min | Solution Gate, Software Factory, Test Strength and Resilience when triggered, full Review Gate |
 | `external-pr` | 90 min | Work Intake, exact-head dogfood, focused verdict or successor |
 
+When the change adds or changes reads or writes against infrastructure other teams or customers share (an analytics store, a database, a third-party API, a queue), freeze a load budget in the contract before shaping: requests per hour at expected scale (clients x items per client x refreshes), the cost of each request, and what bounds them (cache, rate limit, once-a-day reads). Include deploys and cold starts, when every instance's cache is empty at once. A change with no computed budget is not admitted past contract; one whose budget exceeds the owner's stated or measured capacity returns to shape. Classify it at least `standard`.
+
 For a non-mechanical change with multiple material shapes, invoke `solution-gate`; let it orchestrate `shaping`, and require a passing fit check plus an independently mergeable accepted slice. Crossing the default budget requires a newly evidenced risk recorded in the manifest.
 
 **Complete when:** an executable contract and accepted slice exist, or the run stops with the unresolved contract decision.
@@ -76,7 +78,7 @@ Thrashing returns to Solution Gate. A stage failure stops the run. Do not route 
 
 ## 5. Gate Spec and Standards separately
 
-Run an independent Spec check against every accepted ID and must-not-change behavior. Record `pass`, `fail`, or `not_provided`; green tests never imply Spec approval.
+Run an independent Spec check against every accepted ID, must-not-change behavior, and any frozen load budget: the diff's real request paths must match the budget's count. Record `pass`, `fail`, or `not_provided`; green tests never imply Spec approval.
 
 Only after Spec passes, invoke `review-gate` on the exact current HEAD or immutable diff. A review finding that preserves the contract starts a successor factory run. A finding that changes the contract or shape returns to Solution Gate.
 

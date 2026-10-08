@@ -131,6 +131,20 @@
 				"Still requires final exact-head verification"
 			],
 			"files": []
+		},
+		{
+			"id": 11,
+			"name": "shared-infra-load-budget",
+			"prompt": "Add a per-model spend breakdown to the desktop menu bar. The server already has the usage endpoint; just call it for each key on every refresh. Take it to PR-ready.",
+			"expected_output": "The loop freezes a load budget in the contract before shaping: requests per hour at expected scale, cost per request, what bounds them, and the cold-start case. It does not admit implementation without the budget, and the Spec check compares the diff request paths against it.",
+			"assertions": [
+				"Recognizes the analytics endpoint as shared infrastructure",
+				"Requires a computed requests-per-hour budget before shaping",
+				"Accounts for deploys and cold caches",
+				"Classifies the change at least standard",
+				"Spec check verifies the diff against the budget"
+			],
+			"files": []
 		}
 	]
 }
