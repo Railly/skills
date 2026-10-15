@@ -1,0 +1,236 @@
+You are an adversarial reviewer for a Rust change in vercel-labs/agent-browser (a browser automation CLI over Chrome DevTools Protocol). You did not write it. Find real defects; do not praise. Read the repository at the current working directory as needed (cli/src/native/network.rs, cli/src/native/actions.rs, cli/src/native/e2e_tests.rs).
+
+Context: with --allowed-domains, a domain filter is a security containment control. Cross-origin iframe (OOPIF) targets auto-attach paused (waitForDebuggerOnStart) before any document. install_domain_filter_script registers Page.addScriptToEvaluateOnNewDocument and then Runtime.evaluate on the current context. Runtime.evaluate on a paused target with no context fails with "Cannot find default execution context", which was treated as a containment failure and closed the browser, so any page with a cross-origin iframe failed to open.
+
+The change returns Ok when Runtime.evaluate fails with exactly that error, relying on the new-document script for the first document. Every other error still fails closed.
+
+Questions to answer with file:line evidence:
+1. Can "Cannot find default execution context" be returned for a target that already has a live document which would then run unfiltered (containment gap)? Consider: new tabs, popups, service/shared workers, about:blank initial documents, srcdoc/about:blank iframes in the same process, navigation commit races, targets resumed before install, every caller of install_domain_filter_script / install_network_controls_for_session.
+2. Is the new-document script guaranteed to be registered on the same session before the target resumes, for every caller path?
+3. Do the tests prove the claims (fail on base, catch broadening the match to all errors)?
+4. Anything else wrong in the diff.
+
+Reply as JSON: {"findings":[{"severity":"P0|P1|P2|P3","claim":"...","evidence":"file:line ...","failure_scenario":"..."}],"verdict":"pass|findings"}. Empty findings with verdict pass is acceptable only if you checked every question.
+
+Contract:
+# Issue Contract: agent-browser #2031
+
+Source: https://github.com/vercel-labs/agent-browser/issues/2031 (open, 2026-09-30). Related: #1651 / PR #1655 (different error, `Session with given id not found`).
+
+## Reproduced claim (user-visible layer, main 1d1f... see manifest base)
+- `--allowed-domains 127.0.0.1` + `open` of a page that embeds a cross-origin iframe fails: `Failed to install browser network controls: CDP error (Runtime.evaluate): Cannot find default execution context`, and the browser is closed.
+- The issue's literal repro (`open https://example.com --allowed-domains example.com` on a fresh session) does NOT reproduce on main today (3/3 success, isolated namespace, serving pid verified).
+- Cause: iframe/OOPIF targets attach paused (`waitForDebuggerOnStart`) before any document; `install_domain_filter_runtime_script` (network.rs) evaluates without a context and the error is treated as a containment failure.
+
+## Acceptance
+- A1: navigating an allowed page with a cross-origin iframe to a blocked host succeeds; the blocked iframe receives the filter's block page and the blocked host gets zero requests.
+- A2: inside an allowed cross-origin iframe, the domain filter runtime is active (fetch to a blocked host throws SecurityError; RTCPeerConnection blocked).
+- A3: an e2e test fails on base and passes on the fix.
+
+## Must not change
+- M1: any other `Runtime.evaluate` failure, and any failure of `Page.addScriptToEvaluateOnNewDocument`, `Fetch.enable`, or `Page.enable`, still fails closed and closes the browser.
+- M2: a target that already has a default context still gets the runtime script applied to its current document.
+- M3: allowed-domain behavior for pages without iframes (example.com fresh launch) unchanged.
+
+## Non-goals
+- #1651 stale-session handling (PR #1655). WebDriver backend. Blocked-iframe navigation reporting.
+
+## Risks
+- R1: swallowing the error on a target whose context exists but is transiently missing would leave the current document unpatched (containment gap). Mitigation claim: the error string is only returned when no default context exists, and the new-document script is registered before resume.
+- R2: string-matching a CDP error message is brittle across Chrome versions (fails closed if the text changes, i.e. regresses to current behavior, not to a leak).
+
+## Proof commands
+- `cargo test e2e_domain_filter -- --ignored --test-threads=1`
+- `cargo test network`
+- CLI repro with `AGENT_BROWSER_NAMESPACE` isolation against `/tmp/ab2021/server.mjs` routes `/iframe`, `/probe-parent`.
+
+Diff:
+diff --git a/cli/src/native/e2e_tests.rs b/cli/src/native/e2e_tests.rs
+index 9d77bd91..c49300d2 100644
+--- a/cli/src/native/e2e_tests.rs
++++ b/cli/src/native/e2e_tests.rs
+@@ -4170,6 +4170,101 @@ async fn e2e_domain_filter() {
+     assert_success(&resp);
+ }
+ 
++#[tokio::test]
++#[ignore]
++async fn e2e_domain_filter_navigates_page_with_cross_origin_iframes() {
++    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
++    let port = listener.local_addr().unwrap().port();
++    let requests = Arc::new(Mutex::new(Vec::<String>::new()));
++    let requests_for_server = requests.clone();
++    let server = tokio::spawn(async move {
++        for _ in 0..20 {
++            let Ok((mut stream, _)) = listener.accept().await else {
++                break;
++            };
++            let requests = requests_for_server.clone();
++            tokio::spawn(async move {
++                let mut buf = vec![0u8; 8192];
++                let n = stream.read(&mut buf).await.unwrap_or(0);
++                let request = String::from_utf8_lossy(&buf[..n]);
++                let request_line = request.lines().next().unwrap_or("").to_string();
++                let body = if request_line.contains(" /probe ") {
++                    "<p id=r>pending</p><script>fetch('https://example.com/').then(() => r.textContent = 'fetch allowed', (e) => r.textContent = 'fetch ' + e.name)</script>".to_string()
++                } else {
++                    format!(
++                        "<title>frames</title><iframe src=\"http://127.0.0.1:{port}/probe\"></iframe><iframe src=\"http://blocked.localtest.me:{port}/denied\"></iframe>"
++                    )
++                };
++                if let Ok(mut logged) = requests.lock() {
++                    logged.push(request_line);
++                }
++                let response = format!(
++                    "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
++                    body.len(),
++                    body,
++                );
++                let _ = stream.write_all(response.as_bytes()).await;
++                let _ = stream.flush().await;
++            });
++        }
++    });
++
++    let mut state = DaemonState::new();
++    {
++        let mut df = state.domain_filter.write().await;
++        *df = Some(super::network::DomainFilter::new("localhost,127.0.0.1"));
++    }
++
++    let resp = execute_command(
++        &json!({ "id": "1", "action": "launch", "headless": true }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++
++    // Both iframes are cross-origin, so each attaches paused before it has an
++    // execution context.
++    let resp = execute_command(
++        &json!({
++            "id": "2",
++            "action": "navigate",
++            "url": format!("http://localhost:{}/", port),
++        }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++
++    let mut snapshot = String::new();
++    for _ in 0..20 {
++        let resp = execute_command(&json!({ "id": "3", "action": "snapshot" }), &mut state).await;
++        assert_success(&resp);
++        snapshot = get_data(&resp)["snapshot"]
++            .as_str()
++            .unwrap_or("")
++            .to_string();
++        if !snapshot.contains("pending") {
++            break;
++        }
++        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
++    }
++    assert!(
++        snapshot.contains("fetch SecurityError"),
++        "Allowed iframe should run the domain filter script: {}",
++        snapshot
++    );
++    let logged = requests.lock().unwrap().clone();
++    assert!(
++        !logged.iter().any(|line| line.contains(" /denied ")),
++        "Blocked iframe made a server request: {:?}",
++        logged
++    );
++
++    let resp = execute_command(&json!({ "id": "99", "action": "close" }), &mut state).await;
++    assert_success(&resp);
++    server.abort();
++}
++
+ #[tokio::test]
+ #[ignore]
+ async fn e2e_domain_filter_blocks_page_created_popup_before_first_request() {
+diff --git a/cli/src/native/network.rs b/cli/src/native/network.rs
+index 98c2212a..7161881a 100644
+--- a/cli/src/native/network.rs
++++ b/cli/src/native/network.rs
+@@ -192,13 +192,20 @@ async fn install_domain_filter_runtime_script(
+     }
+ 
+     let script = domain_filter_script(allowed_domains);
+-    let evaluation = client
++    let evaluation = match client
+         .send_command(
+             "Runtime.evaluate",
+             Some(json!({ "expression": &script })),
+             Some(session_id),
+         )
+-        .await?;
++        .await
++    {
++        Ok(evaluation) => evaluation,
++        // A target paused before its first document has no context to patch;
++        // the new-document script installed above covers that document.
++        Err(error) if error.contains("Cannot find default execution context") => return Ok(()),
++        Err(error) => return Err(error),
++    };
+     if let Some(details) = evaluation.get("exceptionDetails") {
+         let message = details
+             .get("exception")
+@@ -663,6 +670,55 @@ impl EventTracker {
+ mod tests {
+     use super::*;
+ 
++    async fn install_script_with_runtime_error(message: &'static str) -> Result<(), String> {
++        use futures_util::{SinkExt, StreamExt};
++        use tokio_tungstenite::tungstenite::Message;
++
++        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
++        let url = format!("ws://{}", listener.local_addr().unwrap());
++        let server = tokio::spawn(async move {
++            let (stream, _) = listener.accept().await.unwrap();
++            let mut ws = tokio_tungstenite::accept_async(stream).await.unwrap();
++            while let Some(Ok(Message::Text(text))) = ws.next().await {
++                let request: Value = serde_json::from_str(&text).unwrap();
++                let mut response = json!({ "id": request["id"] });
++                if request["method"] == "Runtime.evaluate" {
++                    response["error"] = json!({ "code": -32000, "message": message });
++                } else {
++                    response["result"] = json!({ "identifier": "1" });
++                }
++                ws.send(Message::Text(response.to_string())).await.unwrap();
++            }
++        });
++
++        let client = CdpClient::connect(&url).await.unwrap();
++        let result =
++            install_domain_filter_script(&client, "session", &["example.com".to_string()]).await;
++        drop(client);
++        server.abort();
++        result
++    }
++
++    #[tokio::test]
++    async fn domain_filter_script_skips_targets_without_a_context() {
++        assert_eq!(
++            install_script_with_runtime_error("Cannot find default execution context").await,
++            Ok(())
++        );
++    }
++
++    #[tokio::test]
++    async fn domain_filter_script_fails_closed_on_other_runtime_errors() {
++        let error = install_script_with_runtime_error("Execution context was destroyed.")
++            .await
++            .unwrap_err();
++        assert!(
++            error.contains("Execution context was destroyed"),
++            "{}",
++            error
++        );
++    }
++
+     #[test]
+     fn test_domain_filter_exact() {
+         let filter = DomainFilter::new("example.com");

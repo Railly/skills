@@ -1,0 +1,15 @@
+{
+  "repository": "vercel-labs/agent-browser",
+  "source": "vercel-labs/agent-browser#2021 (supersedes #2048)",
+  "pr": "https://github.com/vercel-labs/agent-browser/pull/2114",
+  "head": "2558b7d1",
+  "profile": "standard",
+  "note": "Retroactive review-gate: PR was opened before contract, review-gate and receipts existed (process gap).",
+  "stages": {
+    "reproduce": "main: open of a 302 to a disallowed host returns success (see session notes; title empty proves #2048's title check cannot fire)",
+    "test_strength": "e2e_domain_filter_reports_blocked_redirect fails on base (observed), passes on head; surviving mutation: removing clear() before navigate",
+    "review": "independent occam review (same-family gap). P2 wait_until=none race: NOT reproduced on loopback (wait-none.log 3/3 correct error), plausible on remote providers -> issue candidate. P3: tab new/click/back/reload not covered -> issue candidate (out of scope). P3: auto JS-redirect inside the window names blocked cause. No blocking findings.",
+    "claim_check": "PR body claim 'blocked iframes do not affect the result' was unverified at open time; verified with #2031 fix applied (combined-iframe.log). On main alone any blocked-iframe page fails earlier via #2031.",
+    "verdict": "pass with issue candidates; no new commit required"
+  }
+}

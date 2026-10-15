@@ -1,0 +1,28 @@
+{
+  "repository": "vercel-labs/agent-browser",
+  "source": "vercel-labs/agent-browser#2031",
+  "base": "518f6e5d73f92a403acfd07d5e5cfec0f79dcb77",
+  "head": null,
+  "dirty": "diff.patch sha256 e29765162fb50c8b1f372443490c28556333391b72f1f70914ce48d5a2220754",
+  "worktree": "/Users/raillyhugo/Programming/vercel/agent-browser-2031",
+  "branch": "railly/allowed-domains-iframe-context",
+  "authorization": "Hunter: 'a ver' (investigate+fix), 'chamare go' (run factory-loop); commit/push/PR NOT yet authorized",
+  "formula": "non-mechanical change (bug fix)",
+  "profile": "high-risk",
+  "profile_trigger": "relaxes a fail-closed path inside the domain-filter containment control",
+  "skill_revision": "railly/skills@33de8ce2699fe4357df17126147d541ad45a704a",
+  "contract": "contract.md",
+  "stages": {
+    "admit": "pass (human go; no formal work-intake run, recorded gap)",
+    "contract": "pass (frozen after implementation, recorded gap)",
+    "shape": "single shape; alternatives considered: resume-before-evaluate, contextId wait",
+    "execute": "pass (diff.patch)",
+    "spec": "pass: A1 (cli-after.log, e2e block-page assert), A2 (cli-after.log FETCH/RTC SecurityError in allowed OOPIF), A3 (e2e fails on base: mutations.log fix-absent), M1 (unit fails_closed_on_other_runtime_errors + live-target test; mutations A,C killed), M2 (existing e2e_domain_filter kills skip-runtime mutation), M3 (example.com before/after)",
+    "review": "findings resolved: F1 (live-session swallow) closed structurally via paused_before_document; F1b (945 hardcoded true) closed by reading event.params.waitingForDebugger; F2/F3 e2e asserts block page, bounded poll. Reviewer: native subagent occam, degraded_from fx_worker (missing Keychain item), same-family independence gap. Deterministic: fmt ok; full cargo test 1450 passed/148 ignored; 7 domain-filter e2e pass; clippy -D warnings has 3 pre-existing failures on origin/main (rust 1.99 chunks_exact_to_as_chunks), none in diff. Gap: schema-v1 run report not materialized via gate.sh.",
+    "before_after": "not_applicable (CLI behavior, no visual web delta); main-vs-fix CLI transcripts cli-before.log / cli-after.log",
+    "promotion": "pending: commit + push + PR need Hunter",
+    "test_strength": "mutations.log: A swallow-all killed, C ignore-paused-flag killed, fix-absent killed, D0' waiting flag forced false killed; drained iframe/page paths shown unnecessary (left fail-closed)",
+    "security": "domain-filter containment touched; no separate security-review receipt; containment proven at runtime inside allowed OOPIF (A2) and live targets stay fail-closed"
+  },
+  "independent_review": "independent-review.json"
+}
