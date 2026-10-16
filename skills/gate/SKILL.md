@@ -27,7 +27,7 @@ Honor the manifest profile:
 |---|---|
 | `mechanical` | exact-state identity, applicable deterministic checks, narrow proof, one focused review pass |
 | `standard` | deterministic checks, claim inventory, triggered receipts and lenses, real-boundary proof |
-| `high-risk` | full proof ledger, required Test Strength or Resilience receipts when triggered, independent challenge |
+| `high-risk` | full proof ledger, required Test Strength or Resilience receipts when triggered, independent challenge from a different model family through `scripts/run-fx-review.mjs` by default |
 | `external-pr` | standard or high-risk obligations plus built-artifact dogfood before trusting authored tests |
 
 Escalate the profile or wall-time budget only when new evidence exposes a new risk. Record the trigger in the manifest.
@@ -74,7 +74,7 @@ Read [the run-report schema](references/run-report.md) when materializing the ex
 
 Run `scripts/gate.sh report <run-report.json>`. A pass requires the exact current head, resolved required receipts, no open finding or gap, and required independence. Update the manifest's `review` stage atomically.
 
-Record the reviewed patch-id in the report. Before any promotion, `scripts/gate.sh drift <reviewed-patch-id>` must pass; a different patch-id voids the verdict.
+Record the reviewed patch-id in the report. `scripts/gate.sh scope` and `scripts/gate.sh prbody <body.md>` run before any commit or PR. Before any promotion, `scripts/gate.sh drift <reviewed-patch-id>` must pass; a different patch-id voids the verdict.
 
 After an external review, harvest each escaped finding into the smallest durable destination: deterministic gate, triggered lens, project norm, or subsystem invariant. Record outcome fields including external findings, review rounds, human corrections, and escaped finding class.
 
