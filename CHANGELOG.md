@@ -139,7 +139,7 @@ Solution Gate can now audit existing work without letting it define the contract
 
 - Candidate-audit mode for `solution-gate`, which reconstructs the contract and solution shapes before revealing an existing PR or patch
 - Primitive-contract mismatch as failure shape S12, harvested from agent-browser #1669
-- Additional public case and gate-run evidence from agent-browser, Portless, wterm, gateway-spend, and Vercel Labs Emulate
+- Additional public case and gate-run evidence from agent-browser, Portless, wterm, and Vercel Labs Emulate
 
 ### Changed
 
