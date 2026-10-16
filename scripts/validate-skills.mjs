@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
-import { validateCaseKnowledge } from "./lib/case-knowledge.mjs";
-import { validateIssueContracts } from "./lib/issue-contracts.mjs";
-import { loadKnowledge } from "./lib/knowledge.mjs";
+import { validateCase } from "./lib/case.mjs";
 import { markdownLinkTargets } from "./lib/markdown-links.mjs";
 import { parseSkillFrontmatter } from "./lib/skill-frontmatter.mjs";
 
@@ -30,10 +28,6 @@ const CANONICAL_WRITERS = new Set([
 	"gate",
 ]);
 const errors = [];
-const knowledge = loadKnowledge(resolve("."));
-const knowledgeGaps = knowledge.skills.flatMap((skill) =>
-	(skill.gaps ?? []).map((gap) => gap.id),
-);
 
 function markdownFiles(root) {
 	return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
@@ -76,58 +70,6 @@ function validateLinks(file) {
 	}
 }
 
-function validateCase(file) {
-	const text = readFileSync(file, "utf8");
-	const required = [
-		"Status",
-		"Validation",
-		"Human review",
-		"Maintainer acceptance",
-		"Delivery",
-		"Upstream status checked",
-		"Visibility",
-		"Repository",
-		"Source",
-	];
-	for (const field of required) {
-		if (!new RegExp(`^${field}:\\s+.+$`, "m").test(text)) {
-			errors.push(`${file}: missing case field "${field}"`);
-		}
-	}
-	if (!/^Visibility: public$/m.test(text)) {
-		errors.push(`${file}: published cases must have public visibility`);
-	}
-	if (
-		/\/Users\/|approved-private|internal review|reviewer identity/i.test(text)
-	) {
-		errors.push(`${file}: contains local or private-case material`);
-	}
-	if (/Unvalidated agent backfill/i.test(text)) {
-		if (!/^Status: observed$/m.test(text)) {
-			errors.push(
-				`${file}: unvalidated agent backfill must have observed status`,
-			);
-		}
-		if (!/^Validation: unvalidated$/m.test(text)) {
-			errors.push(
-				`${file}: unvalidated agent backfill must remain unvalidated`,
-			);
-		}
-		if (!/^Human review: pending$/m.test(text)) {
-			errors.push(
-				`${file}: unvalidated agent backfill must have pending human review`,
-			);
-		}
-	}
-	errors.push(
-		...validateCaseKnowledge({
-			path: file.split("\\").join("/"),
-			text,
-			patterns: knowledge.patterns,
-			gaps: knowledgeGaps,
-		}).errors,
-	);
-}
 
 if (!existsSync(SKILLS_DIR)) {
 	console.error(`No ${SKILLS_DIR}/ directory found.`);
@@ -378,10 +320,14 @@ const NON_CASE_BASENAMES = new Set(["README.md", "conventions.md"]);
 for (const file of markdownFiles("cases").filter(
 	(file) => !NON_CASE_BASENAMES.has(basename(file)),
 )) {
-	validateCase(file);
+	errors.push(
+		...validateCase({
+			path: file.split("\\").join("/"),
+			text: readFileSync(file, "utf8"),
+		}),
+	);
 }
 
-errors.push(...validateIssueContracts(resolve("."), []).errors);
 
 if (errors.length) {
 	console.error(

@@ -11,10 +11,10 @@ Name the maintenance unit: one issue, PR, incident, review, disproven claim, or 
 
 ## 2. Build the ledger
 
-When a work-item manifest exists, treat it as the primary inventory and verify only drift-prone external state. Do not reconstruct stage order, skill revisions, elapsed time, promotion, or close-cycle state from the session transcript. Inventory evidence before prose. Collect durable retrieval handles:
+When a contract exists in the target repo's `.agents/verify/contract.md`, treat it as the primary inventory and verify only drift-prone external state. Do not reconstruct stage order, skill revisions, elapsed time, promotion, or close-cycle state from the session transcript. Inventory evidence before prose. Collect durable retrieval handles:
 
 - repository, commit, branch, issue, and PR
-- Issue Contract path, final state, and acceptance IDs when one exists
+- contract path, final state, and acceptance IDs when one exists
 - exact command and behavior-specific output
 - regression test and its fix-absent result
 - restored green command
@@ -61,33 +61,18 @@ Then set `Enforcer`. A mistake that escaped any step gets a check that fails on 
 
 **Complete when:** the lesson states its evidence boundary and exactly one smallest destination is selected.
 
-## 5. Classify compiled knowledge
-
-Read the compact knowledge index before opening detailed pattern or provenance pages. Record exactly one disposition and its typed target:
-
-- `link-existing` with an existing `pattern.<id>` when the case reinforces that pattern
-- `create-candidate` with a new `pattern.<id>` when no existing pattern fits; create it with candidate status and link the case as source evidence
-- `gap` with an existing `gap.<id>` when evidence is missing or ambiguous
-- `no-change` with `none` when the lesson should remain case-local
-
-For `link-existing`, add the case as active origin, application, evaluation, or transfer evidence. For `create-candidate`, add it as active origin evidence. Contradiction, rejection, or inactive evidence cannot support either disposition. Update skill provenance only when the case supports a typed relationship. Never edit an installable skill during this step. Promotion and procedural mutation remain separate reviewed workflows.
-
-**Complete when:** the case, target pattern or gap, and reverse links agree; generated projections are current; and the case operation changed no file under `skills/`.
-
-## 6. Pass the confidentiality gate
+## 5. Pass the confidentiality gate
 
 For a public case, retain public repositories and the author's public work. Sanitize secrets, customer data, private review text, internal chat, local paths, neighboring-project identity, and unapproved employer context. Ambiguous provenance routes the case to an approved private destination or a public coverage-gap record.
 
 **Complete when:** every source is authorized for the chosen visibility and the public draft contains no private retrieval handle or identity.
 
-## 7. Materialize the case
+## 6. Materialize the case
 
 Read [the case schema and allowed values](template.md), then write to `cases/<repo>/` under the canonical source root. Use another destination only when the user explicitly names it and it is not an installed skill copy. Follow the canonical corpus naming and validation rules. Without write authority, return the complete draft in the response.
 
 Set human-review status only from explicit human feedback or retrievable review evidence. Present new agent-authored records as pending review.
 
-When the case closes a live mission, project the ledger from the manifest, update its Issue Contract to `Status: closed`, and record the case path and final delivery state in both artifacts. Generate SkillKit outcome annotations with the packaged `scripts/work-item.mjs annotations <manifest> --output <private-path>`, inspect the private JSON, then apply it locally with `skillkit receipts --annotate <private-path>`. Remote annotation is unsupported. Do not fill missing proof retrospectively.
+Stage the new case, then run `bun scripts/validate-skills.mjs` from the canonical checkout.
 
-Stage the new public case before validation so tracked-file evidence checks can resolve it, then validate the case and compiled knowledge and regenerate projections.
-
-**Complete when:** the artifact passes the destination's validator, all schema fields and the knowledge disposition are resolved, the live contract and manifest point to the case when applicable, the close-cycle receipt reports handoff, case, git, and promotion state, and a reader can reconstruct the work from retrieval handles without trusting the narrative.
+**Complete when:** the case passes the validator, every field is resolved including `Enforcer`, and a reader can reconstruct the work from its retrieval handles without trusting the narrative.

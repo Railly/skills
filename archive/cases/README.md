@@ -1,0 +1,164 @@
+# Case inventory
+
+This inventory tracks public-safe metadata. Private review text and identities remain outside this repository.
+
+A case records evidence. It does not become a rule, exemplar, or skill merely by existing.
+
+## Published case studies
+
+- [Railly Skills v0.0.8: review and promotion attach to an exact tree](skills/factory-loop-v0.0.8-exact-state-release.md)
+- [Portless #352: match the full routing discriminator](portless/0352-tailscale-authority-matching.md)
+- [Portless #355: test the changed caller](portless/0355-changed-caller-coverage.md)
+- [agent-browser #1532: revive a discarded tab without losing live-tab state](agent-browser/1532-discarded-tab-revival.md)
+- [agent-browser #1461: a red job nobody runs hides the bug it was built to catch](agent-browser/1461-doctor-version-query-hang.md)
+- [agent-browser #1669: an SPKI error bypass is not CA trust](agent-browser/1669-spki-bypass-is-not-ca-trust.md)
+- [wterm #86: read the dependency's contract for the field, not just its type](wterm/0086-style-id-stale-across-screens.md)
+- [wterm #67: check who calls the function before accepting a reset](wterm/0067-reconnect-reset-breaks-backoff.md)
+- [wterm #65: keep the diagnosis, change the placement in a hot path](wterm/0065-hot-path-invalidation.md)
+- [wterm #105: response delivery is a continuation boundary](wterm/0105-response-delivery-is-a-continuation-boundary.md)
+- [wterm #106: repeated modes need generation identity](wterm/0106-generation-identity-across-synchronized-output.md)
+- [wterm #107: terminal mouse support is a browser interaction contract](wterm/0107-browser-native-mouse-contract.md)
+- [wterm #111: WASM view lifetime crosses secondary grapheme reads](wterm/0111-wasm-view-lifetime-across-grapheme-reads.md)
+- [wterm #112: a performance PR may prove only a simpler scheduler](wterm/0112-noisy-performance-proof.md)
+- [wterm #113: host theme state crosses the terminal-core boundary](wterm/0113-host-theme-state-crosses-the-core-boundary.md)
+- [wterm #114: final grid equality does not prove atomic rendering](wterm/0114-final-grid-equality-does-not-prove-atomic-rendering.md)
+- [wterm #115: visual parity does not prove bounded scrollback](wterm/0115-visual-parity-and-bounded-scrollback.md)
+- [wterm #116 audit: scroll anchoring needs one owner](wterm/0117-scroll-anchoring-needs-one-owner.md)
+- [wterm #116 audit: hyperlink bounds must cross layers](wterm/0118-hyperlink-bounds-must-cross-layers.md)
+
+### Portless unvalidated backfill
+
+- [#241: preserve runtime precedence](portless/241-runtime-precedence.md)
+- [#263: map generic settings to framework flags](portless/263-framework-flags.md)
+- [#269: apply worktree identity at the caller](portless/269-multi-app-worktree.md)
+- [#274: preserve configuration provenance](portless/274-config-provenance.md)
+- [#285: forward flags through package scripts](portless/285-package-script-flags.md)
+- [#288: probe the downstream address](portless/288-downstream-address.md)
+- [#305: bypass Windows command-length limits](portless/305-windows-command-length.md)
+- [#310: extend shared-host allowlists](portless/310-shared-host-allowlist.md)
+- [#343: route public tunnel metadata](portless/343-tunnel-route-metadata.md)
+- [#346: preserve LAN TLDs](portless/346-lan-tlds.md)
+
+### agent-browser maintenance backfill
+
+- [#1291: bound unreachable state origins](agent-browser/1291-state-load-timeout.md)
+- [#1105: detect swallowed exceptions behind silent success](agent-browser/1105-select-silent-success.md)
+- [#1204: verify exporter payloads through the artifact](agent-browser/1204-har-response-bodies.md)
+- [#1266: pierce every pipeline stage](agent-browser/1266-shadow-dom-locators.md)
+- [#1336: isolate implicit setup with an A/B/C matrix](agent-browser/1336-implicit-relaunch.md)
+- [#1367: trace server identity across shutdown](agent-browser/1367-shutdown-race.md)
+- [#1378: reproduce loud and silent subprocess failures](agent-browser/1378-profile-lock.md)
+- [#1445: test the reporter's claimed boundary](agent-browser/1445-frame-identity.md)
+- [#1460: use a working contrast to find the seam](agent-browser/1460-frame-aware-locators.md)
+- [Disproven batch: explain the green](agent-browser/disproven-current-main.md)
+- [Cross-case session observations](agent-browser/session-observations.md)
+- [#1552: trace a silent same-day revert before writing a new fix](agent-browser/1552-getbyrole-implicit-roles-regression.md)
+- [#1553: force a guard-and-match drift to see the real failure mode](agent-browser/1553-error-detail-and-help-drift.md)
+- [#1589: cover every writer to a shared sink; force-red the regression test against the production revert](agent-browser/1589-sibling-sink-and-guardless-regression-test.md)
+- [#1589 round 3: fix the class, not the instance: sweep every call site of the operation in the same commit](agent-browser/1589-fix-the-class-not-the-instance.md)
+- [Shared daemon cross-worktree contamination](agent-browser/shared-daemon-cross-worktree-contamination.md)
+- [PR #1594: a drop-stale guarantee is void below the layer that enforces it](agent-browser/1594-latest-frame-below-the-socket.md)
+- [PR #1594 round 2: a regression test for a wedging defect reports nothing unless the deadline lives outside it](agent-browser/1594-a-test-that-hangs-reports-nothing.md)
+
+## Cases
+
+| Case | Source | Validation | Delivery | Primary lesson | Foundry action |
+|---|---|---|---|---|---|
+| [json-render PR #319](json-render/0319-nested-repeat-contract-across-renderers.md) | [issue](https://github.com/vercel-labs/json-render/issues/252) · [PR](https://github.com/vercel-labs/json-render/pull/319) · [release](https://github.com/vercel-labs/json-render/releases/tag/v0.20.0) | independently-validated | released | one shared contract needs one resolver and parity across every consumer | review reference-rule candidate |
+| [json-render PR #320](json-render/0320-structural-slots-cross-every-consumer.md) | [issue](https://github.com/vercel-labs/json-render/issues/39) · [PR](https://github.com/vercel-labs/json-render/pull/320) · [release](https://github.com/vercel-labs/json-render/releases/tag/v0.20.0) | contributor-validated | released | a new structural edge must cross every traversal and conversion consumer | review reference-rule candidate |
+| [json-render v0.20.0](json-render/0321-partial-monorepo-release-recovery.md) | [PR](https://github.com/vercel-labs/json-render/pull/321) · [workflow](https://github.com/vercel-labs/json-render/actions/runs/31950623188) · [release](https://github.com/vercel-labs/json-render/releases/tag/v0.20.0) | contributor-validated | artifact verified | verify every independently authorized package after a monorepo release | review deterministic-check candidate |
+| [json-render PR #323](json-render/0323-vue-slot-delivery-matrix.md) | [PR](https://github.com/vercel-labs/json-render/pull/323) | contributor-validated | merged | framework parity needs a delivery and lifecycle matrix | review behavior-eval candidate |
+| [Portless #241](portless/241-runtime-precedence.md) | [issue](https://github.com/vercel-labs/portless/issues/241) · [PR](https://github.com/vercel-labs/portless/pull/247) | unvalidated | PR open | preserve caller runtime precedence | review reference-rule candidate |
+| [Portless #263](portless/263-framework-flags.md) | [issue](https://github.com/vercel-labs/portless/issues/263) · [PR](https://github.com/vercel-labs/portless/pull/272) | unvalidated | PR open | map semantic settings to framework flags | review exemplar candidate |
+| [Portless #269](portless/269-multi-app-worktree.md) | [issue](https://github.com/vercel-labs/portless/issues/269) · [PR](https://github.com/vercel-labs/portless/pull/355) | unvalidated | PR open | test the changed caller, not only its helper | round 1 fixture; exemplar rejected |
+| [Portless #274](portless/274-config-provenance.md) | [issue](https://github.com/vercel-labs/portless/issues/274) · [PR](https://github.com/vercel-labs/portless/pull/300) | unvalidated | PR open | carry provenance through normalization | review reference-rule candidate |
+| [Portless #285](portless/285-package-script-flags.md) | [issue](https://github.com/vercel-labs/portless/issues/285) · [PR](https://github.com/vercel-labs/portless/pull/303) | unvalidated | PR open | drive the public wrapper seam | corroborating round 1 case |
+| [Portless #288](portless/288-downstream-address.md) | [issue](https://github.com/vercel-labs/portless/issues/288) · [PR](https://github.com/vercel-labs/portless/pull/302) | unvalidated | PR open | probe the exact downstream address | review reference-rule candidate |
+| [Portless #305](portless/305-windows-command-length.md) | [issue](https://github.com/vercel-labs/portless/issues/305) · [PR](https://github.com/vercel-labs/portless/pull/306) | unvalidated | PR open | separate resolver proof from platform proof | retain as coverage gap |
+| [Portless #310](portless/310-shared-host-allowlist.md) | [issue](https://github.com/vercel-labs/portless/issues/310) · [PR](https://github.com/vercel-labs/portless/pull/350) | unvalidated | PR open | propagate alternate hosts through every validator | review eval candidate |
+| [Portless #343](portless/343-tunnel-route-metadata.md) | [issue](https://github.com/vercel-labs/portless/issues/343) · [PR](https://github.com/vercel-labs/portless/pull/349) | unvalidated | PR open | build the current-base artifact before accepting a patch | review deterministic-check candidate |
+| [Portless #346](portless/346-lan-tlds.md) | [issue](https://github.com/vercel-labs/portless/issues/346) · [PR](https://github.com/vercel-labs/portless/pull/348) | unvalidated | PR open | compose additive modes without replacing explicit config | review exemplar candidate |
+| Portless PR #352 | [PR](https://github.com/vercel-labs/portless/pull/352) | contributor-validated | PR open | use the full routing discriminator before fallback | retained as a case, not loaded by a skill |
+| [Portless PR #365](portless/365-risky-suffix-overgeneralization.md) | [PR](https://github.com/vercel-labs/portless/pull/365) | independently-validated | PR open | run the repo's documented examples through a new warning trigger; force-red cannot catch a codified wrong decision | review reference-rule candidate |
+| Portless PR #355 | [PR](https://github.com/vercel-labs/portless/pull/355) | contributor-validated | PR open | mutate the changed caller; surface subprocess output | round 1 evidence; exemplar rejected |
+| [Portless PR #366](portless/366-guard-derived-matrix.md) | [PR](https://github.com/vercel-labs/portless/pull/366) | unvalidated | PR open | derive matrix cells from the composed helpers' domain, not the guard's shape | review reference-rule candidate; gate-miss ledger updated |
+| [Portless PR #366 follow-up](portless/366-framework-argument-ownership.md) | [PR](https://github.com/vercel-labs/portless/pull/366) | contributor-validated | local | parse ownership across Portless, runner, and framework grammars before transforming argv | review reference-rule candidate |
+| [Portless PR #374 follow-up](portless/374-explicit-protocol-state.md) | [PR](https://github.com/vercel-labs/portless/pull/374) | contributor-validated | local | represent producer and parser state directly instead of inferring it from timing or string proxies | review reference-rule candidate |
+| [agent-browser #1461](agent-browser/1461-doctor-version-query-hang.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1461) · [PR](https://github.com/vercel-labs/agent-browser/pull/1641) · [PR](https://github.com/vercel-labs/agent-browser/pull/1637) | contributor-validated | merged | a CI job excluded from pull requests stops being a gate; unblocking a fast failure exposes what queued behind it | review deterministic-check candidate |
+| [agent-browser PR #1532](agent-browser/1532-discarded-tab-revival.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1532) | contributor-validated | PR open | prefer a non-destructive recovery so a heuristic false positive is harmless | review notes addressed |
+| [agent-browser #1291](agent-browser/1291-state-load-timeout.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1291) · [branch](https://github.com/Railly/agent-browser/tree/fix/state-load-unreachable-origin) | unvalidated | local | bound each batch item and cancel abandoned side effects | Review rule and eval candidate |
+| [agent-browser #1105](agent-browser/1105-select-silent-success.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1105) · [branch](https://github.com/Railly/agent-browser/tree/fix/select-non-select-errors) | unvalidated | local | observe the substrate when success output may lie | Review rule and eval candidate |
+| [agent-browser #1204](agent-browser/1204-har-response-bodies.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1204) · [branch](https://github.com/Railly/agent-browser/tree/fix/har-response-bodies) | unvalidated | local | verify serialized payloads through the artifact | record only |
+| [agent-browser #1266](agent-browser/1266-shadow-dom-locators.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1266) · [branch](https://github.com/Railly/agent-browser/tree/fix/shadow-dom-locators) | unvalidated | local | cross every stage of a boundary-piercing pipeline | exemplar and eval candidate |
+| [agent-browser #1336](agent-browser/1336-implicit-relaunch.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1336) · [branch](https://github.com/Railly/agent-browser/tree/fix/storage-state-implicit-relaunch) | unvalidated | local | isolate hidden setup with an A/B/C matrix | exemplar and eval candidate |
+| [agent-browser #1367](agent-browser/1367-shutdown-race.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1367) · [branch](https://github.com/Railly/agent-browser/tree/fix/close-shutdown-race) | unvalidated | local | timeline server identity; reject work after shutdown decision | Triage and Review rule candidates |
+| [agent-browser #1378](agent-browser/1378-profile-lock.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1378) · [branch](https://github.com/Railly/agent-browser/tree/fix/profile-lock-collision) | unvalidated | local | reproduce loud and silent subprocess failures | exemplar and eval candidate |
+| [agent-browser #1445](agent-browser/1445-frame-identity.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1445) · [branch](https://github.com/Railly/agent-browser/tree/fix/frame-select-oopif) | unvalidated | local | test the reporter's claimed boundary | Triage rule and eval candidate |
+| [agent-browser #1460](agent-browser/1460-frame-aware-locators.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1460) · [branch](https://github.com/Railly/agent-browser/tree/fix/semantic-locators-active-frame) | unvalidated | local | use a working contrast to find the reusable seam | exemplar and eval candidate |
+| [agent-browser disproven batch](agent-browser/disproven-current-main.md) | public issues linked in case | unvalidated | local | explain why current main is green | Triage rule and eval candidate |
+| [agent-browser session observations](agent-browser/session-observations.md) | public case cluster | unvalidated | local | cross-case operational and diagnostic patterns | candidate generator only |
+| [agent-browser PR #1594](agent-browser/1594-latest-frame-below-the-socket.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1594) | contributor-validated | PR open | a latest-wins guarantee holds only to the first hand-off; enforce it where the consumer's progress is known | review reference-rule candidate |
+| [agent-browser PR #1594 round 2](agent-browser/1594-a-test-that-hangs-reports-nothing.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1594) | contributor-validated | PR open | force-red must distinguish no-output from passed; a wedging defect needs a deadline outside the process | review reference-rule candidate |
+| [agent-browser PR #1669](agent-browser/1669-spki-bypass-is-not-ca-trust.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1669) | independently-validated | PR open | compare the primitive's accept/reject semantics with the product contract before adopting a candidate | solution-gate candidate-audit regression case |
+| [agent-browser PR #1682](agent-browser/1677-active-main-frame-stream-url.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1677) · [PR](https://github.com/vercel-labs/agent-browser/pull/1682) | contributor-validated | PR open | accept active-state events only when owner generation and authoritative subresource identity both match | review reference-rule candidate |
+| [agent-browser PR #1683](agent-browser/1068-real-world-browser-context-isolation.md) | [issue](https://github.com/vercel-labs/agent-browser/issues/1068) · [PR](https://github.com/vercel-labs/agent-browser/pull/1683) | contributor-validated | PR open | stress the full ownership lifecycle, then force-red a producer, filter, and destructor | review deterministic-check candidate |
+| [agent-browser PR #1552](agent-browser/1552-getbyrole-implicit-roles-regression.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1552) | independently-validated | PR open | a same-day merge on the same file is a checkable revert signature | review reference-rule candidate |
+| [agent-browser PR #1553](agent-browser/1553-error-detail-and-help-drift.md) | [PR](https://github.com/vercel-labs/agent-browser/pull/1553) | independently-validated | PR open | force a "can't happen" fallback once against a live instance before trusting it | review reference-rule candidate |
+| [agent-browser shared daemon](agent-browser/shared-daemon-cross-worktree-contamination.md) | PRs [#1552](https://github.com/vercel-labs/agent-browser/pull/1552) · [#1553](https://github.com/vercel-labs/agent-browser/pull/1553) | independently-validated | local | check who actually answered before trusting a live verification result | review reference-rule candidate |
+| [wterm #86](wterm/0086-style-id-stale-across-screens.md) | [issue](https://github.com/vercel-labs/wterm/issues/86) · [PR](https://github.com/vercel-labs/wterm/pull/96) | contributor-validated | PR open | a conditional field over a reused buffer is stale, not undefined | review reference-rule candidate |
+| [wterm #67](wterm/0067-reconnect-reset-breaks-backoff.md) | [PR](https://github.com/vercel-labs/wterm/pull/67) | contributor-validated | local | enumerate callers before accepting a state reset | review reference-rule candidate |
+| [wterm #65](wterm/0065-hot-path-invalidation.md) | [PR](https://github.com/vercel-labs/wterm/pull/92) | contributor-validated | merged | keep the diagnosis, change the placement in a hot path | review reference-rule candidate |
+| [wterm PR #105](wterm/0105-response-delivery-is-a-continuation-boundary.md) | [PR](https://github.com/vercel-labs/wterm/pull/105) | contributor-validated | merged | a user callback inside an incremental loop becomes part of the continuation boundary | review reference-rule candidate |
+| [wterm PR #106](wterm/0106-generation-identity-across-synchronized-output.md) | [PR](https://github.com/vercel-labs/wterm/pull/106) | independently-validated | merged | carry occurrence identity across the authoritative boundary when repeated states look identical | review deterministic-check candidate |
+| [wterm PR #107](wterm/0107-browser-native-mouse-contract.md) | [PR](https://github.com/vercel-labs/wterm/pull/107) | contributor-validated | merged | derive browser-hosted protocol tests from both terminal and browser contracts | review behavior-eval candidate |
+| [wterm PR #111](wterm/0111-wasm-view-lifetime-across-grapheme-reads.md) | [PR](https://github.com/vercel-labs/wterm/pull/111) | contributor-validated | merged | separate WASM data freshness from JavaScript view attachment | review reference-rule candidate |
+| [wterm PR #112](wterm/0112-noisy-performance-proof.md) | [PR](https://github.com/vercel-labs/wterm/pull/112) | contributor-validated | merged | keep a proved structural performance claim and discard an unproved numeric claim | performance-proof method candidate |
+| [wterm PR #113](wterm/0113-host-theme-state-crosses-the-core-boundary.md) | [PR](https://github.com/vercel-labs/wterm/pull/113) | contributor-validated | merged | carry host-owned presentation state through every core boundary | review reference-rule candidate |
+| [wterm PR #114](wterm/0114-final-grid-equality-does-not-prove-atomic-rendering.md) | [PR](https://github.com/vercel-labs/wterm/pull/114) | contributor-validated | merged | prove temporal rendering behavior with intermediate-render counts and a fix-absent mutation | review deterministic-check candidate |
+| [wterm PR #115](wterm/0115-visual-parity-and-bounded-scrollback.md) | [issue](https://github.com/vercel-labs/wterm/issues/61) · [PR](https://github.com/vercel-labs/wterm/pull/115) | contributor-validated | PR open | prove visible parity, bounded structure, and anchoring as separate properties | review deterministic-check candidate |
+| [wterm PR #116 audit: scroll anchoring](wterm/0117-scroll-anchoring-needs-one-owner.md) | [PR](https://github.com/vercel-labs/wterm/pull/116) | contributor-validated | local | assign logical scroll anchoring to exactly one owner | review deterministic-check candidate |
+| [wterm PR #116 audit: hyperlink bounds](wterm/0118-hyperlink-bounds-must-cross-layers.md) | [PR](https://github.com/vercel-labs/wterm/pull/116) | contributor-validated | local | carry identity lifetime, bounds, and saturation signals through every retaining layer | review reference-rule candidate |
+
+One merged case remains to be backfilled. It is not required for round 1 because merge status and technical validation are independent dimensions.
+
+## Lesson clusters
+
+### A. Test teeth and changed-path coverage
+
+Cases: Portless #269, #285, PR #355, agent-browser PR #1532.
+
+Repeated method: remove the production behavior while retaining the committed test, require a bug-specific failure, then restore and require green. When the change lives in caller wiring, drive and mutate that caller rather than only its helper.
+
+Destination: Test Strength behavior fixtures plus Review Gate. The proposed exemplars and proof-record text did not outperform the prior standalone skill and were rejected.
+
+### B. Reproduction as a controlled experiment
+
+Cases: Portless PR #352; agent-browser #1291, #1336, #1367, #1445, and the disproven batch.
+
+Repeated method: verify the reported path and preconditions, run the control outside the claimed boundary, timeline process identity when state crosses commands, and explain a green before accepting non-reproduction.
+
+Destination: [candidate pack](../foundry/candidates/2026-07-agent-browser-evidence-pack.md) for a controlled Issue Contract reproduction round.
+
+### C. Substrate and artifact verification
+
+Cases: agent-browser #1105, #1204, #1266, #1291, and #1336.
+
+Repeated method: distrust a success output implicated by the bug, inspect the real substrate or serialized artifact, and verify external side effects end to end.
+
+Destination: retain as Review Gate rules and Test Strength eval candidates.
+
+### D. Configuration and adapter boundaries
+
+Cases: Portless #241, #263, #274, #285, #346.
+
+Candidate lessons: preserve user precedence, retain provenance, map semantic options explicitly, and verify values through every wrapper boundary.
+
+Destination: retain as unvalidated reference or exemplar candidates.
+
+### E. Runtime and platform boundaries
+
+Cases: Portless #288, #305, #310, #343, PR #352, PR #355.
+
+Candidate lessons: probe the exact consumed address, distinguish unit proof from affected-platform proof, propagate public hostnames downstream, and build the current-base artifact.
+
+Destination: coverage gaps and future promotion rounds.

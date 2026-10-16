@@ -17,8 +17,6 @@ jobs:
           bun-version: latest
       - name: Validate skills
         run: bun scripts/validate-skills.mjs
-      - name: Validate Issue Contracts
-        run: bun scripts/validate-issue-contracts.mjs
       - name: Audit packaged skills
         run: bunx @crafter/skillkit@0.13.0 audit skills --json --strict
       - name: Test validators
@@ -29,14 +27,6 @@ jobs:
         run: bun test skills/gate/scripts/run-fx-review.test.mjs
       - name: Test Gate executable dependency contract
         run: bash skills/gate/scripts/test-execdeps-gate.sh
-      - name: Validate compiled knowledge
-        run: bun scripts/validate-knowledge.mjs
-      - name: Check compiled knowledge projections
-        run: bun scripts/compile-knowledge.mjs --check
-      - name: Check textual match audit
-        run: bun scripts/audit-knowledge-matches.mjs --check
-      - name: Verify behavior fixtures
-        run: bun scripts/verify-eval-fixtures.mjs
       - name: Install website dependencies
         working-directory: www
         run: bun install --frozen-lockfile

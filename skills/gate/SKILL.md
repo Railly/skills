@@ -7,7 +7,7 @@ allowed-tools: [Agent]
 
 # Gate
 
-Gate decides whether one exact diff is ready for human promotion. It owns deterministic checks, claim review, triggered judgment lenses, empirical verification, and the final verdict. Its deep lenses live in `references/lenses/`: [test strength](references/lenses/test-strength.md) for behavioral falsification, [resilience](references/lenses/resilience.md) for failure-path pressure, [security](references/lenses/security.md) for attacker modeling and vulnerability classification, and [simplify](references/lenses/simplify.md) for bounded reduction. Each emits the receipt the report schema expects.
+Gate decides whether one exact diff is ready for human promotion. It owns deterministic checks, claim review, triggered judgment lenses, empirical verification, and the final verdict. Its deep lenses live in `references/lenses/`: [test strength](references/lenses/test-strength.md) for behavioral falsification, [resilience](references/lenses/resilience.md) for failure-path pressure, [security](references/lenses/security.md) for attacker modeling and vulnerability classification, and [simplify](references/lenses/simplify.md) for bounded reduction. Their supporting rules: [security classification](references/lenses/security-classification.md), [security receipt](references/lenses/security-receipt.md), [simplification method](references/lenses/simplify-method.md). Each emits the receipt the report schema expects.
 
 ## Canonical state and execution identity
 
