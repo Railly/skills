@@ -1,0 +1,87 @@
+
+ RUN  v4.0.17 /private/var/folders/t_/srzvjq016kn2zdmpxsr841b00000gn/Tjson-render-336-strength-lWF3oO
+
+ ↓ src/types.test.ts (156 tests | 156 skipped)
+ ❯ src/state-store.test.ts (47 tests | 1 failed | 29 skipped) 5ms
+     ↓ returns the original snapshot for invalid array leaf token "01"
+     ↓ returns the original snapshot for invalid array leaf token "1x"
+     ↓ returns the original snapshot for invalid array leaf token "1.5"
+     ↓ returns the original snapshot for invalid array leaf token "-1"
+     ↓ returns the original snapshot for invalid array leaf token "4294967295"
+     ↓ returns the original snapshot for invalid intermediate array token "01"
+     ↓ returns the original snapshot for invalid intermediate array token "1x"
+     ↓ returns the original snapshot for invalid intermediate array token "1.5"
+     ↓ returns the original snapshot for invalid intermediate array token "-1"
+     ↓ returns the original snapshot for invalid intermediate array token "4294967295"
+     ↓ preserves structural sharing and infers canonical arrays only
+     ↓ rejects __proto__ without changing snapshot identity or its prototype
+     ↓ rejects constructor without changing snapshot identity or its prototype
+     ↓ rejects prototype without changing snapshot identity or its prototype
+     ✓ creates a store with initial state 1ms
+     ✓ set notifies subscribers 0ms
+     ✓ set skips notification when value is unchanged 0ms
+     ✓ update notifies subscribers once 0ms
+     ✓ update skips notification when no values changed 0ms
+     ✓ unsubscribe stops notifications 0ms
+     ✓ getSnapshot returns a new reference after mutation 0ms
+     ✓ getSnapshot returns same reference when set is a no-op 0ms
+     ✓ set on nested path does not mutate previous snapshot 0ms
+     ✓ update on nested paths does not mutate previous snapshot 0ms
+     ✓ set preserves structural sharing for untouched branches 0ms
+     ✓ getServerSnapshot returns the same state as getSnapshot 0ms
+     × silently ignores malformed array writes without changing snapshot identity 2ms
+     ✓ skips all-invalid batches and applies mixed batches only once 0ms
+     ✓ evaluates batch entries against progressively updated state 0ms
+     ✓ rejects __proto__ state paths without publishing a snapshot 0ms
+     ✓ rejects constructor state paths without publishing a snapshot 0ms
+     ✓ rejects prototype state paths without publishing a snapshot 0ms
+     ↓ does not write snapshots for invalid sets or all-invalid batches
+     ↓ writes once for a mixed batch and preserves earlier snapshots
+     ↓ evaluates sequential adapter batch paths against the latest snapshot
+     ↓ rejects __proto__ state paths without writing a snapshot
+     ↓ rejects constructor state paths without writing a snapshot
+     ↓ rejects prototype state paths without writing a snapshot
+     ↓ flattens top-level keys
+     ↓ flattens nested plain objects
+     ↓ preserves arrays as leaf values
+     ↓ preserves null as a leaf value
+     ↓ handles deeply nested objects
+     ↓ returns empty object for empty input
+     ↓ handles mixed nesting
+     ↓ stops recursion on circular references via seen set
+     ↓ caps recursion at depth limit
+
+ Test Files  1 failed | 1 skipped (2)
+      Tests  1 failed | 17 passed | 185 skipped (203)
+   Start at  12:40:37
+   Duration  156ms (transform 92ms, setup 0ms, import 143ms, tests 5ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/state-store.test.ts > createStateStore > silently ignores malformed array writes without changing snapshot identity
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 2 times
+
+Received: 
+
+  1st vi.fn() call:
+
+    Array []
+
+  2nd vi.fn() call:
+
+    Array []
+
+
+Number of calls: 2
+
+ ❯ src/state-store.test.ts:251:26
+    249|       ),
+    250|     ).toEqual(["0", "1"]);
+    251|     expect(listener).not.toHaveBeenCalled();
+       |                          ^
+    252|   });
+    253| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

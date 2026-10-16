@@ -1,0 +1,212 @@
+
+ RUN  v4.0.17 /private/var/folders/t_/srzvjq016kn2zdmpxsr841b00000gn/Tjson-render-336-strength-lWF3oO
+
+ ↓ src/state-store.test.ts (47 tests | 47 skipped)
+ ❯ src/types.test.ts (156 tests | 2 failed | 118 skipped) 8ms
+     ↓ gets nested values with JSON pointer paths
+     ↓ returns root object for empty or root path
+     ↓ returns undefined for missing paths
+     ↓ handles paths without leading slash
+     ↓ returns undefined when traversing through non-object
+     ↓ handles null values in path
+     ✓ does not coerce invalid token "01" at an array leaf 1ms
+     ✓ does not coerce invalid token "00" at an array leaf 0ms
+     ✓ does not coerce invalid token "1x" at an array leaf 0ms
+     ✓ does not coerce invalid token "1.5" at an array leaf 0ms
+     ✓ does not coerce invalid token "+1" at an array leaf 0ms
+     ✓ does not coerce invalid token "-1" at an array leaf 0ms
+     ✓ does not coerce invalid token "-0" at an array leaf 0ms
+     ✓ does not coerce invalid token "1e1" at an array leaf 0ms
+     ✓ does not coerce invalid token "0x10" at an array leaf 0ms
+     ✓ does not coerce invalid token "" at an array leaf 0ms
+     ✓ does not coerce invalid token " " at an array leaf 0ms
+     ✓ does not coerce invalid token "1\n" at an array leaf 0ms
+     ✓ does not coerce invalid token "NaN" at an array leaf 0ms
+     ✓ does not coerce invalid token "Infinity" at an array leaf 0ms
+     ✓ does not coerce invalid token "4294967295" at an array leaf 0ms
+     ✓ does not coerce invalid token "9007199254740992" at an array leaf 0ms
+     × does not coerce invalid token "1234567890123456789012345678901234567890" at an array leaf 3ms
+     ✓ does not mutate or create properties below invalid intermediate token "01" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "00" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "1x" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "1.5" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "+1" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "-1" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "-0" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "1e1" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "0x10" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token " " 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "1\n" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "NaN" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "Infinity" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "4294967295" 0ms
+     ✓ does not mutate or create properties below invalid intermediate token "9007199254740992" 0ms
+     × does not mutate or create properties below invalid intermediate token "1234567890123456789012345678901234567890" 1ms
+     ✓ keeps numeric-looking and special tokens as literal object keys 0ms
+     ✓ infers arrays only for canonical indices and a terminal append token 0ms
+     ✓ supports canonical indices, ordering, and terminal append 0ms
+     ✓ rejects an append token for reads, removals, and intermediate traversal 0ms
+     ↓ preserves string paths exactly
+     ↓ resolves $item paths against the enclosing item path
+     ↓ resolves an empty $item path to the enclosing item
+     ↓ does not resolve $item outside repeat scope
+     ↓ builds item paths without duplicate root separators
+     ↓ sets value at existing path
+     ↓ creates intermediate objects for deep paths
+     ↓ handles paths without leading slash
+     ↓ overwrites existing values
+     ↓ handles array-like paths
+     ↓ resolves literal string values
+     ↓ resolves literal number values
+     ↓ resolves literal boolean values
+     ↓ resolves $state references
+     ↓ returns undefined for missing $state references
+     ↓ returns undefined for null value
+     ↓ returns undefined for undefined value
+     ↓ getByPath unescapes ~1 to /
+     ↓ getByPath unescapes ~0 to ~
+     ↓ getByPath handles combined ~0 and ~1 escaping
+     ↓ setByPath unescapes ~1 to / in keys
+     ↓ setByPath unescapes ~0 to ~ in keys
+     ↓ getByPath reads array elements properly
+     ↓ rejects __proto__ in path utility writes
+     ↓ rejects constructor in path utility writes
+     ↓ rejects prototype in path utility writes
+     ↓ does not read or remove values through Object.prototype
+     ↓ rejects compound patches containing __proto__ before mutation
+     ↓ rejects compound patches containing constructor before mutation
+     ↓ rejects compound patches containing prototype before mutation
+     ↓ adds a property to an object
+     ↓ replaces an existing object property (add semantics)
+     ↓ inserts into an array at a specific index
+     ↓ appends to an array with - (end-of-array)
+     ↓ inserts at index 0 of an array
+     ↓ creates intermediate objects
+     ↓ deletes an object property
+     ↓ removes an element from an array by index
+     ↓ removes nested properties
+     ↓ is a no-op for non-existent paths
+       ↓ adds a new object property
+       ↓ adds nested properties creating intermediates
+       ↓ inserts into array at index
+       ↓ appends to array with -
+       ↓ removes an object property
+       ↓ removes from array by index
+       ↓ replaces an existing value
+       ↓ replaces nested values
+       ↓ moves a value from one path to another
+       ↓ moves nested values
+       ↓ is a no-op if from is missing
+       ↓ copies a value from one path to another
+       ↓ copies complex values
+       ↓ is a no-op if from is missing
+       ↓ does not copy undefined from a malformed source or write to a malformed destination
+       ↓ does not delete a move source when its destination is malformed
+       ↓ stages a move destination after removing its source
+       ↓ does not traverse unrelated branches while staging a move
+       ↓ does not access unrelated properties while staging a move
+       ↓ does not throw or delete the source for a self-referential staged destination
+       ↓ keeps applying later stream patches after a malformed path
+       ↓ succeeds when values match
+       ↓ succeeds for matching objects
+       ↓ succeeds for matching arrays
+       ↓ throws when values do not match
+       ↓ throws when path does not exist
+     ↓ compiles a series of add patches
+     ↓ handles remove operations
+     ↓ handles replace operations
+     ↓ handles move operations
+     ↓ handles copy operations
+     ↓ skips empty lines
+     ↓ uses initial value
+     ↓ processes chunks incrementally
+     ↓ handles partial lines across chunks
+     ↓ processes remaining buffer on getResult
+     ↓ resets to clean state
+     ↓ tracks all applied patches
+     ↓ handles all RFC 6902 operations
+     ↓ sets the root element
+     ↓ adds an element to the elements map
+     ↓ replaces an existing element
+     ↓ removes an element
+     ↓ adds state data
+     ↓ returns the mutated spec
+     ↓ classifies JSONL lines as patches
+     ↓ classifies non-JSONL lines as text
+     ↓ handles mixed text and JSONL
+     ↓ buffers partial lines across chunks
+     ↓ flushes remaining buffer on flush()
+     ↓ flushes text buffer on flush()
+     ↓ skips empty lines
+     ↓ converts a single node with no children
+     ↓ converts a tree with children
+     ↓ converts nested named slots to flat element references
+     ↓ hoists state from root node
+     ↓ preserves extra fields like visible and on
+     ↓ handles deeply nested trees
+     ↓ returns empty elements for empty children array
+     ↓ does not hoist state from non-root nodes
+     ↓ passes prose text through as text-delta
+     ↓ classifies valid JSONL patches as data-spec (heuristic mode)
+     ↓ lines starting with { that are NOT patches are flushed as text
+     ↓ parses content inside ```spec fence as patches
+     ↓ handles mixed text + heuristic patches in single stream
+     ↓ non-text chunks pass through unchanged
+     ↓ flush behavior at end of stream
+     ↓ splits text blocks around spec data (text-start/text-end pairs)
+     ↓ flush closes an open text block when stream ends without text-end
+     ↓ consecutive patches do not produce empty text blocks
+     ↓ parses patches inside ```spec fence
+     ↓ fence delimiters are not emitted as text or patches
+
+ Test Files  1 failed | 1 skipped (2)
+      Tests  2 failed | 36 passed | 165 skipped (203)
+   Start at  12:40:36
+   Duration  152ms (transform 97ms, setup 0ms, import 161ms, tests 8ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/types.test.ts > array JSON Pointer tokens > does not coerce invalid token "1234567890123456789012345678901234567890" at an array leaf
+AssertionError: expected 'one' to be undefined
+
+- Expected: 
+undefined
+
++ Received: 
+"one"
+
+ ❯ src/types.test.ts:95:50
+     93|       const items = data.items as unknown[];
+     94| 
+     95|       expect(getByPath(data, `/items/${token}`)).toBeUndefined();
+       |                                                  ^
+     96|       setByPath(data, `/items/${token}`, "set");
+     97|       addByPath(data, `/items/${token}`, "add");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/types.test.ts > array JSON Pointer tokens > does not mutate or create properties below invalid intermediate token "1234567890123456789012345678901234567890"
+AssertionError: expected [ 'zero', {} ] to deeply equal [ 'zero', 'one' ]
+
+- Expected
++ Received
+
+  [
+    "zero",
+-   "one",
++   {},
+  ]
+
+ ❯ expectUntouchedArray src/types.test.ts:84:17
+     82| 
+     83| function expectUntouchedArray(array: unknown[], values: unknown[]) {
+     84|   expect(array).toEqual(values);
+       |                 ^
+     85|   expect(Object.keys(array)).toEqual(values.map((_, index) => String(i…
+     86| }
+ ❯ src/types.test.ts:118:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

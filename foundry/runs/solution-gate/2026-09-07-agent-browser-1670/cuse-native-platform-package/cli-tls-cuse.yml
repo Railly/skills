@@ -1,0 +1,32 @@
+name: CLI TLS with cuse
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - id: tls
+        uses: crafter-agents/cuse@v0.2.1
+        with:
+          version: v0.2.1
+          scenario: .github/scenarios/cli-tls-windows.json
+          evidence-name: cli-tls-windows
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cli-tls-windows
+          path: |
+            ${{ steps.tls.outputs.evidence-path }}
+            windows-native-store-result.json
+          if-no-files-found: error

@@ -1,0 +1,694 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-09",
+    "repo": "vercel-labs/agent-browser",
+    "base": "eb05921bad874cd2a1b4fa5d1149f1ed26576cae",
+    "head": "323449d9618693c85d2191f7dd10010ad22f640b",
+    "profile": "external-pr",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Required passing exact-head Test Strength receipt is unavailable; authored green tests are not behavioral falsification.",
+      "Required passing exact-head Resilience Audit receipt is unavailable; full failure ownership and immediate retry proof are not established.",
+      "Independent agent uses the same OpenAI family; author model is unknown. W3C reference drive provides an independent oracle for combobox commitment, not exhaustive cross-family review.",
+      "Linux, Windows, Lightpanda, cross-document/native-dialog edge states and full trusted-input failure partitions were not exercised."
+    ],
+    "summary": "Do not promote: five reproduced correctness defects (F1-F4, F6); F5 cleared as an unverifiable-state limitation. Required specialist receipts unavailable."
+  },
+  "execution": {
+    "mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "Same-family review; author model unknown. Reference-oracle independence limited to W3C combobox commitment.",
+    "receipt": "independent-review.json",
+    "schema_failures": 3,
+    "operations": [
+      {
+        "operation": "FX credential status schema",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "native reviewer launch",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "reviewer status inventory",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      }
+    ],
+    "capability_failure": "FX wrapper reported unsupported auth mode: missing; inspected fx status --help once and fell back without repeating the wrapper.",
+    "scope_deviation": "Independent agent also ran isolated browser probes and spawned a read-only Test Strength check despite a narrower requested pass; stopped further empirical work and preserved results as supplemental evidence, not specialist pass receipts."
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-09-agent-browser-1770-323449d/contract.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5",
+      "A6"
+    ],
+    "gaps": [
+      "No separately approved Solution Gate/Spec or prior work-item manifest supplied. Review criteria derived from issue and PR."
+    ]
+  },
+  "provenance": {
+    "author_model": "unknown (PR author ctate)",
+    "reviewer_model": "GPT-6 root; independent GPT-6 Astra; supplemental native specialist",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "browser selection state machine",
+      "externally visible partial UI changes",
+      "dialog and timeout lifecycle"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "w3c-preview-repro.json",
+      "evidence": "Official W3C APG editable combobox reference reproduces F1 and manual Enter provides the independent commitment oracle. This is bounded oracle independence, not cross-family model review."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md, issue.json",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "evidence": "Review criteria derived from issue 1105 and PR guarantees."
+    },
+    {
+      "source": "design",
+      "location": "PR body; no separate Spec",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "No independently approved design or stage receipt supplied."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, docs, help, MCP/Eve, skill-data",
+      "status": "reviewed",
+      "properties": [
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P7"
+      ],
+      "evidence": "Surfaces promise exact matching, trusted activation, verified state and bounded timeout."
+    },
+    {
+      "source": "implementation",
+      "location": "diff.patch",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "evidence": "Reviewed native/ARIA branching, state predicates, filtering, polling, input and dialog handoff."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Native selection verifies the current live selected control after activation.",
+      "kind": "behavior",
+      "status": "refuted",
+      "oracle": {
+        "observes": "actual DOM/form value, activation count, popup state, and elapsed time",
+        "layer": "real browser through built CLI",
+        "method": "drive selection and inspect independent page state; compare official W3C Enter behavior",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CLI success or selected-state marker",
+        "counterexample": "The selected detached object has ca while the live replacement has us.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "REFUTED by F6: the new verification accepted a detached original select while the live replacement remained us. Basic and multiple selection cases still passed."
+      },
+      "substrates": [
+        {
+          "name": "macOS arm64 Chrome, exact built binary",
+          "status": "exercised",
+          "evidence": "Native Canada label selection returned underlying value ca in dogfood.json; authored e2e_aria_select_controls exercised native multiple values after independent dogfood."
+        }
+      ],
+      "evidence": "REFUTED by F6: the new verification accepted a detached original select while the live replacement remained us. Basic and multiple selection cases still passed."
+    },
+    {
+      "id": "P2",
+      "claim": "Combobox success corresponds to committed state, including keyboard-highlighted options.",
+      "kind": "behavior",
+      "status": "refuted",
+      "oracle": {
+        "observes": "actual DOM/form value, activation count, popup state, and elapsed time",
+        "layer": "real browser through built CLI",
+        "method": "drive selection and inspect independent page state; compare official W3C Enter behavior",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CLI success or selected-state marker",
+        "counterexample": "CLI result and actual committed widget state diverge",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "F1: W3C reference widget returned success with input C and open popup; manual Enter committed Alabama."
+      },
+      "substrates": [
+        {
+          "name": "macOS arm64 Chrome, exact built binary",
+          "status": "exercised",
+          "evidence": "F1: W3C reference widget returned success with input C and open popup; manual Enter committed Alabama."
+        }
+      ],
+      "evidence": "F1: W3C reference widget returned success with input C and open popup; manual Enter committed Alabama."
+    },
+    {
+      "id": "P3",
+      "claim": "Value/label matching survives popup removal after successful activation.",
+      "kind": "behavior",
+      "status": "refuted",
+      "oracle": {
+        "observes": "actual DOM/form value, activation count, popup state, and elapsed time",
+        "layer": "real browser through built CLI",
+        "method": "drive selection and inspect independent page state; compare official W3C Enter behavior",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CLI success or selected-state marker",
+        "counterexample": "CLI result and actual committed widget state diverge",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "F3: ca matched Canada, clicked and committed, then timed out after popup removal."
+      },
+      "substrates": [
+        {
+          "name": "macOS arm64 Chrome, exact built binary",
+          "status": "exercised",
+          "evidence": "F3: ca matched Canada, clicked and committed, then timed out after popup removal."
+        }
+      ],
+      "evidence": "F3: ca matched Canada, clicked and committed, then timed out after popup removal."
+    },
+    {
+      "id": "P4",
+      "claim": "Configured action timeout bounds every retry and activation path.",
+      "kind": "lifecycle",
+      "status": "refuted",
+      "oracle": {
+        "observes": "actual DOM/form value, activation count, popup state, and elapsed time",
+        "layer": "real browser through built CLI",
+        "method": "drive selection and inspect independent page state; compare official W3C Enter behavior",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CLI success or selected-state marker",
+        "counterexample": "CLI result and actual committed widget state diverge",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "F2: 500 ms configured deadline allowed 2421 Enter events over 2.513 seconds."
+      },
+      "substrates": [
+        {
+          "name": "macOS arm64 Chrome, exact built binary",
+          "status": "exercised",
+          "evidence": "F2: 500 ms configured deadline allowed 2421 Enter events over 2.513 seconds."
+        }
+      ],
+      "evidence": "F2: 500 ms configured deadline allowed 2421 Enter events over 2.513 seconds."
+    },
+    {
+      "id": "P5",
+      "claim": "Input-backed filtering replaces previous text and verifies successful filtered selection.",
+      "kind": "behavior",
+      "status": "refuted",
+      "oracle": {
+        "observes": "actual DOM/form value, activation count, popup state, and elapsed time",
+        "layer": "real browser through built CLI",
+        "method": "drive selection and inspect independent page state; compare official W3C Enter behavior",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CLI success or selected-state marker",
+        "counterexample": "CLI result and actual committed widget state diverge",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "F4: Red became ReBlue on macOS. F5: Blue committed and popup disappeared but unchanged filter text caused timeout."
+      },
+      "substrates": [
+        {
+          "name": "macOS arm64 Chrome, exact built binary",
+          "status": "exercised",
+          "evidence": "F4: Red became ReBlue on macOS. F5: Blue committed and popup disappeared but unchanged filter text caused timeout."
+        }
+      ],
+      "evidence": "REFUTED by F4: macOS replacement retained Re and typed ReBlue. F5 is an acknowledged unverifiable-state limitation, not a blocker."
+    },
+    {
+      "id": "P6",
+      "claim": "Explicit multiselect final sets and supported dialog handoff work in the supplied cases.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "actual DOM/form value, activation count, popup state, and elapsed time",
+        "layer": "real browser through built CLI",
+        "method": "drive selection and inspect independent page state; compare official W3C Enter behavior",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CLI success or selected-state marker",
+        "counterexample": "CLI result and actual committed widget state diverge",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "7 authored ARIA E2E tests passed after built-artifact dogfood, including multiselect and active-descendant confirm-dialog handoff; exhaustive failure/retry coverage remains unavailable."
+      },
+      "substrates": [
+        {
+          "name": "macOS arm64 Chrome, exact built binary",
+          "status": "exercised",
+          "evidence": "7 authored ARIA E2E tests passed after built-artifact dogfood, including multiselect and active-descendant confirm-dialog handoff; exhaustive failure/retry coverage remains unavailable."
+        }
+      ],
+      "evidence": "7 authored ARIA E2E tests passed after built-artifact dogfood, including multiselect and active-descendant confirm-dialog handoff; exhaustive failure/retry coverage remains unavailable."
+    },
+    {
+      "id": "P7",
+      "claim": "CLI, MCP and guidance agree on expanded select scope.",
+      "kind": "behavior",
+      "status": "verified",
+      "oracle": {
+        "observes": "actual DOM/form value, activation count, popup state, and elapsed time",
+        "layer": "real browser through built CLI",
+        "method": "drive selection and inspect independent page state; compare official W3C Enter behavior",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A file is in the diff",
+        "counterexample": "Another unchanged passage could still advertise incompatible semantics",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "All required documentation surfaces are touched; MCP forwards selector and all values; parser/schema tests pass; WebDriver explicitly rejects select. Runtime selection promises themselves fail under F1-F5."
+      },
+      "substrates": [
+        {
+          "name": "source, CLI help, unit tests, docs passage enumeration",
+          "status": "exercised",
+          "evidence": "All required documentation surfaces are touched; MCP forwards selector and all values; parser/schema tests pass; WebDriver explicitly rejects select. Runtime selection promises themselves fail under F1-F5."
+        }
+      ],
+      "evidence": "All required documentation surfaces are touched; MCP forwards selector and all values; parser/schema tests pass; WebDriver explicitly rejects select. Runtime selection promises themselves fail under F1-F5."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "Required passing exact-head Test Strength receipt is unavailable; authored green tests are not behavioral falsification."
+    },
+    "resilience": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "Required passing exact-head Resilience Audit receipt is unavailable; full failure ownership and immediate retry proof are not established."
+    }
+  },
+  "security_trigger": {
+    "required": false,
+    "reason": "Selection operates within existing browser-command authority; no authentication, origin, credential, sandbox, tenant or privilege policy changes. Values are serialized as CDP arguments, not interpolated into executable strings."
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "implementation",
+      "claim": "aria-selected=true on a combobox popup proves committed value.",
+      "status": "refuted",
+      "evidence": "W3C F1."
+    },
+    {
+      "id": "A2",
+      "source": "implementation",
+      "claim": "Raw requested value can verify the committed display after popup removal.",
+      "status": "refuted",
+      "evidence": "F3 alias mismatch."
+    },
+    {
+      "id": "A3",
+      "source": "implementation",
+      "claim": "Popup closure plus unchanged filter text is insufficient to verify commitment.",
+      "status": "verified",
+      "evidence": "F5 exemption: no distinct standard selected/form state remains; same observables can occur on cancellation, consistent with documented unverifiable rejection."
+    },
+    {
+      "id": "A4",
+      "source": "implementation",
+      "claim": "Platform Meta+A reliably selects all through this CDP helper.",
+      "status": "refuted",
+      "evidence": "F4 macOS Chrome retained Re prefix."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Reviewed preserved native matching and multiselect; new filtered and popup-removal states fail F3/F4/F6."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Compared native, combobox, listbox, selected-preview, filtering, unmount, disabled/unknown, and dialog states. F1-F4/F6 refute expanded claims; exhaustive specialist matrix unavailable."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Compared native JS matching, ARIA state matchValues, Rust matching and committed-value fallback; F3 loses value/label aliases after popup unmount."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command rewriting added."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "Selection errors observed in attached CLI JSON, preserving target and available-options context; examined opened/filter_input_sent latches."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No new external executable shims."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Native input/change and single/multiple guards inspected against prior implementation and tests; no separately confirmed default regression beyond recorded findings."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No framework or runtime signal forwarding patch."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Exact binary on Chrome and independent W3C example contradict success predicate; full substrate matrix remains a gap."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "Official W3C example driven without code edits; highlighted aria-selected option is committed only by Enter. F1."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "handle_select and dispatch read after caller sweep; F3/F5 return errors after actual selection side effects."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No new flag, mode, or config bit. Existing timeout is traced in boundary/timeout lenses."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Unknown/unverified authored E2E and local post-commit failures exercised. Required Resilience receipt remains missing."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "Inspected partial filter/selection state and subsequent errors; F3/F4/F6 leave mutated widgets. Complete cleanup/retry ownership not proven."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "F2 reproduces missed deadline and repeated Enter; general resilience receipt absent."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "CLI parser to handle_select to selection helper to CDP input and verification; MCP delegates same parser; WebDriver rejects early."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Built exact SHA and drove Chrome; W3C reference state checked independently. Other supported substrates not exercised."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Native and adversarial ARIA cases run before trusting authored tests. dogfood.json and w3c-preview-repro.json."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Postconditions owned in aria_selection_confirmed disagree with actual widget commitment (F1/F3/F5)."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Surface sweep passes, but timeout/commit/filter guarantees are contradicted by F1-F4/F6."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "HTML snippet is schematic, with no event handlers; command examples describe supported API but do not prove live behavior. Actual browser fixtures supplied in run artifacts."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No contributor decision trail supplied."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "ARIA state scans associated options on each poll and matches requested values; worst-case O(options * requested-values) plus layout reads. No performance benchmark or independent performance guarantee claimed."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "identity",
+      "outcome": "pass",
+      "reason": "Exact-copy skill doctor at 77fdde3e; exact clean head and binary digest in identity.json."
+    },
+    {
+      "check": "covered",
+      "outcome": "acknowledged",
+      "reason": "Packaged check matched the newly created SHA-named directory before any report existed; not accepted as prior coverage. Final report generated and exact SHA rechecked."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "style.log"
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "surfaces.log"
+    },
+    {
+      "check": "callers select_option",
+      "outcome": "pass",
+      "reason": "All callers in changed files; callers.log; radius Impact Map saved."
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": "timings.log; numerical sweep does not detect the F2 missing branch check."
+    },
+    {
+      "check": "siblings select",
+      "outcome": "acknowledged",
+      "reason": "doc-passages.log read: unchanged hits are selectors/tab selection/security policy or historical changelogs, terse native dropdown examples, jq select, and navigation paths; canonical selection prose updated. No missing required surface."
+    },
+    {
+      "check": "cargo build --locked",
+      "outcome": "pass",
+      "reason": "build.log; exact binary digest in identity.json."
+    },
+    {
+      "check": "cargo fmt -- --check",
+      "outcome": "pass",
+      "reason": "fmt.log"
+    },
+    {
+      "check": "cargo test --locked",
+      "outcome": "pass",
+      "reason": "1219 unit + 6 integration tests passed, 116 ignored; unit.log."
+    },
+    {
+      "check": "cargo clippy -- -D warnings",
+      "outcome": "pass",
+      "reason": "clippy.log; rustc 1.98.1."
+    },
+    {
+      "check": "cargo test e2e_aria_select -- --ignored --test-threads=1",
+      "outcome": "pass",
+      "reason": "7 passed after independent built-artifact dogfood; aria-e2e.log."
+    },
+    {
+      "check": "GitHub checks",
+      "outcome": "acknowledged",
+      "reason": "Fetched for exact head; Native E2E skipped remotely, local selection E2E run."
+    },
+    {
+      "check": "stale/producers/shellmeta/artifacts/rawinput/flagsweep/execdeps",
+      "outcome": "acknowledged",
+      "reason": "No retired duplicated value, narrowed error classifier, shell detector, new persistent artifact, deepened shared resolver, new flag or external executable."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "priority": "P1",
+      "claim": "[P1] Do not treat a highlighted combobox option as a committed value",
+      "evidence": "w3c-preview-repro.json: on the official W3C editable combobox example, type C, ArrowDown, then select the highlighted Alabama. CLI returns success but the input remains C and aria-expanded remains true. Manual Enter then commits Alabama. aria-selected is also used for popup navigation; this early return bypasses activation. Local fixture independently returned success with commits=0.",
+      "layer": "built CLI and Chrome page state",
+      "source": "built-artifact dogfood",
+      "path": "cli/src/native/interaction.rs:1603-1612",
+      "code_location": {
+        "absolute_file_path": "/Users/raillyhugo/Programming/vercel/agent-browser-1770-review/cli/src/native/interaction.rs",
+        "line_range": {
+          "start": 1603,
+          "end": 1612
+        }
+      },
+      "resolution": "open"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "priority": "P1",
+      "claim": "[P1] Enforce the deadline on the active-descendant Enter branch",
+      "evidence": "dogfood.json: with AGENT_BROWSER_DEFAULT_TIMEOUT=500, a non-committing active option received 2421 Enter events over 2.513 seconds. The fixture removed the option after 2500 ms to bound the experiment. The unconditional continue avoids every deadline check while the active option remains available. Already reported by the Vercel review on this exact head; review-comments.json records attribution.",
+      "layer": "built CLI and Chrome page state",
+      "source": "existing external review plus built-artifact reproduction",
+      "path": "cli/src/native/interaction.rs:1276-1277",
+      "code_location": {
+        "absolute_file_path": "/Users/raillyhugo/Programming/vercel/agent-browser-1770-review/cli/src/native/interaction.rs",
+        "line_range": {
+          "start": 1276,
+          "end": 1277
+        }
+      },
+      "resolution": "open"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "priority": "P2",
+      "claim": "[P2] Retain the matched option identity when verifying an unmounted popup",
+      "evidence": "dogfood.json: request ca for an option value=ca/text=Canada. Trusted click commits Canada and removes the popup; commits=1 and display=Canada, but CLI returns timeout. Post-commit fallback compares the display only against raw request ca and loses the value-to-label relationship it used to select the option.",
+      "layer": "built CLI and Chrome page state",
+      "source": "built-artifact dogfood",
+      "path": "cli/src/native/interaction.rs:1632-1637",
+      "code_location": {
+        "absolute_file_path": "/Users/raillyhugo/Programming/vercel/agent-browser-1770-review/cli/src/native/interaction.rs",
+        "line_range": {
+          "start": 1632,
+          "end": 1637
+        }
+      },
+      "resolution": "open"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "priority": "P2",
+      "claim": "[P2] Clear the existing filter reliably before typing a replacement on macOS",
+      "evidence": "independent-dogfood.json: a Chrome combobox starts with Red. Selecting Blue results in ReBlue, input events Red/Re/ReB/ReBl/ReBlu/ReBlue, commits=[], and timeout. The Meta+A CDP chord does not select all in this tested macOS Chrome path, so Backspace deletes only the last character. This new caller needs a verified select-all operation.",
+      "layer": "built CLI and Chrome page state",
+      "source": "native independent reviewer and its exact-binary isolated Chrome drive",
+      "path": "cli/src/native/interaction.rs:1149-1153",
+      "code_location": {
+        "absolute_file_path": "/Users/raillyhugo/Programming/vercel/agent-browser-1770-review/cli/src/native/interaction.rs",
+        "line_range": {
+          "start": 1149,
+          "end": 1153
+        }
+      },
+      "resolution": "open"
+    },
+    {
+      "id": "F5",
+      "state": "exempted",
+      "priority": null,
+      "claim": "Popup closure with unchanged filtered text supplies no independent standard commitment signal",
+      "evidence": "independent-dogfood.json: an initially empty combobox filters on Blue, then a trusted option click commits Blue, closes the popup, and removes its options. The command still times out although commits=[blue] and value=Blue. committed_before_activation was already Blue due to filtering, so requiring a change in text rejects this ordinary successful commit. Cleared after independent challenge: the PR explicitly rejects unverifiable widgets, and this state is indistinguishable from filter cancellation. Keep as a documented coverage/support limitation rather than a blocker.",
+      "layer": "built CLI and Chrome page state",
+      "source": "native independent reviewer and its exact-binary isolated Chrome drive",
+      "path": "cli/src/native/interaction.rs:1620-1623",
+      "code_location": {
+        "absolute_file_path": "/Users/raillyhugo/Programming/vercel/agent-browser-1770-review/cli/src/native/interaction.rs",
+        "line_range": {
+          "start": 1620,
+          "end": 1623
+        }
+      },
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F6",
+      "state": "confirmed",
+      "priority": "P1",
+      "claim": "[P1] Verify the live native select after change handlers can replace it",
+      "evidence": "supplemental-native-rerender.json: native #country change handler replaces the control. select ca returns success, but document.querySelector(#country).value is us and the live selected label is USA. New verification reuses the detached original object_id after input/change, so it confirms an obsolete node instead of the visible control.",
+      "layer": "built CLI and live Chrome DOM after synchronous rerender",
+      "source": "independent supplemental exact-binary Chrome reproduction",
+      "path": "cli/src/native/interaction.rs:746-750",
+      "code_location": {
+        "absolute_file_path": "/Users/raillyhugo/Programming/vercel/agent-browser-1770-review/cli/src/native/interaction.rs",
+        "line_range": {
+          "start": 746,
+          "end": 750
+        }
+      },
+      "resolution": "open"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Unchanged select-keyword siblings need expanded ARIA prose.",
+      "evidence": "doc-passages.log shows unrelated selector/tab/policy usage, historical entries and terse examples; full semantic prose is updated in all required surfaces."
+    },
+    {
+      "claim": "getByRole contract checklist applies.",
+      "evidence": "This diff classifies explicit select control roles and descendant options; it does not alter semantic locator lookup or AX-role normalization."
+    },
+    {
+      "claim": "Filtered popup removal with unchanged input text should necessarily return success.",
+      "evidence": "F5 real commit occurred, but externally standard state is indistinguishable from a filter cancellation; explicit unverifiable-control limitation supports conservative rejection. Independent report IR2."
+    }
+  ],
+  "issue_candidates": [],
+  "outcomes": {
+    "external_findings": 1,
+    "review_rounds": 1,
+    "human_corrections": 0,
+    "escaped_finding_class": "active-descendant retry branch bypasses timeout; already recorded in external review",
+    "related_work": "PR 1540 remains open and competes for issue 1105; PR 1106 closed. See xref.json."
+  }
+}

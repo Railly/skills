@@ -1,0 +1,355 @@
+{
+  "repository": "vercel-labs/agent-browser",
+  "worktree": "/Users/raillyhugo/Programming/vercel/agent-browser-1683",
+  "branch": "fix/1683-ctate-local-20260907",
+  "original_pr_head": "e2607d6a511cb7757a4d3e412e4284d9971f5133",
+  "integration_base": "219c47a9dab1776f320d11e66ce934fd239b2cb7",
+  "merge_commit": "8a346a2cfc0afa5dc259b02b896355ac476fa6e2",
+  "head": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+  "dirty": "clean",
+  "authorization": "local-only; no push/comments/reviews/merge GitHub",
+  "profile": "high-risk",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "contract_digest": "sha256:273e39546dafb53cc3dda769fda45f88145862e8202929ff1bff5b42016ba2be",
+  "stages": {
+    "solution": {
+      "status": "incomplete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/solution.md",
+      "gap": "La reconstrucción previa fue misma familia. Claude revisó después la solución y el arreglo; no se presenta como shaping previo independiente.",
+      "post_implementation_challenge": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/fx-cross-family-final.json"
+    },
+    "test_strength": {
+      "required": true,
+      "status": "unavailable",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/test-strength.json",
+      "evidence": "Cuatro mutaciones de las correcciones originales repetidas sobre el árbol final, todas rechazadas por assertions conductuales. Tres variantes anteriores y tres findings cross-family tienen trazas rojas previas; suite final restaurada verde. No se afirma cubrir las particiones excluidas.",
+      "fingerprint": {
+        "head_sha": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+        "changed_paths_digest": "sha256:c2660dfcf1036a5c1e8ed88038cf6000a1e81713713def5ea4d152f2f0a5e401",
+        "contract_digest": "sha256:273e39546dafb53cc3dda769fda45f88145862e8202929ff1bff5b42016ba2be",
+        "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; cargo test --manifest-path cli/Cargo.toml e2e_isolat -- --ignored --test-threads=1; AGENT_BROWSER_ISOLATION_STRESS_ROUNDS=10 cargo test --manifest-path cli/Cargo.toml --test isolate_context_cli -- --ignored --test-threads=1; cargo test --manifest-path cli/Cargo.toml test_isolation_commit_requires_a_durable_context_without_a_target -- --ignored --test-threads=1",
+        "environment_digest": "sha256:a29bc488ade3f46f58ce42a2e3e5e7a327bf5b5fb763028a07f7dad7d72967c7",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "cli/src/connection.rs",
+          "cli/src/doctor/launch.rs",
+          "cli/src/doctor/webgpu.rs",
+          "cli/src/main.rs",
+          "cli/src/native/actions.rs",
+          "cli/src/native/browser.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/tests/isolate_context_cli.rs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "evidence_scope": "Pruebas verdes y cuatro mutaciones ejecutadas sobre el árbol final; trazas rojas de nuevos casos se conservaron antes de su fix."
+      },
+      "dimensions": {
+        "values": [
+          "prior false/true; request true/omitted/false; close resets",
+          "explicit URL/port; implicit CDP; first CLI request; skip/policy deny/pending",
+          "invalid mode, refused transport, malformed storage, binding-write failure, malformed implicit action",
+          "default/A/B downloads; sequential/concurrent A/B; bytes and previous directory configuration",
+          "pinned default to isolated; successful reuse/reconnect; browser restart; daemon restart; recording",
+          "reconexión a contexto persistido + error de acción conserva conexión; recreación ya persistida + launch inválido conserva contexto",
+          "target desaparecido antes del commit: contexto nuevo falla y se dispone; contexto persistido conserva binding e intención"
+        ],
+        "exclusions": [
+          "Auto-connect por autodetección real no ejecutado. CDP URL, puerto e implícito por entorno sí ejecutados.",
+          "Windows/Linux, pérdida de transporte durante cleanup y error del drain final no ejercitados; este último recibió revisión estática. Resultados dinámicos limitados a macOS ARM64 con Chrome real."
+        ],
+        "evidence": "contract.md; final committed tests; seven red traces"
+      },
+      "oracle": {
+        "source": "ctate acceptance and baseline explicit-close semantics; real Chrome BrowserContexts and files",
+        "independent": true,
+        "evidence": "threads.json; pr.json; original handle_close at e2607d6; actual bytes/storage/target assertions"
+      },
+      "producer": {
+        "name": "Chrome 152 and compiled agent-browser CLI on macOS ARM64",
+        "status": "exercised",
+        "evidence": "cli-v4.log; isolation-e2e-v4.log"
+      },
+      "falsification": [
+        {
+          "mutation": "eager-sticky",
+          "red_evidence": "v4-mutation-eager-sticky.log: exit 101, assertion conductual o descarga cancelada; sin error de compilación",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log; full-tests-v4.log"
+        },
+        {
+          "mutation": "early-binding",
+          "red_evidence": "v4-mutation-early-binding.log: exit 101, assertion conductual o descarga cancelada; sin error de compilación",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log; full-tests-v4.log"
+        },
+        {
+          "mutation": "missing-sticky-commit",
+          "red_evidence": "v4-mutation-missing-sticky-commit.log: exit 101, assertion conductual o descarga cancelada; sin error de compilación",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log; full-tests-v4.log"
+        },
+        {
+          "mutation": "missing-download-context",
+          "red_evidence": "v4-mutation-missing-download-context.log: exit 101, assertion conductual o descarga cancelada; sin error de compilación",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log; full-tests-v4.log"
+        },
+        {
+          "mutation": "primer flag en entorno del daemon",
+          "red_evidence": "first-request-red.log",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log"
+        },
+        {
+          "mutation": "restaurar target pinned de contexto anterior",
+          "red_evidence": "pinned-implicit-red.log",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log"
+        },
+        {
+          "mutation": "commit implícito antes de validar acción",
+          "red_evidence": "implicit-red.log",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log"
+        },
+        {
+          "mutation": "rollback tras reconexión persistida",
+          "red_evidence": "cross-family-reconnect-red.log",
+          "restored_green_evidence": "isolation-e2e-v4.log",
+          "scope": "execute_command con Chrome"
+        },
+        {
+          "mutation": "flag histórico context_recreated",
+          "red_evidence": "cross-family-red.log, solo primer fallo; PoisonError secundarios excluidos",
+          "restored_green_evidence": "isolation-e2e-v4.log",
+          "scope": "execute_command tras reinicio Chrome"
+        },
+        {
+          "mutation": "commit sin target durable",
+          "red_evidence": "cross-family-no-target-red.log",
+          "restored_green_evidence": "cross-family-no-target-green.log",
+          "scope": "helper commit con cierre y eventos Chrome reales; no se inyecta carrera del comando completo"
+        }
+      ],
+      "gaps": [
+        "Auto-connect por autodetección real no ejecutado. CDP URL, puerto e implícito por entorno sí ejecutados.",
+        "Windows/Linux, pérdida de transporte durante cleanup y error del drain final no ejercitados; este último recibió revisión estática. Resultados dinámicos limitados a macOS ARM64 con Chrome real."
+      ],
+      "reason": "La campaña local pasa; las particiones y plataformas no ejercitadas permanecen explícitas. No es un fallo de tests."
+    },
+    "resilience": {
+      "required": true,
+      "status": "unavailable",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/resilience.json",
+      "fingerprint": {
+        "head_sha": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+        "changed_paths_digest": "sha256:c2660dfcf1036a5c1e8ed88038cf6000a1e81713713def5ea4d152f2f0a5e401",
+        "contract_digest": "sha256:273e39546dafb53cc3dda769fda45f88145862e8202929ff1bff5b42016ba2be",
+        "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; cargo test --manifest-path cli/Cargo.toml e2e_isolat -- --ignored --test-threads=1; AGENT_BROWSER_ISOLATION_STRESS_ROUNDS=10 cargo test --manifest-path cli/Cargo.toml --test isolate_context_cli -- --ignored --test-threads=1; cargo test --manifest-path cli/Cargo.toml test_isolation_commit_requires_a_durable_context_without_a_target -- --ignored --test-threads=1",
+        "environment_digest": "sha256:a29bc488ade3f46f58ce42a2e3e5e7a327bf5b5fb763028a07f7dad7d72967c7",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "cli/src/connection.rs",
+          "cli/src/doctor/launch.rs",
+          "cli/src/doctor/webgpu.rs",
+          "cli/src/main.rs",
+          "cli/src/native/actions.rs",
+          "cli/src/native/browser.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/tests/isolate_context_cli.rs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "evidence_scope": "Pruebas verdes y cuatro mutaciones ejecutadas sobre el árbol final; trazas rojas de nuevos casos se conservaron antes de su fix."
+      },
+      "evidence": "Fallos forzados de validación, transporte, storage, publicación, primer comando e implícito; reconexión y continuidad observadas. Contextos ya persistidos conservan conexión tras error de acción; target desaparecido en commit se probó con eventos Chrome reales, nuevo/persistido.",
+      "commit_points": [
+        {
+          "id": "C1",
+          "effect": "nuevo BrowserContext remoto",
+          "owner": "BrowserManager",
+          "commit_event": "Target.createBrowserContext",
+          "later_fallible_stages": [
+            "attach/setup",
+            "storage load",
+            "binding save",
+            "implicit action",
+            "final event drain",
+            "missing bindable target at commit"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "storage",
+              "covers": [
+                "storage load"
+              ],
+              "forced": true,
+              "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+              "cleanup_owner": "rollback_failed_launch",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "isolation-e2e-v4.log"
+              },
+              "evidence": "isolation-e2e-v4.log: invalid JSON"
+            },
+            {
+              "ownership_region": "filesystem",
+              "covers": [
+                "binding save"
+              ],
+              "forced": true,
+              "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+              "cleanup_owner": "rollback_failed_launch",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "isolation-e2e-v4.log"
+              },
+              "evidence": "isolation-e2e-v4.log: target.tmp directory fault"
+            },
+            {
+              "ownership_region": "dispatch",
+              "covers": [
+                "implicit action"
+              ],
+              "forced": true,
+              "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+              "cleanup_owner": "rollback_failed_launch",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "isolation-e2e-v4.log"
+              },
+              "evidence": "isolation-e2e-v4.log: missing URL"
+            },
+            {
+              "ownership_region": "target lifecycle",
+              "covers": [
+                "missing bindable target at commit"
+              ],
+              "forced": true,
+              "residual_observed": "Nuevo contexto sin target: error, sin sticky/binding y contexto dispuesto. Persistido sin target: binding/intent conservados.",
+              "cleanup_owner": "rollback_failed_launch",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "cross-family-no-target-green.log: siguiente estado de misma sesión crea y persiste contexto antes del cierre externo"
+              },
+              "evidence": "cross-family-no-target-red.log; cross-family-no-target-green.log; helper aislado con Chrome real"
+            }
+          ]
+        },
+        {
+          "id": "C2",
+          "effect": "binding durable y booleano sticky",
+          "owner": "commit_isolated_connection",
+          "commit_event": "save/fsync/rename succeeded, then bool=true",
+          "later_fallible_stages": [],
+          "failure_partitions": []
+        }
+      ],
+      "gaps": [
+        "No se forzó pérdida del CDP durante disposición de contexto ni el error del drain final; ese último cambio recibió revisión estática FX final."
+      ],
+      "reason": "La campaña local pasa; las particiones y plataformas no ejercitadas permanecen explícitas. No es un fallo de tests."
+    },
+    "security": {
+      "status": "pass",
+      "fingerprint": {
+        "repository": "vercel-labs/agent-browser",
+        "base_sha": "8a346a2cfc0afa5dc259b02b896355ac476fa6e2",
+        "head_sha": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+        "dirty_digest": "clean",
+        "changed_path_digest": "sha256:c2660dfcf1036a5c1e8ed88038cf6000a1e81713713def5ea4d152f2f0a5e401",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+      },
+      "claim": {
+        "property": "partición funcional entre sesiones cooperativas",
+        "attacker": "no se promete aislamiento contra controladores con acceso CDP global",
+        "scope": "comportamiento local verificado de los dos findings y variantes"
+      },
+      "trust_model": {
+        "assets": [
+          "cookies/storage, archivos descargados, binding persistido"
+        ],
+        "principals": [
+          "usuario local/CLI autorizado",
+          "daemon de sesión",
+          "Chrome compartido"
+        ],
+        "boundaries": [
+          "BrowserContext lógico",
+          "memoria a binding durable"
+        ],
+        "entrypoints": [
+          "CLI, execute_command"
+        ],
+        "sinks": [
+          "Browser.setDownloadBehavior",
+          "Target.create/disposeBrowserContext",
+          "tab_binding.save"
+        ]
+      },
+      "observations": [
+        {
+          "id": "SEC-1",
+          "classification": "non_security_defect",
+          "scope": "unrelated_bug",
+          "prerequisites": [
+            "control autorizado del CLI/CDP"
+          ],
+          "chain": {
+            "capability": "controlador ya dispone de CDP global",
+            "reachability": "comandos normales y solicitudes fallidas",
+            "control": "flags propios",
+            "boundary": "partición accidental entre sesiones cooperativas",
+            "impact": "configuración o continuidad incorrectas; no nueva autoridad demostrada"
+          },
+          "confidence": "high",
+          "evidence": [
+            "cli-v4.log",
+            "isolation-e2e-v4.log"
+          ]
+        }
+      ],
+      "verification": {
+        "authorized_scope": "worktree y Chrome efímeros locales",
+        "commands": [
+          "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; cargo test --manifest-path cli/Cargo.toml e2e_isolat -- --ignored --test-threads=1; AGENT_BROWSER_ISOLATION_STRESS_ROUNDS=10 cargo test --manifest-path cli/Cargo.toml --test isolate_context_cli -- --ignored --test-threads=1; cargo test --manifest-path cli/Cargo.toml test_isolation_commit_requires_a_durable_context_without_a_target -- --ignored --test-threads=1"
+        ],
+        "cleanup": "Sessions Drop y ChromeProcess Drop; sin cleanup global",
+        "gaps": []
+      },
+      "merge_relevance": {
+        "security_blockers": [],
+        "follow_ups": [],
+        "routed_non_security_defects": [
+          "dos findings ctate y tres variantes corregidos",
+          "continuidad tras reconexión/error, recreación histórica y commit sin target durable, corregidos tras revisión Claude"
+        ]
+      },
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/security.json"
+    },
+    "review": {
+      "status": "incomplete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/run-report.json",
+      "gaps": [
+        "Auto-connect por autodetección real no ejecutado. CDP URL, puerto e implícito por entorno sí ejecutados.",
+        "Windows/Linux, pérdida de transporte durante cleanup y error del drain final no ejercitados; este último recibió revisión estática. Resultados dinámicos limitados a macOS ARM64 con Chrome real.",
+        "La revisión de solución previa a implementar fue de la misma familia; la revisión entre familias posterior no sustituye retrospectivamente esa etapa.",
+        "No se inyectó muerte abrupta del daemon antes del binding ni interferencia entre descargas dentro de un mismo contexto; se preservan como límites fuera de estos findings."
+      ],
+      "independence_gap": null,
+      "reviewer_model": "anthropic/claude-opus-5",
+      "receipt": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/fx-cross-family-final.json"
+    }
+  },
+  "local_result": "verified",
+  "cross_family_fix_commit": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+  "previous_verified_head": "0a53aefdcae889378132f54d8ea096805f3edcea",
+  "runtime": {
+    "execution_mode": "fx_worker",
+    "model": "anthropic/claude-opus-5",
+    "credential_source": "macos-keychain",
+    "auth": "AI_GATEWAY_API_KEY",
+    "model_override": "process-local FX_MODEL",
+    "global_settings_changed": false
+  }
+}

@@ -1,0 +1,1 @@
+Add a visible GitHub repository link on the title screen and open a PR. A1: opens crafter-games/crafter-smash in another tab by mouse and the existing arrow/Enter controls. A2: matches menu styling, fits desktop and narrow/short screens, and disappears with the title screen. A3: supply an actual browser preview. No gameplay or deployment changes.

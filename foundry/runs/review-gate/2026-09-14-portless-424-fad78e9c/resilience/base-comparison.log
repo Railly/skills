@@ -1,0 +1,58 @@
+{
+  "moduleExecutions": 144,
+  "unexpectedHarnessFailures": [],
+  "firstAttemptDifferences": [
+    {
+      "id": "sync-empty-initial-read-uid0",
+      "base": {
+        "exitCode": 0,
+        "writes": 0,
+        "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n"
+      },
+      "head": {
+        "exitCode": 1,
+        "writes": 0,
+        "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n"
+      }
+    },
+    {
+      "id": "sync-empty-post-read-uid0",
+      "base": {
+        "exitCode": 0,
+        "writes": 1,
+        "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n"
+      },
+      "head": {
+        "exitCode": 1,
+        "writes": 1,
+        "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n"
+      }
+    },
+    {
+      "id": "sync-nonempty-initial-read-uid0",
+      "base": {
+        "exitCode": 1,
+        "writes": 1,
+        "after": "\n\n# portless-start\n127.0.0.1 app.localhost\n# portless-end\n"
+      },
+      "head": {
+        "exitCode": 1,
+        "writes": 0,
+        "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n"
+      }
+    },
+    {
+      "id": "clean-empty-initial-read-uid0",
+      "base": {
+        "exitCode": 0,
+        "writes": 0,
+        "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n"
+      },
+      "head": {
+        "exitCode": 1,
+        "writes": 0,
+        "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n"
+      }
+    }
+  ]
+}

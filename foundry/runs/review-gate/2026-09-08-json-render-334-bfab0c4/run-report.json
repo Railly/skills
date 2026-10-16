@@ -1,0 +1,767 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-08",
+    "repo": "vercel-labs/json-render",
+    "base": "ea3326046f57138671a238f7b1110ce5de015778",
+    "head": "bfab0c4a6ce4d1a5a56ad2979577d28993dc1736",
+    "dirty_digest": "clean",
+    "profile": "external-pr",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Required Test Strength receipt is unavailable for the new router/parser and rendering adapter. Authored tests and review reproductions do not replace that method.",
+      "Required Resilience receipt is unavailable for asynchronous loader failures, pending route transitions and retry ownership.",
+      "No accepted Issue Contract or separate design/spec receipt accompanied this standalone review; acceptance claims were derived from the PR and package documentation.",
+      "Full TanStack Start deployment, hydration and prerender pipeline were not exercised. Built package browser routing and React SSR were exercised."
+    ]
+  },
+  "execution": {
+    "mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "Original author model is unknown. Native reviewer is the same family as the orchestrator; reference-runtime oracles supply the independent behavioral challenge.",
+    "schema_failures": 2,
+    "operations": [
+      {
+        "operation": "FX wrapper independent review",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false,
+        "evidence": "Wrapper reported unsupported auth mode: missing. fx status --help inspected once; wrapper not repeated."
+      },
+      {
+        "operation": "Native fallback reviewer launch",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false,
+        "evidence": "First tool arguments rejected empty reasoning_effort; corrected schema used once."
+      }
+    ],
+    "independent_review_artifact": "native-review.md"
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-08-json-render-334-bfab0c4/scope.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5"
+    ],
+    "gaps": [
+      "No accepted Issue Contract or separate design/spec receipt accompanied this standalone review; acceptance claims were derived from the PR and package documentation."
+    ]
+  },
+  "provenance": {
+    "author_model": "unknown (GitHub author ctate)",
+    "reviewer_model": "Native GPT-6 separate review context plus root review",
+    "same_family": null
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "Asynchronous route lifecycle, pending transitions and recovery ownership",
+      "Server/client import boundary and isomorphic loader confidentiality guidance"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "independent-oracles.mjs",
+      "evidence": "Pinned TanStack implementation defines routing semantics independently; independent-oracles.log compares actual route matching and renders real HeadContent. Native-review.md is an additional separate-context review with same model family, not cross-family evidence."
+    }
+  },
+  "security_review": {
+    "status": "pass",
+    "fingerprint": {
+      "repository": "vercel-labs/json-render",
+      "base_sha": "ea3326046f57138671a238f7b1110ce5de015778",
+      "head_sha": "bfab0c4a6ce4d1a5a56ad2979577d28993dc1736",
+      "dirty_digest": "clean",
+      "changed_path_digest": "5c8821150693d1f9ba0e838a467c0895d95b8eb8837be64fc4fb56bbb9052f06",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+    },
+    "claim": {
+      "property": "Server helper import separation and navigation delegation do not create a new credential or code-execution boundary crossing.",
+      "attacker": "A user influencing generated JSON text and navigation destinations; no authority to replace application code or registered loader functions is assumed.",
+      "scope": "New package and its documented isomorphic-loader wiring; no application auth system is introduced."
+    },
+    "trust_model": {
+      "assets": [
+        "Application server credentials remain the host application responsibility",
+        "Browser origin and script execution"
+      ],
+      "principals": [
+        {
+          "name": "App developer",
+          "authority": "Chooses spec, component registry, handlers, loaders and whether to use createServerFn"
+        },
+        {
+          "name": "Generated JSON author",
+          "authority": "Supplies strings, state, declared components and named actions within host-provided registry"
+        },
+        {
+          "name": "Browser user",
+          "authority": "Navigates and reads public serialized PageData"
+        }
+      ],
+      "boundaries": [
+        "Host server-only application imports to client bundle",
+        "JSON navigation href to browser location",
+        "Untrusted displayed strings to HTML"
+      ],
+      "entrypoints": [
+        "createStartApp options and named loader selection",
+        "Link href and navigate action",
+        "StartErrorBoundary error.message"
+      ],
+      "sinks": [
+        "router.navigate and TanStack RouterLink",
+        "React text rendering",
+        "Returned PageData serialization by the host framework"
+      ]
+    },
+    "observations": [
+      {
+        "id": "SEC-1",
+        "classification": "informational",
+        "scope": "out_of_scope_hardening",
+        "prerequisites": [
+          "Application follows documented createServerFn requirement for secret-bearing loaders"
+        ],
+        "chain": {
+          "capability": "Generated spec can name only host registered loader entries; it does not define executable loaders.",
+          "reachability": "create-app.ts invokes loader mapped by route.loader.",
+          "control": "Developer supplies loader implementation and import graph.",
+          "boundary": "Isomorphic code and server-only code are separated by host TanStack Start createServerFn, not by the /server export label.",
+          "impact": "No automatic confidentiality guarantee is claimed: README explicitly documents isomorphic execution and server-function wrapping."
+        },
+        "confidence": "high",
+        "evidence": [
+          "packages/tanstack-start/README.md:135-139",
+          "packages/tanstack-start/src/create-app.ts:30-45",
+          "server-import-check.json"
+        ]
+      },
+      {
+        "id": "SEC-2",
+        "classification": "informational",
+        "scope": "out_of_scope_hardening",
+        "prerequisites": [
+          "Pinned TanStack Router default protocolAllowlist remains configured"
+        ],
+        "chain": {
+          "capability": "Generated JSON can supply href values.",
+          "reachability": "provider.tsx forwards navigation to router.navigate; link.tsx uses RouterLink.",
+          "control": "Navigation destination only; no raw HTML or eval sink added.",
+          "boundary": "TanStack Router validates dangerous URL protocols at the browser navigation boundary.",
+          "impact": "No new protocol validation bypass is visible in the adapter."
+        },
+        "confidence": "high",
+        "evidence": [
+          "packages/tanstack-start/src/components/provider.tsx:43-49",
+          "packages/tanstack-start/src/components/link.tsx:19-27",
+          "@tanstack/router-core@1.171.27/src/router.ts:2297-2305",
+          "@tanstack/router-core@1.171.27/src/utils.ts:576-610"
+        ]
+      },
+      {
+        "id": "SEC-3",
+        "classification": "non_security_defect",
+        "scope": "unrelated_bug",
+        "prerequisites": [
+          "A route loader throws a transient error"
+        ],
+        "chain": {
+          "capability": "Ordinary failing loader.",
+          "reachability": "StartErrorBoundary default Retry button.",
+          "control": "No attacker capability required.",
+          "boundary": "No authorization or confidentiality boundary crosses.",
+          "impact": "Retry remains in error state; route recovery defect."
+        },
+        "confidence": "high",
+        "evidence": [
+          "retry-before.json",
+          "retry-after-invalidate.json"
+        ]
+      }
+    ],
+    "verification": {
+      "authorized_scope": "Read-only source review and disposable local fixture. No third-party data or live application endpoint tested.",
+      "commands": [
+        "Built server export inspection",
+        "Installed TanStack Router navigation/protocol source trace",
+        "Node SSR rendering and local Chrome recovery fixture"
+      ],
+      "cleanup": "Generated files only under canonical review run and ignored dependency/build outputs in isolated review worktree.",
+      "gaps": []
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": [
+        "F1 loader retry remains stuck"
+      ]
+    },
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-08-json-render-334-bfab0c4/security-review.json"
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "scope.md and PR #334 body",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "evidence": "Derived review acceptance from PR; absence of formal Issue Contract remains a gap."
+    },
+    {
+      "source": "design",
+      "location": "No accepted Solution Gate or design receipt supplied",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "No work-item manifest existed for #334 before this review; xref contains only the seed PR."
+    },
+    {
+      "source": "user_facing",
+      "location": "Package README, API MDX, agent skill and default error UI",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "evidence": "Documented route wiring and public metadata types exercised in compiled-artifact fixtures."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/tanstack-start/src and dist",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ],
+      "evidence": "Read production package and focused tests; built and exercised its exported APIs."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Documented static/dynamic/splat matcher ranking agrees with TanStack Router.",
+      "kind": "routing",
+      "status": "verified",
+      "oracle": {
+        "observes": "Winning route IDs and decoded loader params",
+        "layer": "Built package with pinned TanStack Router",
+        "method": "Compare with createRouter.matchRoutes and exercise encoded browser route",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Handwritten matcher tests pass",
+        "counterexample": "Compare empty splats and exact routes against real Router, not an assumed specificity rule",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "oracle.mjs/log; encoded-browser.json; authored tests.log. A guessed splat specificity bug was refuted."
+      },
+      "substrates": [
+        {
+          "name": "Built package with pinned TanStack Router",
+          "status": "exercised",
+          "evidence": "oracle.mjs/log; encoded-browser.json; authored tests.log. A guessed splat specificity bug was refuted."
+        }
+      ],
+      "evidence": "oracle.mjs/log; encoded-browser.json; authored tests.log. A guessed splat specificity bug was refuted."
+    },
+    {
+      "id": "P2",
+      "claim": "Loader state is rendered and updated after invalidation; navigation preserves query/hash and pending fallback works.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "DOM state values and browser URL",
+        "layer": "Built package with pinned TanStack Router",
+        "method": "Drive compiled provider/page components and actual router",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "getPageData returns a state object",
+        "counterexample": "Change loader value via invalidate while retaining pathname; navigate query/hash; render pending component",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "revalidation.json shows value 2; browser fixture query action produced /ok?sort=name#section; pending-completed.json; tests.log includes layout and transition cases."
+      },
+      "substrates": [
+        {
+          "name": "Built package with pinned TanStack Router",
+          "status": "exercised",
+          "evidence": "revalidation.json shows value 2; browser fixture query action produced /ok?sort=name#section; pending-completed.json; tests.log includes layout and transition cases."
+        }
+      ],
+      "evidence": "revalidation.json shows value 2; browser fixture query action produced /ok?sort=name#section; pending-completed.json; tests.log includes layout and transition cases."
+    },
+    {
+      "id": "P3",
+      "claim": "Default Try again recovers from a transient route loader failure. [REFUTED]",
+      "kind": "lifecycle",
+      "status": "refuted",
+      "oracle": {
+        "observes": "Loader attempt count and recovered DOM",
+        "layer": "Built package with pinned TanStack Router",
+        "method": "Fail once, click the supplied recovery button, then compare explicit router invalidation",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A reset callback and visible button exist",
+        "counterexample": "Reset clears React catch state but does not invalidate the failed TanStack match",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "retry-before.json and retry-after-invalidate.json confirm F1."
+      },
+      "substrates": [
+        {
+          "name": "Built package with pinned TanStack Router",
+          "status": "exercised",
+          "evidence": "retry-before.json and retry-after-invalidate.json confirm F1."
+        }
+      ],
+      "evidence": "retry-before.json and retry-after-invalidate.json confirm F1."
+    },
+    {
+      "id": "P4",
+      "claim": "Route-specific metadata reaches SSR HTML for encoded static paths. [REFUTED]",
+      "kind": "metadata",
+      "status": "refuted",
+      "oracle": {
+        "observes": "Title corresponding to the displayed route",
+        "layer": "Built package with pinned TanStack Router",
+        "method": "Load /caf%C3%A9 through the documented loader and head wiring",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "getHead produces valid descriptors for unencoded helper input",
+        "counterexample": "Router supplies decoded location.pathname but encoded match.pathname",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "ssr-unicode.json confirms F2."
+      },
+      "substrates": [
+        {
+          "name": "Built package with pinned TanStack Router",
+          "status": "exercised",
+          "evidence": "ssr-unicode.json confirms F2."
+        }
+      ],
+      "evidence": "ssr-unicode.json confirms F2."
+    },
+    {
+      "id": "P5",
+      "claim": "All declared Open Graph images reach the rendered head. [REFUTED]",
+      "kind": "metadata",
+      "status": "refuted",
+      "oracle": {
+        "observes": "Rendered og:image elements",
+        "layer": "Built package with pinned TanStack Router",
+        "method": "Render HeadContent with two configured images",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "metadataToHead array includes both descriptors",
+        "counterexample": "HeadContent deduplicates equal property attributes after helper output",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "ssr.json confirms F3."
+      },
+      "substrates": [
+        {
+          "name": "Built package with pinned TanStack Router",
+          "status": "exercised",
+          "evidence": "ssr.json confirms F3."
+        }
+      ],
+      "evidence": "ssr.json confirms F3."
+    },
+    {
+      "id": "P6",
+      "claim": "Server helper exports do not import React or the router at runtime.",
+      "kind": "module-boundary",
+      "status": "verified",
+      "oracle": {
+        "observes": "Built server entry import graph",
+        "layer": "Built package with pinned TanStack Router",
+        "method": "Inspect dist/server.mjs and execute it in Node SSR helper flow",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Source server.ts claims server-safe imports",
+        "counterexample": "Compare actual external imports of built subpath, not the filename",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "server-import-check.json; ssr.json. Full Start createServerFn compiler path remains outside exercised scope."
+      },
+      "substrates": [
+        {
+          "name": "Built package with pinned TanStack Router",
+          "status": "exercised",
+          "evidence": "server-import-check.json; ssr.json. Full Start createServerFn compiler path remains outside exercised scope."
+        }
+      ],
+      "evidence": "server-import-check.json; ssr.json. Full Start createServerFn compiler path remains outside exercised scope."
+    },
+    {
+      "id": "P7",
+      "claim": "Trailing-slash route keys remain reachable through emitted static paths. [REFUTED]",
+      "kind": "routing",
+      "status": "refuted",
+      "oracle": {
+        "observes": "Matched route identity and emitted prerender path",
+        "layer": "Pinned native Router and compiled adapter",
+        "method": "Compare /about/ and /blog/$slug/ route patterns using slash/no-slash pathnames",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "collectStaticPaths emits a pathname for a static route",
+        "counterexample": "The emitted pathname is stripped before matching a route regex which requires the slash",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "independent-oracles.log: adapter null, TanStack /about/ for both pathnames"
+      },
+      "substrates": [
+        {
+          "name": "Compiled server.mjs and TanStack Router 1.170.32",
+          "status": "exercised",
+          "evidence": "independent-oracles.mjs/log"
+        }
+      ],
+      "evidence": "F4 confirmed by a reference-runtime differential; emitted paths can be unreachable."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "Required Test Strength receipt is unavailable for the new router/parser and rendering adapter. Authored tests and review reproductions do not replace that method."
+    },
+    "resilience": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "Required Resilience receipt is unavailable for asynchronous loader failures, pending route transitions and retry ownership."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Review setup",
+      "claim": "Reviewed tree matches open GitHub PR head and pinned Router dependency.",
+      "status": "verified",
+      "evidence": "github-final.json; identity.json; installed react-router=1.170.32 and router-core=1.171.27 match pnpm-lock.yaml."
+    },
+    {
+      "id": "A2",
+      "source": "README server-only loader guidance",
+      "claim": "The server subpath is import-safe, while secret-bearing loader isolation is owned by the host createServerFn wiring.",
+      "status": "verified",
+      "evidence": "README expressly calls loaders isomorphic; server-import-check.json confirms no React/router runtime import. No host-app secret isolation guarantee is inferred."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "New additive package does not replace an existing matcher data source."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "No existing guard or accepted domain is widened; new adapter behavioral matrix belongs to missing Test Strength receipt."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "F2 identifies decoded/encoded pathname split between loader and head. F4: trailing-slash keys are compiled with a slash which incoming normalization always removes. F4: trailing-slash keys are compiled with a slash which incoming normalization always removes."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No production shell argument composition added."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No daemon or one-shot warning channel."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "Tests do not replace external executables through PATH."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "No existing renderer default is changed."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No framework patch or new low-level signal channel is added."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No browser accessibility/OS semantic lookup translation; router oracle run is focused separately."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "oracle.mjs compared specificity with pinned TanStack Router; suspected empty-splat bug refuted."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No existing function gains a new failure outcome; new loader failure covered by error forcing."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No new CLI flag or dispatch envelope."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "F1 forced real loader failure, button retry, then successful router invalidation. Missing formal Resilience receipt remains explicit."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "Retry is explicit rather than a heuristic recovery detector."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Reviewed async spec factories/loaders and pending ownership; no supplied receipt verifies cancellation partitions, so review remains incomplete."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced spec to loader/PageRenderer and metadata to HeadContent; F2 and F3 are consumer-boundary mismatches."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Observed actual Chrome DOM, loader attempts, URL and serialized SSR HTML."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Compiled core/react-state/react/tanstack-start and drove dist artifacts in browser and Node SSR before trusting authored tests."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Reviewed server-safe import graph, decoded parameter claims and rendering metadata; actual import graph supports limited module claim."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "README route wiring reproduced; F2. API metadata arrays reproduced; F3."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Used the documented splat loader/head/provider pattern in executable SSR and browser fixtures."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No author decision trail was supplied."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "matchRoute recompiles and sorts routes per call: O(R log R) plus input length; not quadratic element processing and no advertised scale/SLA warrants a confirmed performance finding."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "acknowledged",
+      "reason": "No exact-head report pre-existed. Script falsely reports pass because run directory name contains head. This report supplies actual coverage; no prior pass inferred."
+    },
+    {
+      "check": "style",
+      "outcome": "acknowledged",
+      "reason": "Two added documentation em dashes match neighboring existing prose. Retained as nonblocking editorial observations; user requested review, not source edits."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "Stored conventions use legacy -> syntax, so script is not sufficient proof. Manually verified new package README, root README, API doc, renderer guide, skills, navigation, titles and docs-chat registration."
+    },
+    {
+      "check": "siblings",
+      "outcome": "pass",
+      "reason": "All tanstack-start keyword surfaces are in the diff."
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": "No new wait ceiling."
+    },
+    {
+      "check": "execdeps",
+      "outcome": "pass",
+      "reason": "No production external executable invocation."
+    },
+    {
+      "check": "version:check",
+      "outcome": "pass",
+      "reason": "All public package versions match 0.20.0."
+    },
+    {
+      "check": "build",
+      "outcome": "pass",
+      "reason": "Bun package scripts built core, react-state, react and tanstack-start including declaration outputs."
+    },
+    {
+      "check": "package tests",
+      "outcome": "pass",
+      "reason": "All 34 tests across seven files pass; tests.log."
+    },
+    {
+      "check": "package typecheck",
+      "outcome": "pass",
+      "reason": "bun run --cwd packages/tanstack-start check-types exits 0."
+    },
+    {
+      "check": "repository CI",
+      "outcome": "acknowledged",
+      "reason": "GitHub checks green at exact head. Local turbo delegated to pnpm and failed private-registry 401; used direct Bun package builds/types. No full local monorepo pass claimed."
+    },
+    {
+      "check": "stale/callers/producers/shellmeta/artifacts/rawinput/flagsweep",
+      "outcome": "acknowledged",
+      "reason": "No retired values, pre-existing consumers of new public functions, narrowed error predicates, shell detectors, persistent-file writers, prior resolution consumers or CLI flags. New intra-package resolver consumers were traced manually; F2 retained."
+    },
+    {
+      "check": "radius",
+      "outcome": "pass",
+      "reason": "Impact Map saved as impact.json; guidance only."
+    },
+    {
+      "check": "diff-check",
+      "outcome": "pass",
+      "reason": "git diff --check passes; diff-check.log."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "priority": "P2",
+      "state": "confirmed",
+      "claim": "Retry loader failures through the router before clearing the error boundary.",
+      "detail": "The default Try again button only invokes the React boundary reset. TanStack retains the failed route match, so rendering throws the same loader error again without calling the loader. In the built browser fixture the loader failed once; clicking Try again left attempts=1 and Transient failure visible. router.invalidate() immediately ran attempt 2 and rendered Recovered. Use router.invalidate() (and coordinate reset as necessary) for route-loader errors.",
+      "path": "packages/tanstack-start/src/components/error-boundary.tsx:38-39",
+      "line_start": 38,
+      "line_end": 39,
+      "evidence": "retry-before.json; retry-after-invalidate.json; browser/main.tsx; TanStack CatchBoundary/Match source",
+      "layer": "Built package, real TanStack Router and Chrome DOM",
+      "source": "dogfood",
+      "resolution": "open"
+    },
+    {
+      "id": "F4",
+      "priority": "P2",
+      "state": "confirmed",
+      "claim": "Normalize trailing slashes on route keys as well as incoming pathnames.",
+      "detail": "compileRoute preserves a required slash in /about/ and /blog/$slug/, but normalizePathname removes it from every incoming path. These keys can never resolve. The real TanStack Router matches both /about and /about/ to /about/, while this adapter returns null for both. collectStaticPaths still emits /about/, yielding a generated prerender path getPageData rejects. Normalize patterns without losing their original lookup identity, or validate and explicitly reject unsupported keys.",
+      "path": "packages/tanstack-start/src/router.ts:18",
+      "line_start": 18,
+      "line_end": 18,
+      "evidence": "independent-oracles.mjs; independent-oracles.log; native-review.md",
+      "layer": "Built adapter versus pinned TanStack Router runtime",
+      "source": "native independent reviewer",
+      "resolution": "open"
+    },
+    {
+      "id": "F2",
+      "priority": "P2",
+      "state": "confirmed",
+      "claim": "Normalize the head pathname consistently with the loader pathname.",
+      "detail": "For a static route /café, the documented loader passes decoded location.pathname=/café and renders its page, but the documented head hook passes encoded match.pathname=/caf%C3%A9. matchRoute compares literal static segments, misses the route, and getHead silently returns root metadata. The SSR fixture rendered Cafe body with SSR proof as its title instead of the route title Cafe page. Use the same pathname representation at both hooks, with safe segment encoding semantics.",
+      "path": "packages/tanstack-start/src/create-app.ts:70-72",
+      "line_start": 70,
+      "line_end": 72,
+      "evidence": "ssr-unicode.mjs; ssr-unicode.json; documented head hook in packages/tanstack-start/README.md:124",
+      "layer": "Real TanStack match records and rendered SSR HTML",
+      "source": "boundary pipeline trace",
+      "resolution": "open"
+    },
+    {
+      "id": "F3",
+      "priority": "P2",
+      "state": "confirmed",
+      "claim": "Account for HeadContent deduplication before advertising multiple Open Graph images.",
+      "detail": "StartMetadata accepts images:string[] and metadataToHead emits repeated og:image descriptors. The pinned TanStack HeadContent deduplicates by property and retains the last descriptor, so images [\"/a.png\",\"/b.png\"] becomes only /b.png in rendered HTML. This silently drops the first/preferred image and every additional image. Preserve supported multi-image semantics at the rendering boundary or explicitly narrow the API and choose the intended single image.",
+      "path": "packages/tanstack-start/src/metadata.ts:87-89",
+      "line_start": 87,
+      "line_end": 89,
+      "evidence": "ssr.mjs; ssr.json; @tanstack/react-router/src/headContentUtils.tsx:35-70",
+      "layer": "Rendered SSR head HTML",
+      "source": "substrate verification",
+      "resolution": "open"
+    },
+    {
+      "id": "R1",
+      "state": "refuted",
+      "claim": "Empty splat incorrectly outranks exact route.",
+      "evidence": "oracle.log shows same winner in actual TanStack Router.",
+      "layer": "reference implementation",
+      "source": "oracle",
+      "path": "packages/tanstack-start/src/router.ts",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "R2",
+      "state": "refuted",
+      "claim": "Same-path invalidation never updates rendered initial state.",
+      "evidence": "revalidation.json shows value 2 and react-state syncs changed initialState.",
+      "layer": "Chrome DOM",
+      "source": "dogfood",
+      "path": "packages/tanstack-start/src/components/page-renderer.tsx",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No existing renderer implementation needs parity changes.",
+      "evidence": "The new package composes existing React Renderer; core or sibling renderer semantics are not changed."
+    },
+    {
+      "claim": "No public skill/README edits made during review.",
+      "evidence": "Review-only authorization; target git status remains clean."
+    }
+  ],
+  "issue_candidates": [],
+  "outcome": {
+    "external_findings": null,
+    "review_rounds": 1,
+    "human_corrections": 0,
+    "escaped_finding_class": null
+  }
+}

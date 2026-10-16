@@ -1,0 +1,83 @@
+{
+  "startedAt": "2026-09-18T02:07:30.219107+00:00",
+  "commands": [
+    {
+      "name": "negative-base",
+      "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/post-ready-control",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "native::cdp::chrome::tests::test_stderr_drained_after_port_readiness",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exitCode": 101,
+      "expectedExitCode": 101,
+      "elapsedSeconds": 53.390571541,
+      "log": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/post-ready-results/negative-base.log"
+    },
+    {
+      "name": "positive-chrome-tests",
+      "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/post-ready",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "native::cdp::chrome::tests::",
+        "--",
+        "--test-threads=1"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 45.270569458000004,
+      "log": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/post-ready-results/positive-chrome-tests.log"
+    },
+    {
+      "name": "format",
+      "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/post-ready",
+      "argv": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 1.0807843749999932,
+      "log": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/post-ready-results/format.log"
+    },
+    {
+      "name": "original-gate-integrity",
+      "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate",
+      "argv": [
+        "python3",
+        "verify-gate.py"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "elapsedSeconds": 0.29752412499999537,
+      "log": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/post-ready-results/original-gate-integrity.log"
+    }
+  ],
+  "status": "PASS",
+  "endedAt": "2026-09-18T02:09:10.391265+00:00",
+  "runtimeSha256": "6d24863eef6216c684527fc6c1ffe5a084479020bec67ea01e5d7627ea595ead",
+  "productionCodeUnchangedFromCandidate": true,
+  "identicalRegressionOnBase": true,
+  "patchSha256": "cb434ab13882a48b5fc8f203bc2c5abe08a96acb9b462bee6a4613222ff6787b"
+}

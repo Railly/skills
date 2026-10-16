@@ -1,0 +1,113 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/json-render",
+    "base_sha": "ea3326046f57138671a238f7b1110ce5de015778",
+    "head_sha": "8ada1493956ab69a9cede7c80964c9bafedcff0f",
+    "dirty_digest": "clean",
+    "changed_path_digest": "c6a7fa943b486ae95c53e8999cfa690d176ccdd917a5ea40d5cd64895a0e1ed9",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "Server helper import separation and navigation delegation do not create a new credential or code-execution boundary crossing.",
+    "attacker": "A user influencing generated JSON text and navigation destinations; no authority to replace application code or registered loader functions is assumed.",
+    "scope": "New package and its documented isomorphic-loader wiring; no application auth system is introduced."
+  },
+  "trust_model": {
+    "assets": [
+      "Application server credentials remain the host application responsibility",
+      "Browser origin and script execution"
+    ],
+    "principals": [
+      {
+        "name": "App developer",
+        "authority": "Chooses spec, component registry, handlers, loaders and whether to use createServerFn"
+      },
+      {
+        "name": "Generated JSON author",
+        "authority": "Supplies strings, state, declared components and named actions within host-provided registry"
+      },
+      {
+        "name": "Browser user",
+        "authority": "Navigates and reads public serialized PageData"
+      }
+    ],
+    "boundaries": [
+      "Host server-only application imports to client bundle",
+      "JSON navigation href to browser location",
+      "Untrusted displayed strings to HTML"
+    ],
+    "entrypoints": [
+      "createStartApp options and named loader selection",
+      "Link href and navigate action",
+      "StartErrorBoundary error.message"
+    ],
+    "sinks": [
+      "router.navigate and TanStack RouterLink",
+      "React text rendering",
+      "Returned PageData serialization by the host framework"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-1",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": [
+        "Application follows documented createServerFn requirement for secret-bearing loaders"
+      ],
+      "chain": {
+        "capability": "Generated spec can name only host registered loader entries; it does not define executable loaders.",
+        "reachability": "create-app.ts invokes loader mapped by route.loader.",
+        "control": "Developer supplies loader implementation and import graph.",
+        "boundary": "Isomorphic code and server-only code are separated by host TanStack Start createServerFn, not by the /server export label.",
+        "impact": "No automatic confidentiality guarantee is claimed: README explicitly documents isomorphic execution and server-function wrapping."
+      },
+      "confidence": "high",
+      "evidence": [
+        "packages/tanstack-start/README.md:135-139",
+        "packages/tanstack-start/src/create-app.ts:30-45",
+        "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-08-json-render-334-bfab0c4/server-import-check.json"
+      ]
+    },
+    {
+      "id": "SEC-2",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": [
+        "Pinned TanStack Router default protocolAllowlist remains configured"
+      ],
+      "chain": {
+        "capability": "Generated JSON can supply href values.",
+        "reachability": "provider.tsx forwards navigation to router.navigate; link.tsx uses RouterLink.",
+        "control": "Navigation destination only; no raw HTML or eval sink added.",
+        "boundary": "TanStack Router validates dangerous URL protocols at the browser navigation boundary.",
+        "impact": "No new protocol validation bypass is visible in the adapter."
+      },
+      "confidence": "high",
+      "evidence": [
+        "packages/tanstack-start/src/components/provider.tsx:43-49",
+        "packages/tanstack-start/src/components/link.tsx:19-27",
+        "@tanstack/router-core@1.171.27/src/router.ts:2297-2305",
+        "@tanstack/router-core@1.171.27/src/utils.ts:576-610"
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "Read-only source review and disposable local fixture. No third-party data or live application endpoint tested.",
+    "commands": [
+      "Built server export inspection",
+      "Installed TanStack Router navigation/protocol source trace",
+      "Node SSR rendering and local Chrome recovery fixture",
+      "Inspect bfab0c4..8ada149 delta: normalize decoded static text, preserve %25 and invalidate router on retry; no security-sensitive sink added."
+    ],
+    "cleanup": "Generated files only under canonical review run and ignored dependency/build outputs in isolated review worktree.",
+    "gaps": []
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": []
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-08-json-render-334-8ada149/security-review.json"
+}

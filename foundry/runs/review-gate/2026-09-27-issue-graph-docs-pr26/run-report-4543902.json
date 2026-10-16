@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-27",
+    "repo": "vercel-labs/issue-graph",
+    "base": "9f34143ba67f87647735f532573dcb7dff6c90da",
+    "head": "454390242864850160deb26a2829aff14a15032d",
+    "profile": "mechanical",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "sequential_isolated",
+    "degraded_from": null,
+    "independence_gap": "Same-author focused review; no independent approval. Mechanical documentation profile does not require an independent challenge.",
+    "receipt": "focused-review.json",
+    "schema_failures": 0,
+    "operations": [
+      {
+        "operation": "focused documentation review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "contract.md",
+    "spec_status": "not_required",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "Codex root agent",
+    "reviewer_model": "same Codex root agent",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [
+      "Documentation and navigation inventory only; CLI and dashboard runtime unchanged."
+    ],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": false,
+      "method": "not_required",
+      "artifact": null,
+      "evidence": "Mechanical profile uses a focused sequential review and real CLI/browser evidence."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Reviewed scope, executable examples, shared-state claims and static export behavior against actual artifacts."
+    },
+    {
+      "source": "design",
+      "location": "focused-review.json",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Reviewed scope, executable examples, shared-state claims and static export behavior against actual artifacts."
+    },
+    {
+      "source": "user_facing",
+      "location": "README and apps/docs/content/docs",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Reviewed scope, executable examples, shared-state claims and static export behavior against actual artifacts."
+    },
+    {
+      "source": "implementation",
+      "location": "Documentation diff and unchanged runtime contracts",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Reviewed scope, executable examples, shared-state claims and static export behavior against actual artifacts."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The authored query/config examples reproduce the documented filters, scoped weights and frozen replay.",
+      "kind": "documentation",
+      "status": "verified",
+      "oracle": {
+        "observes": "built CLI outputs plus stored config, immutable capture and query receipt",
+        "layer": "CLI and filesystem",
+        "method": "extract 12 real fenced examples and execute against a real 1000-node capture; change defaults then replay",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "examples merely parse or match strings in docs",
+        "counterexample": "a replay that silently takes new defaults or inherits previous filters would still parse",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "New capture queries reset filters, current defaults change reactions to 5, while historical query and viewUrl remain exactly unchanged; overrides reject with exit 2."
+      },
+      "substrates": [
+        {
+          "name": "built CLI and real saved GitHub model",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-pr26-2026-09-27/verification.json"
+        }
+      ],
+      "evidence": "15 invocations passed, including history rejection; 14 matched open issues meet the documented minimum."
+    },
+    {
+      "id": "P2",
+      "claim": "The new guide is navigable and exact links load the documented filtered view while preserving full embedded data and assets.",
+      "kind": "presentation",
+      "status": "verified",
+      "oracle": {
+        "observes": "production HTTP routes, Chromium DOM and embedded model",
+        "layer": "rendered site and exported dashboard",
+        "method": "build production docs, drive routes and named agent-browser sessions, inspect exact view URL and DOM rows",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "successful compilation without checking the rendered page or returned link",
+        "counterexample": "missing navigation, truncated markdown table cells or a generic unfiltered dashboard could compile",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "New guide appears in navigation, six reference tables have valid cell counts, returned file URL renders 14 Rank rows, embedded data retains all 1000 nodes."
+      },
+      "substrates": [
+        {
+          "name": "production Next docs and exported Next dashboard",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-pr26-2026-09-27/browser-reference.json and browser-query.txt"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-pr26-2026-09-27/checks.json"
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "No production behavior, parser, serializer, lifecycle, protocol or regression test logic added; existing content assertions point at the modern rerun constant."
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "No new runtime writes, cleanup, retry, timeout or cancellation behavior."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Git and package registry",
+      "claim": "PR27 is merged and the published package is still 0.3.2; docs follow main rather than claiming released command availability.",
+      "status": "verified",
+      "evidence": "GitHub reports merge commit 9f34143; npm registry latest read returned 0.3.2. README/get-started distinguish main and installed --help."
+    },
+    {
+      "id": "A2",
+      "source": "git diff",
+      "claim": "Provider implementation, dashboard look and feel and private data are unchanged.",
+      "status": "verified",
+      "evidence": "Changed paths are documentation, navigation inventory and an existing content expectation only. Real data lives solely in the external evidence directory."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Focused source-contract review plus real extracted CLI examples, filesystem and browser verification recorded in focused-review.json."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Focused source-contract review plus real extracted CLI examples, filesystem and browser verification recorded in focused-review.json."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Focused source-contract review plus real extracted CLI examples, filesystem and browser verification recorded in focused-review.json."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Focused source-contract review plus real extracted CLI examples, filesystem and browser verification recorded in focused-review.json."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Focused source-contract review plus real extracted CLI examples, filesystem and browser verification recorded in focused-review.json."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "Documentation-only diff does not change the runtime behavior that triggers this lens."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "gate.sh style and git diff --check pass."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "site.ts only adds the modern rerun example constant. discovery.ts and CONTRIBUTING.md do not consume that constant and retain correct install/access guidance."
+    },
+    {
+      "check": "siblings",
+      "outcome": "acknowledged",
+      "reason": "Untouched ISSUE_GRAPH_HOME passages in README, status and canonical skill already describe the correct shared state; no duplicate prose needed."
+    },
+    {
+      "check": "stale",
+      "outcome": "pass",
+      "reason": "No retired flags remain in README or authored web guides; canonical skill retains only its explicit compatibility list and captured fixtures retain historical provenance."
+    },
+    {
+      "check": "docs and skill tests",
+      "outcome": "pass",
+      "reason": "96 docs tests and 36 bundled-skill tests pass."
+    },
+    {
+      "check": "build and browser",
+      "outcome": "pass",
+      "reason": "CLI/static dashboard and production docs build; HTTP suite and agent-browser checks pass."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "Independent agent review is absent",
+      "evidence": "This mechanical docs review uses one same-author focused pass and makes no independent approval claim."
+    }
+  ],
+  "issue_candidates": []
+}

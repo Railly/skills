@@ -1,0 +1,537 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-27",
+    "repo": "vercel-labs/issue-graph",
+    "base": "44a9e181367e42a7e0c1955c9eb75d34b4089c1e",
+    "head": "c4cc8ba76ab184166e0063d3beeb5e051534c951",
+    "profile": "mechanical",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "sequential_isolated",
+    "degraded_from": "native_subagent",
+    "independence_gap": "Native reviewer returned workspace acknowledgement, not substantive review. This focused pass is same-author; mechanical profile does not require independent challenge.",
+    "receipt": "focused-review.json",
+    "schema_failures": 1,
+    "operations": [
+      {
+        "operation": "launch native focused reviewer",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "request substantive native review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "same-author focused diff review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-issue-graph-docs-audit/contract.md",
+    "spec_status": "not_applicable",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "Codex session (model identifier not recorded)",
+    "reviewer_model": "Same-author sequential focused pass",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": false,
+      "method": "not_required",
+      "artifact": "focused-review.json",
+      "evidence": "Mechanical documentation and static command metadata update. No runtime collection, parser, persistence, or permission behavior changes."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "A1-A4 require coherent current docs, complete command discovery, source links and concise guidance."
+    },
+    {
+      "source": "design",
+      "location": "No separate design; source behavior remains authoritative.",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "Audit describes shipped behavior without adding a new product design."
+    },
+    {
+      "source": "user_facing",
+      "location": "README, CONTRIBUTING, docs MDX, CLI help and bundled core skill.",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P3",
+        "P4"
+      ],
+      "evidence": "Documentation changes match current source and observed workflows."
+    },
+    {
+      "source": "implementation",
+      "location": "src/schema.ts, src/schema.test.ts, src/cli.ts, docs site/discovery constants and content assertions.",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "Changes are static metadata, help text, source-link visibility and drift checks."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Guides describe actual scopes, defaults, aliases and local writes.",
+      "kind": "documentation_contract",
+      "status": "verified",
+      "oracle": {
+        "observes": "Parser-selected budgets, CLI formats, retained captures, history and replay URL.",
+        "layer": "emitted commands, persisted artifacts and rendered documentation",
+        "method": "Read dispatch and execute live read-only collection/query/config/runs/replay flows.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A documentation or schema assertion alone could pass while runtime behavior differs.",
+        "counterexample": "A blanket 1000 default or a no-save promise that also forbids HTML contradicts the parser and export path.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/query.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/replay-after-remove.json; focused-review.json"
+      },
+      "substrates": [
+        {
+          "name": "Source parser and built CLI with isolated state",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/query.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/replay-after-remove.json; focused-review.json"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/query.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/replay-after-remove.json; focused-review.json"
+    },
+    {
+      "id": "P2",
+      "claim": "Emitted schema covers every advertised command and matches parser defaults.",
+      "kind": "documentation_contract",
+      "status": "verified",
+      "oracle": {
+        "observes": "Actual schema command inventory and numeric budgets versus live help and parser.",
+        "layer": "emitted commands, persisted artifacts and rendered documentation",
+        "method": "Exercise emitted command JSON, compare inventory, mutate each missing command/default/alias/dispatch, then restore.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A documentation or schema assertion alone could pass while runtime behavior differs.",
+        "counterexample": "Schema object can list commands but dispatch can return a stale object; dispatch mutation rejects that case.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-summary.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/final-artifact.json"
+      },
+      "substrates": [
+        {
+          "name": "Node CLI process and compiled distribution",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-summary.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/final-artifact.json"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-summary.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/final-artifact.json"
+    },
+    {
+      "id": "P3",
+      "claim": "Docs source links reflect the public repository and guides cover exported dashboard APIs.",
+      "kind": "documentation_contract",
+      "status": "verified",
+      "oracle": {
+        "observes": "Live repository visibility, rendered menu target, real library sample outputs.",
+        "layer": "emitted commands, persisted artifacts and rendered documentation",
+        "method": "Read GitHub facts, open actual production-build menu and execute documented example with built exports.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A documentation or schema assertion alone could pass while runtime behavior differs.",
+        "counterexample": "A source constant can be true while the menu omits or misroutes the edit link; browser verified actual href.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/public-facts.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/browser-source-menu.txt; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/site-checks.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/library-sample.mjs"
+      },
+      "substrates": [
+        {
+          "name": "Local docs production server, browser DOM and compiled library",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/public-facts.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/browser-source-menu.txt; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/site-checks.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/library-sample.mjs"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/public-facts.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/browser-source-menu.txt; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/site-checks.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/library-sample.mjs"
+    },
+    {
+      "id": "P4",
+      "claim": "Shorter bundled guidance retains essential routing and boundaries.",
+      "kind": "documentation_contract",
+      "status": "verified",
+      "oracle": {
+        "observes": "Full core returned by compiled CLI plus preserved coverage, private data, config and exact-link rules.",
+        "layer": "emitted commands, persisted artifacts and rendered documentation",
+        "method": "Compare final core to built retrieval, execute retrieval/content assertions and manually review removed versus retained guidance.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A documentation or schema assertion alone could pass while runtime behavior differs.",
+        "counterexample": "A shorter source can pass word checks while the installed guide remains stale; final built retrieval equals source.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/final-artifact.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+      },
+      "substrates": [
+        {
+          "name": "Bundled skill retrieval and docs content routes",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/final-artifact.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/final-artifact.json; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "test-strength-receipt.json",
+      "evidence": "Ten representative mutations rejected at intended assertions; restored implementation passes. Final 42 targeted tests pass after final text-only corrections. /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json",
+      "fingerprint": {
+        "head_sha": "c4cc8ba76ab184166e0063d3beeb5e051534c951",
+        "dirty_digest": "clean",
+        "changed_paths_digest": "sha256:8687339ff1dc657d4570ede8b297f71acce32bfc632631c7080b606625c2a570",
+        "contract_digest": "sha256:8097f4e7be2484301beeec8deb7de8500496cb8839ecc34892a3e539872c71d9",
+        "command": "bun /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/tooling/pnpm/bin/pnpm.cjs exec vitest run src/schema.test.ts src/skill.test.ts src/skills-cli.test.ts",
+        "environment_digest": "sha256:4944222cd91e71484620074903c5f9baee60e69e09c9cd3189aa547f5547d607",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "src/schema.ts",
+          "src/schema.test.ts",
+          "src/cli.ts",
+          "src/bin.ts",
+          "tests/node-process.ts",
+          "skill-data/core/SKILL.md"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      },
+      "dimensions": {
+        "values": [
+          "Every help command including six previously omitted schema commands",
+          "Repository versus labeled/item scope defaults",
+          "Reconcile human alias mapping",
+          "CLI schema dispatch versus exported command contract"
+        ],
+        "exclusions": [
+          "No new parser, lifecycle or provider-write behavior; fuzzing is unnecessary for fixed descriptive metadata.",
+          "Platform package matrix is delegated to repository CI; local package verification uses Node24."
+        ],
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-summary.json"
+      },
+      "oracle": {
+        "source": "Actual CLI --help output and argument parser default values are independent of schema metadata.",
+        "independent": true,
+        "evidence": "Tests compare emitted schema to help inventory and parseArgs outputs rather than reproducing schema constants."
+      },
+      "producer": {
+        "name": "Node-executed CLI command dispatch and packed CLI consumer",
+        "status": "exercised",
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/package-final.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+      },
+      "falsification": [
+        {
+          "mutation": "missing-open",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-missing-open.log (exit 1, assertion=true)",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        },
+        {
+          "mutation": "missing-rank",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-missing-rank.log (exit 1, assertion=true)",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        },
+        {
+          "mutation": "missing-cluster",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-missing-cluster.log (exit 1, assertion=true)",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        },
+        {
+          "mutation": "missing-dashboard",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-missing-dashboard.log (exit 1, assertion=true)",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        },
+        {
+          "mutation": "missing-runs",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-missing-runs.log (exit 1, assertion=true)",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        },
+        {
+          "mutation": "missing-auth",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-missing-auth.log (exit 1, assertion=true)",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        },
+        {
+          "mutation": "wrong-wide-budget",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-wrong-wide-budget.log (exit 1, assertion=true)",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        },
+        {
+          "mutation": "wrong-narrow-budget",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-wrong-narrow-budget.log (exit 1, assertion=true)",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        },
+        {
+          "mutation": "wrong-reconcile-alias",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-wrong-reconcile-alias.log (exit 1, assertion=true)",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        },
+        {
+          "mutation": "wrong-cli-dispatch",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-dispatch.log (exit 1, assertion=true)",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/mutation-restored.log; /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+        }
+      ]
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "No new runtime mutation, lifecycle, retry, timeout or cleanup behavior. Existing storage is documented and exercised."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "AS1",
+      "source": "Live labs/main fetch",
+      "claim": "PR26 is merged and audit base is current canonical main.",
+      "status": "verified",
+      "evidence": "labs/main remains 44a9e181367e42a7e0c1955c9eb75d34b4089c1e after final fetch."
+    },
+    {
+      "id": "AS2",
+      "source": "GitHub API and exported model capabilities",
+      "claim": "Repository visibility is public; live collection support remains GitHub only.",
+      "status": "verified",
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/public-facts.json; focused-review.json"
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Parser checks cover default 80 versus 1000 scopes and reconcile aliases, with falsifying mutations."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Saved captures, frozen replay URLs, retained query history, and browser edit-source target observed directly."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Packed CLI 45-command consumer smoke and live public-repository read-only workflows pass; final compiled schema/skill checked after last text changes."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Traced all HTML export and snapshot paths, cluster apply and runs removal; fixed omitted graph dashboard-model write."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Changed prose checked against help, argument parser, live CLI, library exports and filesystem outputs."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Executed the library example with built exports and real captured graph; CLI examples produced query, replay and scoped config artifacts."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision-trail artifact was created."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No changed runtime dispatch, resolution, lifecycle, input processing or complexity behavior triggers this lens."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "git diff --check; gate style/surfaces",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+    },
+    {
+      "check": "root lint, typecheck, tests and build",
+      "outcome": "pass",
+      "reason": "738 tests pass: /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/core-check-final.log; final metadata recompiled in final-artifact.json."
+    },
+    {
+      "check": "final schema/skill targeted verification",
+      "outcome": "pass",
+      "reason": "42 tests: /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/review-final-checks.json"
+    },
+    {
+      "check": "docs lint/typecheck/test/build/routes",
+      "outcome": "pass",
+      "reason": "96 tests and 90 HTTP route checks: docs-check-final.log, docs-build-final.log, docs-routes-final.log; final text refinements reran 96 tests."
+    },
+    {
+      "check": "package consumption",
+      "outcome": "pass",
+      "reason": "Node24: 45 commands and 16 fixture calls in package-final.log; final compiled metadata and skill checked separately."
+    },
+    {
+      "check": "force-red and restored green",
+      "outcome": "pass",
+      "reason": "Ten targeted mutations rejected: mutation-summary.json."
+    },
+    {
+      "check": "stale-value and documentation-sibling sweep",
+      "outcome": "pass",
+      "reason": "Zero hits for retired internal-repository, alias-rejection, blanket 1000-default and partial-schema wording in current guides/help."
+    },
+    {
+      "check": "GitHub CI exact head",
+      "outcome": "pass",
+      "reason": "Run 36349720573 succeeded on c4cc8ba76ab184166e0063d3beeb5e051534c951: core, package Node20/22/24, docs production and preview. /Users/raillyhugo/Programming/vercel/issue-graph-evidence/docs-audit-2026-09-27/ci-final.json"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Graph local-write schema omitted saved dashboard model on HTML export.",
+      "evidence": "src/cli.ts wantsHtml path calls writeDashboardModel unless noSnapshot; final docs and schema include it.",
+      "layer": "Documentation/storage contract",
+      "source": "focused review",
+      "path": "src/schema.ts commands.graph.localWrites",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Security review not triggered by source visibility and auth wording.",
+      "evidence": "Link target now points to already-public source. Authentication behavior, repository permissions and credential handling are unchanged."
+    },
+    {
+      "claim": "Historical changelog and captures retain original dates and samples.",
+      "evidence": "Current graph page explicitly distinguishes old agent-browser capture from new Portless landing capture."
+    },
+    {
+      "claim": "No new broad tests for editorial text.",
+      "evidence": "Existing content checks run; new behavioral schema guards target omission/default drift and pass falsification."
+    }
+  ],
+  "issue_candidates": [],
+  "outcome": {
+    "external_findings": 0,
+    "review_rounds": 1,
+    "human_corrections": 0,
+    "escaped_finding_class": null
+  }
+}

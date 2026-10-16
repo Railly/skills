@@ -1,0 +1,51 @@
+{
+  "head": "323449d9618693c85d2191f7dd10010ad22f640b",
+  "binary": "/Users/raillyhugo/Programming/vercel/agent-browser-1770-review/cli/target/debug/agent-browser",
+  "binary_sha256": "64cf637b12b8cf82693163597b82e6721224f4266f261376ded0d3476ed51605",
+  "records": [
+    {
+      "args": [
+        "eval",
+        "--stdin"
+      ],
+      "stdin": "document.body.innerHTML='<select id=\"country\"><option value=\"us\">USA</option><option value=\"ca\">Canada</option></select>'; window.events=[]; document.querySelector('#country').onchange=function(){events.push(this.value);this.outerHTML='<select id=\"country\"><option value=\"us\">USA</option><option value=\"ca\">Canada</option></select>'}; true",
+      "exit": 0,
+      "elapsed": 1.390182292,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":11677035664275010974},\"launched\":true,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_attempted\"},\"origin\":\"about:blank\",\"result\":true},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "select",
+        "#country",
+        "ca"
+      ],
+      "stdin": null,
+      "exit": 0,
+      "elapsed": 0.013193334000000112,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":11677035664275010974},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"selected\":[\"ca\"]},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "eval",
+        "--stdin"
+      ],
+      "stdin": "({value:document.querySelector('#country').value,selected:document.querySelector('#country').selectedOptions[0].textContent,events})",
+      "exit": 0,
+      "elapsed": 0.01156558299999988,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":11677035664275010974},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"about:blank\",\"result\":{\"events\":[\"ca\"],\"selected\":\"USA\",\"value\":\"us\"}},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "close"
+      ],
+      "stdin": null,
+      "exit": 0,
+      "elapsed": 0.13202283299999995,
+      "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+      "stderr": ""
+    }
+  ]
+}

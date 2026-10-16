@@ -1,0 +1,251 @@
+{
+  "status": "pass",
+  "observations": [
+    {
+      "args": [
+        "--executable-path",
+        "/usr/bin/chromium",
+        "--args",
+        "--no-sandbox",
+        "--ca-cert",
+        "/work/cli/tests/fixtures/tls/ca-a.pem",
+        "open",
+        "https://localhost:42255"
+      ],
+      "response": {
+        "success": true,
+        "data": {
+          "lifecycle": {
+            "effectiveLaunch": {
+              "browserLaunched": true,
+              "engine": "chrome",
+              "launchHash": 7064699748117958963
+            },
+            "launched": false,
+            "relaunchedBrowser": false,
+            "restartedBackground": false,
+            "restoreStatus": "not_configured",
+            "reused": true,
+            "saveStatus": "not_attempted"
+          },
+          "targetId": "0DC978F5FD0E94F13A715329D25E7901",
+          "title": "",
+          "url": "https://localhost:42255/"
+        },
+        "error": null
+      }
+    },
+    {
+      "args": [
+        "eval",
+        "globalThis.tlsNssMarker = 'same-page'"
+      ],
+      "response": {
+        "success": true,
+        "data": {
+          "lifecycle": {
+            "effectiveLaunch": {
+              "browserLaunched": true,
+              "engine": "chrome",
+              "launchHash": 7064699748117958963
+            },
+            "launched": false,
+            "relaunchedBrowser": false,
+            "restartedBackground": false,
+            "restoreStatus": "not_configured",
+            "reused": true,
+            "saveStatus": "not_attempted"
+          },
+          "origin": "https://localhost:42255/",
+          "result": "same-page"
+        },
+        "error": null
+      }
+    },
+    {
+      "args": [
+        "--ca-cert",
+        "/work/cli/tests/fixtures/tls/ca-b.pem",
+        "read",
+        "https://localhost:44783"
+      ],
+      "response": {
+        "success": true,
+        "data": {
+          "content": "Linux native trust proof\n",
+          "contentType": "text/markdown",
+          "finalUrl": "https://localhost:44783/",
+          "lifecycle": {
+            "effectiveLaunch": {
+              "browserLaunched": true,
+              "engine": "chrome",
+              "launchHash": 7064699748117958963
+            },
+            "launched": false,
+            "relaunchedBrowser": false,
+            "restartedBackground": false,
+            "restoreStatus": "not_configured",
+            "reused": false,
+            "saveStatus": "not_attempted"
+          },
+          "source": "accept-markdown",
+          "status": 200,
+          "truncated": false,
+          "url": "https://localhost:44783/"
+        },
+        "error": null
+      }
+    },
+    {
+      "args": [
+        "eval",
+        "globalThis.tlsNssMarker"
+      ],
+      "response": {
+        "success": true,
+        "data": {
+          "lifecycle": {
+            "effectiveLaunch": {
+              "browserLaunched": true,
+              "engine": "chrome",
+              "launchHash": 7064699748117958963
+            },
+            "launched": false,
+            "relaunchedBrowser": false,
+            "restartedBackground": false,
+            "restoreStatus": "not_configured",
+            "reused": true,
+            "saveStatus": "not_attempted"
+          },
+          "origin": "https://localhost:42255/",
+          "result": "same-page"
+        },
+        "error": null
+      }
+    },
+    {
+      "args": [
+        "open",
+        "https://localhost:42255"
+      ],
+      "response": {
+        "success": true,
+        "data": {
+          "lifecycle": {
+            "effectiveLaunch": {
+              "browserLaunched": true,
+              "engine": "chrome",
+              "launchHash": 7064699748117958963
+            },
+            "launched": false,
+            "relaunchedBrowser": false,
+            "restartedBackground": false,
+            "restoreStatus": "not_configured",
+            "reused": true,
+            "saveStatus": "not_attempted"
+          },
+          "targetId": "0DC978F5FD0E94F13A715329D25E7901",
+          "title": "",
+          "url": "https://localhost:42255/"
+        },
+        "error": null
+      }
+    },
+    {
+      "args": [
+        "open",
+        "https://localhost:44783"
+      ],
+      "response": {
+        "success": false,
+        "data": null,
+        "error": "Navigation failed: net::ERR_CERT_AUTHORITY_INVALID"
+      }
+    },
+    {
+      "args": [
+        "--ca-cert",
+        "/work/cli/tests/fixtures/tls/ca-b.pem",
+        "open",
+        "https://localhost:44783"
+      ],
+      "response": {
+        "success": true,
+        "data": {
+          "lifecycle": {
+            "effectiveLaunch": {
+              "browserLaunched": true,
+              "engine": "chrome",
+              "launchHash": 9350165833984880202
+            },
+            "launched": false,
+            "relaunchedBrowser": false,
+            "restartedBackground": false,
+            "restoreStatus": "not_configured",
+            "reused": true,
+            "saveStatus": "not_configured"
+          },
+          "targetId": "F21DD4123BD1803E9CD1F9DFE9B2266B",
+          "title": "",
+          "url": "https://localhost:44783/"
+        },
+        "error": null
+      }
+    },
+    {
+      "args": [
+        "open",
+        "https://localhost:42255"
+      ],
+      "response": {
+        "success": false,
+        "data": null,
+        "error": "Navigation failed: net::ERR_CERT_AUTHORITY_INVALID"
+      }
+    },
+    {
+      "args": [
+        "--no-ca-cert",
+        "open",
+        "https://localhost:44783"
+      ],
+      "response": {
+        "success": false,
+        "data": null,
+        "error": "Navigation failed: net::ERR_CERT_AUTHORITY_INVALID"
+      }
+    },
+    {
+      "same_pid": "12560",
+      "browser": "Debian Chromium with certutil NSS in disposable container",
+      "verified": "read changes only CLI trust; browser A survives until explicit browser transition to B; clear removes B"
+    },
+    {
+      "args": [
+        "close"
+      ],
+      "response": {
+        "success": true,
+        "data": {
+          "closed": true,
+          "lifecycle": {
+            "effectiveLaunch": {
+              "browserLaunched": false,
+              "engine": "chrome",
+              "launchHash": null
+            },
+            "launched": false,
+            "relaunchedBrowser": false,
+            "restartedBackground": false,
+            "restoreStatus": "not_configured",
+            "reused": false,
+            "saveStatus": "not_configured"
+          },
+          "restoreStatus": "not_configured",
+          "saveStatus": "not_configured"
+        },
+        "error": null
+      }
+    }
+  ]
+}

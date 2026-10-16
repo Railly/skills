@@ -1,0 +1,11 @@
+--- src/hosts.ts
++++ src/hosts.ts
+@@ -118,7 +118,7 @@
+   }
+   // Re-read rather than assume the write landed.
+   const verification = readHostsFile();
+-  return verification !== null && blockMatchesHostnames(verification, hostnames);
++  return verification === null || blockMatchesHostnames(verification, hostnames);
+ }
+ 
+ /**

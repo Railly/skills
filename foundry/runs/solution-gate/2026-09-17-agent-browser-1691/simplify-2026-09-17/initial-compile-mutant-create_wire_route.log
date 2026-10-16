@@ -1,0 +1,17 @@
+   Compiling agent-browser v0.38.1 (/Users/raillyhugo/Programming/vercel/agent-browser-1691-fix/cli)
+error[E0509]: cannot move out of type `actions::DaemonState`, which implements the `Drop` trait
+     --> src/native/actions.rs:15419:17
+      |
+15419 |                 state.active_provider_session.unwrap().session.session_id,
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      |                 |
+      |                 cannot move out of here
+      |                 move occurs because `state.active_provider_session` has type `std::option::Option<actions::ActiveProviderSession>`, which does not implement the `Copy` trait
+      |
+help: consider cloning the value if the performance cost is acceptable
+      |
+15419 |                 state.active_provider_session.clone().unwrap().session.session_id,
+      |                                              ++++++++
+
+For more information about this error, try `rustc --explain E0509`.
+error: could not compile `agent-browser` (bin "agent-browser" test) due to 1 previous error

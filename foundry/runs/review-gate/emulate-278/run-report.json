@@ -1,0 +1,274 @@
+{
+ "schemaVersion": 1,
+ "run": {
+  "date": "2026-10-05",
+  "repo": "vercel-labs/emulate",
+  "base": "main",
+  "head": "56acae77a4356b971e8335149898a067ae2ccfce",
+  "profile": "standard",
+  "skill_revision": "git:da6286e",
+  "status": "complete",
+  "verdict": "findings",
+  "gaps": []
+ },
+ "execution": {
+  "mode": "sequential_isolated_pass",
+  "degraded_from": null,
+  "independence_gap": "standard profile; single reviewer pass, no cross-family challenge required",
+  "receipt": null,
+  "schema_failures": 0,
+  "operations": [
+   {
+    "operation": "review pass",
+    "attempted_calls": 1,
+    "schema_failures": 0,
+    "identical_retry": false
+   }
+  ]
+ },
+ "contract": {
+  "path": "https://github.com/vercel-labs/emulate/pull/278",
+  "spec_status": "not_applicable",
+  "acceptance_reviewed": [
+   "PR body"
+  ],
+  "gaps": []
+ },
+ "provenance": {
+  "author_model": "unknown (human author scotttrinh, write access)",
+  "reviewer_model": "claude-opus-5.5",
+  "same_family": false
+ },
+ "risk": {
+  "level": "standard",
+  "triggers": [
+   "test-only diff",
+   "devDependency pin"
+  ],
+  "independent_challenge": {
+   "required": false,
+   "satisfied": false,
+   "method": "none",
+   "artifact": null,
+   "evidence": "Standard profile."
+  }
+ },
+ "claim_inventory": [
+  {
+   "source": "contract",
+   "location": "PR body",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "Expected-failure tests document missing Blob features; remove fails as each is implemented."
+  },
+  {
+   "source": "design",
+   "location": "commit 15f0c39",
+   "status": "reviewed",
+   "properties": [
+    "P1"
+   ],
+   "evidence": "Uses native vitest expected failures."
+  },
+  {
+   "source": "user_facing",
+   "location": "none",
+   "status": "reviewed",
+   "properties": [],
+   "evidence": "No runtime source or docs changed."
+  },
+  {
+   "source": "implementation",
+   "location": "blob.test.ts, package.json, pnpm-lock.yaml",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2",
+    "P3"
+   ],
+   "evidence": "1219 added test lines, exact pin @vercel/blob 2.8.0."
+  }
+ ],
+ "properties": [
+  {
+   "id": "P1",
+   "claim": "Every expected failure fails because the emulator lacks the behavior, not because of a harness bug.",
+   "kind": "test-validity",
+   "status": "partially_verified",
+   "oracle": {
+    "observes": "first failure message of each test with .fails stripped",
+    "layer": "vitest run against local emulator",
+    "method": "sed strip .fails, run json reporter, classify",
+    "proxy_only": false
+   },
+   "proxy_challenge": {
+    "proxy": "76 expected fail green in vitest",
+    "counterexample": "a test that throws from setup or SDK client validation also counts as expected fail",
+    "attempted": true,
+    "outcome": "separated",
+    "evidence": "75 of 76 fail on behavioral assertions or explicit emulator 'not supported' errors; 1 fails inside SDK get() hostname check (F1)."
+   },
+   "substrates": [
+    {
+     "name": "local emulator in-process, @vercel/blob 2.8.0",
+     "status": "exercised",
+     "evidence": "blob-nofails-vitest.json"
+    }
+   ],
+   "evidence": "No TypeError, no outside-origin fetch, no setup crash among the 76."
+  },
+  {
+   "id": "P2",
+   "claim": "Implemented behaviors pass.",
+   "kind": "behavior",
+   "status": "verified",
+   "oracle": {
+    "observes": "vitest result",
+    "layer": "package test",
+    "method": "pnpm vitest run",
+    "proxy_only": false
+   },
+   "proxy_challenge": {
+    "proxy": "CI green",
+    "counterexample": "n/a",
+    "attempted": true,
+    "outcome": "not_separated",
+    "evidence": "Local: 24 passed, 76 expected fail."
+   },
+   "substrates": [
+    {
+     "name": "local",
+     "status": "exercised",
+     "evidence": "24 passed | 76 expected fail (100)"
+    }
+   ],
+   "evidence": "Matches CI build-and-test success."
+  },
+  {
+   "id": "P3",
+   "claim": "Lockfile change is limited to the Blob pin.",
+   "kind": "dependency",
+   "status": "verified",
+   "oracle": {
+    "observes": "pnpm-lock diff",
+    "layer": "lockfile",
+    "method": "diff read; zod 4.6.5 presence on main",
+    "proxy_only": false
+   },
+   "proxy_challenge": {
+    "proxy": "frozen install succeeds",
+    "counterexample": "unrelated version drift",
+    "attempted": true,
+    "outcome": "not_separated",
+    "evidence": "zod 4.3.6 to 4.6.5 for zod-validation-error is a dedup to a version already on main (18 refs); nuxt/nitro/unstorage peer hashes follow blob 2.8.0."
+   },
+   "substrates": [
+    {
+     "name": "pnpm install --frozen-lockfile",
+     "status": "exercised",
+     "evidence": "exit 0"
+    }
+   ],
+   "evidence": "No unexpected package additions."
+  }
+ ],
+ "stage_receipts": {
+  "test_strength": {
+   "required": false,
+   "status": "not_triggered",
+   "evidence": "Diff adds no runtime behavior; the fix-absent analog (stripping .fails and classifying failures) was run inside P1.",
+   "reason": "Diff adds no runtime behavior; the fix-absent analog (stripping .fails and classifying failures) was run inside P1."
+  },
+  "resilience": {
+   "required": false,
+   "status": "not_triggered",
+   "evidence": "No runtime durable side effects changed.",
+   "reason": "No runtime durable side effects changed."
+  }
+ },
+ "assumptions": [
+  {
+   "id": "A1",
+   "source": "PR body",
+   "claim": "Each fails test becomes passable by emulator work.",
+   "status": "refuted",
+   "evidence": "F1: SDK 2.8.0 get() rejects non *.blob.vercel-storage.com hosts client-side."
+  }
+ ],
+ "lenses": [
+  {
+   "name": "test-validity",
+   "status": "run",
+   "reason": ""
+  },
+  {
+   "name": "dependency",
+   "status": "run",
+   "reason": ""
+  },
+  {
+   "name": "contract-drift",
+   "status": "run",
+   "reason": ""
+  },
+  {
+   "name": "security",
+   "status": "skipped",
+   "reason": "test-only diff; emulator auth code unchanged"
+  },
+  {
+   "name": "surfaces",
+   "status": "skipped",
+   "reason": "no packages/@emulators/vercel/src runtime path changed and no surface rule maps vercel"
+  }
+ ],
+ "deterministic": [
+  {
+   "check": "git diff --check",
+   "outcome": "pass",
+   "reason": ""
+  },
+  {
+   "check": "type-check",
+   "outcome": "pass",
+   "reason": "tsc --noEmit"
+  },
+  {
+   "check": "lint",
+   "outcome": "pass",
+   "reason": "0 errors, 7 warnings"
+  },
+  {
+   "check": "tests",
+   "outcome": "pass",
+   "reason": "24 passed, 76 expected fail"
+  },
+  {
+   "check": "CI",
+   "outcome": "pass",
+   "reason": "build-and-test and custom-consumer matrix green"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "state": "confirmed",
+   "claim": "'allows SDK get to stream a local emulator URL' (blob.test.ts:1434) can never pass via emulator work: @vercel/blob 2.8.0 get() throws 'Invalid URL: the URL does not point to a Vercel Blob store' for any hostname not ending in .blob.vercel-storage.com, before any request. It documents an SDK constraint, not a missing emulator feature, which contradicts the PR's 'remove fails as each behavior is implemented' contract.",
+   "evidence": "Stripped .fails; failure message is the SDK BlobError from dist/index.js:125, not an emulator response.",
+   "layer": "SDK client validation",
+   "source": "lens",
+   "path": "packages/@emulators/vercel/src/__tests__/blob.test.ts:1434",
+   "resolution": "open"
+  }
+ ],
+ "exemptions": [
+  {
+   "claim": "No docs or README updates",
+   "evidence": "Test and devDependency only; no user-visible emulator behavior changed."
+  }
+ ],
+ "issue_candidates": []
+}

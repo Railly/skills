@@ -1,0 +1,33 @@
+{
+  "parent": "fad34d20403e67619cde5340731575745e2762e6",
+  "base": "d01253d9db28d75080e36da3c1c31ef89454731e",
+  "productionPrefixIdentical": true,
+  "productionPrefixDigest": "sha256:cbeeaf56e5996d0e98914f7258b81a6dc71078b568810795873aec12d5efc030",
+  "onlyModifiedFiles": [
+    "cli/src/native/actions.rs",
+    "cli/src/native/e2e_tests.rs"
+  ],
+  "allTargetLint": [
+    {
+      "path": "cli/src/native/browser.rs",
+      "needle": "for i in 0u64.. {",
+      "inBase": true,
+      "inCurrent": true,
+      "wholeFileEqual": true
+    },
+    {
+      "path": "cli/src/native/cdp/client.rs",
+      "needle": "move |\n                    request: &tokio_tungstenite::tungstenite::handshake::server::Request,",
+      "inBase": true,
+      "inCurrent": true,
+      "wholeFileEqual": true
+    },
+    {
+      "path": "cli/src/native/e2e_tests.rs",
+      "needle": "for bytes in output.stdout.chunks_exact(640 * 80 * 3) {",
+      "inBase": true,
+      "inCurrent": true,
+      "wholeFileEqual": false
+    }
+  ]
+}

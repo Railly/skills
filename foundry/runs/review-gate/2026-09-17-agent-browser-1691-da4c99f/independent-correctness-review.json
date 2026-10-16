@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "kind": "independent-correctness-review",
+  "repository": "vercel-labs/agent-browser",
+  "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+  "head": "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+  "dirty_digest": "clean",
+  "reviewer": "native isolated gpt-6-astra subagent",
+  "independence": "Separate review context, same model family; no cross-family claim. Existing dogfood evidence was visible; code path reasoning was independently checked.",
+  "findings": [
+    {
+      "id": "IR1",
+      "priority": "P1",
+      "title": "Preserve the provider session when the V4 stop request fails",
+      "file": "cli/src/native/providers.rs",
+      "start_line": 141,
+      "end_line": 153,
+      "state": "confirmed",
+      "trigger": "A successfully created Browser Use browser is closed, but PATCH /api/v4/browsers/{id} fails with a transport error or HTTP 4xx/5xx.",
+      "consequence": "close reports success and permanently forgets the live cloud browser ID, so a second close cannot retry; the remote session can continue billing until provider-side expiry.",
+      "evidence": [
+        "The changed V4 cleanup branch discards send() result and never checks response status.",
+        "actions.rs:2067-2070 takes active_provider_session before cleanup; the cleanup return type is ().",
+        "actions.rs:2074-2094 only returns an error from BrowserManager.close; browser.rs:1278-1299 deliberately sends no Browser.close for a remote CDP connection."
+      ],
+      "scope": "The branch now creates and retains Browser Use sessions; it exposes previously inert Browser Use cleanup code.",
+      "confidence": "high"
+    },
+    {
+      "id": "IR2",
+      "priority": "P1",
+      "title": "Bound the new V4 create request before awaiting it under the daemon lock",
+      "file": "cli/src/native/providers.rs",
+      "start_line": 388,
+      "end_line": 398,
+      "state": "confirmed",
+      "trigger": "The provider HTTPS endpoint or a configured proxy accepts a connection but stalls before finishing the create response.",
+      "consequence": "open waits without a request deadline; it holds the daemon state mutex, preventing close, subsequent commands and idle/signal cleanup from progressing.",
+      "evidence": [
+        "The new reqwest::Client::new() has no connect/request/read deadline, and .send().await and .text().await are unbounded.",
+        "daemon.rs:553-560 holds state.lock() across execute_command.",
+        "daemon.rs:279,305,348 acquire the same mutex for shutdown/idle paths.",
+        "Existing exact-head dogfood.json independently records a 36-second stalled-proxy open, a blocked 5-second close, and a still-alive daemon after a configured 1-second idle budget."
+      ],
+      "confidence": "high"
+    }
+  ],
+  "additional_observations": [
+    {
+      "id": "IR3",
+      "priority": "P2",
+      "state": "unverified_at_real_provider",
+      "title": "A created session ID is discarded if cdpUrl is missing or malformed",
+      "file": "cli/src/native/providers.rs",
+      "start_line": 458,
+      "end_line": 465,
+      "evidence": "parse_browser_use_connection extracts id but returns Err for missing/nonstring cdpUrl before constructing ProviderSession; both provider callers propagate connect errors without a cleanup handle.",
+      "limit": "This requires malformed successful upstream data and is not a documented normal V4 response. No live provider fault injection was performed."
+    }
+  ],
+  "cleared": [
+    "Both autolaunch and explicit-launch paths call stop when CDP attachment returns an error; absence of any such cleanup is not a valid finding.",
+    "V4 managed proxy null/direct mapping, lowercased country code, profileId and boolean enableRecording fields agree with the retained independent OpenAPI corpus.",
+    "Default idle shutdown intentionally permits provider-owned remote CDP sessions; lack of eligibility is not a valid finding.",
+    "The retained connect.browser-use.com text is historical CHANGELOG content, not an active provider contract."
+  ],
+  "validation": "Read-only source trace across frozen diff, provider caller enumeration, lifecycle close path, daemon locking, and retained independent API corpus. No source edits or live provider calls.",
+  "runtime": {
+    "mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "same-family isolated review; FX auth capability was not validated",
+    "fx_failure": "Wrapper reported unsupported auth mode: missing; one capability inspection showed installed fx status schema, auth=fx login outside wrapper. No identical wrapper retry."
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "head": "1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51",
+  "mode": "sequential_isolated",
+  "independence_gap": "FX authentication-mode verification failed; native reviewer failed before returning evidence (Service Unavailable, then web search not supported). The primary runtime performed the sequential pass in the same conversation with separate frozen input/output artifacts. This is not blind review or cross-family independence.",
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Moving from selector re-resolution to a retained backend node introduces F1 when the DOM replaces an input."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Exercised hidden, disabled, readonly, explicit CSS, stable, and replaced controls; matrix-results.json and race-results.json."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "All three auth control selections use exact local refs; constructors preserve role fallback for existing snapshot refs."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell argument construction is changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "New stale error is returned through the daemon error path, but detached objects skip it and produce false success (F1)."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No executable shim or PATH mock is added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Issue 1998, existing visible-selector waits, and authored regressions establish that the hidden-first timeout is unintended."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No new framework signal or callback is introduced."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Real Chrome A/B compares stable, hidden, disabled, readonly and removed nodes. Detached DOM identity does not imply connected/focusable."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No getByRole, ARIA mapping, or adopted Playwright contract is changed; DOM lifetime is checked directly on Chrome."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Reviewed caller sweep; exact refs remain local to auth. Missing later controls preserve partial form state and retry; stale path fails to reject."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "Internal allow_role_fallback is true in all existing constructors and false only for add_exact_backend_node called by auth."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Forced missing password, missing submit, and node replacement. Descriptor refusal/cancellation remain named gaps."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "The selected-node policy avoids role retargeting on resolution errors, but cannot prevent misdirected keyboard input after detached-node resolution."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Missing-control timeouts and immediate retries exercised; transient CDP failure and cancellation are not exhaustively forced."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced Runtime.evaluate -> DOM.describeNode -> local ref -> DOM.resolveNode -> focus -> page-level Input.insertText. Last boundary breaks P3."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Observed actual DOM values, input-event targets, and submission, with isolated namespaces per compiled binary."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Both exact debug binaries drove CLI auth before contributor tests were trusted."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "The PR's safe-stale claim is false: DOM.resolveNode can return a detached object and focus can leave the previous input active."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Custom CSS and normal auth contracts remain documented; hidden-duplicate fix is a repair of intended form filling. PR stale-safety prose is refuted by F1."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No documentation example is added."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No author decision trail was supplied."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Each selector materializes N matches and scans them linearly; per-poll cost O(sum of selector match counts), without nested per-node lookup."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "P1",
+      "state": "confirmed",
+      "claim": "Reject detached exact auth refs before keyboard input: a replaced password field can receive no input while its password is appended to username, then submitted with loggedIn:true.",
+      "evidence": "Repeated twice per username/password race. Parent fills replacement correctly. Head stale-user inserts into decoy; head stale-pass produces user=review@example.testlocal-test-password, pass='', submitted=true. /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/race-results.json",
+      "layer": "Real browser input delivery",
+      "source": "lens",
+      "path": "cli/src/native/element.rs:700-706 -> cli/src/native/interaction.rs:146-189, newly reached through actions.rs:12694-12703",
+      "resolution": "open",
+      "recommendation": "Validate connectedness and successful focus on the exact selected node before page-level insertion; fail or safely repoll before sending credentials. Add a real-browser replacement regression that asserts actual input destination and forbids false success."
+    }
+  ]
+}

@@ -1,0 +1,641 @@
+[
+  {
+    "id": "H01",
+    "name": "F1 repeated rejected move and immediate corrective retry through public hook",
+    "variant": "head",
+    "observations": [
+      {
+        "before": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "rejected": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "retried": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "items": [
+              "zero",
+              {
+                "$undefined": true
+              }
+            ],
+            "count": 0
+          }
+        },
+        "recovery": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "error": null,
+        "streaming": false
+      }
+    ],
+    "result": "corrupted state; F1 source lost, corrected retry cannot recover source",
+    "cleanup": {
+      "owner": "hook unmount effect",
+      "deadline": "unmount",
+      "reader_cleanup": "simple response mock has no resource lease"
+    },
+    "test_status": "fail",
+    "assertion": "F1 rejected move must preserve source: expected undefined to be 'keep' // Object.is equality",
+    "elapsed_ms": 6.804417000000058
+  },
+  {
+    "id": "P01",
+    "name": "F2 mixed rejected callbacks, repeated updates and exact immediate retry",
+    "variant": "head",
+    "observations": [
+      {
+        "rounds": [
+          {
+            "i": 1,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 1
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 1
+              }
+            ],
+            "events_before_retry": 1,
+            "events_after_retry": 1
+          },
+          {
+            "i": 2,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 2
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 2
+              }
+            ],
+            "events_before_retry": 2,
+            "events_after_retry": 2
+          },
+          {
+            "i": 3,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 3
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 3
+              }
+            ],
+            "events_before_retry": 3,
+            "events_after_retry": 3
+          },
+          {
+            "i": 4,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 4
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 4
+              }
+            ],
+            "events_before_retry": 4,
+            "events_after_retry": 4
+          },
+          {
+            "i": 5,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 5
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 5
+              }
+            ],
+            "events_before_retry": 5,
+            "events_after_retry": 5
+          },
+          {
+            "i": 6,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 6
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 6
+              }
+            ],
+            "events_before_retry": 6,
+            "events_after_retry": 6
+          },
+          {
+            "i": 7,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 7
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 7
+              }
+            ],
+            "events_before_retry": 7,
+            "events_after_retry": 7
+          },
+          {
+            "i": 8,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 8
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 8
+              }
+            ],
+            "events_before_retry": 8,
+            "events_after_retry": 8
+          },
+          {
+            "i": 9,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 9
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 9
+              }
+            ],
+            "events_before_retry": 9,
+            "events_after_retry": 9
+          },
+          {
+            "i": 10,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 10
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 10
+              }
+            ],
+            "events_before_retry": 10,
+            "events_after_retry": 10
+          },
+          {
+            "i": 11,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 11
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 11
+              }
+            ],
+            "events_before_retry": 11,
+            "events_after_retry": 11
+          },
+          {
+            "i": 12,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 12
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 12
+              }
+            ],
+            "events_before_retry": 12,
+            "events_after_retry": 12
+          },
+          {
+            "i": 13,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 13
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 13
+              }
+            ],
+            "events_before_retry": 13,
+            "events_after_retry": 13
+          },
+          {
+            "i": 14,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 14
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 14
+              }
+            ],
+            "events_before_retry": 14,
+            "events_after_retry": 14
+          },
+          {
+            "i": 15,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 15
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 15
+              }
+            ],
+            "events_before_retry": 15,
+            "events_after_retry": 15
+          },
+          {
+            "i": 16,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 16
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 16
+              }
+            ],
+            "events_before_retry": 16,
+            "events_after_retry": 16
+          },
+          {
+            "i": 17,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 17
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 17
+              }
+            ],
+            "events_before_retry": 17,
+            "events_after_retry": 17
+          },
+          {
+            "i": 18,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 18
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 18
+              }
+            ],
+            "events_before_retry": 18,
+            "events_after_retry": 18
+          },
+          {
+            "i": 19,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 19
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 19
+              }
+            ],
+            "events_before_retry": 19,
+            "events_after_retry": 19
+          },
+          {
+            "i": 20,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 20
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 20
+              }
+            ],
+            "events_before_retry": 20,
+            "events_after_retry": 20
+          },
+          {
+            "i": 21,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 21
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 21
+              }
+            ],
+            "events_before_retry": 21,
+            "events_after_retry": 21
+          },
+          {
+            "i": 22,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 22
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 22
+              }
+            ],
+            "events_before_retry": 22,
+            "events_after_retry": 22
+          },
+          {
+            "i": 23,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 23
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 23
+              }
+            ],
+            "events_before_retry": 23,
+            "events_after_retry": 23
+          },
+          {
+            "i": 24,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 24
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 24
+              }
+            ],
+            "events_before_retry": 24,
+            "events_after_retry": 24
+          },
+          {
+            "i": 25,
+            "state": {
+              "items": [
+                "a",
+                "b"
+              ],
+              "count": 25
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 25
+              }
+            ],
+            "events_before_retry": 25,
+            "events_after_retry": 25
+          }
+        ]
+      }
+    ],
+    "result": "F2 callback claims rejected path was written; persists across repetition",
+    "cleanup": {
+      "owner": "StateProvider/useSyncExternalStore",
+      "deadline": "unmount",
+      "callbacks_after_exact_retry": 0,
+      "external_sink_rollback": "not supplied"
+    },
+    "test_status": "fail",
+    "assertion": "F2 rejected entry must not escape to persistence callback: expected [ { path: '/items/01', …(1) }, …(1) ] to deeply equal [ { path: '/count', value: 1 } ]",
+    "elapsed_ms": 6.980624999999918
+  }
+]

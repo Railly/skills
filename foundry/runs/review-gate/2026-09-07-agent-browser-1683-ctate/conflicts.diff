@@ -1,0 +1,358 @@
+diff --cc cli/src/native/actions.rs
+index bca68e2,1c481de..0000000
+--- a/cli/src/native/actions.rs
++++ b/cli/src/native/actions.rs
+@@@ -1471,13 -1606,15 +1627,25 @@@ impl DaemonState 
+                                  match serde_json::from_value::<TargetInfo>(
+                                      target_info_value.clone(),
+                                  ) {
+++<<<<<<< HEAD
+ +                                    Ok(target_info)
+ +                                        if self.browser.as_ref().is_some_and(|browser| {
+ +                                            !browser.owns_target(&target_info)
+ +                                        }) =>
+ +                                    {
+ +                                        attached_other_sessions.push(sid.to_string());
+ +                                    }
+++=======
++                                     // The recorder's screencast session is
++                                     // not a tab and must not have page
++                                     // domains enabled on it.
++                                     Ok(target_info)
++                                         if recording::owns_attachment(
++                                             &self.recording_state.capture_session,
++                                             &target_info.target_id,
++                                             sid,
++                                         ) => {}
+++>>>>>>> 219c47a9dab1776f320d11e66ce934fd239b2cb7
+                                      Ok(target_info) if target_info.target_type == "iframe" => {
+                                          // For OOPIF targets, Chrome uses the frameId as
+                                          // the targetId, so we can key iframe_sessions by it.
+@@@ -2827,7 -3021,7 +3086,11 @@@ pub async fn execute_command(cmd: &Valu
+              lifecycle_relaunched_browser,
+          );
+      }
+++<<<<<<< HEAD
+ +    state.context_recreated = false;
+++=======
++     attach_webmcp_availability(&mut resp, action, state).await;
+++>>>>>>> 219c47a9dab1776f320d11e66ce934fd239b2cb7
+  
+      // Auto-report pending JavaScript dialog so agents know why commands may hang
+      if action != "dialog" {
+@@@ -6935,153 -7293,30 +7437,170 @@@ async fn handle_recording_start(cmd: &V
+          .and_then(|v| v.as_str())
+          .filter(|s| !s.is_empty());
+  
+++<<<<<<< HEAD
+ +    let viewport = state.viewport;
+ +    let domain_filter = state.domain_filter.read().await.clone();
+ +    if let Some(url) = recording_url {
+ +        check_url_allowed_by_filter(domain_filter.as_ref(), url)?;
+ +    }
+ +
+ +    let (client, new_session_id, context_id, nav_url) = {
+ +        let mgr = state.browser.as_mut().ok_or("Browser not launched")?;
+ +        let old_session_id = mgr.active_session_id()?.to_string();
+ +
+ +        // Capture current URL if no URL specified
+ +        let nav_url = if let Some(u) = recording_url {
+ +            u.to_string()
+ +        } else {
+ +            mgr.get_url()
+ +                .await
+ +                .unwrap_or_else(|_| "about:blank".to_string())
+ +        };
+ +        check_url_allowed_by_filter(domain_filter.as_ref(), &nav_url)?;
+ +
+ +        // Capture current cookies
+ +        let cookies_result = mgr
+ +            .client
+ +            .send_command_no_params("Network.getAllCookies", Some(&old_session_id))
+ +            .await
+ +            .ok();
+ +
+ +        // Create new browser context
+ +        let ctx_result = mgr
+ +            .client
+ +            .send_command_no_params("Target.createBrowserContext", None)
+ +            .await?;
+ +        let context_id = ctx_result
+ +            .get("browserContextId")
+ +            .and_then(|v| v.as_str())
+ +            .ok_or("Failed to get browserContextId")?
+ +            .to_string();
+ +        mgr.register_owned_context(context_id.clone());
+ +        // Create page in new context
+ +        let create_result: CreateTargetResult = mgr
+ +            .client
+ +            .send_command_typed(
+ +                "Target.createTarget",
+ +                &json!({ "url": "about:blank", "browserContextId": context_id }),
+ +                None,
+ +            )
+ +            .await?;
+ +
+ +        let attach_result: AttachToTargetResult = mgr
+ +            .client
+ +            .send_command_typed(
+ +                "Target.attachToTarget",
+ +                &AttachToTargetParams {
+ +                    target_id: create_result.target_id.clone(),
+ +                    flatten: true,
+ +                },
+ +                None,
+ +            )
+ +            .await?;
+ +
+ +        let new_session_id = attach_result.session_id.clone();
+ +        mgr.prepare_domains_pub(&new_session_id).await?;
+ +
+ +        // Re-apply download behavior to the recording context.
+ +        // Without this, downloads in the recording context are silently dropped
+ +        // because Browser.setDownloadBehavior at launch only applies to the default context.
+ +        if let Some(ref dl_path) = mgr.download_path {
+ +            let _ = mgr
+ +                .client
+ +                .send_command(
+ +                    "Browser.setDownloadBehavior",
+ +                    Some(json!({
+ +                        "behavior": "allow",
+ +                        "downloadPath": dl_path,
+ +                        "browserContextId": context_id,
+ +                        "eventsEnabled": true
+ +                    })),
+ +                    None,
+ +                )
+ +                .await;
+ +        }
+ +
+ +        // Re-apply HTTPS error ignore to the recording context.
+ +        // Security.setIgnoreCertificateErrors at launch only applies to the session it was sent on.
+ +        if mgr.ignore_https_errors {
+ +            let _ = mgr
+ +                .client
+ +                .send_command(
+ +                    "Security.setIgnoreCertificateErrors",
+ +                    Some(json!({ "ignore": true })),
+ +                    Some(&new_session_id),
+ +                )
+ +                .await;
+ +        }
+ +
+ +        // Transfer cookies to new context
+ +        if let Some(ref cr) = cookies_result {
+ +            if let Some(cookie_arr) = cr.get("cookies").and_then(|v| v.as_array()) {
+ +                if !cookie_arr.is_empty() {
+ +                    let _ = mgr
+ +                        .client
+ +                        .send_command(
+ +                            "Network.setCookies",
+ +                            Some(json!({ "cookies": cookie_arr })),
+ +                            Some(&new_session_id),
+ +                        )
+ +                        .await;
+ +                }
+ +            }
+ +        }
+ +
+ +        // Add page and switch to it
+ +        let tab_id = mgr.assign_tab_id();
+ +        mgr.add_page(super::browser::PageInfo {
+ +            tab_id,
+ +            label: None,
+ +            target_id: create_result.target_id,
+ +            session_id: new_session_id.clone(),
+ +            browser_context_id: Some(context_id.clone()),
+ +            url: "about:blank".to_string(),
+ +            title: String::new(),
+ +            target_type: "page".to_string(),
+ +        });
+ +
+ +        (mgr.client.clone(), new_session_id, context_id, nav_url)
+ +    };
+ +
+ +    let has_proxy_creds = state.proxy_credentials.read().await.is_some();
+ +    install_network_controls_or_resume_prepared_session(state, has_proxy_creds, &new_session_id)
+ +        .await?;
+ +    state.drain_cdp_events_background().await?;
+++=======
++     // Validate the rate before any browser work so a bad value costs nothing.
++     let fps = recording_fps_from_command(cmd)?;
+++>>>>>>> 219c47a9dab1776f320d11e66ce934fd239b2cb7
+  
+      {
+-         let mgr = state.browser.as_mut().ok_or("Browser not launched")?;
+-         if let Some((w, h, scale, mobile)) = viewport {
+-             let _ = mgr.set_viewport(w, h, scale, mobile).await;
+-         }
+- 
+-         // Navigate only after domain filtering and WebRTC containment are active.
+-         if nav_url != "about:blank" {
+-             mgr.navigate(&nav_url, WaitUntil::Load).await?;
++         let domain_filter = state.domain_filter.read().await;
++         if let Some(url) = recording_url {
++             check_url_allowed_by_filter(domain_filter.as_ref(), url)?;
+          }
+      }
+  
+++<<<<<<< HEAD
+ +    let result = recording::recording_start(&mut state.recording_state, path)?;
+ +    state.recording_state.browser_context_id = Some(context_id);
+ +    state.start_recording_task(client, new_session_id).await?;
+++=======
++     if state.recording_state.active {
++         return Err("Recording already active".to_string());
++     }
++ 
++     if let Some(url) = recording_url {
++         navigate_active_page(state, url, WaitUntil::Load).await?;
++     }
++     let (client, session_id) = {
++         let mgr = state.browser.as_ref().ok_or("Browser not launched")?;
++         (mgr.client.clone(), mgr.active_session_id()?.to_string())
++     };
++ 
++     let result = recording::recording_start(&mut state.recording_state, path, fps)?;
++     state.start_recording_task(client, session_id).await?;
+++>>>>>>> 219c47a9dab1776f320d11e66ce934fd239b2cb7
+  
+      if let Some(ref server) = state.stream_server {
+          server.set_recording(true, &state.engine).await;
+@@@ -7091,13 -7326,11 +7610,19 @@@
+  }
+  
+  async fn handle_recording_stop(state: &mut DaemonState) -> Result<Value, String> {
+-     state.stop_recording_task().await?;
++     // Clear the recording state even when the capture task failed, so a
++     // broken take does not block the next `record start`.
++     let task_result = state.stop_recording_task().await;
+      let result = recording::recording_stop(&mut state.recording_state);
+++<<<<<<< HEAD
+ +    if let Some(context_id) = state.recording_state.browser_context_id.take() {
+ +        if let Some(ref mut manager) = state.browser {
+ +            manager.dispose_browser_context(&context_id).await?;
+ +        }
+ +    }
+++=======
++     task_result?;
+++>>>>>>> 219c47a9dab1776f320d11e66ce934fd239b2cb7
+  
+      if let Some(ref server) = state.stream_server {
+          server.set_recording(false, &state.engine).await;
+@@@ -7132,11 -7369,24 +7660,31 @@@ async fn handle_recording_restart(cmd: 
+          None
+      };
+  
+++<<<<<<< HEAD
+ +    let mut start_cmd = json!({ "path": path });
+ +    if let Some(url) = recording_url {
+ +        start_cmd["url"] = json!(url);
+++=======
++     let recording_target = if state.browser.is_some() {
++         if let Some(ref url) = recording_url {
++             navigate_active_page(state, url, WaitUntil::Load).await?;
++         }
++         let browser = state.browser.as_ref().ok_or("Browser not launched")?;
++         Some((
++             browser.client.clone(),
++             browser.active_session_id()?.to_string(),
++         ))
++     } else {
++         None
++     };
++ 
++     recording::recording_start(&mut state.recording_state, path, fps)?;
++ 
++     if let Some((client, session_id)) = recording_target {
++         state.start_recording_task(client, session_id).await?;
+++>>>>>>> 219c47a9dab1776f320d11e66ce934fd239b2cb7
+      }
+ +    handle_recording_start(&start_cmd, state).await?;
+  
+      Ok(json!({
+          "restarted": true,
+diff --cc cli/src/native/recording.rs
+index 1e5e62f,d645ce8..0000000
+--- a/cli/src/native/recording.rs
++++ b/cli/src/native/recording.rs
+@@@ -15,11 -104,18 +104,22 @@@ pub type SharedCaptureSession = Arc<Mut
+  pub struct RecordingState {
+      pub active: bool,
+      pub output_path: String,
++     /// Capture rate for the active (or most recent) recording.
++     pub fps: u32,
++     /// Frames written to the file, including frames held through gaps.
+      pub frame_count: u64,
++     /// Distinct frames received from the screencast.
++     pub captured_count: u64,
+      pub capture_task: Option<tokio::task::JoinHandle<Result<(), String>>>,
+      pub shared_frame_count: Option<Arc<AtomicU64>>,
++     pub shared_captured_count: Option<Arc<AtomicU64>>,
+      pub cancel_tx: Option<oneshot::Sender<()>>,
+++<<<<<<< HEAD
+ +    pub browser_context_id: Option<String>,
+++=======
++     /// Shared with the daemon's event handlers.
++     pub capture_session: SharedCaptureSession,
+++>>>>>>> 219c47a9dab1776f320d11e66ce934fd239b2cb7
+  }
+  
+  impl RecordingState {
+@@@ -27,11 -123,14 +127,18 @@@
+          Self {
+              active: false,
+              output_path: String::new(),
++             fps: DEFAULT_FPS,
+              frame_count: 0,
++             captured_count: 0,
+              capture_task: None,
+              shared_frame_count: None,
++             shared_captured_count: None,
+              cancel_tx: None,
+++<<<<<<< HEAD
+ +            browser_context_id: None,
+++=======
++             capture_session: Arc::new(Mutex::new(None)),
+++>>>>>>> 219c47a9dab1776f320d11e66ce934fd239b2cb7
+          }
+      }
+  }
+diff --cc cli/src/output.rs
+index 63e9a5e,73e8a93..0000000
+--- a/cli/src/output.rs
++++ b/cli/src/output.rs
+@@@ -3734,10 -3901,9 +3901,16 @@@ Options
+    --screenshot-format <fmt>  Screenshot format: png, jpeg (or AGENT_BROWSER_SCREENSHOT_FORMAT)
+    --headed                   Show browser window (not headless) (or AGENT_BROWSER_HEADED env)
+    --webgpu                   Enable WebGPU; uses SwiftShader software Vulkan on Linux, no GPU required (or AGENT_BROWSER_WEBGPU env)
+++<<<<<<< HEAD
+ +  --cdp <port>               Connect via CDP (Chrome DevTools Protocol)
+ +  --isolate-context          Isolate cookies, storage, cache, and targets in a session-owned
+ +                             Chrome BrowserContext for --cdp, --auto-connect, or connect
+ +                             (or AGENT_BROWSER_ISOLATE_CONTEXT env)
+++=======
++   --no-webmcp                Disable default experimental WebMCP support for locally launched Chrome
++                              (or AGENT_BROWSER_NO_WEBMCP env)
++   --cdp <port|url>           Connect via CDP; root WebSocket query slash is optional
+++>>>>>>> 219c47a9dab1776f320d11e66ce934fd239b2cb7
+    --pin-tab                  Pin the session to its bound tab (or AGENT_BROWSER_PIN_TAB env)
+                               Commands fail with a tab_gone error instead of falling back
+                               to another tab when the bound tab is closed. JSON includes
+diff --cc skill-data/core/SKILL.md
+index 02f5a28,1f6cbd9..0000000
+--- a/skill-data/core/SKILL.md
++++ b/skill-data/core/SKILL.md
+@@@ -440,8 -448,7 +448,12 @@@ EO
+  --headed                # show the window (default is headless)
+  --webgpu                # enable WebGPU (software Vulkan on Linux, no GPU needed)
+  --auto-connect          # connect to an already-running Chrome
+++<<<<<<< HEAD
+ +--isolate-context       # isolate this session inside a shared Chrome
+ +--cdp <port>            # connect to a specific CDP port
+++=======
++ --cdp <port|url>        # connect to a CDP port or WebSocket URL; root query slash is optional
+++>>>>>>> 219c47a9dab1776f320d11e66ce934fd239b2cb7
+  --profile <name|path>   # use a Chrome profile (login state survives)
+  --headers <json>        # HTTP headers scoped to the URL's origin
+  --proxy <url>           # proxy server

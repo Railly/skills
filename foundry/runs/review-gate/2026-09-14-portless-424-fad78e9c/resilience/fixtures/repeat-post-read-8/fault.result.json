@@ -1,0 +1,107 @@
+{
+  "phase": "fault",
+  "fault": "post-read",
+  "command": [
+    "/Users/raillyhugo/.nvm/versions/node/v24.18.0/bin/node",
+    "--require",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/preload.cjs",
+    "/tmp/portless-review-424-fad78e9c/packages/portless/dist/cli.js",
+    "hosts",
+    "sync"
+  ],
+  "cwd": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/repeat-post-read-8",
+  "environment": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/repeat-post-read-8/home",
+    "TMPDIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/repeat-post-read-8/tmp",
+    "NO_COLOR": "1",
+    "PORTLESS_STATE_DIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/repeat-post-read-8/state",
+    "PORTLESS_PORT": "65431",
+    "PORTLESS_SYNC_HOSTS": "1",
+    "AUDIT_ROOT": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience",
+    "AUDIT_HOSTS": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/repeat-post-read-8/hosts",
+    "AUDIT_TRACE": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/repeat-post-read-8/fault.jsonl",
+    "AUDIT_FAULT": "post-read",
+    "AUDIT_UID": "0",
+    "AUDIT_SUDO": "1"
+  },
+  "exitCode": 1,
+  "signal": null,
+  "error": null,
+  "stdout": "",
+  "stderr": "Failed to update /etc/hosts.\n",
+  "durationMs": 50.4239579999994,
+  "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+  "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 app.localhost\n# portless-end\n",
+  "reads": 2,
+  "writes": 1,
+  "sudoCalls": 0,
+  "events": [
+    {
+      "time": "2026-09-14T18:45:51.083Z",
+      "op": "preload-ready",
+      "fault": "post-read",
+      "uid": 0,
+      "pid": 62397,
+      "node": "v24.18.0",
+      "platform": "darwin"
+    },
+    {
+      "time": "2026-09-14T18:45:51.104Z",
+      "op": "network-blocked",
+      "result": "ECONNREFUSED"
+    },
+    {
+      "time": "2026-09-14T18:45:51.105Z",
+      "op": "network-blocked",
+      "result": "ECONNREFUSED"
+    },
+    {
+      "time": "2026-09-14T18:45:51.105Z",
+      "op": "read",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/repeat-post-read-8/hosts",
+      "ordinal": 1,
+      "result": "ok"
+    },
+    {
+      "time": "2026-09-14T18:45:51.106Z",
+      "op": "write",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/repeat-post-read-8/hosts",
+      "ordinal": 1,
+      "outcome": "ok",
+      "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+      "intended": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 app.localhost\n# portless-end\n",
+      "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 app.localhost\n# portless-end\n"
+    },
+    {
+      "time": "2026-09-14T18:45:51.106Z",
+      "op": "read",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/repeat-post-read-8/hosts",
+      "ordinal": 2,
+      "result": "EACCES"
+    },
+    {
+      "time": "2026-09-14T18:45:51.106Z",
+      "op": "exit",
+      "code": 1,
+      "reads": 2,
+      "writes": 1,
+      "memory": {
+        "rss": 64782336,
+        "heapTotal": 13352960,
+        "heapUsed": 10001312,
+        "external": 4016478,
+        "arrayBuffers": 146599
+      },
+      "activeResources": [
+        "PipeWrap",
+        "PipeWrap"
+      ]
+    }
+  ],
+  "unrelatedPreserved": true,
+  "routesUnchanged": true
+}

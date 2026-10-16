@@ -1,0 +1,312 @@
+diff --git a/packages/portless/src/cli.ts b/packages/portless/src/cli.ts
+index 3bc9f52..5b80ae0 100644
+--- a/packages/portless/src/cli.ts
++++ b/packages/portless/src/cli.ts
+@@ -1826,31 +1826,31 @@ ${colors.bold("Usage:")}
+   ${colors.cyan("portless")}                         From monorepo root: run all workspace packages
+   ${colors.cyan("portless run")}                     Same as above
+   ${colors.cyan("portless run <cmd>")}               Run a command through the proxy
+   ${colors.cyan("portless <name> <cmd>")}            Run with an explicit app name
+   ${colors.cyan("portless proxy start")}             Start the proxy (HTTPS on port 443, daemon); rarely needed since it auto-starts on first run
+   ${colors.cyan("portless proxy stop")}              Stop the proxy
+   ${colors.cyan("portless service install")}         Start proxy automatically when the OS starts
+   ${colors.cyan("portless get <name>")}              Print URL for a service (for cross-service refs)
+   ${colors.cyan("portless alias <name> <port>")}     Register a static route (e.g. for Docker)
+   ${colors.cyan("portless alias --remove <name>")}   Remove a static route
+   ${colors.cyan("portless list")}                    Show active routes
+   ${colors.cyan("portless doctor")}                  Check local portless health
+   ${colors.cyan("portless trust")}                   Add local CA to system trust store
+   ${colors.cyan("portless clean")}                   Remove portless state, trust entry, and hosts block
+   ${colors.cyan("portless prune")}                   Kill orphaned dev servers from crashed sessions
+-  ${colors.cyan("portless hosts sync")}              Add routes to ${HOSTS_DISPLAY} (fixes Safari)
++  ${colors.cyan("portless hosts sync")}              Reconcile routes with ${HOSTS_DISPLAY} (fixes Safari)
+   ${colors.cyan("portless hosts clean")}             Remove portless entries from ${HOSTS_DISPLAY}
+ 
+ ${colors.bold("Examples:")}
+   portless                            # Run dev script through proxy
+   portless                            # From monorepo root: start all apps
+   portless --script start             # Run "start" script instead of "dev"
+   portless myapp next dev             # -> https://myapp.localhost
+   portless run next dev               # -> https://<project>.localhost
+   portless run next dev               # in worktree -> https://<worktree>.<project>.localhost
+   portless service install            # Start HTTPS proxy on OS startup
+   portless service install --lan      # Persist LAN mode in the startup service
+   portless service install --wildcard # Persist wildcard routing in the startup service
+   portless get backend                # -> https://backend.localhost
+   portless doctor                     # Check proxy, routes, DNS, and CA trust
+   portless myapp --tailscale next dev # -> also https://<node>.ts.net (tailnet)
+@@ -1981,31 +1981,34 @@ ${colors.bold("Environment variables:")}
+ ${colors.bold("Child process environment:")}
+   PORT                          Ephemeral port the child should listen on
+   HOST                          Usually 127.0.0.1 (omitted for Expo in LAN mode)
+   PORTLESS_URL                  Primary public URL of the app
+   PORTLESS_LAN                  Set to 1 when proxy is in LAN mode
+   PORTLESS_TAILSCALE_URL        Tailscale URL of the app (when --tailscale is active)
+   PORTLESS_NGROK_URL            ngrok URL of the app (when --ngrok is active)
+   NODE_EXTRA_CA_CERTS           Path to the portless CA (set when HTTPS is active)
+ 
+ ${colors.bold("Safari / DNS:")}
+   .localhost subdomains auto-resolve in Chrome, Firefox, and Edge.
+   Safari relies on the system DNS resolver, which may not handle them.
+   Auto-syncs ${HOSTS_DISPLAY} for route hostnames by default (including .localhost,
+   custom TLDs, and LAN .local). Set PORTLESS_SYNC_HOSTS=0 to disable. If a route
+   hostname will not resolve, the command that registered it warns instead of
+-  failing silently. To sync manually:
++  failing silently. Manual sync reconciles the managed entries with current routes,
++  removes stale entries when there are no routes, and requires a successful read
++  before writing. Every write is verified; a failed verification uses the normal
++  hosts sync failure path. To sync manually:
+     ${colors.cyan("portless hosts sync")}
+   Clean up later with:
+     ${colors.cyan("portless hosts clean")}
+ 
+ ${colors.bold("Skip portless:")}
+   PORTLESS=0 pnpm dev           # Runs command directly without proxy
+ 
+ ${colors.bold("Reserved names:")}
+   run, get, alias, hosts, list, doctor, trust, clean, prune, proxy, service are subcommands and
+   cannot be used as app names directly. Use "portless run" to infer the name,
+   or "portless --name <name>" to force any name including reserved ones.
+ `);
+   process.exit(0);
+ }
+ 
+@@ -2393,40 +2396,45 @@ ${colors.bold("Examples:")}
+   }
+ 
+   const force = args.includes("--force");
+   addRoutes(store, hostnames, port, 0, force);
+   console.log(colors.green(`Alias registered: ${hostnames.join(", ")} -> 127.0.0.1:${port}`));
+   // Awaited: this command exits, and a warning printed after exit reaches nobody.
+   await reportHostsSyncHere(hostnames, proxyPort, tls, lanMode);
+ }
+ 
+ async function handleHosts(args: string[]): Promise<void> {
+   if (args[1] === "--help" || args[1] === "-h") {
+     console.log(`
+ ${colors.bold("portless hosts")} - Manage ${HOSTS_DISPLAY} entries for .localhost subdomains.
+ 
+ Safari relies on the system DNS resolver, which may not handle .localhost
+-subdomains. This command adds entries to ${HOSTS_DISPLAY} as a workaround.
++subdomains. This command reconciles portless-managed entries in ${HOSTS_DISPLAY}.
+ 
+ ${colors.bold("Usage:")}
+-  ${colors.cyan("portless hosts sync")}    Add current routes to ${HOSTS_DISPLAY}
++  ${colors.cyan("portless hosts sync")}    Reconcile current routes with ${HOSTS_DISPLAY}
+   ${colors.cyan("portless hosts clean")}   Remove portless entries from ${HOSTS_DISPLAY}
+ 
+ ${colors.bold("Auto-sync:")}
+   The proxy updates ${HOSTS_DISPLAY} for route hostnames by default. Disable with
+   PORTLESS_SYNC_HOSTS=0. If a route hostname will not resolve, the command that
+   registered it warns instead of failing silently.
++
++${colors.bold("Safety:")}
++  Sync removes stale entries when there are no routes. It requires a successful
++  hosts-file read before writing and verifies every write. Read or verification
++  failures use the normal elevated privileges or error path.
+ `);
+     process.exit(0);
+   }
+ 
+   if (args[1] === "clean") {
+     if (cleanHostsFile()) {
+       console.log(colors.green(`Removed portless entries from ${HOSTS_DISPLAY}.`));
+       return;
+     }
+ 
+     if (!isWindows && process.getuid?.() !== 0) {
+       console.log(
+         colors.yellow(
+           `Writing to ${HOSTS_DISPLAY} requires elevated privileges. Requesting sudo...`
+         )
+@@ -2441,64 +2449,56 @@ ${colors.bold("Auto-sync:")}
+       );
+       if (result.status === 0) return;
+     }
+ 
+     console.error(
+       colors.red(`Failed to update ${HOSTS_DISPLAY}${isWindows ? " (run as Administrator)." : "."}`)
+     );
+     process.exit(1);
+     return;
+   }
+ 
+   if (!args[1]) {
+     console.log(`
+ ${colors.bold("Usage: portless hosts <command>")}
+ 
+-  ${colors.cyan("portless hosts sync")}    Add current routes to ${HOSTS_DISPLAY}
++  ${colors.cyan("portless hosts sync")}    Reconcile current routes with ${HOSTS_DISPLAY}
+   ${colors.cyan("portless hosts clean")}   Remove portless entries from ${HOSTS_DISPLAY}
+ `);
+     process.exit(0);
+   }
+ 
+   if (args[1] !== "sync") {
+     console.error(colors.red(`Error: Unknown hosts subcommand "${args[1]}".`));
+     console.error(colors.blue("Usage:"));
+-    console.error(colors.cyan(`  portless hosts sync    # Add routes to ${HOSTS_DISPLAY}`));
++    console.error(colors.cyan(`  portless hosts sync    # Reconcile routes with ${HOSTS_DISPLAY}`));
+     console.error(colors.cyan("  portless hosts clean   # Remove portless entries"));
+     process.exit(1);
+   }
+ 
+   const { dir } = await discoverState();
+   const store = new RouteStore(dir, {
+     onWarning: (msg) => console.warn(colors.yellow(msg)),
+   });
+ 
+   const routes = store.loadRoutes();
+-  if (routes.length === 0) {
+-    // Zero routes is a desired state, not a no-op: bailing here would leave a
+-    // block whose routes are gone, in the command the warning tells users to run.
+-    if (getManagedHostnames().length === 0) {
+-      console.log(colors.yellow("No active routes to sync."));
+-      return;
+-    }
+-    if (syncHostsFile([])) {
+-      console.log(colors.green(`Removed stale portless entries from ${HOSTS_DISPLAY}.`));
+-      return;
+-    }
+-  }
+   const hostnames = routes.map((r) => r.hostname);
+   if (syncHostsFile(hostnames)) {
++    if (hostnames.length === 0) {
++      console.log(colors.green(`No stale portless entries remain in ${HOSTS_DISPLAY}.`));
++      return;
++    }
+     console.log(colors.green(`Synced ${hostnames.length} hostname(s) to ${HOSTS_DISPLAY}:`));
+     for (const h of hostnames) {
+       console.log(colors.cyan(`  127.0.0.1 ${h}`));
+     }
+     return;
+   }
+ 
+   if (!isWindows && process.getuid?.() !== 0) {
+     console.log(
+       colors.yellow(`Writing to ${HOSTS_DISPLAY} requires elevated privileges. Requesting sudo...`)
+     );
+     const result = spawnSync(
+       "sudo",
+       ["env", ...collectPortlessEnvArgs(), process.execPath, getEntryScript(), "hosts", "sync"],
+       {
+diff --git a/packages/portless/src/hosts.ts b/packages/portless/src/hosts.ts
+index 23f96bd..dd92f3d 100644
+--- a/packages/portless/src/hosts.ts
++++ b/packages/portless/src/hosts.ts
+@@ -1,37 +1,37 @@
+ import * as fs from "node:fs";
+ import * as dns from "node:dns";
+ import * as path from "node:path";
+ 
+ const isWindows = process.platform === "win32";
+ 
+ const HOSTS_PATH = isWindows
+   ? path.join(process.env.SystemRoot ?? "C:\\Windows", "System32", "drivers", "etc", "hosts")
+   : "/etc/hosts";
+ const LOOPBACK_ADDRESS = "127.0.0.1";
+ const MARKER_START = "# portless-start";
+ const MARKER_END = "# portless-end";
+ 
+ /**
+  * Read the current /etc/hosts file content.
+- * Returns empty string if the file cannot be read.
++ * Returns null if the file cannot be read, including when it does not exist.
+  */
+-function readHostsFile(): string {
++function readHostsFile(): string | null {
+   try {
+     return fs.readFileSync(HOSTS_PATH, "utf-8");
+   } catch {
+-    return "";
++    return null;
+   }
+ }
+ 
+ /**
+  * Extract the portless-managed block from /etc/hosts content.
+  * Returns the lines between the markers (exclusive), or an empty array
+  * if no managed block exists.
+  */
+ export function extractManagedBlock(content: string): string[] {
+   const startIdx = content.indexOf(MARKER_START);
+   const endIdx = content.indexOf(MARKER_END);
+   if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) return [];
+   const block = content.slice(startIdx + MARKER_START.length, endIdx);
+   return block
+     .split("\n")
+@@ -91,66 +91,72 @@ export function blockMatchesHostnames(content: string, hostnames: string[]): boo
+   return seen.size === wanted.size;
+ }
+ 
+ /**
+  * Rewrite the managed block to exactly these hostnames. Needs privilege.
+  *
+  * Returns whether the block matches afterwards, which is the writer's question.
+  * Whether some hostname resolves is a weaker, different question: use
+  * `checkHostResolution`, since a hosts entry is only one reason a name resolves.
+  *
+  * Skips the write when the block already matches, so a no-op reload does not
+  * rewrite the file.
+  */
+ export function syncHostsFile(hostnames: string[]): boolean {
+   const content = readHostsFile();
++  if (content === null) return false;
+   if (blockMatchesHostnames(content, hostnames)) return true;
+   try {
+     const cleaned = removeBlock(content);
+     if (hostnames.length === 0) {
+       fs.writeFileSync(HOSTS_PATH, cleaned);
+     } else {
+       const block = buildBlock(hostnames);
+       fs.writeFileSync(HOSTS_PATH, cleaned.trimEnd() + "\n\n" + block + "\n");
+     }
+   } catch {
+     return false;
+   }
+   // Re-read rather than assume the write landed.
+-  return blockMatchesHostnames(readHostsFile(), hostnames);
++  const verification = readHostsFile();
++  return verification !== null && blockMatchesHostnames(verification, hostnames);
+ }
+ 
+ /**
+  * Remove the portless-managed block from /etc/hosts.
+  * Returns true on success, false on failure.
+  */
+ export function cleanHostsFile(): boolean {
++  const content = readHostsFile();
++  if (content === null) return false;
+   try {
+-    const content = readHostsFile();
+     if (!content.includes(MARKER_START)) return true;
+     fs.writeFileSync(HOSTS_PATH, removeBlock(content));
+     return true;
+   } catch {
+     return false;
+   }
+ }
+ 
+ /**
+  * Return the current portless-managed hostnames from /etc/hosts.
++ * A read failure returns an empty array for best-effort callers; it does not
++ * prove that the hosts file is empty or was read successfully.
+  */
+ export function getManagedHostnames(): string[] {
+   const content = readHostsFile();
++  if (content === null) return [];
+   return extractManagedBlock(content).flatMap((line) => {
+     const [, ...aliases] = line.split("#", 1)[0].trim().split(/\s+/);
+     return aliases;
+   });
+ }
+ 
+ /**
+  * Check whether the system DNS resolver selects an address where the local
+  * proxy listens.
+  */
+ export function checkHostResolution(hostname: string): Promise<boolean> {
+   return new Promise((resolve) => {
+     dns.lookup(hostname, (err, address) => {
+       if (err) {
+         resolve(false);

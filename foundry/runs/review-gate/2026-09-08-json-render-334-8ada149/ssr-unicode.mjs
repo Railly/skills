@@ -1,0 +1,15 @@
+import {createRequire} from 'node:module';
+const repo='/Users/raillyhugo/Programming/vercel/json-render-334-review';
+const require=createRequire(repo+'/packages/tanstack-start/package.json');
+const React=require('react');
+const {renderToString}=require('react-dom/server');
+const {createRootRoute,createRoute,createRouter,createMemoryHistory,RouterProvider,Outlet,HeadContent}=require('@tanstack/react-router');
+const {StartAppProvider,PageRenderer}=require(repo+'/packages/tanstack-start/dist/index.js');
+const {createStartApp}=require(repo+'/packages/tanstack-start/dist/server.js');
+const page={root:'root',elements:{root:{type:'Text',props:{value:{$state:'/value'}},children:[]}}};
+const app=createStartApp({spec:{metadata:{title:'SSR proof',openGraph:{images:['/a.png','/b.png']}},routes:{'/café':{page,loader:'data',metadata:{title:'Cafe page'}}}},loaders:{data:()=>({value:'Cafe body'})}});
+const root=createRootRoute({component:()=>React.createElement(StartAppProvider,{registry:{Text:({element})=>React.createElement('p',null,element.props.value)}},React.createElement(HeadContent),React.createElement(Outlet))});
+const route=createRoute({getParentRoute:()=>root,path:'$',loader:({location})=>app.getPageData({pathname:location.pathname}),head:({match})=>app.getHead({pathname:match.pathname}),component:()=>React.createElement(PageRenderer,route.useLoaderData())});
+const router=createRouter({routeTree:root.addChildren([route]),history:createMemoryHistory({initialEntries:['/caf%C3%A9']}),isServer:true});
+await router.load();
+console.log(JSON.stringify({location:router.state.location.pathname,matches:router.state.matches.map(m=>({pathname:m.pathname,loaderData:m.loaderData,status:m.status,error:String(m.error)})),html:renderToString(React.createElement(RouterProvider,{router}))},null,2));

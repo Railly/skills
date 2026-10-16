@@ -1,0 +1,108 @@
+{
+  "phase": "immediate-persistent-retry",
+  "fault": "none",
+  "command": [
+    "/Users/raillyhugo/.nvm/versions/node/v24.18.0/bin/node",
+    "--require",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/preload.cjs",
+    "/tmp/portless-review-424-fad78e9c/packages/portless/dist/cli.js",
+    "hosts",
+    "sync"
+  ],
+  "cwd": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-orphan-1",
+  "environment": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-orphan-1/home",
+    "TMPDIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-orphan-1/tmp",
+    "NO_COLOR": "1",
+    "PORTLESS_STATE_DIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-orphan-1/state",
+    "PORTLESS_PORT": "65431",
+    "PORTLESS_SYNC_HOSTS": "1",
+    "AUDIT_ROOT": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience",
+    "AUDIT_HOSTS": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-orphan-1/hosts",
+    "AUDIT_TRACE": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-orphan-1/immediate-persistent-retry.jsonl",
+    "AUDIT_FAULT": "none",
+    "AUDIT_UID": "0",
+    "AUDIT_SUDO": "1"
+  },
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "stdout": "Synced 1 hostname(s) to /etc/hosts:\n  127.0.0.1 app.localhost\n",
+  "stderr": "",
+  "durationMs": 60.81812500000069,
+  "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n\n# portless-start\n127.0.0.1 app.localhost\n# portless-end\n",
+  "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 app.localhost\n# portless-end\n",
+  "reads": 2,
+  "writes": 1,
+  "sudoCalls": 0,
+  "events": [
+    {
+      "time": "2026-09-14T18:45:49.122Z",
+      "op": "preload-ready",
+      "fault": "none",
+      "uid": 0,
+      "pid": 62353,
+      "node": "v24.18.0",
+      "platform": "darwin"
+    },
+    {
+      "time": "2026-09-14T18:45:49.152Z",
+      "op": "network-blocked",
+      "result": "ECONNREFUSED"
+    },
+    {
+      "time": "2026-09-14T18:45:49.153Z",
+      "op": "network-blocked",
+      "result": "ECONNREFUSED"
+    },
+    {
+      "time": "2026-09-14T18:45:49.153Z",
+      "op": "read",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-orphan-1/hosts",
+      "ordinal": 1,
+      "result": "ok"
+    },
+    {
+      "time": "2026-09-14T18:45:49.154Z",
+      "op": "write",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-orphan-1/hosts",
+      "ordinal": 1,
+      "outcome": "ok",
+      "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n\n# portless-start\n127.0.0.1 app.localhost\n# portless-end\n",
+      "intended": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 app.localhost\n# portless-end\n",
+      "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 app.localhost\n# portless-end\n"
+    },
+    {
+      "time": "2026-09-14T18:45:49.154Z",
+      "op": "read",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-orphan-1/hosts",
+      "ordinal": 2,
+      "result": "ok"
+    },
+    {
+      "time": "2026-09-14T18:45:49.154Z",
+      "op": "exit",
+      "code": 0,
+      "reads": 2,
+      "writes": 1,
+      "memory": {
+        "rss": 64946176,
+        "heapTotal": 13352960,
+        "heapUsed": 9376680,
+        "external": 4016478,
+        "arrayBuffers": 146599
+      },
+      "activeResources": [
+        "PipeWrap",
+        "PipeWrap",
+        "PipeWrap"
+      ]
+    }
+  ],
+  "unrelatedPreserved": true,
+  "routesUnchanged": true
+}

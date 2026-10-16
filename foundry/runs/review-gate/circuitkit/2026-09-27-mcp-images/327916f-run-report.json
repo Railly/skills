@@ -1,0 +1,907 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-27",
+    "repo": "circuitkit",
+    "base": "3ec090185994b6f93d086c5a2f060e7f4ef8fdad",
+    "head": "327916f472096b07180f049d6d18cd63962096fc",
+    "profile": "high-risk",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "sequential_isolated",
+    "degraded_from": "fx_worker",
+    "independence_gap": "Isolated read-only reviewer is same OpenAI model family after FX auth capability failure. Model cross-family independence is unavailable; independent challenge is instead supplied by the separately maintained official SDK consumer, real browser producer, filesystem fault corpus and explicit contract oracle.",
+    "receipt": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/codex-review-receipt.json",
+    "schema_failures": 1,
+    "operations": [
+      {
+        "operation": "FX auth capability preflight",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "isolated Codex CLI review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/contract.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5",
+      "A6",
+      "A7"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-6 Codex",
+    "reviewer_model": "openai/gpt-5.5 via isolated Codex CLI (configured model)",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "new MCP protocol boundary",
+      "optional iframe UI",
+      "package executable",
+      "Review Gate detected optional audit append and owned subprocess/socket effects in new CLI/reference host."
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/reference-challenge.json",
+      "evidence": "The installed Node executable was consumed through a separately maintained official SDK. Protocol decoder and real browser iframe transport observed results and effects. Native PNG and audit writes were refused on disposable filesystem, then repaired and retried. Five server mutants and one actual browser context call-site mutant were rejected by contract assertions. This is reference-consumer evidence, not cross-family reviewer evidence."
+    }
+  },
+  "security_review": {
+    "status": "pass",
+    "fingerprint": {
+      "repository": "crafter-lab/circuitkit",
+      "base_sha": "3ec090185994b6f93d086c5a2f060e7f4ef8fdad",
+      "head_sha": "327916f472096b07180f049d6d18cd63962096fc",
+      "dirty_digest": "clean",
+      "changed_path_digest": "sha256:bc9508fd7c9f5892b9fa29a0447e20e4f3aaecf20a96153f17dcca20c1ed0f50",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+    },
+    "claim": {
+      "property": "inert input, no input-selected filesystem or executable sink, isolated optional UI",
+      "attacker": "A circuit author controls recipe JSON and .ck source through tool arguments. The stdio launcher already has the current OS user authority.",
+      "scope": "New MCP server and optional browser resource; no public hosted server or native host implementation added."
+    },
+    "trust_model": {
+      "assets": [
+        "OS filesystem and process authority",
+        "host conversation selection",
+        "browser host document"
+      ],
+      "principals": [
+        {
+          "name": "circuit author",
+          "authority": "tool argument content only"
+        },
+        {
+          "name": "operator",
+          "authority": "launch server and configure optional audit path"
+        },
+        {
+          "name": "host",
+          "authority": "mount resource and decide supported message/context capabilities"
+        }
+      ],
+      "boundaries": [
+        "tool arguments to existing validating renderers",
+        "rendered SVG to data URI image and whitelisted path attributes",
+        "resource iframe to official SDK AppBridge"
+      ],
+      "entrypoints": [
+        "show_circuit",
+        "explore_circuit",
+        "ui://circuitkit/view-v1.html"
+      ],
+      "sinks": [
+        "fixed adjacent HTML read at startup",
+        "optional operator-selected JSONL audit",
+        "PNG renderer",
+        "host context/message on explicit selection/action"
+      ]
+    },
+    "observations": [
+      {
+        "id": "SEC-001",
+        "classification": "informational",
+        "scope": "in_scope_security_regression",
+        "prerequisites": [
+          "local operator runs stdio server"
+        ],
+        "chain": {
+          "capability": "author controls bounded input",
+          "reachability": "tools/call",
+          "control": "strict recipe/document/source fields",
+          "boundary": "input to renderer",
+          "impact": "No new file-read or code-execution sink reachable from arguments."
+        },
+        "confidence": "high",
+        "evidence": [
+          "src/mcp/circuit.ts: strict schema, 64 KiB bound, existing renderers",
+          "src/mcp/cli.ts: fixed HTML resource path; audit path comes only from launcher environment",
+          "tests/mcp.test.ts: path input, malformed, unknown, ambiguous and oversized data rejected"
+        ]
+      },
+      {
+        "id": "SEC-002",
+        "classification": "informational",
+        "scope": "in_scope_security_regression",
+        "prerequisites": [
+          "compatible host enforces declared resource policy"
+        ],
+        "chain": {
+          "capability": "author controls circuit labels and attributes accepted by renderer",
+          "reachability": "explore_circuit payload to view",
+          "control": "inert JSON revalidated; SVG placed in image; routes reduced to whitelisted d paths",
+          "boundary": "drawing to host document",
+          "impact": "No raw author HTML injection or host DOM access introduced."
+        },
+        "confidence": "high",
+        "evidence": [
+          "src/mcp/canvas.tsx uses data URI image and React attributes",
+          "resource declares empty connect/resource domains",
+          "reference iframe sandbox=allow-scripts, connect-src none; official SDK transport",
+          "browser receipt proves SDK messages at isolated iframe boundary"
+        ]
+      }
+    ],
+    "verification": {
+      "authorized_scope": "User requested implementing and testing this local feature and creating a PR. Verification used disposable package consumer and local reference host.",
+      "commands": [
+        "bun test ./tests",
+        "bun scripts/check-mcp-browser.ts http://127.0.0.1:52924/ artifacts/mcp-image-first/browser",
+        "node artifacts/mcp-image-first/consumer/verify.mjs (cwd consumer)"
+      ],
+      "cleanup": "No production data or credentials entered artifacts. Disposable dependency renamed back in finally. Browser harness closes sessions.",
+      "gaps": []
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": [
+        "TS2345 in readonly test inputs fixed before final typecheck"
+      ]
+    },
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/security-receipt.json"
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "Compared final image/default and optional explorer behavior to acceptance and observed stdio/browser results."
+    },
+    {
+      "source": "design",
+      "location": "vault chat-presentation-2026-09-27.md, approved by user",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "Compared final image/default and optional explorer behavior to acceptance and observed stdio/browser results."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md; docs/mcp-apps.md; CLI help; planned PR body",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "Compared final image/default and optional explorer behavior to acceptance and observed stdio/browser results."
+    },
+    {
+      "source": "implementation",
+      "location": "src/mcp; scripts/build-mcp.ts; scripts/mcp-host.ts",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "Compared final image/default and optional explorer behavior to acceptance and observed stdio/browser results."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Default tool returns exactly one PNG and no UI template or widget payload in all negotiated modes.",
+      "kind": "protocol",
+      "status": "verified",
+      "oracle": {
+        "observes": "Default tool returns exactly one PNG and no UI template or widget payload in all negotiated modes.",
+        "layer": "real stdio and installed package",
+        "method": "listTools and callTool for recipe/source with UI on/off",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "tool succeeded",
+        "counterexample": "Old UI-capable branch returns text instead of image; image-default mutation caught by wire test",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/installed-package.json"
+      },
+      "substrates": [
+        {
+          "name": "real stdio and installed package",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/installed-package.json"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/installed-package.json"
+    },
+    {
+      "id": "P2",
+      "claim": "Explicit explorer advertises resource and falls back to PNG without correct HTML MIME.",
+      "kind": "protocol",
+      "status": "verified",
+      "oracle": {
+        "observes": "Explicit explorer advertises resource and falls back to PNG without correct HTML MIME.",
+        "layer": "SDK negotiation and installed artifact",
+        "method": "call both tools with true/false/empty/wrong capabilities",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "resource metadata exists",
+        "counterexample": "Fallback branch removed or explorer payload omitted; both mutants killed",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/receipt.json"
+      },
+      "substrates": [
+        {
+          "name": "SDK negotiation and installed artifact",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/receipt.json"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/receipt.json"
+    },
+    {
+      "id": "P3",
+      "claim": "Invalid input and PNG failures return clean errors and allow recovery.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Invalid input and PNG failures return clean errors and allow recovery.",
+        "layer": "live stdio and installed dependency",
+        "method": "malformed/oversized inputs and disable native renderer in disposable consumer",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "error text displayed",
+        "counterexample": "isError=false mutation still has error text but fails declared result status assertions",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/installed-package.json"
+      },
+      "substrates": [
+        {
+          "name": "live stdio and installed dependency",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/installed-package.json"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/installed-package.json"
+    },
+    {
+      "id": "P4",
+      "claim": "Drawing selection emits actual selected identity, and explicit explanation carries it.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Drawing selection emits actual selected identity, and explicit explanation carries it.",
+        "layer": "real browser DOM through SDK host bridge",
+        "method": "pointer/keyboard selection, context and message traces",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "selection helper returns correct data",
+        "counterexample": "context-callsite mutant retains helper behavior but sends null, caught in real host context",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+      },
+      "substrates": [
+        {
+          "name": "real browser DOM through SDK host bridge",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+    },
+    {
+      "id": "P5",
+      "claim": "Image-first host removes widget; cancellation/errors clear stale drawing/context; user can recover.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Image-first host removes widget; cancellation/errors clear stale drawing/context; user can recover.",
+        "layer": "browser presentation and context state",
+        "method": "render image/explorer/cancel/invalid/valid/image sequence",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "error banner exists",
+        "counterexample": "Old drawing could remain below banner; tests assert absence of viewport and stale context as well as recovery",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+      },
+      "substrates": [
+        {
+          "name": "browser presentation and context state",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/test-strength-receipt.json",
+      "evidence": "Real stdio, installed Node executable and browser producer; 2530 full tests, 27 MCP cases, 30 browser checks. Isolated compiled mutants are killed at the intended assertions.",
+      "fingerprint": {
+        "head_sha": "327916f472096b07180f049d6d18cd63962096fc",
+        "changed_paths_digest": "sha256:bc9508fd7c9f5892b9fa29a0447e20e4f3aaecf20a96153f17dcca20c1ed0f50",
+        "contract_digest": "sha256:d34297fd8ccd3e231daa498c400674c9b394f3add4d679877b2b3c6fa2759dfd",
+        "command": "bun test ./tests; bun artifacts/mcp-image-first/mutations/wire.ts; bun artifacts/mcp-image-first/mutations/context.ts; bun scripts/check-mcp-browser.ts",
+        "environment_digest": "sha256:599aa3293913f7ce23468b301a74b7b3cc592e4b9898734b8f80f5e6ed100e7e",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "README.md",
+          "bun.lock",
+          "docs/mcp-apps.md",
+          "package.json",
+          "scripts/build-mcp.ts",
+          "scripts/build.ts",
+          "scripts/check-mcp-browser.ts",
+          "scripts/mcp-host.ts",
+          "scripts/preview-mcp.ts",
+          "src/mcp/canvas.tsx",
+          "src/mcp/circuit.ts",
+          "src/mcp/cli.ts",
+          "src/mcp/server.ts",
+          "src/mcp/view.css",
+          "src/mcp/view.tsx",
+          "tests/mcp.test.ts",
+          "tests/package-education-build.test.ts"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "skill_package_digest": "sha256:a48126adf41ae16e2a3f29bb20b1da68b3a5b9db2a4cd6b5baa08b3c598b70ea"
+      },
+      "dimensions": {
+        "values": [
+          "Tool owner: show_circuit or explore_circuit",
+          "Host UI: HTML MIME present, extension absent, empty MIME list, wrong MIME",
+          "Input: nine known recipes, revised recipe document, valid source, ambiguous, unknown, oversized, malformed",
+          "Output: PNG content with structured circuit; UI payload; clean error",
+          "Prior viewer state: no circuit, recipe selection, source selection, cancelled, invalid result",
+          "Selection producer: real browser pointer on component/module/net; native keyboard Enter/Escape; authored scene select",
+          "Host message/context: supported, missing, rejected; theme light/dark; reduced motion; desktop/mobile"
+        ],
+        "exclusions": [
+          "Native Codex inline explorer compatibility is explicitly outside A6; reference host does not claim it.",
+          "Full electrical simulation is not part of CircuitKit.",
+          "PNG dependency repair is verified after process restart, since native module imports are process-cached."
+        ],
+        "evidence": "Tool x UI x input content assertions and browser checks are the per-class falsifiers. Image-content mutant affects every image class, explorer-payload affects both explorer modes, image-default/fallback isolates negotiation classes, stale-error covers malformed input, context-callsite covers shared selection emission owner. Other controls use direct DOM/message post-state assertions; no claim of exhaustive mutation across the pre-existing circuit renderer."
+      },
+      "oracle": {
+        "source": "Approved contract A1-A5, known RC declared connectivity and official MCP SDK consumer/bridge",
+        "independent": true,
+        "evidence": "Image presence and no UI metadata are explicit product requirements, not expectations copied from the new branch. RC nets are asserted explicitly; browser records actual host messages. Source fixture uses existing .ck examples."
+      },
+      "producer": {
+        "name": "Node-shebang installed bin + official MCP SDK stdio client + agent-browser events into sandboxed AppBridge iframe",
+        "status": "exercised",
+        "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/installed-package.json; /Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+      },
+      "falsification": [
+        {
+          "mutation": "image-content",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/image-content.log: returns declared RC connectivity for show_circuit with UI=",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+        },
+        {
+          "mutation": "explorer-payload",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/explorer-payload.log: returns declared RC connectivity for explore_circuit with UI=",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+        },
+        {
+          "mutation": "image-default",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/image-default.log: returns declared RC connectivity for show_circuit with UI=",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+        },
+        {
+          "mutation": "fallback",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/fallback.log: returns declared RC connectivity for explore_circuit with UI=",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+        },
+        {
+          "mutation": "stale-error",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/stale-error.log: bounded malformed source campaign never returns a circuit payload",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+        },
+        {
+          "mutation": "Actual view updateModelContext call site sends null selection",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/context/red.log: component selection reaches host context fails",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser-restored/receipt.json"
+        }
+      ],
+      "additional_evidence": {
+        "generated_cases": "24 deterministic RC resistance mutations preserve declared connectivity",
+        "fuzz": "32 malformed source strings over eight character families and four lengths",
+        "consumer_checks": [
+          "show_circuit ui=true input=recipe",
+          "show_circuit ui=true input=source",
+          "explore_circuit ui=true input=recipe",
+          "explore_circuit ui=true input=source",
+          "show_circuit ui=false input=recipe",
+          "show_circuit ui=false input=source",
+          "explore_circuit ui=false input=recipe",
+          "explore_circuit ui=false input=source",
+          "dependency failure show_circuit recipe",
+          "dependency failure show_circuit source",
+          "dependency failure explore_circuit recipe",
+          "dependency failure explore_circuit source",
+          "restored dependency and immediate process restart recover both renderers"
+        ],
+        "browser_checks": [
+          "default output is a PNG",
+          "default output does not mount a widget",
+          "RC circuit rendered",
+          "component selection reaches host context",
+          "explain message carries selected component",
+          "net selection reaches host",
+          "teaching scene reaches host",
+          "clear selection clears context",
+          "explanation action is contextual",
+          "keyboard selects a connection",
+          "Escape clears selection",
+          "source replaces recipe and clears selection",
+          "module selection happens on the drawing",
+          "source scene reaches host",
+          "flow routes exist",
+          "pause controls actual animation",
+          "play controls actual animation",
+          "host theme reaches widget",
+          "mobile controls remain available",
+          "zoom applies to circuit viewport",
+          "cancellation removes stale drawing and context",
+          "invalid source removes stale circuit",
+          "invalid source clears stale model context",
+          "valid result recovers after error",
+          "returning to image removes the explorer",
+          "explanation is disabled without host message capability",
+          "rejected message reports failure",
+          "rejected context keeps explicit explanation available",
+          "explanation carries selection after rejected context",
+          "reduced motion disables moving sweep"
+        ],
+        "repeat": "Focused MCP suite ran before and after type-only helper correction; original browser harness repeated after isolated context mutant."
+      }
+    },
+    "resilience": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/resilience-receipt.json",
+      "evidence": "Forced invalid input, dependency refusal, host rejection, cancellation and recovery at actual ownership boundaries. Render tools have no durable writes; optional audit append is caller configured and non-fatal.",
+      "fingerprint": {
+        "head_sha": "327916f472096b07180f049d6d18cd63962096fc",
+        "changed_paths_digest": "sha256:bc9508fd7c9f5892b9fa29a0447e20e4f3aaecf20a96153f17dcca20c1ed0f50",
+        "contract_digest": "sha256:d34297fd8ccd3e231daa498c400674c9b394f3add4d679877b2b3c6fa2759dfd",
+        "command": "node consumer/verify.mjs; bun test tests/mcp.test.ts; bun scripts/check-mcp-browser.ts",
+        "environment_digest": "sha256:599aa3293913f7ce23468b301a74b7b3cc592e4b9898734b8f80f5e6ed100e7e",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "README.md",
+          "bun.lock",
+          "docs/mcp-apps.md",
+          "package.json",
+          "scripts/build-mcp.ts",
+          "scripts/build.ts",
+          "scripts/check-mcp-browser.ts",
+          "scripts/mcp-host.ts",
+          "scripts/preview-mcp.ts",
+          "src/mcp/canvas.tsx",
+          "src/mcp/circuit.ts",
+          "src/mcp/cli.ts",
+          "src/mcp/server.ts",
+          "src/mcp/view.css",
+          "src/mcp/view.tsx",
+          "tests/mcp.test.ts",
+          "tests/package-education-build.test.ts"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "skill_package_digest": "sha256:aa1b09c3864bfca6e882e2c9ea11b63dd9f89279f36018e24e67edeee5edfa4f"
+      },
+      "commit_points": [
+        {
+          "id": "C1",
+          "effect": "viewer adopts a result and publishes selection context (ephemeral state)",
+          "owner": "Viewer/CircuitView",
+          "commit_event": "valid tool result mounted",
+          "later_fallible_stages": [
+            "context publication",
+            "explanation request",
+            "next input/result or cancellation"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "AppBridge context/message",
+              "covers": [
+                "context publication",
+                "explanation request"
+              ],
+              "forced": true,
+              "residual_observed": "Rejected context is visible; explicit explanation retains target. Rejected message shows failure and clears sending state.",
+              "cleanup_owner": "CircuitView async rejection/finally paths",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "After rejected context, Explain selection sends the selected R1 in a separate message."
+              },
+              "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+            },
+            {
+              "ownership_region": "Viewer lifecycle",
+              "covers": [
+                "next input/result or cancellation"
+              ],
+              "forced": true,
+              "residual_observed": "cancelled/invalid state removes the drawing and clears host context; next RC result renders successfully; returning to PNG removes iframe",
+              "cleanup_owner": "Viewer handlers and reference host render ownership counter",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "browser valid result recovers after error check"
+              },
+              "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+            }
+          ]
+        },
+        {
+          "id": "C2",
+          "effect": "validated request before result publication; no durable state committed",
+          "owner": "server render closure",
+          "commit_event": "prepared circuit retained only within request",
+          "later_fallible_stages": [
+            "native PNG import/render",
+            "result publication"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "PNG renderer",
+              "covers": [
+                "native PNG import/render",
+                "result publication"
+              ],
+              "forced": true,
+              "residual_observed": "missing native dependency produces isError with no structured content/widget payload; no image fabricated",
+              "cleanup_owner": "render catch; disposable dependency restored in finally; stdio client closed",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "Restored dependency and immediately restarted installed process returns PNG for recipe and source. Invalid-input recovery succeeds in same live stdio client."
+              },
+              "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/installed-package.json; /Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+            }
+          ]
+        },
+        {
+          "id": "C3",
+          "effect": "Optional capability audit append to an operator-selected path",
+          "owner": "CLI audit callback",
+          "commit_event": "appendFileSync of one JSONL record",
+          "later_fallible_stages": [
+            "later optional audit append",
+            "next tool result"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "audit filesystem",
+              "covers": [
+                "later optional audit append",
+                "next tool result"
+              ],
+              "forced": true,
+              "residual_observed": "A directory at the audit filename refuses append. Stderr reports failure; actual SDK still receives a valid PNG result. After repair, same process immediately succeeds and appends valid JSONL without source data.",
+              "cleanup_owner": "CLI catches append errors without contaminating protocol stdout; test repairs only its own disposable target",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/audit-recovery.json"
+              },
+              "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/audit-recovery.json"
+            }
+          ]
+        }
+      ],
+      "pressure_exclusions": [
+        "No transaction, persisted circuit state, authentication, deployment or public HTTP service added.",
+        "Native desktop host cancellation implementation is outside this package.",
+        "No throughput/DoS or all-platform support claim; Node 20/24 CI will be recorded separately."
+      ],
+      "resource_ownership": "Clients close in afterAll/finally. Browser harness closes sessions. Preview owns a single server client and handles SIGINT/SIGTERM. Events capped at 100; UI requests generation-tagged and aborted on replacement."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A-input",
+      "source": "existing library contracts",
+      "claim": "MCP input can use existing inert renderer validation without executing author code.",
+      "status": "verified",
+      "evidence": "prepareCircuit delegates to renderSchematicSVG/renderCircuitSource; strict MCP input rejects path/extra keys; source is a DSL."
+    },
+    {
+      "id": "A-host",
+      "source": "MCP SDK host negotiation",
+      "claim": "Interactive capability must be advertised by MIME; native Codex compatibility is not inferred.",
+      "status": "verified",
+      "evidence": "UI false/empty/wrong MIME tests get PNG; reference host uses official AppBridge and docs state native support is not established."
+    },
+    {
+      "id": "A-review-delta",
+      "source": "isolated review",
+      "claim": "Final review fix changes only test helper mutability typing.",
+      "status": "verified",
+      "evidence": "tests/mcp.test.ts connect accepts readonly string[] and copies for SDK; final tsc and 27 focused tests pass."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface (promoted)",
+      "status": "skipped",
+      "reason": "No existing matcher/parser is replaced."
+    },
+    {
+      "name": "New-domain matrix (promoted)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers (promoted)",
+      "status": "skipped",
+      "reason": "No existing resolution rule is deepened."
+    },
+    {
+      "name": "Shell re-parse append domain (candidate)",
+      "status": "skipped",
+      "reason": "No shell string construction; subprocesses use argument arrays."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability (candidate)",
+      "status": "skipped",
+      "reason": "No one-shot latch."
+    },
+    {
+      "name": "Shim hermeticity (candidate)",
+      "status": "skipped",
+      "reason": "No executable shim."
+    },
+    {
+      "name": "Deliberate-default check (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Fresh-seam scan (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Substrate differential corpus (promoted)",
+      "status": "skipped",
+      "reason": "No cross-platform detector or filesystem semantics change. Node matrix delegated to repo CI."
+    },
+    {
+      "name": "Reference-implementation oracle (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "New-failure-outcome propagation (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep (candidate)",
+      "status": "skipped",
+      "reason": "No new CLI dispatch flag."
+    },
+    {
+      "name": "Error-path forcing (promoted)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Non-destructive recovery (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Cancellation and timeout hygiene (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Boundary pipeline trace (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Substrate verification (promoted)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Dogfood the built artifact (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Newly-asserted invariant ownership (candidate)",
+      "status": "skipped",
+      "reason": "No takeover of an existing mutable global invariant."
+    },
+    {
+      "name": "Docs-behavior parity (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Demonstrative example (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Choice audit (candidate, needs a decision trail to fire)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    },
+    {
+      "name": "Complexity budget (candidate)",
+      "status": "run",
+      "reason": "Reviewed MCP server, consumer/view ownership, package boundary and docs in isolated reviewer plus applicable proof receipts."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "build",
+      "outcome": "pass",
+      "reason": "artifacts/mcp-image-first/build.log"
+    },
+    {
+      "check": "typecheck",
+      "outcome": "pass",
+      "reason": "artifacts/mcp-image-first/typecheck.log; TS2345 fixed"
+    },
+    {
+      "check": "full tests",
+      "outcome": "pass",
+      "reason": "2530 pass, 21 existing skips, 0 fail"
+    },
+    {
+      "check": "build:web",
+      "outcome": "pass",
+      "reason": "32 static pages; artifacts/mcp-image-first/web-build.log"
+    },
+    {
+      "check": "scoped Biome",
+      "outcome": "pass",
+      "reason": "14 changed code files pass"
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "style.log"
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "surfaces.log with actual MCP surface map"
+    },
+    {
+      "check": "callers",
+      "outcome": "pass",
+      "reason": "all prepareCircuit/createCircuitServer callers in diff"
+    },
+    {
+      "check": "siblings",
+      "outcome": "pass",
+      "reason": "three literal keyword sweeps pass"
+    },
+    {
+      "check": "diff check",
+      "outcome": "pass",
+      "reason": "git diff --cached --check passed before commit; clean worktree after commit"
+    },
+    {
+      "check": "installed package",
+      "outcome": "pass",
+      "reason": "13 consumer checks, including renderer failure/restart"
+    },
+    {
+      "check": "global Biome",
+      "outcome": "acknowledged",
+      "reason": "Two base errors in brand/mark.svg and public/brand-assets/assets.json, plus existing app/globals.css warning. Byte-identical base/current proof at artifacts/mcp-apps/baseline-lint-files.json."
+    },
+    {
+      "check": "post-mutation browser repeat",
+      "outcome": "pass",
+      "reason": "30 of 30 checks passed again on original built resource; browser-restored/receipt.json"
+    },
+    {
+      "check": "remote exact-head CI",
+      "outcome": "pass",
+      "reason": "GitHub run 36354651103: Node 20/24 verify pass; Vercel preview and Preview Comments success. Head 327916f472096b07180f049d6d18cd63962096fc."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "test.each infers readonly MIME arrays incompatible with mutable connect signature",
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/codex-review.md; final artifacts/mcp-image-first/typecheck.log",
+      "layer": "TypeScript build",
+      "source": "isolated reviewer",
+      "path": "tests/mcp.test.ts:connect",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Native inline Codex explorer support is not verified.",
+      "evidence": "Explicitly excluded by A6 and not claimed in docs or PR; actual PNG/stdout and reference host are verified."
+    },
+    {
+      "claim": "No sync-to-iCloud step on work laptop.",
+      "evidence": "User machine context separates personal services from Vercel laptop; only local project memory updated."
+    }
+  ],
+  "issue_candidates": []
+}

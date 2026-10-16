@@ -1,0 +1,328 @@
+[
+  {
+    "file": "packages/core/src/props.ts",
+    "contexts": [
+      {
+        "line": 212,
+        "text": "\n  // $state: read from global state model\n  if (isStateExpression(value)) {\n    return getByPath(ctx.stateModel, value.$state);\n  }\n\n  // $item: read from current repeat item\n  if (isItemExpression(value)) {\n    if (ctx.repeatItem === undefined) return undefined;"
+      },
+      {
+        "line": 221,
+        "text": "    // \"\" means the whole item, \"field\" means a field on the item\n    return value.$item === \"\"\n      ? ctx.repeatItem\n      : getByPath(ctx.repeatItem, value.$item);\n  }\n\n  // $index: return current repeat array index\n  if (isIndexExpression(value)) {\n    return ctx.repeatIndex;"
+      },
+      {
+        "line": 231,
+        "text": "\n  // $bindState: two-way binding to global state path\n  if (isBindStateExpression(value)) {\n    return getByPath(ctx.stateModel, value.$bindState);\n  }\n\n  // $bindItem: two-way binding to repeat item field\n  if (isBindItemExpression(value)) {\n    const resolvedPath = resolveBindItemPath(value.$bindItem, ctx);"
+      },
+      {
+        "line": 238,
+        "text": "  if (isBindItemExpression(value)) {\n    const resolvedPath = resolveBindItemPath(value.$bindItem, ctx);\n    if (resolvedPath === undefined) return undefined;\n    return getByPath(ctx.stateModel, resolvedPath);\n  }\n\n  // $cond/$then/$else: evaluate condition and pick branch\n  if (isCondExpression(value)) {\n    const result = evaluateVisibility(value.$cond, ctx);"
+      },
+      {
+        "line": 277,
+        "text": "      /\\$\\{([^}]+)\\}/g,\n      (_match, rawPath: string) => {\n        if (rawPath.startsWith(\"/\")) {\n          const resolved = getByPath(ctx.stateModel, rawPath);\n          return resolved != null ? String(resolved) : \"\";\n        }\n        // Bare name: try repeat item first\n        if (ctx.repeatItem !== undefined) {\n          const fromItem = getByPath(ctx.repeatItem, rawPath);"
+      },
+      {
+        "line": 282,
+        "text": "        }\n        // Bare name: try repeat item first\n        if (ctx.repeatItem !== undefined) {\n          const fromItem = getByPath(ctx.repeatItem, rawPath);\n          if (fromItem != null) return String(fromItem);\n        }\n        // Fall back to state model\n        const resolved = getByPath(ctx.stateModel, \"/\" + rawPath);\n        return resolved != null ? String(resolved) : \"\";"
+      },
+      {
+        "line": 286,
+        "text": "          if (fromItem != null) return String(fromItem);\n        }\n        // Fall back to state model\n        const resolved = getByPath(ctx.stateModel, \"/\" + rawPath);\n        return resolved != null ? String(resolved) : \"\";\n      },\n    );\n  }\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/core/src/spec-validator.ts",
+    "contexts": [
+      {
+        "line": 261,
+        "text": "          spec.state !== undefined &&\n          (typeof element.repeat.statePath === \"string\" || sampleAvailable);\n        const value = canCheckSample\n          ? getByPath(spec.state, statePath)\n          : undefined;\n\n        if (canCheckSample && !Array.isArray(value)) {\n          issues.push({\n            severity: \"error\","
+      }
+    ]
+  },
+  {
+    "file": "packages/core/src/visibility.ts",
+    "contexts": [
+      {
+        "line": 191,
+        "text": "      \"$state\" in value &&\n      typeof (value as Record<string, unknown>).$state === \"string\"\n    ) {\n      return getByPath(ctx.stateModel, (value as { $state: string }).$state);\n    }\n  }\n  return value;\n}\n"
+      },
+      {
+        "line": 222,
+        "text": "    if (ctx.repeatItem === undefined) return undefined;\n    return cond.$item === \"\"\n      ? ctx.repeatItem\n      : getByPath(ctx.repeatItem, cond.$item);\n  }\n  // StateCondition\n  return getByPath(ctx.stateModel, (cond as StateCondition).$state);\n}\n"
+      },
+      {
+        "line": 225,
+        "text": "      : getByPath(ctx.repeatItem, cond.$item);\n  }\n  // StateCondition\n  return getByPath(ctx.stateModel, (cond as StateCondition).$state);\n}\n\n/**\n * Evaluate a single condition against the context.\n *"
+      }
+    ]
+  },
+  {
+    "file": "packages/image/src/render.tsx",
+    "contexts": [
+      {
+        "line": 75,
+        "text": "    }\n\n    const items =\n      (getByPath(stateModel, statePath) as unknown[] | undefined) ?? [];\n\n    const fragments = items.map((item, index) => {\n      const key =\n        repeat.key && typeof item === \"object\" && item !== null\n          ? String((item as Record<string, unknown>)[repeat.key!] ?? index)"
+      }
+    ]
+  },
+  {
+    "file": "packages/ink/src/renderer.tsx",
+    "contexts": [
+      {
+        "line": 338,
+        "text": "    return null;\n  }\n\n  const raw = getByPath(state, statePath);\n  const items = Array.isArray(raw) ? raw : [];\n\n  return (\n    <>\n      {items.map((itemValue, index) => {"
+      }
+    ]
+  },
+  {
+    "file": "packages/react-email/src/contexts/state.tsx",
+    "contexts": [
+      {
+        "line": 51,
+        "text": "  }, [initialState]);\n\n  const get = useCallback(\n    (path: string) => getByPath(stateRef.current, path),\n    [],\n  );\n\n  const set = useCallback(\n    (path: string, value: unknown) => {"
+      },
+      {
+        "line": 104,
+        "text": "\nexport function useStateValue<T>(path: string): T | undefined {\n  const { state } = useStateStore();\n  return getByPath(state, path) as T | undefined;\n}\n\nexport function useStateBinding<T>(\n  path: string,\n): [T | undefined, (value: T) => void] {"
+      },
+      {
+        "line": 111,
+        "text": "  path: string,\n): [T | undefined, (value: T) => void] {\n  const { state, set } = useStateStore();\n  const value = getByPath(state, path) as T | undefined;\n  const setValue = useCallback(\n    (newValue: T) => set(path, newValue),\n    [path, set],\n  );\n  return [value, setValue];"
+      }
+    ]
+  },
+  {
+    "file": "packages/react-email/src/render.tsx",
+    "contexts": [
+      {
+        "line": 72,
+        "text": "    }\n\n    const items =\n      (getByPath(stateModel, statePath) as unknown[] | undefined) ?? [];\n\n    const fragments = items.map((item, index) => {\n      const repeatKey = repeat.key;\n      const key =\n        repeatKey && typeof item === \"object\" && item !== null"
+      }
+    ]
+  },
+  {
+    "file": "packages/react-email/src/renderer.tsx",
+    "contexts": [
+      {
+        "line": 266,
+        "text": "    return null;\n  }\n\n  const items = (getByPath(state, statePath) as unknown[] | undefined) ?? [];\n\n  return (\n    <>\n      {items.map((itemValue, index) => {\n        const key ="
+      }
+    ]
+  },
+  {
+    "file": "packages/react-native/src/hooks.ts",
+    "contexts": [
+      {
+        "line": 206,
+        "text": " */\nfunction getSpecValue(spec: Spec, path: string): unknown {\n  if (path === \"/root\") return spec.root;\n  return getByPath(spec as unknown as Record<string, unknown>, path);\n}\n\n/**\n * Apply an RFC 6902 JSON patch to the current spec.\n * Supports add, remove, replace, move, copy, and test operations."
+      }
+    ]
+  },
+  {
+    "file": "packages/react-native/src/renderer.tsx",
+    "contexts": [
+      {
+        "line": 318,
+        "text": "    return null;\n  }\n\n  const items = (getByPath(state, statePath) as unknown[] | undefined) ?? [];\n\n  return (\n    <>\n      {items.map((itemValue, index) => {\n        // Use a stable key: prefer key field, fall back to index"
+      }
+    ]
+  },
+  {
+    "file": "packages/react-pdf/src/render.tsx",
+    "contexts": [
+      {
+        "line": 76,
+        "text": "    }\n\n    const items =\n      (getByPath(stateModel, statePath) as unknown[] | undefined) ?? [];\n\n    const fragments = items.map((item, index) => {\n      const key =\n        repeat.key && typeof item === \"object\" && item !== null\n          ? String((item as Record<string, unknown>)[repeat.key!] ?? index)"
+      }
+    ]
+  },
+  {
+    "file": "packages/react-pdf/src/renderer.tsx",
+    "contexts": [
+      {
+        "line": 274,
+        "text": "    return null;\n  }\n\n  const items = (getByPath(state, statePath) as unknown[] | undefined) ?? [];\n\n  return (\n    <>\n      {items.map((itemValue, index) => {\n        const key ="
+      }
+    ]
+  },
+  {
+    "file": "packages/react-state/src/index.tsx",
+    "contexts": [
+      {
+        "line": 163,
+        "text": "    if (!isControlledRef.current && s.getSnapshot() !== prev) {\n      const changes: Array<{ path: string; value: unknown }> = [];\n      for (const [path, value] of Object.entries(updates)) {\n        if (getByPath(prev, path) !== value) {\n          changes.push({ path, value });\n        }\n      }\n      if (changes.length > 0) {\n        onStateChangeRef.current?.(changes);"
+      },
+      {
+        "line": 203,
+        "text": " */\nexport function useStateValue<T>(path: string): T | undefined {\n  const { state } = useStateStore();\n  return getByPath(state, path) as T | undefined;\n}\n\n/**\n * Hook to get and set a value from the state model (like useState).\n *"
+      },
+      {
+        "line": 218,
+        "text": "  path: string,\n): [T | undefined, (value: T) => void] {\n  const { state, set } = useStateStore();\n  const value = getByPath(state, path) as T | undefined;\n  const setValue = useCallback(\n    (newValue: T) => set(path, newValue),\n    [path, set],\n  );\n  return [value, setValue];"
+      }
+    ]
+  },
+  {
+    "file": "packages/react/README.md",
+    "contexts": [
+      {
+        "line": 194,
+        "text": "\n// Option 2: Implement the StateStore interface with your own backend\nconst zustandStore: StateStore = {\n  get: (path) => getByPath(useStore.getState(), path),\n  set: (path, value) =>\n    useStore.setState((prev) => {\n      /* ... */\n    }),\n  update: (updates) =>"
+      }
+    ]
+  },
+  {
+    "file": "packages/react/src/hooks.ts",
+    "contexts": [
+      {
+        "line": 158,
+        "text": "  if (path === \"/state\") return spec.state;\n  if (path.startsWith(\"/state/\") && spec.state) {\n    const statePath = path.slice(\"/state\".length);\n    return getByPath(spec.state as Record<string, unknown>, statePath);\n  }\n  return getByPath(spec as unknown as Record<string, unknown>, path);\n}\n\n/**"
+      },
+      {
+        "line": 160,
+        "text": "    const statePath = path.slice(\"/state\".length);\n    return getByPath(spec.state as Record<string, unknown>, statePath);\n  }\n  return getByPath(spec as unknown as Record<string, unknown>, path);\n}\n\n/**\n * Apply an RFC 6902 JSON patch to the current spec.\n * Supports add, remove, replace, move, copy, and test operations."
+      }
+    ]
+  },
+  {
+    "file": "packages/react/src/renderer.tsx",
+    "contexts": [
+      {
+        "line": 586,
+        "text": "    if (!watchConfig) return undefined;\n    const values: Record<string, unknown> = {};\n    for (const path of Object.keys(watchConfig)) {\n      values[path] = getByPath(watchState, path);\n    }\n    const prev = stableWatchRef.current;\n    if (prev) {\n      const keys = Object.keys(values);\n      if ("
+      },
+      {
+        "line": 840,
+        "text": "    return null;\n  }\n\n  const items = (getByPath(state, statePath) as unknown[] | undefined) ?? [];\n\n  // Per-item filter from the container's own $item/$index visible condition.\n  // Original indices are preserved so item state paths still point at the\n  // right array entry.\n  const entries = items"
+      }
+    ]
+  },
+  {
+    "file": "packages/solid/src/contexts/state.tsx",
+    "contexts": [
+      {
+        "line": 139,
+        "text": "  const set = (path: string, value: unknown) => {\n    const s = store();\n    const prev = s.getSnapshot();\n    const prevValue = getByPath(prev, path);\n    s.set(path, value);\n    if (prevValue !== value) {\n      const changes = [{ path, value }];\n      notifyChanges(changes);\n      if (!props.store && s.getSnapshot() !== prev) {"
+      },
+      {
+        "line": 156,
+        "text": "    s.update(updates);\n    const changes: Array<{ path: string; value: unknown }> = [];\n    for (const [path, value] of Object.entries(updates)) {\n      if (getByPath(prev, path) !== value) {\n        changes.push({ path, value });\n      }\n    }\n    if (changes.length > 0) {\n      notifyChanges(changes);"
+      },
+      {
+        "line": 198,
+        "text": "\nexport function useStateValue<T>(path: string): Accessor<T | undefined> {\n  const store = useStateStore();\n  return createMemo(() => getByPath(store.state, path) as T | undefined);\n}\n\nexport function useStateBinding<T>(\n  path: string,\n): [Accessor<T | undefined>, (value: T) => void] {"
+      },
+      {
+        "line": 205,
+        "text": "  path: string,\n): [Accessor<T | undefined>, (value: T) => void] {\n  const store = useStateStore();\n  const value = createMemo(() => getByPath(store.state, path) as T | undefined);\n  const setValue = (newValue: T) => store.set(path, newValue);\n  return [value, setValue];\n}\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/solid/src/hooks.ts",
+    "contexts": [
+      {
+        "line": 156,
+        "text": "  if (path === \"/state\") return spec.state;\n  if (path.startsWith(\"/state/\") && spec.state) {\n    const statePath = path.slice(\"/state\".length);\n    return getByPath(spec.state as Record<string, unknown>, statePath);\n  }\n  return getByPath(spec as unknown as Record<string, unknown>, path);\n}\n\n/**"
+      },
+      {
+        "line": 158,
+        "text": "    const statePath = path.slice(\"/state\".length);\n    return getByPath(spec.state as Record<string, unknown>, statePath);\n  }\n  return getByPath(spec as unknown as Record<string, unknown>, path);\n}\n\n/**\n * Apply an RFC 6902 JSON patch to the current spec.\n * Supports add, remove, replace, move, copy, and test operations."
+      }
+    ]
+  },
+  {
+    "file": "packages/solid/src/renderer.tsx",
+    "contexts": [
+      {
+        "line": 449,
+        "text": "  const items = () =>\n    statePath() === undefined\n      ? []\n      : ((getByPath(stateStore.state, statePath()!) as unknown[] | undefined) ??\n        []);\n\n  return (\n    <For each={items()}>\n      {(itemValue, index) => {"
+      }
+    ]
+  },
+  {
+    "file": "packages/svelte/src/RepeatChildren.svelte",
+    "contexts": [
+      {
+        "line": 44,
+        "text": "  let items = $derived(\n    statePath === undefined\n      ? []\n      : ((getByPath(stateCtx.state, statePath) as unknown[] | undefined) ?? []),\n  );\n</script>\n\n{#each items as itemValue, index (element.repeat?.key && typeof itemValue === \"object\" && itemValue !== null ? String((itemValue as any)[element.repeat.key] ?? index) : String(index))}\n  {@const basePath = resolveRepeatItemStatePath(statePath!, index)}"
+      }
+    ]
+  },
+  {
+    "file": "packages/svelte/src/contexts/StateProvider.svelte",
+    "contexts": [
+      {
+        "line": 168,
+        "text": "      if (!store && next !== prev) {\n        const changes: Array<{ path: string; value: unknown }> = [];\n        for (const [path, value] of Object.entries(updates)) {\n          if (getByPath(prev, path) !== value) {\n            changes.push({ path, value });\n          }\n        }\n        if (changes.length > 0) {\n          onStateChange?.(changes);"
+      }
+    ]
+  },
+  {
+    "file": "packages/svelte/src/streaming.svelte.ts",
+    "contexts": [
+      {
+        "line": 163,
+        "text": "  if (path === \"/state\") return spec.state;\n  if (path.startsWith(\"/state/\") && spec.state) {\n    const statePath = path.slice(\"/state\".length);\n    return getByPath(spec.state as Record<string, unknown>, statePath);\n  }\n  return getByPath(spec as unknown as Record<string, unknown>, path);\n}\n\nfunction applyPatch(spec: Spec, patch: JsonPatch): Spec {"
+      },
+      {
+        "line": 165,
+        "text": "    const statePath = path.slice(\"/state\".length);\n    return getByPath(spec.state as Record<string, unknown>, statePath);\n  }\n  return getByPath(spec as unknown as Record<string, unknown>, path);\n}\n\nfunction applyPatch(spec: Spec, patch: JsonPatch): Spec {\n  const newSpec = {\n    ...spec,"
+      }
+    ]
+  },
+  {
+    "file": "packages/vue/README.md",
+    "contexts": [
+      {
+        "line": 243,
+        "text": "\n// Option 2: Implement the StateStore interface with your own backend\nconst piniaStore: StateStore = {\n  get: (path) => getByPath(myStore.$state, path),\n  set: (path, value) => myStore.$patch(/* ... */),\n  update: (updates) => myStore.$patch(/* ... */),\n  getSnapshot: () => myStore.$state,\n  subscribe: (listener) => myStore.$subscribe(listener),\n};"
+      }
+    ]
+  },
+  {
+    "file": "packages/vue/src/composables/state.ts",
+    "contexts": [
+      {
+        "line": 160,
+        "text": "      if (!isControlled && store.getSnapshot() !== prev) {\n        const changes: Array<{ path: string; value: unknown }> = [];\n        for (const [path, value] of Object.entries(updates)) {\n          if (getByPath(prev, path) !== value) {\n            changes.push({ path, value });\n          }\n        }\n        if (changes.length > 0) {\n          onStateChangeRef.value?.(changes);"
+      },
+      {
+        "line": 198,
+        "text": " */\nexport function useStateValue<T>(path: string): ComputedRef<T | undefined> {\n  const { state } = useStateStore();\n  return computed(() => getByPath(state.value, path) as T | undefined);\n}\n\n/**\n * Composable to get and set a value from the state model by path.\n *"
+      },
+      {
+        "line": 213,
+        "text": "  path: string,\n): [ComputedRef<T | undefined>, (value: T) => void] {\n  const { state, set } = useStateStore();\n  const value = computed(() => getByPath(state.value, path) as T | undefined);\n  const setValue = (newValue: T) => set(path, newValue);\n  return [value, setValue];\n}\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/vue/src/hooks.ts",
+    "contexts": [
+      {
+        "line": 165,
+        "text": "  if (path === \"/state\") return spec.state;\n  if (path.startsWith(\"/state/\") && spec.state) {\n    const statePath = path.slice(\"/state\".length);\n    return getByPath(spec.state as Record<string, unknown>, statePath);\n  }\n  return getByPath(spec as unknown as Record<string, unknown>, path);\n}\n\n/**"
+      },
+      {
+        "line": 167,
+        "text": "    const statePath = path.slice(\"/state\".length);\n    return getByPath(spec.state as Record<string, unknown>, statePath);\n  }\n  return getByPath(spec as unknown as Record<string, unknown>, path);\n}\n\n/**\n * Apply an RFC 6902 JSON patch to the current spec.\n * Supports add, remove, replace, move, copy, and test operations."
+      }
+    ]
+  },
+  {
+    "file": "packages/vue/src/renderer.ts",
+    "contexts": [
+      {
+        "line": 336,
+        "text": "      if (!cfg) return undefined;\n      const values: Record<string, unknown> = {};\n      for (const path of Object.keys(cfg)) {\n        values[path] = getByPath(watchState.value, path);\n      }\n      return values;\n    });\n\n    watch("
+      },
+      {
+        "line": 550,
+        "text": "        );\n        return null;\n      }\n      const raw = getByPath(state.value, statePath);\n      const items = Array.isArray(raw) ? (raw as unknown[]) : [];\n\n      return items.map((itemValue, index) => {\n        const key =\n          repeat.key && typeof itemValue === \"object\" && itemValue !== null"
+      }
+    ]
+  }
+]

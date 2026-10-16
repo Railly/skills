@@ -1,0 +1,138 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "sha256:aa1b09c3864bfca6e882e2c9ea11b63dd9f89279f36018e24e67edeee5edfa4f",
+  "artifact": "resilience-receipt.json",
+  "evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp/fault-checks.json",
+  "fingerprint": {
+    "head_sha": "66571296bd72f291a7e8be7c050b49aa1c4cdbe4",
+    "changed_paths_digest": "sha256:012f6a3ab5c8498a97a27fdd749a45ada90f37bc822cb18c71d4d98bd2884209",
+    "contract_digest": "sha256:810ead0961251b2e669d0ac7505fe80f375d5e4fe1617045940f55335cdbbe4a",
+    "command": "faults.py http://127.0.0.1:3017; exercise.py",
+    "environment_digest": "sha256:d60a2160b146a89d3e5bce1309ef290cea36f057f745fb3c0a6e8e82ed1e05d4",
+    "skill_revision": "sha256:aa1b09c3864bfca6e882e2c9ea11b63dd9f89279f36018e24e67edeee5edfa4f",
+    "relevant_paths": [
+      "README.md",
+      "apps/web/.env.example",
+      "apps/web/package.json",
+      "apps/web/public/llms.txt",
+      "apps/web/src/app/design/browser-design-store.ts",
+      "apps/web/src/app/design/design-agent.test.ts",
+      "apps/web/src/app/design/design-agent.ts",
+      "apps/web/src/app/design/design-photo-picker.tsx",
+      "apps/web/src/app/design/design-studio.tsx",
+      "apps/web/src/app/design/use-design-studio.ts",
+      "apps/web/src/app/design/use-studio-webmcp.ts",
+      "apps/web/src/app/docs/page.tsx",
+      "apps/web/src/app/docs/toolkit.css",
+      "apps/web/src/app/shell.css",
+      "apps/web/src/components/participant-profile-provider.tsx",
+      "apps/web/src/components/site-header.tsx",
+      "apps/web/src/lib/design-edits.ts",
+      "apps/web/src/lib/webmcp.test.ts",
+      "apps/web/src/lib/webmcp.ts",
+      "bun.lock",
+      "docs/webmcp-contract.md",
+      "friction.md",
+      "skills/badge-studio/SKILL.md",
+      "skills/badge-studio/scripts/image-transfer.mjs"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "Atomic in-memory document replacement",
+      "owner": "validated shared reducer",
+      "commit_event": "React state update after semantic validation",
+      "later_fallible_stages": [],
+      "failure_partitions": [
+        {
+          "ownership_region": "validation",
+          "covers": [],
+          "forced": true,
+          "residual_observed": "Invalid QR and locked edits leave prior document unchanged",
+          "cleanup_owner": "validation",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Same scenario restores dependency and immediately repeats successfully; fault-checks.json."
+          },
+          "evidence": "Built native calls verify unchanged full document before successful retry."
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "effect": "Image available in shared profile",
+      "owner": "ParticipantProfileProvider",
+      "commit_event": "Prepared raster assigned to profile before asynchronous persistence",
+      "later_fallible_stages": [
+        "profile persistence"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "profile persistence",
+          "covers": [
+            "profile persistence"
+          ],
+          "forced": true,
+          "residual_observed": "Image remains usable in session; visible storage warning appears",
+          "cleanup_owner": "profile persistence",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Same scenario restores dependency and immediately repeats successfully; fault-checks.json."
+          },
+          "evidence": "Profile readwrite transaction refusal after image state commit, warning asserted, restore and photo retry clears warning."
+        }
+      ]
+    },
+    {
+      "id": "C3",
+      "effect": "Saved design durable in IndexedDB",
+      "owner": "BrowserDesignStore then useDesignStudio",
+      "commit_event": "IndexedDB transaction oncomplete",
+      "later_fallible_stages": [
+        "UI history and library publication"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "UI history and library publication",
+          "covers": [
+            "UI history and library publication"
+          ],
+          "forced": true,
+          "residual_observed": "Save reports failure after injected history.replaceState throw; saved ID and incremented version remain inspectable; retry updates same ID",
+          "cleanup_owner": "UI history and library publication",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Same scenario restores dependency and immediately repeats successfully; fault-checks.json."
+          },
+          "evidence": "faults.py forces post-commit UI failure then verifies immediate retry produces one saved entry, not duplicate."
+        }
+      ]
+    },
+    {
+      "id": "C4",
+      "effect": "Browser download initiated",
+      "owner": "browser download API",
+      "commit_event": "download anchor activation",
+      "later_fallible_stages": [],
+      "failure_partitions": []
+    }
+  ],
+  "precommit_pressure": [
+    "Delayed example fetch: explicit cancellation twice, no commit, clean retry",
+    "Concurrent mutation returns BUSY while read inspection remains available",
+    "Ten-second sample fetch timeout releases busy state",
+    "Storage refused before save: error and unchanged saved version, then successful retry",
+    "Route navigation unregisters native tools and cancels held load; returning allows edits"
+  ],
+  "limitations": [
+    "A native transport cancellation without callback signal cannot stop page work automatically; explicit badge_cancel is verified.",
+    "Completed profile writes, saved data and started downloads are not rolled back."
+  ]
+}

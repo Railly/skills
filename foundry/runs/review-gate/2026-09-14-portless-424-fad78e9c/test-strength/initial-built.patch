@@ -1,0 +1,12 @@
+--- dist/chunk-RQ7SS7J3.js
++++ dist/chunk-RQ7SS7J3.js
+@@ -1009,8 +1009,7 @@
+   return seen.size === wanted.size;
+ }
+ function syncHostsFile(hostnames) {
+-  const content = readHostsFile();
+-  if (content === null) return false;
++  const content = readHostsFile() ?? "";
+   if (blockMatchesHostnames(content, hostnames)) return true;
+   try {
+     const cleaned = removeBlock(content);

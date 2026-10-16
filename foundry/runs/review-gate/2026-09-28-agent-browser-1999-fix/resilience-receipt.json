@@ -1,0 +1,150 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:91035714a452a14fb4efacb5afd24e37fa5f34a6a25faa606aec925916a786f3",
+  "artifact": "resilience.md",
+  "evidence": "All bounded failure regions reject without submission, release observed handles while transport is usable, and permit immediate caller retry.",
+  "fingerprint": {
+    "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+    "changed_paths_digest": "sha256:ff529690c5e679d2c9a9bff9b58c2ccc570233b4879144b68af2469c603311fd",
+    "contract_digest": "sha256:a7efe4ddf2ff2d778d5b8855e0e6257287add38f308afbcd3780e615576b1fa6",
+    "environment_digest": "sha256:27081eb99b9633cb7412d4a50b1b0d8ece3c0f291e2772f53584079c424ea6c9",
+    "relevant_paths": [
+      "README.md",
+      "cli/src/mcp.rs",
+      "cli/src/native/actions.rs",
+      "cli/src/native/e2e_tests.rs",
+      "cli/src/native/element.rs",
+      "cli/src/output.rs",
+      "docs/src/app/commands/page.mdx",
+      "docs/src/app/security/page.mdx",
+      "skill-data/core/references/authentication.md",
+      "skill-data/core/references/commands.md"
+    ],
+    "reusable": false,
+    "reuse_evidence": null,
+    "command": "node lifecycle-final.mjs; cargo test remote-object release checks; cargo test e2e_auth_login -- --ignored --test-threads=1",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:91035714a452a14fb4efacb5afd24e37fa5f34a6a25faa606aec925916a786f3"
+  },
+  "limitations": [
+    "Best-effort remote-object release cannot be guaranteed after cancellation or renderer/CDP transport destruction."
+  ],
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "Credential value and input event become visible to the selected page control.",
+      "owner": "auth-specific exact-node fill helper",
+      "commit_event": "Synchronous native edit succeeds on the selected remote object.",
+      "later_fallible_stages": [
+        "post-edit identity validation",
+        "next credential fill",
+        "submit control selection and click"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "selected-node edit and validation",
+          "covers": [
+            "post-edit identity validation"
+          ],
+          "forced": true,
+          "residual_observed": "No decoy write or submission; a value already written to the intended node may remain when detachment occurs during input.",
+          "cleanup_owner": "auth helper releases observed remote handles while CDP remains usable",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "All 32 lifecycle cells report retryOk=true after the fixture restores the form."
+          },
+          "evidence": "focus-detach, focus-redirect, select-redirect, readonly transition, input-detach, exception, native-false, and native-throw were forced for both credential fields on both engines."
+        },
+        {
+          "ownership_region": "subsequent credential stage",
+          "covers": [
+            "next credential fill"
+          ],
+          "forced": true,
+          "residual_observed": "The correctly targeted earlier credential may remain; the later field stays empty and submit is not attempted.",
+          "cleanup_owner": "caller restores or re-renders the form before retry; auth helper does not roll back a correct earlier edit",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Password-stage failures were followed immediately by successful complete retries in Chrome and Lightpanda."
+          },
+          "evidence": "The lifecycle matrix forces every password-stage partition after a successful username edit."
+        },
+        {
+          "ownership_region": "submit selection and activation",
+          "covers": [
+            "submit control selection and click"
+          ],
+          "forced": true,
+          "residual_observed": "No submission occurs when a usable submit control is unavailable or the origin changes.",
+          "cleanup_owner": "auth action returns the existing bounded error; caller may retry after restoring the page",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Auth E2E covers usable duplicate submit, delayed render, active-page validation, and cross-origin rejection; subsequent restored-form runs pass."
+          },
+          "evidence": "Serial auth E2E exercises the submit and origin boundaries after both credentials are entered."
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "effect": "CDP remote-object handles are acquired for selected controls and call results.",
+      "owner": "auth selection/fill cleanup path",
+      "commit_event": "Runtime.callFunctionOn or selection returns an objectId.",
+      "later_fallible_stages": [
+        "JavaScript rejection",
+        "CDP command error while transport remains usable",
+        "normal completion"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "JavaScript rejection cleanup",
+          "covers": [
+            "JavaScript rejection"
+          ],
+          "forced": true,
+          "residual_observed": "All observed selection, call-result, and exception object IDs are released.",
+          "cleanup_owner": "auth fill rejection path",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "The release unit test restores the fixture and the next fill succeeds."
+          },
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/fill-exception-red.log proves the mutant red; restored release passes in the final unit checks."
+        },
+        {
+          "ownership_region": "CDP error cleanup",
+          "covers": [
+            "CDP command error while transport remains usable"
+          ],
+          "forced": true,
+          "residual_observed": "Known remote handles are released before returning the CDP error.",
+          "cleanup_owner": "auth fill error path",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Unit mocks keep the transport usable and verify a following attempt can proceed."
+          },
+          "evidence": "Exact-head unit tests cover selection and fill CDP error paths and release calls."
+        },
+        {
+          "ownership_region": "normal completion cleanup",
+          "covers": [
+            "normal completion"
+          ],
+          "forced": true,
+          "residual_observed": "The selected remote handle is released after the synchronous edit result is consumed.",
+          "cleanup_owner": "auth fill success path",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Repeated auth E2E and compatibility probes complete without retained-handle interference."
+          },
+          "evidence": "Exact-head unit checks and repeated built-artifact probes cover normal cleanup."
+        }
+      ]
+    }
+  ]
+}

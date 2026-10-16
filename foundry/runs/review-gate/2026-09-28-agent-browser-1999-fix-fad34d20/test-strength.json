@@ -1,0 +1,100 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-fix-fad34d20/test-strength.json",
+  "fingerprint": {
+    "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+    "changed_paths_digest": "sha256:953d342155af221f951cf886cd063bff7c8124764e58a29982630913ea24bd6b",
+    "contract_digest": "sha256:a7efe4ddf2ff2d778d5b8855e0e6257287add38f308afbcd3780e615576b1fa6",
+    "command": "cargo test -- --test-threads=1; cargo test e2e_auth_login -- --ignored --test-threads=1; cargo clippy -- -D warnings; bun compatibility.mjs; bun lifecycle-final.mjs; bun pressure-fix.mjs fix-race; bun lightpanda-probe.mjs lightpanda-race; bun react-cli-probe.mjs; bun react-lightpanda-probe.mjs",
+    "environment_digest": "sha256:53215f2b9610e304972e09c15b04d73bd6d0cbcc49279f041b29a437fa20639d",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+    "relevant_paths": [
+      "README.md",
+      "cli/src/mcp.rs",
+      "cli/src/native/actions.rs",
+      "cli/src/native/e2e_tests.rs",
+      "cli/src/native/element.rs",
+      "cli/src/output.rs",
+      "docs/src/app/commands/page.mdx",
+      "docs/src/app/security/page.mdx",
+      "skill-data/core/references/authentication.md",
+      "skill-data/core/references/commands.md",
+      "cli/src/native/interaction.rs",
+      "cli/src/native/cdp/client.rs"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/auth-final.log; /Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/unit-final.log; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lifecycle-final-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/compatibility-results.json",
+  "dimensions": {
+    "values": [
+      "Destination: username and password; submit selection remains exact-node click.",
+      "Selection: automatic and explicit CSS; stable, hidden-first, disabled-first, readonly-first, and missing controls.",
+      "Lifecycle: selected node replaced, focus detachment, focus redirection, selection redirection, readonly transition, post-input detachment, page exception.",
+      "Editing capability: present native edit, absent native edit, native false, native exception.",
+      "Editable surface: input, textarea, contenteditable; old values replaced with exact Unicode values.",
+      "Substrate: Chrome 152 and real Lightpanda nightly9842 on macOS arm64; React 19.2 controlled form in both.",
+      "Failure recovery: same auth operation immediately retried after removing page fault; missing password/submit restored without profile or session reset.",
+      "Remote handles: normal completion, rejected fill, JS exception, CDP error, rejected evaluate, non-node result, descriptor error and malformed descriptor."
+    ],
+    "exclusions": [
+      "Readonly is an input/textarea property, not a submit-button state.",
+      "Auth discovery remains top-level CSS; iframe/shadow-root discovery is not introduced.",
+      "No new guarantee of visual occlusion, ancestor opacity or cross-version browser event equality.",
+      "Lifecycle partitions are applied to each credential input. Textarea/contenteditable are separate selection and value-replacement compatibility partitions.",
+      "The formatter, help text, and existing parser delegation require deterministic checks rather than behavioral mutants.",
+      "Arbitrary future cancellation and destroyed CDP contexts are outside the completed-command cleanup claim."
+    ],
+    "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/fix-matrix-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lightpanda-matrix-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lifecycle-final-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/compatibility-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/auth-final.log"
+  },
+  "oracle": {
+    "source": "Issue/contract define the intended credential fields. Actual DOM values, decoy state, event destinations, submitted state and controlled React state are read independently of command success.",
+    "independent": true,
+    "evidence": "The original PR reports success while the password enters username. The same CLI fixture rejects that result and accepts the corrected safe rejection. Field values are asserted on every authored success/rejection path."
+  },
+  "producer": {
+    "name": "Built agent-browser CLI, real Chrome and Lightpanda DOM/focus/input lifecycle, actual React controlled form, and protocol-shaped CDP fault server",
+    "status": "exercised",
+    "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/bin/original-pr; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/bin/fixed; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lifecycle-final.mjs; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/react-cli-probe.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/react-lightpanda-probe.json"
+  },
+  "falsification": [
+    {
+      "mutation": "Omit release of Runtime.callFunctionOn exception/result handles despite returnByValue.",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/fill-exception-red.log: only login-node released; expected call-result and call-exception too. V8 wrapEvaluateResult independently establishes fixture validity in /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/v8-injected-script.cc.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/unit-final.log: final cleanup test passes."
+    },
+    {
+      "mutation": "Run new lifecycle test at original PR production wiring.",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/regression-red.log: user/selection delivers username to decoy and submits; intended destination assertion fails.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/auth-final.log: all 9 auth tests pass with final helper at both call sites."
+    },
+    {
+      "mutation": "Remove the post-selection focus check.",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/mutant-select.log: user/select-redirect places credential in decoy.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/auth-final.log; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lifecycle-final-results.json"
+    },
+    {
+      "mutation": "Remove rejected-evaluation remote-object release.",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/mutant-rejected-object.log: release list lacks exception and rejected node handles.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/unit-final.log: rejected-object cleanup test passes."
+    },
+    {
+      "mutation": "Force native editing when execCommand is absent.",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/mutant-no-fallback.log: user/no-native-edit fails required success; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lightpanda-exec-only-red.json independently observes actual engine regression.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/auth-final.log; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/compatibility-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/react-lightpanda-probe.json"
+    },
+    {
+      "mutation": "Omit explicit contentEditable recognition in the Lightpanda compatibility path.",
+      "red_evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/compatibility-lp-diagnose.json: actual Lightpanda has contentEditable=true and isContentEditable=false; both credential contenteditable cells reject.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/compatibility-results.json: 8/8 Chrome/Lightpanda credential/surface cells pass."
+    },
+    {
+      "mutation": "Remove contributor usable-duplicate discovery.",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-1b4cacd/force-red.log: all three hidden-first contributor regressions fail on parent production.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/auth-final.log; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/fix-matrix-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lightpanda-matrix-results.json"
+    }
+  ],
+  "gaps": []
+}

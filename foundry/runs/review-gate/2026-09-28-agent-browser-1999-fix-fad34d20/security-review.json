@@ -1,0 +1,89 @@
+{
+  "status": "pass",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-fix-fad34d20/security-review.json",
+  "fingerprint": {
+    "repository": "vercel-labs/agent-browser",
+    "base_sha": "d01253d9db28d75080e36da3c1c31ef89454731e",
+    "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:953d342155af221f951cf886cd063bff7c8124764e58a29982630913ea24bd6b",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d"
+  },
+  "claim": {
+    "property": "No new principal obtains saved credentials; existing no-navigate origin binding remains effective, and auth does not silently insert into a different focused field.",
+    "attacker": "Authorized-origin page JavaScript, unrelated origins, and selector text supplied by the local caller.",
+    "scope": "Replacement of PR1999 on exact final head; disposable local credentials only."
+  },
+  "trust_model": {
+    "assets": [
+      "Saved/decrypted credentials",
+      "Selected DOM destination",
+      "Bound active origin"
+    ],
+    "principals": [
+      "Local authorized caller",
+      "Authorized page already able to read its own credential inputs",
+      "Unrelated origins lacking authorization"
+    ],
+    "boundaries": [
+      "Credential store to authorized page",
+      "Active no-navigate page to effective profile URL"
+    ],
+    "entrypoints": [
+      "auth_login",
+      "CSS selector overrides",
+      "Page DOM callbacks"
+    ],
+    "sinks": [
+      "Synchronous exact-target edit",
+      "Existing submit click"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-1",
+      "classification": "hardening",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": [
+        "Selected field replaced or focus redirected by page behavior"
+      ],
+      "chain": {
+        "capability": "Page already controls DOM and reads intended input values.",
+        "reachability": "Original CLI race reproduced on Chrome and Lightpanda.",
+        "control": "Existing authorized origin, not a newly empowered principal.",
+        "boundary": "No new attacker authority is established by the original misdelivery.",
+        "impact": "The replacement prevents credential destination corruption and false successful submission."
+      },
+      "confidence": "high",
+      "evidence": [
+        "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/fix-race-results.json",
+        "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lightpanda-race-results.json",
+        "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lifecycle-final-results.json"
+      ]
+    },
+    {
+      "id": "SEC-2",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": [],
+      "confidence": "high",
+      "evidence": [
+        "Origin checks and profile/plugin resolution remain unchanged; all no-navigate origin/state E2E tests pass.",
+        "Selectors are JSON-serialized and credentials passed as CDP arguments. No credential logging or storage changes added."
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "User-authorized local implementation and bounded browser fixtures.",
+    "commands": [
+      "cargo test -- --test-threads=1; cargo test e2e_auth_login -- --ignored --test-threads=1; cargo clippy -- -D warnings; bun compatibility.mjs; bun lifecycle-final.mjs; bun pressure-fix.mjs fix-race; bun lightpanda-probe.mjs lightpanda-race; bun react-cli-probe.mjs; bun react-lightpanda-probe.mjs"
+    ],
+    "cleanup": "Fixture profiles removed and sessions closed by harness finalizers; production store schema unchanged.",
+    "gaps": []
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": []
+  }
+}

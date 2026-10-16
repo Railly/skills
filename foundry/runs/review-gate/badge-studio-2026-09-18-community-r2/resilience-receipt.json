@@ -1,0 +1,169 @@
+{
+  "required": true,
+  "status": "unavailable",
+  "skill_revision": "sha256:d1eb25b3142313011646419278267936bde967e7f42ec78a7b3b3dafaee91449",
+  "artifact": "resilience-receipt.json",
+  "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community",
+  "fingerprint": {
+    "head_sha": "3179c13fcebfa4f0a3c5f589252ea62c8929bcb1",
+    "changed_paths_digest": "sha256:d13c41d5d2e223413d2842363f6c69852773183adc9e937708931ef2a739a3fc",
+    "contract_digest": "sha256:4939ef347367b1ba0fb09bea6894a8ffdc3d679db82132ed5d6457acdd86b6dc",
+    "command": "Recorded source tests, Neon/R2 lifecycle scripts, native WebMCP dogfood and npm consumer verification",
+    "environment_digest": "sha256:6ac48825dbb68d66e279abb97469ba63eaef45aa7aaac0fa400415c3d164f6e4",
+    "relevant_paths": [
+      ".gitignore",
+      "AGENTS.md",
+      "README.md",
+      "apps/web/.env.example",
+      "apps/web/migrations/001-community.sql",
+      "apps/web/next.config.ts",
+      "apps/web/package.json",
+      "apps/web/public/prism/showcase/previews/noche-abierta-back.webp",
+      "apps/web/public/prism/showcase/previews/noche-abierta-front.webp",
+      "apps/web/scripts/migrate-community.ts",
+      "apps/web/scripts/test-community-database.ts",
+      "apps/web/src/app/api/community/[id]/route.ts",
+      "apps/web/src/app/api/community/authorize/route.ts",
+      "apps/web/src/app/api/community/cancel/route.ts",
+      "apps/web/src/app/api/community/cleanup/route.ts",
+      "apps/web/src/app/api/community/commit/route.ts",
+      "apps/web/src/app/api/community/media/[id]/route.ts",
+      "apps/web/src/app/api/community/review/route.ts",
+      "apps/web/src/app/api/community/route.ts",
+      "apps/web/src/app/api/community/stage/route.ts",
+      "apps/web/src/app/api/community/status/route.ts",
+      "apps/web/src/app/community/[id]/community-detail.tsx",
+      "apps/web/src/app/community/[id]/page.tsx",
+      "apps/web/src/app/community/authorize/page.tsx",
+      "apps/web/src/app/community/authorize/publication-authorization.tsx",
+      "apps/web/src/app/community/community-gallery.tsx",
+      "apps/web/src/app/community/community.css",
+      "apps/web/src/app/community/page.tsx",
+      "apps/web/src/app/design/community-client.test.ts",
+      "apps/web/src/app/design/community-client.ts",
+      "apps/web/src/app/design/community-publish-panel.tsx",
+      "apps/web/src/app/design/design-studio.tsx",
+      "apps/web/src/app/design/design.css",
+      "apps/web/src/app/design/page.tsx",
+      "apps/web/src/app/design/use-community-publishing.ts",
+      "apps/web/src/app/design/use-studio-webmcp.ts",
+      "apps/web/src/app/docs/page.tsx",
+      "apps/web/src/app/gallery/design-gallery.tsx",
+      "apps/web/src/components/badge-snapshot.tsx",
+      "apps/web/src/components/community-badge.tsx",
+      "apps/web/src/lib/community-contract.test.ts",
+      "apps/web/src/lib/community-contract.ts",
+      "apps/web/src/lib/community-media.test.ts",
+      "apps/web/src/lib/community-media.ts",
+      "apps/web/src/lib/community-server.ts",
+      "apps/web/src/lib/community-storage.test.ts",
+      "apps/web/src/lib/community-storage.ts",
+      "apps/web/src/lib/community-store.ts",
+      "apps/web/src/lib/design-showcase.ts",
+      "apps/web/src/lib/studio-participant.test.ts",
+      "apps/web/src/lib/studio-participant.ts",
+      "apps/web/src/lib/studio-samples.json",
+      "apps/web/src/middleware.ts",
+      "apps/web/tsconfig.json",
+      "apps/web/vercel.json",
+      "biome.json",
+      "bun.lock",
+      "docs/webmcp-contract.md",
+      "packages/cli/README.md",
+      "packages/cli/package.json",
+      "packages/cli/skill-data/core.md",
+      "packages/cli/skill-data/design.md",
+      "packages/cli/src/cli.test.ts",
+      "packages/design/package.json",
+      "packages/design/src/badge-design.ts",
+      "packages/design/src/catalog.ts",
+      "packages/design/src/noche-abierta.json",
+      "packages/design/src/qr.ts",
+      "packages/design/tsup.config.ts",
+      "packages/renderer/src/design.ts",
+      "scripts/capture-preview-assets.ts",
+      "scripts/verify-cli-package.mjs",
+      "skills/badge-studio/SKILL.md"
+    ],
+    "reusable": false,
+    "reuse_evidence": null,
+    "skill_revision": "sha256:d1eb25b3142313011646419278267936bde967e7f42ec78a7b3b3dafaee91449"
+  },
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "Reserved private R2 object written before media readiness receipt",
+      "owner": "Community media uploader",
+      "commit_event": "R2 PUT returns successfully",
+      "later_fallible_stages": [
+        "Mark media ready in Neon"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "Media uploader after provider write",
+          "covers": [
+            "Mark media ready in Neon"
+          ],
+          "forced": true,
+          "residual_observed": "Fixture deliberately leaves one reserved row and existing provider object. Two immediate uploads reuse that key and converge to one ready row.",
+          "cleanup_owner": "Uploader retry; cleanup lease for abandoned work",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/r2-lifecycle-followup.log"
+          },
+          "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/r2-lifecycle-proof.ts"
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "effect": "Cleanup item leased for provider deletion",
+      "owner": "Community cleanup worker",
+      "commit_event": "Neon lease update commits",
+      "later_fallible_stages": [
+        "R2 object deletion"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "Provider deletion",
+          "covers": [
+            "R2 object deletion"
+          ],
+          "forced": true,
+          "residual_observed": "One failed item retains retry lease; simulated expired lease is reclaimable.",
+          "cleanup_owner": "Next bounded cleanup run",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/r2-cleanup-proof.log"
+          },
+          "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/r2-cleanup-proof.ts"
+        }
+      ]
+    }
+  ],
+  "pressure_matrix": [
+    {
+      "boundary": "Neon commit and receipt",
+      "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/r2-database-followup.log",
+      "observed": "Identical concurrent retry yields one publication; changed retry and competing versions reject; cancellation after commit retains receipt."
+    },
+    {
+      "boundary": "Private provider write before application receipt",
+      "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/r2-lifecycle-followup.log",
+      "observed": "Concurrent retries recover one key and row; cancellation prevents promotion; owner-only draft access and withdrawal denial verified."
+    },
+    {
+      "boundary": "Cleanup lease and provider delete",
+      "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/r2-cleanup-proof.log",
+      "observed": "40 rows drained with maximum eight active deletes; one failure retained a retry lease; expired lease reclaimed; repeat deletion leaves no objects."
+    }
+  ],
+  "limitations": [
+    "Proof covers the recorded partitions, not arbitrary dependency outages or all scheduler interleavings.",
+    "Cleanup pressure uses actual Neon and S3 SDK with a controlled local HTTP object provider."
+  ],
+  "retries": "Recorded inside the three evidence artifacts.",
+  "reason": "Store/provider and cleanup failure probes are preserved; a complete route-to-caller fault-partition ledger was not recorded."
+}

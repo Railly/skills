@@ -1,0 +1,1378 @@
+diff --git a/README.md b/README.md
+index 1bd019a..a9c82dc 100644
+--- a/README.md
++++ b/README.md
+@@ -956,9 +956,9 @@ This is useful for multimodal AI models that can reason about visual layout, unl
+ | `--proxy <url>` | Proxy server URL with optional auth (or `AGENT_BROWSER_PROXY` env) |
+ | `--proxy-bypass <hosts>` | Hosts to bypass proxy (or `AGENT_BROWSER_PROXY_BYPASS` env) |
+ | `--ignore-https-errors` | Ignore HTTPS certificate errors (useful for self-signed certs) |
+-| `--ca-cert <path>` | Add a CA certificate or PEM bundle to CLI TLS trust; also trust it in locally launched Chromium on Linux, with browser trust retained for later commands (or `AGENT_BROWSER_CA_CERT` env) |
+-| `--no-ca-cert` | Clear CA trust retained by the running browser session (or `AGENT_BROWSER_CLEAR_CA_CERT`) |
+-| `--use-system-ca` | Verify the CLI's own connections against the OS trust store (or `AGENT_BROWSER_USE_SYSTEM_CA` env) |
++| `--ca-cert <path>` | Add a CA certificate or PEM bundle to CLI HTTPS/WSS trust, including `read` and `install`; also trust it in locally launched Chromium on Linux (or `AGENT_BROWSER_CA_CERT` env) |
++| `--no-ca-cert` | Clear the session's extra CLI CA bundle; browser commands also clear local Chromium CA trust (or `AGENT_BROWSER_CLEAR_CA_CERT`) |
++| `--use-system-ca [bool]` | Use the OS trust store for CLI TLS, or select built-in roots with `false` (or `AGENT_BROWSER_USE_SYSTEM_CA` env) |
+ | `--allow-file-access` | Allow file:// URLs to access local files (Chromium only) |
+ | `--hide-scrollbars <bool>` | Hide native scrollbars in headless Chromium screenshots, enabled by default (or `AGENT_BROWSER_HIDE_SCROLLBARS` env) |
+ | `-p, --provider <name>` | Browser provider, including configured `browser.provider` plugins (or `AGENT_BROWSER_PROVIDER` env) |
+@@ -1083,7 +1083,11 @@ Create an `agent-browser.json` file to set persistent defaults instead of repeat
+ }
+ ```
+ 
+-`caCert` configures CLI TLS trust. For local Chromium on Linux it also configures browser trust, which remains effective for later commands in the same running session. Use `"clearCaCert": true`, `--no-ca-cert`, or `AGENT_BROWSER_CLEAR_CA_CERT=1` to remove browser trust. Setting, changing, or clearing the CA relaunches Chromium without restarting the daemon. Repeating the same certificate content, including from a different path, reuses the current browser. On Linux, `agent-browser install --with-deps` installs the required `certutil`; otherwise install `libnss3-tools` on Debian/Ubuntu or `nss-tools` on RPM Linux. `useSystemCa` affects only CLI TLS.
++`caCert` adds a CA to CLI HTTPS/WSS trust. A direct `read URL` uses it without launching Chromium or setting up NSS. `install` uses the current invocation's flags, environment, and config without starting or consulting a session daemon.
++
++Daemon commands retain the session's CLI trust selection when flags, environment, and config supply no replacement. Each HTTP or WSS client acquisition rereads the selected bundle and, when enabled, native roots. Changed roots replace the cached clients without restarting the daemon or browser; operations that already acquired a client may finish with its previous roots. An invalid explicitly selected bundle fails instead of silently falling back. Use `"clearCaCert": true`, `--no-ca-cert`, or `AGENT_BROWSER_CLEAR_CA_CERT=1` to clear the extra bundle and its `SSL_CERT_FILE` fallback. Set `useSystemCa` or `--use-system-ca` to `false` to select built-in roots; this keeps any extra bundle unless it is also cleared.
++
++For local Chromium on Linux, `caCert` also configures browser trust. Changing or clearing browser CA content relaunches Chromium without restarting the daemon; equivalent certificate content, including from a different path, reuses the browser. On Linux, `agent-browser install --with-deps` installs the required `certutil`; otherwise install `libnss3-tools` on Debian/Ubuntu or `nss-tools` on RPM Linux. `useSystemCa` affects only CLI TLS.
+ 
+ Use `--config <path>` or `AGENT_BROWSER_CONFIG` to load a specific config file instead of the defaults:
+ 
+diff --git a/agent-browser.schema.json b/agent-browser.schema.json
+index 9d52b55..1f58bd3 100644
+--- a/agent-browser.schema.json
++++ b/agent-browser.schema.json
+@@ -26,7 +26,11 @@
+     },
+     "restoreSave": {
+       "type": "string",
+-      "enum": ["auto", "always", "never"],
++      "enum": [
++        "auto",
++        "always",
++        "never"
++      ],
+       "default": "auto",
+       "description": "Auto-save policy for restored state."
+     },
+@@ -72,7 +76,9 @@
+       "type": "array",
+       "items": {
+         "type": "string",
+-        "enum": ["react-devtools"]
++        "enum": [
++          "react-devtools"
++        ]
+       },
+       "description": "Built-in launch features to enable."
+     },
+@@ -122,15 +128,15 @@
+     },
+     "caCert": {
+       "type": "string",
+-      "description": "Path to a CA certificate or PEM bundle added to CLI TLS trust and, for a local Chromium launch on Linux, browser trust. Browser trust remains active for later commands in the same running session."
++      "description": "Path to a CA certificate or PEM bundle for CLI HTTPS/WSS, including read and install. Daemon commands retain the session selection when flags, environment, and config supply no replacement. Local Chromium commands on Linux also use it for browser trust."
+     },
+     "useSystemCa": {
+       "type": "boolean",
+-      "description": "Verify the CLI's own TLS connections against the operating system trust store."
++      "description": "Use native roots for CLI HTTPS/WSS, or select built-in roots with false. Daemon commands retain the session selection when flags, environment, and config supply no replacement."
+     },
+     "clearCaCert": {
+       "type": "boolean",
+-      "description": "Explicitly clear CA trust retained by the running browser session."
++      "description": "Clear the session's extra CLI CA bundle and its SSL_CERT_FILE fallback. Browser commands also clear local Chromium CA trust. Does not disable useSystemCa."
+     },
+     "allowFileAccess": {
+       "type": "boolean",
+@@ -154,7 +160,11 @@
+     },
+     "colorScheme": {
+       "type": "string",
+-      "enum": ["dark", "light", "no-preference"],
++      "enum": [
++        "dark",
++        "light",
++        "no-preference"
++      ],
+       "description": "Color scheme preference."
+     },
+     "downloadPath": {
+@@ -191,7 +201,10 @@
+     },
+     "engine": {
+       "type": "string",
+-      "enum": ["chrome", "lightpanda"],
++      "enum": [
++        "chrome",
++        "lightpanda"
++      ],
+       "default": "chrome",
+       "description": "Browser engine to use."
+     },
+@@ -207,7 +220,10 @@
+     },
+     "screenshotFormat": {
+       "type": "string",
+-      "enum": ["png", "jpeg"],
++      "enum": [
++        "png",
++        "jpeg"
++      ],
+       "description": "Screenshot format."
+     },
+     "idleTimeout": {
+@@ -231,7 +247,10 @@
+       "description": "External plugin registry. Project-level entries are appended after user-level entries, and duplicate names resolve to the later entry.",
+       "items": {
+         "type": "object",
+-        "required": ["name", "command"],
++        "required": [
++          "name",
++          "command"
++        ],
+         "properties": {
+           "name": {
+             "type": "string",
+diff --git a/cli/src/chat.rs b/cli/src/chat.rs
+index 0d68223..ca8e95a 100644
+--- a/cli/src/chat.rs
++++ b/cli/src/chat.rs
+@@ -130,8 +130,6 @@ async fn run_interactive(session: &str, model: &str, verbosity: Verbosity, json_
+         .to_string();
+     let api_key = std::env::var("AI_GATEWAY_API_KEY").unwrap_or_default();
+     let url = format!("{}/v1/chat/completions", gateway_url);
+-    let client = chat::http_client();
+-
+     loop {
+         if !json_mode {
+             eprint!("{} ", color::cyan(">"));
+@@ -163,8 +161,15 @@ async fn run_interactive(session: &str, model: &str, verbosity: Verbosity, json_
+         {
+             let split = chat::find_safe_split(&openai_messages, chat::KEEP_RECENT_MESSAGES);
+             let to_summarize = &openai_messages[1..split];
++            let client = match chat::http_client() {
++                Ok(client) => client,
++                Err(error) => {
++                    eprintln!("{error}");
++                    return;
++                }
++            };
+             if let Some(summary) =
+-                chat::summarize_for_compaction(client, &url, &api_key, model, to_summarize).await
++                chat::summarize_for_compaction(&client, &url, &api_key, model, to_summarize).await
+             {
+                 let summary_msg = json!({
+                     "role": "system",
+@@ -220,7 +225,17 @@ async fn run_chat_turn(
+ 
+     let tools: Value = serde_json::from_str(chat::CHAT_TOOLS).unwrap();
+     let url = format!("{}/v1/chat/completions", gateway_url);
+-    let client = chat::http_client();
++    let client = match chat::http_client() {
++        Ok(client) => client,
++        Err(error) => {
++            if json_mode {
++                println!("{}", json!({ "error": error }));
++            } else {
++                eprintln!("{error}");
++            }
++            return false;
++        }
++    };
+ 
+     let total_deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(300);
+     let tool_timeout = std::time::Duration::from_secs(60);
+diff --git a/cli/src/commands.rs b/cli/src/commands.rs
+index 4ce2e64..39f79c8 100644
+--- a/cli/src/commands.rs
++++ b/cli/src/commands.rs
+@@ -3198,6 +3198,7 @@ mod tests {
+             ca_cert: None,
+             clear_ca_cert: false,
+             use_system_ca: false,
++            use_system_ca_set: false,
+             allow_file_access: false,
+             hide_scrollbars: true,
+             webgpu: false,
+diff --git a/cli/src/connection.rs b/cli/src/connection.rs
+index 7201929..6284dd4 100644
+--- a/cli/src/connection.rs
++++ b/cli/src/connection.rs
+@@ -517,10 +517,13 @@ fn apply_daemon_env(cmd: &mut Command, session: &str, opts: &DaemonOptions) {
+     }
+     if let Some(ca) = opts.ca_cert {
+         cmd.env("AGENT_BROWSER_CA_CERT", ca);
++    } else {
++        cmd.env_remove("AGENT_BROWSER_CA_CERT");
+     }
+-    if opts.use_system_ca {
+-        cmd.env("AGENT_BROWSER_USE_SYSTEM_CA", "1");
+-    }
++    cmd.env(
++        "AGENT_BROWSER_USE_SYSTEM_CA",
++        if opts.use_system_ca { "1" } else { "0" },
++    );
+     if opts.allow_file_access {
+         cmd.env("AGENT_BROWSER_ALLOW_FILE_ACCESS", "1");
+     }
+@@ -598,6 +601,7 @@ fn apply_daemon_env(cmd: &mut Command, session: &str, opts: &DaemonOptions) {
+ 
+ fn daemon_config_fingerprint(opts: &DaemonOptions) -> String {
+     let mut hasher = std::collections::hash_map::DefaultHasher::new();
++    "cli-tls-options-v1".hash(&mut hasher);
+     opts.debug.hash(&mut hasher);
+     opts.action_policy.hash(&mut hasher);
+     opts.confirm_actions.hash(&mut hasher);
+@@ -1017,7 +1021,10 @@ fn connect(session: &str) -> Result<Connection, String> {
+     }
+ }
+ 
+-pub fn send_command(cmd: Value, session: &str) -> Result<Response, String> {
++pub fn send_command(mut cmd: Value, session: &str) -> Result<Response, String> {
++    if let Some(options) = crate::tls::command_options() {
++        cmd["tlsOptions"] = options;
++    }
+     // Retry logic for transient errors (EAGAIN/EWOULDBLOCK/connection issues)
+     const MAX_RETRIES: u32 = 5;
+     const RETRY_DELAY_MS: u64 = 200;
+@@ -1293,6 +1300,29 @@ mod tests {
+         }
+     }
+ 
++    #[test]
++    fn tls_options_are_command_state_and_old_protocols_restart_once() {
++        let base = test_daemon_options(None, false, None);
++        let mut changed = test_daemon_options(None, false, None);
++        changed.ca_cert = Some("/tmp/rotated.pem");
++        changed.use_system_ca = true;
++        assert_eq!(
++            daemon_config_fingerprint(&base),
++            daemon_config_fingerprint(&changed)
++        );
++        let mut legacy = std::collections::hash_map::DefaultHasher::new();
++        base.debug.hash(&mut legacy);
++        base.action_policy.hash(&mut legacy);
++        base.confirm_actions.hash(&mut legacy);
++        base.idle_timeout.hash(&mut legacy);
++        base.default_timeout.hash(&mut legacy);
++        base.no_auto_dialog.hash(&mut legacy);
++        assert_ne!(
++            daemon_config_fingerprint(&base),
++            format!("{:016x}", legacy.finish())
++        );
++    }
++
+     #[test]
+     fn test_daemon_config_fingerprint_tracks_daemon_owned_options() {
+         let domains = vec!["example.com".to_string()];
+diff --git a/cli/src/doctor/network.rs b/cli/src/doctor/network.rs
+index c2f5bb7..f6c71c5 100644
+--- a/cli/src/doctor/network.rs
++++ b/cli/src/doctor/network.rs
+@@ -26,23 +26,26 @@ pub(super) fn check(checks: &mut Vec<Check>) {
+         }
+     };
+ 
+-    let client = match crate::tls::apply_to_reqwest(reqwest::Client::builder())
+-        .user_agent(format!("agent-browser/{}", env!("CARGO_PKG_VERSION")))
+-        .timeout(Duration::from_secs(3))
+-        .connect_timeout(Duration::from_secs(3))
+-        .build()
+-    {
+-        Ok(c) => c,
+-        Err(e) => {
+-            checks.push(Check::new(
+-                "net.client",
+-                category,
+-                Status::Fail,
+-                format!("Could not build HTTP client: {}", e),
+-            ));
+-            return;
+-        }
+-    };
++    let client =
++        match crate::tls::apply_to_reqwest(reqwest::Client::builder()).and_then(|builder| {
++            builder
++                .user_agent(format!("agent-browser/{}", env!("CARGO_PKG_VERSION")))
++                .timeout(Duration::from_secs(3))
++                .connect_timeout(Duration::from_secs(3))
++                .build()
++                .map_err(|e| e.to_string())
++        }) {
++            Ok(c) => c,
++            Err(e) => {
++                checks.push(Check::new(
++                    "net.client",
++                    category,
++                    Status::Fail,
++                    format!("Could not build HTTP client: {}", e),
++                ));
++                return;
++            }
++        };
+ 
+     checks.push(Check::new(
+         "net.trust_store",
+diff --git a/cli/src/flags.rs b/cli/src/flags.rs
+index 1141182..fc5c4e2 100644
+--- a/cli/src/flags.rs
++++ b/cli/src/flags.rs
+@@ -389,6 +389,7 @@ pub struct Flags {
+     pub ca_cert: Option<String>,
+     pub clear_ca_cert: bool,
+     pub use_system_ca: bool,
++    pub use_system_ca_set: bool,
+     pub allow_file_access: bool,
+     pub hide_scrollbars: bool,
+     pub webgpu: bool,
+@@ -582,8 +583,11 @@ pub fn parse_flags(args: &[String]) -> Flags {
+             || config.ignore_https_errors.unwrap_or(false),
+         ca_cert,
+         clear_ca_cert,
+-        use_system_ca: env_var_is_truthy("AGENT_BROWSER_USE_SYSTEM_CA")
+-            || config.use_system_ca.unwrap_or(false),
++        use_system_ca: env_var_bool("AGENT_BROWSER_USE_SYSTEM_CA")
++            .or(config.use_system_ca)
++            .unwrap_or(false),
++        use_system_ca_set: env_var_bool("AGENT_BROWSER_USE_SYSTEM_CA").is_some()
++            || config.use_system_ca.is_some(),
+         allow_file_access: env_var_is_truthy("AGENT_BROWSER_ALLOW_FILE_ACCESS")
+             || config.allow_file_access.unwrap_or(false),
+         hide_scrollbars: env_var_bool("AGENT_BROWSER_HIDE_SCROLLBARS")
+@@ -913,6 +917,7 @@ pub fn parse_flags(args: &[String]) -> Flags {
+             "--use-system-ca" => {
+                 let (val, consumed) = parse_bool_arg(args, i);
+                 flags.use_system_ca = val;
++                flags.use_system_ca_set = true;
+                 if consumed {
+                     i += 1;
+                 }
+@@ -2006,6 +2011,7 @@ mod tests {
+     fn test_parse_use_system_ca_explicit_false() {
+         let flags = parse_flags(&args("--use-system-ca false open example.com"));
+         assert!(!flags.use_system_ca);
++        assert!(flags.use_system_ca_set);
+     }
+ 
+     #[test]
+diff --git a/cli/src/install.rs b/cli/src/install.rs
+index 66b6ca0..0155dab 100644
+--- a/cli/src/install.rs
++++ b/cli/src/install.rs
+@@ -237,7 +237,7 @@ fn format_reqwest_error(e: &reqwest::Error) -> String {
+ }
+ 
+ fn http_client() -> Result<reqwest::Client, String> {
+-    crate::tls::apply_to_reqwest(reqwest::Client::builder())
++    crate::tls::apply_to_reqwest(reqwest::Client::builder())?
+         .user_agent(format!("agent-browser/{}", env!("CARGO_PKG_VERSION")))
+         .timeout(std::time::Duration::from_secs(120))
+         .connect_timeout(std::time::Duration::from_secs(30))
+diff --git a/cli/src/main.rs b/cli/src/main.rs
+index 5540e2e..6dc2949 100644
+--- a/cli/src/main.rs
++++ b/cli/src/main.rs
+@@ -232,6 +232,10 @@ fn incompatible_launch_mode_error_for_action(flags: &Flags, action: &str) -> Opt
+ }
+ 
+ fn should_send_local_launch_config(flags: &Flags, command: &serde_json::Value) -> bool {
++    let action = command.get("action").and_then(|v| v.as_str()).unwrap_or("");
++    if action != "launch" && native::actions::skip_launch_action(action) {
++        return false;
++    }
+     (flags.headed
+         || flags.cli_headed
+         || flags.executable_path.is_some()
+@@ -1050,12 +1054,7 @@ fn main() {
+     if let Some(ref namespace) = flags.namespace {
+         env::set_var("AGENT_BROWSER_NAMESPACE", namespace);
+     }
+-    if flags.use_system_ca {
+-        env::set_var("AGENT_BROWSER_USE_SYSTEM_CA", "1");
+-    }
+-    if let Some(ref ca) = flags.ca_cert {
+-        env::set_var("AGENT_BROWSER_CA_CERT", ca);
+-    }
++    tls::configure_cli(&flags);
+     tls::warn_if_trust_source_unusable();
+     let clean = clean_args(&args);
+ 
+@@ -2085,6 +2084,26 @@ mod tests {
+         flags
+     }
+ 
++    #[test]
++    fn browserless_commands_do_not_send_local_launch_config() {
++        let mut flags = neutral_launch_config_flags();
++        flags.ca_cert = Some("/tmp/ca.pem".to_string());
++        flags.proxy = Some("http://proxy.test:8080".to_string());
++        flags.allowed_domains = Some(vec!["example.com".to_string()]);
++        for action in ["read", "close", "auth_list", "credentials_get"] {
++            assert!(!should_send_local_launch_config(
++                &flags,
++                &json!({ "action": action }),
++            ));
++        }
++        for action in ["snapshot", "launch"] {
++            assert!(should_send_local_launch_config(
++                &flags,
++                &json!({ "action": action }),
++            ));
++        }
++    }
++
+     #[test]
+     fn test_attach_allowed_domains_to_launch_command() {
+         let mut flags = neutral_launch_config_flags();
+diff --git a/cli/src/mcp.rs b/cli/src/mcp.rs
+index c8304f7..ad641e8 100644
+--- a/cli/src/mcp.rs
++++ b/cli/src/mcp.rs
+@@ -761,7 +761,7 @@ fn tools() -> Vec<Value> {
+         tool(
+             TOOL_READ,
+             "Read URL",
+-            "Fetch a URL as agent-readable text, preferring text/markdown. Omit url to read the active tab.",
++            "Fetch a URL as agent-readable text, preferring text/markdown. A direct URL uses CLI TLS trust without launching a browser. Omit url to read the active tab.",
+             json!({
+                 "url": { "type": "string", "description": "URL to read. Bare hosts are normalized to https. Omit to read the active tab." },
+                 "raw": { "type": "boolean", "description": "Return the response body without HTML extraction." },
+@@ -1759,7 +1759,7 @@ fn parity_tools() -> Vec<Value> {
+         tool(
+             TOOL_INSTALL,
+             "Install",
+-            "Install browser binaries.",
++            "Install browser binaries. Downloads use CLI TLS trust; an invalid explicitly selected CA bundle is an error.",
+             json!({ "withDeps": { "type": "boolean" } }),
+             &[],
+         ),
+@@ -1904,21 +1904,21 @@ fn tool(name: &str, title: &str, description: &str, properties: Value, required:
+         "caCert".to_string(),
+         json!({
+             "type": "string",
+-            "description": "Path to a CA certificate or PEM bundle added to CLI TLS trust and, for a local Chromium launch on Linux, browser trust."
++            "description": "Path to a CA certificate or PEM bundle added to CLI TLS trust and, for a local Chromium command on Linux, browser trust. Omit to retain the session's CLI bundle unless environment or config supplies one. CLI clients reload certificate contents when acquired, so rotation applies to later requests without restarting the daemon or browser."
+         }),
+     );
+     props.insert(
+         "useSystemCa".to_string(),
+         json!({
+             "type": "boolean",
+-            "description": "Verify the CLI's own TLS connections against the operating system trust store."
++            "description": "Use the operating system trust store for CLI TLS. false selects built-in roots; omit to retain the session's selection unless environment or config supplies one. Roots are reloaded when a CLI client is acquired. Does not change browser trust."
+         }),
+     );
+     props.insert(
+         "clearCaCert".to_string(),
+         json!({
+             "type": "boolean",
+-            "description": "Explicitly clear CA trust retained by the running browser session."
++            "description": "Clear the session's extra CLI CA bundle and its SSL_CERT_FILE fallback. Local Chromium commands also clear retained browser CA trust. Does not disable useSystemCa."
+         }),
+     );
+     props.insert(
+@@ -4295,6 +4295,39 @@ mod tests {
+         assert_eq!(args, vec!["--use-system-ca", "true"]);
+     }
+ 
++    #[test]
++    fn common_global_args_preserve_omitted_trust_selection() {
++        for input in [json!({}), json!({ "clearCaCert": false })] {
++            let mut args = Vec::new();
++            append_common_global_args(&mut args, &input, None).unwrap();
++            assert!(args.is_empty(), "{input}: {args:?}");
++        }
++    }
++
++    #[test]
++    fn common_global_args_keep_explicit_trust_changes_in_cli_parser() {
++        for use_system_ca in [true, false] {
++            let mut args = Vec::new();
++            append_common_global_args(
++                &mut args,
++                &json!({ "useSystemCa": use_system_ca, "clearCaCert": true }),
++                None,
++            )
++            .unwrap();
++            args.extend(["read".to_string(), "https://example.com".to_string()]);
++
++            let flags = crate::flags::parse_flags(&args);
++            assert_eq!(flags.use_system_ca, use_system_ca);
++            assert!(flags.use_system_ca_set);
++            assert!(flags.clear_ca_cert);
++            assert!(flags.ca_cert.is_none());
++            let command =
++                crate::commands::parse_command(&crate::flags::clean_args(&args), &flags).unwrap();
++            assert_eq!(command["action"], "read");
++            assert_eq!(command["url"], "https://example.com");
++        }
++    }
++
+     #[test]
+     fn common_global_args_reject_ca_cert_with_clear() {
+         let mut args = Vec::new();
+diff --git a/cli/src/native/actions.rs b/cli/src/native/actions.rs
+index e3e0fd6..f39f9f1 100644
+--- a/cli/src/native/actions.rs
++++ b/cli/src/native/actions.rs
+@@ -2261,7 +2261,8 @@ pub async fn execute_command(cmd: &Value, state: &mut DaemonState) -> Value {
+ 
+     if let Some(ref server) = state.stream_server {
+         let mut broadcast_cmd;
+-        let has_internal_fields = cmd.get("plugins").is_some()
++        let has_internal_fields = cmd.get("tlsOptions").is_some()
++            || cmd.get("plugins").is_some()
+             || cmd.get("pinTab").is_some()
+             || cmd.get("restoreKey").is_some()
+             || cmd.get("restoreSave").is_some()
+@@ -2271,6 +2272,7 @@ pub async fn execute_command(cmd: &Value, state: &mut DaemonState) -> Value {
+         let cmd_for_broadcast = if has_internal_fields {
+             broadcast_cmd = cmd.clone();
+             if let Some(obj) = broadcast_cmd.as_object_mut() {
++                obj.remove("tlsOptions");
+                 obj.remove("plugins");
+                 obj.remove("pinTab");
+                 obj.remove("restoreKey");
+@@ -2434,6 +2436,10 @@ pub async fn execute_command(cmd: &Value, state: &mut DaemonState) -> Value {
+         }
+     }
+ 
++    if let Err(error) = crate::tls::apply_command_options(cmd) {
++        return error_response(&id, &error);
++    }
++
+     let restore_transition_closed_browser =
+         match apply_restore_config_after_confirmation(cmd, state).await {
+             Ok(closed_browser) => closed_browser,
+diff --git a/cli/src/native/cdp/discovery.rs b/cli/src/native/cdp/discovery.rs
+index 36420cb..1195153 100644
+--- a/cli/src/native/cdp/discovery.rs
++++ b/cli/src/native/cdp/discovery.rs
+@@ -203,7 +203,7 @@ async fn discover_cdp_ws(host: &str, port: u16, timeout: Duration) -> Result<Str
+ }
+ 
+ async fn reqwest_get_string(url: &str) -> Result<String, String> {
+-    let resp = crate::tls::http_client()
++    let resp = crate::tls::http_client()?
+         .get(url)
+         .send()
+         .await
+diff --git a/cli/src/native/providers.rs b/cli/src/native/providers.rs
+index 38d9a48..73b09ff 100644
+--- a/cli/src/native/providers.rs
++++ b/cli/src/native/providers.rs
+@@ -121,7 +121,13 @@ pub async fn close_provider_session_with_plugins(
+         return;
+     }
+ 
+-    let client = crate::tls::http_client();
++    let client = match crate::tls::http_client() {
++        Ok(client) => client,
++        Err(error) => {
++            eprintln!("Could not release provider session: {error}");
++            return;
++        }
++    };
+     match session.provider.as_str() {
+         "browserbase" => {
+             if let Ok(api_key) = env::var("BROWSERBASE_API_KEY") {
+@@ -252,7 +258,7 @@ async fn connect_browserbase() -> Result<(String, Option<ProviderSession>), Stri
+     let api_key = env::var("BROWSERBASE_API_KEY")
+         .map_err(|_| "BROWSERBASE_API_KEY environment variable is not set")?;
+ 
+-    let client = crate::tls::http_client();
++    let client = crate::tls::http_client()?;
+     let response = client
+         .post("https://api.browserbase.com/v1/sessions")
+         .header("content-type", "application/json")
+@@ -328,7 +334,7 @@ async fn connect_browserless() -> Result<(String, Option<ProviderSession>), Stri
+ 
+     let url = format!("{}/session", api_url.trim_end_matches('/'));
+ 
+-    let client = crate::tls::http_client();
++    let client = crate::tls::http_client()?;
+     let response = client
+         .post(&url)
+         .query(&[("token", &api_key)])
+@@ -422,7 +428,7 @@ async fn connect_kernel() -> Result<(String, Option<ProviderSession>), String> {
+         }
+     }
+ 
+-    let client = crate::tls::http_client();
++    let client = crate::tls::http_client()?;
+     let mut request = client.post(&url).header("Content-Type", "application/json");
+     if let Some(ref key) = api_key {
+         request = request.header("Authorization", format!("Bearer {}", key));
+@@ -561,7 +567,7 @@ mod agentcore {
+ 
+         let signed_headers = sign_request("PUT", &url, &region, Some(&body)).await?;
+ 
+-        let client = crate::tls::http_client();
++        let client = crate::tls::http_client()?;
+         let mut req = client.put(&url).body(body.clone());
+         for (key, value) in &signed_headers {
+             req = req.header(key.as_str(), value.as_str());
+@@ -843,7 +849,7 @@ mod agentcore {
+ 
+         let signed_headers = sign_request("PUT", &url, &region, Some(&body)).await?;
+ 
+-        let client = crate::tls::http_client();
++        let client = crate::tls::http_client()?;
+         let mut req = client.put(&url).body(body);
+         for (key, value) in &signed_headers {
+             req = req.header(key.as_str(), value.as_str());
+diff --git a/cli/src/native/stream/chat.rs b/cli/src/native/stream/chat.rs
+index 58ec036..07c3812 100644
+--- a/cli/src/native/stream/chat.rs
++++ b/cli/src/native/stream/chat.rs
+@@ -8,10 +8,8 @@ use super::http::cors_headers_for_origin;
+ 
+ pub(crate) const DEFAULT_AI_GATEWAY_URL: &str = "https://ai-gateway.vercel.sh";
+ 
+-static HTTP_CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
+-
+-pub(crate) fn http_client() -> &'static reqwest::Client {
+-    HTTP_CLIENT.get_or_init(crate::tls::http_client)
++pub(crate) fn http_client() -> Result<reqwest::Client, String> {
++    crate::tls::http_client()
+ }
+ 
+ pub(crate) fn is_chat_enabled() -> bool {
+@@ -53,12 +51,15 @@ pub(super) async fn handle_models_request(
+     };
+ 
+     let url = format!("{}/v1/models", gateway_url);
+-    let client = http_client();
+-    let result = client
+-        .get(&url)
+-        .header("Authorization", format!("Bearer {}", api_key))
+-        .send()
+-        .await;
++    let result = async {
++        http_client()?
++            .get(&url)
++            .header("Authorization", format!("Bearer {}", api_key))
++            .send()
++            .await
++            .map_err(|e| e.to_string())
++    }
++    .await;
+ 
+     let body = match result {
+         Ok(r) if r.status().is_success() => r
+@@ -773,7 +774,15 @@ pub(super) async fn handle_chat_request(
+ 
+     let tools: Value = serde_json::from_str(CHAT_TOOLS).unwrap();
+     let url = format!("{}/v1/chat/completions", gateway_url);
+-    let client = http_client();
++    let client = match http_client() {
++        Ok(client) => client,
++        Err(error) => {
++            let body = json!({ "error": error }).to_string();
++            let response = format!("HTTP/1.1 500 Internal Server Error\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n{cors}\r\n{body}", body.len());
++            let _ = stream.write_all(response.as_bytes()).await;
++            return;
++        }
++    };
+ 
+     let total_chars = estimate_chars(&openai_messages);
+     let mut compaction_summary: Option<String> = None;
+@@ -785,7 +794,7 @@ pub(super) async fn handle_chat_request(
+         let to_summarize = &openai_messages[1..split];
+ 
+         if let Some(summary) =
+-            summarize_for_compaction(client, &url, &api_key, &model, to_summarize).await
++            summarize_for_compaction(&client, &url, &api_key, &model, to_summarize).await
+         {
+             let summary_msg = json!({
+                 "role": "system",
+diff --git a/cli/src/output.rs b/cli/src/output.rs
+index eb4b88f..93d56ef 100644
+--- a/cli/src/output.rs
++++ b/cli/src/output.rs
+@@ -3719,10 +3719,11 @@ Options:
+   --proxy-bypass <hosts>     Bypass proxy for these hosts (or AGENT_BROWSER_PROXY_BYPASS, NO_PROXY)
+                              e.g., --proxy-bypass "localhost,*.internal.com"
+   --ignore-https-errors      Ignore HTTPS certificate errors
+-  --ca-cert <path>           Trust a specific CA certificate for HTTPS interception proxies
+-                             Adds CLI TLS trust and local Chromium trust on Linux
+-  --no-ca-cert               Clear CA trust retained by the running browser session
+-  --use-system-ca            Verify the CLI's own connections against the OS trust store
++  --ca-cert <path>           Trust a CA for CLI HTTPS/WSS, read, and install
++                             Also adds local Chromium trust on Linux
++  --no-ca-cert               Clear CA trust retained by the running session
++  --use-system-ca [bool]     Use the OS trust store for CLI HTTPS/WSS; false selects built-in roots
++                             Session trust persists when omitted; changed roots refresh CLI clients
+   --allow-file-access        Allow file:// URLs to access local files (Chromium only)
+   --hide-scrollbars <bool>   Hide native scrollbars in headless Chromium screenshots (default: true)
+                              Use --hide-scrollbars false to keep scrollbars visible
+@@ -3808,8 +3809,8 @@ Environment:
+   AGENT_BROWSER_DEBUG            Debug output
+   AGENT_BROWSER_IGNORE_HTTPS_ERRORS Ignore HTTPS certificate errors
+   AGENT_BROWSER_CA_CERT          Path to CA certificate to trust (HTTPS interception proxies)
+-  AGENT_BROWSER_CLEAR_CA_CERT    Clear CA trust retained by the running browser session
+-  AGENT_BROWSER_USE_SYSTEM_CA    Use the OS trust store for the CLI's own TLS connections
++  AGENT_BROWSER_CLEAR_CA_CERT    Clear the session's extra CA bundle (and browser CA on browser commands)
++  AGENT_BROWSER_USE_SYSTEM_CA    Select the OS trust store for CLI TLS (1/true); 0/false selects built-in roots
+   AGENT_BROWSER_PROVIDER         Browser provider (ios, browserbase, kernel, browseruse, browserless, agentcore, or plugin name)
+   AGENT_BROWSER_AUTO_CONNECT     Auto-discover and connect to running Chrome
+   AGENT_BROWSER_PIN_TAB          Pin the session to its bound tab (strict tab binding)
+diff --git a/cli/src/read.rs b/cli/src/read.rs
+index fb2c517..0e8f26b 100644
+--- a/cli/src/read.rs
++++ b/cli/src/read.rs
+@@ -200,7 +200,7 @@ pub async fn run_read(raw_url: &str, options: ReadOptions) -> Result<Value, Stri
+             attempt.follow()
+         }
+     });
+-    let client = crate::tls::apply_to_reqwest(Client::builder())
++    let client = crate::tls::apply_to_reqwest(Client::builder())?
+         .timeout(Duration::from_millis(options.timeout_ms))
+         .redirect(redirect_policy)
+         .build()
+diff --git a/cli/src/tls.rs b/cli/src/tls.rs
+index 433002b..05b03b8 100644
+--- a/cli/src/tls.rs
++++ b/cli/src/tls.rs
+@@ -14,11 +14,19 @@
+ //!   `SSL_CERT_FILE` is honored as a fallback, since sandboxes and CI images
+ //!   commonly set it already.
+ //!
+-//! `--ca-cert` is shared with the browser-side trust flag, so one path covers
+-//! both Chromium and the CLI.
++//! CLI commands patch the daemon's session selection. Omission retains it;
++//! clear and explicit false remove the extra bundle or system selection.
++//! Clients reread selected sources on acquisition. Rotated roots replace the
++//! cached generation while already admitted operations may finish.
++//!
++//! `--ca-cert` is shared with browser trust for local Chromium on Linux.
++//! Browserless commands update only CLI trust.
+ 
+ use std::sync::Arc;
+-use std::sync::OnceLock;
++use std::sync::{Mutex, OnceLock};
++
++use serde::{Deserialize, Serialize};
++use serde_json::Value;
+ 
+ use rustls::{ClientConfig, RootCertStore};
+ 
+@@ -48,9 +56,8 @@ impl TrustOptions {
+ 
+     /// Read the options from the environment.
+     ///
+-    /// The daemon runs as a separate process, so the environment is the only
+-    /// channel that carries these across the spawn. `connection::apply_daemon_env`
+-    /// forwards both variables.
++    /// The environment seeds a new daemon. Later CLI commands patch its
++    /// effective selection through `tlsOptions`.
+     pub fn from_env() -> Self {
+         let use_system_ca = crate::flags::env_var_is_truthy("AGENT_BROWSER_USE_SYSTEM_CA");
+         let explicit = std::env::var("AGENT_BROWSER_CA_CERT")
+@@ -138,105 +145,198 @@ fn add_ca_bundle(store: &mut RootCertStore, path: &str) -> Result<usize, String>
+     Ok(added)
+ }
+ 
+-fn client_config(opts: &TrustOptions) -> Result<Arc<ClientConfig>, String> {
+-    let store = build_root_store(opts)?;
+-    let config = ClientConfig::builder()
+-        .with_root_certificates(store)
+-        .with_no_client_auth();
+-    Ok(Arc::new(config))
++#[derive(Clone, Debug, Default, Deserialize, Serialize)]
++#[serde(rename_all = "camelCase", deny_unknown_fields)]
++struct TrustUpdate {
++    #[serde(default)]
++    ca_cert: Option<String>,
++    #[serde(default)]
++    ca_cert_is_implicit: bool,
++    #[serde(default)]
++    clear_ca_cert: bool,
++    #[serde(default)]
++    use_system_ca: Option<bool>,
+ }
+ 
+-/// Process-wide client config, built once from the environment.
+-///
+-/// `Ok(None)` means the defaults are in force and callers should use the
+-/// library default connector.
+-pub fn shared_client_config() -> Result<Option<Arc<ClientConfig>>, String> {
+-    static CACHED: OnceLock<Result<Option<Arc<ClientConfig>>, String>> = OnceLock::new();
+-    CACHED
+-        .get_or_init(|| {
+-            let opts = TrustOptions::from_env();
+-            if opts.is_default() {
+-                return Ok(None);
+-            }
+-            client_config(&opts).map(Some)
+-        })
+-        .clone()
++#[derive(Default)]
++struct TrustCache {
++    options: Option<TrustOptions>,
++    explicit_selection: bool,
++    roots: Vec<rustls::pki_types::TrustAnchor<'static>>,
++    config: Option<Arc<ClientConfig>>,
++    http: Option<reqwest::Client>,
+ }
+ 
+-/// TLS connector for `tokio-tungstenite`, or `None` to use its default.
+-pub fn ws_connector() -> Result<Option<tokio_tungstenite::Connector>, String> {
+-    Ok(shared_client_config()?.map(tokio_tungstenite::Connector::Rustls))
+-}
+-
+-/// Apply the configured roots to a `reqwest` client builder.
+-pub fn apply_to_reqwest(builder: reqwest::ClientBuilder) -> reqwest::ClientBuilder {
+-    let opts = TrustOptions::from_env();
+-    if opts.is_default() {
+-        return builder;
++impl TrustCache {
++    fn options(&self) -> TrustOptions {
++        self.options.clone().unwrap_or_else(TrustOptions::from_env)
+     }
+ 
+-    let mut builder = builder;
+-
+-    // The system store replaces the built-in roots; a CA bundle adds to
+-    // whichever set is active.
+-    if opts.use_system_ca {
+-        let native = load_native_der();
+-        if native.is_empty() {
+-            eprintln!("agent-browser: system trust store unavailable, using built-in roots");
+-        } else {
+-            builder = builder.tls_built_in_root_certs(false);
+-            for der in native {
+-                if let Ok(c) = reqwest::Certificate::from_der(&der) {
+-                    builder = builder.add_root_certificate(c);
+-                }
++    fn update(&mut self, update: TrustUpdate) -> Result<(), String> {
++        if update.ca_cert.is_some() && update.clear_ca_cert {
++            return Err("Cannot set and clear CLI CA trust together".to_string());
++        }
++        if update.ca_cert.is_none() && !update.clear_ca_cert && update.use_system_ca.is_none() {
++            return Ok(());
++        }
++        let mut opts = self.options();
++        let mut explicit =
++            self.explicit_selection || (opts.ca_cert.is_some() && !opts.ca_cert_is_implicit);
++        if update.clear_ca_cert {
++            opts.ca_cert = None;
++            opts.ca_cert_is_implicit = false;
++            explicit = true;
++        } else if let Some(path) = update.ca_cert {
++            if !update.ca_cert_is_implicit || !explicit {
++                opts.ca_cert = Some(path);
++                opts.ca_cert_is_implicit = update.ca_cert_is_implicit;
++                explicit = !update.ca_cert_is_implicit;
+             }
+         }
++        if let Some(value) = update.use_system_ca {
++            opts.use_system_ca = value;
++        }
++        if self.options.as_ref() == Some(&opts) && self.explicit_selection == explicit {
++            return Ok(());
++        }
++        let roots = build_root_store(&opts)?;
++        self.replace_roots(roots);
++        self.options = Some(opts);
++        self.explicit_selection = explicit;
++        Ok(())
+     }
+ 
+-    // The same loader the root store and the Chromium NSS path use. Parsing
+-    // the bundle a third way here is how the accepted input domains drift.
+-    if let Some(path) = &opts.ca_cert {
+-        match crate::ca_bundle::load(path) {
+-            Ok(bundle) => {
+-                for der in bundle.certificates() {
+-                    if let Ok(c) = reqwest::Certificate::from_der(der.as_ref()) {
+-                        builder = builder.add_root_certificate(c);
+-                    }
+-                }
+-            }
+-            Err(e) => eprintln!("agent-browser: ignoring CA bundle '{path}': {e}"),
++    fn replace_roots(&mut self, mut roots: RootCertStore) {
++        roots.roots.sort_by(|a, b| {
++            (
++                a.subject.as_ref(),
++                a.subject_public_key_info.as_ref(),
++                a.name_constraints.as_ref().map(|n| n.as_ref()),
++            )
++                .cmp(&(
++                    b.subject.as_ref(),
++                    b.subject_public_key_info.as_ref(),
++                    b.name_constraints.as_ref().map(|n| n.as_ref()),
++                ))
++        });
++        roots.roots.dedup();
++        if self.config.is_none() || self.roots != roots.roots {
++            self.roots = roots.roots.clone();
++            self.config = Some(Arc::new(
++                ClientConfig::builder()
++                    .with_root_certificates(roots)
++                    .with_no_client_auth(),
++            ));
++            self.http = None;
+         }
+     }
+ 
+-    builder
++    fn config(&mut self) -> Result<Arc<ClientConfig>, String> {
++        self.replace_roots(build_root_store(&self.options())?);
++        Ok(self
++            .config
++            .as_ref()
++            .expect("roots install a TLS config")
++            .clone())
++    }
++
++    fn http_client(&mut self) -> Result<reqwest::Client, String> {
++        let config = self.config()?;
++        if self.http.is_none() {
++            self.http = Some(
++                reqwest::Client::builder()
++                    .use_preconfigured_tls((*config).clone())
++                    .build()
++                    .map_err(|e| format!("Failed to create HTTP client: {e}"))?,
++            );
++        }
++        Ok(self.http.as_ref().expect("HTTP client was built").clone())
++    }
+ }
+ 
+-/// A shared `reqwest` client that honors the configured trust store.
+-///
+-/// Built once and cloned, which is cheap: `reqwest::Client` is a handle around
+-/// a shared pool. Constructing one per call would rebuild the TLS config and
+-/// the connection pool on every request, and CDP discovery calls this twice per
+-/// iteration of a retry loop.
+-///
+-/// Falls back to a default client if the builder cannot be constructed, so a
+-/// bad CA path degrades to the previous behavior instead of killing the command.
+-pub fn http_client() -> reqwest::Client {
+-    static CACHED: OnceLock<reqwest::Client> = OnceLock::new();
+-    CACHED
+-        .get_or_init(|| {
+-            apply_to_reqwest(reqwest::Client::builder())
+-                .build()
+-                .unwrap_or_default()
+-        })
+-        .clone()
++fn cache() -> &'static Mutex<TrustCache> {
++    static CACHE: OnceLock<Mutex<TrustCache>> = OnceLock::new();
++    CACHE.get_or_init(|| Mutex::new(TrustCache::default()))
+ }
+ 
+-fn load_native_der() -> Vec<Vec<u8>> {
+-    rustls_native_certs::load_native_certs()
+-        .certs
+-        .into_iter()
+-        .map(|c| c.as_ref().to_vec())
+-        .collect()
++static COMMAND_OPTIONS: OnceLock<Value> = OnceLock::new();
++
++fn absolute_ca_path(path: String) -> String {
++    let path = std::path::PathBuf::from(path);
++    std::env::current_dir()
++        .unwrap_or_default()
++        .join(&path)
++        .to_string_lossy()
++        .into_owned()
++}
++
++pub fn configure_cli(flags: &crate::flags::Flags) {
++    let mut opts = TrustOptions::from_env();
++    opts.use_system_ca = flags.use_system_ca;
++    if flags.clear_ca_cert {
++        opts.ca_cert = None;
++        opts.ca_cert_is_implicit = false;
++    } else if let Some(path) = &flags.ca_cert {
++        opts.ca_cert = Some(path.clone());
++        opts.ca_cert_is_implicit = false;
++    }
++    opts.ca_cert = opts.ca_cert.map(absolute_ca_path);
++    let update = TrustUpdate {
++        ca_cert: opts.ca_cert.clone(),
++        ca_cert_is_implicit: opts.ca_cert_is_implicit,
++        clear_ca_cert: flags.clear_ca_cert,
++        use_system_ca: flags.use_system_ca_set.then_some(flags.use_system_ca),
++    };
++    let _ = COMMAND_OPTIONS.set(serde_json::to_value(update).expect("trust options serialize"));
++    let mut state = cache().lock().unwrap_or_else(|e| e.into_inner());
++    state.options = Some(opts);
++    state.explicit_selection = flags.ca_cert.is_some() || flags.clear_ca_cert;
++}
++
++pub fn command_options() -> Option<Value> {
++    COMMAND_OPTIONS.get().cloned()
++}
++
++pub fn apply_command_options(command: &Value) -> Result<(), String> {
++    let Some(value) = command.get("tlsOptions") else {
++        return Ok(());
++    };
++    let update: TrustUpdate = serde_json::from_value(value.clone())
++        .map_err(|e| format!("Invalid CLI TLS options: {e}"))?;
++    cache()
++        .lock()
++        .unwrap_or_else(|e| e.into_inner())
++        .update(update)
++}
++
++/// Acquire current roots for a new TLS operation. Each daemon owns one session
++/// per process; replacing a generation retires its pool without closing an
++/// in-flight operation or restarting the browser. Sources are re-read even
++/// when the selection is omitted, so rotation cannot hide behind a cached path.
++pub fn shared_client_config() -> Result<Option<Arc<ClientConfig>>, String> {
++    let mut state = cache().lock().unwrap_or_else(|e| e.into_inner());
++    if state.options().is_default() {
++        return Ok(None);
++    }
++    state.config().map(Some)
++}
++
++pub fn ws_connector() -> Result<Option<tokio_tungstenite::Connector>, String> {
++    Ok(shared_client_config()?.map(tokio_tungstenite::Connector::Rustls))
++}
++
++/// Apply the same validated root snapshot used by WSS. An invalid explicit
++/// bundle is an error for HTTP too; it must never silently widen trust.
++pub fn apply_to_reqwest(builder: reqwest::ClientBuilder) -> Result<reqwest::ClientBuilder, String> {
++    let config = cache().lock().unwrap_or_else(|e| e.into_inner()).config()?;
++    Ok(builder.use_preconfigured_tls((*config).clone()))
++}
++
++pub fn http_client() -> Result<reqwest::Client, String> {
++    cache()
++        .lock()
++        .unwrap_or_else(|e| e.into_inner())
++        .http_client()
+ }
+ 
+ /// Warn on this process's stderr when a configured trust source is unusable.
+@@ -254,7 +354,7 @@ fn load_native_der() -> Vec<Vec<u8>> {
+ /// Silent when no trust source is configured, and silent when the configured
+ /// one works: this fires only on the rare, actionable case.
+ pub fn warn_if_trust_source_unusable() {
+-    let opts = TrustOptions::from_env();
++    let opts = cache().lock().unwrap_or_else(|e| e.into_inner()).options();
+     let Some(path) = &opts.ca_cert else {
+         return;
+     };
+@@ -285,11 +385,10 @@ fn describe_path(path: &str) -> String {
+ 
+ /// One-line description of the active trust store, for `agent-browser doctor`.
+ ///
+-/// Reports what is actually in force. A CA bundle that could not be read is
+-/// named as ignored rather than listed as trusted, since the whole point of the
+-/// line is to tell someone debugging a proxy which roots they really have.
++/// Reports the selected sources. An unusable ambient bundle is ignored;
++/// an unusable explicit bundle prevents new TLS operations.
+ pub fn describe() -> String {
+-    let opts = TrustOptions::from_env();
++    let opts = cache().lock().unwrap_or_else(|e| e.into_inner()).options();
+     let roots = if opts.use_system_ca {
+         "system trust store"
+     } else {
+@@ -301,8 +400,8 @@ pub fn describe() -> String {
+     let mut probe = RootCertStore::empty();
+     match add_ca_bundle(&mut probe, path) {
+         Ok(n) if n > 0 => format!("{roots} plus {n} certificate(s) from {path}"),
+-        Ok(_) => format!("{roots} ({path} holds no certificates, ignored)"),
+-        Err(_) => format!("{roots} ({path} unusable, ignored)"),
++        _ if opts.ca_cert_is_implicit => format!("{roots} ({path} unusable, ignored)"),
++        _ => format!("TLS unavailable: explicit CA bundle '{path}' is unusable"),
+     }
+ }
+ 
+@@ -339,6 +438,64 @@ JtnWOCSAT+dNsAXmz4ebm7kp9OnpLLKjvrNEUNPA20J5S+BXTtPv7x/koRwSX35M\n\
+         path
+     }
+ 
++    #[test]
++    fn trust_generation_tracks_material_and_preserves_omitted_selection() {
++        let path = write_temp_pem(include_str!("../tests/fixtures/tls/ca-a.pem"));
++        let mut cache = TrustCache {
++            options: Some(TrustOptions::default()),
++            ..Default::default()
++        };
++        let select = |path: &std::path::Path| TrustUpdate {
++            ca_cert: Some(path.to_string_lossy().into_owned()),
++            ..Default::default()
++        };
++        cache.update(select(&path)).unwrap();
++        let first = cache.config().unwrap();
++        cache.http_client().unwrap();
++        cache.update(TrustUpdate::default()).unwrap();
++        assert!(Arc::ptr_eq(&first, &cache.config().unwrap()));
++        let equivalent = write_temp_pem(&format!(
++            "{}{}",
++            include_str!("../tests/fixtures/tls/ca-a.pem"),
++            include_str!("../tests/fixtures/tls/ca-a.pem")
++        ));
++        cache.update(select(&equivalent)).unwrap();
++        assert!(Arc::ptr_eq(&first, &cache.config().unwrap()));
++        assert!(cache.http.is_some());
++        std::fs::write(&equivalent, include_str!("../tests/fixtures/tls/ca-b.pem")).unwrap();
++        let rotated = cache.config().unwrap();
++        assert!(!Arc::ptr_eq(&first, &rotated));
++        assert!(cache.http.is_none());
++        cache.http_client().unwrap();
++        std::fs::write(&equivalent, "invalid").unwrap();
++        assert!(cache.http_client().is_err());
++        assert!(cache
++            .update(select(std::path::Path::new("/missing/ca")))
++            .is_err());
++        assert_eq!(cache.options().ca_cert.as_deref(), equivalent.to_str());
++        cache
++            .update(TrustUpdate {
++                clear_ca_cert: true,
++                use_system_ca: Some(false),
++                ..Default::default()
++            })
++            .unwrap();
++        assert!(cache.options().is_default());
++        cache
++            .update(TrustUpdate {
++                ca_cert: Some(path.to_string_lossy().into_owned()),
++                ca_cert_is_implicit: true,
++                ..Default::default()
++            })
++            .unwrap();
++        assert!(
++            cache.options().is_default(),
++            "an ambient fallback must not undo an explicit clear"
++        );
++        let _ = std::fs::remove_dir_all(path.parent().unwrap());
++        let _ = std::fs::remove_dir_all(equivalent.parent().unwrap());
++    }
++
+     #[test]
+     fn default_options_need_no_custom_config() {
+         assert!(TrustOptions::default().is_default());
+@@ -473,7 +630,12 @@ JtnWOCSAT+dNsAXmz4ebm7kp9OnpLLKjvrNEUNPA20J5S+BXTtPv7x/koRwSX35M\n\
+             !store.is_empty(),
+             "system store must fall back to built-in roots rather than trust nothing"
+         );
+-        assert!(client_config(&opts).is_ok());
++        assert!(TrustCache {
++            options: Some(opts),
++            ..Default::default()
++        }
++        .config()
++        .is_ok());
+     }
+ 
+     #[test]
+diff --git a/cli/src/upgrade.rs b/cli/src/upgrade.rs
+index a0c4cd7..ec2e450 100644
+--- a/cli/src/upgrade.rs
++++ b/cli/src/upgrade.rs
+@@ -16,7 +16,7 @@ enum InstallMethod {
+ }
+ 
+ async fn fetch_latest_version() -> Result<String, String> {
+-    let resp = crate::tls::http_client()
++    let resp = crate::tls::http_client()?
+         .get(NPM_REGISTRY_URL)
+         .send()
+         .await
+diff --git a/docs/public/schema.json b/docs/public/schema.json
+index df558c9..f3c590b 100644
+--- a/docs/public/schema.json
++++ b/docs/public/schema.json
+@@ -122,15 +122,15 @@
+     },
+     "caCert": {
+       "type": "string",
+-      "description": "Path to a CA certificate or PEM bundle added to CLI TLS trust and, for a local Chromium launch on Linux, browser trust. Browser trust remains active for later commands in the same running session."
++      "description": "Path to a CA certificate or PEM bundle for CLI HTTPS/WSS, including read and install. Daemon commands retain the session selection when flags, environment, and config supply no replacement. Local Chromium commands on Linux also use it for browser trust."
+     },
+     "useSystemCa": {
+       "type": "boolean",
+-      "description": "Verify the CLI's own TLS connections against the operating system trust store."
++      "description": "Use native roots for CLI HTTPS/WSS, or select built-in roots with false. Daemon commands retain the session selection when flags, environment, and config supply no replacement."
+     },
+     "clearCaCert": {
+       "type": "boolean",
+-      "description": "Explicitly clear CA trust retained by the running browser session."
++      "description": "Clear the session's extra CLI CA bundle and its SSL_CERT_FILE fallback. Browser commands also clear local Chromium CA trust. Does not disable useSystemCa."
+     },
+     "allowFileAccess": {
+       "type": "boolean",
+diff --git a/docs/src/app/commands/page.mdx b/docs/src/app/commands/page.mdx
+index fbea893..ca8905f 100644
+--- a/docs/src/app/commands/page.mdx
++++ b/docs/src/app/commands/page.mdx
+@@ -566,9 +566,9 @@ See [Init Scripts & Extensions](/init-scripts) for launch-time scripts, runtime
+ --proxy <url>            # Proxy server URL
+ --proxy-bypass <hosts>   # Hosts to bypass proxy
+ --ignore-https-errors    # Ignore HTTPS certificate errors
+---ca-cert <path>         # Add a CA to CLI TLS and local Chromium trust on Linux
+---no-ca-cert             # Clear CA trust retained by the running session
+---use-system-ca          # Verify the CLI's own connections against the OS trust store
++--ca-cert <path>         # Add a CA for CLI TLS/read/install and local Chromium on Linux
++--no-ca-cert             # Clear the extra CLI CA bundle; browser commands also clear browser CA
++--use-system-ca [bool]   # Use OS roots for CLI TLS; false selects built-in roots
+ --allow-file-access      # Allow file:// URLs to access local files (Chromium only)
+ --hide-scrollbars <bool> # Hide native scrollbars in headless Chromium screenshots
+ -p, --provider <name>    # Browser provider or configured provider plugin
+diff --git a/docs/src/app/configuration/page.mdx b/docs/src/app/configuration/page.mdx
+index ae72b89..5b0e1e5 100644
+--- a/docs/src/app/configuration/page.mdx
++++ b/docs/src/app/configuration/page.mdx
+@@ -133,9 +133,13 @@ Global launch, output, provider, and chat options can be set in the config file
+ }
+ ```
+ 
+-`caCert` adds the supplied CA certificate or PEM bundle to the CLI's own TLS trust. For locally launched Chromium on Linux, it also imports each certificate into an isolated NSS database used only by that browser process. Browser trust remains active when later commands omit it, and different certificate content or `clearCaCert: true` relaunches Chromium without restarting the daemon. `agent-browser install --with-deps` installs the required `certutil`; otherwise install `libnss3-tools` on Debian/Ubuntu or `nss-tools` on RPM Linux. Browser-side trust does not support Chrome profiles, Lightpanda, macOS, or Windows. With CDP attach, auto-connect, or providers, `caCert` affects only CLI TLS and cannot change the remote browser's trust store. Set `useSystemCa` when the CA already lives in the operating system trust store.
++`caCert` adds the supplied CA certificate or PEM bundle to CLI HTTPS/WSS trust. A direct `read URL` uses it without launching a browser or setting up NSS. `install` runs without a daemon and uses only its invocation's flags, environment, and config.
+ 
+-Without the CA certificate on hand, fall back to ignoring every certificate error, which is less secure:
++Daemon commands retain the session's CLI selection when flags, environment, and config supply no replacement. Each HTTP or WSS client acquisition rereads the selected bundle and, when enabled, native roots. Changed roots replace cached clients without restarting the daemon or browser; operations that already acquired a client may finish with its previous roots. Invalid explicit bundles fail instead of silently falling back. Set `clearCaCert: true` to clear the extra bundle and suppress its `SSL_CERT_FILE` fallback. Set `useSystemCa` to `false` to select built-in roots; this keeps any extra bundle unless it is also cleared.
++
++For locally launched Chromium on Linux, `caCert` also imports each certificate into an isolated NSS database used only by that browser process. Different browser CA content or `clearCaCert: true` relaunches Chromium without restarting the daemon; equivalent content reuses Chromium. `agent-browser install --with-deps` installs the required `certutil`; otherwise install `libnss3-tools` on Debian/Ubuntu or `nss-tools` on RPM Linux. Browser-side trust does not support Chrome profiles, Lightpanda, macOS, or Windows. With CDP attach, auto-connect, or providers, `caCert` affects only CLI TLS and cannot change the remote browser's trust store. Set `useSystemCa` when the CA already lives in the operating system trust store.
++
++For browser navigation only, certificate verification can be disabled:
+ 
+ ```json
+ {
+@@ -145,6 +149,8 @@ Without the CA certificate on hand, fall back to ignoring every certificate erro
+ }
+ ```
+ 
++`ignoreHttpsErrors` does not disable verification for CLI HTTPS/WSS, `read`, or `install`.
++
+ ### CI / Devcontainer
+ 
+ ```json
+@@ -289,7 +295,7 @@ These environment variables configure additional daemon and runtime behavior:
+     <tr><td><code>AGENT_BROWSER_HEADED</code></td><td>Show browser window instead of running headless (<code>1</code> to enable).</td><td>(disabled)</td></tr>
+     <tr><td><code>AGENT_BROWSER_WEBGPU</code></td><td>Enable WebGPU; SwiftShader software Vulkan on Linux, no GPU required (<code>1</code> to enable).</td><td>(disabled)</td></tr>
+     <tr><td><code>AGENT_BROWSER_NO_XVFB</code></td><td>Disable automatic Xvfb virtual display for headed mode on displayless Linux hosts (<code>1</code> to disable).</td><td>(auto-Xvfb enabled)</td></tr>
+-    <tr><td><code>AGENT_BROWSER_CLEAR_CA_CERT</code></td><td>Clear CA trust retained by the running browser session.</td><td>(disabled)</td></tr>
++    <tr><td><code>AGENT_BROWSER_CLEAR_CA_CERT</code></td><td>Clear the session's extra CLI CA bundle; browser commands also clear local Chromium CA trust.</td><td>(disabled)</td></tr>
+     <tr><td><code>AGENT_BROWSER_JSON</code></td><td>Use JSON output by default.</td><td>(disabled)</td></tr>
+     <tr><td><code>AGENT_BROWSER_ANNOTATE</code></td><td>Enable annotated screenshots by default.</td><td>(disabled)</td></tr>
+     <tr><td><code>AGENT_BROWSER_CDP</code></td><td>Connect the daemon to a CDP port or WebSocket URL.</td><td>(none)</td></tr>
+diff --git a/docs/src/app/proxy/page.mdx b/docs/src/app/proxy/page.mdx
+index 3a62aae..0a01037 100644
+--- a/docs/src/app/proxy/page.mdx
++++ b/docs/src/app/proxy/page.mdx
+@@ -18,9 +18,9 @@ agent-browser --proxy "http://proxy.example.com:8080" --ca-cert /etc/ssl/certs/p
+   <tbody>
+     <tr><td><code>--proxy &lt;url&gt;</code></td><td>Proxy server URL, with optional credentials</td></tr>
+     <tr><td><code>--proxy-bypass &lt;hosts&gt;</code></td><td>Hosts that should bypass the proxy</td></tr>
+-    <tr><td><code>--ca-cert &lt;path&gt;</code></td><td>Add a CA certificate or PEM bundle to CLI TLS trust and to locally launched Chromium on Linux</td></tr>
+-    <tr><td><code>--no-ca-cert</code></td><td>Clear CA trust retained by the running browser session</td></tr>
+-    <tr><td><code>--use-system-ca</code></td><td>Verify the CLI's own connections against the OS trust store</td></tr>
++    <tr><td><code>--ca-cert &lt;path&gt;</code></td><td>Add a CA for CLI HTTPS/WSS, read, install, and local Chromium on Linux</td></tr>
++    <tr><td><code>--no-ca-cert</code></td><td>Clear the session's extra CLI CA bundle; browser commands also clear local Chromium CA trust</td></tr>
++    <tr><td><code>--use-system-ca [bool]</code></td><td>Use OS roots for CLI TLS; false selects built-in roots</td></tr>
+   </tbody>
+ </table>
+ 
+@@ -50,10 +50,18 @@ agent-browser --proxy "http://proxy.example.com:8080" --ca-cert /etc/ssl/certs/p
+ 
+ A proxy that inspects HTTPS terminates TLS and re-signs with its own CA. Both Chromium and the CLI may need to trust it.
+ 
+-For a local Chromium launch on Linux, `--ca-cert` imports each certificate into a private NSS database used only by that browser process and also adds it to CLI TLS trust. Later commands retain browser trust when they omit the flag. A different certificate or `--no-ca-cert` relaunches Chromium without restarting the daemon. The same certificate content reuses the current browser even when supplied from a different path. `agent-browser install --with-deps` installs the required `certutil`; otherwise install `libnss3-tools` on Debian/Ubuntu or `nss-tools` on RPM Linux.
++`--ca-cert` adds a CA to CLI HTTPS/WSS trust. A direct `read URL` uses it without launching Chromium or setting up NSS. `install` runs without a daemon and uses only its invocation's flags, environment, and config.
++
++Daemon commands retain the session's CLI selection when flags, environment, and config supply no replacement. Each HTTP or WSS client acquisition rereads the selected bundle and, when enabled, native roots. Changed roots replace cached clients without restarting the daemon or browser. Operations that already acquired a client may finish with its previous roots. `--no-ca-cert` clears the extra bundle and its `SSL_CERT_FILE` fallback. `--use-system-ca false` selects built-in roots while keeping any extra bundle unless it is also cleared. Invalid explicit bundles fail instead of silently falling back.
++
++Native root loading honors `SSL_CERT_FILE` and `SSL_CERT_DIR` overrides in the daemon's environment. Their contents are reread, but changing those environment paths requires a new daemon. Clearing the extra bundle does not disable native-loader overrides while system trust remains enabled. A daemon started by an older binary may restart once to adopt per-command TLS configuration.
++
++For a local Chromium launch on Linux, `--ca-cert` also imports each certificate into a private NSS database used only by that browser process. A different certificate or `--no-ca-cert` relaunches Chromium without restarting the daemon. The same certificate content reuses the current browser even when supplied from a different path. `agent-browser install --with-deps` installs the required `certutil`; otherwise install `libnss3-tools` on Debian/Ubuntu or `nss-tools` on RPM Linux.
+ 
+ Browser-side trust cannot be combined with `--profile`, Lightpanda, or `--ignore-https-errors`, and it is not available for local launches on macOS or Windows. With `--cdp`, `--auto-connect`, or a provider, `--ca-cert` configures only CLI TLS and cannot change the remote browser's trust store. `--use-system-ca` always affects only CLI TLS.
+ 
++`--ignore-https-errors` affects browser navigation only. It does not disable verification for CLI HTTPS/WSS, `read`, or `install`.
++
+ ## SOCKS proxy
+ 
+ ```bash
+diff --git a/skill-data/core/SKILL.md b/skill-data/core/SKILL.md
+index 5464d97..a8895a7 100644
+--- a/skill-data/core/SKILL.md
++++ b/skill-data/core/SKILL.md
+@@ -446,13 +446,15 @@ EOF
+ --proxy <url>           # proxy server
+ --ca-cert <path>        # add a CA to CLI TLS and local Chromium trust on Linux
+ --no-ca-cert            # clear CA trust retained by the running session
+---use-system-ca         # use the OS trust store for CLI TLS
++--use-system-ca [bool]  # use OS roots for CLI TLS; false selects built-in roots
+ --state <path>          # load saved auth state from JSON
+ --restore [name]        # auto-save/restore session state, defaults to --session
+ --restore-save <policy> # auto, always, or never
+ --namespace <name>      # isolate daemon sockets and restore-state directories
+ ```
+ 
++For CLI HTTPS/WSS, including browserless `read URL`, daemon sessions retain the selected trust settings when no flags, environment, or config replace them. `--no-ca-cert` clears the extra bundle and its `SSL_CERT_FILE` fallback; `--use-system-ca false` disables native roots. Changed certificate contents take effect when later CLI clients are acquired, without restarting the daemon or browser. `install` uses only its current invocation's trust settings. Browser trust has a separate Linux Chromium lifecycle. See [references/proxy-support.md](references/proxy-support.md).
++
+ ## When to load another skill
+ 
+ - **Electron desktop app** (VS Code, Slack desktop, Discord, Figma, etc.): `agent-browser skills get electron`
+diff --git a/skill-data/core/references/commands.md b/skill-data/core/references/commands.md
+index 6628e04..89e0921 100644
+--- a/skill-data/core/references/commands.md
++++ b/skill-data/core/references/commands.md
+@@ -398,9 +398,9 @@ agent-browser --headers <json> ...    # HTTP headers scoped to URL's origin
+ agent-browser --executable-path <p>   # Custom browser executable
+ agent-browser --extension <path> ...  # Load browser extension (repeatable)
+ agent-browser --ignore-https-errors   # Ignore SSL certificate errors
+-agent-browser --ca-cert <path>        # Add a CA to CLI TLS and local Chromium trust on Linux
+-agent-browser --no-ca-cert            # Clear CA trust retained by the running session
+-agent-browser --use-system-ca         # Verify the CLI's own connections against the OS trust store
++agent-browser --ca-cert <path>        # Add a CA for CLI TLS/read/install and Chromium on Linux
++agent-browser --no-ca-cert            # Clear the extra CLI CA bundle; browser commands also clear browser CA
++agent-browser --use-system-ca [bool]  # Use OS roots for CLI TLS; false selects built-in roots
+ agent-browser --hide-scrollbars false # Keep native scrollbars visible in headless Chromium screenshots
+ agent-browser --help                  # Show help (-h)
+ agent-browser --version               # Show version (-V)
+diff --git a/skill-data/core/references/proxy-support.md b/skill-data/core/references/proxy-support.md
+index 9e6a114..42ea758 100644
+--- a/skill-data/core/references/proxy-support.md
++++ b/skill-data/core/references/proxy-support.md
+@@ -182,9 +182,11 @@ export AGENT_BROWSER_CA_CERT=/etc/ssl/certs/proxy-ca.crt
+ agent-browser open https://example.com
+ ```
+ 
+-On Linux, `--ca-cert` imports the certificate or PEM bundle into an isolated NSS database used only by that locally launched Chromium process. Certificate hostname, validity period, and unrelated authority verification stay enabled. Later commands retain the CA when they omit the flag. Use `--no-ca-cert` to clear it. Different certificate content or an explicit clear relaunches Chromium without restarting the daemon, while the same content from any path reuses the browser. `agent-browser install --with-deps` installs the required `certutil`; otherwise install `libnss3-tools` on Debian/Ubuntu or `nss-tools` on RPM Linux.
++Daemon commands retain the CLI trust selection when flags, environment, and config supply no replacement. This includes browserless `read`, provider APIs, and WSS CDP connections. Each HTTP or WSS client acquisition rereads the selected bundle and, when enabled, native roots. Changed roots replace cached clients without restarting the daemon or browser. Operations that already acquired a client may finish with its previous roots. Invalid explicitly selected bundles fail instead of silently falling back.
+ 
+-For a local Chromium launch, the option also adds the CA to the CLI's own TLS trust. Browser-side trust cannot be combined with `--profile`, Lightpanda, or `--ignore-https-errors`, and it is not available for local launches on macOS or Windows.
++Use `--no-ca-cert` to clear the extra CA bundle and suppress its `SSL_CERT_FILE` fallback for that session. Use `--use-system-ca false` to select built-in roots; this retains any extra bundle unless it is also cleared. `install` runs without a daemon and uses only its invocation's flags, environment, and config.
++
++On Linux, `--ca-cert` also imports the certificate or PEM bundle into an isolated NSS database used only by that locally launched Chromium process. Certificate hostname, validity period, and unrelated authority verification stay enabled. Different certificate content or an explicit clear relaunches Chromium without restarting the daemon, while the same content from any path reuses the browser. `agent-browser install --with-deps` installs the required `certutil`; otherwise install `libnss3-tools` on Debian/Ubuntu or `nss-tools` on RPM Linux. Browser-side trust cannot be combined with `--profile`, Lightpanda, or `--ignore-https-errors`, and it is not available for local launches on macOS or Windows.
+ 
+ ### Two trust stores
+ 
+@@ -196,7 +198,7 @@ An intercepting proxy can break the connection in two different places, and they
+ | `net::ERR_CERT_AUTHORITY_INVALID` on a page | Chromium | `--ca-cert` |
+ | `CDP WebSocket connect failed: ... UnknownIssuer` | The CLI, before the browser is reached | `--ca-cert` or `--use-system-ca` |
+ 
+-The CLI verifies its own connections (remote CDP over `wss://`, cloud provider APIs) against a root list compiled into the binary, which cannot see a private CA. Two opt-ins widen it:
++The CLI verifies its own connections (`read`, `install`, remote CDP over `wss://`, and cloud provider APIs) against a root list compiled into the binary, which cannot see a private CA. `--use-system-ca` selects native roots instead, while `--ca-cert` adds a bundle to the selected roots:
+ 
+ ```bash
+ # Use the machine's trust store, where the proxy CA is usually already installed
+@@ -207,7 +209,9 @@ agent-browser --cdp wss://remote.example.com/session open https://example.com
+ agent-browser --ca-cert /etc/pki/ca-trust/source/anchors/proxy-ca.pem --cdp wss://... open https://example.com
+ ```
+ 
+-Neither disables verification. Without one of them the CLI keeps using the built-in roots, so nothing changes for setups that work today. `agent-browser doctor` reports which trust store is active.
++Neither disables hostname or validity verification. `agent-browser doctor` reports the trust settings resolved for that invocation.
++
++Native root loading honors `SSL_CERT_FILE` and `SSL_CERT_DIR` overrides in the daemon's environment. The contents are reread, but changing those environment paths requires a new daemon. Clearing the extra bundle does not disable these native-loader overrides while `--use-system-ca` remains enabled. A daemon started by an older binary may restart once to adopt per-command TLS configuration; later CLI trust updates preserve it.
+ 
+ With `--cdp`, `--auto-connect`, or a provider, `--ca-cert` configures only the CLI's connections. It cannot change the trust store of a browser that agent-browser did not launch. `--use-system-ca` always affects only CLI TLS.
+ 
+@@ -226,13 +230,15 @@ Which one to reach for depends on where the CA already lives, and that differs b
+ 
+ A Vercel Sandbox network policy that rewrites requests terminates TLS and re-signs with the Vercel proxy CA, which the sandbox already installs. Set `AGENT_BROWSER_USE_SYSTEM_CA=1` in the sandbox so the CLI picks it up.
+ 
+-Without the CA certificate on hand, fall back to ignoring every certificate error:
++For browser navigation only, certificate verification can be disabled:
+ 
+ ```bash
+ # For testing only - not recommended for production
+ agent-browser open https://example.com --ignore-https-errors
+ ```
+ 
++`--ignore-https-errors` does not disable verification for CLI HTTPS/WSS, `read`, or `install`.
++
+ ### Slow Performance
+ 
+ ```bash

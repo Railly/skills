@@ -1,0 +1,2753 @@
+Review PR 1770 read-only at frozen head 323449d9618693c85d2191f7dd10010ad22f640b. Identify concrete bugs with narrow changed-file line ranges and reachable scenarios. Focus independently on selection postconditions, filtering, multi-select final set, trusted input, dialog pending releases, timeout and ref/frame boundaries. Do not edit files or run browser sessions. No network actions. Inspect surrounding callers as needed. Return confirmed code findings and uncertainties distinctly. Diff follows:
+diff --git a/README.md b/README.md
+index fee408f..5d1d321 100644
+--- a/README.md
++++ b/README.md
+@@ -123,7 +123,7 @@ agent-browser keyboard inserttext <text>  # Insert text without key events (no s
+ agent-browser keydown <key>           # Hold key down
+ agent-browser keyup <key>             # Release key
+ agent-browser hover <sel>             # Hover element
+-agent-browser select <sel> <val>      # Select dropdown option
++agent-browser select <sel> <val...>   # Select native or ARIA dropdown option(s)
+ agent-browser check <sel>             # Check checkbox
+ agent-browser uncheck <sel>           # Uncheck checkbox
+ agent-browser scroll <dir> [px]       # Scroll (up/down/left/right, --selector <sel>)
+@@ -1190,6 +1190,13 @@ agent-browser hover @e4                   # Hover the link
+ 
+ When a ref click is blocked by an overlay, the error includes the covering element, such as `covered by <div#consent-banner>`. Click the banner or dialog control first, then run `snapshot` again before reusing refs.
+ 
++`select` accepts native `<select>` elements and standard ARIA `combobox` or `listbox` controls. Values match an option's exact value, label, or whitespace-normalized accessible text. A single-select native or ARIA control accepts one value; native multiple selects retain multi-value behavior, while multiple values for ARIA controls require an explicitly multiselectable listbox and represent its final set. The command opens comboboxes with browser input, types the requested value into input-backed filters when needed, waits for associated options, and verifies the widget's selected or committed state. It fails when an option is unknown, disabled, hidden, unsupported, or exposes no standard state that can confirm the selection. Re-snapshot after a widget opens or rerenders before using newly exposed option refs. This action uses the CDP browser path; WebDriver backends report it as unsupported.
++
++```bash
++agent-browser select @e4 "United States"
++agent-browser select "#country-combobox" "us"
++```
++
+ **Why use refs?**
+ 
+ - **Deterministic**: Ref points to exact element from snapshot
+diff --git a/cli/src/commands.rs b/cli/src/commands.rs
+index d0b6949..51969f2 100644
+--- a/cli/src/commands.rs
++++ b/cli/src/commands.rs
+@@ -4291,6 +4291,17 @@ mod tests {
+         assert_eq!(cmd["values"], json!(["opt1", "opt2", "opt3"]));
+     }
+ 
++    #[test]
++    fn test_select_preserves_value_contract_for_single_and_multiple_values() {
++        let single = parse_command(&args("select @e4 blue"), &default_flags()).unwrap();
++        assert_eq!(single["action"], "select");
++        assert_eq!(single["selector"], "@e4");
++        assert_eq!(single["values"], "blue");
++
++        let multiple = parse_command(&args("select #menu red blue"), &default_flags()).unwrap();
++        assert_eq!(multiple["values"], json!(["red", "blue"]));
++    }
++
+     #[test]
+     fn test_frame_main() {
+         let cmd = parse_command(&args("frame main"), &default_flags()).unwrap();
+diff --git a/cli/src/mcp.rs b/cli/src/mcp.rs
+index 60b3ced..d714c90 100644
+--- a/cli/src/mcp.rs
++++ b/cli/src/mcp.rs
+@@ -892,7 +892,7 @@ fn tools() -> Vec<Value> {
+         tool(
+             TOOL_SELECT,
+             "Select options",
+-            "Select one or more options in a select element.",
++            "Select options in a native select or supported ARIA combobox/listbox using exact values, labels, or normalized accessible text, then verify the resulting widget state.",
+             json!({
+                 "selector": selector_schema(),
+                 "values": {
+@@ -2644,11 +2644,15 @@ fn call_download(arguments: &Value) -> Result<Value, ProtocolError> {
+ }
+ 
+ fn call_select(arguments: &Value) -> Result<Value, ProtocolError> {
++    call_cli_tool(arguments, select_command_args(arguments)?, None)
++}
++
++fn select_command_args(arguments: &Value) -> Result<Vec<String>, ProtocolError> {
+     let selector = required_string(arguments, "selector")?;
+     let values = required_string_array(arguments, "values")?;
+     let mut args = vec!["select".to_string(), selector];
+     args.extend(values);
+-    call_cli_tool(arguments, args, None)
++    Ok(args)
+ }
+ 
+ fn call_scroll(arguments: &Value) -> Result<Value, ProtocolError> {
+@@ -4008,6 +4012,40 @@ mod tests {
+         assert!(props.get("webmcp").is_some());
+     }
+ 
++    #[test]
++    fn select_tool_schema_describes_native_and_aria_controls() {
++        let select = tools()
++            .into_iter()
++            .find(|tool| tool["name"].as_str() == Some(TOOL_SELECT))
++            .expect("select tool should be registered");
++        assert_eq!(
++            select["inputSchema"]["required"],
++            json!(["selector", "values"])
++        );
++        assert_eq!(select["inputSchema"]["properties"]["values"]["minItems"], 1);
++        let description = select["description"].as_str().unwrap();
++        assert!(description.contains("native select"));
++        assert!(description.contains("ARIA combobox/listbox"));
++        assert!(description.contains("normalized accessible text"));
++    }
++
++    #[test]
++    fn select_forwards_selector_and_all_values_to_the_cli_command() {
++        let args = select_command_args(&json!({
++            "selector": "@e4",
++            "values": ["red", "Blue Label"]
++        }))
++        .unwrap();
++        assert_eq!(args, vec!["select", "@e4", "red", "Blue Label"]);
++    }
++
++    #[test]
++    fn select_requires_selector_and_values() {
++        assert!(select_command_args(&json!({ "values": ["red"] })).is_err());
++        assert!(select_command_args(&json!({ "selector": "#menu" })).is_err());
++        assert!(select_command_args(&json!({ "selector": "#menu", "values": [] })).is_err());
++    }
++
+     #[test]
+     fn open_args_forwards_explicit_booleans() {
+         // Absent fields send nothing (env/config resolution stays with the CLI).
+diff --git a/cli/src/native/actions.rs b/cli/src/native/actions.rs
+index 4b33319..2c330bf 100644
+--- a/cli/src/native/actions.rs
++++ b/cli/src/native/actions.rs
+@@ -2443,6 +2443,21 @@ pub async fn execute_command(cmd: &Value, state: &mut DaemonState) -> Value {
+         _ => {}
+     }
+ 
++    // WebDriver does not expose the CDP Runtime and trusted-input primitives
++    // required by these actions. Reject before the generic launch/recovery path
++    // can try to create a missing CDP browser for an existing WebDriver session.
++    if matches!(state.backend_type, BackendType::WebDriver)
++        && WEBDRIVER_UNSUPPORTED_ACTIONS.contains(&action)
++    {
++        return error_response(
++            &id,
++            &format!(
++                "Action '{}' is not supported on the WebDriver backend",
++                action
++            ),
++        );
++    }
++
+     let skip_launch = skip_launch_action(action);
+     let restore_key_change_needs_launch = !skip_launch
+         && command_changes_restore_key(cmd, state)
+@@ -2567,19 +2582,6 @@ pub async fn execute_command(cmd: &Value, state: &mut DaemonState) -> Value {
+         }
+     }
+ 
+-    // WebDriver backend: reject unsupported CDP-only actions
+-    if matches!(state.backend_type, BackendType::WebDriver)
+-        && WEBDRIVER_UNSUPPORTED_ACTIONS.contains(&action)
+-    {
+-        return error_response(
+-            &id,
+-            &format!(
+-                "Action '{}' is not supported on the WebDriver backend",
+-                action
+-            ),
+-        );
+-    }
+-
+     // A pending confirm/prompt dialog blocks the renderer's main thread, so
+     // any command that touches the page would hang until the client read
+     // timeout. Fail fast with instructions instead. Actions in skip_launch
+@@ -5548,6 +5550,10 @@ async fn handle_scroll(cmd: &Value, state: &mut DaemonState) -> Result<Value, St
+     Ok(json!({ "scrolled": true }))
+ }
+ 
++/// Select and verify native or standard ARIA dropdown controls. The interaction
++/// helper owns matching, trusted input, dynamic option polling, and postcondition
++/// verification; this handler only preserves the CLI/MCP response shape and
++/// pending-dialog lifecycle.
+ async fn handle_select(cmd: &Value, state: &mut DaemonState) -> Result<Value, String> {
+     let mgr = state.browser.as_ref().ok_or("Browser not launched")?;
+     let session_id = mgr.active_session_id()?.to_string();
+@@ -5569,15 +5575,20 @@ async fn handle_select(cmd: &Value, state: &mut DaemonState) -> Result<Value, St
+             .unwrap_or_default(),
+     };
+ 
+-    interaction::select_option(
++    let result = interaction::select_option(
+         &mgr.client,
+         &session_id,
+         &state.ref_map,
+         selector,
+         &values,
+         &state.iframe_sessions,
++        state.timeout_ms(cmd),
+     )
+     .await?;
++    if result.dialog_opened {
++        state.pending_pointer_release = result.pending_release;
++        return Ok(json!({ "selected": values, "dialogOpened": true }));
++    }
+     Ok(json!({ "selected": values }))
+ }
+ 
+diff --git a/cli/src/native/browser.rs b/cli/src/native/browser.rs
+index 798ee5c..930b793 100644
+--- a/cli/src/native/browser.rs
++++ b/cli/src/native/browser.rs
+@@ -205,6 +205,12 @@ pub fn to_ai_friendly_error(error: &str) -> String {
+             "{detail}. Verify the selector, role, or name is correct and the element exists in the DOM."
+         );
+     }
++    // Selection errors include the target, requested values, available options,
++    // and verification reason. Preserve that context instead of letting the
++    // generic timeout/interception guidance discard the actionable details.
++    if lower.starts_with("selection failed for ") {
++        return error.to_string();
++    }
+     if lower.contains("strict mode violation") {
+         return "Element matched multiple results. Use a more specific selector.".to_string();
+     }
+@@ -2687,6 +2693,15 @@ mod tests {
+         );
+     }
+ 
++    #[test]
++    fn test_to_ai_friendly_error_preserves_selection_details() {
++        let error = "Selection failed for '#country': no visible, enabled option matched [\"missing\"]. Available options: us (\"United States\")";
++        assert_eq!(to_ai_friendly_error(error), error);
++
++        let timeout = "Selection failed for '#country': selection verification timed out";
++        assert_eq!(to_ai_friendly_error(timeout), timeout);
++    }
++
+     #[test]
+     fn test_to_ai_friendly_error_miss_wins_over_keyword_in_name() {
+         // A genuine locator miss whose echoed name contains a classifier keyword
+diff --git a/cli/src/native/e2e_tests.rs b/cli/src/native/e2e_tests.rs
+index c133ba9..6a17bc5 100644
+--- a/cli/src/native/e2e_tests.rs
++++ b/cli/src/native/e2e_tests.rs
+@@ -1176,6 +1176,9 @@ async fn e2e_form_interaction() {
+         "<input id='name' type='text' placeholder='Name'>",
+         "<input id='email' type='email'>",
+         "<select id='color'><option value='red'>Red</option><option value='blue'>Blue</option></select>",
++        "<select id='labelled'><option value='us' label='United States'>USA</option><option value='ca'>Canada</option></select>",
++        "<select id='whitespace'><option value='us'>United\nStates</option></select>",
++        "<select id='colors' multiple><option value='red'>Red</option><option value='blue'>Blue</option><option value='green'>Green</option></select>",
+         "<input id='agree' type='checkbox'>",
+         "<textarea id='bio'></textarea>",
+         "<button id='submit'>Submit</button>",
+@@ -1238,6 +1241,68 @@ async fn e2e_form_interaction() {
+     assert_success(&resp);
+     assert_eq!(get_data(&resp)["result"], "blue");
+ 
++    let resp = execute_command(
++        &json!({ "id": "15-label", "action": "select", "selector": "#labelled", "values": ["United States"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    let resp = execute_command(
++        &json!({ "id": "15-label-value", "action": "evaluate", "script": "document.getElementById('labelled').value" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["result"], "us");
++
++    let resp = execute_command(
++        &json!({ "id": "15a", "action": "select", "selector": "#whitespace", "values": ["United States"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    let resp = execute_command(
++        &json!({ "id": "15aa", "action": "evaluate", "script": "document.getElementById('whitespace').value" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["result"], "us");
++
++    let resp = execute_command(
++        &json!({ "id": "15b", "action": "select", "selector": "#colors", "values": ["red", "green"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    let resp = execute_command(
++        &json!({ "id": "15c", "action": "evaluate", "script": "Array.from(document.getElementById('colors').selectedOptions).map(option => option.value).join(',')" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["result"], "red,green");
++
++    // A native single-select cannot represent more than one requested value.
++    // Reject the request before changing the existing selection.
++    let resp = execute_command(
++        &json!({ "id": "15d", "action": "select", "selector": "#color", "values": ["red", "blue"] }),
++        &mut state,
++    )
++    .await;
++    assert!(!resp["success"].as_bool().unwrap_or(true));
++    assert!(resp["error"]
++        .as_str()
++        .unwrap_or_default()
++        .contains("single-select native select"));
++    let resp = execute_command(
++        &json!({ "id": "15e", "action": "evaluate", "script": "document.getElementById('color').value" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["result"], "blue");
++
+     // Check checkbox
+     let resp = execute_command(
+         &json!({ "id": "16", "action": "check", "selector": "#agree" }),
+@@ -1285,6 +1350,537 @@ async fn e2e_form_interaction() {
+     assert_success(&resp);
+ }
+ 
++// ---------------------------------------------------------------------------
++// ARIA select controls: trusted interaction, delayed options, and verification
++// ---------------------------------------------------------------------------
++
++#[tokio::test]
++#[ignore]
++async fn e2e_aria_select_controls() {
++    let mut state = DaemonState::new();
++    state.default_timeout_ms = 3_000;
++
++    assert_success(
++        &execute_command(
++            &json!({ "id": "1", "action": "launch", "headless": true }),
++            &mut state,
++        )
++        .await,
++    );
++    let html = format!(
++        "data:text/html;base64,{}",
++        STANDARD.encode(concat!(
++        "<html><body>",
++        "<label for='country'>Country</label>",
++        "<div id='country' role='combobox' aria-expanded='false' aria-controls='country-options' tabindex='0'>Choose a country</div>",
++        "<div id='country-options' role='listbox' hidden></div>",
++        "<div id='fruits' role='listbox' aria-multiselectable='true'>",
++        "<div role='option' value='apple' aria-selected='false'>Apple</div>",
++        "<div role='option' value='pear' aria-selected='false'>Pear</div>",
++        "</div>",
++        "<div id='single' role='listbox'>",
++        "<div id='single-one' role='option' value='one' aria-selected='false'>One</div>",
++        "<div id='single-two' role='option' value='two' aria-selected='false'>Two</div>",
++        "</div>",
++        "<script>",
++        "const country=document.getElementById('country'), popup=document.getElementById('country-options');",
++        "const wireCountry=()=>popup.querySelectorAll('[role=option]').forEach(o=>o.onclick=()=>{popup.querySelectorAll('[role=option]').forEach(x=>x.setAttribute('aria-selected',x===o?'true':'false'));country.textContent=o.textContent;country.setAttribute('aria-activedescendant',o.id||'');country.dataset.value=o.getAttribute('value');});",
++        "country.onclick=()=>{country.setAttribute('aria-expanded','true');popup.hidden=false;popup.innerHTML=\"<div role='option' value='one' aria-selected='false'>One</div>\";wireCountry();setTimeout(()=>{popup.insertAdjacentHTML('beforeend',\"<div id='us' role='option' value='us' aria-selected='false'>United States</div><div role='option' value='ca' aria-selected='false'>Canada</div><div role='option' value='mx' aria-disabled='true' aria-selected='false'>Mexico</div>\");wireCountry();},100)};",
++        "document.querySelectorAll('#fruits [role=option]').forEach(o=>o.onclick=()=>o.setAttribute('aria-selected',o.getAttribute('aria-selected')!=='true'));",
++        "document.querySelectorAll('#single [role=option]').forEach(o=>o.onclick=()=>{document.querySelectorAll('#single [role=option]').forEach(x=>x.setAttribute('aria-selected',x===o?'true':'false'));});",
++        "</script></body></html>"
++        ))
++    );
++    assert_success(
++        &execute_command(
++            &json!({ "id": "2", "action": "navigate", "url": html }),
++            &mut state,
++        )
++        .await,
++    );
++
++    let resp = execute_command(&json!({ "id": "2b", "action": "snapshot" }), &mut state).await;
++    assert_success(&resp);
++    let country_ref = get_data(&resp)["snapshot"]
++        .as_str()
++        .unwrap()
++        .lines()
++        .find_map(|line| {
++            if !line.contains("combobox") {
++                return None;
++            }
++            let start = line.find("ref=")? + 4;
++            let end = line[start..]
++                .find(|character: char| character == ']' || character.is_whitespace())
++                .map(|offset| start + offset)
++                .unwrap_or(line.len());
++            Some(format!("@{}", &line[start..end]))
++        })
++        .expect("snapshot should expose the combobox ref");
++
++    let resp = execute_command(
++        &json!({ "id": "3", "action": "select", "selector": "#country", "values": ["us"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["selected"], json!(["us"]));
++
++    let resp = execute_command(
++        &json!({ "id": "4", "action": "evaluate", "script": "country.dataset.value" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["result"], "us");
++
++    let resp = execute_command(
++        &json!({ "id": "4b", "action": "select", "selector": country_ref, "values": ["Canada"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["selected"], json!(["Canada"]));
++
++    let resp = execute_command(
++        &json!({ "id": "4c", "action": "select", "selector": "#single", "values": ["two"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++
++    let resp = execute_command(
++        &json!({ "id": "4d", "action": "select", "selector": "#single", "values": ["one", "two"] }),
++        &mut state,
++    )
++    .await;
++    assert!(!resp["success"].as_bool().unwrap_or(true));
++    assert!(resp["error"]
++        .as_str()
++        .unwrap_or_default()
++        .contains("single-select"));
++    let resp = execute_command(
++        &json!({ "id": "4e", "action": "evaluate", "script": "document.querySelector('#single [aria-selected=true]').getAttribute('value')" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["result"], "two");
++
++    let resp = execute_command(
++        &json!({ "id": "5", "action": "select", "selector": "#country", "values": ["missing"] }),
++        &mut state,
++    )
++    .await;
++    assert!(!resp["success"].as_bool().unwrap_or(true));
++    assert!(resp["error"]
++        .as_str()
++        .unwrap_or_default()
++        .contains("Canada"));
++    let resp = execute_command(
++        &json!({ "id": "5a", "action": "evaluate", "script": "country.dataset.value" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["result"], "ca");
++
++    let resp = execute_command(
++        &json!({ "id": "5b", "action": "select", "selector": "#country", "values": ["mx"] }),
++        &mut state,
++    )
++    .await;
++    assert!(!resp["success"].as_bool().unwrap_or(true));
++    assert!(resp["error"]
++        .as_str()
++        .unwrap_or_default()
++        .contains("[disabled]"));
++    let resp = execute_command(
++        &json!({ "id": "5c", "action": "evaluate", "script": "country.dataset.value" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["result"], "ca");
++
++    let resp = execute_command(
++        &json!({ "id": "6", "action": "select", "selector": "#fruits", "values": ["apple", "pear"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    let resp = execute_command(
++        &json!({ "id": "7", "action": "select", "selector": "#fruits", "values": ["apple", "pear", "other"] }),
++        &mut state,
++    )
++    .await;
++    assert!(!resp["success"].as_bool().unwrap_or(true));
++
++    let resp = execute_command(
++        &json!({ "id": "8", "action": "select", "selector": "#country", "values": ["United States", "Canada"] }),
++        &mut state,
++    )
++    .await;
++    assert!(!resp["success"].as_bool().unwrap_or(true));
++
++    assert_success(&execute_command(&json!({ "id": "99", "action": "close" }), &mut state).await);
++}
++
++#[tokio::test]
++#[ignore]
++async fn e2e_aria_select_filtered_input_combobox() {
++    let mut state = DaemonState::new();
++    state.default_timeout_ms = 2_000;
++    assert_success(
++        &execute_command(
++            &json!({ "id": "1", "action": "launch", "headless": true }),
++            &mut state,
++        )
++        .await,
++    );
++    let html = format!(
++        "data:text/html;base64,{}",
++        STANDARD.encode(concat!(
++            "<html><body>",
++            "<label for='combo'>Color</label>",
++            "<input id='combo' role='combobox' aria-expanded='false' aria-controls='popup' autocomplete='off'>",
++            "<div id='popup' role='listbox' hidden></div>",
++            "<script>",
++            "const combo=document.getElementById('combo'),popup=document.getElementById('popup');",
++            "function wireOption(){const option=popup.querySelector('[role=option]');if(option)option.onclick=()=>{option.setAttribute('aria-selected','true');combo.dataset.committed=option.getAttribute('value');combo.setAttribute('aria-expanded','false');};}",
++            "function render(){popup.hidden=false;popup.innerHTML=combo.value==='Blue' ? \"<div id='blue' role='option' value='blue' aria-selected='false'>Blue</div>\" : '';wireOption();}",
++            "combo.addEventListener('click',()=>{combo.setAttribute('aria-expanded','true');render();});",
++            "combo.addEventListener('input',render);",
++            "</script></body></html>"
++        ))
++    );
++    assert_success(
++        &execute_command(
++            &json!({ "id": "2", "action": "navigate", "url": html }),
++            &mut state,
++        )
++        .await,
++    );
++
++    let resp = execute_command(
++        &json!({ "id": "3", "action": "select", "selector": "#combo", "values": ["Blue"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["selected"], json!(["Blue"]));
++
++    let resp = execute_command(
++        &json!({ "id": "4", "action": "evaluate", "script": "JSON.stringify({value:combo.value,committed:combo.dataset.committed,selected:document.getElementById('blue').getAttribute('aria-selected')})" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(
++        get_data(&resp)["result"],
++        r#"{"value":"Blue","committed":"blue","selected":"true"}"#
++    );
++    assert_success(&execute_command(&json!({ "id": "99", "action": "close" }), &mut state).await);
++}
++
++#[tokio::test]
++#[ignore]
++async fn e2e_aria_select_rejects_filter_only_closed_combobox() {
++    let mut state = DaemonState::new();
++    state.default_timeout_ms = 500;
++    assert_success(
++        &execute_command(
++            &json!({ "id": "1", "action": "launch", "headless": true }),
++            &mut state,
++        )
++        .await,
++    );
++    let html = format!(
++        "data:text/html;base64,{}",
++        STANDARD.encode(concat!(
++            "<html><body>",
++            "<input id='combo' role='combobox' aria-expanded='false' aria-controls='popup' autocomplete='off'>",
++            "<div id='popup' role='listbox' hidden></div>",
++            "<script>",
++            "const combo=document.getElementById('combo'),popup=document.getElementById('popup');",
++            "function render(){popup.hidden=false;popup.innerHTML=combo.value==='Blue' ? \"<div id='blue' role='option' value='blue' aria-selected='false'>Blue</div>\" : '';combo.setAttribute('aria-expanded','true');const option=popup.querySelector('[role=option]');if(option)option.onclick=()=>combo.setAttribute('aria-expanded','false');}",
++            "combo.addEventListener('click',render);combo.addEventListener('input',render);",
++            "</script></body></html>"
++        ))
++    );
++    assert_success(
++        &execute_command(
++            &json!({ "id": "2", "action": "navigate", "url": html }),
++            &mut state,
++        )
++        .await,
++    );
++
++    let resp = execute_command(
++        &json!({ "id": "3", "action": "select", "selector": "#combo", "values": ["Blue"] }),
++        &mut state,
++    )
++    .await;
++    assert!(!resp["success"].as_bool().unwrap_or(true));
++    assert!(resp["error"]
++        .as_str()
++        .unwrap_or_default()
++        .contains("verification"));
++
++    let resp = execute_command(
++        &json!({ "id": "4", "action": "evaluate", "script": "JSON.stringify({value:combo.value,expanded:combo.getAttribute('aria-expanded'),selected:document.getElementById('blue')?.getAttribute('aria-selected')})" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(
++        get_data(&resp)["result"],
++        r#"{"value":"Blue","expanded":"false","selected":"false"}"#
++    );
++    assert_success(&execute_command(&json!({ "id": "99", "action": "close" }), &mut state).await);
++}
++
++#[tokio::test]
++#[ignore]
++async fn e2e_aria_select_rejects_unsupported_and_unverified_controls() {
++    let mut state = DaemonState::new();
++    state.default_timeout_ms = 200;
++    assert_success(
++        &execute_command(
++            &json!({ "id": "1", "action": "launch", "headless": true }),
++            &mut state,
++        )
++        .await,
++    );
++    let html = "data:text/html,<div id='styled'>Choose</div><div id='opaque' role='combobox' aria-expanded='true' aria-controls='options' tabindex='0'>Choose</div><div id='options' role='listbox'><div role='option' aria-selected='false'>One</div></div>";
++    assert_success(
++        &execute_command(
++            &json!({ "id": "2", "action": "navigate", "url": html }),
++            &mut state,
++        )
++        .await,
++    );
++
++    let resp = execute_command(
++        &json!({ "id": "3", "action": "select", "selector": "#styled", "values": ["One"] }),
++        &mut state,
++    )
++    .await;
++    assert!(!resp["success"].as_bool().unwrap_or(true));
++    assert!(resp["error"]
++        .as_str()
++        .unwrap_or_default()
++        .contains("native select"));
++
++    let resp = execute_command(
++        &json!({ "id": "4", "action": "select", "selector": "#opaque", "values": ["One"] }),
++        &mut state,
++    )
++    .await;
++    assert!(!resp["success"].as_bool().unwrap_or(true));
++    assert!(resp["error"]
++        .as_str()
++        .unwrap_or_default()
++        .contains("verification"));
++    assert_success(&execute_command(&json!({ "id": "99", "action": "close" }), &mut state).await);
++}
++
++#[tokio::test]
++#[ignore]
++async fn e2e_aria_select_active_descendant_focuses_control() {
++    let mut state = DaemonState::new();
++    state.default_timeout_ms = 1_000;
++    assert_success(
++        &execute_command(
++            &json!({ "id": "1", "action": "launch", "headless": true }),
++            &mut state,
++        )
++        .await,
++    );
++    let html = format!(
++        "data:text/html;base64,{}",
++        STANDARD.encode(concat!(
++            "<html><body>",
++            "<div id='combo' role='combobox' tabindex='0' aria-expanded='true' aria-controls='popup' aria-activedescendant='blue'>Current</div>",
++            "<div id='popup' role='listbox'><div id='blue' role='option' aria-selected='false'>Blue</div></div>",
++            "<div id='list' role='listbox' tabindex='0' aria-activedescendant='list-blue'><div id='list-blue' role='option' aria-selected='false'>List Blue</div></div>",
++            "<script>",
++            "combo.addEventListener('keydown',event=>{if(event.key==='Enter'&&document.activeElement===combo){blue.setAttribute('aria-selected','true');combo.textContent='Blue';combo.dataset.committed='blue';}});",
++            "document.getElementById('list-blue').onclick=()=>document.getElementById('list-blue').setAttribute('aria-selected','true');",
++            "</script></body></html>"
++        ))
++    );
++    assert_success(
++        &execute_command(
++            &json!({ "id": "2", "action": "navigate", "url": html }),
++            &mut state,
++        )
++        .await,
++    );
++
++    let resp = execute_command(
++        &json!({ "id": "3", "action": "select", "selector": "#combo", "values": ["Blue"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++
++    let resp = execute_command(
++        &json!({ "id": "4", "action": "evaluate", "script": "JSON.stringify({active:document.activeElement.id,selected:blue.getAttribute('aria-selected'),committed:combo.dataset.committed})" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(
++        get_data(&resp)["result"],
++        r#"{"active":"combo","selected":"true","committed":"blue"}"#
++    );
++
++    let resp = execute_command(
++        &json!({ "id": "5", "action": "select", "selector": "#list", "values": ["List Blue"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++
++    let resp = execute_command(
++        &json!({ "id": "6", "action": "evaluate", "script": "document.getElementById('list-blue').getAttribute('aria-selected')" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["result"], "true");
++
++    assert_success(&execute_command(&json!({ "id": "99", "action": "close" }), &mut state).await);
++}
++
++#[tokio::test]
++#[ignore]
++async fn e2e_aria_select_active_descendant_dialog_is_reported_without_timeout() {
++    let mut state = DaemonState::new();
++    state.default_timeout_ms = 1_000;
++    assert_success(
++        &execute_command(
++            &json!({ "id": "1", "action": "launch", "headless": true }),
++            &mut state,
++        )
++        .await,
++    );
++    let html = format!(
++        "data:text/html;base64,{}",
++        STANDARD.encode(concat!(
++            "<html><body>",
++            "<div id='combo' role='combobox' tabindex='0' aria-expanded='true' aria-controls='popup' aria-activedescendant='blue'>Current</div>",
++            "<div id='popup' role='listbox'><div id='blue' role='option' aria-selected='false'>Blue</div></div>",
++            "<script>",
++            "combo.addEventListener('keydown',event=>{if(event.key==='Enter'&&document.activeElement===combo&&confirm('Select Blue?')){blue.setAttribute('aria-selected','true');combo.textContent='Blue';combo.dataset.committed='blue';}});",
++            "</script></body></html>"
++        ))
++    );
++    assert_success(
++        &execute_command(
++            &json!({ "id": "2", "action": "navigate", "url": html }),
++            &mut state,
++        )
++        .await,
++    );
++
++    let resp = execute_command(
++        &json!({ "id": "3", "action": "select", "selector": "#combo", "values": ["Blue"] }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["selected"], json!(["Blue"]));
++    assert_eq!(get_data(&resp)["dialogOpened"], true);
++    assert!(resp["warning"]
++        .as_str()
++        .unwrap_or_default()
++        .contains("confirm"));
++
++    let resp = execute_command(
++        &json!({ "id": "4", "action": "dialog", "response": "status" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(get_data(&resp)["hasDialog"], true);
++    assert_eq!(get_data(&resp)["type"], "confirm");
++
++    let resp = execute_command(
++        &json!({ "id": "5", "action": "dialog", "response": "accept" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++
++    let resp = execute_command(
++        &json!({ "id": "6", "action": "evaluate", "script": "JSON.stringify({selected:blue.getAttribute('aria-selected'),committed:combo.dataset.committed})" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(
++        get_data(&resp)["result"],
++        r#"{"selected":"true","committed":"blue"}"#
++    );
++
++    assert_success(&execute_command(&json!({ "id": "99", "action": "close" }), &mut state).await);
++}
++
++#[tokio::test]
++#[ignore]
++async fn e2e_aria_select_rejects_transient_combobox_input_value() {
++    let mut state = DaemonState::new();
++    state.default_timeout_ms = 250;
++    assert_success(
++        &execute_command(
++            &json!({ "id": "1", "action": "launch", "headless": true }),
++            &mut state,
++        )
++        .await,
++    );
++    let html = format!(
++        "data:text/html;base64,{}",
++        STANDARD.encode(concat!(
++            "<html><body>",
++            "<input id='combo' role='combobox' value='Blue' aria-expanded='true' aria-controls='popup'>",
++            "<div id='popup' role='listbox'><div id='blue' role='option' aria-selected='false'>Blue</div></div>",
++            "</body></html>"
++        ))
++    );
++    assert_success(
++        &execute_command(
++            &json!({ "id": "2", "action": "navigate", "url": html }),
++            &mut state,
++        )
++        .await,
++    );
++
++    let resp = execute_command(
++        &json!({ "id": "3", "action": "select", "selector": "#combo", "values": ["Blue"] }),
++        &mut state,
++    )
++    .await;
++    assert!(!resp["success"].as_bool().unwrap_or(true));
++    assert!(resp["error"]
++        .as_str()
++        .unwrap_or_default()
++        .contains("verification"));
++
++    let resp = execute_command(
++        &json!({ "id": "4", "action": "evaluate", "script": "JSON.stringify({value:combo.value,selected:blue.getAttribute('aria-selected')})" }),
++        &mut state,
++    )
++    .await;
++    assert_success(&resp);
++    assert_eq!(
++        get_data(&resp)["result"],
++        r#"{"value":"Blue","selected":"false"}"#
++    );
++    assert_success(&execute_command(&json!({ "id": "99", "action": "close" }), &mut state).await);
++}
++
+ // ---------------------------------------------------------------------------
+ // Navigation: back, forward, reload
+ // ---------------------------------------------------------------------------
+diff --git a/cli/src/native/interaction.rs b/cli/src/native/interaction.rs
+index e82b905..0ea0778 100644
+--- a/cli/src/native/interaction.rs
++++ b/cli/src/native/interaction.rs
+@@ -1,4 +1,5 @@
+ use std::collections::HashMap;
++use std::time::Duration;
+ 
+ use serde_json::Value;
+ 
+@@ -428,7 +429,15 @@ pub async fn select_option(
+     selector_or_ref: &str,
+     values: &[String],
+     iframe_sessions: &HashMap<String, String>,
+-) -> Result<(), String> {
++    timeout_ms: u64,
++) -> Result<SelectionResult, String> {
++    if values.is_empty() {
++        return Err(format!(
++            "Cannot select from '{}': at least one value is required",
++            selector_or_ref
++        ));
++    }
++
+     let (object_id, effective_session_id) = resolve_element_object_id(
+         client,
+         session_id,
+@@ -438,54 +447,1263 @@ pub async fn select_option(
+     )
+     .await?;
+ 
+-    // Matching nothing must be an error, not a silent success: an agent that
+-    // selects a misspelled option otherwise sees "Done", and only discovers
+-    // the page state is wrong after more commands. List what was available.
+-    let js = r#"function(vals) {
+-            const options = Array.from(this.options);
+-            let matched = 0;
+-            for (const opt of options) {
+-                opt.selected = vals.includes(opt.value) || vals.includes(opt.textContent.trim());
+-                if (opt.selected) matched += 1;
+-            }
+-            if (matched === 0) {
+-                const available = options.map(o => o.value + ' ("' + o.textContent.trim() + '")').join(', ');
+-                return { error: 'No option matched ' + JSON.stringify(vals) + '. Available options: ' + available };
+-            }
+-            this.dispatchEvent(new Event('change', { bubbles: true }));
+-            return { matched };
+-        }"#
+-    .to_string();
++    // Keep this classifier beside the native/custom branch: supported custom
++    // controls are explicit ARIA comboboxes and listboxes, values match exact
++    // value/label or normalized accessible text, and success requires a
++    // standard verified state before the configured action timeout expires.
++    // Opaque styled elements, shadow-DOM and cross-document popups remain
++    // intentionally unsupported.
++    let metadata = call_selection_function(
++        client,
++        &effective_session_id,
++        &object_id,
++        "function() { return { tag: (this.tagName || '').toLowerCase(), role: (this.getAttribute('role') || '').toLowerCase() }; }",
++        None,
++        selector_or_ref,
++    )
++    .await?;
++    let metadata = metadata
++        .as_object()
++        .ok_or_else(|| selection_error(selector_or_ref, "the target metadata was not returned"))?;
++    let kind = classify_selection_control(
++        metadata
++            .get("tag")
++            .and_then(Value::as_str)
++            .unwrap_or_default(),
++        metadata
++            .get("role")
++            .and_then(Value::as_str)
++            .unwrap_or_default(),
++    );
+ 
+-    let result = client
+-        .send_command_typed::<_, Value>(
++    match kind {
++        SelectionControlKind::NativeSelect => {
++            select_native_option(
++                client,
++                &effective_session_id,
++                &object_id,
++                selector_or_ref,
++                values,
++            )
++            .await?;
++            Ok(SelectionResult::default())
++        }
++        SelectionControlKind::AriaCombobox | SelectionControlKind::AriaListbox => {
++            select_aria_option(
++                client,
++                AriaSelectionRequest {
++                    session_id,
++                    ref_map,
++                    target: selector_or_ref,
++                    values,
++                    iframe_sessions,
++                    expected_kind: kind,
++                    timeout_ms,
++                },
++            )
++            .await
++        }
++        SelectionControlKind::Unsupported => Err(selection_error(
++            selector_or_ref,
++            "the target is not a native select or a role=combobox/listbox control",
++        )),
++    }
++}
++
++/// Selection actions can open a JavaScript dialog during the real input
++/// sequence. The daemon stores this release and sends it after the dialog is
++/// accepted or dismissed, just as it does for `click`.
++#[derive(Default)]
++pub struct SelectionResult {
++    pub dialog_opened: bool,
++    pub pending_release: Option<PendingRelease>,
++}
++
++#[derive(Debug, Clone, Copy, PartialEq, Eq)]
++enum SelectionControlKind {
++    NativeSelect,
++    AriaCombobox,
++    AriaListbox,
++    Unsupported,
++}
++
++fn classify_selection_control(tag: &str, role: &str) -> SelectionControlKind {
++    match (tag, role) {
++        ("select", _) => SelectionControlKind::NativeSelect,
++        (_, "combobox") => SelectionControlKind::AriaCombobox,
++        (_, "listbox") => SelectionControlKind::AriaListbox,
++        _ => SelectionControlKind::Unsupported,
++    }
++}
++
++fn normalize_selection_whitespace(value: &str) -> String {
++    value.split_whitespace().collect::<Vec<_>>().join(" ")
++}
++
++fn selection_option_matches(
++    requested: &str,
++    value: Option<&str>,
++    label: Option<&str>,
++    accessible_text: &str,
++) -> bool {
++    value == Some(requested)
++        || label == Some(requested)
++        || normalize_selection_whitespace(accessible_text)
++            == normalize_selection_whitespace(requested)
++}
++
++fn bounded_available_options(options: &[String]) -> String {
++    const MAX_OPTIONS: usize = 12;
++    const MAX_CHARS: usize = 500;
++    let mut output = String::new();
++    let mut truncated = options.len() > MAX_OPTIONS;
++    for (index, option) in options.iter().take(MAX_OPTIONS).enumerate() {
++        let separator = if index == 0 { "" } else { ", " };
++        if output.len() + separator.len() + option.len() > MAX_CHARS {
++            truncated = true;
++            break;
++        }
++        output.push_str(separator);
++        output.push_str(option);
++    }
++    if truncated {
++        if !output.is_empty() {
++            output.push_str(", ");
++        }
++        output.push('…');
++    }
++    if output.is_empty() {
++        "(none)".to_string()
++    } else {
++        output
++    }
++}
++
++fn selection_error(target: &str, reason: &str) -> String {
++    format!("Selection failed for '{}': {}", target, reason)
++}
++
++fn exception_error(target: &str, result: &EvaluateResult) -> Option<String> {
++    result.exception_details.as_ref().map(|details| {
++        let description = details
++            .exception
++            .as_ref()
++            .and_then(|exception| exception.description.as_deref())
++            .unwrap_or(&details.text);
++        selection_error(target, &format!("JavaScript exception: {}", description))
++    })
++}
++
++async fn call_selection_function(
++    client: &CdpClient,
++    session_id: &str,
++    object_id: &str,
++    function_declaration: &str,
++    argument: Option<Value>,
++    target: &str,
++) -> Result<Value, String> {
++    let arguments = argument.map(|value| {
++        vec![CallArgument {
++            value: Some(value),
++            object_id: None,
++        }]
++    });
++    let result: EvaluateResult = client
++        .send_command_typed(
+             "Runtime.callFunctionOn",
+             &CallFunctionOnParams {
+-                function_declaration: js,
+-                object_id: Some(object_id),
+-                arguments: Some(vec![CallArgument {
+-                    value: Some(serde_json::json!(values)),
+-                    object_id: None,
+-                }]),
++                function_declaration: function_declaration.to_string(),
++                object_id: Some(object_id.to_string()),
++                arguments,
+                 return_by_value: Some(true),
+                 await_promise: Some(false),
+             },
+-            Some(&effective_session_id),
++            Some(session_id),
+         )
+         .await?;
++    if let Some(error) = exception_error(target, &result) {
++        return Err(error);
++    }
++    result
++        .result
++        .value
++        .ok_or_else(|| selection_error(target, "the browser returned no selection result"))
++}
+ 
+-    if let Some(error) = result
+-        .get("result")
+-        .and_then(|r| r.get("value"))
+-        .and_then(|v| v.get("error"))
+-        .and_then(|e| e.as_str())
+-    {
+-        return Err(error.to_string());
++async fn call_selection_object_function(
++    client: &CdpClient,
++    session_id: &str,
++    object_id: &str,
++    function_declaration: &str,
++    argument: Option<Value>,
++    return_by_value: bool,
++    target: &str,
++) -> Result<EvaluateResult, String> {
++    let arguments = argument.map(|value| {
++        vec![CallArgument {
++            value: Some(value),
++            object_id: None,
++        }]
++    });
++    let result: EvaluateResult = client
++        .send_command_typed(
++            "Runtime.callFunctionOn",
++            &CallFunctionOnParams {
++                function_declaration: function_declaration.to_string(),
++                object_id: Some(object_id.to_string()),
++                arguments,
++                return_by_value: Some(return_by_value),
++                await_promise: Some(false),
++            },
++            Some(session_id),
++        )
++        .await?;
++    if let Some(error) = exception_error(target, &result) {
++        return Err(error);
+     }
++    Ok(result)
++}
+ 
++async fn select_native_option(
++    client: &CdpClient,
++    session_id: &str,
++    object_id: &str,
++    target: &str,
++    values: &[String],
++) -> Result<(), String> {
++    let result = call_selection_function(
++        client,
++        session_id,
++        object_id,
++        r#"function(vals) {
++            const normalize = value => String(value || '').replace(/\s+/g, ' ').trim();
++            if ((this.tagName || '').toLowerCase() !== 'select') {
++                return { error: 'target is not a native select' };
++            }
++            if (this.matches(':disabled')) {
++                return { error: 'the native select is disabled' };
++            }
++            if (this.multiple !== true && vals.length > 1) {
++                return { error: 'multiple values were requested from a single-select native select' };
++            }
++            const options = Array.from(this.options || []);
++            const describe = option => {
++                const label = normalize(option.label);
++                const text = normalize(option.textContent);
++                const textDetail = label === text ? '' : ` [text: "${text}"]`;
++                return `${option.value} ("${label}")${textDetail}${option.matches(':disabled') ? ' [disabled]' : ''}`;
++            };
++            const available = options.map(describe);
++            const matches = (option, value) =>
++                option.value === value ||
++                normalize(option.label) === normalize(value) ||
++                normalize(option.textContent) === normalize(value);
++            const enabledMatch = value => options.some(option =>
++                !option.matches(':disabled') &&
++                matches(option, value)
++            );
++            const missing = vals.filter(value => !enabledMatch(value));
++            if (missing.length) {
++                return { error: 'No enabled option matched ' + JSON.stringify(missing), available };
++            }
++            for (const option of options) {
++                option.selected = !option.matches(':disabled') && vals.some(value => matches(option, value));
++            }
++            this.dispatchEvent(new Event('input', { bubbles: true }));
++            this.dispatchEvent(new Event('change', { bubbles: true }));
++            return {
++                selected: Array.from(this.selectedOptions || []).map(option => ({ value: option.value, label: normalize(option.label), text: normalize(option.textContent) })),
++                multiple: this.multiple === true
++            };
++        }"#,
++        Some(serde_json::json!(values)),
++        target,
++    )
++    .await?;
++
++    if let Some(error) = result.get("error").and_then(Value::as_str) {
++        let available = result
++            .get("available")
++            .and_then(Value::as_array)
++            .map(|options| {
++                options
++                    .iter()
++                    .filter_map(Value::as_str)
++                    .map(String::from)
++                    .collect::<Vec<_>>()
++            })
++            .unwrap_or_default();
++        return Err(selection_error(
++            target,
++            &format!(
++                "{}. Available options: {}",
++                error,
++                bounded_available_options(&available)
++            ),
++        ));
++    }
++
++    let verify = call_selection_function(
++        client,
++        session_id,
++        object_id,
++        r#"function(vals) {
++            const normalize = value => String(value || '').replace(/\s+/g, ' ').trim();
++            if ((this.tagName || '').toLowerCase() !== 'select') return { verified: false, selected: [] };
++            const selected = Array.from(this.selectedOptions || []).map(option => ({ value: option.value, label: normalize(option.label), text: normalize(option.textContent) }));
++            const matches = entry => vals.some(value => entry.value === value || entry.label === normalize(value) || entry.text === normalize(value));
++            const verified = this.multiple === true
++                ? vals.every(value => selected.some(entry => entry.value === value || entry.label === normalize(value) || entry.text === normalize(value)))
++                : selected.some(matches);
++            return { verified, selected };
++        }"#,
++        Some(serde_json::json!(values)),
++        target,
++    )
++    .await?;
++    if !verify
++        .get("verified")
++        .and_then(Value::as_bool)
++        .unwrap_or(false)
++    {
++        return Err(selection_error(
++            target,
++            &format!(
++                "the native select did not verify the requested value(s) {}",
++                serde_json::to_string(values).unwrap_or_else(|_| "[]".to_string())
++            ),
++        ));
++    }
+     Ok(())
+ }
+ 
++const ARIA_STATE_FUNCTION: &str = r#"function(vals) {
++    const normalize = value => String(value || '').replace(/\s+/g, ' ').trim();
++    const role = (this.getAttribute('role') || '').toLowerCase();
++    const roots = [];
++    const addRoot = root => { if (root && !roots.includes(root)) roots.push(root); };
++    // A listbox owns descendant options directly. A combobox can likewise
++    // render its popup below itself, while aria-controls/aria-owns add the
++    // standard same-document popup relationship when it is portaled.
++    if (role === 'listbox' || role === 'combobox') addRoot(this);
++    for (const attribute of ['aria-controls', 'aria-owns']) {
++        for (const id of (this.getAttribute(attribute) || '').split(/\s+/).filter(Boolean)) {
++            addRoot(this.ownerDocument && this.ownerDocument.getElementById(id));
++        }
++    }
++    if (!roots.length) addRoot(this);
++    const options = [];
++    const seen = new Set();
++    for (const root of roots) {
++        if (root.matches && root.matches('[role="option"]') && !seen.has(root)) {
++            seen.add(root); options.push(root);
++        }
++        for (const option of root.querySelectorAll ? root.querySelectorAll('[role="option"]') : []) {
++            if (!seen.has(option)) { seen.add(option); options.push(option); }
++        }
++    }
++    const visible = option => {
++        if (option.getAttribute('aria-hidden') === 'true') return false;
++        const style = option.ownerDocument.defaultView.getComputedStyle(option);
++        const rect = option.getBoundingClientRect();
++        return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity || '1') > 0 && rect.width > 0 && rect.height > 0;
++    };
++    const disabled = option => option.matches(':disabled') || option.getAttribute('aria-disabled') === 'true';
++    const fields = option => {
++        const labelledBy = (option.getAttribute('aria-labelledby') || '').split(/\s+/)
++            .map(id => option.ownerDocument.getElementById(id))
++            .filter(Boolean)
++            .map(element => element.textContent || '')
++            .join(' ');
++        return {
++            value: option.getAttribute('value'),
++            label: option.getAttribute('aria-label') || option.getAttribute('label') || (labelledBy ? normalize(labelledBy) : null),
++            text: normalize(option.textContent),
++        };
++    };
++    const matches = (field, value) => field.value === value || field.label === value || field.text === normalize(value);
++    const state = options.map((option, index) => {
++        const field = fields(option);
++        const available = visible(option) && !disabled(option);
++        const matchValues = vals.filter(value => matches(field, value));
++        return {
++            index,
++            value: field.value,
++            label: field.label,
++            text: field.text,
++            selected: option.getAttribute('aria-selected') === 'true',
++            hasSelectedState: option.hasAttribute('aria-selected'),
++            available,
++            disabled: disabled(option),
++            visible: visible(option),
++            matchValues,
++        };
++    });
++    const activeId = this.getAttribute('aria-activedescendant');
++    const active = activeId && this.ownerDocument ? this.ownerDocument.getElementById(activeId) : null;
++    const activeIndex = active ? options.indexOf(active) : -1;
++    const committed = [];
++    if ('value' in this && typeof this.value === 'string') committed.push(normalize(this.value));
++    if (this.getAttribute('aria-valuetext')) committed.push(normalize(this.getAttribute('aria-valuetext')));
++    const formControl = this.matches && this.matches('input,textarea,select')
++        ? this
++        : (this.querySelector && this.querySelector('input,textarea,select'));
++    const input = this.matches && this.matches('input,textarea')
++        ? this
++        : (this.querySelector && this.querySelector('input,textarea'));
++    if (formControl && typeof formControl.value === 'string') {
++        committed.push(normalize(formControl.value));
++    }
++    if (role === 'combobox') committed.push(normalize(this.textContent));
++    return {
++        role,
++        disabled: this.matches && (this.matches(':disabled') || this.getAttribute('aria-disabled') === 'true'),
++        expanded: this.getAttribute('aria-expanded') === 'true',
++        multiselectable: this.getAttribute('aria-multiselectable') === 'true',
++        associated: roots.length > 0,
++        options: state,
++        committed: committed.filter(Boolean),
++        inputBacked: !!input,
++        inputValue: input && typeof input.value === 'string' ? normalize(input.value) : null,
++        // aria-activedescendant is navigation state, not a committed value.
++        // Keep it separate so keyboard-operated widgets are committed with
++        // Enter before selection can be reported as successful.
++        hasCommittedState: committed.length > 0,
++        activeIndex: activeIndex >= 0 ? activeIndex : null,
++    };
++}"#;
++
++const ARIA_FOCUS_INPUT_FUNCTION: &str = r#"function() {
++    const input = this.matches && this.matches('input,textarea')
++        ? this
++        : (this.querySelector && this.querySelector('input,textarea'));
++    if (!input) return { focused: false, value: null };
++    input.focus();
++    return {
++        focused: input.ownerDocument.activeElement === input,
++        value: typeof input.value === 'string' ? input.value : ''
++    };
++}"#;
++
++const ARIA_GET_OPTION_FUNCTION: &str = r#"function(index) {
++    const role = (this.getAttribute('role') || '').toLowerCase();
++    const roots = [];
++    const addRoot = root => { if (root && !roots.includes(root)) roots.push(root); };
++    if (role === 'listbox' || role === 'combobox') addRoot(this);
++    for (const attribute of ['aria-controls', 'aria-owns']) {
++        for (const id of (this.getAttribute(attribute) || '').split(/\s+/).filter(Boolean)) {
++            addRoot(this.ownerDocument && this.ownerDocument.getElementById(id));
++        }
++    }
++    if (!roots.length) addRoot(this);
++    const options = [];
++    const seen = new Set();
++    for (const root of roots) {
++        if (root.matches && root.matches('[role="option"]') && !seen.has(root)) { seen.add(root); options.push(root); }
++        for (const option of root.querySelectorAll ? root.querySelectorAll('[role="option"]') : []) {
++            if (!seen.has(option)) { seen.add(option); options.push(option); }
++        }
++    }
++    return options[index] || null;
++}"#;
++
++struct AriaSelectionRequest<'a> {
++    session_id: &'a str,
++    ref_map: &'a RefMap,
++    target: &'a str,
++    values: &'a [String],
++    iframe_sessions: &'a HashMap<String, String>,
++    expected_kind: SelectionControlKind,
++    timeout_ms: u64,
++}
++
++#[derive(Default)]
++struct AriaSelectionVerification<'a> {
++    requested_options_seen: bool,
++    committed_before_activation: Option<&'a [String]>,
++    activation_attempted: bool,
++}
++
++async fn select_aria_option(
++    client: &CdpClient,
++    request: AriaSelectionRequest<'_>,
++) -> Result<SelectionResult, String> {
++    let AriaSelectionRequest {
++        session_id,
++        ref_map,
++        target,
++        values,
++        iframe_sessions,
++        expected_kind,
++        timeout_ms,
++    } = request;
++    if expected_kind == SelectionControlKind::AriaCombobox && values.len() > 1 {
++        return Err(selection_error(
++            target,
++            "multiple values are only supported for an explicitly multiselectable ARIA listbox",
++        ));
++    }
++
++    let deadline = tokio::time::Instant::now() + Duration::from_millis(timeout_ms);
++    let mut opened = false;
++    let mut requested_options_seen = false;
++    let mut filter_input_sent = false;
++    let mut activation_attempted = false;
++    // A combobox's input/display can contain the requested text while the
++    // popup is only filtering options. Keep the pre-activation committed state
++    // so that fallback verification requires an actual commit transition.
++    let mut committed_before_activation: Option<Vec<String>> = None;
++
++    loop {
++        let (object_id, effective_session_id) =
++            match resolve_element_object_id(client, session_id, ref_map, target, iframe_sessions)
++                .await
++            {
++                Ok(resolved) => resolved,
++                Err(error) if is_stale_selection_error(&error) => {
++                    if tokio::time::Instant::now() >= deadline {
++                        return Err(selection_error(
++                            target,
++                            "the control rerendered before inspection",
++                        ));
++                    }
++                    tokio::time::sleep(Duration::from_millis(25)).await;
++                    continue;
++                }
++                Err(error) => return Err(error),
++            };
++        let state = match call_selection_function(
++            client,
++            &effective_session_id,
++            &object_id,
++            ARIA_STATE_FUNCTION,
++            Some(serde_json::json!(values)),
++            target,
++        )
++        .await
++        {
++            Ok(state) => state,
++            Err(error) if is_stale_selection_error(&error) => {
++                if tokio::time::Instant::now() >= deadline {
++                    return Err(selection_error(
++                        target,
++                        "the control rerendered during inspection",
++                    ));
++                }
++                tokio::time::sleep(Duration::from_millis(25)).await;
++                continue;
++            }
++            Err(error) => return Err(error),
++        };
++        let state_role = state
++            .get("role")
++            .and_then(Value::as_str)
++            .unwrap_or_default();
++        if classify_selection_control("", state_role) != expected_kind {
++            return Err(selection_error(
++                target,
++                "the control changed to an unsupported ARIA role",
++            ));
++        }
++
++        let multiselectable = state
++            .get("multiselectable")
++            .and_then(Value::as_bool)
++            .unwrap_or(false);
++        if state
++            .get("disabled")
++            .and_then(Value::as_bool)
++            .unwrap_or(false)
++        {
++            return Err(selection_error(target, "the ARIA control is disabled"));
++        }
++        if expected_kind == SelectionControlKind::AriaListbox
++            && values.len() > 1
++            && !multiselectable
++        {
++            return Err(selection_error(
++                target,
++                "multiple values were requested from a single-select ARIA listbox",
++            ));
++        }
++
++        if expected_kind == SelectionControlKind::AriaCombobox
++            && !opened
++            && !state
++                .get("expanded")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++        {
++            let click_result = click(
++                client,
++                session_id,
++                ref_map,
++                target,
++                "left",
++                1,
++                iframe_sessions,
++            )
++            .await;
++            let click_result = match click_result {
++                Ok(result) => result,
++                Err(error) if is_stale_selection_error(&error) => {
++                    if tokio::time::Instant::now() >= deadline {
++                        return Err(selection_error(
++                            target,
++                            "the combobox rerendered while opening",
++                        ));
++                    }
++                    tokio::time::sleep(Duration::from_millis(25)).await;
++                    continue;
++                }
++                Err(error) => return Err(error),
++            };
++            opened = true;
++            if click_result.dialog_opened {
++                return Ok(SelectionResult {
++                    dialog_opened: true,
++                    pending_release: click_result.pending_release,
++                });
++            }
++            continue;
++        }
++
++        let options = state
++            .get("options")
++            .and_then(Value::as_array)
++            .cloned()
++            .unwrap_or_default();
++        if values.iter().all(|value| {
++            options.iter().any(|option| {
++                option
++                    .get("available")
++                    .and_then(Value::as_bool)
++                    .unwrap_or(false)
++                    && option_matches_requested_value(option, value)
++            })
++        }) {
++            requested_options_seen = true;
++        }
++        // Verify before requiring a visible option. A normal combobox closes
++        // its popup immediately after a successful choice, so its committed
++        // value or aria-selected state can be the only observable signal on
++        // the next poll.
++        if aria_selection_confirmed(
++            &state,
++            expected_kind,
++            values,
++            multiselectable,
++            &AriaSelectionVerification {
++                requested_options_seen,
++                committed_before_activation: committed_before_activation.as_deref(),
++                activation_attempted,
++            },
++        ) {
++            return Ok(SelectionResult::default());
++        }
++
++        // Input-backed comboboxes commonly render no options until the user
++        // types a filter. Use the same trusted keyboard input as `type`, then
++        // continue polling and re-resolving the option nodes. This remains
++        // limited to standard ARIA comboboxes; opaque custom controls are not
++        // inferred from arbitrary page attributes.
++        if expected_kind == SelectionControlKind::AriaCombobox
++            && !filter_input_sent
++            && state
++                .get("inputBacked")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++            && !values.iter().all(|value| {
++                options.iter().any(|option| {
++                    option
++                        .get("available")
++                        .and_then(Value::as_bool)
++                        .unwrap_or(false)
++                        && option_matches_requested_value(option, value)
++                })
++            })
++        {
++            let focus_result = call_selection_function(
++                client,
++                &effective_session_id,
++                &object_id,
++                ARIA_FOCUS_INPUT_FUNCTION,
++                None,
++                target,
++            )
++            .await?;
++            if !focus_result
++                .get("focused")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++            {
++                return Err(selection_error(
++                    target,
++                    "the combobox input could not receive keyboard input",
++                ));
++            }
++            let current_value = focus_result
++                .get("value")
++                .and_then(Value::as_str)
++                .unwrap_or_default();
++            if !current_value.is_empty() {
++                let modifier = if cfg!(target_os = "macos") { 4 } else { 2 };
++                press_key_with_modifiers(client, &effective_session_id, "a", Some(modifier))
++                    .await?;
++                press_key(client, &effective_session_id, "Backspace").await?;
++            }
++            type_text_into_active_context(client, &effective_session_id, &values[0], None).await?;
++            filter_input_sent = true;
++            continue;
++        }
++
++        let available = options
++            .iter()
++            .filter(|option| {
++                option
++                    .get("available")
++                    .and_then(Value::as_bool)
++                    .unwrap_or(false)
++            })
++            .collect::<Vec<_>>();
++        if available.is_empty() {
++            if tokio::time::Instant::now() >= deadline {
++                return Err(selection_error(
++                    target,
++                    &format!(
++                        "no visible, enabled ARIA options rendered before the timeout (available: {})",
++                        bounded_available_options(&aria_option_descriptions(&options))
++                    ),
++                ));
++            }
++            tokio::time::sleep(Duration::from_millis(50)).await;
++            continue;
++        }
++
++        let missing = values
++            .iter()
++            .filter(|value| {
++                !available.iter().any(|option| {
++                    option
++                        .get("matchValues")
++                        .and_then(Value::as_array)
++                        .is_some_and(|matches| {
++                            matches
++                                .iter()
++                                .any(|matched| matched.as_str() == Some(value))
++                        })
++                })
++            })
++            .cloned()
++            .collect::<Vec<_>>();
++        if !missing.is_empty() {
++            if tokio::time::Instant::now() >= deadline {
++                return Err(selection_error(
++                    target,
++                    &format!(
++                        "no visible, enabled option matched {} before the timeout. Available options: {}",
++                        serde_json::to_string(&missing).unwrap_or_else(|_| "[]".to_string()),
++                        bounded_available_options(&aria_option_descriptions(&options))
++                    ),
++                ));
++            }
++            // A visible option does not prove that an asynchronously rendered
++            // or virtualized option set is complete. Keep polling so a later
++            // option can become matchable within the configured timeout.
++            tokio::time::sleep(Duration::from_millis(50)).await;
++            continue;
++        }
++
++        let click_index = aria_next_click_index(&state, expected_kind, values, multiselectable);
++        let Some(click_index) = click_index else {
++            if tokio::time::Instant::now() >= deadline {
++                return Err(selection_error(
++                    target,
++                    &format!(
++                        "selection verification failed: the control did not expose a standard verified selection state for {}",
++                        serde_json::to_string(values).unwrap_or_else(|_| "[]".to_string())
++                    ),
++                ));
++            }
++            tokio::time::sleep(Duration::from_millis(50)).await;
++            continue;
++        };
++
++        // Keyboard-operated comboboxes may expose the requested option as the
++        // active descendant without making the option itself clickable. Enter
++        // is the normal commit action for that standard widget contract.
++        if aria_active_descendant_matches(&state, expected_kind, click_index) {
++            // aria-activedescendant is navigation state on a combobox, so
++            // Enter must be delivered to the focused control rather than to
++            // the option node. Listboxes still receive the normal option
++            // click path because an active descendant does not define their
++            // selection commitment semantics.
++            let focused = call_selection_function(
++                client,
++                &effective_session_id,
++                &object_id,
++                "function() { this.focus(); return document.activeElement === this; }",
++                None,
++                target,
++            )
++            .await?;
++            if !focused.as_bool().unwrap_or(false) {
++                return Err(selection_error(
++                    target,
++                    "the control could not receive keyboard input",
++                ));
++            }
++            if committed_before_activation.is_none() {
++                committed_before_activation = selection_committed_values(&state);
++            }
++            activation_attempted = true;
++            if dispatch_key_for_selection(
++                client,
++                &effective_session_id,
++                &[effective_session_id.as_str(), session_id],
++                "Enter",
++            )
++            .await?
++            {
++                // Enter can synchronously open a confirm or prompt from the
++                // widget's key handler. The renderer then cannot acknowledge
++                // the key event until the dialog is resolved, so surface the
++                // dialog immediately instead of waiting for the CDP timeout.
++                return Ok(SelectionResult {
++                    dialog_opened: true,
++                    pending_release: None,
++                });
++            }
++            continue;
++        }
++
++        let fresh_object = match call_selection_object_function(
++            client,
++            &effective_session_id,
++            &object_id,
++            ARIA_GET_OPTION_FUNCTION,
++            Some(serde_json::json!(click_index)),
++            false,
++            target,
++        )
++        .await
++        {
++            Ok(result) => result,
++            Err(error) if is_stale_selection_error(&error) => {
++                if tokio::time::Instant::now() >= deadline {
++                    return Err(selection_error(
++                        target,
++                        "the control rerendered before input",
++                    ));
++                }
++                tokio::time::sleep(Duration::from_millis(25)).await;
++                continue;
++            }
++            Err(error) => return Err(error),
++        };
++        let Some(option_object_id) = fresh_object.result.object_id else {
++            if tokio::time::Instant::now() >= deadline {
++                return Err(selection_error(
++                    target,
++                    "the matched option became stale before input",
++                ));
++            }
++            continue;
++        };
++        let geometry = match call_selection_object_function(
++            client,
++            &effective_session_id,
++            &option_object_id,
++            r#"function(add_frame_offsets) {
++                if (!this.isConnected) return { error: 'option became detached' };
++                this.scrollIntoView({ block: 'nearest', inline: 'nearest' });
++                const rect = this.getBoundingClientRect();
++                const style = this.ownerDocument.defaultView.getComputedStyle(this);
++                if (style.display === 'none' || style.visibility === 'hidden' || rect.width <= 0 || rect.height <= 0) {
++                    return { error: 'option is not visible' };
++                }
++                let x = rect.left + rect.width / 2;
++                let y = rect.top + rect.height / 2;
++                const hit = this.ownerDocument.elementFromPoint(x, y);
++                if (hit && hit !== this && !this.contains(hit)) {
++                    const name = hit.tagName.toLowerCase() + (hit.id ? '#' + hit.id : '');
++                    return { error: 'option is covered by <' + name + '>' };
++                }
++                if (add_frame_offsets) {
++                    let win = this.ownerDocument.defaultView;
++                    while (win && win.frameElement) {
++                        const frameRect = win.frameElement.getBoundingClientRect();
++                        x += frameRect.x + win.frameElement.clientLeft;
++                        y += frameRect.y + win.frameElement.clientTop;
++                        win = win.parent;
++                    }
++                }
++                return { x, y };
++            }"#,
++            Some(serde_json::json!(effective_session_id == session_id)),
++            true,
++            target,
++        )
++        .await
++        {
++            Ok(geometry) => geometry,
++            Err(error) if is_stale_selection_error(&error) => {
++                if tokio::time::Instant::now() >= deadline {
++                    return Err(selection_error(target, "the matched option became stale before input"));
++                }
++                tokio::time::sleep(Duration::from_millis(25)).await;
++                continue;
++            }
++            Err(error) => return Err(error),
++        };
++        let geometry = geometry.result.value.unwrap_or(Value::Null);
++        if let Some(error) = geometry.get("error").and_then(Value::as_str) {
++            if matches!(error, "option became detached" | "option is not visible") {
++                if tokio::time::Instant::now() >= deadline {
++                    return Err(selection_error(target, error));
++                }
++                tokio::time::sleep(Duration::from_millis(25)).await;
++                continue;
++            }
++            return Err(selection_error(target, error));
++        }
++        let Some(x) = geometry.get("x").and_then(Value::as_f64) else {
++            if tokio::time::Instant::now() >= deadline {
++                return Err(selection_error(
++                    target,
++                    "the matched option had no usable click coordinates",
++                ));
++            }
++            continue;
++        };
++        let Some(y) = geometry.get("y").and_then(Value::as_f64) else {
++            if tokio::time::Instant::now() >= deadline {
++                return Err(selection_error(
++                    target,
++                    "the matched option had no usable click coordinates",
++                ));
++            }
++            continue;
++        };
++        if committed_before_activation.is_none() {
++            committed_before_activation = selection_committed_values(&state);
++        }
++        activation_attempted = true;
++        let click_result = dispatch_click(
++            client,
++            &effective_session_id,
++            &[effective_session_id.as_str(), session_id],
++            x,
++            y,
++            "left",
++            1,
++        )
++        .await?;
++        if click_result.dialog_opened {
++            return Ok(SelectionResult {
++                dialog_opened: true,
++                pending_release: click_result.pending_release,
++            });
++        }
++        if tokio::time::Instant::now() >= deadline {
++            return Err(selection_error(target, "selection verification timed out"));
++        }
++    }
++}
++
++fn is_stale_selection_error(error: &str) -> bool {
++    [
++        "Could not find object with given id",
++        "Cannot find context with specified id",
++        "Execution context was destroyed",
++        "Object reference chain is too long",
++    ]
++    .iter()
++    .any(|marker| error.contains(marker))
++}
++
++fn aria_active_descendant_matches(
++    state: &Value,
++    kind: SelectionControlKind,
++    click_index: usize,
++) -> bool {
++    kind == SelectionControlKind::AriaCombobox
++        && state
++            .get("activeIndex")
++            .and_then(Value::as_u64)
++            .map(|index| index as usize)
++            == Some(click_index)
++}
++
++fn aria_option_descriptions(options: &[Value]) -> Vec<String> {
++    options
++        .iter()
++        .map(|option| {
++            let value = option
++                .get("value")
++                .and_then(Value::as_str)
++                .unwrap_or_default();
++            let label = option
++                .get("label")
++                .and_then(Value::as_str)
++                .or_else(|| option.get("text").and_then(Value::as_str))
++                .unwrap_or_default();
++            let status = if option
++                .get("disabled")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++            {
++                " [disabled]"
++            } else if !option
++                .get("visible")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++            {
++                " [hidden]"
++            } else {
++                ""
++            };
++            format!("{} (\"{}\"){}", value, label, status)
++        })
++        .collect()
++}
++
++fn option_matches_values(option: &Value, values: &[String]) -> bool {
++    values.iter().any(|requested| {
++        selection_option_matches(
++            requested,
++            option.get("value").and_then(Value::as_str),
++            option.get("label").and_then(Value::as_str),
++            option
++                .get("text")
++                .and_then(Value::as_str)
++                .unwrap_or_default(),
++        )
++    })
++}
++
++fn option_matches_requested_value(option: &Value, value: &str) -> bool {
++    option
++        .get("matchValues")
++        .and_then(Value::as_array)
++        .is_some_and(|matches| {
++            matches
++                .iter()
++                .any(|matched| matched.as_str() == Some(value))
++        })
++        || selection_option_matches(
++            value,
++            option.get("value").and_then(Value::as_str),
++            option.get("label").and_then(Value::as_str),
++            option
++                .get("text")
++                .and_then(Value::as_str)
++                .unwrap_or_default(),
++        )
++}
++
++fn selection_committed_values(state: &Value) -> Option<Vec<String>> {
++    state
++        .get("committed")
++        .and_then(Value::as_array)
++        .map(|values| {
++            values
++                .iter()
++                .filter_map(Value::as_str)
++                .map(String::from)
++                .collect()
++        })
++}
++
++fn committed_state_changed(state: &Value, before: Option<&[String]>) -> bool {
++    let Some(before) = before else {
++        return false;
++    };
++    selection_committed_values(state).is_some_and(|after| after != before)
++}
++
++fn aria_selection_confirmed(
++    state: &Value,
++    kind: SelectionControlKind,
++    values: &[String],
++    multiselectable: bool,
++    verification: &AriaSelectionVerification<'_>,
++) -> bool {
++    let AriaSelectionVerification {
++        requested_options_seen,
++        committed_before_activation,
++        activation_attempted,
++    } = verification;
++    let requested_options_seen = *requested_options_seen;
++    let committed_before_activation = *committed_before_activation;
++    let activation_attempted = *activation_attempted;
++    let options = state
++        .get("options")
++        .and_then(Value::as_array)
++        .map(Vec::as_slice)
++        .unwrap_or_default();
++    let selected = options
++        .iter()
++        .filter(|option| {
++            option
++                .get("selected")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++        })
++        .collect::<Vec<_>>();
++    let selected_matches = values.iter().all(|value| {
++        selected.iter().any(|option| {
++            (!option
++                .get("disabled")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++                && (option
++                    .get("available")
++                    .and_then(Value::as_bool)
++                    .unwrap_or(false)
++                    || (kind == SelectionControlKind::AriaCombobox && requested_options_seen)))
++                && option_matches_requested_value(option, value)
++        })
++    });
++    let known_requested_options = values.iter().all(|value| {
++        options.iter().any(|option| {
++            (kind != SelectionControlKind::AriaListbox
++                || option
++                    .get("available")
++                    .and_then(Value::as_bool)
++                    .unwrap_or(false))
++                && option_matches_requested_value(option, value)
++        })
++    });
++    if kind == SelectionControlKind::AriaListbox {
++        let has_state = options.iter().any(|option| {
++            option
++                .get("hasSelectedState")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++        });
++        let final_set = if multiselectable {
++            selected.iter().all(|option| {
++                option
++                    .get("available")
++                    .and_then(Value::as_bool)
++                    .unwrap_or(false)
++                    && option_matches_values(option, values)
++            }) && selected_matches
++        } else {
++            selected.len() == 1
++                && selected[0]
++                    .get("available")
++                    .and_then(Value::as_bool)
++                    .unwrap_or(false)
++                && selected_matches
++        };
++        return known_requested_options && has_state && final_set;
++    }
++    if known_requested_options
++        && selected_matches
++        && selected.iter().any(|option| {
++            option
++                .get("hasSelectedState")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++        })
++    {
++        return true;
++    }
++    // A combobox commonly removes its popup options after committing a
++    // choice. In that case the exact input/display or associated form value
++    // is the only remaining standard postcondition, so it must not depend on
++    // the option node still being mounted. The value must have changed after
++    // activation; a filter-only input value and popup closure are not a
++    // selection commit.
++    let committed_after_activation = committed_state_changed(state, committed_before_activation);
++    requested_options_seen
++        && activation_attempted
++        && committed_after_activation
++        && state
++            .get("committed")
++            .and_then(Value::as_array)
++            .is_some_and(|committed| {
++                state
++                    .get("hasCommittedState")
++                    .and_then(Value::as_bool)
++                    .unwrap_or(false)
++                    && values.iter().all(|value| {
++                        committed.iter().any(|entry| {
++                            entry.as_str().is_some_and(|entry| {
++                                entry == value
++                                    || normalize_selection_whitespace(entry)
++                                        == normalize_selection_whitespace(value)
++                            })
++                        })
++                    })
++            })
++}
++
++fn aria_next_click_index(
++    state: &Value,
++    kind: SelectionControlKind,
++    values: &[String],
++    multiselectable: bool,
++) -> Option<usize> {
++    let options = state.get("options")?.as_array()?;
++    if kind == SelectionControlKind::AriaListbox && multiselectable {
++        if let Some(option) = options.iter().find(|option| {
++            option
++                .get("available")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++                && option
++                    .get("selected")
++                    .and_then(Value::as_bool)
++                    .unwrap_or(false)
++                && !option_matches_values(option, values)
++        }) {
++            return option
++                .get("index")
++                .and_then(Value::as_u64)
++                .map(|index| index as usize);
++        }
++        if let Some(option) = options.iter().find(|option| {
++            option
++                .get("available")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++                && !option
++                    .get("selected")
++                    .and_then(Value::as_bool)
++                    .unwrap_or(false)
++                && option_matches_values(option, values)
++        }) {
++            return option
++                .get("index")
++                .and_then(Value::as_u64)
++                .map(|index| index as usize);
++        }
++        return None;
++    }
++    options.iter().find_map(|option| {
++        (option
++            .get("available")
++            .and_then(Value::as_bool)
++            .unwrap_or(false)
++            && option_matches_values(option, values)
++            && !option
++                .get("selected")
++                .and_then(Value::as_bool)
++                .unwrap_or(false)
++            && option.get("index").and_then(Value::as_u64).is_some())
++        .then(|| {
++            option
++                .get("index")
++                .and_then(Value::as_u64)
++                .map(|index| index as usize)
++        })
++        .flatten()
++    })
++}
++
+ pub async fn check(
+     client: &CdpClient,
+     session_id: &str,
+@@ -987,6 +2205,90 @@ async fn dispatch_mouse_or_dialog(
+     }
+ }
+ 
++/// Dispatch one key event and return whether a JavaScript dialog opened before
++/// the browser acknowledged it. Synchronous dialogs block the renderer's
++/// acknowledgement just as they do for mouse events, so keyboard activation
++/// must observe the dialog event concurrently with the CDP request.
++async fn dispatch_key_or_dialog(
++    client: &CdpClient,
++    session_id: &str,
++    accept_sessions: &[&str],
++    params: &DispatchKeyEventParams,
++) -> Result<bool, String> {
++    use tokio::sync::broadcast::error::RecvError;
++
++    let mut events = client.subscribe();
++    let send =
++        client.send_command_typed::<_, Value>("Input.dispatchKeyEvent", params, Some(session_id));
++    tokio::pin!(send);
++    loop {
++        tokio::select! {
++            res = &mut send => {
++                res?;
++                return Ok(false);
++            }
++            event = events.recv() => {
++                match event {
++                    Ok(e) if e.method == "Page.javascriptDialogOpening" => {
++                        let ours = match e.session_id.as_deref() {
++                            Some(sid) => accept_sessions.contains(&sid),
++                            None => true,
++                        };
++                        if ours {
++                            return Ok(true);
++                        }
++                    }
++                    Ok(_) => {}
++                    Err(RecvError::Lagged(_)) => {}
++                    Err(RecvError::Closed) => {
++                        (&mut send).await?;
++                        return Ok(false);
++                    }
++                }
++            }
++        }
++    }
++}
++
++/// Send a trusted keyDown+keyUp sequence for selection, stopping as soon as a
++/// dialog opens. No keyUp is sent after a dialog interrupts keyDown because the
++/// blocked renderer cannot process it; unlike a mouse button, a keyboard key
++/// does not need a pending release tracked in daemon state.
++async fn dispatch_key_for_selection(
++    client: &CdpClient,
++    session_id: &str,
++    accept_sessions: &[&str],
++    key: &str,
++) -> Result<bool, String> {
++    let (key_name, code, key_code) = named_key_info(key);
++    let text = key_text(&key_name);
++    let key_down = DispatchKeyEventParams {
++        event_type: "keyDown".to_string(),
++        key: Some(key_name.clone()),
++        code: Some(code.clone()),
++        text: text.clone(),
++        unmodified_text: text,
++        windows_virtual_key_code: Some(key_code),
++        native_virtual_key_code: Some(key_code),
++        modifiers: None,
++    };
++    if dispatch_key_or_dialog(client, session_id, accept_sessions, &key_down).await? {
++        return Ok(true);
++    }
++
++    let key_up = DispatchKeyEventParams {
++        event_type: "keyUp".to_string(),
++        key: Some(key_name),
++        code: Some(code),
++        text: None,
++        unmodified_text: None,
++        windows_virtual_key_code: Some(key_code),
++        native_virtual_key_code: Some(key_code),
++        modifiers: None,
++    };
++    dispatch_key_or_dialog(client, session_id, accept_sessions, &key_up).await
++}
++
+ async fn dispatch_click(
+     client: &CdpClient,
+     session_id: &str,
+@@ -1334,4 +2636,256 @@ mod tests {
+         assert_eq!(key_text("Backspace"), None);
+         assert_eq!(key_text("Delete"), None);
+     }
++
++    #[test]
++    fn selection_classifier_accepts_native_and_standard_aria_controls_only() {
++        assert_eq!(
++            classify_selection_control("select", ""),
++            SelectionControlKind::NativeSelect
++        );
++        assert_eq!(
++            classify_selection_control("div", "combobox"),
++            SelectionControlKind::AriaCombobox
++        );
++        assert_eq!(
++            classify_selection_control("ul", "listbox"),
++            SelectionControlKind::AriaListbox
++        );
++        assert_eq!(
++            classify_selection_control("div", "button"),
++            SelectionControlKind::Unsupported
++        );
++    }
++
++    #[test]
++    fn selection_whitespace_and_diagnostics_are_bounded() {
++        assert_eq!(
++            normalize_selection_whitespace("  New\n York\tCity "),
++            "New York City"
++        );
++        assert_eq!(bounded_available_options(&[]), "(none)");
++        let options = (0..20)
++            .map(|index| format!("option-{index}"))
++            .collect::<Vec<_>>();
++        let diagnostic = bounded_available_options(&options);
++        assert!(diagnostic.len() <= 503);
++        assert!(diagnostic.ends_with("…"));
++        assert!(!diagnostic.contains("option-19"));
++    }
++
++    #[test]
++    fn selection_option_matching_is_exact_with_normalized_text() {
++        assert!(selection_option_matches(
++            "us",
++            Some("us"),
++            Some("United States"),
++            "United States"
++        ));
++        assert!(selection_option_matches(
++            "United States",
++            Some("us"),
++            None,
++            " United\n States "
++        ));
++        assert!(!selection_option_matches(
++            "u",
++            Some("us"),
++            Some("United States"),
++            "United States"
++        ));
++        assert!(selection_option_matches(
++            "United States",
++            Some("us"),
++            None,
++            "United\nStates"
++        ));
++    }
++
++    #[test]
++    fn aria_selection_verification_requires_standard_state_and_exact_values() {
++        let state = serde_json::json!({
++            "options": [
++                { "index": 0, "matchValues": ["red", "Red"], "selected": false, "available": true, "hasSelectedState": true },
++                { "index": 1, "matchValues": ["blue", "Blue"], "selected": true, "available": true, "hasSelectedState": true }
++            ],
++            "committed": [],
++            "hasCommittedState": false
++        });
++        assert!(aria_selection_confirmed(
++            &state,
++            SelectionControlKind::AriaListbox,
++            &["blue".to_string()],
++            false,
++            &AriaSelectionVerification {
++                requested_options_seen: true,
++                ..Default::default()
++            }
++        ));
++        assert!(!aria_selection_confirmed(
++            &state,
++            SelectionControlKind::AriaListbox,
++            &["blu".to_string()],
++            false,
++            &AriaSelectionVerification {
++                requested_options_seen: true,
++                ..Default::default()
++            }
++        ));
++
++        let no_state = serde_json::json!({
++            "options": [{ "index": 0, "matchValues": ["blue"], "selected": true, "hasSelectedState": false }],
++            "committed": [],
++            "hasCommittedState": false
++        });
++        assert!(!aria_selection_confirmed(
++            &no_state,
++            SelectionControlKind::AriaListbox,
++            &["blue".to_string()],
++            false,
++            &AriaSelectionVerification::default()
++        ));
++
++        let disabled_selected = serde_json::json!({
++            "options": [{
++                "index": 0,
++                "matchValues": ["blue"],
++                "selected": true,
++                "available": false,
++                "disabled": true,
++                "hasSelectedState": true
++            }]
++        });
++        assert!(!aria_selection_confirmed(
++            &disabled_selected,
++            SelectionControlKind::AriaCombobox,
++            &["blue".to_string()],
++            false,
++            &AriaSelectionVerification {
++                requested_options_seen: true,
++                ..Default::default()
++            }
++        ));
++
++        let hidden_selected_after_observation = serde_json::json!({
++            "options": [{
++                "index": 0,
++                "matchValues": ["blue"],
++                "selected": true,
++                "available": false,
++                "visible": false,
++                "hasSelectedState": true
++            }]
++        });
++        assert!(aria_selection_confirmed(
++            &hidden_selected_after_observation,
++            SelectionControlKind::AriaCombobox,
++            &["blue".to_string()],
++            false,
++            &AriaSelectionVerification {
++                requested_options_seen: true,
++                ..Default::default()
++            }
++        ));
++
++        let committed_without_popup = serde_json::json!({
++            "options": [],
++            "committed": ["Blue Label"],
++            "hasCommittedState": true
++        });
++        let previous_committed = vec!["Choose".to_string()];
++        assert!(aria_selection_confirmed(
++            &committed_without_popup,
++            SelectionControlKind::AriaCombobox,
++            &["Blue Label".to_string()],
++            false,
++            &AriaSelectionVerification {
++                requested_options_seen: true,
++                committed_before_activation: Some(&previous_committed),
++                activation_attempted: true,
++            }
++        ));
++
++        let transient_input = serde_json::json!({
++            "options": [{
++                "index": 0,
++                "matchValues": ["Blue"],
++                "selected": false,
++                "available": true,
++                "hasSelectedState": true
++            }],
++            "committed": ["Blue"],
++            "hasCommittedState": true
++        });
++        let same_committed = vec!["Blue".to_string()];
++        assert!(!aria_selection_confirmed(
++            &transient_input,
++            SelectionControlKind::AriaCombobox,
++            &["Blue".to_string()],
++            false,
++            &AriaSelectionVerification {
++                requested_options_seen: true,
++                committed_before_activation: Some(&same_committed),
++                ..Default::default()
++            }
++        ));
++
++        let filter_only_closed_popup = serde_json::json!({
++            "options": [{
++                "index": 0,
++                "matchValues": ["Blue"],
++                "selected": false,
++                "available": false,
++                "visible": false,
++                "hasSelectedState": true
++            }],
++            "committed": ["Blue"],
++            "hasCommittedState": true,
++            "expanded": false
++        });
++        assert!(!aria_selection_confirmed(
++            &filter_only_closed_popup,
++            SelectionControlKind::AriaCombobox,
++            &["Blue".to_string()],
++            false,
++            &AriaSelectionVerification {
++                requested_options_seen: true,
++                committed_before_activation: Some(&same_committed),
++                activation_attempted: true,
++            }
++        ));
++    }
++
++    #[test]
++    fn aria_multiselect_next_click_drives_the_final_set() {
++        let state = serde_json::json!({
++            "options": [
++                { "index": 0, "matchValues": ["red"], "selected": true, "available": true },
++                { "index": 1, "matchValues": ["blue"], "selected": false, "available": true }
++            ]
++        });
++        assert_eq!(
++            aria_next_click_index(
++                &state,
++                SelectionControlKind::AriaListbox,
++                &["blue".to_string()],
++                true,
++            ),
++            Some(0)
++        );
++    }
++
++    #[test]
++    fn active_descendant_commit_is_reserved_for_comboboxes() {
++        let state = serde_json::json!({ "activeIndex": 1 });
++        assert!(aria_active_descendant_matches(
++            &state,
++            SelectionControlKind::AriaCombobox,
++            1
++        ));
++        assert!(!aria_active_descendant_matches(
++            &state,
++            SelectionControlKind::AriaListbox,
++            1
++        ));
++    }
+ }
+diff --git a/cli/src/native/webdriver/backend.rs b/cli/src/native/webdriver/backend.rs
+index e31559a..2566f5f 100644
+--- a/cli/src/native/webdriver/backend.rs
++++ b/cli/src/native/webdriver/backend.rs
+@@ -129,6 +129,9 @@ pub const WEBDRIVER_UNSUPPORTED_ACTIONS: &[&str] = &[
+     "network",
+     "har_start",
+     "har_stop",
++    // Selection uses CDP Runtime and trusted input for ARIA widgets. Keep the
++    // WebDriver backend explicit rather than silently taking the CDP path.
++    "select",
+ ];
+ 
+ #[cfg(test)]
+@@ -141,5 +144,6 @@ mod tests {
+         assert!(WEBDRIVER_UNSUPPORTED_ACTIONS.contains(&"screencast_start"));
+         assert!(WEBDRIVER_UNSUPPORTED_ACTIONS.contains(&"trace_start"));
+         assert!(!WEBDRIVER_UNSUPPORTED_ACTIONS.contains(&"navigate"));
++        assert!(WEBDRIVER_UNSUPPORTED_ACTIONS.contains(&"select"));
+     }
+ }
+diff --git a/cli/src/output.rs b/cli/src/output.rs
+index 6ff640c..35b28dd 100644
+--- a/cli/src/output.rs
++++ b/cli/src/output.rs
+@@ -1746,7 +1746,14 @@ agent-browser select - Select a dropdown option
+ 
+ Usage: agent-browser select <selector> <value...>
+ 
+-Selects one or more options in a <select> dropdown by value.
++Selects options in a native <select> or supported role="combobox"/role="listbox"
++control by exact value, label, or normalized accessible text, then verifies the
++resulting selection state. Input-backed comboboxes receive the requested value
++as a filter before their associated options are queried.
++Single-select native and ARIA controls accept one value. Native multiple selects
++retain multi-value behavior; multiple ARIA values require an explicitly
++multiselectable listbox and represent its final set. Unmatched, disabled,
++unsupported, or unverified controls return an actionable error.
+ 
+ Global Options:
+   --json               Output as JSON
+@@ -3613,7 +3620,7 @@ Core Commands:
+   focus <sel>                Focus element
+   check <sel>                Check checkbox
+   uncheck <sel>              Uncheck checkbox
+-  select <sel> <val...>      Select dropdown option
++  select <sel> <val...>      Select native or ARIA dropdown option(s)
+   drag <src> <dst>           Drag and drop
+   upload <sel> <files...>    Upload files
+   download <sel> <path>      Download file by clicking element
+diff --git a/docs/src/app/commands/page.mdx b/docs/src/app/commands/page.mdx
+index a490c1e..3f1c888 100644
+--- a/docs/src/app/commands/page.mdx
++++ b/docs/src/app/commands/page.mdx
+@@ -17,7 +17,7 @@ agent-browser keydown <key>           # Hold key down
+ agent-browser keyup <key>             # Release key
+ agent-browser hover <sel>             # Hover element
+ agent-browser focus <sel>             # Focus element
+-agent-browser select <sel> <val>      # Select dropdown option
++agent-browser select <sel> <val...>   # Select native or ARIA dropdown option(s)
+ agent-browser check <sel>             # Check checkbox
+ agent-browser uncheck <sel>           # Uncheck checkbox
+ agent-browser scroll <dir> [px]       # Scroll (up/down/left/right, --selector <sel>)
+@@ -44,6 +44,17 @@ agent-browser mcp                     # Start an MCP stdio server
+ 
+ Clicks fail before dispatch when another element covers the target's click point. The error names the covering element, for example `covered by <div#consent-banner>`. Dismiss or interact with that element, take a fresh snapshot, then retry the original action.
+ 
++### Select controls
++
++`select` supports native `<select>` elements and standard ARIA `combobox` and `listbox` controls. Option matching is exact against the value, label, or whitespace-normalized accessible text. The command uses browser input to open and choose custom widgets, types into input-backed combobox filters when needed, waits for dynamically rendered associated options, and verifies selected state, the committed combobox display/value, or an associated standard form value. A single-select native or ARIA control accepts one value. Native multiple selects retain multi-value behavior; multiple ARIA values require `aria-multiselectable="true"` on an ARIA listbox and are treated as the final desired set. Unknown, disabled, hidden, unsupported, or unverifiable controls return an error. The wait is bounded by the configured default action timeout. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
++
++```bash
++agent-browser select "#native-country" "us"
++agent-browser select "#country-combobox" "United States"
++agent-browser snapshot -i
++agent-browser select @e12 "United States"
++```
++
+ Headless Chromium screenshots hide native scrollbars for consistent image output. Pass `--hide-scrollbars false` when launching to keep native scrollbars visible.
+ 
+ ## Get info
+diff --git a/docs/src/app/quick-start/page.mdx b/docs/src/app/quick-start/page.mdx
+index 07b5383..677ddff 100644
+--- a/docs/src/app/quick-start/page.mdx
++++ b/docs/src/app/quick-start/page.mdx
+@@ -42,8 +42,11 @@ CSS selectors and semantic locators also supported:
+ agent-browser click "#submit"
+ agent-browser fill "#email" "test@example.com"
+ agent-browser find role button click --name "Submit"
++agent-browser select "#country-combobox" "United States"
+ ```
+ 
++The `select` command works with native `<select>` controls and standard ARIA `combobox` or `listbox` widgets. It matches exact values or labels, types into input-backed filters when needed, waits for associated custom options to render, and verifies the committed state. Use one value for single-select controls; native multiple selects retain multi-value behavior, while multiple ARIA values require an explicitly multiselectable listbox. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
++
+ ## Headed mode
+ 
+ Show browser window for debugging:
+diff --git a/docs/src/app/selectors/page.mdx b/docs/src/app/selectors/page.mdx
+index 3660554..2a981d9 100644
+--- a/docs/src/app/selectors/page.mdx
++++ b/docs/src/app/selectors/page.mdx
+@@ -35,6 +35,8 @@ agent-browser click "div > button"
+ agent-browser click "[data-testid='submit']"
+ ```
+ 
++Use the same CSS selector or snapshot ref with `select` for native `<select>` elements and supported ARIA `combobox` or `listbox` controls. Matching is exact against option values, labels, or normalized accessible text. Input-backed comboboxes receive the requested value as a filter when needed. Re-snapshot after a custom widget opens or rerenders if you need refs for its options; the select command itself re-queries the associated option set and verifies the final state. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
++
+ ## Text & XPath
+ 
+ ```bash
+diff --git a/evals/cases/command-usage.ts b/evals/cases/command-usage.ts
+index 4fb47a9..8f111ca 100644
+--- a/evals/cases/command-usage.ts
++++ b/evals/cases/command-usage.ts
+@@ -14,7 +14,7 @@ const COMMAND_CONTEXT = `You already ran \`agent-browser skills get core\` and l
+ - agent-browser click @ref (click element)
+ - agent-browser fill @ref "text" (clear and type)
+ - agent-browser type @ref "text" (type without clearing)
+-- agent-browser select @ref "option" (select dropdown)
++- agent-browser select @ref "option" (select a native or ARIA dropdown option)
+ - agent-browser screenshot (screenshot to temp dir)
+ - agent-browser screenshot --full (full page screenshot)
+ - agent-browser diff url <url1> <url2> (compare two pages)
+diff --git a/packages/@agent-browser/eve/README.md b/packages/@agent-browser/eve/README.md
+index 6d4dd5f..10b28ff 100644
+--- a/packages/@agent-browser/eve/README.md
++++ b/packages/@agent-browser/eve/README.md
+@@ -87,7 +87,7 @@ export default browser({
+ | `fill` | Type into an input (clearing first by default) |
+ | `press_key` | Press a key or combination (`Enter`, `Control+a`) |
+ | `hover` | Hover an element |
+-| `select_option` | Pick a `<select>` option |
++| `select_option` | Pick an option from a native or supported ARIA dropdown |
+ | `set_checked` | Check/uncheck a checkbox or radio |
+ | `scroll` | Scroll the page, a container, or an element into view |
+ | `drag` | Drag and drop |
+diff --git a/packages/@agent-browser/eve/extension/tools/select_option.ts b/packages/@agent-browser/eve/extension/tools/select_option.ts
+index 2452fe6..42818e4 100644
+--- a/packages/@agent-browser/eve/extension/tools/select_option.ts
++++ b/packages/@agent-browser/eve/extension/tools/select_option.ts
+@@ -4,10 +4,10 @@ import { z } from "zod";
+ import { runBrowser, SELECTOR_HINT } from "../lib/browser";
+ 
+ export default defineTool({
+-  description: "Select an option in a <select> dropdown by value.",
++  description: "Select an option in a native select or supported ARIA combobox/listbox by exact value, label, or normalized accessible text.",
+   inputSchema: z.object({
+     selector: z.string().describe(SELECTOR_HINT),
+-    value: z.string().describe("The option value to select."),
++    value: z.string().describe("The exact option value, label, or normalized accessible text to select."),
+   }),
+   async execute({ selector, value }, ctx) {
+     return await runBrowser(ctx, ["select", selector, value]);
+diff --git a/skill-data/core/SKILL.md b/skill-data/core/SKILL.md
+index 684d5bd..7692806 100644
+--- a/skill-data/core/SKILL.md
++++ b/skill-data/core/SKILL.md
+@@ -135,14 +135,16 @@ agent-browser press Enter                 # press a key at current focus
+ agent-browser press Control+a             # key combination
+ agent-browser check @e3                   # check checkbox
+ agent-browser uncheck @e3                 # uncheck
+-agent-browser select @e4 "option-value"   # select dropdown option
+-agent-browser select @e4 "a" "b"          # select multiple
++agent-browser select @e4 "option-value"   # select native or ARIA dropdown option
++agent-browser select @e4 "a" "b"          # final set in multiselectable listbox
+ agent-browser upload @e5 file1.pdf        # upload file(s)
+ agent-browser scroll down 500             # scroll page (up/down/left/right)
+ agent-browser scrollintoview @e1          # scroll element into view
+ agent-browser drag @e1 @e2                # drag and drop
+ ```
+ 
++For a native `<select>` or standard ARIA `combobox`/`listbox`, use `select` with an exact option value or label. Closed comboboxes are opened with real browser input; input-backed comboboxes receive the requested value as a filter when needed; dynamically rendered associated options are re-queried; and the command verifies selected state, a committed combobox value/display, or an associated form value before returning success. Use one value for a single-select control. Native multiple selects retain multi-value behavior; multiple ARIA values are a final set and require `aria-multiselectable="true"` on a listbox. After a widget opens or rerenders, take a fresh snapshot before using any newly exposed refs. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
++
+ ### When refs don't work or you don't want to snapshot
+ 
+ Use semantic locators:
+diff --git a/skill-data/core/references/commands.md b/skill-data/core/references/commands.md
+index 56d3328..390074a 100644
+--- a/skill-data/core/references/commands.md
++++ b/skill-data/core/references/commands.md
+@@ -66,14 +66,30 @@ agent-browser keyup Shift         # Release key
+ agent-browser hover @e1           # Hover
+ agent-browser check @e1           # Check checkbox
+ agent-browser uncheck @e1         # Uncheck checkbox
+-agent-browser select @e1 "value"  # Select dropdown option
+-agent-browser select @e1 "a" "b"  # Select multiple options
++agent-browser select @e1 "value"  # Select a native or ARIA option
++agent-browser select @e1 "a" "b"  # Select final set in multiselectable ARIA listbox
+ agent-browser scroll down 500     # Scroll page (default: down 300px)
+ agent-browser scrollintoview @e1  # Scroll element into view (alias: scrollinto)
+ agent-browser drag @e1 @e2        # Drag and drop
+ agent-browser upload @e1 file.pdf # Upload files
+ ```
+ 
++### Select controls
++
++`select <selector> <value...>` supports native `<select>` elements and standard ARIA `combobox` or `listbox` controls. Matching is exact against an option value or label, with whitespace-normalized accessible text as a third match. Custom controls are opened and changed with browser input; input-backed comboboxes receive the requested value as a filter when needed; and the result is verified through selected options, the committed combobox value/display, or an associated form value. A single-select native or ARIA control accepts one value; native multiple selects retain multi-value behavior, while multiple ARIA values require `aria-multiselectable="true"` on a listbox and mean its final selected set. Unknown, disabled, hidden, unsupported, or unverifiable controls fail with an actionable error, bounded by the configured action timeout. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
++
++```html
++<div id="country" role="combobox" aria-expanded="false" aria-controls="country-options">Choose a country</div>
++<div id="country-options" role="listbox" hidden>
++  <div role="option" value="us">United States</div>
++</div>
++```
++
++```bash
++agent-browser snapshot -i
++agent-browser select @e4 "United States"
++```
++
+ Clicks fail before dispatch when another element covers the target's click point. The error names the covering element, for example `covered by <div#consent-banner>`. Dismiss or interact with that element, run a fresh snapshot, then retry the original action.
+ 
+ ## Get Information
+diff --git a/skill-data/core/references/snapshot-refs.md b/skill-data/core/references/snapshot-refs.md
+index 3cc0fea..8c9819a 100644
+--- a/skill-data/core/references/snapshot-refs.md
++++ b/skill-data/core/references/snapshot-refs.md
+@@ -126,6 +126,8 @@ agent-browser snapshot -i          # See dropdown items
+ agent-browser click @e7            # Select item
+ ```
+ 
++`select @e1 "value"` also supports a native `<select>` or a standard ARIA `combobox`/`listbox`. It opens closed comboboxes, types into input-backed filters when needed, waits for associated options, matches exact values or labels, and verifies selected or committed state. Use a single value for single-select controls. Native multiple selects retain multi-value behavior; multiple ARIA values require `aria-multiselectable="true"` on a listbox and represent its final set. If the widget rerenders, `select` re-resolves its associated options; take a fresh snapshot before using any newly shown option refs. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
++
+ ### 4. Snapshot Specific Regions
+ 
+ For complex pages, snapshot specific areas:

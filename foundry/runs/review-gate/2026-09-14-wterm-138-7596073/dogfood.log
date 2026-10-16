@@ -1,0 +1,220 @@
+{
+  "node": "v24.18.0",
+  "dependency": "just-bash@2.14.2",
+  "results": [
+    {
+      "case": "assigned-PWD",
+      "base": [
+        {
+          "command": "PWD=/tmp; pwd",
+          "cwd": "/home/user",
+          "output": "\r\n/home/user\r\n[/home/user]> "
+        },
+        {
+          "command": "pwd",
+          "cwd": "/home/user",
+          "output": "\r\n/home/user\r\n[/home/user]> "
+        }
+      ],
+      "head": [
+        {
+          "command": "PWD=/tmp; pwd",
+          "cwd": "/tmp",
+          "output": "\r\n/home/user\r\n[/tmp]> "
+        },
+        {
+          "command": "pwd",
+          "cwd": "/tmp",
+          "output": "\r\n/tmp\r\n[/tmp]> "
+        }
+      ]
+    },
+    {
+      "case": "unset-PWD",
+      "base": [
+        {
+          "command": "cd /tmp; unset PWD; pwd",
+          "cwd": "/tmp",
+          "output": "\r\n/tmp\r\n[/tmp]> "
+        },
+        {
+          "command": "pwd",
+          "cwd": "/tmp",
+          "output": "\r\n/tmp\r\n[/tmp]> "
+        }
+      ],
+      "head": [
+        {
+          "command": "cd /tmp; unset PWD; pwd",
+          "cwd": "/home/user",
+          "output": "\r\n/tmp\r\n[/home/user]> "
+        },
+        {
+          "command": "pwd",
+          "cwd": "/home/user",
+          "output": "\r\n/home/user\r\n[/home/user]> "
+        }
+      ]
+    },
+    {
+      "case": "local-PWD",
+      "base": [
+        {
+          "command": "f() { local PWD; cd /tmp; }; f; pwd",
+          "cwd": "/tmp",
+          "output": "\r\n/tmp\r\n[/tmp]> "
+        },
+        {
+          "command": "pwd",
+          "cwd": "/tmp",
+          "output": "\r\n/tmp\r\n[/tmp]> "
+        }
+      ],
+      "head": [
+        {
+          "command": "f() { local PWD; cd /tmp; }; f; pwd",
+          "cwd": "/home/user",
+          "output": "\r\n/tmp\r\n[/home/user]> "
+        },
+        {
+          "command": "pwd",
+          "cwd": "/home/user",
+          "output": "\r\n/home/user\r\n[/home/user]> "
+        }
+      ]
+    },
+    {
+      "case": "nonzero",
+      "base": [
+        {
+          "command": "cd /tmp; false",
+          "cwd": "/tmp",
+          "output": "\r\n[/tmp]> "
+        },
+        {
+          "command": "pwd",
+          "cwd": "/tmp",
+          "output": "\r\n/tmp\r\n[/tmp]> "
+        }
+      ],
+      "head": [
+        {
+          "command": "cd /tmp; false",
+          "cwd": "/tmp",
+          "output": "\r\n[/tmp]> "
+        },
+        {
+          "command": "pwd",
+          "cwd": "/tmp",
+          "output": "\r\n/tmp\r\n[/tmp]> "
+        }
+      ]
+    },
+    {
+      "case": "explicit-exit",
+      "base": [
+        {
+          "command": "cd /tmp; exit 1",
+          "cwd": "/home/user",
+          "output": "\r\n[/home/user]> "
+        },
+        {
+          "command": "pwd",
+          "cwd": "/home/user",
+          "output": "\r\n/home/user\r\n[/home/user]> "
+        }
+      ],
+      "head": [
+        {
+          "command": "cd /tmp; exit 1",
+          "cwd": "/home/user",
+          "output": "\r\n[/home/user]> "
+        },
+        {
+          "command": "pwd",
+          "cwd": "/home/user",
+          "output": "\r\n/home/user\r\n[/home/user]> "
+        }
+      ]
+    },
+    {
+      "case": "relative-cwd-completion",
+      "version": "base",
+      "initial": {
+        "command": "pwd",
+        "cwd": "/home/user",
+        "output": "\r\n/home/user\r\n[/home/user]> "
+      },
+      "completion": "file"
+    },
+    {
+      "case": "default-filesystem",
+      "version": "base",
+      "commands": [
+        {
+          "command": "pwd",
+          "cwd": "/",
+          "output": "\r\n\u001b[31mbash: cd: /home/user: No such file or directory\r\n\u001b[0m[/]> "
+        },
+        {
+          "command": "ls",
+          "cwd": "/",
+          "output": "\r\nbin\r\ndev\r\nproc\r\nusr\r\n[/]> "
+        },
+        {
+          "command": "ls",
+          "cwd": "/",
+          "output": "\r\nbin\r\ndev\r\nproc\r\nusr\r\n[/]> "
+        }
+      ]
+    },
+    {
+      "case": "append-once",
+      "version": "base",
+      "contents": "once\nonce\n"
+    },
+    {
+      "case": "relative-cwd-completion",
+      "version": "head",
+      "initial": {
+        "command": "pwd",
+        "cwd": "home/user",
+        "output": "\r\nhome/user\r\n[home/user]> "
+      },
+      "completion": ""
+    },
+    {
+      "case": "default-filesystem",
+      "version": "head",
+      "commands": [
+        {
+          "command": "pwd",
+          "cwd": "/home/user",
+          "output": "\r\n/home/user\r\n[/home/user]> "
+        },
+        {
+          "command": "ls",
+          "cwd": "/home/user",
+          "output": "\r\n\u001b[31mls: .: No such file or directory\r\n\u001b[0m[/home/user]> "
+        },
+        {
+          "command": "ls",
+          "cwd": "/home/user",
+          "output": "\r\n\u001b[31mls: .: No such file or directory\r\n\u001b[0m[/home/user]> "
+        }
+      ]
+    },
+    {
+      "case": "append-once",
+      "version": "head",
+      "contents": "once\n"
+    }
+  ]
+}
+EFFECT_ONCE_PASS: base appends twice; head appends once
+REGRESSION: assigned-PWD: expected /home/user, got /tmp
+REGRESSION: unset-PWD: expected /tmp, got /home/user
+REGRESSION: local-PWD: expected /tmp, got /home/user
+REGRESSION: relative cwd: not normalized; completion lost
+REGRESSION: default shell: repeated ls fails in nonexistent /home/user
+REGRESSION_COUNT=5 (3 root causes)

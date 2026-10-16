@@ -1,0 +1,89 @@
+{
+  "endpoint": "https://api.github.com/repos/vercel-labs/emulate/contents/packages/@emulators/github/src/routes/contents.ts?ref=dc3548304b0e07c43d08bdbfc8b903551f2bd55a",
+  "cases": [
+    {
+      "name": "quoted raw-looking parameter",
+      "accept": "application/json; profile=\"foo,application/vnd.github.raw+json,bar\"",
+      "expected": "json",
+      "observed": "json",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "content_length": "39132",
+      "body_length": 39132,
+      "body_sha256": "f6a3b1648d365ef0e375e377f88cc19f4c2c5537d1a79d00f575201f7ebf18c0"
+    },
+    {
+      "name": "quoted parameter followed by genuine raw range",
+      "accept": "application/json; profile=\"foo,bar\", application/vnd.github.raw+json",
+      "expected": "raw",
+      "observed": "raw",
+      "status": 200,
+      "content_type": "application/json,application/vnd.github.raw+json; charset=utf-8",
+      "content_length": "27529",
+      "body_length": 27529,
+      "body_sha256": "3a7478aa941d03ef6b33f2cd57c12d468c53ded903ffbcfe237f89ede2849d01"
+    },
+    {
+      "name": "raw range with quoted comma parameter",
+      "accept": "application/vnd.github.raw+json; profile=\"foo,bar\"",
+      "expected": "raw",
+      "observed": "raw",
+      "status": 200,
+      "content_type": "application/vnd.github.raw+json; charset=utf-8",
+      "content_length": "27529",
+      "body_length": 27529,
+      "body_sha256": "3a7478aa941d03ef6b33f2cd57c12d468c53ded903ffbcfe237f89ede2849d01"
+    },
+    {
+      "name": "raw q zero",
+      "accept": "application/json; q=1, application/vnd.github.raw+json; q=0",
+      "expected": "raw",
+      "observed": "raw",
+      "status": 200,
+      "content_type": "application/json,application/vnd.github.raw+json; charset=utf-8",
+      "content_length": "27529",
+      "body_length": 27529,
+      "body_sha256": "3a7478aa941d03ef6b33f2cd57c12d468c53ded903ffbcfe237f89ede2849d01"
+    },
+    {
+      "name": "raw prefix lookalike",
+      "accept": "application/vnd.github.rawfoo",
+      "expected": "json",
+      "observed": "json",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "content_length": "39132",
+      "body_length": 39132,
+      "body_sha256": "f6a3b1648d365ef0e375e377f88cc19f4c2c5537d1a79d00f575201f7ebf18c0"
+    },
+    {
+      "name": "escaped quote keeps raw-looking text quoted",
+      "accept": "application/json; profile=\"foo\\\",application/vnd.github.raw+json\"",
+      "expected": "json",
+      "observed": "json",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "content_length": "39132",
+      "body_length": 39132,
+      "body_sha256": "f6a3b1648d365ef0e375e377f88cc19f4c2c5537d1a79d00f575201f7ebf18c0"
+    },
+    {
+      "name": "escaped backslash then closing quote permits raw range",
+      "accept": "application/json; profile=\"foo\\\\\", application/vnd.github.raw+json",
+      "expected": "raw",
+      "observed": "raw",
+      "status": 200,
+      "content_type": "application/json,application/vnd.github.raw+json; charset=utf-8",
+      "content_length": "27529",
+      "body_length": 27529,
+      "body_sha256": "3a7478aa941d03ef6b33f2cd57c12d468c53ded903ffbcfe237f89ede2849d01"
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "cases": 7,
+    "failures": 0,
+    "raw": 4,
+    "json": 3
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "identity": {
+    "base": "c32c6e83a9408e0ca6fa4784a3757851f1e29274",
+    "head": "b88f469c7c05ed3abaf2264ef940dbbf67e6203a",
+    "tree": "6fec253d39fe04ec19af7cec2a50d1384efd1635",
+    "diffSha256": "009414190aeb2a5f3a32efb116a2df0244c4cc8086fe5e1541f2688518ab084f",
+    "testedInputsMatch": true,
+    "scope": "Three-file navigation correction only; this is not a new review of the entire migration PR."
+  },
+  "contract_digest": "05e679f622f406c8a085559bb248afebb3d57521b03e423162b0d5fdd1b82330",
+  "review_skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+  "strength": {
+    "required": true,
+    "status": "pass",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:152b1f2073db38ee43657fc15a138424cb231f05c5b4d643d4228ac306efb833",
+    "artifact": "/Users/raillyhugo/Programming/vercel/agent-browser-1887-nav-verification/fix-validation.json",
+    "evidence": "The exact tested dirty tree is now committed without any content changes. identity.json verifies the full binary diff and all recorded input hashes. Nine breadcrumb cases failed before the fix and passed after; production suite passed 516 checks.",
+    "fingerprint": {
+      "head_sha": "b88f469c7c05ed3abaf2264ef940dbbf67e6203a",
+      "changed_paths_digest": "009414190aeb2a5f3a32efb116a2df0244c4cc8086fe5e1541f2688518ab084f",
+      "contract_digest": "05e679f622f406c8a085559bb248afebb3d57521b03e423162b0d5fdd1b82330",
+      "command": "DOCS_TEST_URL=http://127.0.0.1:3887 bun run node --test --test-name-pattern=\"native search preserves original section breadcrumbs\" tests/docs-routes.test.mjs; bun run test:routes",
+      "environment_digest": "bc236d72d4332eeacb64a6d31e404542407580cfac5afc3a9543fe5e87fd5cc7",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:152b1f2073db38ee43657fc15a138424cb231f05c5b4d643d4228ac306efb833",
+      "relevant_paths": [
+        "docs/content/docs/meta.json",
+        "docs/tests/docs-baseline.test.mjs",
+        "docs/tests/docs-routes.test.mjs",
+        "docs/tests/fixtures/docs-baseline.json"
+      ],
+      "reusable": false,
+      "reuse_evidence": null
+    },
+    "dimensions": {
+      "values": [
+        "/changelog",
+        "/engines/chrome",
+        "/engines/lightpanda",
+        "/providers/agentcore",
+        "/providers/browser-use",
+        "/providers/browserbase",
+        "/providers/browserless",
+        "/providers/kernel",
+        "/providers/remote-agent-browser"
+      ],
+      "exclusions": [
+        "No protocol, parser, lifecycle, security or durable-state implementation changed."
+      ],
+      "evidence": "All six providers, two engines and Changelog checked against the frozen independent navigation fixture."
+    },
+    "oracle": {
+      "source": "docs/tests/fixtures/docs-baseline.json from pre-migration commit aff6125",
+      "independent": true,
+      "evidence": "Expected navigation sections come from the unchanged legacy fixture, not the changed metadata."
+    },
+    "producer": {
+      "name": "Actual local Next.js search endpoint and headed Chrome",
+      "status": "exercised",
+      "evidence": "regression-before.log, regression-after.log, routes.log, before.png and after.png."
+    },
+    "falsification": [
+      {
+        "mutation": "Leave original meta.json grouping active while the new regression tests are installed.",
+        "red_evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1887-nav-verification/regression-before.log: nine breadcrumb equality failures caused by the extra Features ancestor.",
+        "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1887-nav-verification/regression-after.log: all nine pass after the metadata correction."
+      }
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+Moves the Browser Use provider to Cloud V4. Provider setup now has bounded deadlines, and a failed or canceled stop keeps the browser ID available for retry instead of reporting a successful close. Recovery receipts omit API keys and CDP credentials.
+
+Based on Magnus Müller’s work in #1691, with coauthor credit preserved. This is a separate implementation PR.
+
+Validation: 1,410 Rust tests, an additional real-Chrome continuity test, docs build, and seven regression mutations passed. Live Cloud testing also passed explicit and environment-based launch, navigation and state continuity, cookie/localStorage persistence across browsers, confirmed close and repeated stop, recording retrieval, and idle cleanup. All three test browsers were confirmed stopped and the temporary profile was deleted. The source tree is unchanged. Broader fuzz/platform failure coverage remains outstanding. Cloud reported a small proxy-cost counter in direct mode; the counter alone does not establish routing, so that provider behavior remains unverified.

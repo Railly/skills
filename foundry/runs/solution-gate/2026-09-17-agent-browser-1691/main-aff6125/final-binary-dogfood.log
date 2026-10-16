@@ -1,0 +1,84 @@
+{
+  "binary": "/Users/raillyhugo/Programming/vercel/agent-browser-1691-probe-build/debug/agent-browser",
+  "sha256": "15f77ad70a964239b16cb9ae3e1dd1034edfb73bed00f44a4b2eaafb0e9553c5",
+  "cases": [
+    {
+      "name": "missing-key",
+      "result": {
+        "args": [
+          "-p",
+          "browseruse",
+          "open",
+          "about:blank",
+          "--json"
+        ],
+        "exit": 1,
+        "seconds": 0.11,
+        "stdout": "{\"error\":\"BROWSER_USE_API_KEY environment variable is not set\",\"success\":false}\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "missing-key-close",
+      "result": {
+        "args": [
+          "close",
+          "--json"
+        ],
+        "exit": 0,
+        "seconds": 0.008,
+        "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "stalled-proxy",
+      "proxy_reached": true,
+      "request_headers": [
+        "CONNECT api.browser-use.com:443 HTTP/1.1\r\nHost: api.browser-use.com:443\r\n\r\n"
+      ],
+      "open": {
+        "args": [
+          "-p",
+          "browseruse",
+          "open",
+          "about:blank",
+          "--json"
+        ],
+        "exit": 1,
+        "seconds": 10.116,
+        "stdout": "{\"error\":\"Browser Use create timed out after 10s; the browser may still have been created; inspect Browser Use Cloud before retrying\",\"success\":false}\n",
+        "stderr": ""
+      },
+      "close": {
+        "args": [
+          "close",
+          "--json"
+        ],
+        "exit": 0,
+        "seconds": 8.609,
+        "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+        "stderr": ""
+      },
+      "daemon_alive_after_1_second_idle_budget": [
+        {
+          "pid": 62741,
+          "process": "/Users/raillyhugo/Programming/vercel/agent-browser-1691-probe-build/debug/agent-browser"
+        }
+      ]
+    },
+    {
+      "name": "after-proxy-release",
+      "result": {
+        "args": [
+          "close",
+          "--json"
+        ],
+        "exit": 0,
+        "seconds": 1.143,
+        "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+        "stderr": ""
+      }
+    }
+  ]
+}

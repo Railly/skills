@@ -1,0 +1,22 @@
+{
+  "kind": "bounded_local_review",
+  "head": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+  "acceptance": [
+    "R0",
+    "R1",
+    "R2",
+    "R3",
+    "R4"
+  ],
+  "platform_claim": "macOS ARM64 y Linux ARM64, Chrome/Chromium 152, sustratos realmente ejecutados",
+  "authorization": "Trabajo local autorizado por Hunter. No publicación. La pregunta opcional sobre Windows no recibió respuesta; el alcance local se declaró durante la ejecución, sin inferir aprobación del silencio.",
+  "exclusions": [
+    "Windows no ejecutado: sin entorno Windows disponible. No se certifica soporte Windows ni equivalencia del IPC Windows.",
+    "BrowserContexts entre sesiones cooperativas; no sandbox contra un controlador con autoridad CDP global.",
+    "No se promete atomicidad ante SIGKILL o pérdida del canal de disposición. Un contexto remoto puede quedar huérfano y los fallos repetidos pueden acumularlos hasta cerrar Chrome.",
+    "Matching de GUIDs de descargas simultáneas dentro de un mismo contexto y sesiones no aisladas que comparten default son comportamientos preexistentes fuera de estos dos findings.",
+    "No se afirma explorar todas las intercalaciones de procesos, todos los navegadores/versiones o todas las fallas de CDP."
+  ],
+  "historical_solution_gate": "Permanece incomplete. La revisión posterior de Claude no se presenta como shaping independiente previo. La auditoría nueva de admisión también queda incomplete y no se consume como evidencia aprobatoria del Review Gate.",
+  "basis": "review-gate/references/proof-obligations.md permite acotar la propiedad al sustrato ejecutado; no sustituir entornos ausentes con fixtures."
+}

@@ -1,0 +1,32 @@
+<!doctype html>
+<input id="field" value="old value">
+<div id="editor" contenteditable="true">old <b>bold</b> text</div>
+<input id="email" type="email" value="old@x.com">
+<input id="num" type="number" value="42">
+<input id="tel" type="tel" value="555">
+<input id="pw" type="password" value="secret">
+<input id="search" type="search" value="q">
+<textarea id="ta">line1
+line2</textarea>
+<input id="date" type="date" value="2026-01-01">
+<input id="time" type="time" value="08:00">
+<input id="dtl" type="datetime-local" value="2026-01-01T08:00">
+<input id="color" type="color" value="#000000">
+<input id="range" type="range" min="0" max="10" value="1">
+<input id="ro" readonly value="locked">
+<input id="dis" disabled value="off">
+<input id="max" maxlength="3" value="ab">
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script>
+  function App() {
+    const [value, setValue] = React.useState("old value");
+    const [n, setN] = React.useState("7");
+    window.reactState = value; window.reactNum = n;
+    return React.createElement("div", null,
+      React.createElement("input", { id: "x", value, onChange: e => setValue(e.target.value) }),
+      React.createElement("input", { id: "rn", type: "number", value: n, onChange: e => setN(e.target.value) }));
+  }
+  ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>

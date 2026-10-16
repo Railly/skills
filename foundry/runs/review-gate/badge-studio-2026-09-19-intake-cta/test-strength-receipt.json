@@ -1,0 +1,73 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "sha256:a48126adf41ae16e2a3f29bb20b1da68b3a5b9db2a4cd6b5baa08b3c598b70ea",
+  "artifact": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log",
+  "evidence": "Three real UI entry points each pass write success, denied fallback and keyboard recovery; three mutants fail at the intended assertions for all three points, then restored source passes.",
+  "fingerprint": {
+    "head_sha": "74b4ae90cf756cdae3e9ad77ab32b1f87044d8fc",
+    "changed_paths_digest": "sha256:c5bad63655dfc36618ee82385eeb857980a9644b9a0e4aa3f191276a63aef657",
+    "contract_digest": "sha256:28b2cb208a08cd664e8edbd3b9c2a7636c177ab8c79aaa71bef3245438cc50b9",
+    "command": "bun /Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/verify-copy.mjs",
+    "environment_digest": "sha256:e27083dec30021019f9a02cc01b8dc3c158f2b425be377e0f7ea21774482cd17",
+    "skill_revision": "sha256:a48126adf41ae16e2a3f29bb20b1da68b3a5b9db2a4cd6b5baa08b3c598b70ea",
+    "relevant_paths": [
+      "README.md",
+      "apps/web/src/app/docs/page.tsx",
+      "apps/web/src/app/landing/landing.css",
+      "apps/web/src/app/landing/studio-landing.tsx",
+      "apps/web/src/components/agent-prompt.tsx",
+      "apps/web/src/components/ui/copy-button.tsx",
+      "apps/web/src/lib/agent-setup.ts",
+      "bun.lock",
+      "packages/cli/package.json",
+      "packages/cli/skill-data/core.md",
+      "packages/cli/skill-data/design.md",
+      "packages/cli/skill-data/images.md",
+      "skills/badge-studio/SKILL.md"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "dimensions": {
+    "values": [
+      "entry point: hero, workflow, docs",
+      "prior state/transition: idle to copied, copied to error, error to copied",
+      "input: actual pointer activation, actual Enter key retry",
+      "clipboard: real write accepted, forced NotAllowedError"
+    ],
+    "exclusions": [
+      "Photo generation and public publishing implementations are unchanged.",
+      "No claim about rapid overlapping clicks or other OS clipboard implementations.",
+      "Manual text selection uses native read-only textarea; no custom copy engine."
+    ],
+    "evidence": "verify-copy.mjs drives all nine location/transition cases. Shared component equivalence is still verified at each caller."
+  },
+  "oracle": {
+    "source": "The exact prompt supplied by the user and the contract that success requires write completion, denied copy exposes all text, and keyboard retry can recover.",
+    "independent": true,
+    "evidence": "The test embeds the user-supplied prompt independently of the exported application constant."
+  },
+  "producer": {
+    "name": "agent-browser Chromium pointer and keyboard events",
+    "status": "exercised",
+    "evidence": "Actual browser events invoke the React controls; a wrapper calls the real Clipboard API for success and forces a browser-shaped NotAllowedError for rejection."
+  },
+  "falsification": [
+    {
+      "mutation": "Replace AgentPrompt CopyButton value with Incorrect prompt at the real call site.",
+      "red_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/wrong-copy-payload-red.log",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log"
+    },
+    {
+      "mutation": "Disable rendering of the manual textarea on error.",
+      "red_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/missing-manual-fallback-red.log",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log"
+    },
+    {
+      "mutation": "Prevent copied status when retrying from error.",
+      "red_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/broken-retry-red.log",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log"
+    }
+  ]
+}

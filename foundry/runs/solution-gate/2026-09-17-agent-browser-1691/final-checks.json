@@ -1,0 +1,71 @@
+{
+  "diff_sha256": "c919ca9e28dd47d39eec9af0af389d06e243a47e08fe9da147bcd1518f64cb37",
+  "checks": [
+    {
+      "name": "final-fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "seconds": 1.025270625
+    },
+    {
+      "name": "final-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "seconds": 7.59239625
+    },
+    {
+      "name": "final-suite",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 127.43803525000001
+    },
+    {
+      "name": "final-owned-continuity",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "e2e_browser_use_owned_connection_preserves_plain_command_state",
+        "--",
+        "--ignored",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "seconds": 1.9452998749999892
+    },
+    {
+      "name": "final-build",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "cli/Cargo.toml"
+      ],
+      "exit": 0,
+      "seconds": 11.007412459000022
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/portless",
+    "pull_request": 424,
+    "base_sha": "1ad573bb95810daf6cd50c1718707015450f3f09",
+    "head_sha": "fad78e9c5e3f1958558eca616d747313e4d4ba60",
+    "current_main_sha": "c7f38a6f33de1322ca628470be594d907da5aa71",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:0e706a14d1231e6c9b59877e7826b714ff3d2cf62f990b75a1fcdf365c6327df",
+    "changed_path_digest_method": "SHA-256 of exact git diff --name-only BASE HEAD output, UTF-8 paths in Git order, newline terminated",
+    "changed_path_digest_nul": "sha256:30a39c930d2433ae053c409bcf04952c68ee3c554b3e32f0b030471a8c0744bb",
+    "diff_digest": "sha256:946dd97e06830752e0f31e7e7569e1d0bfc1891939fd13abe9559a2459e8f456",
+    "skill_revision": "a006c7a52acfdb112e7a4882063d0a3dbbe757d7",
+    "skill_revision_method": "Last Git commit touching the selected skill and required references; those files were clean",
+    "skill_repository_head": "77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "skill_file_digests_sha256": {
+      "SKILL.md": "0254178afea32b2192e7d00446fe0dd99efc36420c72c8ffbc5a3b4b8082d1d9",
+      "references/classification.md": "ee37508410d752fcd16ff61533e619f6fcc5bfc9c890f74b466d7075d492ae6c",
+      "references/receipt.md": "443ccbc6e6df8568e21db710f161317a3ac588b526c93beaef86fb870f1f43bb"
+    }
+  },
+  "identity": {
+    "author": "ctate",
+    "author_model": "unknown",
+    "reviewer": "fx assigned security and independent correctness review context",
+    "reviewer_exact_model": "not independently attested",
+    "independence": "Separate review reasoning; same-family independence limitation recorded. No cross-family independence claimed. Unknown author model is not inferred from commit trailers or review runtime.",
+    "execution_context": "Requested native fallback after the user-reported FX wrapper schema auth-field mismatch. No nested reviewer or additional subagent was launched by this review.",
+    "parent_manifest": "Unavailable through the final pre-emission existence check. Independently calculated digests above must be reconciled by Review Gate with its manifest. This reviewer did not create or modify the manifest."
+  },
+  "claim": {
+    "property": "System hosts-file integrity and fail-closed mutation on initial read failure; truthful manual-sync verification failures",
+    "attacker": "A lower-privilege local principal able to invoke the CLI or influence route state, or a remote/browser principal attempting to trigger privileged sync. Filesystem read/write failures themselves are not assumed attacker-controlled.",
+    "scope": "Exact-head change and commit message: reject unreadable hosts files before mutation, distinguish them from readable empty files, reject unreadable post-write verification, reconcile empty route sets, and preserve existing elevation/error paths and best-effort inspection.",
+    "limitations": "Not a claim of transactional writes, arbitrary malformed-marker repair, complete-file post-write equality, safe recovery from route-store read failures, or a newly designed privilege/authentication boundary."
+  },
+  "trust_model": {
+    "assets": [
+      "Unmanaged system/custom hosts mappings and managed route mappings",
+      "OS authorization to modify system hosts and execute an elevated CLI",
+      "Accuracy of manual sync/cleanup success and failure reporting"
+    ],
+    "principals": [
+      {"name": "Local operator", "existing_authority": "Runs installed CLI and controls its own environment and user-owned state. Writing system hosts requires existing filesystem authority or OS-approved elevation."},
+      {"name": "Privileged CLI/proxy", "existing_authority": "May rewrite system hosts when started with sufficient privileges. This authority exists at the merge base."},
+      {"name": "Route-state writer", "existing_authority": "Can alter route data only where filesystem permissions already allow it. The existing daemon already consumes that data; this PR adds no route-input channel."},
+      {"name": "Remote/browser principal or unrelated local user", "existing_authority": "May reach the proxy subject to binding/network constraints, but has no presumed state-file write permission, sync token, system-hosts write permission, or sudo authorization."}
+    ],
+    "boundaries": [
+      "Local CLI to OS-authorized elevated subprocess: cli.ts:2436-2450 and 2497-2509; existing argv-based spawnSync, no new shell interpolation or automatic bypass",
+      "Route-state data to privileged hosts-file content: routes.ts:174-208, cli.ts:649-667 and 2478-2485, hosts.ts:104-121",
+      "HTTP request to privileged sync callback: proxy.ts:88-125 and 268-274; loopback peer and authority, absent browser-origin/fetch headers, single valid token header, timing-safe token comparison",
+      "Failed/unknown file read to mutable system configuration: hosts.ts:18-23, 104-121 and 128-137"
+    ],
+    "entrypoints": [
+      "portless hosts sync and portless hosts clean",
+      "portless clean and daemon shutdown cleanup",
+      "Daemon startup/route reload and authenticated hosts-sync trigger",
+      "Doctor and resolution-warning best-effort managed-hostname inspection"
+    ],
+    "sinks": [
+      "hosts.ts:111,114,133 fs.writeFileSync to the system hosts path",
+      "cli.ts:2442-2449,2501-2508 existing elevated subprocess invocation",
+      "cli.ts:2485-2494 manual success reporting"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-001",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "title": "Read-failure integrity guard is effective; no supported new vulnerability",
+      "prerequisites": ["Initial hosts read throws, including unreadable or absent files; or post-write verification read throws"],
+      "chain": {
+        "capability": "A failure is injected at the filesystem seam. No evidence establishes that a lower-trust attacker can induce that failure on the real protected file.",
+        "reachability": "Both mutation helpers and the manual handler use the new read result; daemon sync reaches the same helper.",
+        "control": "Neither request input nor route data can turn null into a successful read.",
+        "boundary": "Initial failure returns false before write; manual root/Windows paths report failure and non-root Unix retains OS-mediated elevation.",
+        "impact": "Zero initial-read-failure writes at head; populated sync at base attempted a write. Empty-sync unreadable verification changes from false success at base to false at head. No new attacker authority demonstrated."
+      },
+      "confidence": "high for source behavior and mocked boundary; no real OS exploitation claim",
+      "evidence": [
+        "packages/portless/src/hosts.ts:18-23,104-121,128-151",
+        "packages/portless/src/cli.ts:2430-2457,2478-2515",
+        "independent-review.md#verification: 40-check differential probe",
+        "tool-output:fx-command-replay-f911fa4e577957f478c78116bc040c99-df41fe8f351b22d3.bin"
+      ],
+      "merge_relevance": "Supports the bounded security claim; not a vulnerability blocker."
+    },
+    {
+      "id": "SEC-002",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "title": "No privilege-boundary widening established",
+      "prerequisites": ["Local CLI invocation or a request to the existing sync endpoint", "OS-granted elevation remains necessary where hosts is not writable"],
+      "chain": {
+        "capability": "Local callers already execute their own CLI; network callers do not thereby gain route-state control or elevation.",
+        "reachability": "Read failures now use preexisting CLI failure/elevation branches. Remote callback authentication and route-loading code are unchanged.",
+        "control": "Elevation arguments retain existing fixed executable/subcommands and PORTLESS_* forwarding. Callback loads local routes, not request-provided hostnames.",
+        "boundary": "Existing sudo authorization and endpoint token/origin/peer checks remain in place.",
+        "impact": "Additional authorized retry on read failure is not evidence of a new cross-user/root capability. No token or other secret was accessed."
+      },
+      "confidence": "high for delta; runtime OS authorization untested by design",
+      "evidence": [
+        "packages/portless/src/cli.ts:417-425,635-658,2436-2450,2497-2509",
+        "packages/portless/src/proxy.ts:88-125,268-274",
+        "packages/portless/src/hosts-sync-auth.ts:29-38",
+        "git base/head diff: routes.ts, cli-utils.ts, proxy.ts, hosts-sync-auth.ts unchanged",
+        "independent-review.md#verification"
+      ],
+      "merge_relevance": "No security blocker; not a broad audit of existing state-directory trust."
+    },
+    {
+      "id": "SEC-003",
+      "classification": "non_security_defect",
+      "scope": "unrelated_bug",
+      "title": "Inherited integrity/reconciliation limitations are not fixed by this change",
+      "prerequisites": ["Malformed orphan marker, a write producing empty/truncated content, or route-store read failure"],
+      "chain": {
+        "capability": "Synthetic malformed data/I/O failures; attacker control over real protected-file faults is unestablished.",
+        "reachability": "Existing block parser, non-transactional writer, and RouteStore empty-on-error behavior feed sync at both base and head.",
+        "control": "The probe controls only memory fixtures. This does not demonstrate an attacker crossing OS file permissions.",
+        "boundary": "No new boundary crossing. Existing helpers conflate missing/malformed blocks, verify managed content only, and consume empty routes on route-read error.",
+        "impact": "An orphan block can remain after an empty sync; empty post-write content satisfies an empty desired set even if unrelated entries were lost; unreadable route data clears valid managed entries. Each reproduced at the actual merge base as well as head."
+      },
+      "confidence": "high for inherited correctness behavior; no exploitability claim",
+      "evidence": [
+        "packages/portless/src/hosts.ts:31-52,77-91,104-121,128-134",
+        "packages/portless/src/routes.ts:174-208",
+        "packages/portless/src/cli.ts:2483-2485; base cli.ts:2475-2492",
+        "independent-review.md#inherited-observations",
+        "tool-output:fx-command-replay-f911fa4e577957f478c78116bc040c99-df41fe8f351b22d3.bin"
+      ],
+      "merge_relevance": "Route to correctness follow-up, not an in-scope security regression or adjacent exploitable blocker."
+    }
+  ],
+  "verification": {
+    "authorized_scope": "Read-only exact checkout and Git history; bounded in-memory source probes. Only the two requested review artifacts are written under security/. No target modification, GitHub mutation/access, actual sudo, real hosts I/O, DNS query, state/token read, or secret access.",
+    "commands": [
+      {"command": "git rev-parse HEAD; git status --porcelain=v1", "exit_code": 0, "result": "Exact requested head; clean worktree before and after probes"},
+      {"command": "git diff --no-ext-diff --no-textconv 1ad573bb95810daf6cd50c1718707015450f3f09 fad78e9c5e3f1958558eca616d747313e4d4ba60", "exit_code": 0, "result": "Full seven-file diff read, including retained-output pagination"},
+      {"command": "git diff --check 1ad573bb95810daf6cd50c1718707015450f3f09 fad78e9c5e3f1958558eca616d747313e4d4ba60", "exit_code": 0, "result": "PASS; no whitespace errors"},
+      {"command": "node --version", "exit_code": 0, "result": "v24.18.0"},
+      {"command": "node --input-type=module <<'NODE' [exact stdin preserved in independent-review.md, Verification] NODE", "exit_code": 0, "result": "PASS: 40 in-memory source/caller and base/head differential checks. Simulated darwin/win32 branches, not Windows OS execution.", "evidence_handle": "fx-command-replay-f911fa4e577957f478c78116bc040c99-df41fe8f351b22d3.bin"},
+      {"command": "Same Node probe before Array.from normalization; exact one-line difference preserved in independent-review.md", "exit_code": 1, "result": "Harness-only cross-realm deepStrictEqual assertion after 12 checks; corrected and complete matrix rerun", "evidence_handle": "fx-command-replay-a05e62311a215032bbac6c7b4a2e2f62-7d715ccdc193e0d4.bin"}
+    ],
+    "cleanup": "Probes created no files, listeners, or persistent processes. Review artifacts require no cleanup. Target worktree remained clean.",
+    "gaps": [
+      "No real system-hosts access, sudo execution, Administrator execution, OS ACL/SELinux behavior, crash/power-loss durability, concurrent writer stress, or live endpoint testing. These were intentionally outside authorization.",
+      "Probe loads exact source into a VM with synthetic filesystem, discovery, console, UID and subprocess seams. It does not prove built-CLI module/preload integration or real elevated-child behavior.",
+      "Existing Vitest suites and full build were inspected as relevant but not run; no full-suite or build pass is claimed.",
+      "Only frozen PR/base and supplied current-main objects reviewed. Main's relevant intervening change is unrelated Turbo help; no merged-main build or remote PR metadata validation performed.",
+      "Parent manifest was not yet available, so independent digest calculation is recorded rather than asserting a manifest match.",
+      "Same-family reviewer limitation and unknown author model prevent a claim of cross-family independence."
+    ]
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": ["Review Gate must bind these independent fingerprints to the parent manifest and assess reviewer independence."],
+    "routed_non_security_defects": ["SEC-003: inherited malformed-block, partial-write verification, and route-read-error limitations"],
+    "verdict_owner": "Review Gate. Security pass supports the bounded read-failure claim only; it does not assert overall merge readiness."
+  },
+  "artifact": "independent-review.md",
+  "disclosure": "Local review artifact only; not published to GitHub. Contains no live credentials or tested exploit against a real target."
+}

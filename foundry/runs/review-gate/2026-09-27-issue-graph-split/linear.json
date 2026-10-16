@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-27",
+    "repo": "vercel-labs/issue-graph",
+    "base": "77d53c77cb101cc5c83899c5f2e4d6b2c339656d",
+    "head": "637d2f4554a6b46ed1d27a78fa33bff2d77c3850",
+    "profile": "standard",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Formal Test Strength and Resilience receipts were not regenerated for this split; prior tests and mutation evidence are retained without claiming a complete formal gate.",
+      "Reviewer uses the same model family; no cross-family assurance.",
+      "Live credentialed Linear SDK transport remains unverified.",
+      "Independent pass covered security; no final-head independent correctness receipt."
+    ]
+  },
+  "execution": {
+    "mode": "native_subagent",
+    "degraded_from": null,
+    "independence_gap": "Same-family reviewers; final CSS fixes validated by author.",
+    "schema_failures": 1,
+    "operations": [
+      {
+        "operation": "reviewer spawn",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-issue-graph-split/contract.md",
+    "spec_status": "not_separately_authored",
+    "acceptance_reviewed": [
+      "split",
+      "granular-commits",
+      "pr-state",
+      "no-private-data",
+      "preserve-original"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-6",
+    "reviewer_model": "inherited parent model",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [
+      "provider adapter",
+      "credential transport",
+      "bounded failure handling"
+    ],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": false,
+      "method": "native_subagent",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-issue-graph-split/reviewer-messages.json",
+      "evidence": "static security review"
+    }
+  },
+  "security_review": {
+    "status": "incomplete",
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-issue-graph-split/reviewer-messages.json",
+    "verification": {
+      "gaps": [
+        "No final-head formal security receipt."
+      ]
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-issue-graph-split/contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Shared renderer identity, diff partition, private-data exclusion, tests, installed CLI and browser checks."
+    },
+    {
+      "source": "design",
+      "location": "/Users/raillyhugo/Programming/vercel/issue-graph-linear-integration",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Shared renderer identity, diff partition, private-data exclusion, tests, installed CLI and browser checks."
+    },
+    {
+      "source": "user_facing",
+      "location": "/Users/raillyhugo/Programming/vercel/issue-graph-linear-integration",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Shared renderer identity, diff partition, private-data exclusion, tests, installed CLI and browser checks."
+    },
+    {
+      "source": "implementation",
+      "location": "/Users/raillyhugo/Programming/vercel/issue-graph-linear-integration",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Shared renderer identity, diff partition, private-data exclusion, tests, installed CLI and browser checks."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Provider-neutral dashboard changes are isolated from Linear integration.",
+      "kind": "compatibility",
+      "status": "verified",
+      "oracle": {
+        "observes": "Git diff file sets and shared renderer bytes",
+        "layer": "committed branch tree",
+        "method": "Compare dashboard diff with main and Linear diff with dashboard",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Branch names imply separation",
+        "counterexample": "Linear dependency remains in dashboard or duplicated HTML appears in Linear diff",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "No Linear-specific contents in dashboard changed files; shared html.ts byte-identical."
+      },
+      "substrates": [
+        {
+          "name": "final git worktrees",
+          "status": "exercised",
+          "evidence": "sha256:955037004b9b9cdfd6d0d68557ab4d75f6ee379294b8303b960551b2e66120d1"
+        }
+      ],
+      "evidence": "All 31 original paths accounted for; all original file hashes remain unchanged."
+    },
+    {
+      "id": "P2",
+      "claim": "Changed boundaries preserve documented local behavior.",
+      "kind": "behavior",
+      "status": "partial",
+      "oracle": {
+        "observes": "Installed package output, browser presentation and docs HTTP routes",
+        "layer": "built artifacts",
+        "method": "Package smoke and browser checks",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Tests pass without behavioral strength",
+        "counterexample": "Count omits pull requests",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "dashboard-counts-red.log records expected failure; restored source passes in dashboard-counts-green.log."
+      },
+      "substrates": [
+        {
+          "name": "installed package on Node 24.18.0",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/split-prs-2026-09-27/linear-package.log"
+        }
+      ],
+      "evidence": "650 dashboard tests / 765 integration tests; 45 / 59 package commands; real-data browser checks; Linear docs 96 tests and 90 routes. Live Linear SDK remains a named gap."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "incomplete",
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/split-prs-2026-09-27/dashboard-counts-red.log"
+    },
+    "resilience": {
+      "required": true,
+      "status": "incomplete",
+      "evidence": "Existing failure-path tests pass; no current formal stage receipt."
+    }
+  },
+  "assumptions": [],
+  "lenses": [
+    {
+      "name": "security",
+      "status": "run",
+      "reason": "static security review"
+    },
+    {
+      "name": "built artifact",
+      "status": "run",
+      "reason": "Local package installation and browser/docs checks."
+    },
+    {
+      "name": "remaining catalog",
+      "status": "skipped",
+      "reason": "User requested rapid split/publication; full formal gate explicitly incomplete."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "Final branch range clean."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "Canonical conventions gate passed."
+    },
+    {
+      "check": "style",
+      "outcome": "acknowledged",
+      "reason": "The only em dash matches represent the unavailable-count UI glyph and its literal documentation, not prose punctuation."
+    },
+    {
+      "check": "tests/typecheck/lint/build/package",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/split-prs-2026-09-27"
+    },
+    {
+      "check": "original worktree preservation",
+      "outcome": "pass",
+      "reason": "31 SHA-256 digests equal the pre-split manifest."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "Unavailable-count em dash glyph retained",
+      "evidence": "Glyph is a data placeholder and documented verbatim, not sentence punctuation."
+    }
+  ],
+  "issue_candidates": []
+}

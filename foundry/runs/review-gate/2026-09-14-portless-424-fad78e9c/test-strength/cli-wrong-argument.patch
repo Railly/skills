@@ -1,0 +1,11 @@
+--- dist/cli.js
++++ dist/cli.js
+@@ -6291,7 +6291,7 @@
+   });
+   const routes = store.loadRoutes();
+   const hostnames = routes.map((r) => r.hostname);
+-  if (syncHostsFile(hostnames)) {
++  if (syncHostsFile([])) {
+     if (hostnames.length === 0) {
+       console.log(colors_default.green(`No stale portless entries remain in ${HOSTS_DISPLAY2}.`));
+       return;

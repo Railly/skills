@@ -1,0 +1,1 @@
+export default {"root": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/test-strength/disposable", "cacheDir": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/test-strength/vite-cache", "test": {"include": ["src/*.test.ts"], "watch": false}};

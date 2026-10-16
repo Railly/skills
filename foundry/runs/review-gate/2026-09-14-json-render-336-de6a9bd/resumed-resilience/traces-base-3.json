@@ -1,0 +1,2474 @@
+[
+  {
+    "id": "C01",
+    "name": "invalid immutable writes are allocation and notification no-ops",
+    "variant": "base",
+    "observations": [
+      {
+        "attempts": 400,
+        "sameStore": false,
+        "sameAdapter": false,
+        "notifications": 152,
+        "writes": 152,
+        "state": {
+          "items": [
+            "bad",
+            "bad"
+          ],
+          "count": 0
+        }
+      }
+    ],
+    "result": "preserved invariant",
+    "cleanup": {
+      "owner": "subscriber",
+      "action": "unsubscribe",
+      "deadline": "before next write",
+      "post_unsubscribe_calls": 0
+    },
+    "test_status": "pass",
+    "elapsed_ms": 1.0522080000000074
+  },
+  {
+    "id": "C02",
+    "name": "progressive batch and immediate identical retry",
+    "variant": "base",
+    "observations": [
+      {
+        "before": {
+          "items": [
+            "a",
+            "b"
+          ],
+          "count": 0
+        },
+        "after": {
+          "items": [
+            "a",
+            "bad"
+          ],
+          "count": 1,
+          "new": [
+            "accepted"
+          ]
+        },
+        "after_retry": {
+          "items": [
+            "a",
+            "bad"
+          ],
+          "count": 1,
+          "new": [
+            "accepted"
+          ]
+        },
+        "atCommit": 1,
+        "afterRetry": 1
+      }
+    ],
+    "result": "preserved invariant",
+    "cleanup": {
+      "owner": "subscriber",
+      "deadline": "same turn",
+      "unsubscribed": true
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.12370900000001939
+  },
+  {
+    "id": "C03",
+    "name": "compound staging rejects source and destination without partial commit",
+    "variant": "base",
+    "observations": [
+      {
+        "patch": {
+          "op": "move",
+          "from": "/state/source",
+          "path": "/state/items/01"
+        },
+        "repeats": 25,
+        "before": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "after": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "items": [
+              "zero",
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              {
+                "$undefined": true
+              },
+              "keep",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "same": false
+      },
+      {
+        "patch": {
+          "op": "copy",
+          "from": "/state/items/01",
+          "path": "/state/copied"
+        },
+        "repeats": 25,
+        "before": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "after": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0,
+            "copied": "one"
+          }
+        },
+        "same": false
+      },
+      {
+        "patch": {
+          "op": "move",
+          "from": "/state/items/01",
+          "path": "/state/moved"
+        },
+        "repeats": 25,
+        "before": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "after": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero"
+            ],
+            "count": 0,
+            "moved": {
+              "$undefined": true
+            }
+          }
+        },
+        "same": false
+      },
+      {
+        "patch": {
+          "op": "move",
+          "from": "/state/source",
+          "path": "/state/__proto__/auditSentinel"
+        },
+        "repeats": 25,
+        "before": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "after": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "same": false
+      }
+    ],
+    "result": "preserved invariant",
+    "recovery": {
+      "root": "main",
+      "elements": {},
+      "state": {
+        "items": [
+          "zero",
+          {
+            "$undefined": true
+          },
+          "keep",
+          "one"
+        ],
+        "count": 0
+      }
+    },
+    "cleanup": {
+      "owner": "core operation",
+      "deadline": "return",
+      "staged_containers": "no escaped references observable; GC not measured"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.3504169999999931
+  },
+  {
+    "id": "C04",
+    "name": "adapter refusal before commit followed by immediate retry",
+    "variant": "base",
+    "observations": [
+      {
+        "partition": "before external setSnapshot commit",
+        "snapshot": {
+          "items": [
+            "a"
+          ],
+          "count": 0
+        },
+        "calls": 1
+      },
+      {
+        "partition": "immediate retry",
+        "snapshot": {
+          "items": [
+            "a"
+          ],
+          "count": 1
+        },
+        "calls": 2
+      }
+    ],
+    "result": "preserved invariant",
+    "cleanup": {
+      "owner": "adapter implementer",
+      "deadline": "throw/return",
+      "remaining_inflight": 0
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.3687919999999849
+  },
+  {
+    "id": "C05",
+    "name": "adapter ambiguous success partitions replacement versus append",
+    "variant": "base",
+    "observations": [
+      {
+        "mode": "replace",
+        "committed": {
+          "items": [],
+          "count": 1
+        },
+        "after_retry": {
+          "items": [],
+          "count": 1
+        },
+        "calls": 1
+      },
+      {
+        "mode": "append",
+        "committed": {
+          "items": [
+            "x"
+          ],
+          "count": 0
+        },
+        "after_retry": {
+          "items": [
+            "x",
+            "x"
+          ],
+          "count": 0
+        },
+        "calls": 2
+      }
+    ],
+    "result": "duplicated state for append; replacement retry is idempotent",
+    "attribution": "baseline comparison required; no idempotency key supplied by API",
+    "cleanup": {
+      "owner": "external adapter",
+      "deadline": "throw/return",
+      "pending": 0,
+      "rollback": "not supplied by core"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.37762499999996635
+  },
+  {
+    "id": "C06",
+    "name": "listener throw after state commit cannot be healed by same retry",
+    "variant": "base",
+    "observations": [
+      {
+        "committed": {
+          "count": 1
+        },
+        "after_retry": {
+          "count": 1
+        },
+        "downstream_notifications": 0
+      }
+    ],
+    "result": "recoverable degradation; retry does not redeliver failed notifications",
+    "cleanup": {
+      "owner": "subscriber",
+      "deadline": "before recovery write",
+      "detached": true,
+      "further_calls": 0
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.10408400000000029
+  },
+  {
+    "id": "C07",
+    "name": "reentrant conflicting state transition and unsubscribe",
+    "variant": "base",
+    "observations": [
+      {
+        "seen": [
+          [
+            "first",
+            {
+              "count": 1,
+              "marker": "committed"
+            }
+          ],
+          [
+            "first",
+            {
+              "count": 2,
+              "marker": "committed"
+            }
+          ],
+          [
+            "second",
+            {
+              "count": 2,
+              "marker": "committed"
+            }
+          ],
+          [
+            "second",
+            {
+              "count": 2,
+              "marker": "committed"
+            }
+          ]
+        ],
+        "after": {
+          "count": 2,
+          "marker": "committed"
+        }
+      }
+    ],
+    "result": "preserved final state; synchronous reentrant notifications are not transaction-isolated",
+    "cleanup": {
+      "owner": "subscribers",
+      "deadline": "next mutation",
+      "post_unsubscribe": 0
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.08758299999999508
+  },
+  {
+    "id": "C08",
+    "name": "compiler partial commit then throwing test and immediate replay",
+    "variant": "base",
+    "observations": [
+      {
+        "partial": {
+          "count": 1
+        },
+        "patchesAtFault": 1,
+        "after_retry": {
+          "count": 1,
+          "later": true
+        },
+        "patchesAfterRetry": 2
+      }
+    ],
+    "result": "recoverable partial commit; failed test is deduplicated on identical replay, not transaction rollback",
+    "cleanup": {
+      "owner": "compiler caller",
+      "action": "reset",
+      "deadline": "before next logical stream",
+      "patches": 0,
+      "result": {}
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.443540999999982
+  },
+  {
+    "id": "C09",
+    "name": "compiler fragmented malformed input and reconnect/reset",
+    "variant": "base",
+    "observations": [
+      {
+        "chunk_bytes": 3,
+        "first": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "items": [
+              "zero",
+              "keep",
+              "one"
+            ],
+            "count": 0,
+            "later": "accepted"
+          }
+        },
+        "replay": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "items": [
+              "zero",
+              "keep",
+              "one"
+            ],
+            "count": 0,
+            "later": "accepted"
+          }
+        },
+        "reset_then_reconnect": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0,
+            "later": "accepted"
+          }
+        }
+      }
+    ],
+    "result": "preserved invariant",
+    "cleanup": {
+      "owner": "compiler caller",
+      "deadline": "synchronous reset",
+      "retained_patch_count": 0
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.18216699999999264
+  },
+  {
+    "id": "C10",
+    "name": "bounded overload experiment plus repeated cleanup cycles",
+    "variant": "base",
+    "observations": [
+      {
+        "sizes": [
+          {
+            "inputs": 100,
+            "retained_patches": 100,
+            "array_length": 100
+          },
+          {
+            "inputs": 500,
+            "retained_patches": 500,
+            "array_length": 500
+          },
+          {
+            "inputs": 1000,
+            "retained_patches": 1000,
+            "array_length": 1000
+          }
+        ],
+        "elapsed_ms": 1.5392499999999814,
+        "cycles": 30,
+        "after_reset": {
+          "items": []
+        },
+        "retained_patches": 0
+      }
+    ],
+    "result": "growth proportional to distinct input retained until reset; no built-in queue or byte cap verified",
+    "cleanup": {
+      "owner": "compiler caller",
+      "deadline": "end of each logical stream",
+      "action": "reset",
+      "retained_patches": 0,
+      "heap_and_gc": "gap"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 1.5996249999999463
+  },
+  {
+    "id": "H01",
+    "name": "F1 repeated rejected move and immediate corrective retry through public hook",
+    "variant": "base",
+    "observations": [
+      {
+        "before": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "rejected": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "items": [
+              "zero",
+              {
+                "$undefined": true
+              }
+            ],
+            "count": 0
+          }
+        },
+        "retried": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "items": [
+              "zero",
+              {
+                "$undefined": true
+              }
+            ],
+            "count": 0
+          }
+        },
+        "recovery": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one"
+            ],
+            "count": 0
+          }
+        },
+        "error": null,
+        "streaming": false
+      }
+    ],
+    "result": "baseline accepts noncanonical token; repeated move not idempotent",
+    "cleanup": {
+      "owner": "hook unmount effect",
+      "deadline": "unmount",
+      "reader_cleanup": "simple response mock has no resource lease"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 6.015958000000012
+  },
+  {
+    "id": "H02",
+    "name": "dependency refusal/no-body/malformed stream with immediate retry",
+    "variant": "base",
+    "observations": [
+      {
+        "fault": "fetch-refusal",
+        "afterFault": {
+          "state": {
+            "root": "",
+            "elements": {}
+          },
+          "error": "offline",
+          "errors": [
+            "offline"
+          ],
+          "complete": 0,
+          "streaming": false
+        },
+        "retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "count": 2
+          }
+        },
+        "retryError": null
+      },
+      {
+        "fault": "http-503",
+        "afterFault": {
+          "state": {
+            "root": "",
+            "elements": {}
+          },
+          "error": "HTTP error: 503",
+          "errors": [
+            "HTTP error: 503"
+          ],
+          "complete": 0,
+          "streaming": false
+        },
+        "retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "count": 2
+          }
+        },
+        "retryError": null
+      },
+      {
+        "fault": "no-body",
+        "afterFault": {
+          "state": {
+            "root": "",
+            "elements": {}
+          },
+          "error": "No response body",
+          "errors": [
+            "No response body"
+          ],
+          "complete": 0,
+          "streaming": false
+        },
+        "retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "count": 2
+          }
+        },
+        "retryError": null
+      },
+      {
+        "fault": "malformed-jsonl",
+        "afterFault": {
+          "state": {
+            "root": "",
+            "elements": {},
+            "state": {
+              "count": 1
+            }
+          },
+          "errors": [],
+          "complete": 1,
+          "streaming": false
+        },
+        "retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "count": 2
+          }
+        },
+        "retryError": null
+      }
+    ],
+    "result": "preserved invariant",
+    "cleanup": {
+      "owner": "hook finally/unmount",
+      "deadline": "send settles, then unmount",
+      "active_mock_operations": 0
+    },
+    "test_status": "pass",
+    "elapsed_ms": 2.924250000000029
+  },
+  {
+    "id": "H03-before-patch",
+    "name": "forced deadline while reader pending, then immediate retry",
+    "variant": "base",
+    "observations": [
+      {
+        "partition": "before-patch",
+        "during": {
+          "spec": {
+            "root": "",
+            "elements": {}
+          },
+          "streaming": true,
+          "stats": {
+            "readers": 1,
+            "reads": 1,
+            "active": 1,
+            "aborts": 0,
+            "release": 0,
+            "cancel": 0,
+            "completions": 0
+          }
+        },
+        "fault": {
+          "spec": {
+            "root": "",
+            "elements": {}
+          },
+          "error": "external-deadline",
+          "streaming": false,
+          "stats": {
+            "readers": 1,
+            "reads": 1,
+            "active": 0,
+            "aborts": 0,
+            "release": 0,
+            "cancel": 0,
+            "completions": 0
+          }
+        },
+        "after_retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "recovered": true
+          }
+        },
+        "errors": [
+          "external-deadline"
+        ]
+      }
+    ],
+    "result": "recoverable partial state; external deadline required; no rollback promised for full stream",
+    "cleanup": {
+      "owner": "transport mock settles pending read; hook clears flag",
+      "deadline": "send settlement",
+      "stats": {
+        "readers": 1,
+        "reads": 1,
+        "active": 0,
+        "aborts": 1,
+        "release": 0,
+        "cancel": 0,
+        "completions": 0
+      },
+      "lock_release": "not called by hook",
+      "real_fetch_timeout": "gap; no built-in deadline"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.8772500000000036
+  },
+  {
+    "id": "H03-after-first-patch",
+    "name": "forced deadline while reader pending, then immediate retry",
+    "variant": "base",
+    "observations": [
+      {
+        "partition": "after-first-patch",
+        "during": {
+          "spec": {
+            "root": "",
+            "elements": {},
+            "state": {
+              "count": 1
+            }
+          },
+          "streaming": true,
+          "stats": {
+            "readers": 1,
+            "reads": 2,
+            "active": 1,
+            "aborts": 0,
+            "release": 0,
+            "cancel": 0,
+            "completions": 0
+          }
+        },
+        "fault": {
+          "spec": {
+            "root": "",
+            "elements": {},
+            "state": {
+              "count": 1
+            }
+          },
+          "error": "external-deadline",
+          "streaming": false,
+          "stats": {
+            "readers": 1,
+            "reads": 2,
+            "active": 0,
+            "aborts": 0,
+            "release": 0,
+            "cancel": 0,
+            "completions": 0
+          }
+        },
+        "after_retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "recovered": true
+          }
+        },
+        "errors": [
+          "external-deadline"
+        ]
+      }
+    ],
+    "result": "recoverable partial state; external deadline required; no rollback promised for full stream",
+    "cleanup": {
+      "owner": "transport mock settles pending read; hook clears flag",
+      "deadline": "send settlement",
+      "stats": {
+        "readers": 1,
+        "reads": 2,
+        "active": 0,
+        "aborts": 1,
+        "release": 0,
+        "cancel": 0,
+        "completions": 0
+      },
+      "lock_release": "not called by hook",
+      "real_fetch_timeout": "gap; no built-in deadline"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.5269999999999868
+  },
+  {
+    "id": "H03-after-last-patch-before-eof",
+    "name": "forced deadline while reader pending, then immediate retry",
+    "variant": "base",
+    "observations": [
+      {
+        "partition": "after-last-patch-before-eof",
+        "during": {
+          "spec": {
+            "root": "",
+            "elements": {},
+            "state": {
+              "count": 1,
+              "done": true
+            }
+          },
+          "streaming": true,
+          "stats": {
+            "readers": 1,
+            "reads": 3,
+            "active": 1,
+            "aborts": 0,
+            "release": 0,
+            "cancel": 0,
+            "completions": 0
+          }
+        },
+        "fault": {
+          "spec": {
+            "root": "",
+            "elements": {},
+            "state": {
+              "count": 1,
+              "done": true
+            }
+          },
+          "error": "external-deadline",
+          "streaming": false,
+          "stats": {
+            "readers": 1,
+            "reads": 3,
+            "active": 0,
+            "aborts": 0,
+            "release": 0,
+            "cancel": 0,
+            "completions": 0
+          }
+        },
+        "after_retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "recovered": true
+          }
+        },
+        "errors": [
+          "external-deadline"
+        ]
+      }
+    ],
+    "result": "recoverable partial state; external deadline required; no rollback promised for full stream",
+    "cleanup": {
+      "owner": "transport mock settles pending read; hook clears flag",
+      "deadline": "send settlement",
+      "stats": {
+        "readers": 1,
+        "reads": 3,
+        "active": 0,
+        "aborts": 1,
+        "release": 0,
+        "cancel": 0,
+        "completions": 0
+      },
+      "lock_release": "not called by hook",
+      "real_fetch_timeout": "gap; no built-in deadline"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.47316699999998946
+  },
+  {
+    "id": "H04",
+    "name": "unmount cancellation before and after visible commit",
+    "variant": "base",
+    "observations": [
+      {
+        "committed": false,
+        "before": {
+          "root": "",
+          "elements": {}
+        },
+        "stats": {
+          "readers": 1,
+          "reads": 1,
+          "active": 0,
+          "aborts": 1,
+          "release": 0,
+          "cancel": 0,
+          "completions": 0
+        },
+        "completions": 0,
+        "errors": 0
+      },
+      {
+        "committed": true,
+        "before": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "count": 1
+          }
+        },
+        "stats": {
+          "readers": 1,
+          "reads": 2,
+          "active": 0,
+          "aborts": 1,
+          "release": 0,
+          "cancel": 0,
+          "completions": 0
+        },
+        "completions": 0,
+        "errors": 0
+      }
+    ],
+    "result": "preserved invariant",
+    "cleanup": {
+      "owner": "hook effect aborts; transport mock rejects read",
+      "deadline": "unmount and pending promise settlement",
+      "active_reads": 0,
+      "real_reader_release": "gap"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 1.1995840000000157
+  },
+  {
+    "id": "H05",
+    "name": "superseding request conflict and immediate retry while old cancellation settles",
+    "variant": "base",
+    "observations": [
+      {
+        "during": {
+          "streaming": false,
+          "a": {
+            "readers": 1,
+            "reads": 1,
+            "active": 0,
+            "aborts": 1,
+            "release": 0,
+            "cancel": 0,
+            "completions": 0
+          },
+          "b": {
+            "readers": 1,
+            "reads": 1,
+            "active": 1,
+            "aborts": 0,
+            "release": 0,
+            "cancel": 0,
+            "completions": 0
+          }
+        },
+        "after": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "winner": "second"
+          }
+        },
+        "final_streaming": false
+      }
+    ],
+    "result": "stale streaming flag during supersession; baseline attribution required",
+    "cleanup": {
+      "owner": "hook abort + transport",
+      "deadline": "both sends settled",
+      "active_reads": 0
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.5962089999999876
+  },
+  {
+    "id": "H06",
+    "name": "8 concurrent independent hooks over 10 failure/recovery cycles",
+    "variant": "base",
+    "observations": [
+      {
+        "rounds": [
+          {
+            "round": 0,
+            "active_reads": 0,
+            "readers": 8,
+            "abort_signals": 8
+          },
+          {
+            "round": 1,
+            "active_reads": 0,
+            "readers": 8,
+            "abort_signals": 8
+          },
+          {
+            "round": 2,
+            "active_reads": 0,
+            "readers": 8,
+            "abort_signals": 8
+          },
+          {
+            "round": 3,
+            "active_reads": 0,
+            "readers": 8,
+            "abort_signals": 8
+          },
+          {
+            "round": 4,
+            "active_reads": 0,
+            "readers": 8,
+            "abort_signals": 8
+          },
+          {
+            "round": 5,
+            "active_reads": 0,
+            "readers": 8,
+            "abort_signals": 8
+          },
+          {
+            "round": 6,
+            "active_reads": 0,
+            "readers": 8,
+            "abort_signals": 8
+          },
+          {
+            "round": 7,
+            "active_reads": 0,
+            "readers": 8,
+            "abort_signals": 8
+          },
+          {
+            "round": 8,
+            "active_reads": 0,
+            "readers": 8,
+            "abort_signals": 8
+          },
+          {
+            "round": 9,
+            "active_reads": 0,
+            "readers": 8,
+            "abort_signals": 8
+          }
+        ],
+        "mounts": 80,
+        "heap_start": 56989320,
+        "heap_end": 75020464,
+        "heap_note": "diagnostic only, GC not forced, not proof of leak freedom"
+      }
+    ],
+    "result": "preserved invariant",
+    "cleanup": {
+      "owner": "hook unmount and mock transport",
+      "deadline": "each round",
+      "active_reads_bound": 0,
+      "listeners": "mock signal objects dropped each round",
+      "process_and_fd": "real transport gap"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 11.766249999999957
+  },
+  {
+    "id": "H07",
+    "name": "completion callback failure after commit with immediate previousSpec retry",
+    "variant": "base",
+    "observations": [
+      {
+        "committed": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one",
+              "x"
+            ],
+            "count": 0
+          }
+        },
+        "error": "completion-sink-failed",
+        "after_retry": {
+          "root": "main",
+          "elements": {},
+          "state": {
+            "source": "keep",
+            "items": [
+              "zero",
+              "one",
+              "x",
+              "x"
+            ],
+            "count": 0
+          }
+        },
+        "callbacks": 2
+      }
+    ],
+    "result": "duplicated append after ambiguous callback success; no stream idempotency key",
+    "cleanup": {
+      "owner": "hook finally/unmount; callback owner for sink compensation",
+      "deadline": "send settlement",
+      "streaming": false
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.407209000000023
+  },
+  {
+    "id": "P01",
+    "name": "F2 mixed rejected callbacks, repeated updates and exact immediate retry",
+    "variant": "base",
+    "observations": [
+      {
+        "rounds": [
+          {
+            "i": 1,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 1
+            },
+            "callback": [
+              {
+                "path": "/items/01",
+                "value": "rejected"
+              },
+              {
+                "path": "/count",
+                "value": 1
+              }
+            ],
+            "events_before_retry": 1,
+            "events_after_retry": 1
+          },
+          {
+            "i": 2,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 2
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 2
+              }
+            ],
+            "events_before_retry": 2,
+            "events_after_retry": 2
+          },
+          {
+            "i": 3,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 3
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 3
+              }
+            ],
+            "events_before_retry": 3,
+            "events_after_retry": 3
+          },
+          {
+            "i": 4,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 4
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 4
+              }
+            ],
+            "events_before_retry": 4,
+            "events_after_retry": 4
+          },
+          {
+            "i": 5,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 5
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 5
+              }
+            ],
+            "events_before_retry": 5,
+            "events_after_retry": 5
+          },
+          {
+            "i": 6,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 6
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 6
+              }
+            ],
+            "events_before_retry": 6,
+            "events_after_retry": 6
+          },
+          {
+            "i": 7,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 7
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 7
+              }
+            ],
+            "events_before_retry": 7,
+            "events_after_retry": 7
+          },
+          {
+            "i": 8,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 8
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 8
+              }
+            ],
+            "events_before_retry": 8,
+            "events_after_retry": 8
+          },
+          {
+            "i": 9,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 9
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 9
+              }
+            ],
+            "events_before_retry": 9,
+            "events_after_retry": 9
+          },
+          {
+            "i": 10,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 10
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 10
+              }
+            ],
+            "events_before_retry": 10,
+            "events_after_retry": 10
+          },
+          {
+            "i": 11,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 11
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 11
+              }
+            ],
+            "events_before_retry": 11,
+            "events_after_retry": 11
+          },
+          {
+            "i": 12,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 12
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 12
+              }
+            ],
+            "events_before_retry": 12,
+            "events_after_retry": 12
+          },
+          {
+            "i": 13,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 13
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 13
+              }
+            ],
+            "events_before_retry": 13,
+            "events_after_retry": 13
+          },
+          {
+            "i": 14,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 14
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 14
+              }
+            ],
+            "events_before_retry": 14,
+            "events_after_retry": 14
+          },
+          {
+            "i": 15,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 15
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 15
+              }
+            ],
+            "events_before_retry": 15,
+            "events_after_retry": 15
+          },
+          {
+            "i": 16,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 16
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 16
+              }
+            ],
+            "events_before_retry": 16,
+            "events_after_retry": 16
+          },
+          {
+            "i": 17,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 17
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 17
+              }
+            ],
+            "events_before_retry": 17,
+            "events_after_retry": 17
+          },
+          {
+            "i": 18,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 18
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 18
+              }
+            ],
+            "events_before_retry": 18,
+            "events_after_retry": 18
+          },
+          {
+            "i": 19,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 19
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 19
+              }
+            ],
+            "events_before_retry": 19,
+            "events_after_retry": 19
+          },
+          {
+            "i": 20,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 20
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 20
+              }
+            ],
+            "events_before_retry": 20,
+            "events_after_retry": 20
+          },
+          {
+            "i": 21,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 21
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 21
+              }
+            ],
+            "events_before_retry": 21,
+            "events_after_retry": 21
+          },
+          {
+            "i": 22,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 22
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 22
+              }
+            ],
+            "events_before_retry": 22,
+            "events_after_retry": 22
+          },
+          {
+            "i": 23,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 23
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 23
+              }
+            ],
+            "events_before_retry": 23,
+            "events_after_retry": 23
+          },
+          {
+            "i": 24,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 24
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 24
+              }
+            ],
+            "events_before_retry": 24,
+            "events_after_retry": 24
+          },
+          {
+            "i": 25,
+            "state": {
+              "items": [
+                "a",
+                "rejected"
+              ],
+              "count": 25
+            },
+            "callback": [
+              {
+                "path": "/count",
+                "value": 25
+              }
+            ],
+            "events_before_retry": 25,
+            "events_after_retry": 25
+          }
+        ]
+      }
+    ],
+    "result": "baseline callback matches coerced write",
+    "cleanup": {
+      "owner": "StateProvider/useSyncExternalStore",
+      "deadline": "unmount",
+      "callbacks_after_exact_retry": 0,
+      "external_sink_rollback": "not supplied"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 3.1584159999999883
+  },
+  {
+    "id": "P02",
+    "name": "provider callback sink fails before/after its own commit, then same retry",
+    "variant": "base",
+    "observations": [
+      {
+        "stage": "before-sink",
+        "caught": "before-sink",
+        "committed": {
+          "items": [
+            "a",
+            "b"
+          ],
+          "count": 1
+        },
+        "after_retry": {
+          "items": [
+            "a",
+            "b"
+          ],
+          "count": 1
+        },
+        "callback_calls": 1,
+        "sink": []
+      },
+      {
+        "stage": "after-sink",
+        "caught": "after-sink",
+        "committed": {
+          "items": [
+            "a",
+            "b"
+          ],
+          "count": 1
+        },
+        "after_retry": {
+          "items": [
+            "a",
+            "b"
+          ],
+          "count": 1
+        },
+        "callback_calls": 1,
+        "sink": [
+          [
+            {
+              "path": "/count",
+              "value": 1
+            }
+          ]
+        ]
+      }
+    ],
+    "result": "caller-level persistence gap after local commit; identical retry suppresses callback instead of rolling back/redelivering",
+    "cleanup": {
+      "owner": "application callback sink",
+      "deadline": "application-defined; absent from library contract",
+      "pending": 0,
+      "automatic_compensation": false
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.7004170000000158
+  },
+  {
+    "id": "H08",
+    "name": "fetch stalls before response and external logical deadline fires",
+    "variant": "base",
+    "observations": [
+      {
+        "during": {
+          "streaming": true,
+          "spec": {
+            "root": "",
+            "elements": {}
+          },
+          "requests": 1
+        },
+        "failed": {
+          "error": "fetch-external-deadline",
+          "streaming": false
+        },
+        "after_retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "recovered": true
+          }
+        },
+        "first_signal_aborted_on_retry": true
+      }
+    ],
+    "result": "recoverable rejection under externally supplied deadline; no hook timeout",
+    "cleanup": {
+      "owner": "fetch implementation rejects; hook aborts old signal on retry",
+      "deadline": "external deadline and next send",
+      "pending_fetches": 0
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.730041999999969
+  },
+  {
+    "id": "H09",
+    "name": "onError throws at last fallible stage after a committed patch",
+    "variant": "base",
+    "observations": [
+      {
+        "afterFault": {
+          "spec": {
+            "root": "",
+            "elements": {},
+            "state": {
+              "count": 1
+            }
+          },
+          "streaming": false,
+          "error": "disconnect",
+          "rejected_send": "error-sink-failed"
+        },
+        "retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "count": 2
+          }
+        },
+        "stats": {
+          "readers": 1,
+          "reads": 2,
+          "active": 0,
+          "aborts": 1,
+          "release": 0,
+          "cancel": 0,
+          "completions": 0
+        }
+      }
+    ],
+    "result": "error callback exception propagates but finally clears streaming",
+    "cleanup": {
+      "owner": "hook finally + caller catch",
+      "deadline": "send promise settlement",
+      "active_reads": 0,
+      "callback_sink": "application-owned"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.6127500000000055
+  },
+  {
+    "id": "H10",
+    "name": "malformed upstream patch shape is signaled and retry recovers",
+    "variant": "base",
+    "observations": [
+      {
+        "patch": {
+          "op": "add",
+          "path": 17,
+          "value": 1
+        },
+        "afterFault": {
+          "spec": {
+            "root": "main",
+            "elements": {},
+            "state": {
+              "source": "keep",
+              "items": [
+                "zero",
+                "one"
+              ],
+              "count": 0
+            }
+          },
+          "error": "path.startsWith is not a function",
+          "streaming": false
+        },
+        "after_retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "recovered": true
+          }
+        }
+      },
+      {
+        "patch": {
+          "op": "move",
+          "from": 17,
+          "path": "/state/moved"
+        },
+        "afterFault": {
+          "spec": {
+            "root": "main",
+            "elements": {},
+            "state": {
+              "source": "keep",
+              "items": [
+                "zero",
+                "one"
+              ],
+              "count": 0
+            }
+          },
+          "error": "path.startsWith is not a function",
+          "streaming": false
+        },
+        "after_retry": {
+          "root": "",
+          "elements": {},
+          "state": {
+            "recovered": true
+          }
+        }
+      }
+    ],
+    "result": "malformed schema is rejected at runtime, stream error signaled, retry recovers",
+    "cleanup": {
+      "owner": "hook finally/unmount",
+      "deadline": "send settles",
+      "mock_requests_pending": 0
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.860334000000023
+  },
+  {
+    "id": "H11",
+    "name": "burst growth and explicit fresh-send cleanup of raw lines",
+    "variant": "base",
+    "observations": [
+      {
+        "sizes": [
+          {
+            "delivered": 128,
+            "retained_raw_lines": 128,
+            "state": {
+              "root": "",
+              "elements": {},
+              "state": {
+                "count": 127
+              }
+            }
+          },
+          {
+            "delivered": 256,
+            "retained_raw_lines": 256,
+            "state": {
+              "root": "",
+              "elements": {},
+              "state": {
+                "count": 255
+              }
+            }
+          },
+          {
+            "delivered": 384,
+            "retained_raw_lines": 384,
+            "state": {
+              "root": "",
+              "elements": {},
+              "state": {
+                "count": 383
+              }
+            }
+          },
+          {
+            "delivered": 512,
+            "retained_raw_lines": 512,
+            "state": {
+              "root": "",
+              "elements": {},
+              "state": {
+                "count": 511
+              }
+            }
+          }
+        ],
+        "afterClear": {
+          "spec": null,
+          "raw_lines": 512
+        },
+        "after_fresh_send": {
+          "raw_lines": 1,
+          "state": {
+            "root": "",
+            "elements": {},
+            "state": {
+              "count": 0
+            }
+          }
+        },
+        "stats": {
+          "readers": 1,
+          "reads": 5,
+          "active": 0,
+          "aborts": 1,
+          "release": 0,
+          "cancel": 0,
+          "completions": 1
+        }
+      }
+    ],
+    "result": "raw line retention grows with input and survives clear; fresh send resets, no built-in overload cap",
+    "cleanup": {
+      "owner": "hook next send/unmount, application caps ingress",
+      "deadline": "new send",
+      "active_reads": 0,
+      "retained_raw_lines_after_new_send": 1,
+      "maximum_supported_load": "gap"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 1.5022499999999468
+  },
+  {
+    "id": "C11",
+    "name": "accessor refuses read before immutable commit and retry succeeds",
+    "variant": "base",
+    "observations": [
+      {
+        "atFault": {
+          "same_snapshot": true,
+          "writes": 0,
+          "original_array": [
+            "a"
+          ]
+        },
+        "after_retry": {
+          "count": 0,
+          "items": [
+            "b"
+          ]
+        },
+        "writes": 1,
+        "original_array": [
+          "a"
+        ]
+      }
+    ],
+    "result": "preserved invariant",
+    "cleanup": {
+      "owner": "accessor/adapter owner",
+      "deadline": "before immediate retry",
+      "fault_disabled": true,
+      "pending": 0
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.16737499999999272
+  },
+  {
+    "id": "C12",
+    "name": "frozen destination throws after source removal, then immediate retry",
+    "variant": "base",
+    "observations": [
+      {
+        "mode": "frozen",
+        "before": {
+          "source": "keep",
+          "locked": {
+            "value": "before"
+          }
+        },
+        "error": "Cannot assign to read only property 'value' of object '#<Object>'",
+        "afterFault": {
+          "locked": {
+            "value": "before"
+          }
+        },
+        "sourceGone": true,
+        "after_immediate_retry": {
+          "locked": {
+            "value": {
+              "$undefined": true
+            }
+          }
+        },
+        "explicit_compensation": {
+          "locked": {
+            "value": "keep"
+          }
+        }
+      },
+      {
+        "mode": "throwing-setter",
+        "before": {
+          "source": "keep",
+          "locked": {
+            "value": "before"
+          }
+        },
+        "error": "setter-refused",
+        "afterFault": {
+          "locked": {
+            "value": "before"
+          }
+        },
+        "sourceGone": true,
+        "after_immediate_retry": {
+          "locked": {
+            "value": {
+              "$undefined": true
+            }
+          }
+        },
+        "explicit_compensation": {
+          "locked": {
+            "value": "keep"
+          }
+        }
+      },
+      {
+        "mode": "commit-only-setter",
+        "before": {
+          "source": "keep",
+          "locked": {
+            "value": "before"
+          }
+        },
+        "error": "setter-refused",
+        "afterFault": {
+          "locked": {
+            "value": "before"
+          }
+        },
+        "sourceGone": true,
+        "after_immediate_retry": {
+          "locked": {
+            "value": {
+              "$undefined": true
+            }
+          }
+        },
+        "explicit_compensation": {
+          "locked": {
+            "value": "keep"
+          }
+        }
+      }
+    ],
+    "result": "all three non-JSON destination failures occur after source removal",
+    "cleanup": {
+      "owner": "caller supplying non-JSON object",
+      "deadline": "before safe retry",
+      "action": "replace failing destination and restore source from independent snapshot",
+      "automatic_rollback": false
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.1931250000000091
+  },
+  {
+    "id": "C13",
+    "name": "unrelated cyclic branch survives repeated rejected move without traversal",
+    "variant": "base",
+    "observations": [
+      {
+        "repeats": 100,
+        "same_cycle": true,
+        "cycle_intact": true,
+        "source_present": false,
+        "items": [
+          "a",
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          {
+            "$undefined": true
+          },
+          "keep",
+          "b"
+        ]
+      }
+    ],
+    "result": "preserved invariant",
+    "cleanup": {
+      "owner": "caller drops graph after operation",
+      "deadline": "test return",
+      "garbage_collection": "gap; identity invariant only"
+    },
+    "test_status": "pass",
+    "elapsed_ms": 0.13754199999999628
+  }
+]

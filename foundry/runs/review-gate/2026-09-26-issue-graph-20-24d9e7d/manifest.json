@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "id": "issue-graph-pr20-review-2026-09-26",
+  "repository": "vercel-labs/issue-graph",
+  "target_path": "/Users/raillyhugo/Programming/vercel/issue-graph-review-pr20",
+  "base": "55714fa1d45642d00451bc0170aae54de87a966a",
+  "head": "24d9e7d2b211e6eb6bf9bc1ec54f6792bd3bb475",
+  "dirty_digest": "clean",
+  "changed_paths_digest": "sha256:570b6e715cfea0e4e836e74e4d8c821c2423076f16adb2fab090ba6ae94cfd5c",
+  "authorization": "User explicitly requested $review-gate for PR20. Local review/build/fixtures only; no posting, source fixes, merge or publish.",
+  "profile": "external-pr",
+  "risk": "high",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "runtime": {
+    "mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "FX credential status did not satisfy wrapper contract. Native reviewers are separate contexts in the same model family as root; contributor model is unknown.",
+    "schema_failures": 2,
+    "operations": [
+      {
+        "operation": "FX independent review",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false,
+        "evidence": "FX wrapper: unsupported auth mode missing; inspected fx status keys and fx ask help once."
+      },
+      {
+        "operation": "native reviewer dispatch",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false,
+        "evidence": "First dispatch rejected empty optional reasoning_effort; corrected dispatch succeeded."
+      }
+    ],
+    "receipt": "correctness-review.md"
+  },
+  "budget": {
+    "review_timeout_ms": 1200000,
+    "source": "packaged run-fx-review.mjs DEFAULT_TIMEOUT_MS"
+  },
+  "stages": {
+    "test_strength": {
+      "status": "unavailable",
+      "reason": "Required Test Strength receipt is absent for Jira normalization, TWG decoding, and shared traversal changes."
+    },
+    "resilience": {
+      "status": "unavailable",
+      "reason": "Required Resilience Audit receipt is absent for subprocess timeout, output-file cleanup, failure partitions, and retry."
+    },
+    "security_review": {
+      "status": "incomplete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/security-review.json",
+      "fingerprint": {
+        "repository": "vercel-labs/issue-graph",
+        "base_sha": "55714fa1d45642d00451bc0170aae54de87a966a",
+        "head_sha": "24d9e7d2b211e6eb6bf9bc1ec54f6792bd3bb475",
+        "dirty_digest": "clean",
+        "changed_path_digest": "sha256:570b6e715cfea0e4e836e74e4d8c821c2423076f16adb2fab090ba6ae94cfd5c",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+      }
+    },
+    "review": {
+      "schemaVersion": 1,
+      "status": "incomplete",
+      "verdict": "incomplete",
+      "head": "24d9e7d2b211e6eb6bf9bc1ec54f6792bd3bb475",
+      "report": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/run-report-24d9e7d.json",
+      "human_view": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/run-report-24d9e7d.md",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "fingerprint": {
+        "head_sha": "24d9e7d2b211e6eb6bf9bc1ec54f6792bd3bb475",
+        "changed_paths_digest": "sha256:570b6e715cfea0e4e836e74e4d8c821c2423076f16adb2fab090ba6ae94cfd5c",
+        "contract_digest": "sha256:1c9a7efcd811203a2f498f65852024b2e6fc7fed26cee711e3b3261215a8ec48",
+        "command": "review-gate PR20; exact commands and observations in run-report-24d9e7d.json",
+        "environment_digest": "sha256:76ae7b4686f33badf6893cce95505407889f43031fbb8483945d60fa9f49ef4b",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "CHANGELOG.md",
+          "CONTRIBUTING.md",
+          "README.md",
+          "apps/docs/content/docs/changelog.mdx",
+          "apps/docs/content/docs/get-started.mdx",
+          "apps/docs/content/docs/index.mdx",
+          "apps/docs/content/docs/jira.mdx",
+          "apps/docs/content/docs/library.mdx",
+          "apps/docs/content/docs/meta.json",
+          "apps/docs/content/docs/reference.mdx",
+          "apps/docs/content/docs/security.mdx",
+          "apps/docs/src/lib/docs-paths.ts",
+          "apps/docs/tests/content.test.ts",
+          "apps/docs/tests/public-skill.test.ts",
+          "package.json",
+          "scripts/verify-package.ts",
+          "skill-data/core/SKILL.md",
+          "skill-data/core/references/workflows.md",
+          "src/bin.ts",
+          "src/cli.ts",
+          "src/crawl.test.ts",
+          "src/crawl.ts",
+          "src/index.ts",
+          "src/jira-cli.test.ts",
+          "src/jira-cli.ts",
+          "src/jira.test.ts",
+          "src/jira.ts",
+          "src/schema.test.ts",
+          "src/schema.ts",
+          "src/transports/twg.test.ts",
+          "src/transports/twg.ts",
+          "src/types.ts"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      },
+      "evidence": [
+        "Two confirmed P2 normalization defects, F1 and F2.",
+        "636 core tests,96 docs tests, lint/types/build,48 package commands and90 production docs HTTP checks pass.",
+        "Native separate-context correctness/security review completed. Cross-family independence and real TWG remain unverified.",
+        "Test Strength and Resilience receipts unavailable; security review incomplete.",
+        "gate report exit1 expected for gaps/findings; render and exact-head coverage exit0."
+      ],
+      "validation": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/validation-receipt.json"
+    }
+  },
+  "contract": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/contract.md",
+  "updated_at": "2026-09-26T20:39:19.447014+00:00",
+  "review": {
+    "schemaVersion": 1,
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "head": "24d9e7d2b211e6eb6bf9bc1ec54f6792bd3bb475",
+    "report": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/run-report-24d9e7d.json",
+    "human_view": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/run-report-24d9e7d.md",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "fingerprint": {
+      "head_sha": "24d9e7d2b211e6eb6bf9bc1ec54f6792bd3bb475",
+      "changed_paths_digest": "sha256:570b6e715cfea0e4e836e74e4d8c821c2423076f16adb2fab090ba6ae94cfd5c",
+      "contract_digest": "sha256:1c9a7efcd811203a2f498f65852024b2e6fc7fed26cee711e3b3261215a8ec48",
+      "command": "review-gate PR20; exact commands and observations in run-report-24d9e7d.json",
+      "environment_digest": "sha256:76ae7b4686f33badf6893cce95505407889f43031fbb8483945d60fa9f49ef4b",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "relevant_paths": [
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "README.md",
+        "apps/docs/content/docs/changelog.mdx",
+        "apps/docs/content/docs/get-started.mdx",
+        "apps/docs/content/docs/index.mdx",
+        "apps/docs/content/docs/jira.mdx",
+        "apps/docs/content/docs/library.mdx",
+        "apps/docs/content/docs/meta.json",
+        "apps/docs/content/docs/reference.mdx",
+        "apps/docs/content/docs/security.mdx",
+        "apps/docs/src/lib/docs-paths.ts",
+        "apps/docs/tests/content.test.ts",
+        "apps/docs/tests/public-skill.test.ts",
+        "package.json",
+        "scripts/verify-package.ts",
+        "skill-data/core/SKILL.md",
+        "skill-data/core/references/workflows.md",
+        "src/bin.ts",
+        "src/cli.ts",
+        "src/crawl.test.ts",
+        "src/crawl.ts",
+        "src/index.ts",
+        "src/jira-cli.test.ts",
+        "src/jira-cli.ts",
+        "src/jira.test.ts",
+        "src/jira.ts",
+        "src/schema.test.ts",
+        "src/schema.ts",
+        "src/transports/twg.test.ts",
+        "src/transports/twg.ts",
+        "src/types.ts"
+      ],
+      "reusable": false,
+      "reuse_evidence": null
+    },
+    "evidence": [
+      "Two confirmed P2 normalization defects, F1 and F2.",
+      "636 core tests,96 docs tests, lint/types/build,48 package commands and90 production docs HTTP checks pass.",
+      "Native separate-context correctness/security review completed. Cross-family independence and real TWG remain unverified.",
+      "Test Strength and Resilience receipts unavailable; security review incomplete.",
+      "gate report exit1 expected for gaps/findings; render and exact-head coverage exit0."
+    ],
+    "validation": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/validation-receipt.json"
+  },
+  "followups": [
+    {
+      "kind": "review-main-compatibility-addendum",
+      "observed_at": "2026-09-26T21:11:25.809476+00:00",
+      "main": "06f8496ad26b4dbd2d8bca754a125fcc23846dae",
+      "integration_tree": "37c52a80b71934fb840ccd594103174be9736edf",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/main-06f8496/main-impact.json",
+      "verdict": "original_findings_persist"
+    }
+  ]
+}

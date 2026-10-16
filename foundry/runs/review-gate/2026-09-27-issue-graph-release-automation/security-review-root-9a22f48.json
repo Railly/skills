@@ -1,0 +1,99 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/issue-graph",
+    "base_sha": "8de9132367c6f69859160df40f8235cb6676894b",
+    "head_sha": "9a22f48f5e73cd072fcadddfa833f60ff82a8da1",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:2978b99ea56e33be7878636838f13fbb17c2d19c80ed872c818e2258a785bee2",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "Only canonical main release code can publish the tested retained artifact with the existing OIDC identity; no stored npm credentials or widened GitHub job permissions.",
+    "attacker": "Untrusted pull-request/fork author or malformed registry response; main writers are trusted release principals under the explicitly requested policy.",
+    "scope": "Four-file release automation diff and Release environment reviewer-policy change."
+  },
+  "trust_model": {
+    "assets": [
+      "npm issue-graph immutable versions",
+      "GitHub version tags and releases",
+      "Release-bound OIDC identity",
+      "Exact tested archive and source identity"
+    ],
+    "principals": [
+      "PR/fork author: no canonical main push event or Release environment access",
+      "Canonical main writer: user-authorized release principal after this policy change",
+      "Build/consumer: contents read, no OIDC",
+      "Publish: contents/actions read and id-token write, no contents write",
+      "github-release: contents write only, no OIDC"
+    ],
+    "boundaries": [
+      "Event/repository/ref guards before candidate outputs",
+      "Manifest stable version and event SHA checked against actual checkout",
+      "Immutable artifact ID, release.json and SHA256 verified across build/consumers/publish",
+      "Registry metadata and bytes treated as untrusted; URL allowlist/no redirects/checksums",
+      "Main-only Release deployment policy verified after removing human reviewer gate"
+    ],
+    "entrypoints": [
+      "push main",
+      "workflow_dispatch main with exact version/SHA; publish defaults false"
+    ],
+    "sinks": [
+      "npm publish exact tarball with ignore-scripts and OIDC",
+      "Git refs POST at expected commit; gh release create verify-tag"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-POLICY",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": [
+        "User explicitly requests publication without manual approval"
+      ],
+      "chain": {
+        "capability": "Canonical main write permission",
+        "reachability": "Push triggers source version candidate",
+        "control": "Main source controls publish script and package",
+        "boundary": "Release manual reviewer approval removed as requested; main-only binding retained",
+        "impact": "Main writes now carry release authority, which is the requested policy rather than an unintended escalation"
+      },
+      "confidence": "high",
+      "evidence": [
+        "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/environment-before.json",
+        "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/environment-after.json",
+        "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/environment-branch-policy.json",
+        "Canonical main rule read: enterprise signed commits; source docs do not claim enforced PR review."
+      ]
+    },
+    {
+      "id": "SEC-INPUTS",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "confidence": "high",
+      "evidence": [
+        "157 release tests reject noncanonical repos, non-main refs, invalid events, SHA/version mismatch, registry failures, foreign URLs and altered bytes.",
+        "Production callsite mutations disabling registry byte verification or forcing publish are rejected by real process tests.",
+        ".github/workflows/release.yml retains exact event checkout and scoped permissions; no new secret source or registry mutation command."
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "Read-only source/registry review, isolated local process/network doubles, and user-requested Release environment policy update. No remote fault injection.",
+    "commands": [
+      "bun run check",
+      "bun x --no-install vitest run --config vitest.config.ts src/release.test.ts",
+      "gh api repos/vercel-labs/issue-graph/environments/Release",
+      "gh api repos/vercel-labs/issue-graph/environments/Release/deployment-branch-policies"
+    ],
+    "cleanup": "Mutation worktree source restored clean; production fixture archive not altered; environment main policy preserved.",
+    "gaps": [],
+    "results": "Runtime/workflow/source tests unchanged since e78e205; inspected later guide and docs-contract-test deltas,95docs tests pass with lint/typecheck."
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": []
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-issue-graph-release-automation/security-review-root-9a22f48.json"
+}

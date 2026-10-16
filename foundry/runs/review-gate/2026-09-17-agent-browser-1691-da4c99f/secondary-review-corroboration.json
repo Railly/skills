@@ -1,0 +1,58 @@
+{
+  "kind": "secondary-review-corroboration",
+  "observed_at": "2026-09-17T06:40:51.403325+00:00",
+  "repository": "vercel-labs/agent-browser",
+  "head": "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+  "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+  "scope": "Read-only diff, caller, daemon lock, dependency source, official saved API schema, and existing run artifact audit.",
+  "independence": "This pass consumed existing dogfood and cleanup evidence and is corroboration, not a blind or cross-family review. No source or shared report changes.",
+  "findings": [
+    {
+      "id": "secondary-F1",
+      "priority": "P1",
+      "title": "Bound the new create request and response read",
+      "location": {
+        "path": "cli/src/native/providers.rs",
+        "start": 388,
+        "end": 403
+      },
+      "claim": "The new HTTP create request and full response read have no request deadline. A peer that accepts a connection but never answers holds the daemon state lock; close and idle cleanup cannot progress.",
+      "source_evidence": [
+        "reqwest 0.12.28 async_impl/client.rs defaults connect_timeout=None, read_timeout=None, timeout=None; timeout docs state default no timeout",
+        "cli/src/native/daemon.rs:553-554 holds state.lock while awaiting execute_command",
+        "cli/src/native/actions.rs:3527 and 4469 provider calls await without an outer timeout"
+      ],
+      "empirical_evidence": "Existing dogfood.json: proxy_reached=true; open exceeded 36 seconds; concurrent close exceeded 5 seconds; daemon still alive despite configured 1000ms idle timeout. Proxy release allowed close.",
+      "limit": "Measurements were produced by the existing coordinator artifact, not rerun by this pass."
+    },
+    {
+      "id": "secondary-F2",
+      "priority": "P1",
+      "title": "Do not discard the session when the V4 stop fails",
+      "location": {
+        "path": "cli/src/native/providers.rs",
+        "start": 140,
+        "end": 151
+      },
+      "claim": "The PR makes Browser Use return a managed ProviderSession and activates the stop path, but stop errors and non-success HTTP statuses are ignored. close_active_provider_session takes the session before awaiting, so close reports success and a second close has no session ID to retry.",
+      "source_evidence": [
+        "cli/src/native/actions.rs:2067-2071 takes and drops active_provider_session",
+        "cli/src/native/providers.rs:142-151 ignores send result and status",
+        "README.md:1833-1835 newly promises stop/billing cleanup"
+      ],
+      "empirical_evidence": "Successful section of existing cleanup-probe.log: FIRST_CLOSE success=true, RETAINED_SESSION=false, SECOND_CLOSE success=true, STOP_TRANSPORT_ATTEMPTS=1 after proxy returns 502.",
+      "limit": "Scratch probe injects retained state and transport failure, not a live cloud session; log contains an unrelated failed compile tail and should be regenerated cleanly before final receipt."
+    }
+  ],
+  "verification_gaps": [
+    "Existing tests.log stopped at timed_out_plugin_is_killed with no final test-result summary at inspection; full-suite success cannot be asserted from it.",
+    "No passing Test Strength or Resilience receipt in existing manifest.",
+    "Live create/connect/profile/proxy/recording/stop provider smoke remains unavailable.",
+    "The saved API schema permits absent/null cdpUrl. The parser loses an otherwise valid id on that branch; active-create reachability is not proven, so this is an unverified cleanup gap rather than an additional confirmed finding."
+  ],
+  "concurrency_observations": {
+    "target_status": "?? node_modules",
+    "dogfood_binary_hash_matches_current": false,
+    "note": "Concurrent coordinator work appears active; final identity should be refreshed after its build/setup."
+  }
+}

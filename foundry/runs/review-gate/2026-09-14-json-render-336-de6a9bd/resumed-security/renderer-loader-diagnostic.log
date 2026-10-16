@@ -1,0 +1,66 @@
+{"core_resolutions":[],"hooks_resolved":"/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/react/src/hooks.ts","linked_core":"/Users/raillyhugo/Programming/vercel/json-render/packages/core/dist/index.js"}
+{"direct_core_guarded":true}
+43 |     const {result,unmount} = renderHook(()=>useUIStream({api:'/in-process-only'}));
+44 |     try {
+45 |       await act(async()=>{await result.current.send('local synthetic input');});
+46 |       assert.equal(requests,1); assert.equal(result.current.error,null);
+47 |       const spec = result.current.spec;
+48 |       for (const [p,descriptors] of protos) assert.deepEqual(Object.getOwnPropertyDescriptors(p),descriptors);
+                                                        ^
+AssertionError: Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  {
+    ['__proto__']: {
+      configurable: true,
+      enumerable: false,
+      get: [Function: get __proto__],
+...
+    },
++   __json336_renderer_local_marker__: {
++     configurable: true,
++     enumerable: true,
++     value: true,
++     writable: true
++   },
+    __lookupGetter__: {
+      configurable: true,
+      enumerable: false,
+      value: [Function: __lookupGetter__],
+      writable: true
+
+ generatedMessage: true,
+     actual: {
+  toString: [Object ...],
+  toLocaleString: [Object ...],
+  valueOf: [Object ...],
+  hasOwnProperty: [Object ...],
+  propertyIsEnumerable: [Object ...],
+  isPrototypeOf: [Object ...],
+  __defineGetter__: [Object ...],
+  __defineSetter__: [Object ...],
+  __lookupGetter__: [Object ...],
+  __lookupSetter__: [Object ...],
+  __proto__: [Object ...],
+  __json336_renderer_local_marker__: [Object ...],
+},
+   expected: {
+  toString: [Object ...],
+  toLocaleString: [Object ...],
+  valueOf: [Object ...],
+  hasOwnProperty: [Object ...],
+  propertyIsEnumerable: [Object ...],
+  isPrototypeOf: [Object ...],
+  __defineGetter__: [Object ...],
+  __defineSetter__: [Object ...],
+  __lookupGetter__: [Object ...],
+  __lookupSetter__: [Object ...],
+  __proto__: [Object ...],
+},
+   operator: "deepStrictEqual",
+       code: "ERR_ASSERTION"
+
+      at /Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-security/renderer-loader-diagnostic.mjs:48:52
+
+Bun v1.3.11 (macOS arm64)

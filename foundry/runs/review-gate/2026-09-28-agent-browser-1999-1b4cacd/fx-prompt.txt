@@ -1,0 +1,1278 @@
+Independently review external PR vercel-labs/agent-browser#1999 frozen head 1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51 against parent d01253d9db28d75080e36da3c1c31ef89454731e. Read-only. The CLI before/after already proves hidden-first user/password/submit fail on base and pass on head. Assess only real actionable defects in this diff, not speculative hardening. Triggered lenses: inverse regression surface, new-domain matrix, error propagation, cancellation and timeout, substrate/identity, complexity, newly claimed invariant and auth trust boundaries. Specifically independently challenge exact node preservation and stale failure, explicit CSS selectors, descriptor retries and remote object release. Provide severity, exact changed line, concrete reachable repro, distinction between changed vs preexisting and security vs correctness. Author identity unknown. Return concise findings or no findings. Source packet follows.
+
+resolution-object
+
+pub async fn resolve_element_object_id(
+    client: &CdpClient,
+    session_id: &str,
+    ref_map: &RefMap,
+    selector_or_ref: &str,
+    iframe_sessions: &HashMap<String, String>,
+) -> Result<(String, String), String> {
+    if let Some(ref_id) = parse_ref(selector_or_ref) {
+        let entry = ref_map
+            .get(&ref_id)
+            .ok_or_else(|| format!("Unknown ref: {}", ref_id))?;
+
+        let effective_session_id =
+            resolve_frame_session(entry.frame_id.as_deref(), session_id, iframe_sessions);
+
+        // Try cached backend_node_id first (fast path)
+        if let Some(backend_node_id) = entry.backend_node_id {
+            let result: Result<DomResolveNodeResult, String> = client
+                .send_command_typed(
+                    "DOM.resolveNode",
+                    &DomResolveNodeParams {
+                        backend_node_id: Some(backend_node_id),
+                        node_id: None,
+                        object_group: Some("agent-browser".to_string()),
+                    },
+                    Some(effective_session_id),
+                )
+                .await;
+
+            if let Ok(r) = result {
+                if let Some(object_id) = r.object.object_id {
+                    return Ok((object_id, effective_session_id.to_string()));
+                }
+            }
+            if !entry.allow_role_fallback {
+                return Err(format!("Element ref {ref_id} is stale"));
+            }
+            // backend_node_id is stale; re-query the accessibility tree below
+        }
+
+        // Fallback: re-query the accessibility tree to find a fresh node by role/name
+        let fresh_id = find_node_id_by_role_name(
+            client,
+            session_id,
+            &entry.role,
+            &entry.name,
+            entry.nth,
+            entry.frame_id.as_deref(),
+            iframe_sessions,
+        )
+        .await?;
+        let result: DomResolveNodeResult = client
+            .send_command_typed(
+                "DOM.resolveNode",
+                &DomResolveNodeParams {
+                    backend_node_id: Some(fresh_id),
+                    node_id: None,
+                    object_group: Some("agent-browser".to_string()),
+                },
+                Some(effective_session_id),
+            )
+            .await?;
+        let object_id = result
+            .object
+            .object_id
+            .ok_or_else(|| format!("No objectId for ref {}", ref_id))?;
+        return Ok((object_id, effective_session_id.to_string()));
+    }
+
+    // Selector fallback (CSS or XPath): honor an active `frame <sel>` selection.
+    if let Some(frame_id) = active_frame() {
+        if let Some(frame_session) = iframe_sessions.get(&frame_id) {
+            let js = build_find_element_js(selector_or_ref);
+            let result: EvaluateResult = client
+
+
+auth
+    state.session_setup.extra_headers = Some(headers);
+
+    Ok(json!({ "set": true }))
+}
+
+// ---------------------------------------------------------------------------
+// Auth handlers
+// ---------------------------------------------------------------------------
+
+struct AuthLoginElement {
+    ref_map: RefMap,
+}
+
+/// Wait for any selector in `selectors` to match a usable element and retain
+/// that element's stable backend node identity for the subsequent interaction.
+///
+/// This is used by `auth_login` auto-detection so SPA login forms can render
+/// after initial navigation without requiring global network-idle.
+async fn wait_for_any_selector(
+    client: &super::cdp::client::CdpClient,
+    session_id: &str,
+    selectors: &[&str],
+    timeout_ms: u64,
+) -> Result<AuthLoginElement, String> {
+    let deadline = tokio::time::Instant::now() + tokio::time::Duration::from_millis(timeout_ms);
+
+    loop {
+        for selector in selectors {
+            let expression = format!(
+                r#"(() => {{
+                    return Array.from(document.querySelectorAll({sel})).find((el) => {{
+                        const r = el.getBoundingClientRect();
+                        const s = window.getComputedStyle(el);
+                        const opacity = parseFloat(s.opacity || '1');
+                        const isVisible =
+                            r.width > 0 &&
+                            r.height > 0 &&
+                            s.visibility !== 'hidden' &&
+                            s.display !== 'none' &&
+                            (!Number.isFinite(opacity) || opacity > 0);
+
+                        if (!isVisible || el.matches(':disabled')) return false;
+                        if (el instanceof HTMLInputElement && el.type === 'hidden') return false;
+                        if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && el.readOnly) return false;
+                        return true;
+                    }}) || null;
+                }})()"#,
+                sel = serde_json::to_string(selector).unwrap_or_default()
+            );
+
+            let result: super::cdp::types::EvaluateResult = client
+                .send_command_typed(
+                    "Runtime.evaluate",
+                    &super::cdp::types::EvaluateParams {
+                        expression,
+                        return_by_value: Some(false),
+                        await_promise: Some(true),
+                    },
+                    Some(session_id),
+                )
+                .await?;
+
+            if result.exception_details.is_some()
+                || result.result.subtype.as_deref() != Some("node")
+            {
+                continue;
+            }
+
+            let Some(object_id) = result.result.object_id else {
+                continue;
+            };
+            let describe = client
+                .send_command(
+                    "DOM.describeNode",
+                    Some(json!({ "objectId": object_id })),
+                    Some(session_id),
+                )
+                .await;
+            let _ = client
+                .send_command(
+                    "Runtime.releaseObject",
+                    Some(json!({ "objectId": object_id })),
+                    Some(session_id),
+                )
+                .await;
+            let Ok(describe) = describe else {
+                continue;
+            };
+            let Some(backend_node_id) = describe
+                .pointer("/node/backendNodeId")
+                .and_then(Value::as_i64)
+            else {
+                continue;
+            };
+            let mut ref_map = RefMap::new();
+            ref_map.add_exact_backend_node(AUTH_LOGIN_ELEMENT_REF.to_string(), backend_node_id);
+            return Ok(AuthLoginElement { ref_map });
+        }
+
+        if tokio::time::Instant::now() >= deadline {
+            return Err(format!("Wait timed out after {}ms", timeout_ms));
+        }
+
+        tokio::time::sleep(tokio::time::Duration::from_millis(
+            AUTH_LOGIN_SELECTOR_POLL_INTERVAL_MS,
+        ))
+        .await;
+    }
+}
+
+async fn handle_auth_save(cmd: &Value) -> Result<Value, String> {
+    let name = cmd
+        .get("name")
+        .and_then(|v| v.as_str())
+        .ok_or("Missing 'name'")?;
+    let url = cmd
+        .get("url")
+        .and_then(|v| v.as_str())
+        .ok_or("Missing 'url'")?;
+    let username = cmd
+        .get("username")
+        .and_then(|v| v.as_str())
+        .ok_or("Missing 'username'")?;
+    let password = cmd
+        .get("password")
+        .and_then(|v| v.as_str())
+        .ok_or("Missing 'password'")?;
+    let username_selector = cmd.get("usernameSelector").and_then(|v| v.as_str());
+    let password_selector = cmd.get("passwordSelector").and_then(|v| v.as_str());
+    let submit_selector = cmd.get("submitSelector").and_then(|v| v.as_str());
+    auth::auth_save(
+        name,
+        url,
+        username,
+        password,
+        username_selector,
+        password_selector,
+        submit_selector,
+    )
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct AuthLoginOrigin(String);
+
+#[derive(Debug, Clone)]
+struct AuthLoginBoundPage {
+    target_id: String,
+    session_id: String,
+}
+
+/// Parse a URL into the normalized HTTP(S) origin used to constrain
+/// `auth login --no-navigate`. Paths, queries, and fragments are intentionally
+/// excluded, and URL serialization normalizes explicit default ports.
+fn auth_login_origin(raw_url: &str, label: &str) -> Result<AuthLoginOrigin, String> {
+    let has_unambiguous_authority = raw_url
+        .split_once(':')
+        .map(|(_, rest)| rest)
+        .is_some_and(|rest| rest.starts_with("//") && !rest.starts_with("///"));
+    let parsed = url::Url::parse(raw_url).map_err(|_| {
+        format!(
+            "Invalid {} URL: expected an absolute HTTP(S) URL with a host",
+            label
+        )
+    })?;
+    if !has_unambiguous_authority
+        || !matches!(parsed.scheme(), "http" | "https")
+        || parsed.host_str().is_none()
+    {
+        return Err(format!(
+            "Invalid {} URL: expected an absolute HTTP(S) URL with a host",
+            label
+        ));
+    }
+
+    Ok(AuthLoginOrigin(parsed.origin().ascii_serialization()))
+}
+
+/// Bind no-navigation login to the current top-level page before any external
+/// credential provider is invoked. This rejects missing, blank, opaque, and
+/// otherwise unusable pages without reading a secret unnecessarily.
+async fn bind_auth_login_active_page(state: &DaemonState) -> Result<AuthLoginBoundPage, String> {
+    let mgr = state
+        .browser
+        .as_ref()
+        .ok_or(AUTH_LOGIN_NO_NAVIGATE_PAGE_ERROR)?;
+    if mgr.page_count() == 0 {
+        return Err(AUTH_LOGIN_NO_NAVIGATE_PAGE_ERROR.to_string());
+    }
+    let target_id = mgr
+        .active_target_id()
+        .map_err(|_| AUTH_LOGIN_NO_NAVIGATE_PAGE_ERROR.to_string())?
+        .to_string();
+    let session_id = mgr
+        .active_session_id()
+        .map_err(|_| AUTH_LOGIN_NO_NAVIGATE_PAGE_ERROR.to_string())?
+        .to_string();
+    let current_url = mgr
+        .get_url()
+        .await
+        .map_err(|_| AUTH_LOGIN_NO_NAVIGATE_PAGE_ERROR.to_string())?;
+    auth_login_origin(&current_url, "current page")
+        .map_err(|_| AUTH_LOGIN_NO_NAVIGATE_PAGE_ERROR.to_string())?;
+
+    Ok(AuthLoginBoundPage {
+        target_id,
+        session_id,
+    })
+}
+
+/// Ensure credential-bearing work still targets the page that was active
+/// when no-navigation login began, and that its live document remains on the
+/// expected origin. Diagnostics contain origins only, never URL paths or
+/// credential values.
+async fn validate_auth_login_active_page(
+    mgr: &BrowserManager,
+    bound_page: &AuthLoginBoundPage,
+    expected_origin: &AuthLoginOrigin,
+) -> Result<(), String> {
+    let active_target_id = mgr.active_target_id().map_err(|_| {
+        "Active browser page changed during auth login --no-navigate; retry on the intended login page"
+            .to_string()
+    })?;
+    let active_session_id = mgr.active_session_id().map_err(|_| {
+        "Active browser page changed during auth login --no-navigate; retry on the intended login page"
+            .to_string()
+    })?;
+    if active_target_id != bound_page.target_id || active_session_id != bound_page.session_id {
+        return Err(
+            "Active browser page changed during auth login --no-navigate; retry on the intended login page"
+                .to_string(),
+        );
+    }
+
+    let current_url = mgr.get_url().await.map_err(|_| {
+        "Active browser page changed during auth login --no-navigate; retry on the intended login page"
+            .to_string()
+    })?;
+    let current_origin = auth_login_origin(&current_url, "current page")?;
+    ensure_auth_login_origin_matches(&current_origin, expected_origin)
+}
+
+fn ensure_auth_login_origin_matches(
+    current_origin: &AuthLoginOrigin,
+    expected_origin: &AuthLoginOrigin,
+) -> Result<(), String> {
+    if current_origin == expected_origin {
+        return Ok(());
+    }
+    Err(format!(
+        "Current page origin {} does not match credential origin {}",
+        current_origin.0, expected_origin.0
+    ))
+}
+
+async fn handle_auth_login(cmd: &Value, state: &mut DaemonState) -> Result<Value, String> {
+    let name = cmd
+        .get("name")
+        .and_then(|v| v.as_str())
+        .ok_or("Missing 'name'")?;
+    let no_navigate = cmd
+        .get("noNavigate")
+        .and_then(|value| value.as_bool())
+        .unwrap_or(false);
+    let bound_page = if no_navigate {
+        Some(bind_auth_login_active_page(state).await?)
+    } else {
+        None
+    };
+    if !no_navigate && state.browser.is_none() {
+        return Err("Browser not launched".to_string());
+    }
+    let url_override = cmd.get("url").and_then(|v| v.as_str());
+    let override_origin = if no_navigate {
+        url_override
+            .map(|url| auth_login_origin(url, "credential"))
+            .transpose()?
+    } else {
+        None
+    };
+    if let (Some(bound_page), Some(override_origin)) = (&bound_page, &override_origin) {
+        let mgr = state
+            .browser
+            .as_ref()
+            .ok_or(AUTH_LOGIN_NO_NAVIGATE_PAGE_ERROR)?;
+        validate_auth_login_active_page(mgr, bound_page, override_origin).await?;
+    }
+    let cred = if let Some(provider) = cmd.get("credentialProvider").and_then(|v| v.as_str()) {
+        let command_plugins = cmd
+            .get("plugins")
+            .and_then(|v| {
+                serde_json::from_value::<Vec<crate::plugins::PluginConfig>>(v.clone()).ok()
+            })
+            .unwrap_or_else(crate::plugins::plugins_from_env);
+        let resolved = crate::plugins::resolve_credential_with_plugins(
+            provider,
+            &command_plugins,
+            crate::plugins::CredentialResolveRequest {
+                profile_name: name,
+                item_ref: cmd.get("credentialItem").and_then(|v| v.as_str()),
+                url: url_override,
+            },
+        )
+        .await?;
+        auth::AuthProfile {
+            name: name.to_string(),
+            url: url_override
+                .map(String::from)
+                .or(resolved.url)
+                .unwrap_or_default(),
+            username: resolved.username,
+            password: resolved.password,
+            username_selector: resolved.username_selector,
+            password_selector: resolved.password_selector,
+            submit_selector: resolved.submit_selector,
+            created_at: None,
+            last_login_at: None,
+        }
+    } else {
+        let mut profile = auth::credentials_get_full(name)?;
+        if let Some(url) = url_override {
+            profile.url = url.to_string();
+        }
+        profile
+    };
+    if cred.url.is_empty() {
+        return Err("Credential has no URL".to_string());
+    }
+    let auth::AuthProfile {
+        url,
+        username,
+        password,
+        username_selector: stored_username_selector,
+        password_selector: stored_password_selector,
+        submit_selector: stored_submit_selector,
+        ..
+    } = cred;
+
+    let auth_timeout_ms = state.timeout_ms(cmd);
+    let mgr = state.browser.as_mut().ok_or("Browser not launched")?;
+    let expected_origin = if no_navigate {
+        let origin = auth_login_origin(&url, "credential")?;
+        validate_auth_login_active_page(
+            mgr,
+            bound_page
+                .as_ref()
+                .expect("no-navigation login must bind an active page"),
+            &origin,
+        )
+        .await?;
+        // Auth login always locates its form in the top-level document. Ignore
+        // a prior `frame` selection for this command without mutating the
+        // caller's persistent frame selection.
+        super::element::set_active_frame(None);
+        Some(origin)
+    } else {
+        mgr.navigate(&url, AUTH_LOGIN_WAIT_UNTIL).await?;
+        None
+    };
+
+    let session_id = mgr.active_session_id()?.to_string();
+
+    let preferred_user_selectors = [
+        "input[type=email]",
+        "input[name=email]",
+        "input[id=email]",
+        "input[autocomplete=email]",
+        "input[autocomplete=username]",
+        "input[name=username]",
+        "input[name*=email i]",
+        "input[name*=user i]",
+        "input[id*=email i]",
+        "input[id*=user i]",
+        "input[type=text][name*=email i]",
+        "input[type=text][name*=user i]",
+        "input[type=text][id*=email i]",
+        "input[type=text][id*=user i]",
+        "input[type=text][autocomplete=email]",
+        "input[type=text][autocomplete=username]",
+    ];
+    let fallback_user_selectors = ["input[type=text]", "input:not([type])"];
+    let auto_submit_selectors = [
+        "button[type=submit]",
+        "input[type=submit]",
+        "button:not([type])",
+    ];
+
+    let username_sel = cmd
+        .get("usernameSelector")
+        .and_then(|v| v.as_str())
+        .map(String::from)
+        .or(stored_username_selector);
+    let password_sel = cmd
+        .get("passwordSelector")
+        .and_then(|v| v.as_str())
+        .map(String::from)
+        .or(stored_password_selector);
+    let submit_sel = cmd
+        .get("submitSelector")
+        .and_then(|v| v.as_str())
+        .map(String::from)
+        .or(stored_submit_selector);
+
+    // Find and fill username
+    let user_element = if let Some(s) = username_sel {
+        wait_for_any_selector(&mgr.client, &session_id, &[s.as_str()], auth_timeout_ms)
+            .await
+            .map_err(|_| format!("Timed out waiting for username selector '{}'", s))?
+    } else {
+        let preferred_window_ms = auth_timeout_ms.min(AUTH_LOGIN_PREFERRED_SELECTOR_WINDOW_MS);
+        let fallback_window_ms = auth_timeout_ms.saturating_sub(preferred_window_ms);
+
+        match wait_for_any_selector(
+            &mgr.client,
+            &session_id,
+            &preferred_user_selectors,
+            preferred_window_ms,
+        )
+        .await
+        {
+            Ok(selector) => selector,
+            Err(_) => {
+                if fallback_window_ms == 0 {
+                    return Err(format!(
+                        "Timed out waiting for username field (preferred selectors for {}ms: {})",
+                        preferred_window_ms,
+                        preferred_user_selectors.join(", ")
+                    ));
+                }
+
+                wait_for_any_selector(
+                    &mgr.client,
+                    &session_id,
+                    &fallback_user_selectors,
+                    fallback_window_ms,
+                )
+                .await
+                .map_err(|_| {
+                    format!(
+                        "Timed out waiting for username field (preferred selectors for {}ms: {}; fallback selectors for {}ms: {})",
+                        preferred_window_ms,
+                        preferred_user_selectors.join(", "),
+                        fallback_window_ms,
+                        fallback_user_selectors.join(", ")
+                    )
+                })?
+            }
+        }
+    };
+    if let (Some(bound_page), Some(expected_origin)) = (&bound_page, &expected_origin) {
+        validate_auth_login_active_page(mgr, bound_page, expected_origin).await?;
+    }
+    interaction::fill(
+        &mgr.client,
+        &session_id,
+        &user_element.ref_map,
+        AUTH_LOGIN_ELEMENT_REF,
+        &username,
+        &state.iframe_sessions,
+    )
+    .await?;
+
+    // Find and fill password
+    let pass_sel = password_sel.unwrap_or_else(|| "input[type=password]".to_string());
+    let pass_element = wait_for_any_selector(
+        &mgr.client,
+        &session_id,
+        &[pass_sel.as_str()],
+        auth_timeout_ms,
+    )
+    .await
+    .map_err(|_| format!("Timed out waiting for password selector '{}'", pass_sel))?;
+    if let (Some(bound_page), Some(expected_origin)) = (&bound_page, &expected_origin) {
+        validate_auth_login_active_page(mgr, bound_page, expected_origin).await?;
+    }
+    interaction::fill(
+        &mgr.client,
+        &session_id,
+        &pass_element.ref_map,
+        AUTH_LOGIN_ELEMENT_REF,
+        &password,
+        &state.iframe_sessions,
+    )
+    .await?;
+
+    // Find and click submit
+    let submit_element = if let Some(s) = submit_sel {
+        wait_for_any_selector(&mgr.client, &session_id, &[s.as_str()], auth_timeout_ms)
+            .await
+            .map_err(|_| format!("Timed out waiting for submit selector '{}'", s))?
+    } else {
+        wait_for_any_selector(
+            &mgr.client,
+            &session_id,
+            &auto_submit_selectors,
+            auth_timeout_ms,
+        )
+        .await
+        .map_err(|_| {
+            format!(
+                "Timed out waiting for submit button (tried selectors: {})",
+                auto_submit_selectors.join(", ")
+            )
+        })?
+    };
+    if let (Some(bound_page), Some(expected_origin)) = (&bound_page, &expected_origin) {
+        validate_auth_login_active_page(mgr, bound_page, expected_origin).await?;
+    }
+    let result = interaction::click(
+        &mgr.client,
+        &session_id,
+        &submit_element.ref_map,
+        AUTH_LOGIN_ELEMENT_REF,
+        "left",
+        1,
+        &state.iframe_sessions,
+    )
+    .await?;
+    record_click_animation(
+        &result,
+        &mut state.mouse_state,
+        &state.recording_state.shared_cursor,
+    );
+
+    // Wait for navigation after submit (with fallback timeout)
+    let mut rx = mgr.client.subscribe();
+    let post_submit_timeout_ms = auth_timeout_ms.min(10_000);
+    let deadline =
+        tokio::time::Instant::now() + tokio::time::Duration::from_millis(post_submit_timeout_ms);
+    let mut navigated = false;
+
+    loop {
+        let result = tokio::time::timeout_at(deadline, rx.recv()).await;
+        match result {
+            Ok(Ok(event)) => {
+                if event.session_id.as_deref() == Some(&session_id) {
+                    match event.method.as_str() {
+                        "Page.frameNavigated" | "Page.loadEventFired" => {
+                            navigated = true;
+                            break;
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            Ok(Err(_)) => break,
+            Err(_) => break,
+        }
+    }
+
+    if !navigated {
+        let fallback_sleep_ms = auth_timeout_ms.min(2_000);
+        if fallback_sleep_ms > 0 {
+            tokio::time::sleep(tokio::time::Duration::from_millis(fallback_sleep_ms)).await;
+        }
+    }
+
+    Ok(json!({ "loggedIn": true, "name": name }))
+}
+
+// ---------------------------------------------------------------------------
+// Confirmation handlers (stub)
+// ---------------------------------------------------------------------------
+
+async fn handle_confirm(_cmd: &Value, state: &mut DaemonState) -> Result<Value, String> {
+    let pending = state
+        .pending_confirmation
+        .take()
+        .ok_or("No pending confirmation")?;
+
+    let mut approved_actions = pending.approved_actions.clone();
+    if !approved_actions.iter().any(|a| a == &pending.action) {
+
+
+fill
+pub async fn fill(
+    client: &CdpClient,
+    session_id: &str,
+    ref_map: &RefMap,
+    selector_or_ref: &str,
+    value: &str,
+    iframe_sessions: &HashMap<String, String>,
+) -> Result<(), String> {
+    let (object_id, effective_session_id) = resolve_element_object_id(
+        client,
+        session_id,
+        ref_map,
+        selector_or_ref,
+        iframe_sessions,
+    )
+    .await?;
+
+    // Focus the element
+    client
+        .send_command_typed::<_, Value>(
+            "Runtime.callFunctionOn",
+            &CallFunctionOnParams {
+                function_declaration: "function() { this.focus(); }".to_string(),
+                object_id: Some(object_id.clone()),
+                arguments: None,
+                return_by_value: Some(true),
+                await_promise: Some(false),
+            },
+            Some(&effective_session_id),
+        )
+        .await?;
+
+    // Select all + delete to clear
+    client
+        .send_command_typed::<_, Value>(
+            "Runtime.callFunctionOn",
+            &CallFunctionOnParams {
+                function_declaration: r#"function() {
+                    this.select && this.select();
+                    this.value = '';
+                    this.dispatchEvent(new Event('input', { bubbles: true }));
+                }"#
+                .to_string(),
+                object_id: Some(object_id),
+                arguments: None,
+                return_by_value: Some(true),
+                await_promise: Some(false),
+            },
+            Some(&effective_session_id),
+        )
+        .await?;
+
+    // Insert text (keyboard input dispatched at page level, use parent session_id)
+    client
+        .send_command_typed::<_, Value>(
+            "Input.insertText",
+            &InsertTextParams {
+                text: value.to_string(),
+            },
+            Some(session_id),
+        )
+        .await?;
+
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+
+
+resolution
+    session_id: &str,
+    frame_id: &str,
+    selector: &str,
+) -> Result<String, String> {
+    let owner_object_id = frame_owner_object_id(client, session_id, frame_id).await?;
+    let find_expr = build_find_element_js_in("doc", selector);
+    let function = format!(
+        "function() {{ const doc = this.contentDocument; if (!doc) return null; return {find_expr}; }}",
+    );
+    let result = client
+        .send_command(
+            "Runtime.callFunctionOn",
+            Some(serde_json::json!({
+                "objectId": owner_object_id,
+                "functionDeclaration": function,
+                "returnByValue": false,
+            })),
+            Some(session_id),
+        )
+        .await?;
+    result
+        .get("result")
+        .and_then(|r| r.get("objectId"))
+        .and_then(|v| v.as_str())
+        .map(String::from)
+        .ok_or_else(|| format!("Element not found in the selected frame: {}", selector))
+}
+
+pub async fn resolve_element_center(
+    client: &CdpClient,
+    session_id: &str,
+    ref_map: &RefMap,
+    selector_or_ref: &str,
+    iframe_sessions: &HashMap<String, String>,
+) -> Result<(f64, f64, String), String> {
+    if let Some(ref_id) = parse_ref(selector_or_ref) {
+        let entry = ref_map
+            .get(&ref_id)
+            .ok_or_else(|| format!("Unknown ref: {}", ref_id))?;
+
+        let effective_session_id =
+            resolve_frame_session(entry.frame_id.as_deref(), session_id, iframe_sessions);
+
+        // Try cached backend_node_id first (fast path)
+        if let Some(backend_node_id) = entry.backend_node_id {
+            scroll_node_into_view(client, effective_session_id, backend_node_id).await;
+            let result: Result<DomGetBoxModelResult, String> = client
+                .send_command_typed(
+                    "DOM.getBoxModel",
+                    &DomGetBoxModelParams {
+                        backend_node_id: Some(backend_node_id),
+                        node_id: None,
+                        object_id: None,
+                    },
+                    Some(effective_session_id),
+                )
+                .await;
+
+            if let Ok(r) = result {
+                let (x, y) = box_model_center(&r.model);
+                check_node_interception(
+                    client,
+                    effective_session_id,
+                    backend_node_id,
+                    selector_or_ref,
+                    x,
+                    y,
+                )
+                .await?;
+                return Ok((x, y, effective_session_id.to_string()));
+            }
+            if !entry.allow_role_fallback {
+                return Err(format!("Element ref {ref_id} is stale"));
+            }
+            // backend_node_id is stale; re-query the accessibility tree below
+        }
+
+
+diff
+diff --git a/cli/src/native/actions.rs b/cli/src/native/actions.rs
+index 4ec9ae34..5fcfb52a 100644
+--- a/cli/src/native/actions.rs
++++ b/cli/src/native/actions.rs
+@@ -63,6 +63,10 @@ const AUTH_LOGIN_SELECTOR_POLL_INTERVAL_MS: u64 = 100;
+ /// fallback selectors are allowed.
+ const AUTH_LOGIN_PREFERRED_SELECTOR_WINDOW_MS: u64 = 5_000;
+ 
++/// Local snapshot ref used to keep the auth element selected during detection
++/// bound to the exact DOM node used by the subsequent interaction.
++const AUTH_LOGIN_ELEMENT_REF: &str = "e1";
++
+ const AUTH_LOGIN_NO_NAVIGATE_PAGE_ERROR: &str = "auth login --no-navigate requires an existing active HTTP(S) browser page; open the login page first";
+ 
+ pub struct PendingConfirmation {
+@@ -12222,7 +12226,12 @@ async fn handle_http_credentials(cmd: &Value, state: &mut DaemonState) -> Result
+ // Auth handlers
+ // ---------------------------------------------------------------------------
+ 
+-/// Wait for any selector in `selectors` to appear and return the first match.
++struct AuthLoginElement {
++    ref_map: RefMap,
++}
++
++/// Wait for any selector in `selectors` to match a usable element and retain
++/// that element's stable backend node identity for the subsequent interaction.
+ ///
+ /// This is used by `auth_login` auto-detection so SPA login forms can render
+ /// after initial navigation without requiring global network-idle.
+@@ -12231,33 +12240,29 @@ async fn wait_for_any_selector(
+     session_id: &str,
+     selectors: &[&str],
+     timeout_ms: u64,
+-) -> Result<String, String> {
++) -> Result<AuthLoginElement, String> {
+     let deadline = tokio::time::Instant::now() + tokio::time::Duration::from_millis(timeout_ms);
+ 
+     loop {
+         for selector in selectors {
+             let expression = format!(
+                 r#"(() => {{
+-                    const el = document.querySelector({sel});
+-                    if (!el) return false;
+-
+-                    const r = el.getBoundingClientRect();
+-                    const s = window.getComputedStyle(el);
+-                    const opacity = parseFloat(s.opacity || '1');
+-                    const isVisible =
+-                        r.width > 0 &&
+-                        r.height > 0 &&
+-                        s.visibility !== 'hidden' &&
+-                        s.display !== 'none' &&
+-                        (!Number.isFinite(opacity) || opacity > 0);
+-
+-                    if (!isVisible) return false;
+-                    if (el.matches(':disabled')) return false;
+-
+-                    if (el instanceof HTMLInputElement && el.type === 'hidden') return false;
+-                    if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && el.readOnly) return false;
+-
+-                    return true;
++                    return Array.from(document.querySelectorAll({sel})).find((el) => {{
++                        const r = el.getBoundingClientRect();
++                        const s = window.getComputedStyle(el);
++                        const opacity = parseFloat(s.opacity || '1');
++                        const isVisible =
++                            r.width > 0 &&
++                            r.height > 0 &&
++                            s.visibility !== 'hidden' &&
++                            s.display !== 'none' &&
++                            (!Number.isFinite(opacity) || opacity > 0);
++
++                        if (!isVisible || el.matches(':disabled')) return false;
++                        if (el instanceof HTMLInputElement && el.type === 'hidden') return false;
++                        if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && el.readOnly) return false;
++                        return true;
++                    }}) || null;
+                 }})()"#,
+                 sel = serde_json::to_string(selector).unwrap_or_default()
+             );
+@@ -12267,22 +12272,48 @@ async fn wait_for_any_selector(
+                     "Runtime.evaluate",
+                     &super::cdp::types::EvaluateParams {
+                         expression,
+-                        return_by_value: Some(true),
++                        return_by_value: Some(false),
+                         await_promise: Some(true),
+                     },
+                     Some(session_id),
+                 )
+                 .await?;
+ 
+-            if result
+-                .result
+-                .value
+-                .as_ref()
+-                .and_then(|v| v.as_bool())
+-                .unwrap_or(false)
++            if result.exception_details.is_some()
++                || result.result.subtype.as_deref() != Some("node")
+             {
+-                return Ok((*selector).to_string());
++                continue;
+             }
++
++            let Some(object_id) = result.result.object_id else {
++                continue;
++            };
++            let describe = client
++                .send_command(
++                    "DOM.describeNode",
++                    Some(json!({ "objectId": object_id })),
++                    Some(session_id),
++                )
++                .await;
++            let _ = client
++                .send_command(
++                    "Runtime.releaseObject",
++                    Some(json!({ "objectId": object_id })),
++                    Some(session_id),
++                )
++                .await;
++            let Ok(describe) = describe else {
++                continue;
++            };
++            let Some(backend_node_id) = describe
++                .pointer("/node/backendNodeId")
++                .and_then(Value::as_i64)
++            else {
++                continue;
++            };
++            let mut ref_map = RefMap::new();
++            ref_map.add_exact_backend_node(AUTH_LOGIN_ELEMENT_REF.to_string(), backend_node_id);
++            return Ok(AuthLoginElement { ref_map });
+         }
+ 
+         if tokio::time::Instant::now() >= deadline {
+@@ -12589,11 +12620,10 @@ async fn handle_auth_login(cmd: &Value, state: &mut DaemonState) -> Result<Value
+         .or(stored_submit_selector);
+ 
+     // Find and fill username
+-    let user_sel = if let Some(s) = username_sel {
+-        wait_for_selector(&mgr.client, &session_id, &s, "visible", auth_timeout_ms)
++    let user_element = if let Some(s) = username_sel {
++        wait_for_any_selector(&mgr.client, &session_id, &[s.as_str()], auth_timeout_ms)
+             .await
+-            .map_err(|_| format!("Timed out waiting for username selector '{}'", s))?;
+-        s
++            .map_err(|_| format!("Timed out waiting for username selector '{}'", s))?
+     } else {
+         let preferred_window_ms = auth_timeout_ms.min(AUTH_LOGIN_PREFERRED_SELECTOR_WINDOW_MS);
+         let fallback_window_ms = auth_timeout_ms.saturating_sub(preferred_window_ms);
+@@ -12641,8 +12671,8 @@ async fn handle_auth_login(cmd: &Value, state: &mut DaemonState) -> Result<Value
+     interaction::fill(
+         &mgr.client,
+         &session_id,
+-        &state.ref_map,
+-        &user_sel,
++        &user_element.ref_map,
++        AUTH_LOGIN_ELEMENT_REF,
+         &username,
+         &state.iframe_sessions,
+     )
+@@ -12650,11 +12680,10 @@ async fn handle_auth_login(cmd: &Value, state: &mut DaemonState) -> Result<Value
+ 
+     // Find and fill password
+     let pass_sel = password_sel.unwrap_or_else(|| "input[type=password]".to_string());
+-    wait_for_selector(
++    let pass_element = wait_for_any_selector(
+         &mgr.client,
+         &session_id,
+-        &pass_sel,
+-        "visible",
++        &[pass_sel.as_str()],
+         auth_timeout_ms,
+     )
+     .await
+@@ -12665,19 +12694,18 @@ async fn handle_auth_login(cmd: &Value, state: &mut DaemonState) -> Result<Value
+     interaction::fill(
+         &mgr.client,
+         &session_id,
+-        &state.ref_map,
+-        &pass_sel,
++        &pass_element.ref_map,
++        AUTH_LOGIN_ELEMENT_REF,
+         &password,
+         &state.iframe_sessions,
+     )
+     .await?;
+ 
+     // Find and click submit
+-    let sub_sel = if let Some(s) = submit_sel {
+-        wait_for_selector(&mgr.client, &session_id, &s, "visible", auth_timeout_ms)
++    let submit_element = if let Some(s) = submit_sel {
++        wait_for_any_selector(&mgr.client, &session_id, &[s.as_str()], auth_timeout_ms)
+             .await
+-            .map_err(|_| format!("Timed out waiting for submit selector '{}'", s))?;
+-        s
++            .map_err(|_| format!("Timed out waiting for submit selector '{}'", s))?
+     } else {
+         wait_for_any_selector(
+             &mgr.client,
+@@ -12699,8 +12727,8 @@ async fn handle_auth_login(cmd: &Value, state: &mut DaemonState) -> Result<Value
+     let result = interaction::click(
+         &mgr.client,
+         &session_id,
+-        &state.ref_map,
+-        &sub_sel,
++        &submit_element.ref_map,
++        AUTH_LOGIN_ELEMENT_REF,
+         "left",
+         1,
+         &state.iframe_sessions,
+diff --git a/cli/src/native/e2e_tests.rs b/cli/src/native/e2e_tests.rs
+index 4bee8b52..78c5d221 100644
+--- a/cli/src/native/e2e_tests.rs
++++ b/cli/src/native/e2e_tests.rs
+@@ -6038,6 +6038,89 @@ async fn start_stateful_auth_login_server(
+     (base_url, document_requests, handle)
+ }
+ 
++#[derive(Clone, Copy)]
++enum DuplicateAuthControl {
++    Username,
++    Password,
++    Submit,
++}
++
++/// Starts a login page with a hidden duplicate before one visible auth control.
++async fn start_duplicate_auth_login_server(
++    duplicate: DuplicateAuthControl,
++) -> (String, tokio::task::JoinHandle<()>) {
++    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
++    let port = listener.local_addr().unwrap().port();
++    let base_url = format!("http://127.0.0.1:{}", port);
++
++    let handle = tokio::spawn(async move {
++        for _ in 0..100 {
++            let Ok((mut stream, _)) = listener.accept().await else {
++                break;
++            };
++            tokio::spawn(async move {
++                let mut buf = vec![0u8; 8192];
++                let _ = stream.read(&mut buf).await;
++                let controls = match duplicate {
++                    DuplicateAuthControl::Username => {
++                        r#"
++      <div style="display:none">
++        <input id="hidden-user" type="email" autocomplete="username" />
++      </div>
++      <input id="visible-user" type="email" autocomplete="username webauthn" />
++      <input id="visible-pass" type="password" />
++      <button id="visible-submit" type="submit" onclick="window.__visibleClicked = true">Sign in</button>"#
++                    }
++                    DuplicateAuthControl::Password => {
++                        r#"
++      <input id="visible-user" type="email" autocomplete="username webauthn" />
++      <div style="display:none">
++        <input id="hidden-pass" type="password" />
++      </div>
++      <input id="visible-pass" type="password" />
++      <button id="visible-submit" type="submit" onclick="window.__visibleClicked = true">Sign in</button>"#
++                    }
++                    DuplicateAuthControl::Submit => {
++                        r#"
++      <input id="visible-user" type="email" autocomplete="username webauthn" />
++      <input id="visible-pass" type="password" />
++      <div style="display:none">
++        <button id="hidden-submit" type="submit" onclick="window.__hiddenClicked = true">Sign in</button>
++      </div>
++      <button id="visible-submit" type="submit" onclick="window.__visibleClicked = true">Sign in</button>"#
++                    }
++                };
++                let body = format!(
++                    r#"<!doctype html>
++<html>
++  <head><meta charset="utf-8"><title>Duplicate Login</title><link rel="icon" href="data:," /></head>
++  <body>
++    <form id="visible-login">
++      {controls}
++    </form>
++    <script>
++      document.getElementById('visible-login').addEventListener('submit', (event) => {{
++        event.preventDefault();
++        window.__submitted = true;
++      }});
++    </script>
++  </body>
++</html>"#,
++                );
++                let response = format!(
++                    "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
++                    body.len(),
++                    body,
++                );
++                let _ = stream.write_all(response.as_bytes()).await;
++                let _ = stream.flush().await;
++            });
++        }
++    });
++
++    (base_url, handle)
++}
++
+ fn unique_auth_profile_name(suffix: &str) -> String {
+     format!(
+         "e2e-auth-login-{}-{}",
+@@ -6137,6 +6220,100 @@ async fn e2e_auth_login_no_navigate_preserves_active_page_state() {
+     assert_success(&execute_command(&json!({ "id": "99", "action": "close" }), &mut state).await);
+ }
+ 
++async fn assert_auth_login_uses_visible_duplicate(duplicate: DuplicateAuthControl, suffix: &str) {
++    let (base_url, _server) = start_duplicate_auth_login_server(duplicate).await;
++    let mut state = DaemonState::new();
++    let profile_name = unique_auth_profile_name(suffix);
++
++    assert_success(
++        &execute_command(
++            &json!({ "id": "1", "action": "launch", "headless": true }),
++            &mut state,
++        )
++        .await,
++    );
++    assert_success(
++        &execute_command(
++            &json!({ "id": "2", "action": "navigate", "url": format!("{}/login", base_url) }),
++            &mut state,
++        )
++        .await,
++    );
++    assert_success(
++        &execute_command(
++            &json!({
++                "id": "3",
++                "action": "auth_save",
++                "name": profile_name.clone(),
++                "url": format!("{}/login", base_url),
++                "username": "visible-user@example.com",
++                "password": "visible-password-secret",
++            }),
++            &mut state,
++        )
++        .await,
++    );
++
++    let login = execute_command(
++        &json!({
++            "id": "4",
++            "action": "auth_login",
++            "name": profile_name.clone(),
++            "noNavigate": true,
++            "timeout": 1_000,
++        }),
++        &mut state,
++    )
++    .await;
++    assert_success(&login);
++
++    let verify = execute_command(
++        &json!({
++            "id": "5",
++            "action": "evaluate",
++            "script": "({ hiddenUser: document.querySelector('#hidden-user')?.value ?? '', hiddenPass: document.querySelector('#hidden-pass')?.value ?? '', hiddenClicked: !!window.__hiddenClicked, visibleUser: document.querySelector('#visible-user').value, visiblePass: document.querySelector('#visible-pass').value, visibleClicked: !!window.__visibleClicked, submitted: !!window.__submitted })",
++        }),
++        &mut state,
++    )
++    .await;
++    assert_success(&verify);
++    let result = &get_data(&verify)["result"];
++    assert_eq!(result["hiddenUser"], "");
++    assert_eq!(result["hiddenPass"], "");
++    assert_eq!(result["hiddenClicked"], false);
++    assert_eq!(result["visibleUser"], "visible-user@example.com");
++    assert_eq!(result["visiblePass"], "visible-password-secret");
++    assert_eq!(result["visibleClicked"], true);
++    assert_eq!(result["submitted"], true);
++
++    let _ = execute_command(
++        &json!({ "id": "6", "action": "auth_delete", "name": profile_name }),
++        &mut state,
++    )
++    .await;
++    assert_success(&execute_command(&json!({ "id": "99", "action": "close" }), &mut state).await);
++}
++
++#[tokio::test]
++#[ignore]
++async fn e2e_auth_login_uses_visible_duplicate_username() {
++    assert_auth_login_uses_visible_duplicate(DuplicateAuthControl::Username, "visible-username")
++        .await;
++}
++
++#[tokio::test]
++#[ignore]
++async fn e2e_auth_login_uses_visible_duplicate_password() {
++    assert_auth_login_uses_visible_duplicate(DuplicateAuthControl::Password, "visible-password")
++        .await;
++}
++
++#[tokio::test]
++#[ignore]
++async fn e2e_auth_login_uses_visible_duplicate_submit() {
++    assert_auth_login_uses_visible_duplicate(DuplicateAuthControl::Submit, "visible-submit").await;
++}
++
+ #[cfg(unix)]
+ #[tokio::test]
+ #[ignore]
+diff --git a/cli/src/native/element.rs b/cli/src/native/element.rs
+index a74035e6..82737cea 100644
+--- a/cli/src/native/element.rs
++++ b/cli/src/native/element.rs
+@@ -13,6 +13,7 @@ pub struct RefEntry {
+     pub nth: Option<usize>,
+     pub selector: Option<String>,
+     pub frame_id: Option<String>,
++    allow_role_fallback: bool,
+ }
+ 
+ #[derive(Clone)]
+@@ -67,6 +68,25 @@ impl RefMap {
+                 nth,
+                 selector: None,
+                 frame_id: frame_id.map(|s| s.to_string()),
++                allow_role_fallback: true,
++            },
++        );
++    }
++
++    /// Add a ref that must keep resolving to this exact backend node. This is
++    /// used for actions that select a concrete DOM node before interacting;
++    /// falling back by role/name could silently target a different element.
++    pub fn add_exact_backend_node(&mut self, ref_id: String, backend_node_id: i64) {
++        self.map.insert(
++            ref_id,
++            RefEntry {
++                backend_node_id: Some(backend_node_id),
++                role: String::new(),
++                name: String::new(),
++                nth: None,
++                selector: None,
++                frame_id: None,
++                allow_role_fallback: false,
+             },
+         );
+     }
+@@ -88,6 +108,7 @@ impl RefMap {
+                 nth,
+                 selector: Some(selector),
+                 frame_id: None,
++                allow_role_fallback: true,
+             },
+         );
+     }
+@@ -437,6 +458,9 @@ pub async fn resolve_element_center(
+                 .await?;
+                 return Ok((x, y, effective_session_id.to_string()));
+             }
++            if !entry.allow_role_fallback {
++                return Err(format!("Element ref {ref_id} is stale"));
++            }
+             // backend_node_id is stale; re-query the accessibility tree below
+         }
+ 
+@@ -678,6 +702,9 @@ pub async fn resolve_element_object_id(
+                     return Ok((object_id, effective_session_id.to_string()));
+                 }
+             }
++            if !entry.allow_role_fallback {
++                return Err(format!("Element ref {ref_id} is stale"));
++            }
+             // backend_node_id is stale; re-query the accessibility tree below
+         }
+ 

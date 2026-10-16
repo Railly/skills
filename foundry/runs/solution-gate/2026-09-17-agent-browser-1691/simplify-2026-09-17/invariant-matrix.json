@@ -1,0 +1,315 @@
+{
+  "head": "837f9adf6f28345f072638cfd2832b722edfafe1",
+  "contract_digest": "sha256:d47c7f97ca877b085937f00ea6abe35d5e184a664ac6fe05002504a75766b91c",
+  "matrix": [
+    {
+      "id": "C1",
+      "boundary": "V4 wire and options",
+      "test": "test_browser_use_v4_protocol",
+      "partitions": [
+        "create path/header/body and returned ownership",
+        "ws/wss/http/https/empty endpoint transfer",
+        "profile/country/recording options",
+        "absent vs null proxy",
+        "matching stopped acknowledgment",
+        "active/wrong ID/invalid JSON/404/500 rejection"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": [
+        "create_wire_route",
+        "stop_acknowledgment"
+      ]
+    },
+    {
+      "id": "C2",
+      "boundary": "Identity and safe errors",
+      "test": "test_browser_use_rejects_invalid_identity_without_exposing_secrets",
+      "partitions": [
+        "create HTTP error",
+        "malformed JSON",
+        "missing/malformed UUID",
+        "UUID-shaped credential reflection",
+        "invalid stop ID and missing key"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": []
+    },
+    {
+      "id": "C3",
+      "boundary": "Request body deadlines",
+      "test": "test_browser_use_create_and_stop_body_deadlines",
+      "partitions": [
+        "create body stall",
+        "stop body stall"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": [
+        "create_body_deadline",
+        "stop_body_deadline"
+      ]
+    },
+    {
+      "id": "C4",
+      "boundary": "Caller configuration rollback",
+      "test": "test_browser_use_failed_launches_restore_configuration",
+      "partitions": [
+        "explicit launch failure",
+        "automatic launch failure"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": [
+        "explicit_config_rollback",
+        "automatic_config_rollback"
+      ]
+    },
+    {
+      "id": "C5",
+      "boundary": "Cancellation",
+      "test": "test_browser_use_canceled_setup_and_stop_preserve_state",
+      "partitions": [
+        "setup timeout while HTTPS CONNECT is stalled",
+        "cancel close while stop CONNECT is stalled"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": [
+        "retain_same_id"
+      ]
+    },
+    {
+      "id": "C6",
+      "boundary": "CDP validation and ownership",
+      "test": "test_browser_use_cdp_failure_retains_ownership_without_exposing_credentials",
+      "partitions": [
+        "empty endpoint",
+        "invalid scheme",
+        "refused connection with credential-bearing URL"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": [
+        "remember_before_cdp_validation"
+      ]
+    },
+    {
+      "id": "C7",
+      "boundary": "Public close/replacement commands",
+      "test": "test_browser_use_failed_close_retains_id_and_blocks_replacement",
+      "partitions": [
+        "first failed close",
+        "same-ID close retry",
+        "replacement launch refused"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/final-rust-full.log",
+      "falsifiers": [
+        "retain_same_id, via shared close helper"
+      ]
+    },
+    {
+      "id": "C8",
+      "boundary": "Real Chrome command continuity",
+      "test": "e2e_browser_use_owned_connection_preserves_plain_command_state",
+      "partitions": [
+        "plain commands retain target and page memory",
+        "external Chrome survives attachment close"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/final-chrome.log",
+      "falsifiers": []
+    }
+  ],
+  "oracle": {
+    "spec": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/browser-use-v4-openapi.json",
+    "historical_live": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/cloud-live-2026-09-17/live-cloud.json",
+    "current_producer": "real Chrome and localhost HTTP/TLS-proxy fixtures"
+  },
+  "exclusions": [
+    "Disk receipt write/delete/restart/ACL partitions were removed with that feature by explicit user scope.",
+    "Daemon state mutation is serialized through exclusive mutable ownership. These tests cover cancellation and immediate retry rather than simultaneous mutation of the same state.",
+    "No global performance, billing or direct-routing guarantee is asserted. Prior proxy-counter uncertainty remains historical, unverified routing evidence."
+  ],
+  "commit_points": [
+    {
+      "point": "Remote POST allocates browser before its response arrives",
+      "owner": "Cloud until the client receives a valid ID",
+      "failure": "Unknown outcome is surfaced with dashboard inspection guidance; no blind create retry."
+    },
+    {
+      "point": "Valid ID returned to attachment helper",
+      "owner": "Daemon, synchronously before endpoint validation or CDP await",
+      "failure": "Stop failure/cancellation retains same ID and blocks replacement; close retries it."
+    },
+    {
+      "point": "Matching stopped response",
+      "owner": "Provider acknowledgment",
+      "failure": "Only a matching ID/status clears daemon ownership; a 404 remains unacknowledged."
+    }
+  ],
+  "mutations": [
+    {
+      "name": "create_wire_route",
+      "file": "cli/src/native/providers.rs",
+      "test": "test_browser_use_v4_protocol",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "test_browser_use_v4_protocol",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 18.417950167,
+      "killed": true,
+      "log": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/mutant-create_wire_route.log"
+    },
+    {
+      "name": "create_body_deadline",
+      "file": "cli/src/native/providers.rs",
+      "test": "test_browser_use_create_and_stop_body_deadlines",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "test_browser_use_create_and_stop_body_deadlines",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 14.823626,
+      "killed": true,
+      "log": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/mutant-create_body_deadline.log"
+    },
+    {
+      "name": "stop_body_deadline",
+      "file": "cli/src/native/providers.rs",
+      "test": "test_browser_use_create_and_stop_body_deadlines",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "test_browser_use_create_and_stop_body_deadlines",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 15.410441749999997,
+      "killed": true,
+      "log": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/mutant-stop_body_deadline.log"
+    },
+    {
+      "name": "stop_acknowledgment",
+      "file": "cli/src/native/providers.rs",
+      "test": "test_browser_use_v4_protocol",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "test_browser_use_v4_protocol",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 15.332139583,
+      "killed": true,
+      "log": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/mutant-stop_acknowledgment.log"
+    },
+    {
+      "name": "retain_same_id",
+      "file": "cli/src/native/actions.rs",
+      "test": "test_browser_use_canceled_setup_and_stop_preserve_state",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "test_browser_use_canceled_setup_and_stop_preserve_state",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 18.226707915999995,
+      "killed": true,
+      "log": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/mutant-retain_same_id.log"
+    },
+    {
+      "name": "remember_before_cdp_validation",
+      "file": "cli/src/native/actions.rs",
+      "test": "test_browser_use_cdp_failure_retains_ownership_without_exposing_credentials",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "test_browser_use_cdp_failure_retains_ownership_without_exposing_credentials",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 18.597284290999994,
+      "killed": true,
+      "log": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/mutant-remember_before_cdp_validation.log"
+    },
+    {
+      "name": "explicit_config_rollback",
+      "file": "cli/src/native/actions.rs",
+      "test": "test_browser_use_failed_launches_restore_configuration",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "test_browser_use_failed_launches_restore_configuration",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 16.268558416000005,
+      "killed": true,
+      "log": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/mutant-explicit_config_rollback.log"
+    },
+    {
+      "name": "automatic_config_rollback",
+      "file": "cli/src/native/actions.rs",
+      "test": "test_browser_use_failed_launches_restore_configuration",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "test_browser_use_failed_launches_restore_configuration",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 15.81261195799999,
+      "killed": true,
+      "log": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/mutant-automatic_config_rollback.log"
+    }
+  ],
+  "gaps": [
+    "The simplified binary was not rerun against live Browser Use Cloud because the clipboard credential was no longer available. Earlier same-day live evidence verifies the producer contract, not this exact source.",
+    "Eight representative mutations were killed. Exhaustive per-partition falsification, structured fuzz/property campaigns, and all post-attach caller-failure partitions were not executed."
+  ],
+  "limits": [
+    "The final automated suite ran on macOS. Current GitHub platform job dispositions are recorded separately.",
+    "A compile failure in the first mutation attempt was recorded and not counted as a killed mutant. After the borrowed assertion fix, all eight mutants failed executed assertions and the restored source passed."
+  ]
+}

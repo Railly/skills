@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "work_item": {
+    "source": "https://github.com/vercel-labs/agent-browser/pull/2027",
+    "repository": "vercel-labs/agent-browser",
+    "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-wait-download",
+    "base_sha": "6d3e22c673a44271d0c213c2fef722e0aeba627d",
+    "head_sha": "c4ec7fef",
+    "dirty_digest": null,
+    "authorization": "edit, test, commit on railly/wait-download-ledger; push and reviewer reply need separate approval; #2058 untouched",
+    "profile": "standard",
+    "budget_minutes": 60,
+    "budget_started_at": "2026-10-08T02:28:35Z",
+    "budget_escalation": null
+  },
+  "formula": "non-mechanical change: successor run on own PR for contract-preserving review findings (ctate CHANGES_REQUESTED 2026-10-07T19:34:29Z)",
+  "contract": {
+    "acceptance": {
+      "A1": "A download that completes while the per-command liveness check (Browser.getVersion) runs is claimed by wait --download, no timeout.",
+      "A2": "An invalid destination returns an error and leaves the download claimable; a retry with a valid path moves the file.",
+      "A3": "wait --download <path> moves only files reported by a browser agent-browser launched (inside download_path when set); CDP/auto-connect/provider rejects without touching the filesystem"
+    },
+    "must_not_change": [
+      "each download is claimed once",
+      "claims stay FIFO by begin order",
+      "download <selector> <path> stays outside the ledger"
+    ],
+    "non_goals": [
+      "window new context downloads (#1683)",
+      "clippy lines outside the diff"
+    ]
+  },
+  "stages": {
+    "intake": {
+      "status": "pass",
+      "head_sha": "135fc2a8e436dd7f5b81affddfc1f42b129aac8e",
+      "finished_at": "2026-10-08T02:28:35Z"
+    },
+    "contract": {
+      "status": "pass",
+      "head_sha": "135fc2a8e436dd7f5b81affddfc1f42b129aac8e",
+      "finished_at": "2026-10-08T02:28:35Z"
+    },
+    "execute": {
+      "status": "pass",
+      "dirty_digest": "sha256:b65c2650b33208817574bd617dbaa9cfc182ec9e5e64f6da3cbceb869d767439",
+      "finished_at": "2026-10-08T02:33:46Z",
+      "evidence": [
+        "e2e A1/A2 red on 135fc2a8 (Timeout waiting for download; retry timed out), green with fix",
+        "cargo test 1437 pass; fmt ok; clippy 3 pre-existing outside diff",
+        "CLI dogfood: base retry times out, fix retry moves file, third wait not reclaimed"
+      ]
+    },
+    "spec": {
+      "status": "pass",
+      "dirty_digest": "sha256:b65c2650b33208817574bd617dbaa9cfc182ec9e5e64f6da3cbceb869d767439",
+      "finished_at": "2026-10-08T02:33:46Z",
+      "checks": {
+        "A1": "pass",
+        "A2": "pass",
+        "claimed_once": "pass",
+        "fifo": "pass",
+        "download_selector_outside_ledger": "pass (mark_claimed untouched)"
+      }
+    },
+    "review": {
+      "status": "pass",
+      "dirty_digest": "sha256:b65c2650b33208817574bd617dbaa9cfc182ec9e5e64f6da3cbceb869d767439",
+      "reviewer": "occam",
+      "finished_at": "2026-10-08T02:34:38Z",
+      "verdict": "pass, no confirmed findings",
+      "independence_gap": "same model family (Claude author and reviewer)",
+      "unconfirmed": [
+        "late file on no-file-at path stays claimed (out of contract)",
+        "inspect_err needs Rust 1.76; CI uses stable"
+      ]
+    },
+    "show": {
+      "status": "pass",
+      "finished_at": "2026-10-08T02:34:38Z",
+      "artifact": "2027.before-after.md",
+      "basis": "CLI transcript; before-after skill is DOM-based, change has no visual surface"
+    },
+    "promote": {
+      "status": "pass",
+      "finished_at": "2026-10-08T02:36:26Z",
+      "actions": [
+        "commit 38158f44 signed",
+        "push railly/wait-download-ledger"
+      ],
+      "pending_human": [
+        "reply on 2 threads + resolve (Hunter posts)",
+        "ctate re-review"
+      ]
+    },
+    "record": {
+      "status": "pending"
+    },
+    "successor_security": {
+      "status": "pass",
+      "finished_at": "2026-10-08T05:10:39Z",
+      "source": "vercel security reviewer Medium: remote CDP filePath relocates local files",
+      "evidence": [
+        "unit only_a_launched_browser_may_name_the_file_to_move (remote, outside dir, .. escape, symlink)",
+        "CLI dogfood over --cdp: refused, nothing moved",
+        "cargo test 1450 pass; docs routes preview 439 pass after merge of main"
+      ],
+      "review": "not re-run by independent reviewer"
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "required": true,
+  "status": "unavailable",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/resilience.json",
+  "fingerprint": {
+    "head_sha": "0a53aefdcae889378132f54d8ea096805f3edcea",
+    "changed_paths_digest": "sha256:c2660dfcf1036a5c1e8ed88038cf6000a1e81713713def5ea4d152f2f0a5e401",
+    "contract_digest": "sha256:273e39546dafb53cc3dda769fda45f88145862e8202929ff1bff5b42016ba2be",
+    "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; cargo test --manifest-path cli/Cargo.toml e2e_isolat -- --ignored --test-threads=1; AGENT_BROWSER_ISOLATION_STRESS_ROUNDS=10 cargo test --manifest-path cli/Cargo.toml --test isolate_context_cli -- --ignored --test-threads=1",
+    "environment_digest": "sha256:a29bc488ade3f46f58ce42a2e3e5e7a327bf5b5fb763028a07f7dad7d72967c7",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "cli/src/connection.rs",
+      "cli/src/doctor/launch.rs",
+      "cli/src/doctor/webgpu.rs",
+      "cli/src/main.rs",
+      "cli/src/native/actions.rs",
+      "cli/src/native/browser.rs",
+      "cli/src/native/e2e_tests.rs",
+      "cli/tests/isolate_context_cli.rs"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "evidence": "Fallos forzados de validación, transporte, storage, publicación, primer comando e implícito; reconexión y continuidad observadas.",
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "nuevo BrowserContext remoto",
+      "owner": "BrowserManager",
+      "commit_event": "Target.createBrowserContext",
+      "later_fallible_stages": [
+        "attach/setup",
+        "storage load",
+        "binding save",
+        "implicit action"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "storage",
+          "covers": [
+            "storage load"
+          ],
+          "forced": true,
+          "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+          "cleanup_owner": "rollback_failed_launch",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "isolation-e2e-v3.log"
+          },
+          "evidence": "isolation-e2e-v3.log: invalid JSON"
+        },
+        {
+          "ownership_region": "filesystem",
+          "covers": [
+            "binding save"
+          ],
+          "forced": true,
+          "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+          "cleanup_owner": "rollback_failed_launch",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "isolation-e2e-v3.log"
+          },
+          "evidence": "isolation-e2e-v3.log: target.tmp directory fault"
+        },
+        {
+          "ownership_region": "dispatch",
+          "covers": [
+            "implicit action"
+          ],
+          "forced": true,
+          "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+          "cleanup_owner": "rollback_failed_launch",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "isolation-e2e-v3.log"
+          },
+          "evidence": "isolation-e2e-v3.log: missing URL"
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "effect": "binding durable y booleano sticky",
+      "owner": "commit_isolated_connection",
+      "commit_event": "save/fsync/rename succeeded, then bool=true",
+      "later_fallible_stages": [],
+      "failure_partitions": []
+    }
+  ],
+  "gaps": [
+    "No se forzó pérdida del CDP durante disposición de contexto ni el error del drain final; ese último cambio recibió revisión estática FX final."
+  ],
+  "reason": "La evidencia local descrita pasó; falta la campaña completa de las particiones y sustratos declarados en gaps. No equivale a fallo de tests."
+}

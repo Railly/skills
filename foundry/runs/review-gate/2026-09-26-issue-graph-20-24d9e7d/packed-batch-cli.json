@@ -1,0 +1,142 @@
+{
+  "command": [
+    "node",
+    "/Users/raillyhugo/Programming/vercel/issue-graph-pr20-proof/consumer/node_modules/issue-graph/dist/bin.js",
+    "jira",
+    "PROJ-1",
+    "--site",
+    "site-a",
+    "--depth",
+    "1",
+    "--json"
+  ],
+  "exitCode": 0,
+  "report": {
+    "schemaVersion": 1,
+    "source": "jira-twg",
+    "generatedAt": "2026-09-26T20:33:04.603Z",
+    "site": "site-a",
+    "seeds": [
+      "PROJ-1"
+    ],
+    "limits": {
+      "maxDepth": 1,
+      "maxNodes": 80,
+      "hubThreshold": 12,
+      "concurrency": 4
+    },
+    "coverageComplete": true,
+    "coverage": {
+      "fetched": 3,
+      "failed": [],
+      "cappedOut": []
+    },
+    "nodes": [
+      {
+        "key": "jira:PROJ-1",
+        "source": "jira",
+        "issueKey": "PROJ-1",
+        "title": "Root",
+        "status": "Open",
+        "issueType": "Issue",
+        "url": "https://site-a.atlassian.net/browse/PROJ-1",
+        "depth": 0,
+        "fetched": true,
+        "edges": [
+          {
+            "to": "jira:PROJ-9",
+            "via": "text"
+          },
+          {
+            "to": "jira:PROJ-8",
+            "via": "remote-link",
+            "url": "https://site-a.atlassian.net/browse/PROJ-8"
+          }
+        ],
+        "externalLinks": [
+          "https://site-a.atlassian.net/browse/PROJ-8"
+        ]
+      },
+      {
+        "key": "jira:PROJ-8",
+        "source": "jira",
+        "issueKey": "PROJ-8",
+        "title": "Unrelated local issue",
+        "status": "Open",
+        "issueType": "Issue",
+        "url": "https://site-a.atlassian.net/browse/PROJ-8",
+        "depth": 1,
+        "fetched": true,
+        "edges": [],
+        "externalLinks": []
+      },
+      {
+        "key": "jira:PROJ-9",
+        "source": "jira",
+        "issueKey": "PROJ-9",
+        "title": "Unrelated local issue",
+        "status": "Open",
+        "issueType": "Issue",
+        "url": "https://site-a.atlassian.net/browse/PROJ-9",
+        "depth": 1,
+        "fetched": true,
+        "edges": [],
+        "externalLinks": []
+      }
+    ],
+    "components": [
+      [
+        "jira:PROJ-1",
+        "jira:PROJ-9",
+        "jira:PROJ-8"
+      ]
+    ]
+  },
+  "calls": [
+    {
+      "key": "PROJ-1",
+      "args": [
+        "--site",
+        "site-a",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-1",
+        "--full"
+      ]
+    },
+    {
+      "key": "PROJ-9",
+      "args": [
+        "--site",
+        "site-a",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-9",
+        "--full"
+      ]
+    },
+    {
+      "key": "PROJ-8",
+      "args": [
+        "--site",
+        "site-a",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-8",
+        "--full"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,577 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-08-31",
+    "repo": "vercel-labs/emulate#215",
+    "base": "e4d665715f2b6ccdd28dc3f1dccd2be5ea223caa",
+    "head": "eb0acba6ea8852a77d0176bb68188161914b0267",
+    "profile": "external-pr",
+    "skill_revision": "git:a006c7a52acfdb112e7a4882063d0a3dbbe757d7",
+    "status": "complete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Required exact-head Test Strength receipt is missing.",
+      "Required exact-head Resilience Audit receipt is missing.",
+      "Required exact-head Security Review receipt is missing.",
+      "No canonical work-item manifest was provided or found; the explicit user request was used as the frozen work-item contract."
+    ]
+  },
+  "execution": {
+    "mode": "fx_worker",
+    "degraded_from": null,
+    "independence_gap": null,
+    "receipt": "fx-review.json",
+    "schema_failures": 0,
+    "operations": [
+      {
+        "operation": "packaged FX independent review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "User request dated 2026-08-31 for vercel-labs/emulate#215",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "A1 inspection metadata remains secret-free",
+      "A2 reset clears installation authorization and metadata while preserving seeded state and App identity",
+      "A3 Next.js and Nuxt cold starts restore durable metadata and authorization",
+      "A4 legacy snapshots do not fabricate metadata",
+      "A5 endpoint, persistence, reset, and adapters preserve the confidentiality boundary"
+    ],
+    "gaps": [
+      "No canonical work-item manifest with upstream stage fingerprints was available."
+    ]
+  },
+  "provenance": {
+    "author_model": "unknown",
+    "reviewer_model": "zai/glm-5.3-flash",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "installation-token metadata",
+      "authorization reset",
+      "secret and confidentiality boundary",
+      "adapter cold-start persistence",
+      "durable emulator state"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "fx-review.json",
+      "evidence": "The packaged FX wrapper completed through Vercel AI Gateway using zai/glm-5.3-flash. It found no defect, but its durability conclusion relied on the authored test waiting for persistence. Direct built-artifact failure forcing independently disproved that assumption."
+    }
+  },
+  "security_review": {
+    "status": "unavailable",
+    "fingerprint": {
+      "repository": "vercel-labs/emulate",
+      "base_sha": "e4d665715f2b6ccdd28dc3f1dccd2be5ea223caa",
+      "head_sha": "eb0acba6ea8852a77d0176bb68188161914b0267",
+      "dirty_digest": "clean",
+      "changed_path_digest": "sha256:5fe21233ea44b72452d4633de7b64fb74952f3c455d9983ea0cd8bc354a95e93",
+      "skill_revision": "missing"
+    },
+    "observations": [
+      {
+        "id": "SEC-GAP-001",
+        "classification": "verification_gap",
+        "scope": "in_scope_security_regression",
+        "confidence": "high",
+        "evidence": [
+          "No exact-head Security Review receipt tied to the frozen base, head, clean digest, changed-path digest, and Security Review revision was found."
+        ]
+      }
+    ],
+    "verification": {
+      "gaps": [
+        "Exact-head Security Review receipt missing."
+      ]
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": [
+        "F1 durable cold-start state can lag a successful token mint response."
+      ]
+    },
+    "artifact": "missing-receipts.md"
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "User request and frozen PR identity",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "The request explicitly names metadata confidentiality, reset, persistence, adapters, durable state, built dogfood, and direct substrate verification."
+    },
+    {
+      "source": "design",
+      "location": "PR body and changed tests",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "The PR body promises secret-free inspection, reset behavior, and metadata persistence across Next.js and Nuxt cold starts; contract tests encode the intended snapshot behavior."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, apps/web docs, package READMEs, skills, and CLI help",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "The changed prose describes the endpoint payload, informational expiry, reset semantics, and adapter persistence paths."
+    },
+    {
+      "source": "implementation",
+      "location": "GitHub token routes/store, programmatic API reset, core adapter runtime, and shared persistence contract",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "The implementation inserts metadata before token authorization, projects metadata through a new route, clears installation token-map entries on programmatic reset, and relies on the shared asynchronous adapter save queue."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Inspection responses and the metadata collection exclude minted token values, private keys, webhook secrets, and token-derived identifiers.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "serialized endpoint output and the persisted metadata collection",
+        "layer": "built HTTP artifact and durable snapshot substrate",
+        "method": "mint a real installation token, compare serialized endpoint and collection data against the token, private key, and base64 private key",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the endpoint object has no field named token",
+        "counterexample": "a secret could appear in another field, substring, derived identifier, or persisted collection while the token field is absent",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "dogfood.json checked the complete serialized response and metadata collection against the full token and private key representations."
+      },
+      "substrates": [
+        {
+          "name": "built emulate API, GitHub package, and Next adapter distributions",
+          "status": "exercised",
+          "evidence": "dogfood.json records secret-free programmatic and adapter endpoint output plus a secret-free persisted metadata entity."
+        }
+      ],
+      "evidence": "The endpoint projection at packages/@emulators/github/src/routes/installation-tokens.ts:7-33 exposes only metadata. Built dogfood found no minted token, token field, private key, or base64 private key in the response or metadata collection."
+    },
+    {
+      "id": "P2",
+      "claim": "Programmatic reset clears minted installation authorization and metadata while preserving seeded authorization and the generated App identity.",
+      "kind": "authorization",
+      "status": "verified",
+      "oracle": {
+        "observes": "endpoint rows, repository authorization status, seeded token status, and generated private-key identity before and after reset",
+        "layer": "built programmatic emulator HTTP boundary",
+        "method": "mint, authorize, reset, retry the minted token, retry seeded access, and compare generated identity",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the inspection endpoint is empty after reset",
+        "counterexample": "metadata could be empty while the minted token remains authorized or the App identity rotates",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "dogfood.json and the focused API suite checked metadata, authorization, and identity separately."
+      },
+      "substrates": [
+        {
+          "name": "built packages/emulate/dist/api.js with a real listening server",
+          "status": "exercised",
+          "evidence": "After reset the metadata count was zero, the minted token lost repository access, the seeded token remained usable, and the generated private key was unchanged."
+        }
+      ],
+      "evidence": "packages/emulate/src/api.ts:95-100 deletes token-map entries carrying installation state before store reset and re-seed. The built boundary verified the complete outcome."
+    },
+    {
+      "id": "P3",
+      "claim": "A successful adapter token mint is durably available to an immediate cold start.",
+      "kind": "durability",
+      "status": "refuted",
+      "oracle": {
+        "observes": "metadata count and minted-token authorization in a separate handler created immediately after HTTP 201",
+        "layer": "built adapter plus persistence backend",
+        "method": "block or fail the post-request persistence save, accept the 201 response, create a cold handler, and query metadata and authorization",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "a cold start restores metadata after the test waits until persistence contains the new collection",
+        "counterexample": "the mutation returns 201 before the save commits, so a cold start during delay or after save failure restores the prior snapshot",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "durability-race.json records 201 followed by zero metadata and 401 before the save settles; persistence-failure.json records the same permanent loss after a swallowed save failure."
+      },
+      "substrates": [
+        {
+          "name": "built Next adapter with delayed and failing custom persistence backends",
+          "status": "exercised",
+          "evidence": "The immediate cold start saw metadataCount 0 and tokenAuthStatus 401; after delayed persistence settled it saw metadataCount 1 and tokenAuthStatus 200."
+        }
+      ],
+      "evidence": "packages/@emulators/core/src/adapter-runtime.ts:335-339 queues but does not await persistence before returning the response, and lines 240-248 swallow ordinary save failures. tests/contracts/github-app-identity.js:239 waits for the save before creating the cold handler, masking the defect."
+    },
+    {
+      "id": "P4",
+      "claim": "A legacy snapshot can restore installation authorization without fabricating inspection metadata, and a later mint creates metadata normally.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "legacy cold-start metadata, token authorization, and metadata after a later mint",
+        "layer": "adapter snapshot compatibility boundary",
+        "method": "remove the metadata collection from a real snapshot while retaining token-map state, restore, authorize, mint again, and inspect",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the legacy snapshot parses successfully",
+        "counterexample": "parsing can succeed while metadata is fabricated, authorization is lost, or a later mint cannot recreate the collection",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The Next and Nuxt contract suites explicitly exercise all three outcomes."
+      },
+      "substrates": [
+        {
+          "name": "Next and Nuxt adapter contract suites",
+          "status": "exercised",
+          "evidence": "Both adapter suites passed 17 tests, including legacy restoration without fabricated metadata."
+        }
+      ],
+      "evidence": "tests/contracts/github-app-identity.js:247-281 verifies empty metadata, retained authorization, and normal metadata creation on a subsequent mint."
+    },
+    {
+      "id": "P5",
+      "claim": "Metadata publication and in-memory token authorization are committed consistently for each successful mint.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "metadata row count and token-map authorization after success and forced metadata insertion failure",
+        "layer": "GitHub route and in-memory authorization substrate",
+        "method": "mint twice successfully, then force metadata insertion to throw and inspect both state stores",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the route returns a successful token response",
+        "counterexample": "a token could be authorized without metadata, or metadata could be recorded for a rejected mint",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The GitHub focused suite verifies one row per successful mint, no rows for rejected mint, and no token-map entry when metadata insertion fails."
+      },
+      "substrates": [
+        {
+          "name": "GitHub package route tests and built in-memory route path",
+          "status": "exercised",
+          "evidence": "The GitHub suite passed 91 tests; insertion failure returned 500 with no ghs_ authorization and no inspection row."
+        }
+      ],
+      "evidence": "packages/@emulators/github/src/routes/apps.ts:197-226 inserts metadata before tokenMap.set and the 201 response. This property is limited to in-memory state and does not clear the durable adapter finding P3."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "No exact-head Test Strength receipt was found for the changed adapter persistence and authorization lifecycle."
+    },
+    "resilience": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "No exact-head Resilience Audit receipt was found for the durable metadata/token commit points, post-response save, failure cleanup, and immediate cold-start retry behavior."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "PR body and adapter contract test",
+      "claim": "Waiting until the save completes before creating a second handler is representative of a cold start after a successful mint.",
+      "status": "refuted",
+      "evidence": "The built delayed-save probe cold-started immediately after HTTP 201 and restored the prior snapshot with zero metadata and no token authorization."
+    },
+    {
+      "id": "A2",
+      "source": "Documentation",
+      "claim": "Persisted emulator snapshots are kept private because they contain generated keys and minted token values.",
+      "status": "verified",
+      "evidence": "The documentation explicitly requires a private persistence backend; dogfood verified the metadata collection adds no token or private-key copy while the separate token-map snapshot remains confidential."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "inverse regression surface",
+      "status": "skipped",
+      "reason": "The diff does not replace a matcher, parser, or lookup data source."
+    },
+    {
+      "name": "new-domain matrix",
+      "status": "skipped",
+      "reason": "The diff does not widen a guard or relax a validator."
+    },
+    {
+      "name": "resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No user-input resolution rule changes."
+    },
+    {
+      "name": "shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell-parsed argument construction changes."
+    },
+    {
+      "name": "emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No warning channel or one-shot latch changes."
+    },
+    {
+      "name": "shim hermeticity",
+      "status": "skipped",
+      "reason": "No external-binary shim was added."
+    },
+    {
+      "name": "deliberate-default check",
+      "status": "run",
+      "reason": "Reset semantics and adapter persistence behavior were compared against prior tests and documentation; programmatic reset is intentional and adapter durability remains weaker than the new cold-start claim."
+    },
+    {
+      "name": "fresh-seam scan",
+      "status": "skipped",
+      "reason": "The diff does not patch a framework runtime to expose a new application signal."
+    },
+    {
+      "name": "substrate differential corpus",
+      "status": "skipped",
+      "reason": "No guard models an external substrate."
+    },
+    {
+      "name": "reference-implementation oracle",
+      "status": "skipped",
+      "reason": "The new emulator-only inspection contract has no claimed GitHub reference endpoint."
+    },
+    {
+      "name": "new-failure-outcome propagation",
+      "status": "run",
+      "reason": "Persistence save failure was forced through the real adapter caller; the failure is swallowed after the response and a cold start loses the successful mint."
+    },
+    {
+      "name": "flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No flag, mode, or config bit was added."
+    },
+    {
+      "name": "error-path forcing",
+      "status": "run",
+      "reason": "Metadata insertion failure, delayed persistence, failed persistence, reset, and legacy snapshot paths were exercised."
+    },
+    {
+      "name": "non-destructive recovery",
+      "status": "run",
+      "reason": "Immediate cold-start recovery after delayed and failed persistence was tested; the failed-save path loses the mint from durable state."
+    },
+    {
+      "name": "cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "The changed code introduces no cancellation or timeout mechanism."
+    },
+    {
+      "name": "boundary pipeline trace",
+      "status": "run",
+      "reason": "Mint validation, metadata insert, tokenMap set, HTTP 201, adapter save queue, snapshot restore, endpoint projection, and reset were traced end to end."
+    },
+    {
+      "name": "substrate verification",
+      "status": "run",
+      "reason": "The built distributions were driven against real HTTP and custom persistence backends."
+    },
+    {
+      "name": "dogfood the built artifact",
+      "status": "run",
+      "reason": "Built GitHub, emulate API, and Next adapter artifacts were used for mint, inspection, reset, persistence, expiry, and cold-start probes."
+    },
+    {
+      "name": "newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "The route owns in-memory metadata/token ordering, while the shared adapter runtime owns durability; the latter does not await or fail closed on ordinary saves."
+    },
+    {
+      "name": "docs-behavior parity",
+      "status": "run",
+      "reason": "Endpoint shape, informational expiry, reset, and paths match; the broad cold-start persistence claim does not disclose the post-201 asynchronous durability window."
+    },
+    {
+      "name": "demonstrative example",
+      "status": "skipped",
+      "reason": "The added curl example demonstrates inspection but is not relied on as proof."
+    },
+    {
+      "name": "choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was provided."
+    },
+    {
+      "name": "complexity budget",
+      "status": "run",
+      "reason": "The endpoint maps all retained metadata rows and storage grows by one row per successful mint with no pruning; recorded as a non-blocking issue candidate."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "clean exact-head identity",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "live GitHub frozen head/base before and after",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "style",
+      "outcome": "acknowledged",
+      "reason": "The generic gate flags an em dash in packages/@emulators/github/README.md, but repository AGENTS.md explicitly requires an em dash instead of prose double hyphens."
+    },
+    {
+      "check": "surface sweep",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "doc sibling sweep for installation-tokens",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "timing ceiling sweep",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "shell metacharacter sweep",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "external executable dependency sweep",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "radius impact map",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "pnpm build",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "pnpm test",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "focused GitHub, emulate API, Next, and Nuxt tests",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "pnpm type-check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "pnpm lint",
+      "outcome": "pass",
+      "reason": "Completed with pre-existing warnings and no errors."
+    },
+    {
+      "check": "pnpm format:check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "sync-versions --check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "built-artifact confidentiality/reset/persistence dogfood",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "post-201 delayed-save cold-start",
+      "outcome": "acknowledged",
+      "reason": "Confirmed F1: immediate cold start restored zero metadata and returned 401 for the newly minted token."
+    },
+    {
+      "check": "post-201 failed-save cold-start",
+      "outcome": "acknowledged",
+      "reason": "Confirmed F1: ordinary persistence failure was swallowed, leaving the successful mint absent from durable state."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "high",
+      "state": "confirmed",
+      "claim": "The adapters can return HTTP 201 for a minted installation token before its metadata and authorization are durable, so an immediate cold start loses both; an ordinary persistence failure makes the loss permanent.",
+      "evidence": "packages/@emulators/core/src/adapter-runtime.ts:335-339 calls enqueueSave without await, and lines 240-248 swallow non-fail-closed save failures. durability-race.json records 201 then metadataCount 0 and tokenAuthStatus 401 before the save settles. persistence-failure.json records 201, a swallowed failed save, metadataCount 0, and tokenAuthStatus 401. The changed contract test at tests/contracts/github-app-identity.js:239 waits for persistence before cold-starting, so it cannot reject this implementation.",
+      "layer": "durable adapter commit point and immediate cold-start boundary",
+      "source": "built-artifact dogfood and error-path forcing",
+      "path": "packages/@emulators/core/src/adapter-runtime.ts:335",
+      "resolution": "open"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Generic Review Gate style check flags the added em dash.",
+      "evidence": "The target repository AGENTS.md requires em dashes where prose punctuation is needed and forbids prose double hyphens."
+    },
+    {
+      "claim": "The endpoint is unauthenticated and CORS-accessible.",
+      "evidence": "This matches the emulator's existing open local-service model and exposes metadata rather than token or key material; retained as hardening context, not classified as a security blocker without the missing Security Review."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Installation-token metadata grows without pruning",
+      "evidence": "packages/@emulators/github/src/routes/apps.ts inserts one row per successful mint and packages/@emulators/github/src/routes/installation-tokens.ts returns all rows.",
+      "why_out_of_scope": "Capacity policy is not specified by this PR and no concrete operational failure was reproduced."
+    },
+    {
+      "title": "Unauthenticated cross-origin inspection metadata",
+      "evidence": "The new GET route has no auth middleware and the core server uses wildcard CORS.",
+      "why_out_of_scope": "The emulator is intentionally open locally and the route was verified secret-free; classification needs the missing exact-head Security Review."
+    }
+  ]
+}

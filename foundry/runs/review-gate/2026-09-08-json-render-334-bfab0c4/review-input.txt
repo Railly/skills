@@ -1,0 +1,1745 @@
+Read-only independent review of PR #334 at bfab0c4a6ce4d1a5a56ad2979577d28993dc1736. Find concrete correctness defects in the new TanStack Start adapter, especially route specificity, loader state refresh, navigation URL semantics, error recovery, server/client separation and documentation contracts. Do not modify or post anything. Return only actionable findings with exact file and line ranges, a reproducible trigger and confidence. Distinguish unsupported features from advertised defects. The complete new production sources and README follow.
+
+FILE packages/tanstack-start/CHANGELOG.md
+1: # @json-render/tanstack-start
+2: 
+3: ## 0.20.0
+4: 
+5: ### Minor Changes
+6: 
+7: - Add TanStack Start support for full JSON-defined applications with routes,
+8:   layouts, head metadata, SSR loaders, prerender paths, and client navigation.
+9: 
+
+FILE packages/tanstack-start/README.md
+1: # @json-render/tanstack-start
+2: 
+3: TanStack Start renderer for [@json-render/core](https://json-render.dev).
+4: Define routes, layouts, head metadata, state, and loader-backed pages as JSON,
+5: then render them through TanStack Router and Start SSR.
+6: 
+7: ## Installation
+8: 
+9: ```bash
+10: npm install @json-render/core @json-render/react @json-render/tanstack-start
+11: ```
+12: 
+13: ## Quick Start
+14: 
+15: ### 1. Define the catalog
+16: 
+17: Include the definitions for the built-in `Slot` and `Link` components. Their
+18: React implementations are added automatically by `PageRenderer`.
+19: 
+20: ```typescript
+21: import { defineCatalog } from "@json-render/core";
+22: import {
+23:   schema,
+24:   startComponentDefinitions,
+25: } from "@json-render/tanstack-start/server";
+26: 
+27: export const catalog = defineCatalog(schema, {
+28:   components: {
+29:     ...startComponentDefinitions,
+30:     Card: cardDefinition,
+31:     Container: containerDefinition,
+32:     NavBar: navBarDefinition,
+33:     Post: postDefinition,
+34:   },
+35:   actions: {},
+36: });
+37: ```
+38: 
+39: ### 2. Define the application
+40: 
+41: ```typescript
+42: import type { StartAppSpec } from "@json-render/tanstack-start";
+43: 
+44: export const spec: StartAppSpec = {
+45:   metadata: {
+46:     title: { default: "My App", template: "%s | My App" },
+47:   },
+48:   layouts: {
+49:     main: {
+50:       root: "shell",
+51:       elements: {
+52:         shell: {
+53:           type: "Container",
+54:           props: {},
+55:           children: ["nav", "slot"],
+56:         },
+57:         nav: { type: "NavBar", props: {}, children: [] },
+58:         slot: { type: "Slot", props: {}, children: [] },
+59:       },
+60:     },
+61:   },
+62:   routes: {
+63:     "/": {
+64:       layout: "main",
+65:       metadata: { title: "Home" },
+66:       page: {
+67:         root: "hero",
+68:         elements: {
+69:           hero: {
+70:             type: "Card",
+71:             props: { title: "Welcome" },
+72:             children: [],
+73:           },
+74:         },
+75:       },
+76:     },
+77:     "/blog/$slug": {
+78:       layout: "main",
+79:       loader: "post",
+80:       page: {
+81:         root: "post",
+82:         elements: {
+83:           post: {
+84:             type: "Post",
+85:             props: { post: { $state: "/post" } },
+86:             children: [],
+87:           },
+88:         },
+89:       },
+90:     },
+91:   },
+92: };
+93: ```
+94: 
+95: ### 3. Create the route helpers
+96: 
+97: ```typescript
+98: // src/lib/json-app.ts
+99: import { createStartApp } from "@json-render/tanstack-start/server";
+100: import { spec } from "./spec";
+101: 
+102: export const { getPageData, getHead, getStaticPaths } = createStartApp({
+103:   spec,
+104:   loaders: {
+105:     post: async ({ slug }) => ({ post: await getPost(slug as string) }),
+106:   },
+107: });
+108: ```
+109: 
+110: ### 4. Wire a splat route
+111: 
+112: ```tsx
+113: // src/routes/$.tsx
+114: import { createFileRoute, notFound } from "@tanstack/react-router";
+115: import {
+116:   PageRenderer,
+117:   StartErrorBoundary,
+118:   StartLoading,
+119:   StartNotFound,
+120: } from "@json-render/tanstack-start";
+121: import { getHead, getPageData } from "@/lib/json-app";
+122: 
+123: export const Route = createFileRoute("/$")({
+124:   loader: async ({ location }) => {
+125:     const data = await getPageData({ pathname: location.pathname });
+126:     if (!data) throw notFound();
+127:     return data;
+128:   },
+129:   head: ({ match }) => getHead({ pathname: match.pathname }),
+130:   component: Page,
+131:   pendingComponent: StartLoading,
+132:   errorComponent: StartErrorBoundary,
+133:   notFoundComponent: StartNotFound,
+134: });
+135: 
+136: function Page() {
+137:   return <PageRenderer {...Route.useLoaderData()} />;
+138: }
+139: ```
+140: 
+141: TanStack Router loaders are isomorphic. If your spec factory or named loaders
+142: contain secrets or server-only imports, call `getPageData` and `getHead` from a
+143: TanStack Start `createServerFn` and return the resulting data from the route
+144: loader.
+145: 
+146: ### 5. Provide the registry
+147: 
+148: ```tsx
+149: // src/routes/__root.tsx
+150: import {
+151:   createRootRoute,
+152:   HeadContent,
+153:   Outlet,
+154:   Scripts,
+155: } from "@tanstack/react-router";
+156: import { StartAppProvider } from "@json-render/tanstack-start";
+157: import { registry, handlers } from "@/lib/registry";
+158: import { spec } from "@/lib/spec";
+159: 
+160: export const Route = createRootRoute({ component: Root });
+161: 
+162: function Root() {
+163:   return (
+164:     <html lang="en">
+165:       <head>
+166:         <HeadContent />
+167:       </head>
+168:       <body>
+169:         <StartAppProvider
+170:           registry={registry}
+171:           handlers={handlers}
+172:           spec={spec}
+173:         >
+174:           <Outlet />
+175:         </StartAppProvider>
+176:         <Scripts />
+177:       </body>
+178:     </html>
+179:   );
+180: }
+181: ```
+182: 
+183: Passing `spec` lets the Router boundary components automatically render the
+184: matched route's `loading`, `error`, and `notFound` specs. An explicit
+185: `loadingSpec`, `errorSpec`, or `notFoundSpec` prop overrides this lookup. If the
+186: application spec is server-only, omit `spec` from the provider and supply those
+187: explicit props from client-safe fallback specs.
+188: 
+189: Pass named functions through the provider when generated props use
+190: `$computed`:
+191: 
+192: ```tsx
+193: <StartAppProvider
+194:   registry={registry}
+195:   spec={spec}
+196:   functions={{ uppercase: ({ value }) => String(value).toUpperCase() }}
+197: >
+198:   <Outlet />
+199: </StartAppProvider>
+200: ```
+201: 
+202: ## Route Patterns
+203: 
+204: | Pattern       | Matches       | Loader params            |
+205: | ------------- | ------------- | ------------------------ |
+206: | `/`           | `/`           | `{}`                     |
+207: | `/about`      | `/about`      | `{}`                     |
+208: | `/blog/$slug` | `/blog/hello` | `{ slug: "hello" }`      |
+209: | `/docs/$`     | `/docs/a/b`   | `{ _splat: "a/b" }`       |
+210: 
+211: Static routes are included in `getStaticPaths()`. Dynamic routes are included
+212: when their route spec supplies `staticParams`. Loader parameters are URL-decoded,
+213: and splat content is a slash-delimited string under `_splat`. Parameter values
+214: emitted by `getStaticPaths()` are URL-encoded.
+215: 
+216: Initial state is merged in this order: application state, layout state, page
+217: state, then loader data. Later sources override earlier values.
+218: 
+219: Map the paths to TanStack Start's top-level `pages` option when prerendering:
+220: 
+221: ```typescript
+222: const pages = (await getStaticPaths()).map((path) => ({ path }));
+223: ```
+224: 
+225: ## Entry Points
+226: 
+227: | Import                                | Description                                                   |
+228: | ------------------------------------- | ------------------------------------------------------------- |
+229: | `@json-render/tanstack-start`         | Provider, page renderer, Link, and route fallback components  |
+230: | `@json-render/tanstack-start/server`  | App factory, schema, matcher, metadata, and prerender helpers |
+231: | `@json-render/tanstack-start/catalog` | Server-safe definitions for built-in Slot and Link components |
+232: 
+233: See the [full API reference](https://json-render.dev/docs/api/tanstack-start).
+234: 
+
+FILE packages/tanstack-start/package.json
+1: {
+2:   "name": "@json-render/tanstack-start",
+3:   "version": "0.20.0",
+4:   "license": "Apache-2.0",
+5:   "description": "TanStack Start renderer for @json-render/core. JSON becomes full TanStack Start applications with routes, layouts, head metadata, and SSR.",
+6:   "keywords": [
+7:     "json",
+8:     "ui",
+9:     "tanstack",
+10:     "tanstack-start",
+11:     "tanstack-router",
+12:     "ai",
+13:     "generative-ui",
+14:     "llm",
+15:     "renderer",
+16:     "streaming",
+17:     "ssr",
+18:     "pages",
+19:     "routing"
+20:   ],
+21:   "repository": {
+22:     "type": "git",
+23:     "url": "git+https://github.com/vercel-labs/json-render.git",
+24:     "directory": "packages/tanstack-start"
+25:   },
+26:   "homepage": "https://json-render.dev",
+27:   "bugs": {
+28:     "url": "https://github.com/vercel-labs/json-render/issues"
+29:   },
+30:   "publishConfig": {
+31:     "access": "public"
+32:   },
+33:   "main": "./dist/index.js",
+34:   "module": "./dist/index.mjs",
+35:   "types": "./dist/index.d.ts",
+36:   "exports": {
+37:     ".": {
+38:       "types": "./dist/index.d.ts",
+39:       "import": "./dist/index.mjs",
+40:       "require": "./dist/index.js"
+41:     },
+42:     "./server": {
+43:       "types": "./dist/server.d.ts",
+44:       "import": "./dist/server.mjs",
+45:       "require": "./dist/server.js"
+46:     },
+47:     "./catalog": {
+48:       "types": "./dist/catalog.d.ts",
+49:       "import": "./dist/catalog.mjs",
+50:       "require": "./dist/catalog.js"
+51:     }
+52:   },
+53:   "files": [
+54:     "dist"
+55:   ],
+56:   "scripts": {
+57:     "build": "rm -rf dist && tsup",
+58:     "dev": "tsup --watch",
+59:     "check-types": "tsc --noEmit",
+60:     "typecheck": "tsc --noEmit"
+61:   },
+62:   "dependencies": {
+63:     "@json-render/core": "workspace:*",
+64:     "@json-render/react": "workspace:*"
+65:   },
+66:   "devDependencies": {
+67:     "@internal/typescript-config": "workspace:*",
+68:     "@tanstack/react-router": "1.170.32",
+69:     "@types/react": "19.2.14",
+70:     "tsup": "^8.5.1",
+71:     "typescript": "^5.4.5",
+72:     "zod": "^4.3.6"
+73:   },
+74:   "peerDependencies": {
+75:     "@tanstack/react-router": "^1.170.32",
+76:     "react": "^19.2.3",
+77:     "zod": "^4.0.0"
+78:   }
+79: }
+80: 
+
+FILE packages/tanstack-start/src/catalog-types.ts
+1: /** Catalog-aware types shared with the React renderer. */
+2: export type {
+3:   EventHandle,
+4:   BaseComponentProps,
+5:   SetState,
+6:   StateModel,
+7:   ComponentContext,
+8:   ComponentFn,
+9:   Components,
+10:   ActionFn,
+11:   Actions,
+12: } from "@json-render/react";
+13: 
+
+FILE packages/tanstack-start/src/catalog.ts
+1: import { z } from "zod";
+2: 
+3: /**
+4:  * Server-safe catalog definitions for components built into PageRenderer.
+5:  * Include these in every TanStack Start catalog that generates layouts or links.
+6:  */
+7: export const startComponentDefinitions = {
+8:   Slot: {
+9:     props: z.object({}),
+10:     slots: ["default"],
+11:     description:
+12:       "Layout placeholder where the matched route's page content is rendered.",
+13:     example: {},
+14:   },
+15:   Link: {
+16:     props: z.object({
+17:       href: z.string(),
+18:       replace: z.boolean().optional(),
+19:       prefetch: z.boolean().optional(),
+20:       className: z.string().optional(),
+21:       style: z.record(z.string(), z.unknown()).optional(),
+22:     }),
+23:     slots: ["default"],
+24:     description: "Client-side link to another route in the application.",
+25:     example: { href: "/about" },
+26:   },
+27: };
+28: 
+29: export type StartComponentDefinitions = typeof startComponentDefinitions;
+30: 
+
+FILE packages/tanstack-start/src/components/error-boundary.tsx
+1: import React from "react";
+2: import type { Spec } from "@json-render/core";
+3: import { PageRenderer } from "./page-renderer";
+4: import { resolveRouteFallback } from "./route-fallback";
+5: import { useOptionalStartApp } from "./provider";
+6: 
+7: /** Props accepted by TanStack Router's `errorComponent`. */
+8: export interface StartErrorBoundaryProps {
+9:   error: Error;
+10:   reset: () => void;
+11:   /** Explicit fallback override; otherwise the matched route's spec is used. */
+12:   errorSpec?: Spec | null;
+13: }
+14: 
+15: /** Render a route-specific error spec or a small default error view. */
+16: export function StartErrorBoundary({
+17:   error,
+18:   reset,
+19:   errorSpec,
+20: }: StartErrorBoundaryProps) {
+21:   const context = useOptionalStartApp();
+22:   const resolvedSpec = resolveRouteFallback(
+23:     context?.spec,
+24:     context?.pathname,
+25:     "error",
+26:     errorSpec,
+27:   );
+28:   if (resolvedSpec && context) {
+29:     return <PageRenderer spec={resolvedSpec} />;
+30:   }
+31: 
+32:   return (
+33:     <div style={{ padding: "2rem", textAlign: "center" }}>
+34:       <h2 style={{ marginBottom: "1rem" }}>Something went wrong</h2>
+35:       <p style={{ color: "#666", marginBottom: "1.5rem" }}>
+36:         {error.message || "An unexpected error occurred."}
+37:       </p>
+38:       <button
+39:         onClick={reset}
+40:         style={{
+41:           padding: "0.5rem 1rem",
+42:           borderRadius: "0.375rem",
+43:           border: "1px solid #ccc",
+44:           background: "#fff",
+45:           cursor: "pointer",
+46:         }}
+47:       >
+48:         Try again
+49:       </button>
+50:     </div>
+51:   );
+52: }
+53: 
+
+FILE packages/tanstack-start/src/components/link.tsx
+1: import React from "react";
+2: import { Link as RouterLink } from "@tanstack/react-router";
+3: import type { ComponentRenderProps } from "@json-render/react";
+4: 
+5: export interface LinkProps {
+6:   href: string;
+7:   replace?: boolean;
+8:   /** Preload the target route on intent. */
+9:   prefetch?: boolean;
+10:   className?: string;
+11:   style?: React.CSSProperties;
+12: }
+13: 
+14: /** Built-in client navigation component for generated specs. */
+15: export function Link({ element, children }: ComponentRenderProps<LinkProps>) {
+16:   const { href, replace, prefetch, className, style } =
+17:     element.props as LinkProps;
+18: 
+19:   return (
+20:     <RouterLink
+21:       to={href}
+22:       replace={replace}
+23:       preload={prefetch === undefined ? undefined : prefetch ? "intent" : false}
+24:       className={className}
+25:       style={style}
+26:     >
+27:       {children}
+28:     </RouterLink>
+29:   );
+30: }
+31: 
+
+FILE packages/tanstack-start/src/components/loading-renderer.tsx
+1: import React from "react";
+2: import type { Spec } from "@json-render/core";
+3: import { PageRenderer } from "./page-renderer";
+4: import { resolveRouteFallback } from "./route-fallback";
+5: import { useOptionalStartApp } from "./provider";
+6: 
+7: export interface StartLoadingProps {
+8:   /** Explicit fallback override; otherwise the matched route's spec is used. */
+9:   loadingSpec?: Spec | null;
+10: }
+11: 
+12: /** Render a route-specific pending spec or a small default spinner. */
+13: export function StartLoading({ loadingSpec }: StartLoadingProps = {}) {
+14:   const context = useOptionalStartApp();
+15:   const resolvedSpec = resolveRouteFallback(
+16:     context?.spec,
+17:     context?.pathname,
+18:     "loading",
+19:     loadingSpec,
+20:   );
+21:   if (resolvedSpec && context) {
+22:     return <PageRenderer spec={resolvedSpec} loading />;
+23:   }
+24: 
+25:   return (
+26:     <div
+27:       style={{
+28:         display: "flex",
+29:         justifyContent: "center",
+30:         alignItems: "center",
+31:         minHeight: "200px",
+32:       }}
+33:     >
+34:       <div
+35:         style={{
+36:           width: "2rem",
+37:           height: "2rem",
+38:           border: "2px solid #e5e7eb",
+39:           borderTopColor: "#3b82f6",
+40:           borderRadius: "50%",
+41:           animation: "jr-spin 0.6s linear infinite",
+42:         }}
+43:       />
+44:       <style>{`@keyframes jr-spin { to { transform: rotate(360deg) } }`}</style>
+45:     </div>
+46:   );
+47: }
+48: 
+
+FILE packages/tanstack-start/src/components/not-found-renderer.tsx
+1: import React from "react";
+2: import type { NotFoundRouteProps } from "@tanstack/react-router";
+3: import type { Spec } from "@json-render/core";
+4: import { PageRenderer } from "./page-renderer";
+5: import { resolveRouteFallback } from "./route-fallback";
+6: import { useOptionalStartApp } from "./provider";
+7: 
+8: export interface StartNotFoundProps extends Partial<NotFoundRouteProps> {
+9:   /** Explicit fallback override; otherwise the matched route's spec is used. */
+10:   notFoundSpec?: Spec | null;
+11: }
+12: 
+13: /** Render a route-specific not-found spec or a small default 404 view. */
+14: export function StartNotFound({ notFoundSpec }: StartNotFoundProps = {}) {
+15:   const context = useOptionalStartApp();
+16:   const resolvedSpec = resolveRouteFallback(
+17:     context?.spec,
+18:     context?.pathname,
+19:     "notFound",
+20:     notFoundSpec,
+21:   );
+22:   if (resolvedSpec && context) {
+23:     return <PageRenderer spec={resolvedSpec} />;
+24:   }
+25: 
+26:   return (
+27:     <div
+28:       style={{
+29:         display: "flex",
+30:         flexDirection: "column",
+31:         alignItems: "center",
+32:         justifyContent: "center",
+33:         minHeight: "400px",
+34:         padding: "2rem",
+35:         textAlign: "center",
+36:       }}
+37:     >
+38:       <h1 style={{ fontSize: "4rem", fontWeight: 700, margin: 0 }}>404</h1>
+39:       <p style={{ color: "#666", marginTop: "0.5rem", fontSize: "1.125rem" }}>
+40:         This page could not be found.
+41:       </p>
+42:     </div>
+43:   );
+44: }
+45: 
+
+FILE packages/tanstack-start/src/components/page-renderer.tsx
+1: import React, { useMemo, type ReactNode } from "react";
+2: import { useMatch } from "@tanstack/react-router";
+3: import type { Spec } from "@json-render/core";
+4: import {
+5:   JSONUIProvider,
+6:   Renderer,
+7:   type ComponentRegistry,
+8:   type ComponentRenderProps,
+9: } from "@json-render/react";
+10: import { Link } from "./link";
+11: import { useStartApp } from "./provider";
+12: 
+13: export interface PageRendererProps {
+14:   spec: Spec;
+15:   initialState?: Record<string, unknown>;
+16:   layoutSpec?: Spec | null;
+17:   loading?: boolean;
+18: }
+19: 
+20: function Slot({ children }: ComponentRenderProps) {
+21:   return <>{children}</>;
+22: }
+23: 
+24: /** Render page data returned by `createStartApp` inside an optional layout. */
+25: export function PageRenderer({
+26:   spec,
+27:   initialState,
+28:   layoutSpec,
+29:   loading,
+30: }: PageRendererProps) {
+31:   const {
+32:     registry,
+33:     handlers,
+34:     spec: appSpec,
+35:     functions,
+36:     navigate,
+37:   } = useStartApp();
+38:   const renderedPathname = useMatch({
+39:     strict: false,
+40:     select: (match) => match.pathname,
+41:   });
+42:   const augmentedRegistry: ComponentRegistry = useMemo(
+43:     () => ({ ...registry, Link, Slot }),
+44:     [registry],
+45:   );
+46:   const actionHandlers = useMemo(
+47:     () => ({
+48:       ...handlers,
+49:       navigate: (params: Record<string, unknown>) => {
+50:         const href = params.href;
+51:         if (typeof href === "string") navigate(href);
+52:       },
+53:     }),
+54:     [handlers, navigate],
+55:   );
+56:   const resolvedInitialState = useMemo(() => {
+57:     if (initialState !== undefined) return initialState;
+58:     if (!appSpec?.state && !layoutSpec?.state && !spec.state) return undefined;
+59:     return { ...appSpec?.state, ...layoutSpec?.state, ...spec.state };
+60:   }, [appSpec?.state, initialState, layoutSpec?.state, spec.state]);
+61: 
+62:   const page = (
+63:     <Renderer spec={spec} registry={augmentedRegistry} loading={loading} />
+64:   );
+65: 
+66:   // Key from the rendered match rather than the global location. During a
+67:   // pending navigation, TanStack advances the location while keeping the
+68:   // previous match mounted until the next page is ready.
+69:   return (
+70:     <JSONUIProvider
+71:       key={renderedPathname}
+72:       registry={augmentedRegistry}
+73:       initialState={resolvedInitialState}
+74:       handlers={actionHandlers}
+75:       navigate={navigate}
+76:       functions={functions}
+77:     >
+78:       {layoutSpec ? (
+79:         <LayoutWithSlot
+80:           layoutSpec={layoutSpec}
+81:           registry={augmentedRegistry}
+82:           loading={loading}
+83:         >
+84:           {page}
+85:         </LayoutWithSlot>
+86:       ) : (
+87:         page
+88:       )}
+89:     </JSONUIProvider>
+90:   );
+91: }
+92: 
+93: function LayoutWithSlot({
+94:   layoutSpec,
+95:   registry,
+96:   loading,
+97:   children,
+98: }: {
+99:   layoutSpec: Spec;
+100:   registry: ComponentRegistry;
+101:   loading?: boolean;
+102:   children: ReactNode;
+103: }) {
+104:   const layoutRegistry: ComponentRegistry = useMemo(
+105:     () => ({
+106:       ...registry,
+107:       Slot: function LayoutSlot() {
+108:         return <>{children}</>;
+109:       },
+110:     }),
+111:     [children, registry],
+112:   );
+113: 
+114:   return (
+115:     <Renderer spec={layoutSpec} registry={layoutRegistry} loading={loading} />
+116:   );
+117: }
+118: 
+
+FILE packages/tanstack-start/src/components/provider.tsx
+1: import React, { createContext, useContext, type ReactNode } from "react";
+2: import { useLocation, useRouter } from "@tanstack/react-router";
+3: import type { ComputedFunction } from "@json-render/core";
+4: import type { ComponentRegistry } from "@json-render/react";
+5: import type { StartAppSpec } from "../types";
+6: 
+7: export interface StartAppContextValue {
+8:   registry: ComponentRegistry;
+9:   handlers?: Record<
+10:     string,
+11:     (params: Record<string, unknown>) => Promise<unknown> | unknown
+12:   >;
+13:   spec?: StartAppSpec;
+14:   functions?: Record<string, ComputedFunction>;
+15:   pathname: string;
+16:   navigate: (href: string) => void;
+17: }
+18: 
+19: const StartAppContext = createContext<StartAppContextValue | null>(null);
+20: 
+21: export interface StartAppProviderProps {
+22:   registry: ComponentRegistry;
+23:   handlers?: Record<
+24:     string,
+25:     (params: Record<string, unknown>) => Promise<unknown> | unknown
+26:   >;
+27:   /** Application spec used to resolve route-specific fallback components. */
+28:   spec?: StartAppSpec;
+29:   /** Named functions available to `$computed` prop expressions. */
+30:   functions?: Record<string, ComputedFunction>;
+31:   children: ReactNode;
+32: }
+33: 
+34: /** Provide rendering dependencies, route fallbacks, and TanStack navigation. */
+35: export function StartAppProvider({
+36:   registry,
+37:   handlers,
+38:   spec,
+39:   functions,
+40:   children,
+41: }: StartAppProviderProps) {
+42:   const router = useRouter();
+43:   const pathname = useLocation({ select: (location) => location.pathname });
+44:   const navigate = React.useCallback(
+45:     (href: string) => {
+46:       void router.navigate({ to: href });
+47:     },
+48:     [router],
+49:   );
+50:   const value = React.useMemo(
+51:     () => ({ registry, handlers, spec, functions, pathname, navigate }),
+52:     [registry, handlers, spec, functions, pathname, navigate],
+53:   );
+54: 
+55:   return (
+56:     <StartAppContext.Provider value={value}>
+57:       {children}
+58:     </StartAppContext.Provider>
+59:   );
+60: }
+61: 
+62: /** Access the current TanStack Start json-render application context. */
+63: export function useStartApp(): StartAppContextValue {
+64:   const context = useContext(StartAppContext);
+65:   if (!context) {
+66:     throw new Error(
+67:       "[json-render/tanstack-start] useStartApp must be used within a " +
+68:         "<StartAppProvider>.",
+69:     );
+70:   }
+71:   return context;
+72: }
+73: 
+74: export function useOptionalStartApp(): StartAppContextValue | null {
+75:   return useContext(StartAppContext);
+76: }
+77: 
+
+FILE packages/tanstack-start/src/components/route-fallback.ts
+1: import type { Spec } from "@json-render/core";
+2: import { matchRoute } from "../router";
+3: import type { StartAppSpec } from "../types";
+4: 
+5: export type RouteFallbackKind = "loading" | "error" | "notFound";
+6: 
+7: /** Resolve an explicit fallback or the fallback on the currently matched route. */
+8: export function resolveRouteFallback(
+9:   spec: StartAppSpec | undefined,
+10:   pathname: string | undefined,
+11:   kind: RouteFallbackKind,
+12:   explicitSpec: Spec | null | undefined,
+13: ): Spec | null | undefined {
+14:   if (explicitSpec !== undefined) return explicitSpec;
+15:   if (!spec || pathname === undefined) return undefined;
+16:   return matchRoute(spec, pathname)?.route[kind];
+17: }
+18: 
+
+FILE packages/tanstack-start/src/create-app.ts
+1: import { metadataToHead, resolveMetadata } from "./metadata";
+2: import { collectStaticPaths, matchRoute } from "./router";
+3: import type {
+4:   CreateStartAppOptions,
+5:   HeadDescriptors,
+6:   PageData,
+7:   StartAppExports,
+8:   StartAppSpec,
+9: } from "./types";
+10: 
+11: async function resolveSpec(
+12:   specOrFactory: StartAppSpec | (() => StartAppSpec | Promise<StartAppSpec>),
+13: ): Promise<StartAppSpec> {
+14:   return typeof specOrFactory === "function"
+15:     ? await specOrFactory()
+16:     : specOrFactory;
+17: }
+18: 
+19: function mergeState(
+20:   ...sources: (Record<string, unknown> | null | undefined)[]
+21: ): Record<string, unknown> {
+22:   return Object.assign({}, ...sources.filter((source) => source != null));
+23: }
+24: 
+25: /**
+26:  * Create the route-loader, head, and prerender helpers for a TanStack Start
+27:  * catch-all route.
+28:  */
+29: export function createStartApp(
+30:   options: CreateStartAppOptions,
+31: ): StartAppExports {
+32:   const { spec: specOrFactory, loaders } = options;
+33: 
+34:   async function getPageData({
+35:     pathname,
+36:   }: {
+37:     pathname: string;
+38:   }): Promise<PageData | null> {
+39:     const spec = await resolveSpec(specOrFactory);
+40:     const matched = matchRoute(spec, pathname);
+41:     if (!matched) return null;
+42: 
+43:     const { route } = matched;
+44:     const loader = route.loader ? loaders?.[route.loader] : undefined;
+45:     const loaderData = loader ? await loader(matched.params) : undefined;
+46:     const layoutSpec =
+47:       route.layout && spec.layouts
+48:         ? (spec.layouts[route.layout] ?? null)
+49:         : null;
+50:     const initialState = mergeState(
+51:       spec.state,
+52:       layoutSpec?.state,
+53:       route.page.state,
+54:       loaderData,
+55:     );
+56: 
+57:     return {
+58:       spec: route.page,
+59:       initialState:
+60:         Object.keys(initialState).length > 0 ? initialState : undefined,
+61:       layoutSpec,
+62:     };
+63:   }
+64: 
+65:   async function getHead({
+66:     pathname,
+67:   }: {
+68:     pathname: string;
+69:   }): Promise<HeadDescriptors> {
+70:     const spec = await resolveSpec(specOrFactory);
+71:     const matched = matchRoute(spec, pathname);
+72:     return metadataToHead(resolveMetadata(spec, matched?.route));
+73:   }
+74: 
+75:   async function getStaticPaths(): Promise<string[]> {
+76:     return collectStaticPaths(await resolveSpec(specOrFactory));
+77:   }
+78: 
+79:   return { getPageData, getHead, getStaticPaths };
+80: }
+81: 
+
+FILE packages/tanstack-start/src/index.ts
+1: "use client";
+2: 
+3: // React components for TanStack Start applications.
+4: 
+5: export {
+6:   StartAppProvider,
+7:   useStartApp,
+8:   type StartAppContextValue,
+9:   type StartAppProviderProps,
+10: } from "./components/provider";
+11: export {
+12:   PageRenderer,
+13:   type PageRendererProps,
+14: } from "./components/page-renderer";
+15: export {
+16:   StartErrorBoundary,
+17:   type StartErrorBoundaryProps,
+18: } from "./components/error-boundary";
+19: export {
+20:   StartLoading,
+21:   type StartLoadingProps,
+22: } from "./components/loading-renderer";
+23: export {
+24:   StartNotFound,
+25:   type StartNotFoundProps,
+26: } from "./components/not-found-renderer";
+27: export { Link, type LinkProps } from "./components/link";
+28: 
+29: export type {
+30:   CreateStartAppOptions,
+31:   HeadDescriptors,
+32:   LoaderFn,
+33:   MatchedRoute,
+34:   PageData,
+35:   StartAppExports,
+36:   StartAppSpec,
+37:   StartMetadata,
+38:   StartRouteSpec,
+39: } from "./types";
+40: export type {
+41:   ActionFn,
+42:   Actions,
+43:   BaseComponentProps,
+44:   ComponentContext,
+45:   ComponentFn,
+46:   Components,
+47:   EventHandle,
+48:   SetState,
+49:   StateModel,
+50: } from "./catalog-types";
+51: export type { ComputedFunction, Spec, StateStore } from "@json-render/core";
+52: export { createStateStore } from "@json-render/core";
+53: export type {
+54:   ComponentRegistry,
+55:   ComponentRenderProps,
+56: } from "@json-render/react";
+57: 
+
+FILE packages/tanstack-start/src/metadata.ts
+1: import type {
+2:   HeadDescriptors,
+3:   StartAppSpec,
+4:   StartMetadata,
+5:   StartRouteSpec,
+6: } from "./types";
+7: 
+8: export type ResolvedMetadata = Record<string, unknown>;
+9: 
+10: /** Merge application metadata with a route's overrides. */
+11: export function resolveMetadata(
+12:   spec: StartAppSpec,
+13:   route?: StartRouteSpec | null,
+14: ): ResolvedMetadata {
+15:   const globalMetadata = spec.metadata;
+16:   const routeMetadata = route?.metadata;
+17:   if (!globalMetadata && !routeMetadata) return {};
+18: 
+19:   const result: ResolvedMetadata = {};
+20:   const title = resolveTitle(globalMetadata?.title, routeMetadata?.title);
+21:   if (title !== undefined) result.title = title;
+22: 
+23:   const description = routeMetadata?.description ?? globalMetadata?.description;
+24:   if (description) result.description = description;
+25: 
+26:   const keywords = routeMetadata?.keywords ?? globalMetadata?.keywords;
+27:   if (keywords) result.keywords = keywords;
+28: 
+29:   const openGraph = mergeObject(
+30:     globalMetadata?.openGraph,
+31:     routeMetadata?.openGraph,
+32:   );
+33:   if (openGraph) result.openGraph = openGraph;
+34: 
+35:   const twitter = mergeObject(globalMetadata?.twitter, routeMetadata?.twitter);
+36:   if (twitter) result.twitter = twitter;
+37: 
+38:   const robots = routeMetadata?.robots ?? globalMetadata?.robots;
+39:   if (robots) result.robots = robots;
+40: 
+41:   const alternates = routeMetadata?.alternates ?? globalMetadata?.alternates;
+42:   if (alternates) result.alternates = alternates;
+43: 
+44:   const icons = routeMetadata?.icons ?? globalMetadata?.icons;
+45:   if (icons) result.icons = icons;
+46: 
+47:   return result;
+48: }
+49: 
+50: /** Convert resolved metadata to TanStack Router `head` descriptors. */
+51: export function metadataToHead(metadata: ResolvedMetadata): HeadDescriptors {
+52:   const meta: Record<string, string>[] = [];
+53:   const links: Record<string, string>[] = [];
+54:   const title = titleToString(metadata.title);
+55: 
+56:   if (title) meta.push({ title });
+57:   if (typeof metadata.description === "string") {
+58:     meta.push({ name: "description", content: metadata.description });
+59:   }
+60:   if (Array.isArray(metadata.keywords) && metadata.keywords.length > 0) {
+61:     meta.push({ name: "keywords", content: metadata.keywords.join(", ") });
+62:   }
+63: 
+64:   const openGraph = metadata.openGraph as
+65:     | StartMetadata["openGraph"]
+66:     | undefined;
+67:   if (openGraph) {
+68:     if (openGraph.title) {
+69:       meta.push({ property: "og:title", content: openGraph.title });
+70:     }
+71:     if (openGraph.description) {
+72:       meta.push({ property: "og:description", content: openGraph.description });
+73:     }
+74:     if (openGraph.type) {
+75:       meta.push({ property: "og:type", content: openGraph.type });
+76:     }
+77:     if (openGraph.url)
+78:       meta.push({ property: "og:url", content: openGraph.url });
+79:     if (openGraph.siteName) {
+80:       meta.push({ property: "og:site_name", content: openGraph.siteName });
+81:     }
+82:     if (openGraph.locale) {
+83:       meta.push({ property: "og:locale", content: openGraph.locale });
+84:     }
+85:     for (const image of toArray(openGraph.images)) {
+86:       meta.push({ property: "og:image", content: image });
+87:     }
+88:   }
+89: 
+90:   const twitter = metadata.twitter as StartMetadata["twitter"] | undefined;
+91:   if (twitter) {
+92:     if (twitter.card) {
+93:       meta.push({ name: "twitter:card", content: twitter.card });
+94:     }
+95:     if (twitter.title) {
+96:       meta.push({ name: "twitter:title", content: twitter.title });
+97:     }
+98:     if (twitter.description) {
+99:       meta.push({ name: "twitter:description", content: twitter.description });
+100:     }
+101:     if (twitter.creator) {
+102:       meta.push({ name: "twitter:creator", content: twitter.creator });
+103:     }
+104:     if (twitter.site) {
+105:       meta.push({ name: "twitter:site", content: twitter.site });
+106:     }
+107:     for (const image of toArray(twitter.images)) {
+108:       meta.push({ name: "twitter:image", content: image });
+109:     }
+110:   }
+111: 
+112:   const robots = metadata.robots as StartMetadata["robots"] | undefined;
+113:   if (robots) {
+114:     const content =
+115:       typeof robots === "string"
+116:         ? robots
+117:         : [
+118:             robots.index === false ? "noindex" : "index",
+119:             robots.follow === false ? "nofollow" : "follow",
+120:           ].join(", ");
+121:     meta.push({ name: "robots", content });
+122:   }
+123: 
+124:   const alternates = metadata.alternates as
+125:     | StartMetadata["alternates"]
+126:     | undefined;
+127:   if (alternates?.canonical) {
+128:     links.push({ rel: "canonical", href: alternates.canonical });
+129:   }
+130: 
+131:   const icons = metadata.icons as StartMetadata["icons"] | undefined;
+132:   if (typeof icons === "string") {
+133:     links.push({ rel: "icon", href: icons });
+134:   } else if (icons) {
+135:     if (icons.icon) links.push({ rel: "icon", href: icons.icon });
+136:     if (icons.apple) {
+137:       links.push({ rel: "apple-touch-icon", href: icons.apple });
+138:     }
+139:     if (icons.shortcut) {
+140:       links.push({ rel: "shortcut icon", href: icons.shortcut });
+141:     }
+142:   }
+143: 
+144:   return { meta, links };
+145: }
+146: 
+147: function resolveTitle(
+148:   globalTitle: StartMetadata["title"],
+149:   routeTitle: StartMetadata["title"],
+150: ): unknown {
+151:   if (!routeTitle && !globalTitle) return undefined;
+152: 
+153:   if (!routeTitle) {
+154:     if (typeof globalTitle === "string") return globalTitle;
+155:     return globalTitle?.default;
+156:   }
+157: 
+158:   const template =
+159:     typeof globalTitle === "object" ? globalTitle.template : undefined;
+160: 
+161:   if (typeof routeTitle === "object") {
+162:     if (routeTitle.absolute) return routeTitle.absolute;
+163:     return applyTitleTemplate(template, routeTitle.default);
+164:   }
+165: 
+166:   return applyTitleTemplate(template, routeTitle);
+167: }
+168: 
+169: function applyTitleTemplate(
+170:   template: string | undefined,
+171:   title: string,
+172: ): string {
+173:   return template ? template.replace(/%s/g, () => title) : title;
+174: }
+175: 
+176: function titleToString(title: unknown): string | undefined {
+177:   if (typeof title === "string") return title;
+178:   if (typeof title === "object" && title !== null) {
+179:     const value = title as { absolute?: string; default?: string };
+180:     return value.absolute ?? value.default;
+181:   }
+182:   return undefined;
+183: }
+184: 
+185: function toArray(value: string | string[] | undefined): string[] {
+186:   if (!value) return [];
+187:   return Array.isArray(value) ? value : [value];
+188: }
+189: 
+190: function mergeObject(
+191:   base: Record<string, unknown> | undefined,
+192:   override: Record<string, unknown> | undefined,
+193: ): Record<string, unknown> | undefined {
+194:   if (!base && !override) return undefined;
+195:   return { ...base, ...override };
+196: }
+197: 
+
+FILE packages/tanstack-start/src/router.ts
+1: import type { MatchedRoute, StartAppSpec } from "./types";
+2: 
+3: interface CompiledRoute {
+4:   pattern: string;
+5:   regex: RegExp;
+6:   paramNames: string[];
+7:   segmentRanks: number[];
+8: }
+9: 
+10: const SPLAT_PARAM = "_splat";
+11: const STATIC_SEGMENT_RANK = 3;
+12: const DYNAMIC_SEGMENT_RANK = 2;
+13: const SPLAT_SEGMENT_RANK = 1;
+14: 
+15: /** Compile a TanStack Router pattern into a pathname matcher. */
+16: function compileRoute(pattern: string): CompiledRoute {
+17:   const paramNames: string[] = [];
+18:   const segments = pattern === "/" ? [""] : pattern.split("/").slice(1);
+19:   const regexParts: string[] = [];
+20:   const segmentRanks: number[] = [];
+21: 
+22:   for (const segment of segments) {
+23:     if (segment === "$") {
+24:       paramNames.push(SPLAT_PARAM);
+25:       segmentRanks.push(SPLAT_SEGMENT_RANK);
+26:       regexParts.push("(?:/(.*))?");
+27:     } else if (segment.startsWith("$") && segment.length > 1) {
+28:       paramNames.push(segment.slice(1));
+29:       segmentRanks.push(DYNAMIC_SEGMENT_RANK);
+30:       regexParts.push("/([^/]+)");
+31:     } else {
+32:       segmentRanks.push(STATIC_SEGMENT_RANK);
+33:       regexParts.push(`/${escapeRegExp(segment)}`);
+34:     }
+35:   }
+36: 
+37:   return {
+38:     pattern,
+39:     regex: new RegExp(
+40:       pattern === "/" ? "^/$" : `^${regexParts.join("")}$`,
+41:       "i",
+42:     ),
+43:     paramNames,
+44:     segmentRanks,
+45:   };
+46: }
+47: 
+48: function escapeRegExp(value: string): string {
+49:   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+50: }
+51: 
+52: /** Match a pathname using TanStack Router's static, dynamic, and splat forms. */
+53: export function matchRoute(
+54:   spec: StartAppSpec,
+55:   pathname: string,
+56: ): MatchedRoute | null {
+57:   const normalizedPath = normalizePathname(pathname);
+58:   const compiled = Object.keys(spec.routes).map(compileRoute);
+59: 
+60:   compiled.sort((a, b) => {
+61:     const segmentCount = Math.max(a.segmentRanks.length, b.segmentRanks.length);
+62:     for (let index = 0; index < segmentCount; index++) {
+63:       const aRank = a.segmentRanks[index] ?? 0;
+64:       const bRank = b.segmentRanks[index] ?? 0;
+65:       if (aRank !== bRank) return bRank - aRank;
+66:     }
+67:     return 0;
+68:   });
+69: 
+70:   for (const candidate of compiled) {
+71:     const match = candidate.regex.exec(normalizedPath);
+72:     if (!match) continue;
+73: 
+74:     const params: Record<string, string> = {};
+75:     let validParams = true;
+76:     for (let index = 0; index < candidate.paramNames.length; index++) {
+77:       const name = candidate.paramNames[index]!;
+78:       const value = match[index + 1];
+79:       try {
+80:         params[name] = decodeURIComponent(value ?? "");
+81:       } catch {
+82:         validParams = false;
+83:         break;
+84:       }
+85:     }
+86:     if (!validParams) continue;
+87: 
+88:     return {
+89:       route: spec.routes[candidate.pattern]!,
+90:       pattern: candidate.pattern,
+91:       params,
+92:     };
+93:   }
+94: 
+95:   return null;
+96: }
+97: 
+98: function normalizePathname(pathname: string): string {
+99:   if (pathname === "" || pathname === "/") return "/";
+100:   return pathname.replace(/\/+$/, "") || "/";
+101: }
+102: 
+103: /** Convert TanStack Router splat content to a pathname. */
+104: export function splatToPath(splat: string | undefined): string {
+105:   if (!splat) return "/";
+106:   return `/${splat}`;
+107: }
+108: 
+109: /** Collect concrete pathnames suitable for TanStack Start prerendering. */
+110: export function collectStaticPaths(spec: StartAppSpec): string[] {
+111:   const results: string[] = [];
+112: 
+113:   for (const [pattern, route] of Object.entries(spec.routes)) {
+114:     if (route.staticParams) {
+115:       for (const params of route.staticParams) {
+116:         const pathname = buildPathFromPattern(pattern, params);
+117:         if (pathname) results.push(pathname);
+118:       }
+119:     } else if (!pattern.includes("$")) {
+120:       results.push(pattern);
+121:     }
+122:   }
+123: 
+124:   return results;
+125: }
+126: 
+127: function buildPathFromPattern(
+128:   pattern: string,
+129:   params: Record<string, string>,
+130: ): string | null {
+131:   if (pattern === "/") return "/";
+132: 
+133:   const result: string[] = [];
+134:   for (const segment of pattern.split("/").slice(1)) {
+135:     if (segment === "$") {
+136:       const value = params[SPLAT_PARAM];
+137:       if (value) result.push(...value.split("/").map(encodeURIComponent));
+138:     } else if (segment.startsWith("$") && segment.length > 1) {
+139:       const value = params[segment.slice(1)];
+140:       if (!value) return null;
+141:       result.push(encodeURIComponent(value));
+142:     } else {
+143:       result.push(segment);
+144:     }
+145:   }
+146: 
+147:   return result.length === 0 ? "/" : `/${result.join("/")}`;
+148: }
+149: 
+
+FILE packages/tanstack-start/src/schema.ts
+1: import { defineSchema, type PromptContext } from "@json-render/core";
+2: 
+3: function startAppPromptTemplate(context: PromptContext): string {
+4:   const { catalog, options, formatZodType } = context;
+5:   const {
+6:     system = "You are a TanStack Start application generator.",
+7:     customRules = [],
+8:   } = options;
+9:   const lines: string[] = [system, ""];
+10: 
+11:   lines.push("OUTPUT FORMAT:");
+12:   lines.push(
+13:     "Output JSONL (one JSON object per line) with RFC 6902 JSON Patch operations to build a TanStack Start application spec.",
+14:   );
+15:   lines.push(
+16:     "The spec defines routes, layouts, metadata, and state for a full TanStack Start app.",
+17:   );
+18:   lines.push("");
+19:   lines.push("Example output (each line is a separate JSON object):");
+20:   lines.push("");
+21:   lines.push(
+22:     `{"op":"add","path":"/metadata","value":{"title":{"default":"My App","template":"%s | My App"},"description":"A TanStack Start application"}}`,
+23:   );
+24:   lines.push(`{"op":"add","path":"/layouts","value":{}}`);
+25:   lines.push(
+26:     `{"op":"add","path":"/layouts/main","value":{"root":"shell","elements":{"shell":{"type":"AppShell","props":{},"children":["nav","slot"]},"nav":{"type":"NavBar","props":{},"children":[]},"slot":{"type":"Slot","props":{},"children":[]}}}}`,
+27:   );
+28:   lines.push(`{"op":"add","path":"/routes","value":{}}`);
+29:   lines.push(
+30:     `{"op":"add","path":"/routes/~1","value":{"layout":"main","metadata":{"title":"Home"},"page":{"root":"hero","elements":{"hero":{"type":"Card","props":{"title":"Welcome"},"children":[]}}}}}`,
+31:   );
+32:   lines.push("");
+33: 
+34:   lines.push("SPEC STRUCTURE:");
+35:   lines.push("- metadata: Root SEO metadata and title templates");
+36:   lines.push(
+37:     "- layouts: Reusable element trees with a Slot element for page content",
+38:   );
+39:   lines.push("- routes: Route definitions keyed by URL pattern");
+40:   lines.push("- state: Global initial state shared by routes");
+41:   lines.push("");
+42: 
+43:   lines.push("ROUTES:");
+44:   lines.push("Route keys use TanStack Router URL patterns:");
+45:   lines.push("- '/' - home page");
+46:   lines.push("- '/about' - static route");
+47:   lines.push("- '/blog/$slug' - dynamic segment");
+48:   lines.push("- '/docs/$' - splat segment matching the remaining path");
+49:   lines.push("");
+50:   lines.push(
+51:     "In JSON Patch paths, escape every forward slash in a route key as ~1.",
+52:   );
+53:   lines.push("- Route '/' becomes '/routes/~1'");
+54:   lines.push("- Route '/about' becomes '/routes/~1about'");
+55:   lines.push("- Route '/blog/$slug' becomes '/routes/~1blog~1$slug'");
+56:   lines.push("");
+57: 
+58:   lines.push("Each route has:");
+59:   lines.push("- page: Element tree with root, elements, and optional state");
+60:   lines.push("- metadata: Route-specific SEO metadata");
+61:   lines.push("- layout: Key in the top-level layouts map");
+62:   lines.push("- loading, error, notFound: Optional fallback element trees");
+63:   lines.push("- loader: Optional server loader name");
+64:   lines.push("- staticParams: Optional params for prerendered dynamic routes");
+65:   lines.push("");
+66: 
+67:   lines.push("PAGE ELEMENTS:");
+68:   lines.push("- props may contain $state, $item, $index, and $computed values");
+69:   lines.push("- on maps component events to one or more action bindings");
+70:   lines.push("- repeat renders children for values at a state path");
+71:   lines.push("- visible conditionally includes an element");
+72:   lines.push("- watch runs actions when state paths change");
+73:   lines.push(
+74:     "- slots maps named slots to element keys; use children for default",
+75:   );
+76:   lines.push("");
+77: 
+78:   const catalogData = catalog as {
+79:     components?: Record<
+80:       string,
+81:       {
+82:         description?: string;
+83:         props?: unknown;
+84:         slots?: string[];
+85:         events?: string[];
+86:       }
+87:     >;
+88:     actions?: Record<string, { description?: string }>;
+89:   };
+90: 
+91:   if (catalogData.components) {
+92:     lines.push(
+93:       `AVAILABLE COMPONENTS (${Object.keys(catalogData.components).length}):`,
+94:     );
+95:     lines.push("");
+96:     for (const [name, definition] of Object.entries(catalogData.components)) {
+97:       const props = definition.props
+98:         ? formatZodType(definition.props as any)
+99:         : "{}";
+100:       const children = definition.slots?.length ? " [accepts children]" : "";
+101:       const events = definition.events?.length
+102:         ? ` [events: ${definition.events.join(", ")}]`
+103:         : "";
+104:       const description = definition.description
+105:         ? ` - ${definition.description}`
+106:         : "";
+107:       lines.push(`${name}: ${props}${description}${children}${events}`);
+108:     }
+109:     lines.push("");
+110:   }
+111: 
+112:   lines.push("BUILT-IN COMPONENTS:");
+113:   lines.push("- Slot: Layout placeholder for page content");
+114:   lines.push("- Link: { href: string } client-side navigation link");
+115:   lines.push("");
+116: 
+117:   if (catalogData.actions && Object.keys(catalogData.actions).length > 0) {
+118:     lines.push("AVAILABLE ACTIONS:");
+119:     for (const [name, definition] of Object.entries(catalogData.actions)) {
+120:       lines.push(
+121:         `${name}${definition.description ? `: ${definition.description}` : ""}`,
+122:       );
+123:     }
+124:     lines.push("");
+125:   }
+126: 
+127:   lines.push("BUILT-IN ACTIONS:");
+128:   lines.push("- setState: { statePath, value }");
+129:   lines.push("- pushState: { statePath, value, clearStatePath? }");
+130:   lines.push("- removeState: { statePath, index }");
+131:   lines.push("- navigate: { href }");
+132:   lines.push("");
+133: 
+134:   lines.push("RULES:");
+135:   const rules = [
+136:     "Output only JSONL patches, one JSON object per line",
+137:     "Add metadata, then layouts, then routes",
+138:     "Every layout must contain a Slot element",
+139:     "Only use available components plus Slot and Link",
+140:     "Every element must include type, props, and children",
+141:     "Every child and named-slot key must reference an existing element",
+142:     "Escape route-key slashes as ~1 in JSON Patch paths",
+143:     "Use Link for navigation between routes",
+144:     "Use repeat for lists and include realistic state data",
+145:     "Create a cohesive application with consistent layouts",
+146:     ...customRules,
+147:   ];
+148:   rules.forEach((rule, index) => lines.push(`${index + 1}. ${rule}`));
+149: 
+150:   return lines.join("\n");
+151: }
+152: 
+153: /** The AI generation schema for full TanStack Start applications. */
+154: export const schema = defineSchema(
+155:   (s) => ({
+156:     spec: s.object({
+157:       metadata: {
+158:         ...s.object({
+159:           title: { ...s.any(), ...s.optional() },
+160:           description: { ...s.string(), ...s.optional() },
+161:           keywords: { ...s.array(s.string()), ...s.optional() },
+162:           openGraph: { ...s.any(), ...s.optional() },
+163:           twitter: { ...s.any(), ...s.optional() },
+164:           robots: { ...s.any(), ...s.optional() },
+165:           alternates: { ...s.any(), ...s.optional() },
+166:           icons: { ...s.any(), ...s.optional() },
+167:         }),
+168:         ...s.optional(),
+169:       },
+170:       routes: s.record(
+171:         s.object({
+172:           page: s.object({
+173:             root: s.string(),
+174:             elements: s.record(
+175:               s.object({
+176:                 type: s.ref("catalog.components"),
+177:                 props: s.propsOf("catalog.components"),
+178:                 children: s.array(s.string()),
+179:                 slots: {
+180:                   ...s.record(s.array(s.string())),
+181:                   ...s.optional(),
+182:                 },
+183:                 visible: { ...s.any(), ...s.optional() },
+184:                 on: { ...s.any(), ...s.optional() },
+185:                 repeat: { ...s.any(), ...s.optional() },
+186:                 watch: { ...s.any(), ...s.optional() },
+187:               }),
+188:             ),
+189:             state: { ...s.any(), ...s.optional() },
+190:           }),
+191:           metadata: { ...s.any(), ...s.optional() },
+192:           layout: { ...s.string(), ...s.optional() },
+193:           loading: { ...s.any(), ...s.optional() },
+194:           error: { ...s.any(), ...s.optional() },
+195:           notFound: { ...s.any(), ...s.optional() },
+196:           loader: { ...s.string(), ...s.optional() },
+197:           staticParams: { ...s.any(), ...s.optional() },
+198:         }),
+199:       ),
+200:       layouts: {
+201:         ...s.record(
+202:           s.object({
+203:             root: s.string(),
+204:             elements: s.record(
+205:               s.object({
+206:                 type: s.ref("catalog.components"),
+207:                 props: s.propsOf("catalog.components"),
+208:                 children: s.array(s.string()),
+209:                 slots: {
+210:                   ...s.record(s.array(s.string())),
+211:                   ...s.optional(),
+212:                 },
+213:                 visible: { ...s.any(), ...s.optional() },
+214:                 on: { ...s.any(), ...s.optional() },
+215:                 repeat: { ...s.any(), ...s.optional() },
+216:                 watch: { ...s.any(), ...s.optional() },
+217:               }),
+218:             ),
+219:             state: { ...s.any(), ...s.optional() },
+220:           }),
+221:         ),
+222:         ...s.optional(),
+223:       },
+224:       state: { ...s.any(), ...s.optional() },
+225:     }),
+226:     catalog: s.object({
+227:       components: s.map({
+228:         props: s.zod(),
+229:         slots: s.array(s.string()),
+230:         description: s.string(),
+231:         example: s.any(),
+232:       }),
+233:       actions: s.map({
+234:         params: s.zod(),
+235:         description: s.string(),
+236:       }),
+237:     }),
+238:   }),
+239:   {
+240:     promptTemplate: startAppPromptTemplate,
+241:     builtInActions: [
+242:       {
+243:         name: "setState",
+244:         description:
+245:           "Update state at a JSON Pointer. Params: { statePath, value }",
+246:       },
+247:       {
+248:         name: "pushState",
+249:         description:
+250:           "Append to an array. Params: { statePath, value, clearStatePath? }",
+251:       },
+252:       {
+253:         name: "removeState",
+254:         description: "Remove an array item. Params: { statePath, index }",
+255:       },
+256:       {
+257:         name: "navigate",
+258:         description: "Navigate within the app. Params: { href }",
+259:       },
+260:     ],
+261:   },
+262: );
+263: 
+264: export type StartSchema = typeof schema;
+265: export type StartSpec<TCatalog> = typeof schema extends {
+266:   createCatalog: (catalog: TCatalog) => { _specType: infer S };
+267: }
+268:   ? S
+269:   : never;
+270: 
+
+FILE packages/tanstack-start/src/server.ts
+1: /** Server-safe TanStack Start helpers with no React or router imports. */
+2: 
+3: export { createStartApp } from "./create-app";
+4: export {
+5:   startComponentDefinitions,
+6:   type StartComponentDefinitions,
+7: } from "./catalog";
+8: export { schema, type StartSchema, type StartSpec } from "./schema";
+9: export { collectStaticPaths, matchRoute, splatToPath } from "./router";
+10: export {
+11:   metadataToHead,
+12:   resolveMetadata,
+13:   type ResolvedMetadata,
+14: } from "./metadata";
+15: export type {
+16:   CreateStartAppOptions,
+17:   HeadDescriptors,
+18:   LoaderFn,
+19:   MatchedRoute,
+20:   PageData,
+21:   StartAppExports,
+22:   StartAppSpec,
+23:   StartMetadata,
+24:   StartRouteSpec,
+25: } from "./types";
+26: export type {
+27:   ActionFn,
+28:   Actions,
+29:   BaseComponentProps,
+30:   ComponentContext,
+31:   ComponentFn,
+32:   Components,
+33:   EventHandle,
+34:   SetState,
+35:   StateModel,
+36: } from "./catalog-types";
+37: export type { Spec, StateStore } from "@json-render/core";
+38: 
+
+FILE packages/tanstack-start/src/types.ts
+1: import type { Spec } from "@json-render/core";
+2: 
+3: /**
+4:  * SEO metadata for TanStack Start pages.
+5:  *
+6:  * This framework-neutral shape resolves into TanStack Router `head`
+7:  * descriptors through `metadataToHead`.
+8:  */
+9: export interface StartMetadata {
+10:   /** Page title, or a title template configuration. */
+11:   title?:
+12:     | string
+13:     | {
+14:         /** Default title when no route overrides it. */
+15:         default: string;
+16:         /** Template containing `%s` for the route title. */
+17:         template?: string;
+18:         /** Absolute title that ignores the parent template. */
+19:         absolute?: string;
+20:       };
+21:   description?: string;
+22:   keywords?: string[];
+23:   openGraph?: {
+24:     title?: string;
+25:     description?: string;
+26:     images?: string | string[];
+27:     type?: string;
+28:     url?: string;
+29:     siteName?: string;
+30:     locale?: string;
+31:   };
+32:   twitter?: {
+33:     card?: "summary" | "summary_large_image" | "app" | "player";
+34:     title?: string;
+35:     description?: string;
+36:     images?: string | string[];
+37:     creator?: string;
+38:     site?: string;
+39:   };
+40:   robots?: string | { index?: boolean; follow?: boolean };
+41:   alternates?: { canonical?: string };
+42:   icons?: string | { icon?: string; apple?: string; shortcut?: string };
+43: }
+44: 
+45: /** A route definition within a StartAppSpec. */
+46: export interface StartRouteSpec {
+47:   /** Page content as a standard json-render element tree. */
+48:   page: Spec;
+49:   metadata?: StartMetadata;
+50:   /** Key of a reusable layout in `StartAppSpec.layouts`. */
+51:   layout?: string;
+52:   loading?: Spec;
+53:   error?: Spec;
+54:   notFound?: Spec;
+55:   /** Name of a loader supplied to `createStartApp`. */
+56:   loader?: string;
+57:   /** Parameter sets used to produce concrete prerender paths. */
+58:   staticParams?: Record<string, string>[];
+59: }
+60: 
+61: /**
+62:  * A full json-render application for TanStack Start.
+63:  *
+64:  * Route keys use TanStack Router conventions: `/`, `/blog/$slug`, and
+65:  * `/docs/$` for a splat route.
+66:  */
+67: export interface StartAppSpec {
+68:   metadata?: StartMetadata;
+69:   routes: Record<string, StartRouteSpec>;
+70:   /** Layouts use a `Slot` element to mark where page content is inserted. */
+71:   layouts?: Record<string, Spec>;
+72:   state?: Record<string, unknown>;
+73: }
+74: 
+75: /** The result of matching a pathname against the application spec. */
+76: export interface MatchedRoute {
+77:   route: StartRouteSpec;
+78:   pattern: string;
+79:   /** Splat content is returned as a slash-delimited string under `_splat`. */
+80:   params: Record<string, string>;
+81: }
+82: 
+83: export type LoaderFn = (
+84:   params: Record<string, string>,
+85: ) => Promise<Record<string, unknown>> | Record<string, unknown>;
+86: 
+87: export interface CreateStartAppOptions {
+88:   spec: StartAppSpec | (() => StartAppSpec | Promise<StartAppSpec>);
+89:   loaders?: Record<string, LoaderFn>;
+90: }
+91: 
+92: /** Serializable data returned from a TanStack Start route loader. */
+93: export interface PageData {
+94:   spec: Spec;
+95:   initialState?: Record<string, unknown>;
+96:   layoutSpec?: Spec | null;
+97: }
+98: 
+99: /** Descriptors accepted by a TanStack Router route's `head` option. */
+100: export interface HeadDescriptors {
+101:   meta: Record<string, string>[];
+102:   links: Record<string, string>[];
+103: }
+104: 
+105: export interface StartAppExports {
+106:   /** Resolve serializable page data for a pathname, or null when unmatched. */
+107:   getPageData: (props: { pathname: string }) => Promise<PageData | null>;
+108:   /** Resolve metadata for a route's `head` option. */
+109:   getHead: (props: { pathname: string }) => Promise<HeadDescriptors>;
+110:   /** Get concrete pathnames for TanStack Start prerendering. */
+111:   getStaticPaths: () => Promise<string[]>;
+112: }
+113: 
+
+FILE packages/tanstack-start/tsconfig.json
+1: {
+2:   "extends": "@internal/typescript-config/react-library.json",
+3:   "compilerOptions": {
+4:     "outDir": "dist",
+5:     "rootDir": "src"
+6:   },
+7:   "include": ["src"],
+8:   "exclude": ["node_modules", "dist"]
+9: }
+10: 
+
+FILE packages/tanstack-start/tsup.config.ts
+1: import { defineConfig } from "tsup";
+2: 
+3: const sharedExternal = [
+4:   "react",
+5:   "react-dom",
+6:   "@tanstack/react-router",
+7:   "@json-render/core",
+8:   "@json-render/react",
+9:   "zod",
+10: ];
+11: 
+12: export default defineConfig([
+13:   {
+14:     entry: { index: "src/index.ts" },
+15:     format: ["cjs", "esm"],
+16:     dts: true,
+17:     sourcemap: true,
+18:     splitting: false,
+19:     banner: ({ format }) => (format === "cjs" ? { js: '"use client";' } : {}),
+20:     external: sharedExternal,
+21:   },
+22:   {
+23:     entry: { server: "src/server.ts", catalog: "src/catalog.ts" },
+24:     format: ["cjs", "esm"],
+25:     dts: true,
+26:     sourcemap: true,
+27:     splitting: false,
+28:     external: sharedExternal,
+29:   },
+30: ]);
+31: 

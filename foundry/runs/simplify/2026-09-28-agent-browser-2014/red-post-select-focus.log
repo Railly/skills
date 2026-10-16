@@ -1,0 +1,24 @@
+
+running 1 test
+test native::e2e_tests::e2e_auth_login_selects_usable_controls_and_preserves_credential_targets ... FAILED
+
+failures:
+
+---- native::e2e_tests::e2e_auth_login_selects_usable_controls_and_preserves_credential_targets stdout ----
+
+thread 'native::e2e_tests::e2e_auth_login_selects_usable_controls_and_preserves_credential_targets' (1626549) panicked at src/native/e2e_tests.rs:6166:9:
+assertion `left == right` failed: user/select-redirect: {"decoy":"decoy:target@example.test","detached":false,"events":[{"id":"decoy","trusted":true,"value":"decoy:target@example.test"},{"id":"pass","trusted":true,"value":"target-password"}],"hiddenClicked":false,"hiddenPass":"","hiddenUser":"","pass":"target-password","submitted":true,"user":""}
+  left: String("decoy:target@example.test")
+ right: "decoy:"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    native::e2e_tests::e2e_auth_login_selects_usable_controls_and_preserves_credential_targets
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1534 filtered out; finished in 7.40s
+
+   Compiling agent-browser v0.38.1 (/Users/raillyhugo/Programming/vercel/agent-browser-2014-reduction-red/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 29.09s
+     Running unittests src/main.rs (/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/target-head/debug/deps/agent_browser-445f2c75b50aa6d3)
+error: test failed, to rerun pass `--bin agent-browser`

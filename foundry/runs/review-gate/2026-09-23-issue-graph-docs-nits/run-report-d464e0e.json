@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-23",
+    "repo": "vercel-labs/issue-graph",
+    "base": "5a4f21797b11824cd76f60b0943dc6e3a9249f47",
+    "head": "d464e0efa043b2de48bea9e7c8bafb5bff520585",
+    "profile": "mechanical",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "sequential_isolated",
+    "degraded_from": "native_subagent",
+    "independence_gap": "Same-author focused review; native subagent delivered no review and FX auth capability was unavailable. Independent challenge is not required for this mechanical profile.",
+    "receipt": "focused-review.json",
+    "schema_failures": 1,
+    "operations": [
+      {
+        "operation": "native reviewer launch",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "native reviewer follow-up",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "FX wrapper capability check",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "focused sequential review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "contract.md",
+    "spec_status": "not_required",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5",
+      "A6",
+      "A7",
+      "A8"
+    ],
+    "gaps": [],
+    "promotion_note": "A8 authorizes subsequent PR creation and merge; no claim that promotion has already completed."
+  },
+  "provenance": {
+    "author_model": "Codex, exact inherited backend not recorded",
+    "reviewer_model": "same Codex root agent",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [
+      "documentation and bounded presentation changes"
+    ],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": false,
+      "method": "not_required",
+      "artifact": null,
+      "evidence": "Mechanical profile uses one focused sequential review. Browser falsification supplies a direct independent-of-implementation oracle, not a separate reviewer."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "A1-A7 define the changed product properties; A8 authorizes promotion."
+    },
+    {
+      "source": "design",
+      "location": "contract.md",
+      "status": "not_applicable",
+      "properties": [],
+      "evidence": "No separate design spec for bounded prose, links, and CSS."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md and apps/docs",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "Reviewed final documentation and browser-rendered website."
+    },
+    {
+      "source": "implementation",
+      "location": "apps/docs/src and apps/docs/tests",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "Inspected all changed source and tests; compared unchanged CLI, skill, examples and fixtures."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Original terminal examples remain complete and the page handles vertical scrolling.",
+      "kind": "presentation",
+      "status": "verified",
+      "oracle": {
+        "observes": "panel dimensions, page and panel scroll offsets, and unchanged example payloads",
+        "layer": "built browser and tracked source",
+        "method": "Compare original payloads; exercise all three tabs at four widths and native PageDown at 390px.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A static screenshot or CSS declaration alone looks correct.",
+        "counterexample": "The old CSS captures native PageDown and creates vertical overflow on narrow screens.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "browser-falsification.json records 12 current/old/restored cases and native PageDown; focused-review.json confirms source payload identity."
+      },
+      "substrates": [
+        {
+          "name": "Chromium and production Next.js site on port 3437",
+          "status": "exercised",
+          "evidence": "browser-falsification.json records 12 current/old/restored cases and native PageDown; focused-review.json confirms source payload identity."
+        }
+      ],
+      "evidence": "browser-falsification.json records 12 current/old/restored cases and native PageDown; focused-review.json confirms source payload identity."
+    },
+    {
+      "id": "P2",
+      "claim": "Header links to npm, hero breaks after work, and the agent pill copies the repository shorthand.",
+      "kind": "presentation",
+      "status": "verified",
+      "oracle": {
+        "observes": "rendered anchor attributes, headline markup, clipboard write payload",
+        "layer": "real DOM and navigator.clipboard.writeText boundary",
+        "method": "Inspect the actual rendered anchors and heading; capture the actual copy handler payload.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Configuration values or button labels alone.",
+        "counterexample": "Rendered href or copy callback could retain a stale URL despite changed constants.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "ui-checks.json records the npm href, external target and icon, headline break, and npx skills@latest add vercel-labs/issue-graph payload. OS clipboard readback is not claimed."
+      },
+      "substrates": [
+        {
+          "name": "Rendered production site and copy handler",
+          "status": "exercised",
+          "evidence": "ui-checks.json records the npm href, external target and icon, headline break, and npx skills@latest add vercel-labs/issue-graph payload. OS clipboard readback is not claimed."
+        }
+      ],
+      "evidence": "ui-checks.json records the npm href, external target and icon, headline break, and npx skills@latest add vercel-labs/issue-graph payload. OS clipboard readback is not claimed."
+    },
+    {
+      "id": "P3",
+      "claim": "Documentation uses direct published-product wording while retaining existing prerequisites, coverage limits, and setup distinctions.",
+      "kind": "presentation",
+      "status": "verified",
+      "oracle": {
+        "observes": "README, all authored documentation, served routes and canonical skill",
+        "layer": "tracked authored text and production HTTP routes",
+        "method": "Read the diff and final pages, check route suite and retained canonical source.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Text-match tests alone.",
+        "counterexample": "A page could satisfy phrases while losing setup caveats or rewriting behavior.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Focused review inspected prose and boundaries; 89 docs tests and 85 HTTP route checks passed. CLI and canonical skill are byte-for-byte unchanged. Public-site skill fallback remains documented."
+      },
+      "substrates": [
+        {
+          "name": "Authored Markdown/MDX and built docs routes",
+          "status": "exercised",
+          "evidence": "Focused review inspected prose and boundaries; 89 docs tests and 85 HTTP route checks passed. CLI and canonical skill are byte-for-byte unchanged. Public-site skill fallback remains documented."
+        }
+      ],
+      "evidence": "Focused review inspected prose and boundaries; 89 docs tests and 85 HTTP route checks passed. CLI and canonical skill are byte-for-byte unchanged. Public-site skill fallback remains documented."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "browser-falsification.json",
+      "evidence": "12 real-browser green/old-CSS/restored cases; old CSS prevents native PageDown page motion; restored CSS passes native PageDown in all three panels at 390px.",
+      "fingerprint": {
+        "head_sha": "d464e0efa043b2de48bea9e7c8bafb5bff520585",
+        "changed_paths_digest": "sha256:b5769b058d1436a1912b2ccaba2a7189b6c07491c25780d99ff5d38160d9b89f",
+        "contract_digest": "sha256:17f840f6fedd5ae5b0f5dec7959e62befc2cc0a86993706a0a80c2b10eae4ab5",
+        "command": "python3 verify-browser.py",
+        "environment_digest": "sha256:6c2d8c8ea4f23423c0c3b6a2a0932e9ed009d6612f3b6eb4e1aa9adf072c8f36",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "apps/docs/src/components/terminal-demo.css",
+          "apps/docs/src/components/terminal-demo.tsx",
+          "apps/docs/src/lib/terminal-examples.ts"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      },
+      "dimensions": {
+        "values": [
+          "viewport 1440, 640, 390, 320 px",
+          "Graph, PR status, Backlog",
+          "current CSS, original fixed-height containment, restored current CSS"
+        ],
+        "exclusions": [
+          "Pointer-wheel coordinate targeting unavailable in installed browser automation; no pointer-wheel-specific claim.",
+          "Theme duplicates are omitted in this CSS falsification because the size/overflow rules are theme-independent; earlier light/dark layout checks remain available."
+        ],
+        "evidence": "All 12 geometry cells rejected the injected original CSS and passed after its removal. Native keyboard drives cover the overflowing baseline Graph case and every restored tab."
+      },
+      "oracle": {
+        "source": "User acceptance A6 plus browser page/panel scroll offsets and overflow dimensions",
+        "independent": true,
+        "evidence": "Expected page movement comes from user intent; PageDown is browser-generated input, not a dispatched synthetic DOM event."
+      },
+      "producer": {
+        "name": "Chromium driven by agent-browser against owned production server on 3437",
+        "status": "exercised",
+        "evidence": "browser-falsification.json records real geometry and native key results at exact head."
+      },
+      "falsification": [
+        {
+          "mutation": "Inject original height/overflow/containment at the rendered component via an ephemeral stylesheet",
+          "red_evidence": "Every cell violates the no-containment invariant; native PageDown on 390px Graph fails page movement.",
+          "restored_green_evidence": "Removing the stylesheet restores zero vertical panel overflow at all widths; native PageDown moves page in all three tabs."
+        }
+      ]
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "No new durable writes, retry, cleanup, lifecycle, or post-commit failure paths."
+    }
+  },
+  "assumptions": [],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher, parser, or lookup data source changes."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "No validation or accepted-input domain changes."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No resolution or discovery algorithm changes."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell argument construction or package-script changes."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No new warnings, latches, or daemon behavior."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No external binary shims added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "The former fixed-height terminal is intentionally replaced by natural height; all original payloads remain."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No framework or runtime patch."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No guard models an external substrate."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No spec or reference behavior is reimplemented."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No new runtime outcome classes."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No new flags or modes; obsolete constant branch removed from published-product copy."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "skipped",
+      "reason": "No new branch, guard, wrapper, or durable side effect."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No recovery action added."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No new async operations or waits."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "skipped",
+      "reason": "No runtime feature crosses a new boundary."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Consumed exact-head browser measurements, clipboard-write payload, and rendered npm link evidence."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Built production docs and exercised routes, terminal tabs, keyboard input, header and copy button."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "skipped",
+      "reason": "Copy restates existing behavior; no new mutable-state invariant is asserted."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Reviewed README and all authored docs against retained CLI contracts and website behavior."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Original three terminal examples retained; command examples remain consistent with installed CLI help and existing contract tests."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was emitted for this bounded docs change."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No per-element loop or lookup is added."
+    },
+    {
+      "name": "security",
+      "status": "skipped",
+      "reason": "Permissions/privacy prose retains existing boundaries. No credential, authorization, confidentiality, sandbox, or security runtime behavior changes."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "exact head, clean tree, valid local signature",
+      "outcome": "pass",
+      "reason": "d464e0efa043b2de48bea9e7c8bafb5bff520585"
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "No added prose punctuation findings."
+    },
+    {
+      "check": "stale packageReleasePending",
+      "outcome": "pass",
+      "reason": "Zero remaining hits after CONTRIBUTING fix."
+    },
+    {
+      "check": "doc siblings skills@latest add",
+      "outcome": "pass",
+      "reason": "Repository shorthand and public fallback are consistent."
+    },
+    {
+      "check": "surface sweep",
+      "outcome": "acknowledged",
+      "reason": "terminal-demo.test.ts unchanged intentionally: original examples and existing keyboard semantics are preserved; actual CSS scroll behavior is covered by browser falsification."
+    },
+    {
+      "check": "impact radius",
+      "outcome": "pass",
+      "reason": "impact-map.json and impact-map-receipt.json retained."
+    },
+    {
+      "check": "pnpm check",
+      "outcome": "pass",
+      "reason": "592 tests, lint, typecheck, and build."
+    },
+    {
+      "check": "pnpm check:docs",
+      "outcome": "pass",
+      "reason": "89 tests, docs lint, and typecheck."
+    },
+    {
+      "check": "production docs build and HTTP route suite",
+      "outcome": "pass",
+      "reason": "Build successful; 85 route checks."
+    },
+    {
+      "check": "fix-absent browser proof",
+      "outcome": "pass",
+      "reason": "12 green/old-CSS/restored cases plus native PageDown."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "Clean."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "CONTRIBUTING still mentioned removed packageReleasePending constant.",
+      "evidence": "Exact-head CONTRIBUTING now describes publication and repository visibility without the removed constant.",
+      "layer": "authored docs",
+      "source": "focused review",
+      "path": "CONTRIBUTING.md",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Existing terminal tests and demo payload source do not change.",
+      "evidence": "Compared against base; unchanged original contents are an explicit user requirement. Browser proof exercises the changed CSS."
+    },
+    {
+      "claim": "Native wheel targeting and OS clipboard readback are outside the reported verification.",
+      "evidence": "The report limits claims to panel geometry, native PageDown, actual DOM, and clipboard-write payload."
+    }
+  ],
+  "issue_candidates": [],
+  "outcomes": {
+    "pull_request": "https://github.com/vercel-labs/issue-graph/pull/16",
+    "merge_sha": "987615b5c80427a35af2017401c2bc04e20081cf",
+    "external_findings": [],
+    "review_rounds": 1,
+    "human_corrections": [
+      "Minimal PR body without verification section."
+    ],
+    "escaped_finding_class": null,
+    "external_checks": "12/12 pass including Vercel Agent Review; no PR reviews or review threads.",
+    "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-docs-nits-qa/pr16-premerge.json"
+  }
+}

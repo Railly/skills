@@ -1,0 +1,80 @@
+[
+  {
+    "args": [
+      "eval",
+      "--stdin"
+    ],
+    "script": "document.body.innerHTML = `<input id=\"combo\" role=\"combobox\" aria-expanded=\"false\" aria-controls=\"popup\" autocomplete=\"off\" value=\"Red\"><div id=\"popup\" role=\"listbox\" hidden></div>`;\n    window.commits=[]; window.inputs=[];\n    const combo=document.getElementById('combo'), popup=document.getElementById('popup');\n    function render(){ inputs.push(combo.value); popup.hidden=false; popup.innerHTML=combo.value==='Blue'? '<div role=\"option\" value=\"blue\" aria-selected=\"false\">Blue</div>':''; const option=popup.firstElementChild; if(option) option.onclick=()=>{commits.push('blue');option.setAttribute('aria-selected','true');combo.setAttribute('aria-expanded','false')}; }\n    combo.onclick=()=>{combo.setAttribute('aria-expanded','true');render()};combo.oninput=render; true",
+    "elapsed": 1.363,
+    "exit": 0,
+    "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":11677035664275010974},\"launched\":true,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_attempted\"},\"origin\":\"about:blank\",\"result\":true},\"error\":null}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "select",
+      "#combo",
+      "Blue"
+    ],
+    "script": null,
+    "elapsed": 0.765,
+    "exit": 1,
+    "stdout": "{\"success\":false,\"data\":null,\"error\":\"Selection failed for '#combo': no visible, enabled ARIA options rendered before the timeout (available: (none))\"}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "eval",
+      "--stdin"
+    ],
+    "script": "({value:combo.value,commits,inputs})",
+    "elapsed": 0.011,
+    "exit": 0,
+    "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":11677035664275010974},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"about:blank\",\"result\":{\"commits\":[],\"inputs\":[\"Red\",\"Re\",\"ReB\",\"ReBl\",\"ReBlu\",\"ReBlue\"],\"value\":\"ReBlue\"}},\"error\":null}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "eval",
+      "--stdin"
+    ],
+    "script": "document.body.innerHTML = `<input id=\"filtered\" role=\"combobox\" aria-expanded=\"false\" aria-controls=\"filtered-popup\" autocomplete=\"off\"><div id=\"filtered-popup\" role=\"listbox\" hidden></div>`;\n    window.filteredCommits=[];\n    const filtered=document.getElementById('filtered'), fp=document.getElementById('filtered-popup');\n    function filteredRender(){fp.hidden=false; fp.innerHTML=filtered.value==='Blue'? '<div role=\"option\" value=\"blue\" aria-selected=\"false\">Blue</div>':'';const option=fp.firstElementChild;if(option)option.onclick=()=>{filteredCommits.push('blue'); filtered.value=option.textContent; filtered.setAttribute('aria-expanded','false');fp.replaceChildren();fp.hidden=true};}\n    filtered.onclick=()=>{filtered.setAttribute('aria-expanded','true');filteredRender()}; filtered.oninput=filteredRender;true",
+    "elapsed": 0.013,
+    "exit": 0,
+    "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":11677035664275010974},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"about:blank\",\"result\":true},\"error\":null}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "select",
+      "#filtered",
+      "Blue"
+    ],
+    "script": null,
+    "elapsed": 0.738,
+    "exit": 1,
+    "stdout": "{\"success\":false,\"data\":null,\"error\":\"Selection failed for '#filtered': no visible, enabled ARIA options rendered before the timeout (available: (none))\"}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "eval",
+      "--stdin"
+    ],
+    "script": "({value:filtered.value,commits:filteredCommits,expanded:filtered.getAttribute(\"aria-expanded\"),options:document.getElementById(\"filtered-popup\").children.length})",
+    "elapsed": 0.008,
+    "exit": 0,
+    "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":11677035664275010974},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"about:blank\",\"result\":{\"commits\":[\"blue\"],\"expanded\":\"false\",\"options\":0,\"value\":\"Blue\"}},\"error\":null}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "close"
+    ],
+    "script": null,
+    "elapsed": 0.134,
+    "exit": 0,
+    "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+    "stderr": ""
+  }
+]

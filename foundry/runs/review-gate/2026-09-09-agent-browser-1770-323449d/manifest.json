@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "repository": "vercel-labs/agent-browser",
+  "pr": 1770,
+  "target": {
+    "path": "/Users/raillyhugo/Programming/vercel/agent-browser-1770-review",
+    "head": "323449d9618693c85d2191f7dd10010ad22f640b",
+    "base": "eb05921bad874cd2a1b4fa5d1149f1ed26576cae",
+    "dirty_digest": "clean",
+    "changed_paths_digest": "sha256:175679ec67be1450ab9a944969863e161e4f57211a6c4c30306ed1ac01f55166"
+  },
+  "authorization": {
+    "request": "review-gate PR 1770",
+    "scope": "local review, build, verification, durable reports"
+  },
+  "profile": "external-pr",
+  "risk": "high",
+  "risk_triggers": [
+    "browser interaction state machine",
+    "partial UI changes and dialog lifecycle"
+  ],
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "runtime": {
+    "execution_mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "Same-family review; author model unknown. Reference-oracle independence limited to W3C combobox commitment."
+  },
+  "stages": {
+    "review": {
+      "status": "incomplete",
+      "verdict": "incomplete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-09-agent-browser-1770-323449d/run-report.json",
+      "head": "323449d9618693c85d2191f7dd10010ad22f640b",
+      "base": "eb05921bad874cd2a1b4fa5d1149f1ed26576cae",
+      "dirty_digest": "clean",
+      "changed_paths_digest": "sha256:175679ec67be1450ab9a944969863e161e4f57211a6c4c30306ed1ac01f55166",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "confirmed_findings": [
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F6"
+      ],
+      "gaps": [
+        "Required passing exact-head Test Strength receipt is unavailable; authored green tests are not behavioral falsification.",
+        "Required passing exact-head Resilience Audit receipt is unavailable; full failure ownership and immediate retry proof are not established.",
+        "Independent agent uses the same OpenAI family; author model is unknown. W3C reference drive provides an independent oracle for combobox commitment, not exhaustive cross-family review.",
+        "Linux, Windows, Lightpanda, cross-document/native-dialog edge states and full trusted-input failure partitions were not exercised."
+      ],
+      "report_digest": "sha256:bb13a3f72b6c65294ad47b6f235702050591c95b86a4ba63645b2f90699d6a38",
+      "independent_artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-09-agent-browser-1770-323449d/independent-review.json",
+      "validation": {
+        "command": "gate.sh report run-report.json",
+        "exit_code": 1,
+        "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-09-agent-browser-1770-323449d/validation.log",
+        "meaning": "Promotion rejected for confirmed open findings and explicit proof gaps; no invalid schema fields remain."
+      }
+    }
+  },
+  "missing_upstream": [
+    "test_strength",
+    "resilience"
+  ],
+  "created_at": "2026-09-09",
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-09-agent-browser-1770-323449d/contract.md",
+    "digest": "sha256:2af239615484ffcae25864fc171ebd89cb286a486be0a698abc49745032bcda8"
+  }
+}

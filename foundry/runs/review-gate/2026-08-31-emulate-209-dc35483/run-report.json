@@ -1,0 +1,502 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-08-31",
+    "repo": "vercel-labs/emulate#209",
+    "base": "5b1fbf042466229d8b5d8de25d7ec737ef706637",
+    "head": "dc3548304b0e07c43d08bdbfc8b903551f2bd55a",
+    "profile": "external-pr",
+    "skill_revision": "git:a006c7a52acfdb112e7a4882063d0a3dbbe757d7",
+    "status": "complete",
+    "verdict": "incomplete",
+    "gaps": [
+      "No exact-head Test Strength receipt was available for the changed HTTP Accept parser and content-negotiation adapter.",
+      "The packaged FX independent review was attempted once and timed out after 180 seconds; no independent reviewer pass completed.",
+      "No work-item manifest or separate Issue Contract was found.",
+      "The generic surface gate reported skills/emulate/SKILL.md and apps/web/app/docs/page.mdx as absent for the CLI help surface; both were inspected and are not GitHub Contents semantic surfaces.",
+      "The canonical skills-doctor identity check failed with a tooling TypeError, so the skill revision is recorded but its installed-package digest tie is unavailable."
+    ]
+  },
+  "execution": {
+    "mode": "unavailable",
+    "degraded_from": "fx_worker",
+    "independence_gap": "The single packaged FX reviewer attempt timed out; no native or visible independent reviewer capability was available, so the remaining judgment is deterministic and sequential.",
+    "receipt": "fx-review.json",
+    "schema_failures": 0,
+    "operations": [
+      {
+        "operation": "packaged FX independent review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "native independent reviewer capability",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "skills-doctor identity check",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "User request dated 2026-08-31 for vercel-labs/emulate#209 plus PR #209 body",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "Supported GitHub raw media types return exact file bytes through Contents",
+      "Quoted commas in Accept parameters do not create false raw ranges",
+      "Genuine raw ranges after quoted parameters remain recognized",
+      "Ordinary files, directories, missing paths, symlinks, and submodules retain their intended representations",
+      "Raw response metadata includes Content-Type, Content-Length, and Vary: Accept",
+      "Existing advertised raw URL and symlink resolution behavior remains consistent"
+    ],
+    "gaps": [
+      "No canonical work-item manifest or separate Issue Contract was available."
+    ]
+  },
+  "provenance": {
+    "author_model": "human external author",
+    "reviewer_model": "GPT-5 Codex deterministic Review Gate; packaged FX reviewer timed out",
+    "same_family": false
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [
+      "HTTP Accept parsing",
+      "content negotiation",
+      "GitHub compatibility adapter"
+    ],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "live-github-accept-corpus.json",
+      "evidence": "GitHub's live Contents API independently defined the quoted-parameter, genuine-range, q=0, prefix-lookalike, and escaped-quote outcomes; the built emulator was driven over a real TCP listener against the same classes."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "User request, PR #209 body, and prior evidence",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The requested review explicitly requires the prior quoted-comma blocker to be verified at the built HTTP boundary and asks for regression coverage."
+    },
+    {
+      "source": "design",
+      "location": "PR body and changed tests",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The PR describes raw Contents responses, JSON preservation for non-blob entries, symlink-aware resolution, Vary metadata, and quote-aware Accept parsing."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md, apps/web/app/docs/github/page.mdx, packages/@emulators/github/README.md, packages/emulate/src/index.ts, skills/github/SKILL.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Changed documentation advertises raw Contents media types and preserves the ordinary JSON and directory route description."
+    },
+    {
+      "source": "implementation",
+      "location": "packages/@emulators/github/src/routes/contents.ts and packages/@emulators/github/src/__tests__/contents-commits.test.ts",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The implementation scans quoted Accept parameters, restricts raw output to blob entries, resolves symlinks, and serializes raw bytes with response metadata."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Raw-looking text inside a quoted Accept parameter does not select raw Contents bytes, while a genuine supported raw media range remains recognized.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "The selected representation, exact body bytes, and response headers at the HTTP boundary.",
+        "layer": "built emulator TCP server and live GitHub REST API",
+        "method": "Differential Accept corpus covering quoted commas, escaped quotes, genuine ranges after quoted parameters, q=0, aliases, case, and prefix lookalikes.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A raw-looking token is present somewhere in the Accept header.",
+        "counterexample": "The token appears only inside a quoted parameter value and must not be treated as a media-range token.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The live and built matrices kept quoted-only tokens on the JSON path while selecting raw for genuine ranges after quoted parameters."
+      },
+      "substrates": [
+        {
+          "name": "Built packages/emulate/dist/index.js server over TCP on localhost:43127",
+          "status": "exercised",
+          "evidence": "built-http-matrix.json records 26 cells with zero failures, including quoted-comma, escaped-quote, genuine-range, q=0, alias, case, and prefix cases."
+        },
+        {
+          "name": "Live GitHub Contents REST API",
+          "status": "exercised",
+          "evidence": "live-github-accept-corpus.json records seven differential Accept cases with zero classification failures."
+        }
+      ],
+      "evidence": "The exact prior blocker no longer reproduced at the compiled HTTP boundary. The new scanner at packages/@emulators/github/src/routes/contents.ts:63-97 tracks quoted and escaped characters before treating commas as range separators."
+    },
+    {
+      "id": "P2",
+      "claim": "Raw Contents output preserves exact bytes and metadata, while ordinary JSON, directories, symlinks, submodules, and missing paths retain their intended behavior.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "HTTP status, representation, exact bytes or JSON shape, Content-Type, Content-Length, and Vary.",
+        "layer": "built emulator TCP server",
+        "method": "Seed binary, regular, symlink, broken symlink, submodule, directory, and missing entries through public HTTP endpoints, then fetch each through Contents.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A route returns status 200.",
+        "counterexample": "The response can be 200 while returning JSON for a raw request, raw link text for a valid symlink, or a 404 for a submodule.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The matrix asserted representation type, body bytes or JSON shape, metadata, symlink target behavior, submodule JSON, and missing-path 404 separately."
+      },
+      "substrates": [
+        {
+          "name": "Built GitHub emulator Contents route",
+          "status": "exercised",
+          "evidence": "Twelve raw and fourteen JSON cells passed; raw bodies matched binary, valid-link, and broken-link bytes with expected headers, while directory and submodule cells remained JSON."
+        }
+      ],
+      "evidence": "The compiled route returned exact binary bytes with Content-Length and Vary: Accept, valid symlink target bytes, stored broken-link bytes, JSON submodule and directory representations, and 404 for a missing path."
+    },
+    {
+      "id": "P3",
+      "claim": "Existing raw download URL behavior remains symlink-aware and exact.",
+      "kind": "correctness",
+      "status": "verified",
+      "oracle": {
+        "observes": "Raw download URL status, exact body bytes, and Content-Length.",
+        "layer": "built emulator TCP server",
+        "method": "Compare the existing raw URL route with the new shared resolver on a valid symlink target.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The shared resolver compiles.",
+        "counterexample": "Refactoring the existing route could return symlink text or fail to resolve the target while the new Contents route passes.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The built matrix fetched the valid symlink through the existing raw URL route and the new Contents raw route; both returned target bytes."
+      },
+      "substrates": [
+        {
+          "name": "Built emulator raw URL and Contents routes",
+          "status": "exercised",
+          "evidence": "The existing raw URL route continued to return target bytes after it was switched to resolveRawBlob()."
+        }
+      ],
+      "evidence": "The shared resolveRawBlob() path at packages/@emulators/github/src/routes/contents.ts:136-139 preserved the existing raw URL behavior."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "The diff changes a protocol parser and compatibility adapter, but no exact-head Test Strength receipt with an independent oracle, real producer, and fix-absent falsification was supplied. The built corpus and authored tests do not substitute for that required receipt."
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "The changed GET representation path adds no durable or remote side effect and no new lifecycle, timeout, cancellation, or cleanup behavior."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "GitHub compatibility contract",
+      "claim": "Only commas outside quoted strings delimit Accept media ranges.",
+      "status": "verified",
+      "evidence": "Live GitHub response classification and the built differential corpus agree on quoted-comma and escaped-quote cells."
+    },
+    {
+      "id": "A2",
+      "source": "Route model",
+      "claim": "Raw Contents responses apply only to blob entries; directories and submodules remain JSON.",
+      "status": "verified",
+      "evidence": "Built HTTP matrix returned JSON arrays for directories and JSON submodule objects under raw Accept."
+    },
+    {
+      "id": "A3",
+      "source": "Symlink model",
+      "claim": "Valid symlinks resolve to target blob bytes, while broken symlinks retain their stored link bytes on raw requests.",
+      "status": "verified",
+      "evidence": "Built HTTP matrix returned target bytes for valid links and stored target text for broken links; GitHub's live symlink endpoints returned the same raw link bytes."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Tested both false-positive quoted-token inputs and genuine raw ranges after quoted parameters."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Regenerated the Accept and resource matrix for the new quote-aware parser and drove it through the built artifact."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Checked the Contents route and the existing advertised raw URL route after shared symlink-aware resolution."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Absent Accept, ordinary JSON, wildcards, vendor JSON, prefix lookalikes, q=0, directories, submodules, and missing paths were exercised."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Inspected Accept scanning, route branching, symlink resolution, and Hono response construction."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Compared the built emulator with live GitHub across the critical Accept grammar."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "Used the live GitHub Contents API as the external behavior oracle."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Forced submodule, broken symlink, and missing-path branches through the public route."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Exercised missing paths and unresolved symlink behavior through the built server."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced Accept input through parsing, blob gating, symlink resolution, and HTTP serialization."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Observed real TCP response bodies and headers."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "The compiled CLI was driven through public Contents endpoints."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Checked the blob-only raw branch and shared raw resolver against all special entry classes."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Changed documentation was compared with observed raw-file and JSON fallback behavior."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "The added raw Contents curl example requires the new route behavior."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No decision trail was provided."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "The scanner is a single linear pass over the Accept header; no nested scale-sensitive work was added."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "The shellmeta output is an inapplicable false positive; this diff changes HTTP header parsing, not shell parsing."
+    },
+    {
+      "name": "Security",
+      "status": "skipped",
+      "reason": "The diff does not change authentication, authorization, secrets, origin validation, tenant isolation, sandboxing, or privilege."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "exact checkout identity and cleanliness",
+      "outcome": "pass",
+      "reason": "Target checkout is clean and detached at dc3548304b0e07c43d08bdbfc8b903551f2bd55a."
+    },
+    {
+      "check": "base identity",
+      "outcome": "pass",
+      "reason": "The requested base 5b1fbf042466229d8b5d8de25d7ec737ef706637 resolves in the target repository."
+    },
+    {
+      "check": "GitHub head before and after",
+      "outcome": "pass",
+      "reason": "GitHub reported base 5b1fbf042466229d8b5d8de25d7ec737ef706637 and head dc3548304b0e07c43d08bdbfc8b903551f2bd55a at both identity checks."
+    },
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "The exact-head run report path contains dc35483 and the pre-report coverage check was recorded."
+    },
+    {
+      "check": "style",
+      "outcome": "acknowledged",
+      "reason": "The generic gate flags an added em dash in packages/@emulators/github/README.md; repository AGENTS.md explicitly requires em dashes for prose punctuation."
+    },
+    {
+      "check": "surface sweep",
+      "outcome": "acknowledged",
+      "reason": "GitHub-specific required surfaces are updated. The generic rule also reports skills/emulate/SKILL.md and apps/web/app/docs/page.mdx because the CLI help file changed; those surfaces contain generic startup/configuration material and no GitHub Contents contract."
+    },
+    {
+      "check": "doc sibling sweep",
+      "outcome": "pass",
+      "reason": "Every repository file mentioning raw media is in the diff, with no stale matching line in a diffed file."
+    },
+    {
+      "check": "timing sweep",
+      "outcome": "pass",
+      "reason": "No wait ceiling was added."
+    },
+    {
+      "check": "shellmeta",
+      "outcome": "acknowledged",
+      "reason": "The gate falsely classifies HTTP parser code as a shell-metacharacter detector; no shell behavior changed."
+    },
+    {
+      "check": "execdeps",
+      "outcome": "pass",
+      "reason": "No external executable dependency map applies."
+    },
+    {
+      "check": "callers",
+      "outcome": "acknowledged",
+      "reason": "The unchanged packages/@emulators/github/src/index.ts:648 call only registers contentsRoutes(ctx); no pre-call state or changed outcome assumption exists."
+    },
+    {
+      "check": "rawinput",
+      "outcome": "acknowledged",
+      "reason": "The gate reports unrelated OAuth Accept comparisons at packages/@emulators/github/src/routes/oauth.ts:197 and :199; they do not implement Contents raw-media negotiation."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "No whitespace errors."
+    },
+    {
+      "check": "pnpm build",
+      "outcome": "pass",
+      "reason": "The target head built successfully."
+    },
+    {
+      "check": "pnpm test",
+      "outcome": "pass",
+      "reason": "The repository test suite passed."
+    },
+    {
+      "check": "pnpm type-check",
+      "outcome": "pass",
+      "reason": "Type checking passed."
+    },
+    {
+      "check": "pnpm lint",
+      "outcome": "pass",
+      "reason": "Lint completed without errors; warnings were non-blocking."
+    },
+    {
+      "check": "pnpm format:check",
+      "outcome": "pass",
+      "reason": "Formatting check passed."
+    },
+    {
+      "check": "focused Contents and Commits suite",
+      "outcome": "pass",
+      "reason": "The focused suite passed, including the added quoted-parameter and special-entry tests."
+    },
+    {
+      "check": "focused repetition",
+      "outcome": "pass",
+      "reason": "The focused Contents suite passed repeatedly during the prior exact-head review run."
+    },
+    {
+      "check": "built HTTP boundary matrix",
+      "outcome": "pass",
+      "reason": "built-http-matrix.json records 26 cells and zero failures."
+    },
+    {
+      "check": "live GitHub Accept differential",
+      "outcome": "pass",
+      "reason": "live-github-accept-corpus.json records seven cases and zero failures."
+    },
+    {
+      "check": "packaged FX independent review",
+      "outcome": "acknowledged",
+      "reason": "The single packaged FX attempt timed out at 180 seconds and produced a failed receipt; it is not counted as a pass."
+    },
+    {
+      "check": "Test Strength",
+      "outcome": "acknowledged",
+      "reason": "Required exact-head receipt unavailable; built boundary evidence is retained but does not close the specialist receipt."
+    },
+    {
+      "check": "Resilience Audit",
+      "outcome": "acknowledged",
+      "reason": "Not triggered for this read-only representation change."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "No P0/P1/P2 blocker was confirmed in the exact-head review.",
+      "evidence": "The prior quoted-comma false-positive no longer reproduces in the built HTTP matrix; the live GitHub differential agrees across the critical grammar, and all special-entry and metadata cells pass."
+    },
+    {
+      "claim": "The generic shellmeta findings are not applicable.",
+      "evidence": "packages/@emulators/github/src/routes/contents.ts contains HTTP Accept parsing only; no shell command construction or shell metacharacter detector is present."
+    },
+    {
+      "claim": "The generic surface findings for skills/emulate/SKILL.md and apps/web/app/docs/page.mdx are not applicable.",
+      "evidence": "The changed package CLI help line documents GitHub coverage, while those generic surfaces document startup and configuration rather than service-specific endpoint semantics."
+    },
+    {
+      "claim": "The caller finding for contentsRoutes is not a defect.",
+      "evidence": "packages/@emulators/github/src/index.ts:648 only invokes route registration; the new behavior is contained in the route module and has no changed return contract."
+    },
+    {
+      "claim": "The rawinput findings in OAuth are unrelated.",
+      "evidence": "packages/@emulators/github/src/routes/oauth.ts:197 and :199 negotiate OAuth response formats and do not consume the Contents raw media-type set."
+    },
+    {
+      "claim": "Broken symlink raw requests return stored link bytes.",
+      "evidence": "The built emulator returns the stored link target bytes; GitHub's live Contents API returns the same bytes for live symlink entries such as git/git/subprojects/git-gui and gitk."
+    }
+  ],
+  "issue_candidates": []
+}

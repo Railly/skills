@@ -1,0 +1,34 @@
+cli/src/native/daemon.rs:15:    auto_save_restore_state, close_all_browser_backends, close_current_browser, execute_command,
+cli/src/native/daemon.rs:286:                    let _ = close_current_browser(&mut s).await;
+cli/src/native/daemon.rs:440:                    let _ = close_current_browser(&mut s).await;
+cli/src/native/actions.rs:2044:    let result = close_current_browser(state).await;
+cli/src/native/actions.rs:2128:        providers::close_provider_session_with_plugins(&active.session, &active.plugins).await?;
+cli/src/native/actions.rs:2135:pub(crate) async fn close_current_browser(state: &mut DaemonState) -> Result<(), String> {
+cli/src/native/actions.rs:2166:/// Lifecycle shutdown paths use this instead of `close_current_browser`
+cli/src/native/actions.rs:2169:    let close_result = close_current_browser(state).await;
+cli/src/native/actions.rs:2192:    let close_error = close_current_browser(state).await.err();
+cli/src/native/actions.rs:3454:        close_current_browser(state),
+cli/src/native/actions.rs:3488:        return providers::connect_provider_with_plugins_and_options(provider, plugins, options)
+cli/src/native/actions.rs:3491:    let (ws_url, session) = providers::connect_browser_use_owned(|session| {
+cli/src/native/actions.rs:3677:                    cleanup_error = providers::close_provider_session_with_plugins(ps, &plugins)
+cli/src/native/actions.rs:4263:    let close_result = close_current_browser(state).await;
+cli/src/native/actions.rs:4541:            close_current_browser(state).await?;
+cli/src/native/actions.rs:4657:                            providers::close_provider_session_with_plugins(ps, &command_plugins)
+cli/src/native/actions.rs:13132:    async fn test_close_current_browser_closes_active_provider_plugin_session() {
+cli/src/native/actions.rs:13166:        close_current_browser(&mut state).await.unwrap();
+cli/src/native/actions.rs:13315:        close_current_browser(&mut state).await.unwrap();
+cli/src/native/actions.rs:13464:    async fn test_close_current_browser_clears_iframe_sessions() {
+cli/src/native/actions.rs:13471:        close_current_browser(&mut state).await.unwrap();
+cli/src/native/providers.rs:35:    connect_provider_with_plugins(provider_name, &plugins).await
+cli/src/native/providers.rs:41:pub async fn connect_provider_with_plugins(
+cli/src/native/providers.rs:45:    connect_provider_with_plugins_and_options(provider_name, plugins, None).await
+cli/src/native/providers.rs:52:pub async fn connect_provider_with_plugins_and_options(
+cli/src/native/providers.rs:113:    close_provider_session_with_plugins(session, &plugins).await
+cli/src/native/providers.rs:117:pub async fn close_provider_session_with_plugins(
+cli/src/native/providers.rs:447:pub async fn connect_browser_use_owned<F>(
+cli/src/native/providers.rs:1735:        let result = rt.block_on(connect_provider_with_plugins("env-cloud", &[]));
+cli/src/native/providers.rs:1829:        rt.block_on(close_provider_session_with_plugins(&session, &plugins))
+cli/src/native/providers.rs:1875:        rt.block_on(connect_provider_with_plugins("cloud-browser", &plugins))
+cli/src/native/providers.rs:1925:        rt.block_on(connect_provider_with_plugins_and_options(
+cli/src/native/e2e_tests.rs:19:    close_current_browser, execute_command, maybe_autosave_restore_state, DaemonState,
+cli/src/native/e2e_tests.rs:7488:        let _ = close_current_browser(&mut state).await;

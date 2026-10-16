@@ -1,0 +1,151 @@
+{
+  "required": true,
+  "status": "incomplete",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/resilience.json",
+  "fingerprint": {
+    "head_sha": "a45f1b656cb13c74bf1dca2f1439b77e8020360c",
+    "dirty_digest": "1c50ffee94cbae40be0971be6d1e1862a3eaed1d879d426094baa8a444c5c54d",
+    "changed_paths_digest": "fc8dcb0c5ec25ad65c7f8a1f79127967afa294c82dc1161f1763a9964b0f72bc",
+    "contract_digest": "9908e06eddd8a767958d0cdaa5de1514d4c9d3c3897034de3baa924711b7e70b",
+    "command": "cargo test --manifest-path cli/Cargo.toml --locked -- --test-threads=1; tls_cli Chrome ignored test; mutations; MCP smoke",
+    "environment_digest": "fd42a3dfa9ff29ecc4c9c8371fddaf55aaa6cf48c38bc5f0e3b604ca507b2b39",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "cli/src/chat.rs",
+      "cli/src/commands.rs",
+      "cli/src/connection.rs",
+      "cli/src/doctor/network.rs",
+      "cli/src/flags.rs",
+      "cli/src/install.rs",
+      "cli/src/main.rs",
+      "cli/src/mcp.rs",
+      "cli/src/native/actions.rs",
+      "cli/src/native/cdp/discovery.rs",
+      "cli/src/native/providers.rs",
+      "cli/src/native/stream/chat.rs",
+      "cli/src/output.rs",
+      "cli/src/read.rs",
+      "cli/src/tls.rs",
+      "cli/src/upgrade.rs",
+      "cli/tests/fixtures/tls/ca-a.pem",
+      "cli/tests/fixtures/tls/ca-b.pem",
+      "cli/tests/fixtures/tls/expired.pem",
+      "cli/tests/fixtures/tls/install.key",
+      "cli/tests/fixtures/tls/install.pem",
+      "cli/tests/fixtures/tls/server-a.key",
+      "cli/tests/fixtures/tls/server-a.pem",
+      "cli/tests/fixtures/tls/server-b.key",
+      "cli/tests/fixtures/tls/server-b.pem",
+      "cli/tests/tls_cli.rs"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "evidence": "Forced unknown issuer, corrupt retained file, failed explicit update, restore file and immediate retry; daemon and live page continuity. pool-proof.json exercises an old in-flight pooled HTTP operation, root replacement, rejection of the previous issuer at the next acquisition, and success after server certificate rotation, all with one daemon. Follow-up verified all 36 explicit/native selection transition cells, 32 structured input classes, six additional killed faults, cancellation/timeout/disconnect/shutdown recovery, CPU-width concurrent requests, and real Debian native-store plus Chromium NSS behavior.",
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "in-memory effective trust selection and client generation",
+      "owner": "TrustCache under Mutex",
+      "commit_event": "validate replacement roots, replace generation, then publish options",
+      "later_fallible_stages": [
+        "TLS acquisition / handshake",
+        "HTTP or WSS request",
+        "operation completion"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "TLS provider and read caller",
+          "covers": [
+            "TLS acquisition / handshake"
+          ],
+          "forced": true,
+          "residual_observed": "invalid new selection retains prior options in unit test; corrupt retained file rejects new operation; restored file succeeds on immediate retry; no daemon reset",
+          "cleanup_owner": "Client/Arc drop and Session test Drop",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart and trust_generation_tracks_material_and_preserves_omitted_selection"
+          },
+          "evidence": "cargo-test.log, mutations.json"
+        },
+        {
+          "ownership_region": "WSS caller",
+          "covers": [
+            "HTTP or WSS request"
+          ],
+          "forced": true,
+          "residual_observed": "stub rejects WebSocket upgrade after validated TLS; rotated root later reaches HTTP request in same daemon",
+          "cleanup_owner": "TLS stub closes socket and test session closes daemon",
+          "retry": {
+            "attempted": true,
+            "outcome": "expected protocol rejection after TLS success",
+            "evidence": "wss_uses_refreshed_trust_on_the_same_daemon"
+          },
+          "evidence": "cargo-test.log"
+        },
+        {
+          "ownership_region": "background HTTP pool acquisition",
+          "covers": [
+            "operation completion"
+          ],
+          "forced": true,
+          "residual_observed": "old acquired request completed after roots rotated; later acquisition rejected old issuer without reaching server; after server rotated the immediate retry succeeded",
+          "cleanup_owner": "reqwest Client/Arc ownership and isolated Python fixture teardown",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pool-proof.json"
+          },
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pool-proof.py"
+        },
+        {
+          "ownership_region": "foreground caller and daemon lifecycle",
+          "covers": [
+            "operation completion"
+          ],
+          "forced": true,
+          "residual_observed": "Caller cancellation, request timeout and peer disconnect retain daemon and allow immediate successful retry; SIGTERM during active request allows replacement daemon and successful retry",
+          "cleanup_owner": "daemon lifecycle, reqwest clients and isolated fixture teardown",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pressure-proof.json"
+          },
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pressure-proof.py"
+        }
+      ]
+    }
+  ],
+  "gaps": [
+    "Zscaler interception with MDM-managed macOS Keychain rotation on the reporter machine.",
+    "Native Windows store acceptance and rotation not executed."
+  ],
+  "additional_evidence": [
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pool-proof.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pool-proof.py",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/transition-matrix.log",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/protocol-proof.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/extended-mutations.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pressure-proof.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/linux-native-proof.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/linux-nss-proof.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/linux-final.log",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/preview-artifact.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/preview-smoke.json"
+  ],
+  "resource_measurement": {
+    "case": "concurrent_pool_load_across_rotation",
+    "workers": 15,
+    "before": {
+      "rss_kib": 13024,
+      "open_descriptors": 28
+    },
+    "after": {
+      "rss_kib": 13264,
+      "open_descriptors": 28
+    },
+    "same_pid": true
+  }
+}

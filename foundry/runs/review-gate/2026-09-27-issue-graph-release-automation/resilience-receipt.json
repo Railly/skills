@@ -1,0 +1,93 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/pressure-results.json",
+  "evidence": "Forced failure before/after GitHub release creation, conflict and lookup failure, plus retained archive after npm acceptance and propagation failures. Recovery never changes archive or tag.",
+  "fingerprint": {
+    "head_sha": "e78e205b141537c6d28486b3c8e1cf68dd166938",
+    "changed_paths_digest": "sha256:f33d2379498ed789a24f1463bd12a473f68f72f074e70b814fc3c71154b37581",
+    "contract_digest": "sha256:4e51c732ec46ba92d6cfff4e78c4e24c714405bebf7aa4cf53b873593dad77a4",
+    "command": "bun run check; bun x --no-install vitest run --config vitest.config.ts src/release.test.ts",
+    "environment_digest": "sha256:54cc32c3e878b8f9ddc01de58b21edfad8ed4fb7691f0a3e6d73108053fc9a01",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      ".github/workflows/release.yml",
+      "CONTRIBUTING.md",
+      "scripts/release.ts",
+      "src/release.test.ts"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "Immutable npm package accepted",
+      "owner": "npm registry",
+      "commit_event": "npm publish accepts tested tarball",
+      "later_fallible_stages": [
+        "registry propagation and byte verification",
+        "GitHub tag/release creation"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "registry verification",
+          "covers": [
+            "registry propagation and byte verification"
+          ],
+          "forced": true,
+          "residual_observed": "Local approved archive unchanged; existing published version reused only after identical integrity and downloaded bytes",
+          "cleanup_owner": "No rollback of immutable npm version; retained artifact and failed-job rerun own recovery",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/check-0.log: retained artifact prepare-publish published returns publish=false; changed bytes fail"
+          },
+          "evidence": "src/release.test.ts process-level registry fixture and bounded propagation tests"
+        },
+        {
+          "ownership_region": "GitHub publisher",
+          "covers": [
+            "GitHub tag/release creation"
+          ],
+          "forced": true,
+          "residual_observed": "One matching tag remains before release failure; one release remains after ambiguous create success",
+          "cleanup_owner": "Original workflow failed-job rerun; do not delete or move tags",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/pressure-results.json: both fault partitions recover without new tag or duplicate release"
+          },
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/github-release-pressure.sh uses extracted production shell"
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "effect": "GitHub version tag exists",
+      "owner": "github-release job",
+      "commit_event": "Git refs POST succeeds",
+      "later_fallible_stages": [
+        "release creation"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "GitHub Release API",
+          "covers": [
+            "release creation"
+          ],
+          "forced": true,
+          "residual_observed": "Tag retains exact SHA after rejection; no release before successful retry",
+          "cleanup_owner": "Retry validates matching tag; mismatch rejects before mutation",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/pressure-results.json: fail-before second attempt succeeds, third performs no writes"
+          },
+          "evidence": "Persistent local stub tracks every tag/release write, not just process output."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:152b1f2073db38ee43657fc15a138424cb231f05c5b4d643d4228ac306efb833",
+  "artifact": "test-strength.md",
+  "evidence": "Real-browser matrices and four fix-absent mutations reject the wrong implementations at the user-visible boundary.",
+  "fingerprint": {
+    "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+    "changed_paths_digest": "sha256:ff529690c5e679d2c9a9bff9b58c2ccc570233b4879144b68af2469c603311fd",
+    "contract_digest": "sha256:a7efe4ddf2ff2d778d5b8855e0e6257287add38f308afbcd3780e615576b1fa6",
+    "environment_digest": "sha256:27081eb99b9633cb7412d4a50b1b0d8ece3c0f291e2772f53584079c424ea6c9",
+    "relevant_paths": [
+      "README.md",
+      "cli/src/mcp.rs",
+      "cli/src/native/actions.rs",
+      "cli/src/native/e2e_tests.rs",
+      "cli/src/native/element.rs",
+      "cli/src/output.rs",
+      "docs/src/app/commands/page.mdx",
+      "docs/src/app/security/page.mdx",
+      "skill-data/core/references/authentication.md",
+      "skill-data/core/references/commands.md"
+    ],
+    "reusable": false,
+    "reuse_evidence": null,
+    "command": "cargo test; cargo test e2e_auth_login -- --ignored --test-threads=1; node fix-race/lightpanda-race/compatibility probes; three isolated mutants",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:152b1f2073db38ee43657fc15a138424cb231f05c5b4d643d4228ac306efb833"
+  },
+  "dimensions": {
+    "values": [
+      "selector: built-in username/password/submit candidates and explicit CSS",
+      "usability: visible, hidden, disabled, readonly, editable",
+      "lifecycle: stable, replaced, detached, focus redirected, readonly transition",
+      "field: username, password, submit",
+      "engine: Chrome 152 and Lightpanda nightly9842",
+      "editor: input, textarea, contenteditable, React controlled input",
+      "native capability: present-success, absent, returns false, throws",
+      "value: existing replacement, Unicode username and password",
+      "navigation: navigate, no-navigate, cross-origin rejection, delayed SPA render"
+    ],
+    "exclusions": [
+      "Cleanup after cancellation or a destroyed renderer/CDP transport is outside the bounded release claim."
+    ],
+    "evidence": "The matrix crosses selector usability and node lifecycle with both supported browser engines; compatibility probes cover editor and framework variants."
+  },
+  "oracle": {
+    "source": "Issue contract R1-R5 plus observed DOM values, event targets, submission state, and process exit codes",
+    "independent": true,
+    "evidence": "Expected target identity and no-submit outcomes were defined before the final implementation and do not reuse production helper output."
+  },
+  "producer": {
+    "name": "Built agent-browser CLI driving Chrome and actual Lightpanda pages",
+    "status": "exercised",
+    "evidence": "The browser engines produced focus, input, replacement, detach, React state, textarea, and contenteditable behavior through CDP."
+  },
+  "falsification": [
+    {
+      "mutation": "Run the regression test against the original PR focus-based implementation.",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/regression-red.log fails because the decoy receives target@example.test and the form submits.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/post-cleanup-checks.log passes the exact-node replacement regression on the final implementation."
+    },
+    {
+      "mutation": "Remove exact selected-node protection at the production call site.",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/mutant-select.log fails because the redirected decoy receives the credential and submission proceeds.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/auth-exact.log passes all nine auth E2E cases."
+    },
+    {
+      "mutation": "Remove the absent-execCommand fallback used by Lightpanda.",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/mutant-no-fallback.log fails at the no-native-edit compatibility assertion.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/final-react-lightpanda-probe.mjs.log and compatibility-results.json pass on actual Lightpanda."
+    },
+    {
+      "mutation": "Skip release of rejected CDP remote objects.",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/mutant-rejected-object.log fails the rejected-object release assertion.",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/post-cleanup-checks.log passes after restoring release on rejection."
+    }
+  ]
+}

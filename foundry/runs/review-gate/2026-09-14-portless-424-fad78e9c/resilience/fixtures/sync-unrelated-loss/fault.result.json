@@ -1,0 +1,108 @@
+{
+  "phase": "fault",
+  "fault": "unrelated-loss",
+  "command": [
+    "/Users/raillyhugo/.nvm/versions/node/v24.18.0/bin/node",
+    "--require",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/preload.cjs",
+    "/tmp/portless-review-424-fad78e9c/packages/portless/dist/cli.js",
+    "hosts",
+    "sync"
+  ],
+  "cwd": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-unrelated-loss",
+  "environment": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-unrelated-loss/home",
+    "TMPDIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-unrelated-loss/tmp",
+    "NO_COLOR": "1",
+    "PORTLESS_STATE_DIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-unrelated-loss/state",
+    "PORTLESS_PORT": "65431",
+    "PORTLESS_SYNC_HOSTS": "1",
+    "AUDIT_ROOT": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience",
+    "AUDIT_HOSTS": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-unrelated-loss/hosts",
+    "AUDIT_TRACE": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-unrelated-loss/fault.jsonl",
+    "AUDIT_FAULT": "unrelated-loss",
+    "AUDIT_UID": "0",
+    "AUDIT_SUDO": "1"
+  },
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "stdout": "Synced 1 hostname(s) to /etc/hosts:\n  127.0.0.1 app.localhost\n",
+  "stderr": "",
+  "durationMs": 59.681125000000065,
+  "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+  "after": "# portless-start\n127.0.0.1 app.localhost\n# portless-end\n",
+  "reads": 2,
+  "writes": 1,
+  "sudoCalls": 0,
+  "events": [
+    {
+      "time": "2026-09-14T18:45:49.504Z",
+      "op": "preload-ready",
+      "fault": "unrelated-loss",
+      "uid": 0,
+      "pid": 62362,
+      "node": "v24.18.0",
+      "platform": "darwin"
+    },
+    {
+      "time": "2026-09-14T18:45:49.527Z",
+      "op": "network-blocked",
+      "result": "ECONNREFUSED"
+    },
+    {
+      "time": "2026-09-14T18:45:49.528Z",
+      "op": "network-blocked",
+      "result": "ECONNREFUSED"
+    },
+    {
+      "time": "2026-09-14T18:45:49.528Z",
+      "op": "read",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-unrelated-loss/hosts",
+      "ordinal": 1,
+      "result": "ok"
+    },
+    {
+      "time": "2026-09-14T18:45:49.529Z",
+      "op": "write",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-unrelated-loss/hosts",
+      "ordinal": 1,
+      "outcome": "unrelated-data-lost",
+      "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+      "intended": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 app.localhost\n# portless-end\n",
+      "after": "# portless-start\n127.0.0.1 app.localhost\n# portless-end\n"
+    },
+    {
+      "time": "2026-09-14T18:45:49.529Z",
+      "op": "read",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-unrelated-loss/hosts",
+      "ordinal": 2,
+      "result": "ok"
+    },
+    {
+      "time": "2026-09-14T18:45:49.529Z",
+      "op": "exit",
+      "code": 0,
+      "reads": 2,
+      "writes": 1,
+      "memory": {
+        "rss": 64716800,
+        "heapTotal": 13352960,
+        "heapUsed": 9371720,
+        "external": 4016478,
+        "arrayBuffers": 146599
+      },
+      "activeResources": [
+        "PipeWrap",
+        "PipeWrap",
+        "PipeWrap"
+      ]
+    }
+  ],
+  "unrelatedPreserved": false,
+  "routesUnchanged": true
+}

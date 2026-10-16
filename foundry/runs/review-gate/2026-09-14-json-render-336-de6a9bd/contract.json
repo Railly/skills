@@ -1,0 +1,15 @@
+{
+  "requested": "Review exact PR head; report actionable regressions with direct evidence; do not edit source or publish to GitHub",
+  "acceptance": {
+    "A1": "Canonical decimal array tokens; literal numeric-looking object keys; existing append and valid path behavior preserved",
+    "A2": "Rejected immutable writes retain identity and produce no notification or adapter write; batches evaluate progressively",
+    "A3": "Invalid compound patches cannot delete source or insert undefined; valid move/copy still work through compiled stream",
+    "A4": "Reserved decoded tokens cannot traverse or mutate prototypes through read/write/remove/state/compound boundaries"
+  },
+  "scope": "Disposable local build and bounded proof inputs; mutation work only in separate throwaway source copies",
+  "risks": [
+    "parser and protocol semantics",
+    "externally visible state mutation and partial state",
+    "prototype-chain integrity"
+  ]
+}

@@ -1,0 +1,47 @@
+$ vitest run packages/core/src
+12:25:33 PM [vite-plugin-svelte] no Svelte config found at /Users/raillyhugo/Programming/vercel/json-render-336-review - using default configuration.
+
+ RUN  v4.0.17 /Users/raillyhugo/Programming/vercel/json-render-336-review
+
+ ✓ packages/core/src/devtools-flag.test.ts (5 tests) 3ms
+ ✓ packages/core/src/action-observer.test.ts (4 tests) 4ms
+stderr | packages/core/src/state-store.test.ts > flattenToPointers > caps recursion at depth limit
+flattenToPointers: depth limit (20) reached. Nested state beyond this depth will be treated as a leaf value.
+
+ ✓ packages/core/src/actions.test.ts (26 tests) 7ms
+ ✓ packages/core/src/visibility.test.ts (79 tests) 5ms
+ ✓ packages/core/src/state-store.test.ts (47 tests) 7ms
+stderr | packages/core/src/props.test.ts > $bindState expressions > resolvePropValue with $bindItem > returns undefined when no repeatBasePath
+$bindItem used outside repeat scope: "completed"
+
+stderr | packages/core/src/props.test.ts > resolveActionParam > returns undefined for $item when no repeatBasePath
+$bindItem used outside repeat scope: "title"
+
+stderr | packages/core/src/validation.test.ts > runValidationCheck > returns valid for unknown functions with warning
+Unknown validation function: unknownFunction
+
+ ✓ packages/core/src/spec-validator.test.ts (38 tests) 9ms
+stderr | packages/core/src/props.test.ts > $computed expressions > returns undefined for unknown function
+Unknown $computed function: "unknown"
+
+stderr | packages/core/src/props.test.ts > $computed expressions > returns undefined when no functions in context
+Unknown $computed function: "any"
+
+ ✓ packages/core/src/validation.test.ts (88 tests) 8ms
+ ✓ packages/core/src/props.test.ts (61 tests) 7ms
+ ✓ packages/core/src/directives.test.ts (19 tests) 4ms
+ ✓ packages/core/src/types.test.ts (156 tests) 21ms
+stderr | packages/core/src/schema.test.ts > catalog.prompt > accepts deprecated 'chat' as alias for 'inline'
+[json-render] mode "chat" is deprecated, use "inline" instead
+
+stderr | packages/core/src/schema.test.ts > catalog.prompt > accepts deprecated 'generate' as alias for 'standalone'
+[json-render] mode "generate" is deprecated, use "standalone" instead
+
+ ✓ packages/core/src/schema.test.ts (45 tests) 22ms
+ ✓ packages/core/src/repeat-schema-parity.test.ts (9 tests) 1ms
+
+ Test Files  12 passed (12)
+      Tests  577 passed (577)
+   Start at  12:25:34
+   Duration  1.16s (transform 1.34s, setup 0ms, import 2.02s, tests 99ms, environment 9.08s)
+

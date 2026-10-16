@@ -1,0 +1,252 @@
+# Browser Use
+
+> Documentation for Browser Use Cloud Agent and Browser APIs, and the separate open-source Python library.
+
+> ## Agent Instructions
+> Use https://docs.browser-use.com/llms.txt and its linked .md pages for current documentation. The managed full bundle is https://docs.browser-use.com/.well-known/llms-full.txt and can be cached for up to 24 hours. Do not use the obsolete /cloud/llms*.txt or /open-source/llms*.txt static exports.
+> Choose Cloud API V4 for new agent integrations; V2 is the lower-cost option for simple tasks. Keep V3 examples explicitly versioned. The open-source browser-use library and hosted browser-use-sdk have different APIs.
+> Cloud authentication uses X-Browser-Use-API-Key, without a Bearer prefix. Install or upgrade browser-use-sdk and use its explicit v4 import for V4. Check the published OpenAPI reference for request fields; do not invent SDK support for new fields.
+> Cloud concurrency and HTTP request rate are separate. Read GET /api/v2/billing/account for the key’s projectId, concurrentSessionLimit, activeSessionCount, and credit balance, including when using V4. Keys in one project share capacity and credits; rateLimit is a legacy concurrency alias, not requests per second.
+> Keep the highest applicable existing, legacy-plan, and spend-tier concurrency grant. Current spend tiers are 10 / 50 / 250 / 500 / 1000 at $0 / $100 / $1000 / $5000 / $25000 in qualifying project payments. Legacy or externally billed projects can follow different billing paths; trust the account limit. See https://docs.browser-use.com/cloud/guides/concurrency.md.
+> HTTP rate limits have two layers. Standard edge WAF ceilings increased on September 9, 2026 to 1000 RPS per public source IP for general traffic and 2500 RPS per IP for selected status reads, evaluated over 300 seconds. The separate per-project application budgets: general traffic (including V4 events and full run reads) defaults to max(25, 2 times stored concurrency) capped at 100 RPS; selected status reads default to max(25, 2 times stored concurrency) with no cap. The two are counted independently. Project overrides and account-specific edge rules can differ. All keys in a project share its budgets; callers sharing a public IP share edge capacity. See https://docs.browser-use.com/cloud/guides/concurrency.md.
+> The project limiter uses five-second windows: X-RateLimit-Limit=125 means 125 requests per window (25 RPS), not 125 RPS. Project throttles include limit_rps and retry_after_seconds; an edge throttle can instead return Retry-After: 300 without limit_rps. Honor the returned Retry-After. Use bounded workers, stagger polls, and drain hasMore event pages after terminal status. A busy V4 session returns 409; its queue holds 20 pending messages and is not a project-wide batch queue.
+> A completed run or closed CDP connection does not immediately stop its cloud browser. Stop unneeded owned browsers with PATCH /api/v4/browsers/{id} and {"action":"stop"}. A client wait timeout does not cancel the server-side run.
+> Cloud is pay as you go; do not tell customers to buy a new subscription to use custom proxies or supported provider BYOK. Usage funding and model eligibility still apply. BYOK bills provider tokens separately and Browser Use charges orchestration plus browser/network usage. See https://docs.browser-use.com/cloud/guides/billing.md.
+> Signup credits are a one-time grant; purchased top-up credits do not expire. Check the API key’s project before diagnosing missing credits. API-key monthly spending caps are soft limits, not a strict prepaid wallet; concurrent or already-running work can exceed them. Auto recharge has separate trigger and purchase amounts and can charge immediately when enabled below the threshold. Use https://browser-use.com/pricing for current rates.
+> Box and Bux are retired. Do not recommend their SDKs, sandbox quotas, or subscription plans. Use the Cloud Agent or Browser Infrastructure guides.
+> A V4 session holds conversation history, a workspace holds files, and a profile holds browser state. These IDs and V3/V4 workspace namespaces are not interchangeable. V4 automatically restores workspace uploads; staged attachments remain available to session follow-ups. Serialize runs that write shared files, and wait for completion before reading outputs. See https://docs.browser-use.com/cloud/agent/workspaces.md.
+> API browser recording defaults to off. Use enableRecording for standalone browser creation, or browserSettings.record for an agent run. Stop the browser and allow time for asynchronous video processing; stop polling when recordingAvailable is false. Live preview is for an active browser. Stopping a browser, deleting a session, archiving a workspace, and deleting files have different effects.
+> Use model-specific reasoning values. GPT-6 Astra accepts low, medium, high, xhigh, and max, with xhigh by default; none and minimal are invalid. Use the public REST schema when installed SDK types lag new fields. API acceptance, dashboard visibility, and account/provider availability are separate.
+> For open-source browser-use, is_done only reports a terminal done action. is_successful is the agent-reported outcome; verify important external actions independently. Cloud timeout, API client timeout, model timeout, and task completion are separate concepts.
+> For failed requests, use https://docs.browser-use.com/cloud/guides/troubleshooting.md. Inspect the full error and project before retrying or adding credits. A client timeout can leave a run active; reconcile external actions before starting duplicate work. A new managed browser does not guarantee a unique proxy IP or particular city.
+
+## Docs
+
+- [Quick start](https://docs.browser-use.com/cloud/quickstart.md): Run a hosted agent or launch a cloud browser.
+- [Which Browser Use do I need?](https://docs.browser-use.com/cloud/which-product.md): Choose a hosted agent, the CLI for your existing agent, or the Python library.
+- [Choosing an Agent](https://docs.browser-use.com/cloud/choosing-an-agent.md): Compare Browser Use Cloud agents on accuracy, speed and price, and pick the right one for your task.
+- [Prompt for Vibecoders](https://docs.browser-use.com/cloud/vibecoding.md): Current Cloud documentation, API schemas, concurrency, and billing guidance for AI coding agents.
+- [Run a task](https://docs.browser-use.com/cloud/agent/quickstart.md): Give a high-accuracy browser agent a goal and get the result.
+- [Models](https://docs.browser-use.com/cloud/agent/models.md): Choose a V4 model and understand its token pricing.
+- [Thinking levels](https://docs.browser-use.com/cloud/agent/thinking-levels.md): Configure model reasoning depth across API V2, V3, and V4.
+- [Structured output](https://docs.browser-use.com/cloud/agent/structured-output.md): Ask for JSON and validate the V4 result in your application.
+- [Sessions](https://docs.browser-use.com/cloud/agent/sessions.md): Continue one conversation across multiple V4 runs.
+- [Workspaces & files](https://docs.browser-use.com/cloud/agent/workspaces.md): Persist files across V4 runs and conversations.
+- [Rerunnable scripts](https://docs.browser-use.com/cloud/agent/scripts.md): Save a Browser Use task as a rerunnable script for repeated live data extraction and self-healing runs.
+- [Human in the loop](https://docs.browser-use.com/cloud/agent/human-in-the-loop.md): Open the live browser, take over, then continue the same session.
+- [Observability](https://docs.browser-use.com/cloud/agent/observability.md): Poll ordered V4 events to monitor a run or build a custom UI.
+- [Capture browser network events](https://docs.browser-use.com/cloud/agent/network-capture.md): Attach your own CDP observer to a live V4 browser and save request metadata.
+- [Browser Infrastructure quickstart](https://docs.browser-use.com/cloud/browser/quickstart.md): Launch a cloud browser and connect to it from your code.
+- [Stealth](https://docs.browser-use.com/cloud/browser/stealth.md): Managed Chromium with stealth protections and proxy support.
+- [CAPTCHA handling](https://docs.browser-use.com/cloud/browser/captcha-handling.md): Cloud browsers solve supported CAPTCHA challenges automatically.
+- [Proxies](https://docs.browser-use.com/cloud/browser/proxies.md): Configure residential or custom proxies for API V4 browsers and agent runs.
+- [Live preview & recording](https://docs.browser-use.com/cloud/browser/live-preview.md): Watch an API V4 run in real time or record its browser.
+- [Playwright, Puppeteer, Selenium](https://docs.browser-use.com/cloud/browser/playwright-puppeteer-selenium.md): Control a Browser Use cloud browser directly over CDP.
+- [Profiles](https://docs.browser-use.com/cloud/guides/authentication.md): Reuse cookies and browser state in API V4 runs.
+- [Sync local and cloud cookies](https://docs.browser-use.com/cloud/guides/profile-sync.md): Sync a local login, then use it in an API V4 run.
+- [2FA](https://docs.browser-use.com/cloud/guides/2fa.md): Handle two-factor authentication in API V4 runs.
+- [1Password & 2FA](https://docs.browser-use.com/cloud/guides/1password.md): Auto-fill passwords and TOTP codes from 1Password in API tasks.
+- [Secrets](https://docs.browser-use.com/cloud/guides/secrets.md): Pass run-scoped credentials to API V4 with secret bindings.
+- [Claude Code](https://docs.browser-use.com/cloud/tutorials/integrations/claude-code.md): Give Claude Code cloud browser automation with Browser Use.
+- [Claude Managed Agents](https://docs.browser-use.com/cloud/tutorials/integrations/claude-managed-agents.md): Give Anthropic's Claude Managed Agents a stealth cloud browser via the Browser Use CLI.
+- [OpenClaw](https://docs.browser-use.com/cloud/tutorials/integrations/openclaw.md): Give OpenClaw agents browser automation with Browser Use — via CDP or the CLI skill.
+- [Hermes Agent](https://docs.browser-use.com/cloud/tutorials/integrations/hermes-agent.md): Give Hermes Agent cloud browser automation with Browser Use.
+- [MCP Server](https://docs.browser-use.com/cloud/guides/mcp-server.md): Run browser automation tasks from your AI coding assistant. Connect to Claude, Cursor, Windsurf, or any MCP client.
+- [Webhooks](https://docs.browser-use.com/cloud/guides/webhooks.md): Receive V2 task and V3 session notifications and verify the webhook signature.
+- [x402 (pay-per-request)](https://docs.browser-use.com/cloud/guides/x402.md): Pay for Browser Use Cloud with crypto (USDC on Base). ~30 seconds from wallet to first request.
+- [x402 agent wallets](https://docs.browser-use.com/cloud/guides/x402-agent-wallets.md): Pay for Browser Use Cloud from an agent-native wallet: AgentCash (local wallet, MCP) or Coinbase's Agentic Wallet (hosted wallet, CLI).
+- [Get a Browser Use API Key](https://docs.browser-use.com/cloud/agent-signup.md): Agent signup is off. Create an API key in Cloud, or use x402 without a human.
+- [Concurrency and limits](https://docs.browser-use.com/cloud/guides/concurrency.md): Preserved legacy allowances, spend tiers, browser lifetime, polling budgets, queues, and retry guidance.
+- [EU deployment](https://docs.browser-use.com/cloud/eu-deployment.md): Run agents and browsers in Frankfurt with a regional API key and shared billing.
+- [Billing and credits](https://docs.browser-use.com/cloud/guides/billing.md): Pay-as-you-go credits, project balances, BYOK charges, auto recharge, and API-key spending caps.
+- [iMessage](https://docs.browser-use.com/cloud/guides/imessage.md): Connect a Messages group to a Browser Use agent.
+- [Troubleshooting](https://docs.browser-use.com/cloud/guides/troubleshooting.md): Diagnose account, browser, file, and integration problems before retrying.
+- [FAQ](https://docs.browser-use.com/cloud/faq.md): Common questions and solutions.
+- [Agent (v2)](https://docs.browser-use.com/cloud/legacy/agent.md): V2 agent models and file handling.
+- [Public share links (v2)](https://docs.browser-use.com/cloud/legacy/public-share.md): Generate shareable URLs for agent sessions using the v2 API.
+- [Skills](https://docs.browser-use.com/cloud/legacy/skills.md): Retired. Existing skills still run; new skills are no longer created.
+- [API Reference](https://docs.browser-use.com/cloud/api-v4-overview.md): Authenticate and start using the Browser Use API v4 — the current REST API for long-horizon agents.
+- [List Runs](https://docs.browser-use.com/cloud/api-v4/runs/list-runs.md)
+- [Create Run](https://docs.browser-use.com/cloud/api-v4/runs/create-run.md)
+- [List Run Attachments](https://docs.browser-use.com/cloud/api-v4/runs/list-run-attachments.md): The upload files attached to a run, for rendering attachment chips. Ordered to match the run's attached_file_ids.
+- [Get Run](https://docs.browser-use.com/cloud/api-v4/runs/get-run.md)
+- [Get Run Status](https://docs.browser-use.com/cloud/api-v4/runs/get-run-status.md): Minimal status poll (see RunStatusResponse). POLL rate bucket: selects ONLY the status/project columns — a 2s poll never drags the task/result text (TOAST reads) that GET /runs/{id} pays. Poll until terminal, then fetch the full summary once.
+- [Cancel Run](https://docs.browser-use.com/cloud/api-v4/runs/cancel-run.md): Cancel an in-flight run.
+- [Get Run Events](https://docs.browser-use.com/cloud/api-v4/runs/get-run-events.md): Paginated event read. `after` is the event id cursor — clients doing periodic polls pass back the highest id they've seen to get only the delta. Default 0 returns from the start.
+- [List Sessions](https://docs.browser-use.com/cloud/api-v4/sessions/list-sessions.md): List the project's V4 sessions — one row per session (its most recent run), most-recent first.
+- [Purge Session](https://docs.browser-use.com/cloud/api-v4/sessions/purge-session.md): Immediately purge all data for a V4 session (ZDR projects only).
+- [Get Session](https://docs.browser-use.com/cloud/api-v4/sessions/get-session.md): Session detail — the same slim shape as one GET /sessions row (its latest run). Doubles as the busy/idle poll for a conversation (POLL rate bucket): slim columns only, indexed public_session_id lookup, never the heavy result/token fields.
+- [Delete Session](https://docs.browser-use.com/cloud/api-v4/sessions/delete-session.md): Delete a session: it disappears from the session lists and can no longer be opened or continued.
+- [Update Session](https://docs.browser-use.com/cloud/api-v4/sessions/update-session.md): Rename a session.
+- [List Session Queue](https://docs.browser-use.com/cloud/api-v4/sessions/list-session-queue.md): List open messages, recently delivered queued messages, and steering cutoffs.
+- [Queue Session Message](https://docs.browser-use.com/cloud/api-v4/sessions/queue-session-message.md): Send a message to a session. If the session is busy it waits on the queue and runs as the next turn; if idle it drains immediately.
+- [Get Session Queue Message](https://docs.browser-use.com/cloud/api-v4/sessions/get-session-queue-message.md): Read one queued message including terminal handoff states.
+- [Cancel Queued Message](https://docs.browser-use.com/cloud/api-v4/sessions/cancel-queued-message.md): Remove a still-pending queued message; 409 once the drain has claimed it.
+- [Get Session Feedback](https://docs.browser-use.com/cloud/api-v4/sessions/get-session-feedback.md): Every vote across the session in one query — the run view calls this once per session on load. A session the caller doesn't own returns an empty list (not 404), matching what an unshared session with no votes returns. Reads the PRIMARY, not the replica: this hydrates the thumbs the user may have set…
+- [Set Session Feedback](https://docs.browser-use.com/cloud/api-v4/sessions/set-session-feedback.md): Upsert one chat item's thumbs vote; `feedback_type: null` clears it.
+- [Get Session Share](https://docs.browser-use.com/cloud/api-v4/sessions/get-session-share.md): The session's share link (active or not); null if never shared.
+- [Update Session Share](https://docs.browser-use.com/cloud/api-v4/sessions/update-session-share.md): Toggle the session's share link on/off.
+- [Create Session Share](https://docs.browser-use.com/cloud/api-v4/sessions/create-session-share.md): Enable sharing: reactivates the session's existing share (stable token, so a link that was toggled off keeps working when re-enabled) or creates one on first use.
+- [Create Workspace](https://docs.browser-use.com/cloud/api-v4/workspaces/create-workspace.md): Mint an empty workspace. Lets callers upload input files BEFORE the first run exists; pass the id as workspaceId on POST /runs.
+- [Upload Workspace Files](https://docs.browser-use.com/cloud/api-v4/workspaces/upload-workspace-files.md): Presigned PUT URLs for input files, placed under ``uploads/`` in the workspace. The agent pulls them in at the start of every run. URLs are pinned to the declared Content-Type and exact Content-Length.
+- [Get Workspace](https://docs.browser-use.com/cloud/api-v4/workspaces/get-workspace.md)
+- [Delete Workspace](https://docs.browser-use.com/cloud/api-v4/workspaces/delete-workspace.md): Archive a workspace. Idempotent for missing, archived, and foreign ids.
+- [Update Workspace](https://docs.browser-use.com/cloud/api-v4/workspaces/update-workspace.md): Rename a workspace. Explicit null clears the name; omission is a no-op.
+- [Get Workspace Size](https://docs.browser-use.com/cloud/api-v4/workspaces/get-workspace-size.md): Return current storage usage and the plan-specific workspace quota.
+- [List Workspace Files](https://docs.browser-use.com/cloud/api-v4/workspaces/list-workspace-files.md): List files the agent has produced for this workspace, paginated.
+- [Delete Workspace File](https://docs.browser-use.com/cloud/api-v4/workspaces/delete-workspace-file.md): Delete one exact path from a workspace and remove matching upload metadata.
+- [List Agentcard Wallets](https://docs.browser-use.com/cloud/api-v4/wallets/list-agentcard-wallets.md): The project's active AgentCard wallets, newest first.
+- [Get Stripe Link Status](https://docs.browser-use.com/cloud/api-v4/wallets/get-stripe-link-status.md): The project's active Stripe Link wallet connection, if any.
+- [List Integrations](https://docs.browser-use.com/cloud/api-v4/integrations/list-integrations.md): List available integrations with this project's connection status.
+- [List Categories](https://docs.browser-use.com/cloud/api-v4/integrations/list-categories.md): Get all integration categories, for filtering the list above.
+- [Authorize Integration](https://docs.browser-use.com/cloud/api-v4/integrations/authorize-integration.md): Get the OAuth redirect URL for connecting an integration.
+- [Get Connection Status](https://docs.browser-use.com/cloud/api-v4/integrations/get-connection-status.md): Check whether this project has connected a specific provider.
+- [Disconnect Integration](https://docs.browser-use.com/cloud/api-v4/integrations/disconnect-integration.md): Disconnect an integration for this project.
+- [Get Shared Session](https://docs.browser-use.com/cloud/api-v4/get-shared-session.md): Public transcript of a shared session (sensitive keys scrubbed).
+- [List Shared Session Files](https://docs.browser-use.com/cloud/api-v4/list-shared-session-files.md): Public listing of a shared session's workspace files. Same shape as the authenticated workspace-files endpoint so the share page can reuse the same components.
+- [Get Shared Session Recording](https://docs.browser-use.com/cloud/api-v4/get-shared-session-recording.md): Presigned URL for the shared session's browser recording (mp4).
+- [List Browser Sessions](https://docs.browser-use.com/cloud/api-v4/browsers/list-browser-sessions.md): Get paginated list of browser sessions with optional status filtering.
+- [Create Browser Session](https://docs.browser-use.com/cloud/api-v4/browsers/create-browser-session.md): Create a new browser session.
+- [Get Browser Session](https://docs.browser-use.com/cloud/api-v4/browsers/get-browser-session.md): Get detailed browser session information including status and URLs.
+- [Update Browser Session](https://docs.browser-use.com/cloud/api-v4/browsers/update-browser-session.md): Stop a browser session.
+- [List Browser Session Downloads](https://docs.browser-use.com/cloud/api-v4/browsers/list-browser-session-downloads.md): List files the browser downloaded to S3 during the session.
+- [List Profiles](https://docs.browser-use.com/cloud/api-v4/profiles/list-profiles.md): Get paginated list of profiles.
+- [Create Profile](https://docs.browser-use.com/cloud/api-v4/profiles/create-profile.md): Profiles allow you to preserve the state of the browser between tasks.
+- [Get Profile](https://docs.browser-use.com/cloud/api-v4/profiles/get-profile.md): Get profile details.
+- [Delete Browser Profile](https://docs.browser-use.com/cloud/api-v4/profiles/delete-browser-profile.md): Permanently delete a browser profile and its configuration.
+- [Update Profile](https://docs.browser-use.com/cloud/api-v4/profiles/update-profile.md): Update a browser profile's information.
+- [API Reference](https://docs.browser-use.com/cloud/api-reference.md): Authenticate and start using the Browser Use REST API.
+- [n8n](https://docs.browser-use.com/cloud/tutorials/integrations/n8n.md): Use Browser Use as an HTTP node in n8n workflows.
+- [Chat UI](https://docs.browser-use.com/cloud/tutorials/chat-ui.md): Full end-to-end example. Build a chat UI with live browser preview, follow-up tasks, recording, and streaming messages.
+- [Grow Therapy provider search](https://docs.browser-use.com/cloud/tutorials/grow-therapy-compare.md): Search Grow Therapy for therapists by location, insurance, and specialty — with cached reruns.
+- [List Sessions](https://docs.browser-use.com/cloud/api-v3/sessions/list-sessions.md): List sessions for the authenticated project.
+- [Create Session](https://docs.browser-use.com/cloud/api-v3/sessions/create-session.md): Create a session and/or dispatch a task.
+- [Get Session](https://docs.browser-use.com/cloud/api-v3/sessions/get-session.md): Get session details. Use this to poll for task completion and output.
+- [Delete Session](https://docs.browser-use.com/cloud/api-v3/sessions/delete-session.md): Soft-delete a session. Stops the sandbox first if still running.
+- [Stop Session](https://docs.browser-use.com/cloud/api-v3/sessions/stop-session.md): Stop a session or the running task.
+- [List Session Messages](https://docs.browser-use.com/cloud/api-v3/sessions/list-session-messages.md): Return messages for a session with cursor-based pagination (chronological order).
+- [List Browser Sessions](https://docs.browser-use.com/cloud/api-v3/browsers/list-browser-sessions.md): Get paginated list of browser sessions with optional status filtering.
+- [Create Browser Session](https://docs.browser-use.com/cloud/api-v3/browsers/create-browser-session.md): Create a new browser session.
+- [Get Browser Session](https://docs.browser-use.com/cloud/api-v3/browsers/get-browser-session.md): Get detailed browser session information including status and URLs.
+- [Update Browser Session](https://docs.browser-use.com/cloud/api-v3/browsers/update-browser-session.md): Stop a browser session.
+- [List Browser Session Downloads](https://docs.browser-use.com/cloud/api-v3/browsers/list-browser-session-downloads.md): List files the browser downloaded to S3 during the session.
+- [List Profiles](https://docs.browser-use.com/cloud/api-v3/profiles/list-profiles.md): Get paginated list of profiles.
+- [Create Profile](https://docs.browser-use.com/cloud/api-v3/profiles/create-profile.md): Profiles allow you to preserve the state of the browser between tasks.
+- [Get Profile](https://docs.browser-use.com/cloud/api-v3/profiles/get-profile.md): Get profile details.
+- [Delete Browser Profile](https://docs.browser-use.com/cloud/api-v3/profiles/delete-browser-profile.md): Permanently delete a browser profile and its configuration.
+- [Update Profile](https://docs.browser-use.com/cloud/api-v3/profiles/update-profile.md): Update a browser profile's information.
+- [List Workspaces](https://docs.browser-use.com/cloud/api-v3/workspaces/list-workspaces.md): Get paginated list of workspaces.
+- [Create Workspace](https://docs.browser-use.com/cloud/api-v3/workspaces/create-workspace.md): Create a new workspace for persistent shared file storage across sessions.
+- [Get Workspace](https://docs.browser-use.com/cloud/api-v3/workspaces/get-workspace.md): Get workspace details.
+- [Delete Workspace](https://docs.browser-use.com/cloud/api-v3/workspaces/delete-workspace.md): Delete a workspace and its S3 data.
+- [Update Workspace](https://docs.browser-use.com/cloud/api-v3/workspaces/update-workspace.md): Update a workspace's name.
+- [List Workspace Files](https://docs.browser-use.com/cloud/api-v3/workspaces/list-workspace-files.md): List files in a workspace's S3 prefix.
+- [Delete Workspace File](https://docs.browser-use.com/cloud/api-v3/workspaces/delete-workspace-file.md): Delete a single file from a workspace.
+- [Get Workspace Size](https://docs.browser-use.com/cloud/api-v3/workspaces/get-workspace-size.md): Get current storage usage for a workspace.
+- [Upload Workspace Files](https://docs.browser-use.com/cloud/api-v3/workspaces/upload-workspace-files.md): Get presigned PUT URLs for uploading files to a workspace.
+- [Get Account Billing](https://docs.browser-use.com/cloud/api-v3/billing/get-account-billing.md): Get authenticated account information including credit balance and account details.
+- [X402 Balance](https://docs.browser-use.com/cloud/api-v3/x402/x402-balance.md): Read a wallet-derived project's credit balance auth by off-chain wallet signature
+- [API key](https://docs.browser-use.com/cloud/api-v2-overview.md): Set your API key to access the Browser Use v2 REST API.
+- [Get Account Billing](https://docs.browser-use.com/cloud/api-v2/billing/get-account-billing.md): Get authenticated account information including credit balance and account details.
+- [List Tasks](https://docs.browser-use.com/cloud/api-v2/tasks/list-tasks.md): Get paginated list of AI agent tasks with optional filtering by session and status.
+- [Create Task](https://docs.browser-use.com/cloud/api-v2/tasks/create-task.md): Create and start a new task.
+- [Get Task](https://docs.browser-use.com/cloud/api-v2/tasks/get-task.md): Get detailed task information including status, progress, steps, and file outputs.
+- [Update Task](https://docs.browser-use.com/cloud/api-v2/tasks/update-task.md): Control task execution with stop, pause, resume, or stop task and session actions.
+- [Get Task Status](https://docs.browser-use.com/cloud/api-v2/tasks/get-task-status.md): Lightweight endpoint optimized for polling task status.
+- [Get Task Logs](https://docs.browser-use.com/cloud/api-v2/tasks/get-task-logs.md): Get secure download URL for task execution logs with step-by-step details.
+- [List Sessions](https://docs.browser-use.com/cloud/api-v2/sessions/list-sessions.md): Get paginated list of AI agent sessions with optional status filtering.
+- [Create Session](https://docs.browser-use.com/cloud/api-v2/sessions/create-session.md): Create a new session with a new task.
+- [Get Session](https://docs.browser-use.com/cloud/api-v2/sessions/get-session.md): Get detailed session information including status, URLs, and task details.
+- [Delete Session](https://docs.browser-use.com/cloud/api-v2/sessions/delete-session.md): Delete a session with all its tasks.
+- [Update Session](https://docs.browser-use.com/cloud/api-v2/sessions/update-session.md): Stop a session and all its running tasks.
+- [Purge Session](https://docs.browser-use.com/cloud/api-v2/sessions/purge-session.md): Immediately purge all data for a session (ZDR projects only).
+- [Get Session Public Share](https://docs.browser-use.com/cloud/api-v2/sessions/get-session-public-share.md): Get public share information including URL and usage statistics.
+- [Create Session Public Share](https://docs.browser-use.com/cloud/api-v2/sessions/create-session-public-share.md): Create or return existing public share for a session.
+- [Delete Session Public Share](https://docs.browser-use.com/cloud/api-v2/sessions/delete-session-public-share.md): Remove public share for a session.
+- [Agent Session Upload File Presigned Url](https://docs.browser-use.com/cloud/api-v2/files/agent-session-upload-file-presigned-url.md): Generate a secure presigned URL for uploading files to an agent session.
+- [Browser Session Upload File Presigned Url](https://docs.browser-use.com/cloud/api-v2/files/browser-session-upload-file-presigned-url.md): Generate a secure presigned URL for uploading files to a browser session.
+- [Get Task Output File Presigned Url](https://docs.browser-use.com/cloud/api-v2/files/get-task-output-file-presigned-url.md): Get secure download URL for an output file generated by the AI agent.
+- [List Profiles](https://docs.browser-use.com/cloud/api-v2/profiles/list-profiles.md): Get paginated list of profiles.
+- [Create Profile](https://docs.browser-use.com/cloud/api-v2/profiles/create-profile.md): Profiles allow you to preserve the state of the browser between tasks.
+- [Get Profile](https://docs.browser-use.com/cloud/api-v2/profiles/get-profile.md): Get profile details.
+- [Delete Browser Profile](https://docs.browser-use.com/cloud/api-v2/profiles/delete-browser-profile.md): Permanently delete a browser profile and its configuration.
+- [Update Profile](https://docs.browser-use.com/cloud/api-v2/profiles/update-profile.md): Update a browser profile's information.
+- [List Browser Sessions](https://docs.browser-use.com/cloud/api-v2/browsers/list-browser-sessions.md): Get paginated list of browser sessions with optional status filtering.
+- [Create Browser Session](https://docs.browser-use.com/cloud/api-v2/browsers/create-browser-session.md): Create a new browser session.
+- [Get Browser Session](https://docs.browser-use.com/cloud/api-v2/browsers/get-browser-session.md): Get detailed browser session information including status and URLs.
+- [Update Browser Session](https://docs.browser-use.com/cloud/api-v2/browsers/update-browser-session.md): Stop a browser session.
+- [List Browser Session Downloads](https://docs.browser-use.com/cloud/api-v2/browsers/list-browser-session-downloads.md): List files the browser downloaded to S3 during the session.
+- [List Skills](https://docs.browser-use.com/cloud/api-v2/skills/list-skills.md): List all skills owned by the authenticated project with optional filtering.
+- [Create Skill](https://docs.browser-use.com/cloud/api-v2/skills/create-skill.md): Create a new skill via automated generation.
+- [Get Skill](https://docs.browser-use.com/cloud/api-v2/skills/get-skill.md): Get details of a specific skill owned by the project.
+- [Delete Skill](https://docs.browser-use.com/cloud/api-v2/skills/delete-skill.md): Delete a skill owned by the project.
+- [Update Skill](https://docs.browser-use.com/cloud/api-v2/skills/update-skill.md): Update skill metadata (name, description, enabled, etc.).
+- [Cancel Generation](https://docs.browser-use.com/cloud/api-v2/skills/cancel-generation.md): Cancel the current in-progress generation for a skill.
+- [Rollback Skill](https://docs.browser-use.com/cloud/api-v2/skills/rollback-skill.md): Rollback to the previous version (cannot be undone).
+- [Execute Skill](https://docs.browser-use.com/cloud/api-v2/skills/execute-skill.md): Execute a skill with the provided parameters.
+- [Refine Skill](https://docs.browser-use.com/cloud/api-v2/skills/refine-skill.md): Refine a skill based on feedback.
+- [List Skill Executions](https://docs.browser-use.com/cloud/api-v2/skills/list-skill-executions.md): List executions for a specific skill.
+- [Get Skill Execution Output](https://docs.browser-use.com/cloud/api-v2/skills/get-skill-execution-output.md): Get presigned URL for downloading skill execution output.
+- [List Skills](https://docs.browser-use.com/cloud/api-v2/skills-marketplace/list-skills.md): List all public skills available in the marketplace with optional filtering.
+- [Get Skill](https://docs.browser-use.com/cloud/api-v2/skills-marketplace/get-skill.md): Get details of a specific public skill from the marketplace.
+- [Clone Skill](https://docs.browser-use.com/cloud/api-v2/skills-marketplace/clone-skill.md): Clone a public marketplace skill to the user's project.
+- [Execute Skill](https://docs.browser-use.com/cloud/api-v2/skills-marketplace/execute-skill.md): Execute a skill with the provided parameters.
+- [Browser Use Open Source](https://docs.browser-use.com/open-source/introduction.md): Python library for AI browser automation with 79k+ GitHub stars. Connect any LLM and run locally or self-hosted.
+- [Human Quickstart](https://docs.browser-use.com/open-source/quickstart.md): Install and run your first AI browser agent in minutes. Python setup with pip, environment variables, and a working example.
+- [Prompts for Vibecoders](https://docs.browser-use.com/open-source/vibecoding.md): Complete Python SDK reference for AI coding agents. Paste into Claude Code, Cursor, or Copilot for instant integration.
+- [Supported Models](https://docs.browser-use.com/open-source/supported-models.md): Choose between Claude, Gemini, Llama, DeepSeek, and more. Configuration examples for each provider.
+- [Browser Use CLI](https://docs.browser-use.com/open-source/browser-use-cli.md): Direct browser control for coding agents.
+- [Browser Use Terminal](https://docs.browser-use.com/open-source/browser-use-terminal.md): Use the terminal app for browser agents, or use the same runtime from Python.
+- [Configuration](https://docs.browser-use.com/open-source/customize/agent/basics.md): Configure the agent — set your LLM, define tasks, add custom tools, and control behavior with Python.
+- [Prompting Guide](https://docs.browser-use.com/open-source/customize/agent/prompting-guide.md): Write effective prompts for the agent. Tips for task descriptions, multi-step workflows, and getting reliable structured output.
+- [Output Format](https://docs.browser-use.com/open-source/customize/agent/output-format.md): Control agent output — structured results, step history, action logs, and extracted content from browser automation tasks.
+- [All Parameters](https://docs.browser-use.com/open-source/customize/agent/all-parameters.md): Complete reference for all agent configuration options — LLM settings, prompts, tools, output format, and callbacks.
+- [Configuration](https://docs.browser-use.com/open-source/customize/browser/basics.md): Configure the browser instance — headless mode, viewport size, proxy settings, and Playwright launch options.
+- [Authentication](https://docs.browser-use.com/open-source/customize/browser/authentication.md): Log into websites using real browser profiles, saved storage state, and 2FA codes for authenticated automation.
+- [Real Browser](https://docs.browser-use.com/open-source/customize/browser/real-browser.md): Connect to your existing Chrome browser to preserve login sessions, cookies, and extensions for authenticated tasks.
+- [Remote Browser](https://docs.browser-use.com/open-source/customize/browser/remote.md): Connect to remote browsers via CDP — use with the Cloud, Browserbase, or any remote Chrome instance.
+- [All Parameters](https://docs.browser-use.com/open-source/customize/browser/all-parameters.md): Complete reference for all browser configuration options — launch args, proxy, viewport, user data, and CDP settings.
+- [Overview](https://docs.browser-use.com/open-source/customize/tools/basics.md): Learn about built-in browser actions and custom tools.
+- [Available Tools](https://docs.browser-use.com/open-source/customize/tools/available.md): Built-in tools — click, type, scroll, extract, navigate, and more. Full list of default agent actions.
+- [Add Tools](https://docs.browser-use.com/open-source/customize/tools/add.md): Extend agents with custom Python functions. Add API calls, file operations, or any custom logic as agent tools.
+- [Remove Tools](https://docs.browser-use.com/open-source/customize/tools/remove.md): Exclude default tools to restrict agent capabilities.
+- [Response Format](https://docs.browser-use.com/open-source/customize/tools/response.md): Customize how tools return data to the agent. Control response formatting, extraction, and content filtering.
+- [MCP Server](https://docs.browser-use.com/open-source/customize/integrations/mcp-server.md): Run browser-use as a local Model Context Protocol server. Connect AI models to browser automation through the MCP standard.
+- [Basics](https://docs.browser-use.com/open-source/legacy/actor/basics.md): Low-level Playwright-like browser automation with direct and full CDP control and precise element interactions
+- [Examples](https://docs.browser-use.com/open-source/legacy/actor/examples.md): Comprehensive examples for Browser Actor automation tasks including forms, JavaScript, mouse operations, and AI features
+- [All Parameters](https://docs.browser-use.com/open-source/legacy/actor/all-parameters.md): Complete API reference for Browser Actor classes, methods, and parameters including BrowserSession, Page, Element, and Mouse
+- [Quickstart](https://docs.browser-use.com/open-source/legacy/sandbox/quickstart.md): Run browser automation in the cloud
+- [Events](https://docs.browser-use.com/open-source/legacy/sandbox/events.md): Monitor execution with callbacks
+- [All Parameters](https://docs.browser-use.com/open-source/legacy/sandbox/all-parameters.md): Sandbox configuration reference
+- [Fast Agent](https://docs.browser-use.com/open-source/examples/templates/fast-agent.md): Optimize agent performance for maximum speed and efficiency.
+- [Follow up tasks](https://docs.browser-use.com/open-source/examples/templates/follow-up-tasks.md): Follow up tasks with the same browser session.
+- [Parallel Agents](https://docs.browser-use.com/open-source/examples/templates/parallel-browser.md): Run multiple agents in parallel with separate browser instances
+- [Playwright Integration](https://docs.browser-use.com/open-source/examples/templates/playwright-integration.md): Advanced example showing Playwright and Browser-Use working together
+- [Sensitive Data](https://docs.browser-use.com/open-source/examples/templates/sensitive-data.md): Handle secret information securely and avoid sending PII & passwords to the LLM.
+- [Secure Setup](https://docs.browser-use.com/open-source/examples/templates/secure.md): Azure OpenAI with data privacy and security configuration.
+- [More Examples](https://docs.browser-use.com/open-source/examples/templates/more-examples.md): Explore additional examples and use cases on GitHub.
+- [Ad-Use (Ad Generator)](https://docs.browser-use.com/open-source/examples/apps/ad-use.md): Generate Instagram image ads and TikTok video ads from landing pages using browser agents, Google's Nano Banana 🍌, and Veo3.
+- [Vibetest-Use (Automated QA)](https://docs.browser-use.com/open-source/examples/apps/vibetest-use.md): Run multi-agent Browser-Use tests to catch UI bugs, broken links, and accessibility issues before they ship.
+- [News-Use (News Monitor)](https://docs.browser-use.com/open-source/examples/apps/news-use.md): Monitor news websites and extract articles with sentiment analysis using browser agents and Google Gemini.
+- [Msg-Use (WhatsApp Sender)](https://docs.browser-use.com/open-source/examples/apps/msg-use.md): AI-powered WhatsApp message scheduler using browser agents and Gemini. Schedule personalized messages in natural language.
+- [Overview](https://docs.browser-use.com/open-source/examples/skills/overview.md): Install Browser Use as an agent skill. Drop browser automation, cloud, QA, and payments into Claude Code, Cursor, and any agent that supports SKILL.md.
+- [browser-use](https://docs.browser-use.com/open-source/examples/skills/browser-use.md): Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the agent needs to navigate websites, interact with web pages, fill forms, take screenshots, or extract information.
+- [cloud](https://docs.browser-use.com/open-source/examples/skills/cloud.md): Documentation reference for using Browser Use Cloud — the hosted API and SDK for browser automation.
+- [open-source](https://docs.browser-use.com/open-source/examples/skills/open-source.md): Documentation reference for writing Python code using the browser-use open-source library.
+- [qa](https://docs.browser-use.com/open-source/examples/skills/qa.md): QA-test a website or web app and return a 1–5 quality score (5 = flawless, 1 = broken) with evidence.
+- [remote-browser](https://docs.browser-use.com/open-source/examples/skills/remote-browser.md): Controls a local browser from a sandboxed remote machine. Use when the agent runs in a sandbox (no GUI) and needs to navigate, interact, screenshot, or expose local dev servers via tunnels.
+- [x402](https://docs.browser-use.com/open-source/examples/skills/x402.md): Set up Browser Use Cloud payments with x402 — pay per request from a crypto wallet (USDC on Base mainnet), no signup or API key.
+- [Local Development Setup](https://docs.browser-use.com/open-source/development/setup/local-setup.md): Set up for local development. Clone the repo, install dependencies, and run tests to start contributing.
+- [Contribution Guide](https://docs.browser-use.com/open-source/development/setup/contribution-guide.md): How to contribute — code standards, PR process, testing requirements, and submitting your first pull request.
+- [Lifecycle Hooks](https://docs.browser-use.com/open-source/customize/hooks.md): Hook into agent lifecycle events — before/after actions, navigation, extraction, and error handling callbacks.
+- [Observability](https://docs.browser-use.com/open-source/development/monitoring/observability.md): Trace agent execution steps and capture browser session recordings.
+- [OpenLIT](https://docs.browser-use.com/open-source/development/monitoring/openlit.md): Complete observability with OpenLIT tracing.
+- [Telemetry](https://docs.browser-use.com/open-source/development/monitoring/telemetry.md): Understanding Browser Use's telemetry
+- [Costs](https://docs.browser-use.com/open-source/development/monitoring/costs.md): Track token usage and API costs for your browser automation tasks
+- [Get Help](https://docs.browser-use.com/open-source/development/get-help.md): Get help — join 20k+ developers on Discord, search GitHub issues, or ask the community.
+
+## OpenAPI Specs
+
+- [v4](https://docs.browser-use.com/openapi/v4.json)
+- [v3](https://docs.browser-use.com/openapi/v3.json)
+- [v2](https://docs.browser-use.com/openapi/v2.json)

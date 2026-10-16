@@ -1,0 +1,264 @@
+$ /Users/raillyhugo/.nvm/versions/node/v24.18.0/bin/node /tmp/portless-review-424-fad78e9c/packages/portless/node_modules/vitest/vitest.mjs run --config /Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/test-strength/disposable/vitest.config.mjs --no-cache --maxWorkers 1 --reporter verbose src/hosts.test.ts src/cli.test.ts src/gaps.test.ts src/cli-gaps.test.ts -t 'hosts file mutation safety|blockMatchesHostnames|CLI hosts subcommand sync safety|review gap'
+CWD=/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/test-strength/disposable
+
+ RUN  v4.0.18 /Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/test-strength/disposable
+
+ ↓ src/cli.test.ts > CLI > --help > prints help and exits 0 with --help
+ ↓ src/cli.test.ts > CLI > --help > prints help and exits 0 with -h
+ ↓ src/cli.test.ts > CLI > --help > prints help and exits 0 with no args when no dev script exists
+ ↓ src/cli.test.ts > CLI > --version > prints version and exits 0 with --version
+ ↓ src/cli.test.ts > CLI > --version > prints version and exits 0 with -v
+ ↓ src/cli.test.ts > CLI > list > shows no active routes message when none registered
+ ↓ src/cli.test.ts > CLI > doctor > prints help with --help
+ ↓ src/cli.test.ts > CLI > doctor > reports a stopped proxy as a warning and exits 0
+ ↓ src/cli.test.ts > CLI > doctor > does not fail for a missing nested state directory with a writable ancestor
+ ↓ src/cli.test.ts > CLI > doctor > does not require OpenSSL when persisted proxy state is HTTP
+ ↓ src/cli.test.ts > CLI > doctor > does not require generated CA checks when proxy state uses a custom certificate
+ ↓ src/cli.test.ts > CLI > doctor > exits 1 when the proxy port is occupied by a non-portless process
+ ↓ src/cli.test.ts > CLI > doctor > warns when routes.json is corrupted
+ ↓ src/cli.test.ts > CLI > doctor > warns when a route has an invalid port instead of crashing
+ ↓ src/cli.test.ts > CLI > doctor > does not report an alive stale PID file as healthy
+ ↓ src/cli.test.ts > CLI > doctor > reports a responding proxy and registered route
+ ↓ src/cli.test.ts > CLI > doctor > does not bypass doctor when PORTLESS=0 is set
+ ↓ src/cli.test.ts > CLI > proxy > shows proxy usage hint for bare 'proxy' command
+ ↓ src/cli.test.ts > CLI > proxy > exits 1 for unknown proxy subcommand
+ ↓ src/cli.test.ts > CLI > service > prints service help
+ ↓ src/cli.test.ts > CLI > service > still dispatches service help when PORTLESS=0
+ ↓ src/cli.test.ts > CLI > error: no command provided > exits 1 when only a name is given without a command
+ ↓ src/cli.test.ts > CLI > PORTLESS=0 bypass > runs command directly when PORTLESS=0 is set
+ ↓ src/cli.test.ts > CLI > PORTLESS=0 bypass > runs command directly when PORTLESS=skip is set
+ ↓ src/cli.test.ts > CLI > PORTLESS=0 bypass > does not bypass proxy commands when PORTLESS=0 is set
+ ↓ src/cli.test.ts > CLI > PORTLESS=0 bypass > passes through exit code from bypassed command
+ ↓ src/cli.test.ts > CLI > PORTLESS=0 bypass with run subcommand > runs command directly in run mode
+ ↓ src/cli.test.ts > CLI > PORTLESS=0 bypass with run subcommand > strips --force but passes child --force through
+ ↓ src/cli.test.ts > CLI > PORTLESS=0 bypass with run subcommand > passes -- separator through to child command
+ ↓ src/cli.test.ts > CLI > --force positioning > accepts --force before name (PORTLESS=0)
+ ↓ src/cli.test.ts > CLI > --force positioning > accepts --force after name (PORTLESS=0)
+ ↓ src/cli.test.ts > CLI > --force positioning > does not strip child command --force (PORTLESS=0)
+ ↓ src/cli.test.ts > CLI > unknown flag detection > rejects unknown flags before command
+ ↓ src/cli.test.ts > CLI > invalid hostname > exits 1 for hostname with invalid characters
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > exits 1 with 'No command provided' when no args follow run and no dev script
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > does not dispatch 'list' as the global list command
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > does not print version for run --version
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > prints run-specific help for run --help
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > prints run-specific help for run -h
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > accepts global --lan before run
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > accepts global --lan in run options
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > does not consume global-looking flags after the run command starts
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > does not consume global-looking flags after a named command starts
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > accepts global --lan after leading named-mode options
+ ↓ src/cli.test.ts > CLI > run subcommand dispatch > does not consume global-looking flags after an explicit --name command starts
+ ↓ src/cli.test.ts > CLI > --app-port flag > passes --app-port through in bypass mode (PORTLESS=0)
+ ↓ src/cli.test.ts > CLI > --app-port flag > rejects invalid --app-port value
+ ↓ src/cli.test.ts > CLI > --app-port flag > rejects --app-port without a value
+ ↓ src/cli.test.ts > CLI > --app-port flag > accepts --app-port in named mode (PORTLESS=0)
+ ↓ src/cli.test.ts > CLI > alias subcommand > prints help with --help
+ ↓ src/cli.test.ts > CLI > alias subcommand > prints help with -h
+ ↓ src/cli.test.ts > CLI > alias subcommand > exits 1 with usage when no args given
+ ↓ src/cli.test.ts > CLI > alias subcommand > exits 1 with usage when only name is given
+ ↓ src/cli.test.ts > CLI > alias subcommand > exits 1 for invalid port
+ ↓ src/cli.test.ts > CLI > alias subcommand > exits 1 when --remove has no name
+ ↓ src/cli.test.ts > CLI > hosts subcommand > prints help with --help
+ ↓ src/cli.test.ts > CLI > hosts subcommand > prints help with -h
+ ↓ src/cli.test.ts > CLI > hosts subcommand > shows usage for bare 'hosts' without subcommand
+ ↓ src/cli.test.ts > CLI > hosts subcommand > rejects unknown hosts subcommand
+ ✓ src/cli.test.ts > CLI > hosts subcommand > sync safety > removes stale entries for an empty routes file without changing unrelated entries 51ms
+ ✓ src/cli.test.ts > CLI > hosts subcommand > sync safety > succeeds without writing when an empty routes file meets a readable empty hosts file 50ms
+ ✓ src/cli.test.ts > CLI > hosts subcommand > sync safety > uses the normal failure path without writing after an initial hosts read error 53ms
+ ✓ src/cli.test.ts > CLI > hosts subcommand > sync safety > uses the normal failure path when post-write verification cannot read 57ms
+ ✓ src/cli.test.ts > CLI > hosts subcommand > sync safety > retries a failed initial read through the existing sudo path 52ms
+ ✓ src/cli.test.ts > CLI > hosts subcommand > sync safety > uses the normal failure path for a cleanup read error 44ms
+ ↓ src/cli.test.ts > CLI > clean subcommand > prints help with --help
+ ↓ src/cli.test.ts > CLI > clean subcommand > prints help with -h
+ ↓ src/cli.test.ts > CLI > clean subcommand > rejects unknown arguments
+ ↓ src/cli.test.ts > CLI > clean subcommand > does not bypass when PORTLESS=0 is set
+ ↓ src/cli.test.ts > CLI > clean subcommand > does not bypass clean with extra args when PORTLESS=0
+ ↓ src/cli.test.ts > CLI > proxy subcommand > prints help with --help
+ ↓ src/cli.test.ts > CLI > proxy subcommand > prints help with -h
+ ↓ src/cli.test.ts > CLI > proxy subcommand > shows usage for bare 'proxy' without subcommand
+ ↓ src/cli.test.ts > CLI > proxy subcommand > exits 1 for unknown proxy subcommand
+ ↓ src/cli.test.ts > CLI > proxy subcommand > warns when a running proxy uses a different explicit config
+ ↓ src/cli.test.ts > CLI > persisted LAN marker > reuses persisted LAN mode when starting the proxy again
+ ↓ src/cli.test.ts > CLI > persisted LAN marker > PORTLESS_LAN=0 overrides the LAN marker on a fresh start
+ ↓ src/cli.test.ts > CLI > LAN mode > warns when --lan and --tld are both provided
+ ↓ src/cli.test.ts > CLI > LAN mode > fails early when the mDNS publisher binary is missing
+ ↓ src/cli.test.ts > CLI > LAN mode > propagates the LAN marker into expo child commands
+ ↓ src/cli.test.ts > CLI > LAN mode > checks a custom local TLD when no LAN marker exists
+ ↓ src/cli.test.ts > CLI > LAN mode > leaves Expo --lan in the child command without enabling portless LAN mode
+ ↓ src/cli.test.ts > CLI > LAN mode > leaves --ip in the child command after the command boundary
+ ↓ src/cli.test.ts > CLI > Rsbuild flag injection > injects --port and --host into rsbuild child commands
+ ↓ src/cli.test.ts > CLI > Rsbuild flag injection > registers one app route per configured TLD
+ ↓ src/cli.test.ts > CLI > NODE_EXTRA_CA_CERTS injection > sets NODE_EXTRA_CA_CERTS when TLS is active and ca.pem exists
+ ↓ src/cli.test.ts > CLI > NODE_EXTRA_CA_CERTS injection > does not set NODE_EXTRA_CA_CERTS when TLS is disabled
+ ↓ src/cli.test.ts > CLI > NODE_EXTRA_CA_CERTS injection > does not set NODE_EXTRA_CA_CERTS when ca.pem is missing
+ ↓ src/cli.test.ts > CLI > NODE_EXTRA_CA_CERTS injection > does not override user-set NODE_EXTRA_CA_CERTS
+ ↓ src/cli.test.ts > CLI > get subcommand > prints help with --help
+ ↓ src/cli.test.ts > CLI > get subcommand > prints help with -h
+ ↓ src/cli.test.ts > CLI > get subcommand > exits 1 with usage when no name given
+ ↓ src/cli.test.ts > CLI > get subcommand > prints URL for a given service name
+ ↓ src/cli.test.ts > CLI > get subcommand > prints URL for a dotted service name
+ ↓ src/cli.test.ts > CLI > get subcommand > rejects unknown flags
+ ↓ src/cli.test.ts > CLI > get subcommand > accepts --no-worktree flag
+ ↓ src/cli.test.ts > CLI > get subcommand > exits 1 for invalid hostname
+ ↓ src/cli.test.ts > CLI > --name flag > treats reserved word as app name with PORTLESS=0
+ ↓ src/cli.test.ts > CLI > --name flag > passes --force through with --name (PORTLESS=0)
+ ↓ src/cli.test.ts > CLI > --name flag > exits 1 when --name has no value
+ ↓ src/cli.test.ts > CLI > --name flag > exits 1 when --name has name but no command
+ ↓ src/cli.test.ts > CLI > run --name flag > shows --name in run help
+ ↓ src/cli.test.ts > CLI > run --name flag > strips --name and passes command through (PORTLESS=0)
+ ↓ src/cli.test.ts > CLI > run --name flag > exits 1 when --name has no value
+ ↓ src/cli.test.ts > CLI > run --name flag > exits 1 when --name value looks like a flag
+ ↓ src/cli.test.ts > CLI > run --name flag > combines --name with --force (PORTLESS=0)
+ ↓ src/cli.test.ts > CLI > run --name flag > does not consume --name after -- separator (PORTLESS=0)
+ ↓ src/cli.test.ts > CLI > proxy start/stop lifecycle > starts the proxy and stops it cleanly
+ ↓ src/cli.test.ts > CLI > proxy start/stop lifecycle > accepts connections on IPv6 loopback when available
+ ↓ src/cli.test.ts > CLI > proxy start/stop lifecycle > reports not running when stopped twice
+ ↓ src/cli.test.ts > CLI > proxy start/stop lifecycle > detects an already-running proxy on start
+ ↓ src/cli.test.ts > CLI > proxy start/stop lifecycle > stops proxy using explicit -p flag instead of env var
+ ↓ src/cli.test.ts > CLI > HTTPS proxy with broken security binary (#228) > starts HTTPS proxy when security commands fail
+ ↓ src/cli.test.ts > CLI > portless.json config > portless (no args) runs dev script without portless.json
+ ↓ src/cli.test.ts > CLI > portless.json config > omits HOST for an expo package script in LAN mode
+ ↓ src/cli.test.ts > CLI > portless.json config > omits HOST for an expo script it declines to append to
+ ↓ src/cli.test.ts > CLI > portless.json config > portless (no args) forwards Vite port flags through bun run dev
+ ↓ src/cli.test.ts > CLI > portless.json config > portless run <pm> run <script> forwards Vite port flags (explicit delegation)
+ ↓ src/cli.test.ts > CLI > portless.json config > does not forward flags when the script already sets --port
+ ↓ src/cli.test.ts > CLI > portless.json config > does not forward flags for non-framework scripts
+ ↓ src/cli.test.ts > CLI > portless.json config > portless run (no command) with portless.json resolves dev script
+ ↓ src/cli.test.ts > CLI > portless.json config > portless run (no command) without portless.json resolves dev script
+ ↓ src/cli.test.ts > CLI > portless.json config > portless run with explicit command ignores config script
+ ↓ src/cli.test.ts > CLI > portless.json config > portless run with portless.json script field uses that script
+ ↓ src/cli.test.ts > CLI > portless.json config > --script flag overrides config script field
+ ↓ src/cli.test.ts > CLI > portless.json config > --name overrides portless.json name
+ ↓ src/cli.test.ts > CLI > portless.json config > portless run with missing script errors clearly
+ ↓ src/cli.test.ts > CLI > portless.json config > portless.json validation rejects invalid appPort
+ ↓ src/cli.test.ts > CLI > --tailscale flag > shows --tailscale in help output
+ ↓ src/cli.test.ts > CLI > --tailscale flag > fails with actionable message when tailscale is not installed
+ ↓ src/cli.test.ts > CLI > --tailscale flag > fails with --funnel when tailscale is not installed
+ ↓ src/cli.test.ts > CLI > --tailscale flag > accepts PORTLESS_TAILSCALE=1 env var
+ ↓ src/cli.test.ts > CLI > --tailscale flag > accepts --tailscale after app name
+ ↓ src/cli.test.ts > CLI > --tailscale flag > accepts --tailscale in run subcommand
+ ↓ src/cli.test.ts > CLI > --ngrok flag > shows --ngrok in help output
+ ↓ src/cli.test.ts > CLI > --ngrok flag > fails with actionable message when ngrok is not installed
+ ↓ src/cli.test.ts > CLI > --ngrok flag > accepts PORTLESS_NGROK=1 env var
+ ↓ src/cli.test.ts > CLI > --ngrok flag > accepts --ngrok after app name
+ ↓ src/cli.test.ts > CLI > --ngrok flag > accepts --ngrok in run subcommand
+ ↓ src/cli.test.ts > CLI > multi-app worktree routing (issue #269) > prefixes every app hostname with the worktree branch
+ ↓ src/hosts.test.ts > extractManagedBlock > returns empty array when no markers exist
+ ↓ src/hosts.test.ts > extractManagedBlock > returns empty array when only start marker exists
+ ↓ src/hosts.test.ts > extractManagedBlock > returns empty array when only end marker exists
+ ↓ src/hosts.test.ts > extractManagedBlock > returns empty array when end marker comes before start marker
+ ↓ src/hosts.test.ts > extractManagedBlock > extracts lines between markers
+ ↓ src/hosts.test.ts > extractManagedBlock > trims whitespace from extracted lines
+ ↓ src/hosts.test.ts > extractManagedBlock > filters out empty lines
+ ↓ src/hosts.test.ts > extractManagedBlock > returns empty array when block is empty
+ ↓ src/hosts.test.ts > removeBlock > returns content unchanged when no markers exist
+ ↓ src/hosts.test.ts > removeBlock > removes the managed block and normalizes newlines
+ ↓ src/hosts.test.ts > removeBlock > does not leave more than 2 consecutive newlines
+ ↓ src/hosts.test.ts > removeBlock > preserves content before and after the block
+ ↓ src/hosts.test.ts > buildBlock > returns empty string for empty hostnames array
+ ↓ src/hosts.test.ts > buildBlock > builds a single-entry block with markers
+ ↓ src/hosts.test.ts > buildBlock > builds a multi-entry block
+ ↓ src/hosts.test.ts > buildBlock > produces a block that extractManagedBlock can parse
+ ↓ src/hosts.test.ts > shouldAutoSyncHosts > returns true when unset
+ ↓ src/hosts.test.ts > shouldAutoSyncHosts > returns false for 0 and false
+ ↓ src/hosts.test.ts > shouldAutoSyncHosts > returns true for 1 and true
+ ↓ src/hosts.test.ts > shouldAutoSyncHosts > returns true for other non-empty values
+ ↓ src/hosts.test.ts > checkHostResolution > accepts localhost through either loopback family
+ ↓ src/hosts.test.ts > checkHostResolution > accepts IPv4 loopback
+ ↓ src/hosts.test.ts > checkHostResolution > accepts IPv6 loopback
+ ↓ src/hosts.test.ts > checkHostResolution > rejects non-loopback IPv4
+ ↓ src/hosts.test.ts > checkHostResolution > rejects non-loopback IPv6
+ ↓ src/hosts.test.ts > checkHostResolution > returns false for a nonexistent domain
+ ✓ src/hosts.test.ts > blockMatchesHostnames > is true only when the block is exactly the wanted set 1ms
+ ✓ src/hosts.test.ts > blockMatchesHostnames > is false when a hostname is missing 0ms
+ ✓ src/hosts.test.ts > blockMatchesHostnames > is false when the block carries a hostname that is no longer wanted 0ms
+ ✓ src/hosts.test.ts > blockMatchesHostnames > is false when an extra hostname shares a wanted line 0ms
+ ✓ src/hosts.test.ts > blockMatchesHostnames > ignores inline comments after all hostname aliases 0ms
+ ✓ src/hosts.test.ts > blockMatchesHostnames > is false when a wanted hostname maps to another address 0ms
+ ✓ src/hosts.test.ts > blockMatchesHostnames > is false on a duplicate entry, which is not what a sync would write 0ms
+ ✓ src/hosts.test.ts > blockMatchesHostnames > ignores entries outside the managed block 0ms
+ ✓ src/hosts.test.ts > blockMatchesHostnames > treats no hostnames as satisfied only when no block remains 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > does not write when the initial read fails before a populated sync 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > does not write when the initial read fails before an empty sync 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > does not write when the initial read fails before cleanup 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > returns false when verification cannot read a populated sync 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > returns false when verification cannot read a empty sync 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > returns false when the hosts write fails 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > returns false when a successful write does not produce the requested block 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > treats a readable empty file as an already synchronized empty set 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > does not rewrite an exact matching block 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > removes stale entries while preserving entries before and after the block 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > writes and verifies a replacement block without changing unrelated entries 0ms
+ ✓ src/hosts.test.ts > hosts file mutation safety > keeps getManagedHostnames best-effort on read failure 0ms
+ ✓ src/cli-gaps.test.ts > review gap CLI > passes populated routes to the real writer instead of an empty list 59ms
+ ✓ src/cli-gaps.test.ts > review gap CLI > returns failure when the stubbed sudo retry fails 52ms
+ ✓ src/gaps.test.ts > review gap helper > rejects empty sync when a successful write leaves readable stale entries 1ms
+ × src/gaps.test.ts > review gap helper > cleanup succeeds without a write when no block exists 2ms
+   → expected false to be true // Object.is equality
+ × src/gaps.test.ts > review gap helper > cleanup removes stale entries and preserves unrelated records 0ms
+   → expected false to be true // Object.is equality
+ × src/gaps.test.ts > review gap helper > cleanup reports write failure 0ms
+   → expected "vi.fn()" to be called 1 times, but got 0 times
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  3 failed | 30 passed | 160 skipped (193)
+   Start at  15:56:36
+   Duration  776ms (transform 64ms, setup 0ms, import 105ms, tests 426ms, environment 0ms)
+
+
+STDERR:
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/gaps.test.ts > review gap helper > cleanup succeeds without a write when no block exists
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/gaps.test.ts:26:30
+     24|   it("cleanup succeeds without a write when no block exists", () => {
+     25|     vi.mocked(readFileSync).mockReturnValue(before + after);
+     26|     expect(cleanHostsFile()).toBe(true);
+       |                              ^
+     27|     expect(writeFileSync).not.toHaveBeenCalled();
+     28|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/gaps.test.ts > review gap helper > cleanup removes stale entries and preserves unrelated records
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/gaps.test.ts:32:30
+     30|   it("cleanup removes stale entries and preserves unrelated records", …
+     31|     vi.mocked(readFileSync).mockReturnValue(stale);
+     32|     expect(cleanHostsFile()).toBe(true);
+       |                              ^
+     33|     expect(writeFileSync).toHaveBeenCalledTimes(1);
+     34|     const written = String(vi.mocked(writeFileSync).mock.calls[0][1]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/gaps.test.ts > review gap helper > cleanup reports write failure
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ src/gaps.test.ts:45:27
+     43|     vi.mocked(writeFileSync).mockImplementation(() => { throw new Erro…
+     44|     expect(cleanHostsFile()).toBe(false);
+     45|     expect(writeFileSync).toHaveBeenCalledTimes(1);
+       |                           ^
+     46|   });
+     47| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+EXIT=1

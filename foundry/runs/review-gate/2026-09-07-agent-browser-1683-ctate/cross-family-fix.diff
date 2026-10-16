@@ -1,0 +1,191 @@
+diff --git a/cli/src/native/actions.rs b/cli/src/native/actions.rs
+index b69aba5..306f89e 100644
+--- a/cli/src/native/actions.rs
++++ b/cli/src/native/actions.rs
+@@ -3028,10 +3028,6 @@ pub async fn execute_command(cmd: &Value, state: &mut DaemonState) -> Value {
+             .browser
+             .as_ref()
+             .is_some_and(BrowserManager::is_isolated);
+-    if lifecycle_launched && isolated_launch && result.is_err() {
+-        let _ = rollback_failed_launch(state).await;
+-    }
+-
+     if result.is_ok() && should_validate_restore_after_action(action) {
+         validate_restore_if_pending(state).await;
+     }
+@@ -3104,7 +3100,7 @@ pub async fn execute_command(cmd: &Value, state: &mut DaemonState) -> Value {
+         } else if state
+             .browser
+             .as_ref()
+-            .is_some_and(|manager| manager.context_recreated())
++            .is_some_and(BrowserManager::has_unpersisted_isolated_context)
+             || !state.isolate_context
+         {
+             let _ = rollback_failed_launch(state).await;
+@@ -3306,7 +3302,14 @@ async fn commit_isolated_connection(state: &mut DaemonState) -> Result<(), Strin
+         .as_ref()
+         .is_some_and(BrowserManager::is_isolated)
+     {
+-        if let Some(error) = maybe_persist_tab_binding(state) {
++        let persist_error = maybe_persist_tab_binding(state).or_else(|| {
++            state
++                .browser
++                .as_ref()
++                .is_some_and(BrowserManager::has_unpersisted_isolated_context)
++                .then(|| "isolated context has no persistable target".to_string())
++        });
++        if let Some(error) = persist_error {
+             let _ = rollback_failed_launch(state).await;
+             return Err(format!(
+                 "cannot persist the session isolation binding: {}",
+@@ -14240,6 +14243,76 @@ printf '%s' '{"protocol":"agent-browser.plugin.v1","success":true,"data":{}}'
+         assert_eq!(resp["data"]["url"], "https://example.com");
+     }
+ 
++    #[tokio::test]
++    #[ignore]
++    async fn test_isolation_commit_requires_a_durable_context_without_a_target() {
++        let guard = EnvGuard::new(&[
++            "AGENT_BROWSER_SOCKET_DIR",
++            "XDG_RUNTIME_DIR",
++            "AGENT_BROWSER_SESSION",
++            "AGENT_BROWSER_ISOLATE_CONTEXT",
++        ]);
++        let dir = tempfile::tempdir().unwrap();
++        guard.set("AGENT_BROWSER_SOCKET_DIR", dir.path().to_str().unwrap());
++        guard.remove("XDG_RUNTIME_DIR");
++        guard.set("AGENT_BROWSER_SESSION", "isolation-missing-target");
++        guard.remove("AGENT_BROWSER_ISOLATE_CONTEXT");
++        let mut host = BrowserManager::launch(LaunchOptions::default(), None)
++            .await
++            .unwrap();
++        for persisted in [false, true] {
++            let mut state = DaemonState::new();
++            let manager = BrowserManager::connect_cdp_isolated(host.get_cdp_url(), None)
++                .await
++                .unwrap();
++            let (target, _) = manager.binding_snapshot().unwrap();
++            state.browser = Some(manager);
++            state.subscribe_to_browser_events();
++            if persisted {
++                commit_isolated_connection(&mut state).await.unwrap();
++            }
++            host.client
++                .send_command(
++                    "Target.closeTarget",
++                    Some(json!({"targetId": target})),
++                    None,
++                )
++                .await
++                .unwrap();
++            tokio::time::timeout(std::time::Duration::from_secs(5), async {
++                loop {
++                    state.drain_cdp_events_background().await.unwrap();
++                    if state.browser.as_ref().unwrap().binding_snapshot().is_none() {
++                        break;
++                    }
++                    tokio::time::sleep(std::time::Duration::from_millis(10)).await;
++                }
++            })
++            .await
++            .unwrap();
++            let result = commit_isolated_connection(&mut state).await;
++            if persisted {
++                assert!(result.is_ok(), "{result:?}");
++                assert!(state.isolate_context);
++                assert!(state.browser.is_some());
++                assert!(DaemonState::new().isolate_context);
++                close_current_browser(&mut state).await.unwrap();
++            } else {
++                assert!(result.is_err(), "{result:?}");
++                assert!(!state.isolate_context);
++                assert!(state.browser.is_none());
++                assert!(tab_binding::load(&state.session_id).unwrap().is_none());
++                let contexts = host
++                    .client
++                    .send_command_no_params("Target.getBrowserContexts", None)
++                    .await
++                    .unwrap();
++                assert!(contexts["browserContextIds"].as_array().unwrap().is_empty());
++            }
++        }
++        host.close().await.unwrap();
++    }
++
+     #[tokio::test]
+     async fn test_isolation_invalid_launch_does_not_change_sticky_state() {
+         let guard = EnvGuard::new(&["AGENT_BROWSER_ISOLATE_CONTEXT"]);
+diff --git a/cli/src/native/browser.rs b/cli/src/native/browser.rs
+index 5ae9eec..930acc6 100644
+--- a/cli/src/native/browser.rs
++++ b/cli/src/native/browser.rs
+@@ -1502,6 +1502,10 @@ impl BrowserManager {
+         self.isolated_context_unpersisted = false;
+     }
+ 
++    pub fn has_unpersisted_isolated_context(&self) -> bool {
++        self.isolated_context_unpersisted
++    }
++
+     pub async fn dispose_unpersisted_isolated_context(&mut self) -> Result<(), String> {
+         if !self.isolated_context_unpersisted {
+             return Ok(());
+diff --git a/cli/src/native/e2e_tests.rs b/cli/src/native/e2e_tests.rs
+index ea337de..53e1b9a 100644
+--- a/cli/src/native/e2e_tests.rs
++++ b/cli/src/native/e2e_tests.rs
+@@ -10597,6 +10597,18 @@ async fn e2e_isolated_context_recreates_after_chrome_restart_and_restores_state(
+         .and_then(|mgr| mgr.isolated_context_id())
+         .unwrap();
+     assert_ne!(new_context, old_context);
++    let new_context = new_context.to_string();
++    let resp = execute_command(
++        &json!({"id": "invalid-after-recreation", "action": "launch", "isolateContext": true}),
++        &mut recreated,
++    )
++    .await;
++    assert_eq!(resp["success"], false, "{resp}");
++    assert!(recreated.browser.is_some(), "{resp}");
++    assert_eq!(
++        recreated.browser.as_ref().unwrap().isolated_context_id(),
++        Some(new_context.as_str())
++    );
+ 
+     let resp = execute_command(
+         &json!({ "id": "nav-restored", "action": "navigate", "url": base_url }),
+@@ -10705,6 +10717,35 @@ async fn e2e_isolation_pinned_transition_and_implicit_validation() {
+         Some(context.as_str())
+     );
+     assert!(DaemonState::new().isolate_context);
++    let binding = super::tab_binding::load(&implicit.session_id)
++        .unwrap()
++        .unwrap();
++    close_current_browser(&mut implicit).await.unwrap();
++    let response = execute_command(
++        &json!({"id": "reconnected-invalid-action", "action": "navigate"}),
++        &mut implicit,
++    )
++    .await;
++    assert_eq!(response["success"], false, "{response}");
++    assert!(implicit.browser.is_some(), "{response}");
++    assert!(implicit.isolate_context);
++    assert_eq!(
++        implicit.browser.as_ref().unwrap().isolated_context_id(),
++        Some(context.as_str())
++    );
++    assert_eq!(
++        super::tab_binding::load(&implicit.session_id)
++            .unwrap()
++            .unwrap(),
++        binding
++    );
++    assert_success(
++        &execute_command(
++            &json!({"id": "after-error", "action": "url"}),
++            &mut implicit,
++        )
++        .await,
++    );
+     assert_success(
+         &execute_command(&json!({"id": "close", "action": "close"}), &mut implicit).await,
+     );

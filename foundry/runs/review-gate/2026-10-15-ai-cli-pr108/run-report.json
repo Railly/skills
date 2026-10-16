@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "run": { "date": "2026-10-15", "repo": "vercel-labs/ai-cli", "base": "origin/main", "head": "7359a87", "profile": "standard", "skill_revision": "git:8d38570", "status": "complete", "verdict": "pass", "gaps": [] },
+  "execution": { "mode": "native_subagent", "degraded_from": "fx_worker", "independence_gap": "FX wrapper keychain item 'Vercel AI Gateway' absent; reviewer was a Claude Sonnet subagent, same family as the author", "receipt": null, "schema_failures": 0,
+    "operations": [ { "operation": "independent review", "attempted_calls": 2, "schema_failures": 0, "identical_retry": false } ] },
+  "contract": { "path": "https://github.com/vercel-labs/ai-cli/pull/108", "spec_status": "not_applicable", "acceptance_reviewed": [], "gaps": [] },
+  "provenance": { "author_model": "claude-opus-5.5", "reviewer_model": "claude-sonnet-5.5", "same_family": true },
+  "risk": { "level": "standard", "triggers": ["dependency upgrade changing gateway wire format", "new CLI input flag"], "independent_challenge": { "required": false, "satisfied": true, "method": "native_subagent_review", "artifact": "prompt.md", "evidence": "Subagent read SDK dist sources and ran tests; no P0-P2, four P3 handled." } },
+  "claim_inventory": [
+    { "source": "contract", "location": "PR #108 body", "status": "reviewed", "properties": ["P1","P2"], "evidence": "Problem and change bullets." },
+    { "source": "design", "location": "PR #108 body", "status": "reviewed", "properties": ["P1"], "evidence": "Images as file parts after stdin." },
+    { "source": "user_facing", "location": "README, decide.mdx, commands.mdx, SKILL.md, CHANGELOG", "status": "reviewed", "properties": ["P1","P2","P3"], "evidence": "URL claim narrowed to public URLs after review." },
+    { "source": "implementation", "location": "decide.ts, evaluation.ts", "status": "reviewed", "properties": ["P1","P2","P3"], "evidence": "decisionState builds ordered parts." }
+  ],
+  "properties": [
+    { "id": "P1", "claim": "Jev judges image content passed with --images", "kind": "behavior", "status": "verified",
+      "oracle": { "observes": "Jev probability for a red vs blue image", "layer": "live gateway", "method": "built CLI against typesafe-ai/jev", "proxy_only": false },
+      "proxy_challenge": { "proxy": "request body contains a file part", "counterexample": "file part sent but ignored by the model", "attempted": true, "outcome": "separated", "evidence": "red P=1, blue P=0 for PNG, JPEG and URLs" },
+      "substrates": [ { "name": "built CLI + live gateway", "status": "exercised", "evidence": "1024px PNG/JPEG, two ordered images, public URLs" } ],
+      "evidence": "Live runs on 2026-10-15." },
+    { "id": "P2", "claim": "Existing text and JSON decide behavior is unchanged", "kind": "regression", "status": "verified",
+      "oracle": { "observes": "answers for text and JSON array state", "layer": "live gateway + CLI tests", "method": "text P=0.99, JSON array P=0.97; result keys compared to 7.0.123", "proxy_only": false },
+      "proxy_challenge": { "proxy": "tests pass", "counterexample": "array read as state parts", "attempted": true, "outcome": "separated", "evidence": "array wrapped as json part, asserted in tests and live" },
+      "substrates": [ { "name": "built CLI + live gateway", "status": "exercised", "evidence": "text and JSON array runs" } ],
+      "evidence": "Reviewer diffed SDK result shape across versions." },
+    { "id": "P3", "claim": "Blank stdin is ignored when images are given", "kind": "input", "status": "verified",
+      "oracle": { "observes": "stateParts and exit code", "layer": "CLI test + live", "method": "force-red against prior decide.ts", "proxy_only": false },
+      "proxy_challenge": { "proxy": "empty-string test", "counterexample": "newline-only stdin", "attempted": true, "outcome": "separated", "evidence": "old code failed the \\n case; fix passes; live echo | run P=1" },
+      "substrates": [ { "name": "vitest + live gateway", "status": "exercised", "evidence": "d9070b1" } ],
+      "evidence": "Found by this gate, fixed in d9070b1." }
+  ],
+  "stage_receipts": {
+    "test_strength": { "required": false, "status": "not_triggered", "reason": "standard profile; no lifecycle or state-machine contract" },
+    "resilience": { "required": false, "status": "not_triggered", "reason": "no durable commit points; single stateless request" }
+  },
+  "assumptions": [ { "id": "A1", "source": "SDK", "claim": "SDK downloads URL images and resolves media type", "status": "verified", "evidence": "Public URLs worked live; reviewer confirmed private hosts are rejected by the SDK guard" } ],
+  "lenses": [
+    { "name": "contract-drift", "status": "run", "reason": "" },
+    { "name": "docs-claims", "status": "run", "reason": "" },
+    { "name": "dependency-upgrade", "status": "run", "reason": "" },
+    { "name": "security", "status": "skipped", "reason": "local CLI; URL fetch is user-supplied and guarded by the SDK; no auth or secrets touched" }
+  ],
+  "deterministic": [
+    { "check": "style", "outcome": "pass", "reason": "" },
+    { "check": "surfaces", "outcome": "finding-fixed", "reason": "cli.test.ts flag inventory now lists --images; docs-site routing surfaces unaffected because no pages were added or renamed" },
+    { "check": "timings", "outcome": "pass", "reason": "" },
+    { "check": "typecheck/lint/format/test", "outcome": "pass", "reason": "308 + 20 tests" }
+  ],
+  "findings": [
+    { "id": "F1", "state": "confirmed", "claim": "Blank stdin plus images errored", "evidence": "echo | ai decide -i x failed live", "layer": "CLI input", "source": "lens", "path": "packages/ai-cli/src/commands/decide.ts", "resolution": "fixed" },
+    { "id": "F2", "state": "confirmed", "claim": "Flag inventory test missed --images", "evidence": "gate surfaces", "layer": "test", "source": "gate", "path": "packages/ai-cli/src/cli.test.ts", "resolution": "fixed" },
+    { "id": "F3", "state": "confirmed", "claim": "Docs claimed all http(s) URLs work; SDK rejects localhost and private hosts", "evidence": "reviewer ran -i http://localhost:1/a.png", "layer": "docs", "source": "lens", "path": "apps/web/docs/decide.mdx", "resolution": "fixed" },
+    { "id": "F4", "state": "confirmed", "claim": "Order, JSON+image and data URL paths untested", "evidence": "reviewer", "layer": "test", "source": "lens", "path": "packages/ai-cli/src/commands/decide.test.ts", "resolution": "fixed" },
+    { "id": "F5", "state": "confirmed", "claim": "Gateway endpoint moved to /decision-model; custom proxies on the old path break", "evidence": "gateway 4.0.101 vs 4.0.112 sources", "layer": "release notes", "source": "lens", "path": "CHANGELOG.md", "resolution": "fixed" }
+  ],
+  "exemptions": [
+    { "claim": "Undetectable image formats such as SVG are sent with mediaType 'image'", "evidence": "server rejects them cleanly; PNG/JPEG/WebP resolve; acceptable for this PR" },
+    { "claim": "Images-only call with a never-closing stdin waits for EOF", "evidence": "pre-existing readStdin behavior for decide" }
+  ],
+  "issue_candidates": [
+    { "title": "Gateway reports Jev 'Invalid image dimensions' as generic 'invalid request body'", "evidence": "providerAttempts error in live response", "why_out_of_scope": "gateway service behavior, not ai-cli" }
+  ]
+}

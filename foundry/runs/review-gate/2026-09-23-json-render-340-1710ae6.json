@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-23",
+    "repo": "vercel-labs/json-render",
+    "base": "fdb8982792fa05332a6846c9d00df0edeb9d7685",
+    "head": "1710ae6a07babfa23be54e12fb5931a2dd6c4e28",
+    "profile": "mechanical",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "single_context",
+    "degraded_from": null,
+    "independence_gap": "Focused mechanical review by implementing agent; no independent review claimed. Existing migration was approved by ctate; new remote checks remain required.",
+    "schema_failures": 1,
+    "operations": [
+      {
+        "operation": "fixture and merge parity review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "validate review receipt",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/missions/vercel-labs-json-render/340-maintenance.md",
+    "spec_status": "not_required",
+    "acceptance_reviewed": [
+      "A1",
+      "A2"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-6",
+    "reviewer_model": "GPT-6",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": false,
+      "method": "not_required",
+      "evidence": "Three content hashes only; main merge preserved approved upstream implementation byte-for-byte."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/missions/vercel-labs-json-render/340-maintenance.md",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "The migration must continue serving the current upstream core API source and equivalent Markdown."
+    },
+    {
+      "source": "design",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/missions/vercel-labs-json-render/340-maintenance.md",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "The migration must continue serving the current upstream core API source and equivalent Markdown."
+    },
+    {
+      "source": "user_facing",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/missions/vercel-labs-json-render/340-maintenance.md",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "The migration must continue serving the current upstream core API source and equivalent Markdown."
+    },
+    {
+      "source": "implementation",
+      "location": "apps/web/tests/fixtures/docs-baseline.json",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "The migration must continue serving the current upstream core API source and equivalent Markdown."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Core API fixture describes the exact current main content after its move to the content collection.",
+      "kind": "content_parity",
+      "status": "verified",
+      "oracle": {
+        "observes": "Source bytes and HTTP HTML/Markdown on the built production application",
+        "layer": "upstream source and built HTTP boundary",
+        "method": "Compare reconstructed MDX byte-for-byte with origin/main, calculate source/body/Markdown hashes, and run 122 HTTP tests.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Git reports a successful automatic merge",
+        "counterexample": "The renamed page merges correctly while parity hashes still describe the older core API page.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Inspected stale hashes, verified exact new source against main, and verified rendered Markdown with the updated fixture."
+      },
+      "substrates": [
+        {
+          "name": "Next.js production build",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/json-render-geistdocs-qa/pr340-merge-20260923/web-build.log: all 122 HTTP tests passed."
+        }
+      ],
+      "evidence": "Core packages and skills equal origin/main; only fixture hashes authored beyond automatic merge. 148 focused tests and all 60 type-check tasks pass."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "Maintenance changes only baseline hashes for already-approved upstream documentation; no runtime or test logic changed."
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "No new side effects, lifecycle, persistence or failure-path behavior."
+    }
+  },
+  "assumptions": [],
+  "lenses": [
+    {
+      "name": "Inverse regression surface (promoted)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "New-domain matrix (promoted)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers (promoted)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Shell re-parse append domain (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Shim hermeticity (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Deliberate-default check (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Fresh-seam scan (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Substrate differential corpus (promoted)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Reference-implementation oracle (candidate)",
+      "status": "run",
+      "reason": "Verified source parity against main and the built application through 122 HTTP tests."
+    },
+    {
+      "name": "New-failure-outcome propagation (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Error-path forcing (promoted)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Non-destructive recovery (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Cancellation and timeout hygiene (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Boundary pipeline trace (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Substrate verification (promoted)",
+      "status": "run",
+      "reason": "Verified source parity against main and the built application through 122 HTTP tests."
+    },
+    {
+      "name": "Dogfood the built artifact (candidate)",
+      "status": "run",
+      "reason": "Verified source parity against main and the built application through 122 HTTP tests."
+    },
+    {
+      "name": "Newly-asserted invariant ownership (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Docs-behavior parity (candidate)",
+      "status": "run",
+      "reason": "Verified source parity against main and the built application through 122 HTTP tests."
+    },
+    {
+      "name": "Demonstrative example (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Choice audit (candidate, needs a decision trail to fire)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    },
+    {
+      "name": "Complexity budget (candidate)",
+      "status": "skipped",
+      "reason": "Mechanical fixture-only follow-up; no new runtime logic or interface."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "No whitespace defects."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "Mechanical hash update."
+    },
+    {
+      "check": "main package parity",
+      "outcome": "pass",
+      "reason": "packages/core and skills/core equal origin/main."
+    },
+    {
+      "check": "docs production build and routes",
+      "outcome": "pass",
+      "reason": "122/122 route tests."
+    },
+    {
+      "check": "type-check",
+      "outcome": "pass",
+      "reason": "60/60 tasks."
+    },
+    {
+      "check": "focused core tests",
+      "outcome": "pass",
+      "reason": "148/148 tests."
+    },
+    {
+      "check": "frozen install",
+      "outcome": "pass",
+      "reason": "pnpm lockfile unchanged and frozen install passed."
+    }
+  ],
+  "findings": [],
+  "exemptions": [],
+  "issue_candidates": []
+}

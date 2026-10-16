@@ -1,0 +1,31 @@
+   Compiling agent-browser v0.36.0 (/Users/raillyhugo/Programming/vercel/agent-browser-1683/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.91s
+     Running unittests src/main.rs (cli/target/debug/deps/agent_browser-70383ef64e0f5fc2)
+
+running 2 tests
+test native::actions::tests::test_isolation_invalid_launch_does_not_change_sticky_state ... FAILED
+test native::actions::tests::test_isolation_skipped_command_does_not_commit_sticky_state ... FAILED
+
+failures:
+
+---- native::actions::tests::test_isolation_invalid_launch_does_not_change_sticky_state stdout ----
+
+thread 'native::actions::tests::test_isolation_invalid_launch_does_not_change_sticky_state' (14311526) panicked at src/native/actions.rs:14193:17:
+assertion `left == right` failed: {"action":"launch","id":"invalid","isolateContext":true}: {"error":"--isolate-context requires --cdp, --auto-connect, or connect <port|url>","id":"invalid","success":false}
+  left: true
+ right: false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- native::actions::tests::test_isolation_skipped_command_does_not_commit_sticky_state stdout ----
+
+thread 'native::actions::tests::test_isolation_skipped_command_does_not_commit_sticky_state' (14311527) panicked at src/test_utils.rs:15:37:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+
+
+failures:
+    native::actions::tests::test_isolation_invalid_launch_does_not_change_sticky_state
+    native::actions::tests::test_isolation_skipped_command_does_not_commit_sticky_state
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 1368 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--bin agent-browser`

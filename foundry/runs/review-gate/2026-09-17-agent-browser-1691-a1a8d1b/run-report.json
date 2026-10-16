@@ -1,0 +1,739 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-17",
+    "repo": "vercel-labs/agent-browser",
+    "pr": 1691,
+    "base": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+    "head": "a1a8d1bda39a18a4d78d2ff40ad6b63452b2c6f9",
+    "profile": "external-pr",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "gaps": [
+      "No live Browser Use Cloud credential: hosted create/CDP/stop, billing, profile persistence, recording and repeated-stop semantics remain unverified.",
+      "A positive stop is covered by real HTTP adapter bytes, while caller retries are covered separately; successful stop through the complete CLI wire was not exercised.",
+      "Seven critical mutations were killed, but exhaustive per-partition parser/caller mutations, property generation and structured fuzz campaigns were not run.",
+      "Windows/filesystem-specific fault partitions, receipt deletion permission failure, post-attach provider state-load rollback and cancellation during stream status publication were not directly forced."
+    ],
+    "dirty_digest": "clean",
+    "changed_paths_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83"
+  },
+  "execution": {
+    "mode": "sequential_isolated",
+    "degraded_from": "fx_worker",
+    "independence_gap": "Claude CLI reviewed immutable supplied source in fresh contexts with tools disabled. It did not independently execute tests and overlaps one implementation family. Saved normative OpenAPI is the independent protocol oracle.",
+    "receipt": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-review-receipt.json",
+    "schema_failures": 0,
+    "operations": [
+      {
+        "operation": "scoped Claude CLI review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "Claude CLI amendment follow-up",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/reconciled-contract.md",
+    "amendment": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-shape-amendment.md",
+    "digest": "sha256:d443f9c1838337bc491baa5afc5e37b499a5af4dc4842adefed28c8d6b82ae1b",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5",
+      "R6",
+      "R7",
+      "R8",
+      "R9",
+      "R10",
+      "R11"
+    ],
+    "gaps": [
+      "No live Browser Use Cloud credential: hosted create/CDP/stop, billing, profile persistence, recording and repeated-stop semantics remain unverified.",
+      "A positive stop is covered by real HTTP adapter bytes, while caller retries are covered separately; successful stop through the complete CLI wire was not exercised."
+    ]
+  },
+  "provenance": {
+    "author_model": "Claude CLI implementation plus OpenAI parent corrections",
+    "reviewer_model": "claude-fable-5 in fresh isolated contexts",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "remote side effects",
+      "cancellation and state ownership",
+      "API credential handling"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "reference_oracle",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/browser-use-v4-openapi.json",
+      "evidence": "Normative Cloud API schema captured before fixes; separate Claude scoped/follow-up review found cancellation issues that were corrected and mutation-tested. This is not full cross-family runtime validation."
+    }
+  },
+  "security_review": {
+    "status": "pass",
+    "fingerprint": {
+      "repository": "vercel-labs/agent-browser",
+      "base_sha": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+      "head_sha": "a1a8d1bda39a18a4d78d2ff40ad6b63452b2c6f9",
+      "dirty_digest": "clean",
+      "changed_path_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+    },
+    "claim": {
+      "property": "API key is sent only in the fixed HTTPS provider header; changed lifecycle diagnostics and receipts do not echo the credential, CDP endpoint or hostile response body.",
+      "attacker": "untrusted network/page content without provider TLS identity; operator and Cloud provider already have key authority",
+      "scope": "changed Browser Use API/receipt/error boundaries"
+    },
+    "trust_model": {
+      "assets": [
+        "Browser Use API key",
+        "remote browser session with possible profile cookies",
+        "session recording and provider session ID"
+      ],
+      "principals": [
+        {
+          "name": "local operator/daemon",
+          "existing_authority": "sets and reads its own process environment and cloud credential"
+        },
+        {
+          "name": "Browser Use API",
+          "existing_authority": "authorized recipient of API key, creates remote browser and stores requested profile/recording"
+        },
+        {
+          "name": "browser page",
+          "existing_authority": "controls its own content, no changed path to provider environment"
+        },
+        {
+          "name": "network peer",
+          "existing_authority": "can fail or delay transport; lacks accepted API TLS certificate"
+        }
+      ],
+      "boundaries": [
+        "operator environment to daemon",
+        "daemon HTTPS to fixed Browser Use API host",
+        "provider response to CDP connection",
+        "remote page to browser automation"
+      ],
+      "entrypoints": [
+        "BROWSER_USE_API_KEY",
+        "BROWSER_USE_PROFILE_ID",
+        "BROWSER_USE_PROXY_COUNTRY",
+        "BROWSER_USE_ENABLE_RECORDING",
+        "HTTPS response body containing id and cdpUrl"
+      ],
+      "sinks": [
+        "API-key header to fixed HTTPS API endpoint",
+        "credential-free UUID recovery receipt",
+        "categorized lifecycle errors",
+        "CDP attachment without forwarding the API header"
+      ]
+    },
+    "observations": [
+      {
+        "id": "SEC-1",
+        "classification": "hardening",
+        "scope": "out_of_scope_hardening",
+        "confidence": "high",
+        "prerequisites": [
+          "operator configures Browser Use API key"
+        ],
+        "chain": {
+          "capability": "provider responses may contain unexpected or secret-shaped text",
+          "reachability": "response fields enter local diagnostics and receipt creation",
+          "control": "ID parsed as UUID; reflected credential UUID rejected; response bodies and raw CDP errors omitted",
+          "boundary": "returned text and local receipt cannot inherit API-key/CDP credential content through the changed error paths",
+          "impact": "reduces accidental disclosure without demonstrating a new attacker authority crossing"
+        },
+        "evidence": [
+          "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutations-restored-green.log",
+          "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutations-restored-green.log",
+          "providers.rs browser_use_client disables redirects and retains TLS validation; safe constant receipt body",
+          "actions.rs attach_provider_cdp replaces raw connector errors"
+        ]
+      }
+    ],
+    "verification": {
+      "authorized_scope": "isolated localhost fixtures with dummy key and read-only source review; no third-party account access",
+      "commands": [
+        "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; seven reversible production mutations; built CLI dogfood/continuity/idle proofs"
+      ],
+      "cleanup": "Temporary fixture sockets/Chrome processes cleaned up; no live credential in artifacts.",
+      "gaps": [],
+      "limits": [
+        "Changed-boundary source/fixture review only; no hosted penetration test, ACL confidentiality or power-loss durability assertion."
+      ]
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": []
+    },
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-a1a8d1b/security-review.json"
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/reconciled-contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "evidence": "R0-R11 require bounded lifecycle, retention and workflow continuity."
+    },
+    {
+      "source": "design",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-shape-amendment.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "evidence": "Amend contributor history; explicit ownership callback, bounded calls and manual receipt recovery."
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md; output.rs; provider MDX; commands.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "evidence": "Docs specify positive acknowledgment, deadlines and manual recovery with stale receipts allowed."
+    },
+    {
+      "source": "implementation",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-validated-diff.patch",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "evidence": "Source changes implement create/stop guards and both setup callers; tests observe network/filesystem/caller boundaries."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Provider create failure returns within the client deadline without holding the daemon indefinitely.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "wall time and subsequent close/idle daemon exit",
+        "layer": "built process and real socket",
+        "method": "stall actual CONNECT, run concurrent close and separate idle probe",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "authored timeout constant is correct",
+        "counterexample": "remove effective request timeout; body-stall test fails",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/dogfood.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/idle-proof.json"
+      },
+      "substrates": [
+        {
+          "name": "macOS localhost HTTP/CDP and built Rust CLI",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/dogfood.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/idle-proof.json"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/dogfood.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/idle-proof.json"
+    },
+    {
+      "id": "P2",
+      "claim": "Failed/canceled stop retains the same ID and pending ownership prevents replacement.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "daemon state and repeated command response",
+        "layer": "production cleanup caller",
+        "method": "cancel a real pending CONNECT and invoke same-ID close twice",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "first close reports an error",
+        "counterexample": "replace as_ref with take and observe missing ID",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutations-restored-green.log"
+      },
+      "substrates": [
+        {
+          "name": "macOS localhost HTTP/CDP and built Rust CLI",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutations-restored-green.log"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutations-restored-green.log"
+    },
+    {
+      "id": "P3",
+      "claim": "Known allocation is recorded in memory before waiting for the receipt; acknowledgment is required to clear it.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "allocated ID during blocked filesystem task and stop response matrix",
+        "layer": "HTTP/filesystem ownership boundary",
+        "method": "block receipt write after ID delivery; supply active/wrong ID acknowledgment",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "receipt helper test passes",
+        "counterexample": "omit ownership callback or stopped predicate and regressions fail",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/specialist-model.md"
+      },
+      "substrates": [
+        {
+          "name": "macOS localhost HTTP/CDP and built Rust CLI",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/specialist-model.md"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/specialist-model.md"
+    },
+    {
+      "id": "P4",
+      "claim": "Failed explicit and automatic setup restore configuration, and canceled cleanup clears local launch bookkeeping.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "filter, proxy credentials, scripts and launch fields after failure",
+        "layer": "daemon callers",
+        "method": "force missing key and blocked filesystem/CONNECT; inspect prior state",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "setup emits the correct failure string",
+        "counterexample": "remove rollback/reset code while preserving failure response",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md"
+      },
+      "substrates": [
+        {
+          "name": "macOS localhost HTTP/CDP and built Rust CLI",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutation-results.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md"
+    },
+    {
+      "id": "P5",
+      "claim": "Ordinary commands retain real Chrome state; closing an external attachment does not terminate its producer.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "target ID, DOM sentinel, URL and producer liveness",
+        "layer": "real Chrome and built CLI",
+        "method": "navigate, mutate DOM, compare target and detach",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "each command exits zero",
+        "counterexample": "fresh browser would return zero but lose sentinel/target; exercised continuity assertions",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/continuity-fixed.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-owned-continuity.log"
+      },
+      "substrates": [
+        {
+          "name": "macOS localhost HTTP/CDP and built Rust CLI",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/continuity-fixed.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-owned-continuity.log"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/continuity-fixed.json; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-owned-continuity.log"
+    },
+    {
+      "id": "P6",
+      "claim": "Hosted Cloud create/stop and advertised profile/recording behavior match the local contract.",
+      "kind": "lifecycle",
+      "status": "unverified",
+      "oracle": {
+        "observes": "live hosted browser/profile/billing state",
+        "layer": "Browser Use Cloud account",
+        "method": "requires Cloud credential",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "localhost API fixtures pass",
+        "counterexample": "hosted producer may vary while local fixtures stay green",
+        "attempted": false,
+        "outcome": "not_separated",
+        "evidence": "No Browser Use Cloud credential available; no hosted account observations."
+      },
+      "substrates": [
+        {
+          "name": "macOS localhost HTTP/CDP and built Rust CLI",
+          "status": "unavailable",
+          "evidence": "No Browser Use Cloud credential available; no hosted account observations."
+        }
+      ],
+      "evidence": "No Browser Use Cloud credential available; no hosted account observations."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "unavailable",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-a1a8d1b/test-strength.json",
+      "fingerprint": {
+        "head_sha": "a1a8d1bda39a18a4d78d2ff40ad6b63452b2c6f9",
+        "base_sha": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+        "dirty_digest": "clean",
+        "changed_paths_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83",
+        "contract_digest": "sha256:d443f9c1838337bc491baa5afc5e37b499a5af4dc4842adefed28c8d6b82ae1b",
+        "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; seven reversible production mutations; built CLI dogfood/continuity/idle proofs",
+        "environment_digest": "sha256:106d9fe5308898de1969757545a061b7cf3e6aee394cf5c3c7ba7f9350422aa8",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "README.md",
+          "cli/src/native/actions.rs",
+          "cli/src/native/providers.rs",
+          "cli/src/output.rs",
+          "docs/src/app/providers/browser-use/page.mdx",
+          "skill-data/core/references/commands.md"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "source_identity": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-source-identity.json"
+      },
+      "reason": "The specialist artifact exists with status incomplete; local critical proofs passed, but no full passing receipt is available. Missing exhaustive falsifier/property/fuzz and hosted producer coverage."
+    },
+    "resilience": {
+      "required": true,
+      "status": "unavailable",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-a1a8d1b/resilience.json",
+      "fingerprint": {
+        "head_sha": "a1a8d1bda39a18a4d78d2ff40ad6b63452b2c6f9",
+        "base_sha": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+        "dirty_digest": "clean",
+        "changed_paths_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83",
+        "contract_digest": "sha256:d443f9c1838337bc491baa5afc5e37b499a5af4dc4842adefed28c8d6b82ae1b",
+        "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; seven reversible production mutations; built CLI dogfood/continuity/idle proofs",
+        "environment_digest": "sha256:106d9fe5308898de1969757545a061b7cf3e6aee394cf5c3c7ba7f9350422aa8",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "README.md",
+          "cli/src/native/actions.rs",
+          "cli/src/native/providers.rs",
+          "cli/src/output.rs",
+          "docs/src/app/providers/browser-use/page.mdx",
+          "skill-data/core/references/commands.md"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "source_identity": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-source-identity.json"
+      },
+      "reason": "The specialist artifact exists with status incomplete; local critical proofs passed, but no full passing receipt is available. Hosted and remaining post-commit failure/retry partitions are unverified."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "AS1",
+      "source": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/browser-use-v4-openapi.json",
+      "claim": "V4 POST and PATCH field names and stopped acknowledgment schema are valid.",
+      "status": "verified",
+      "evidence": "Saved normative API schema plus real-byte local protocol tests."
+    },
+    {
+      "id": "AS2",
+      "source": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md",
+      "claim": "Both production Browser Use setup paths retain ownership before awaiting receipt/CDP work.",
+      "status": "verified",
+      "evidence": "Caller sweep, scoped/follow-up source review and omitted-callback/close-take mutations."
+    },
+    {
+      "id": "AS3",
+      "source": "Browser Use Cloud environment",
+      "claim": "Hosted lifecycle and profile/recording behavior matches documented schema under real credentials.",
+      "status": "unverified",
+      "evidence": "No live Browser Use Cloud credential: hosted create/CDP/stop, billing, profile persistence, recording and repeated-stop semantics remain unverified."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Triggered by endpoint acceptance, receipt recovery, new ownership callback or decision trail; reviewed in immutable Claude packets and final-review-disposition.md, with remaining verification limits explicit."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No changed discovery/precedence rule; the new env helper has one production caller shared by both launch families."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command construction changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "Contributor adds no external-binary shim."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Triggered by endpoint acceptance, receipt recovery, new ownership callback or decision trail; reviewed in immutable Claude packets and final-review-disposition.md, with remaining verification limits explicit."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No substrate-modeling guard or detector added."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "Triggered by endpoint acceptance, receipt recovery, new ownership callback or decision trail; reviewed in immutable Claude packets and final-review-disposition.md, with remaining verification limits explicit."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Focused source/claim review and empirical disposition: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/scoped-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/followup-independent-review.md; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md. Local results and Cloud gaps are separated in specialist-model.md."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": "Triggered by endpoint acceptance, receipt recovery, new ownership callback or decision trail; reviewed in immutable Claude packets and final-review-disposition.md, with remaining verification limits explicit."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No per-element loop, membership or candidate scan added."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "final-fmt",
+      "outcome": "pass",
+      "reason": "Exit 0: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-fmt.log"
+    },
+    {
+      "check": "final-clippy",
+      "outcome": "pass",
+      "reason": "Exit 0: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-clippy.log"
+    },
+    {
+      "check": "final-suite",
+      "outcome": "pass",
+      "reason": "Exit 0: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-suite.log"
+    },
+    {
+      "check": "final-owned-continuity",
+      "outcome": "pass",
+      "reason": "Exit 0: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-owned-continuity.log"
+    },
+    {
+      "check": "final-build",
+      "outcome": "pass",
+      "reason": "Exit 0: /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-build.log"
+    },
+    {
+      "check": "docs-build",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-docs-build.json"
+    },
+    {
+      "check": "mutations",
+      "outcome": "pass",
+      "reason": "All seven faults failed behaviorally; restored group green."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/gate-style.log"
+    },
+    {
+      "check": "surface/caller/sibling sweeps",
+      "outcome": "acknowledged",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md"
+    },
+    {
+      "check": "extended all-target Clippy",
+      "outcome": "acknowledged",
+      "reason": "Historical optional all-target run before main integration found an existing test-code lint. Current main validation uses production cargo clippy -D warnings; /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/extended-clippy-classification.md"
+    },
+    {
+      "check": "exact-state",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/final-source-identity.json file hashes revalidated after commit; no source tree change during signing."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Original create call could block daemon beyond client timeout.",
+      "evidence": "Original stalled binary reproduction, fixed bounded binary proof and timeout mutation.",
+      "layer": "built daemon transport",
+      "source": "prior review",
+      "path": "cli/src/native/providers.rs",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "Original failed stop reported success and discarded remote ID.",
+      "evidence": "Original cleanup reproduction; final same-ID retry and cancellation mutants.",
+      "layer": "daemon ownership",
+      "source": "prior review",
+      "path": "cli/src/native/actions.rs",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "Failed setup/canceled cleanup could leave configuration and launch bookkeeping stale.",
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/final-review-disposition.md",
+      "layer": "caller cancellation",
+      "source": "independent review",
+      "path": "cli/src/native/actions.rs",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Generic command listing and metadata siblings are unchanged.",
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/deterministic-dispositions.md"
+    },
+    {
+      "claim": "Local browser process-exit daemon callers keep best-effort handling.",
+      "evidence": "Browser Use attaches have no child process; has_process_exited returns false for external CDP."
+    },
+    {
+      "claim": "No Cloud billing/profile/recording success claimed.",
+      "evidence": "No credential, no hosted producer drive; P6 and specialist receipts remain incomplete."
+    }
+  ],
+  "issue_candidates": [],
+  "outcomes": {
+    "external_findings": 0,
+    "review_rounds": 1,
+    "human_corrections": 0,
+    "escaped_finding_class": null,
+    "github_writes": false,
+    "source_fixes": false,
+    "native_review_contexts": 2
+  },
+  "adjudications": [
+    {
+      "source": "independent-correctness-review.json IR1/IR2",
+      "decision": "Confirmed and merged into F2/F1. Both native passes agree, with evidence visible and no cross-family claim."
+    },
+    {
+      "source": "independent-correctness-review.json IR3",
+      "decision": "Retain verification gap. Official response schema permits nullable/missing cdpUrl; no active-browser real producer measured."
+    },
+    {
+      "source": "secondary-review-corroboration.json",
+      "decision": "Inspection-time uncertainties superseded by finished tests.log (1159 pass), clean cleanup-probe-final.log, removed dependency symlinks, and final binary dogfood replay. No production source changed."
+    }
+  ],
+  "authorization": {
+    "scope": "User explicitly authorized signed append-only fixes and push to existing PR branch; current main integrated to resolve conflicts. No GitHub PR merge/release/comments.",
+    "promotion_limit": "Push is an authorized contribution update. Incomplete evidence is not presented as merge approval."
+  }
+}

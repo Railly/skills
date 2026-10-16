@@ -1,0 +1,51 @@
+{
+  "status": "incomplete",
+  "kind": "separate_candidate_admission_audit",
+  "head": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+  "original_preimplementation_gap_preserved": true,
+  "required_by_current_review_gate": false,
+  "counted_as_passing_evidence": false,
+  "receipts": {
+    "blind-contract-claude.json": {
+      "status": "complete",
+      "model": "anthropic/claude-opus-5",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 19128
+    },
+    "blind-contract-gemini.json": {
+      "status": "complete",
+      "model": "google/gemini-3.1-pro-preview",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 37189
+    },
+    "blind-shaping-claude.json": {
+      "status": "complete",
+      "model": "anthropic/claude-opus-5",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_ms": 42422
+    },
+    "blind-shaping-gemini.json": {
+      "status": "failed",
+      "model": "google/gemini-3.1-pro-preview",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_ms": 31585
+    },
+    "blind-shaping-deepseek.json": {
+      "status": "failed",
+      "model": "deepseek/deepseek-v4-pro",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_ms": 7074
+    }
+  },
+  "disposition": "Circuit breaker: no más reintentos. No reconstruye retrospectivamente shaping previo; Review Gate utiliza únicamente challenge real fx-cross-family-final.json del diff final.",
+  "failures": [
+    "Gemini shaping: retries de red y HTTP400 sobre posición de system messages.",
+    "DeepSeek shaping: 503 y max_tokens 384000 excede límite262144.",
+    "Solo Claude produjo shaping; no se computa independencia de dos propuestas."
+  ]
+}

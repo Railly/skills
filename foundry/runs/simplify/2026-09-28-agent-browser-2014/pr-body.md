@@ -1,0 +1,7 @@
+- Fixes #1998 and recreates #1999 with Jony credited as coauthor.
+- Selects usable login controls when hidden duplicates exist.
+- Binds credential entry to the selected DOM node and rejects replaced fields or redirected focus before submitting.
+- Preserves Chrome and Lightpanda support, including React controlled forms, Unicode, textarea, and contenteditable selectors.
+- Covers regressions with two focused tests: 26 browser scenarios and four CDP failure partitions.
+- Validated with 1,392 unit tests, 6 integration tests, 6 auth E2E tests, targeted mutations, formatting, and CI Clippy.
+- Remote-object cleanup is best effort if the renderer or CDP connection is destroyed.

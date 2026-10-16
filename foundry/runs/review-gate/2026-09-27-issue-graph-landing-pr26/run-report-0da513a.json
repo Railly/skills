@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-27",
+    "repo": "vercel-labs/issue-graph",
+    "base": "8de9132367c6f69859160df40f8235cb6676894b",
+    "head": "0da513a37f05d40776429a8b971dc3e5fe8b33d0",
+    "profile": "standard",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "sequential_isolated",
+    "degraded_from": null,
+    "independence_gap": "Same-author focused review; no independent approval. This standard public-site content and SDK wiring change does not require an independent challenge.",
+    "receipt": "focused-review.json",
+    "schema_failures": 0,
+    "operations": [
+      {
+        "operation": "focused landing and Analytics review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "contract.md",
+    "spec_status": "not_required",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "Codex root agent",
+    "reviewer_model": "same Codex root agent",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [
+      "Static public capture examples, shared Markdown/HTML presentation, and standard official Analytics SDK mounting."
+    ],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": false,
+      "method": "not_required",
+      "artifact": null,
+      "evidence": "Standard profile, verified against real CLI outputs, browser DOM and installed official SDK behavior."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Reviewed current landing and all new commands, public-capture bounds, shared Markdown, preserved tabs, and Analytics mounting."
+    },
+    {
+      "source": "design",
+      "location": "focused-review.json",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Reviewed current landing and all new commands, public-capture bounds, shared Markdown, preserved tabs, and Analytics mounting."
+    },
+    {
+      "source": "user_facing",
+      "location": "README and apps/docs/content/docs",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Reviewed current landing and all new commands, public-capture bounds, shared Markdown, preserved tabs, and Analytics mounting."
+    },
+    {
+      "source": "implementation",
+      "location": "Documentation diff and unchanged runtime contracts",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Reviewed current landing and all new commands, public-capture bounds, shared Markdown, preserved tabs, and Analytics mounting."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The landing represents current capture, filter/rank, and exact-dashboard commands using real public results.",
+      "kind": "presentation",
+      "status": "verified",
+      "oracle": {
+        "observes": "Real CLI JSON, production HTML/Markdown and actual dashboard browser rows",
+        "layer": "CLI, HTTP and browser",
+        "method": "Capture80 public items, query10 Heat matches, open exact view; 96 tests, 90 HTTP checks and browser desktop/mobile",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "commands merely look valid or the site only compiles",
+        "counterexample": "confusing captured80 with matched10, fabricating Heat, or omitting the screenshot still compiles",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Five mutations fail intended assertions; actual browser shows10 Rank items with #313 at33.2; routes and hash targets resolve."
+      },
+      "substrates": [
+        {
+          "name": "CLI0.4.0, Next production build, Chromium desktop/mobile",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/docs-tests.log; http-routes.log; dashboard-rank.png; landing-mobile-viewport.png"
+    },
+    {
+      "id": "P2",
+      "claim": "Analytics is mounted once after hydration and queues pageviews on client navigation.",
+      "kind": "integration",
+      "status": "verified",
+      "oracle": {
+        "observes": "Injected deferred script and pageview queue after actual Link navigation",
+        "layer": "Browser and official SDK",
+        "method": "Inspect pinned SDK effect-based injection; navigate / to /docs/dashboard using the live page link",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "package and import present without working route tracking",
+        "counterexample": "mounting analytics twice or missing Next route binding would pass a manifest-only check",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "One deferred @vercel/analytics/next2.0.1 script; queue contains / and /docs/[...slug] pageviews after real navigation."
+      },
+      "substrates": [
+        {
+          "name": "Built Next site with pinned official SDK in Chromium",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/browser-analytics-navigation.json"
+        }
+      ],
+      "evidence": "This claim covers app integration. Production visitor collection begins after deployment of PR26; preview transport verification follows the push."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/mutations.json",
+      "evidence": "Five behavior mutations failed their intended assertions; original source restored and all 96 docs tests pass.",
+      "fingerprint": {
+        "head_sha": "0da513a37f05d40776429a8b971dc3e5fe8b33d0",
+        "changed_paths_digest": "sha256:ab7eca4aa2c9819df77b2209b43fb71035d4867956ca3e1fed29d7c637e8a6d1",
+        "contract_digest": "sha256:c134071a8a2c890d0d6870393e285f288d5120a5111390202fdfd8cd41a6957b",
+        "command": "bun x --no-install vitest run tests/terminal-demo.test.ts tests/landing.test.ts; bun x --no-install vitest run",
+        "environment_digest": "sha256:72d17dabe1e95024fb7ae23c341977db1df35829c14417ad23f6d7d0dbb88471",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "apps/docs/src/lib/terminal-presentation.ts",
+          "apps/docs/src/components/terminal-demo.tsx",
+          "apps/docs/src/lib/example-workflow.json",
+          "apps/docs/tests/terminal-demo.test.ts",
+          "apps/docs/tests/landing.test.ts"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      },
+      "dimensions": {
+        "values": [
+          "Captured-count versus matched-count presentation",
+          "Real Heat value versus altered Heat value",
+          "Crawl omission count versus fabricated complete coverage",
+          "Semantic presenter versus broken component wiring",
+          "Dashboard image present versus omitted",
+          "Static tabs: mouse and keyboard; desktop and mobile"
+        ],
+        "exclusions": [
+          "No untrusted JSON boundary: parser input is an imported, committed public capture. Broad fuzz campaigns and network retries are outside this static-content change.",
+          "Legacy graph/status/plan renderers retain their existing tests and captured fixtures.",
+          "Analytics routing belongs to the pinned official SDK; verified at the browser boundary instead of mocking SDK internals."
+        ],
+        "evidence": "Each changed content class has an independent captured-producer oracle and a killed mutation; browser tab interaction was preserved and exercised."
+      },
+      "oracle": {
+        "source": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/open.stdout.json and query.stdout.json",
+        "independent": true,
+        "evidence": "Real built CLI consumed authenticated read-only public GitHub data; committed JSON is an allowlisted projection of the actual output."
+      },
+      "producer": {
+        "name": "issue-graph CLI with live public vercel-labs/portless capture and browser-loaded static dashboard",
+        "status": "exercised",
+        "evidence": "80 captured open items; 10 query matches; Heat threshold8.3; same selection in actual Rank view."
+      },
+      "falsification": [
+        {
+          "mutation": "captured-vs-matched",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/mutation-captured-vs-matched.log: × catalog uses the 0.4.0 capture and preserves fields across HTML and Markdown 4ms",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/docs-tests.log: 96 passed"
+        },
+        {
+          "mutation": "invented-heat",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/mutation-invented-heat.log: × catalog uses the 0.4.0 capture and preserves fields across HTML and Markdown 3ms",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/docs-tests.log: 96 passed"
+        },
+        {
+          "mutation": "invented-coverage",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/mutation-invented-coverage.log: × catalog uses the 0.4.0 capture and preserves fields across HTML and Markdown 3ms",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/docs-tests.log: 96 passed"
+        },
+        {
+          "mutation": "presentation-wiring",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/mutation-presentation-wiring.log: × SSR includes three semantic examples, short display commands and linked accessible tabs 19ms; × server-renders the catalog's semantic examples in Home without raw or replay chrome 13ms",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/docs-tests.log: 96 passed"
+        },
+        {
+          "mutation": "missing-preview",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/mutation-missing-preview.log: × SSR includes three semantic examples, short display commands and linked accessible tabs 8ms",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/landing-pr26-2026-09-27/docs-tests.log: 96 passed"
+        }
+      ]
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "No custom lifecycle, persistence, cancellation, retry, or cleanup behavior. Local Analytics endpoint failure was observed with the page and links still usable; official SDK owns injection."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "GitHub API",
+      "claim": "Release PR28 is merged into main8de9132; PR26 remains open.",
+      "status": "verified",
+      "evidence": "PR28 merged2026-09-27T19:19:58Z at8de9132367c6f69859160df40f8235cb6676894b; PR26 rechecked before push."
+    },
+    {
+      "id": "A2",
+      "source": "Live CLI capture and repository visibility",
+      "claim": "Committed demo data comes only from public vercel-labs/portless and preserves scope limits.",
+      "status": "verified",
+      "evidence": "gh repo view returned PUBLIC; allowlisted JSON excludes local paths, authors, descriptions and comments; screenshot shows public issue metadata."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No corresponding change to CLI resolution, OS events, process lifecycle, retry, cancellation, persistent state or provider adapters."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "evidence": "Reviewed HTML/Markdown parity, real-public output values, preserved keyboard/mobile tabs, SDK source and one-time injection, malformed JSON fallback and killed mutations."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "gate.sh style labs/main and git diff --check pass."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "site.ts only adds exampleRerunCommand. discovery.ts and CONTRIBUTING.md do not read that constant; their installation/access guidance remains correct. Terminal CSS, component and tests all changed."
+    },
+    {
+      "check": "stale and siblings",
+      "outcome": "acknowledged",
+      "reason": "Active landing commands and Markdown use the verb/scope API. Old captured graph/status/plan JSON, SVG and their verification retain historical provenance; no capture metadata rewritten."
+    },
+    {
+      "check": "tests",
+      "outcome": "pass",
+      "reason": "96 docs tests,36 bundled-skill tests,5 killed behavior mutations."
+    },
+    {
+      "check": "build, typecheck, lint and HTTP",
+      "outcome": "pass",
+      "reason": "Next production build, TypeScript, Biome,90 route checks and browser checks pass."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    "Historical example-graph/status/plan captures and README SVG retain their original capture provenance; landing uses the new public capture.",
+    "Analytics collection on production is not claimed before PR26 is deployed. Local script404 is Vercel endpoint availability, not an application failure."
+  ],
+  "issue_candidates": []
+}

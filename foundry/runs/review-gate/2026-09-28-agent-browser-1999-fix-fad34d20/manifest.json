@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "work_item": "vercel-labs/agent-browser#1999-recreation",
+  "repository": "vercel-labs/agent-browser",
+  "checkout": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-fix",
+  "base_sha": "d01253d9db28d75080e36da3c1c31ef89454731e",
+  "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+  "dirty_digest": "clean",
+  "changed_paths": [
+    "README.md",
+    "cli/src/mcp.rs",
+    "cli/src/native/actions.rs",
+    "cli/src/native/e2e_tests.rs",
+    "cli/src/native/element.rs",
+    "cli/src/output.rs",
+    "docs/src/app/commands/page.mdx",
+    "docs/src/app/security/page.mdx",
+    "skill-data/core/references/authentication.md",
+    "skill-data/core/references/commands.md"
+  ],
+  "changed_paths_digest": "sha256:953d342155af221f951cf886cd063bff7c8124764e58a29982630913ea24bd6b",
+  "contract": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/contract.md",
+  "contract_digest": "sha256:a7efe4ddf2ff2d778d5b8855e0e6257287add38f308afbcd3780e615576b1fa6",
+  "environment": {
+    "os": "darwin",
+    "arch": "arm64",
+    "rust": "1.98.1",
+    "browser": "Chrome 152.0.7977.64",
+    "secondary_browser": "Lightpanda nightly9842",
+    "fixture_root": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence",
+    "lightpanda": "1.0.0-nightly.9842+ce46f90f1",
+    "react": "19.2.0"
+  },
+  "environment_digest": "sha256:53215f2b9610e304972e09c15b04d73bd6d0cbcc49279f041b29a437fa20639d",
+  "authorization": {
+    "source": "2026-09-28: good clonemos la PR... pongamos como coauthor y fixeemos el blocker!",
+    "scope": "Recreate on upstream branch, preserve human coauthor, fix F1, validate, commit and open replacement PR. No merge."
+  },
+  "profile": "high-risk",
+  "risk": "high",
+  "risk_triggers": [
+    "authentication",
+    "credentials",
+    "node lifetime and retry"
+  ],
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+  "package_identity": "skills-doctor linked review-gate source=clean",
+  "runtime": {
+    "preferred": "fx_worker",
+    "fallback": "native_subagent",
+    "review_budget_ms": 900000
+  },
+  "stages": {
+    "solution": {
+      "status": "pass_to_implementation",
+      "report": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/solution.md",
+      "independence": "two blind model families",
+      "runtime_protocol_gap": "FX used selected Keychain auth; packaged API-key mode unavailable"
+    },
+    "implementation": {
+      "status": "complete",
+      "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+      "tree_sha": "73e89ac4ef93f221187f90505122b41e4a6bdac1"
+    },
+    "review": {
+      "status": "complete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-fix-fad34d20/run-report-fad34d20.json",
+      "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+      "verdict": "pass",
+      "validated_at": "2026-09-28T18:18:04.616Z",
+      "blocking_findings": []
+    },
+    "test_strength": {
+      "status": "pass",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-fix-fad34d20/test-strength.json",
+      "fingerprint": {
+        "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+        "changed_paths_digest": "sha256:953d342155af221f951cf886cd063bff7c8124764e58a29982630913ea24bd6b",
+        "contract_digest": "sha256:a7efe4ddf2ff2d778d5b8855e0e6257287add38f308afbcd3780e615576b1fa6",
+        "command": "cargo test -- --test-threads=1; cargo test e2e_auth_login -- --ignored --test-threads=1; cargo clippy -- -D warnings; bun compatibility.mjs; bun lifecycle-final.mjs; bun pressure-fix.mjs fix-race; bun lightpanda-probe.mjs lightpanda-race; bun react-cli-probe.mjs; bun react-lightpanda-probe.mjs",
+        "environment_digest": "sha256:53215f2b9610e304972e09c15b04d73bd6d0cbcc49279f041b29a437fa20639d",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+        "relevant_paths": [
+          "README.md",
+          "cli/src/mcp.rs",
+          "cli/src/native/actions.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/src/native/element.rs",
+          "cli/src/output.rs",
+          "docs/src/app/commands/page.mdx",
+          "docs/src/app/security/page.mdx",
+          "skill-data/core/references/authentication.md",
+          "skill-data/core/references/commands.md",
+          "cli/src/native/interaction.rs",
+          "cli/src/native/cdp/client.rs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      }
+    },
+    "resilience": {
+      "status": "pass",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-fix-fad34d20/resilience.json",
+      "fingerprint": {
+        "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+        "changed_paths_digest": "sha256:953d342155af221f951cf886cd063bff7c8124764e58a29982630913ea24bd6b",
+        "contract_digest": "sha256:a7efe4ddf2ff2d778d5b8855e0e6257287add38f308afbcd3780e615576b1fa6",
+        "command": "cargo test -- --test-threads=1; cargo test e2e_auth_login -- --ignored --test-threads=1; cargo clippy -- -D warnings; bun compatibility.mjs; bun lifecycle-final.mjs; bun pressure-fix.mjs fix-race; bun lightpanda-probe.mjs lightpanda-race; bun react-cli-probe.mjs; bun react-lightpanda-probe.mjs",
+        "environment_digest": "sha256:53215f2b9610e304972e09c15b04d73bd6d0cbcc49279f041b29a437fa20639d",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+        "relevant_paths": [
+          "README.md",
+          "cli/src/mcp.rs",
+          "cli/src/native/actions.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/src/native/element.rs",
+          "cli/src/output.rs",
+          "docs/src/app/commands/page.mdx",
+          "docs/src/app/security/page.mdx",
+          "skill-data/core/references/authentication.md",
+          "skill-data/core/references/commands.md",
+          "cli/src/native/interaction.rs",
+          "cli/src/native/cdp/client.rs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      }
+    },
+    "security": {
+      "status": "pass",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-fix-fad34d20/security-review.json",
+      "fingerprint": {
+        "repository": "vercel-labs/agent-browser",
+        "base_sha": "d01253d9db28d75080e36da3c1c31ef89454731e",
+        "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+        "dirty_digest": "clean",
+        "changed_path_digest": "sha256:953d342155af221f951cf886cd063bff7c8124764e58a29982630913ea24bd6b",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d"
+      }
+    }
+  },
+  "trail": "/Users/raillyhugo/Programming/railly/skills/foundry/trails/agent-browser/2026-09-28-visible-auth-controls.tsv",
+  "source_pr": {
+    "number": 1999,
+    "head": "1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51",
+    "author": "Jony <13896935+zyz619963502zyz@users.noreply.github.com>"
+  },
+  "tree_sha": "73e89ac4ef93f221187f90505122b41e4a6bdac1",
+  "diff_digest": "sha256:88606d5ecdf3077762826cb20d55079964a3ffdd409cd352a1d423b473d9cf39",
+  "publication": {
+    "status": "pull_request_open",
+    "url": "https://github.com/vercel-labs/agent-browser/pull/2014",
+    "number": 2014,
+    "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+    "signed": true,
+    "ci": "in_progress",
+    "observed_at": "2026-09-28T18:18:33.700Z"
+  }
+}

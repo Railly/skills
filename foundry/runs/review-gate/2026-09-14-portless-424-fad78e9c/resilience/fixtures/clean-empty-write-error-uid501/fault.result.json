@@ -1,0 +1,108 @@
+{
+  "phase": "fault",
+  "fault": "write-error",
+  "command": [
+    "/Users/raillyhugo/.nvm/versions/node/v24.18.0/bin/node",
+    "--require",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/preload.cjs",
+    "/tmp/portless-review-424-fad78e9c/packages/portless/dist/cli.js",
+    "hosts",
+    "clean"
+  ],
+  "cwd": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-write-error-uid501",
+  "environment": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-write-error-uid501/home",
+    "TMPDIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-write-error-uid501/tmp",
+    "NO_COLOR": "1",
+    "PORTLESS_STATE_DIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-write-error-uid501/state",
+    "PORTLESS_PORT": "65431",
+    "PORTLESS_SYNC_HOSTS": "1",
+    "AUDIT_ROOT": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience",
+    "AUDIT_HOSTS": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-write-error-uid501/hosts",
+    "AUDIT_TRACE": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-write-error-uid501/fault.jsonl",
+    "AUDIT_FAULT": "write-error",
+    "AUDIT_UID": "501",
+    "AUDIT_SUDO": "1"
+  },
+  "exitCode": 1,
+  "signal": null,
+  "error": null,
+  "stdout": "Writing to /etc/hosts requires elevated privileges. Requesting sudo...\n",
+  "stderr": "Failed to update /etc/hosts.\n",
+  "durationMs": 72.15033299999959,
+  "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+  "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+  "reads": 1,
+  "writes": 1,
+  "sudoCalls": 1,
+  "events": [
+    {
+      "time": "2026-09-14T18:45:46.980Z",
+      "op": "preload-ready",
+      "fault": "write-error",
+      "uid": 501,
+      "pid": 62319,
+      "node": "v24.18.0",
+      "platform": "darwin"
+    },
+    {
+      "time": "2026-09-14T18:45:47.008Z",
+      "op": "read",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-write-error-uid501/hosts",
+      "ordinal": 1,
+      "result": "ok"
+    },
+    {
+      "time": "2026-09-14T18:45:47.008Z",
+      "op": "write",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-write-error-uid501/hosts",
+      "ordinal": 1,
+      "outcome": "EIO",
+      "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+      "intended": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n",
+      "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n"
+    },
+    {
+      "time": "2026-09-14T18:45:47.008Z",
+      "op": "sudo-stub",
+      "command": "sudo",
+      "args": [
+        "env",
+        "PORTLESS_STATE_DIR=/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-write-error-uid501/state",
+        "PORTLESS_PORT=65431",
+        "PORTLESS_SYNC_HOSTS=1",
+        "/Users/raillyhugo/.nvm/versions/node/v24.18.0/bin/node",
+        "/tmp/portless-review-424-fad78e9c/packages/portless/dist/cli.js",
+        "hosts",
+        "clean"
+      ],
+      "timeout": 30000,
+      "status": 1,
+      "error": null
+    },
+    {
+      "time": "2026-09-14T18:45:47.009Z",
+      "op": "exit",
+      "code": 1,
+      "reads": 1,
+      "writes": 1,
+      "memory": {
+        "rss": 64700416,
+        "heapTotal": 13352960,
+        "heapUsed": 9089288,
+        "external": 4016478,
+        "arrayBuffers": 146599
+      },
+      "activeResources": [
+        "PipeWrap",
+        "PipeWrap",
+        "PipeWrap"
+      ]
+    }
+  ],
+  "unrelatedPreserved": true,
+  "routesUnchanged": true
+}

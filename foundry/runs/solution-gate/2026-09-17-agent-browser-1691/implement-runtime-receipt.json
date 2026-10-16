@@ -1,0 +1,21 @@
+{
+  "exit": 0,
+  "duration": 1091.041252625,
+  "result": "**Hecho / Done.** Implement\u00e9 el shape C completo en el worktree, con la suite verde y el recibo externo escrito. / I implemented the full shape C repair in the worktree, with a green suite and the external receipt written. Nothing was committed, as instructed.\n\n**Cambios principales / Main changes**\n- `cli/src/native/providers.rs`: la creaci\u00f3n de Browser Use ahora usa un helper privado parametrizado por base URL y deadline (el endpoint de producci\u00f3n sigue fijo en `https://api.browser-use.com/api/v4`, sin nuevas variables de entorno ni TLS inseguro), con 10s para create/lectura de cuerpo, sin redirects y una sola creaci\u00f3n por comando. El id devuelto se valida como UUID; antes del attach se escribe un recibo de recuperaci\u00f3n en `<socket dir>/browser-use-<id>.receipt` (solo id e instrucciones fijas de stop manual, nunca la API key ni el cdpUrl), con preflight del directorio antes del POST. `cdpUrl` ausente/null o fallo al escribir el recibo disparan un rollback acotado (4s); si el rollback falla, el error incluye el id y la ruta del recibo. El stop devuelve `Result`, exige 2xx + id coincidente + `status=stopped` (404 es fallo), y borra el recibo solo tras el acknowledgment; un fallo al borrar el recibo nunca se reporta como fallo del stop remoto. Los errores nuevos contienen solo categor\u00edas fijas, status num\u00e9rico e id validado \u2014 nunca cuerpos de respuesta, secretos ni errores de transporte crudos.\n- `cli/src/native/actions.rs`: un stop fallido restaura la sesi\u00f3n en el estado (mismo UUID reintentable); `close_current_browser` combina errores; la transici\u00f3n de restore-key y el auto-relaunch propagan el error de cleanup de Browser Use en vez de descartarlo; ambos callers de attach recuerdan la propiedad antes del attach CDP, que para Browser Use est\u00e1 acotado a 8s, y un attach fallido ejecuta cleanup sobre el estado retenido combinando errores seguros. Un launch nuevo no puede pisar una sesi\u00f3n pendiente. Los dem\u00e1s providers, plugins, CDP local/externo y los mapeos de opciones de entorno quedan intactos; el daemon solo se apaga con `closed: true`, as\u00ed que `close` fallido queda reintentable tambi\u00e9n v\u00eda MCP (que ya delega por `execute_command`; no hizo falta cambio ni test de paridad nuevo).\n- Docs en las cuatro superficies: README, ayuda en `output.rs`, `skill-data/core/references/commands.md` y `docs/src/app/providers/browser-use/page.mdx` (secci\u00f3n nueva \"Close and recovery\").\n- Tests: matriz de loopback HTTP con bytes reales (\u00e9xito/ack, 4xx/5xx con cuerpos hostiles que no se filtran, stall de cuerpo acotado, cdpUrl null con rollback, ciclo de vida del recibo, precondiciones de UUID/clave) m\u00e1s tests a nivel de `execute_command` (close fallido retiene id y reintenta; launch bloqueado por propiedad pendiente).\n\n**Resultados / Results:** `cargo fmt --check` limpio; `cargo test -- --test-threads=1`: 1168 + 2 passed, 0 failed, 105 ignored; `cargo clippy` sin warnings (todo con el target dir de probe-build). Diff: 6 archivos, +805/\u221299.\n\n**Brechas declaradas / Declared gaps** (tambi\u00e9n en el receipt): no hay cobertura positiva de wire del stop a trav\u00e9s de `execute_command` porque la base URL est\u00e1 fija a prop\u00f3sito (se usa fallo determinista por API key ausente); sin credencial viva quedan sin verificar latencia real, repeated-stop, billing, perfiles y grabaci\u00f3n; los e2e con Chrome real (`#[ignore]`) y la prueba de proxy estancado con el binario compilado quedan para la fase siguiente; los timeouts de producci\u00f3n se fijan por asserts de constantes, no por tests de reloj. Trail de decisiones actualizado en tiempo real (4 filas) y receipt completo en `implement-receipt.md`.",
+  "usage": {
+    "claude-fable-5": {
+      "inputTokens": 4147,
+      "outputTokens": 56634,
+      "cacheReadInputTokens": 6087040,
+      "cacheCreationInputTokens": 152371,
+      "webSearchRequests": 0,
+      "costUSD": 10.864847499999998,
+      "contextWindow": 200000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-fable-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  }
+}

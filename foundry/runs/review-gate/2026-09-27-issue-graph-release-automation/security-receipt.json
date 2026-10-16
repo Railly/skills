@@ -1,0 +1,152 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/issue-graph",
+    "base_sha": "8de9132367c6f69859160df40f8235cb6676894b",
+    "head_sha": "e78e205b141537c6d28486b3c8e1cf68dd166938",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:f33d2379498ed789a24f1463bd12a473f68f72f074e70b814fc3c71154b37581",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "Release authorization and package integrity",
+    "attacker": "Fork or pull-request author without canonical-main write authority; corrupted or mismatched registry/artifact data",
+    "scope": "Automatic publication on canonical-main push with the same tested archive, scoped OIDC, and verified idempotent recovery"
+  },
+  "trust_model": {
+    "assets": [
+      "npm issue-graph version contents and latest tag",
+      "GitHub version tag and release",
+      "GitHub OIDC publication identity"
+    ],
+    "principals": [
+      {
+        "name": "External contributor",
+        "existing_authority": "Can propose source changes, cannot run canonical-main release context without maintainer merge"
+      },
+      {
+        "name": "Canonical-main maintainer",
+        "existing_authority": "Can merge executable workflow and package changes; user explicitly makes reviewed merge the release decision"
+      },
+      {
+        "name": "Build and consumer jobs",
+        "existing_authority": "Read-only contents/actions; no publication identity"
+      },
+      {
+        "name": "Publish job",
+        "existing_authority": "Release-bound OIDC only after build and all Node consumers succeed"
+      },
+      {
+        "name": "GitHub-release job",
+        "existing_authority": "Repository contents write after verified publication"
+      }
+    ],
+    "boundaries": [
+      "Contributor branch to canonical main",
+      "Build artifact to privileged publish job",
+      "Registry metadata and archive bytes to trusted source identity",
+      "npm success to GitHub tag creation"
+    ],
+    "entrypoints": [
+      "push on main",
+      "workflow_dispatch expected_sha/expected_version/publish",
+      "npm packument and version metadata",
+      "Immutable run artifact"
+    ],
+    "sinks": [
+      "npm publish --ignore-scripts --access public --tag latest",
+      "GitHub tag and release creation"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-001",
+      "classification": "informational",
+      "scope": "in_scope_security_regression",
+      "prerequisites": [
+        "Protected publication trusts canonical-main maintainers"
+      ],
+      "chain": {
+        "capability": "Contributor may author arbitrary feature-branch or fork changes",
+        "reachability": "No pull_request or pull_request_target release trigger; canonical repo and main job guards apply",
+        "control": "Push version comes from validated manifest; manual inputs must match exact event SHA and manifest",
+        "boundary": "No lower-trust branch acquires OIDC or contents-write authority",
+        "impact": "No unauthorized publication path found"
+      },
+      "confidence": "high",
+      "evidence": [
+        ".github/workflows/release.yml plan and publish guards",
+        "scripts/release.ts validateReleaseContext and main HEAD equality",
+        "src/release.test.ts release context rejection matrix"
+      ]
+    },
+    {
+      "id": "SEC-002",
+      "classification": "informational",
+      "scope": "in_scope_security_regression",
+      "prerequisites": [
+        "GitHub workflow outputs and uploaded run artifact originate from trusted main build"
+      ],
+      "chain": {
+        "capability": "Unexpected archive, registry identity, URL or bytes may be presented",
+        "reachability": "prepare-publish and verify-published execute before GitHub release",
+        "control": "Exact artifact ID, source commit metadata, checksum and registry byte identity are checked",
+        "boundary": "Mismatched data cannot be accepted as the tested archive",
+        "impact": "No integrity bypass found in skip/retry path"
+      },
+      "confidence": "high",
+      "evidence": [
+        "scripts/release.ts record/verify/preparePublication/verifyPublished",
+        "src/release.test.ts retained archive process tests",
+        "mutation-retry-byte-verification.log",
+        "mutation-prepare-command-wiring.log"
+      ]
+    },
+    {
+      "id": "SEC-003",
+      "classification": "informational",
+      "scope": "in_scope_security_regression",
+      "prerequisites": [
+        "User explicitly requests fully automatic release"
+      ],
+      "chain": {
+        "capability": "A canonical-main merge can now cause publication without a second reviewer click",
+        "reachability": "Authorized push enters Release-bound OIDC after all consumers pass",
+        "control": "Only manual reviewer requirement removed; main deployment branch restriction retained",
+        "boundary": "This is the requested maintainer authorization policy; fork and non-main restriction persists",
+        "impact": "No unintended privilege expansion found"
+      },
+      "confidence": "high",
+      "evidence": [
+        "Live GitHub Release environment API: branch_policy only",
+        "Live deployment-branch-policies API: only branch main",
+        "Workflow id-token write scoped only to publish"
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "Read-only source, local focused tests, existing falsification evidence, read-only GitHub environment APIs. No npm publication or external mutation by reviewer.",
+    "commands": [
+      "git diff 8de9132367c6f69859160df40f8235cb6676894b e78e205b141537c6d28486b3c8e1cf68dd166938",
+      "bun x pnpm@10.34.5 exec vitest run src/release.test.ts",
+      "git diff --check 8de9132367c6f69859160df40f8235cb6676894b HEAD",
+      "gh api repos/vercel-labs/issue-graph/environments/Release",
+      "gh api repos/vercel-labs/issue-graph/environments/Release/deployment-branch-policies"
+    ],
+    "results": "157 focused tests passed; diff check clean; no source modifications; live environment has no required reviewers and only main branch allowed.",
+    "cleanup": "No source or external writes. Receipt and test log are the only reviewer artifacts.",
+    "gaps": [],
+    "limits": [
+      "Actual 0.4.0 automatic OIDC publication remains post-merge deployment acceptance A5, not asserted by this source review.",
+      "No independent read access to npm trusted-publisher configuration; workflow preserves existing OIDC binding."
+    ]
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": [
+      "CONTRIBUTING.md retains an INTERNAL repository visibility claim while current GitHub API says public; route wording correction to documentation review."
+    ]
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-issue-graph-release-automation/security-receipt.json"
+}

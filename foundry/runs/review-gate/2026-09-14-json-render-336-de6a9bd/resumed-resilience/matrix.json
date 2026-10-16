@@ -1,0 +1,956 @@
+[
+  {
+    "id": "C01",
+    "boundary": "CP1",
+    "faults": [
+      "invalid input",
+      "repetition",
+      "cleanup"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "A1/A2/A4: invalid array/prototype path leaves snapshot identity, state, notification count and adapter writes unchanged",
+    "classification": "preserved invariant",
+    "retry": "400 rejected requests per store/adapter; exact retries 50 times; valid next write after unsubscribe must not call detached listener",
+    "cleanup": {
+      "owner": "subscriber",
+      "action": "unsubscribe",
+      "deadline": "before next write",
+      "post_unsubscribe_calls": 0
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C01",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C01",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved invariant",
+      "base_result": "preserved invariant"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "C02",
+    "boundary": "CP1",
+    "faults": [
+      "partial batch",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "A2: mixed update commits only valid progressive entries and emits one notification",
+    "classification": "preserved invariant",
+    "retry": "Immediate same invalid/count update is a no-op; no extra notification",
+    "cleanup": {
+      "owner": "subscriber",
+      "deadline": "same turn",
+      "unsubscribed": true
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C02",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C02",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved invariant",
+      "base_result": "preserved invariant"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "C03",
+    "boundary": "CP2",
+    "faults": [
+      "compound commit partitions",
+      "malformed input",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "A3: malformed compound source/destination preserves state; corrected valid move succeeds",
+    "classification": "graceful rejection",
+    "retry": "25 exact retries per invalid patch, then corrected move with retained source",
+    "cleanup": {
+      "owner": "core operation",
+      "deadline": "return",
+      "staged_containers": "no escaped references observable; GC not measured"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C03",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C03",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved invariant",
+      "base_result": "preserved invariant"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "C04",
+    "boundary": "CP3",
+    "faults": [
+      "dependency refusal",
+      "pre-commit retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Adapter refusal before setSnapshot commit preserves original snapshot and exposes exception",
+    "classification": "recoverable degradation",
+    "retry": "Remove one-shot refusal and immediately repeat update; exactly one successful commit",
+    "cleanup": {
+      "owner": "adapter implementer",
+      "deadline": "throw/return",
+      "remaining_inflight": 0
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C04",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C04",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved invariant",
+      "base_result": "preserved invariant"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "C05",
+    "boundary": "CP3",
+    "faults": [
+      "post-commit failure",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Observe durable-sink ambiguity separately for replacement and append, not infer exactly-once behavior",
+    "classification": "duplicated state (append); preserved replacement idempotence; pre-existing",
+    "retry": "Same replacement skips second sink write; append duplicates when sink committed before throw",
+    "cleanup": {
+      "owner": "external adapter",
+      "deadline": "throw/return",
+      "pending": 0,
+      "rollback": "not supplied by core"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C05",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C05",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "duplicated state for append; replacement retry is idempotent",
+      "base_result": "duplicated state for append; replacement retry is idempotent"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "C06",
+    "boundary": "CP1",
+    "faults": [
+      "post-commit callback exception",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Observe state commit versus listener delivery independently",
+    "classification": "recoverable degradation; lost notification redelivery; pre-existing",
+    "retry": "Same set does not notify again after listener throws; unsubscribe faulty listener before recovery write",
+    "cleanup": {
+      "owner": "subscriber",
+      "deadline": "before recovery write",
+      "detached": true,
+      "further_calls": 0
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C06",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C06",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "recoverable degradation; retry does not redeliver failed notifications",
+      "base_result": "recoverable degradation; retry does not redeliver failed notifications"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "C07",
+    "boundary": "CP1",
+    "faults": [
+      "concurrent/conflicting transition",
+      "cleanup"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Reentrant conflicting transition keeps final count=2 and marker; detached subscribers get zero calls",
+    "classification": "preserved final state; no transaction isolation; pre-existing",
+    "retry": "Synchronous conflicting write in first listener; subsequent write after unsubscribe",
+    "cleanup": {
+      "owner": "subscribers",
+      "deadline": "next mutation",
+      "post_unsubscribe": 0
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C07",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C07",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved final state; synchronous reentrant notifications are not transaction-isolated",
+      "base_result": "preserved final state; synchronous reentrant notifications are not transaction-isolated"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "C08",
+    "boundary": "CP4",
+    "faults": [
+      "partial write",
+      "downstream failure",
+      "replay",
+      "reset"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Failing test patch must be visible as exception; earlier writes and dedupe must be observed separately",
+    "classification": "recoverable degradation; failed-test replay suppression pre-existing",
+    "retry": "Immediate same chunk replay applies later line but skips failed test; reset restores empty result and patch list",
+    "cleanup": {
+      "owner": "compiler caller",
+      "action": "reset",
+      "deadline": "before next logical stream",
+      "patches": 0,
+      "result": {}
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C08",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C08",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "recoverable partial commit; failed test is deduplicated on identical replay, not transaction rollback",
+      "base_result": "recoverable partial commit; failed test is deduplicated on identical replay, not transaction rollback"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "C09",
+    "boundary": "CP4",
+    "faults": [
+      "malformed upstream",
+      "fragmentation",
+      "reconnect"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Malformed/fragmented JSONL does not corrupt valid neighboring state; invalid move preserves source on head",
+    "classification": "graceful rejection and recovery",
+    "retry": "Repeat identical stream in same compiler, then reset and replay accepted line; end reset zero patches",
+    "cleanup": {
+      "owner": "compiler caller",
+      "deadline": "synchronous reset",
+      "retained_patch_count": 0
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C09",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C09",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved invariant",
+      "base_result": "preserved invariant"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "C10",
+    "boundary": "CP4",
+    "faults": [
+      "overload",
+      "retained queue/cache growth",
+      "repetition"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Quantify retention under bounded distinct invalid input and observe explicit reset, not claim a global bound",
+    "classification": "growth with input; reset recovers; uncapped retention pre-existing",
+    "retry": "100/500/1000 inputs, 30 independent reset cycles; after reset patches=0",
+    "cleanup": {
+      "owner": "compiler caller",
+      "deadline": "end of each logical stream",
+      "action": "reset",
+      "retained_patches": 0,
+      "heap_and_gc": "gap"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C10",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C10",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "growth proportional to distinct input retained until reset; no built-in queue or byte cap verified",
+      "base_result": "growth proportional to distinct input retained until reset; no built-in queue or byte cap verified"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "H01",
+    "boundary": "CP5",
+    "faults": [
+      "compound partial commit",
+      "retry",
+      "recovery"
+    ],
+    "execution": "executed",
+    "test_status": "fail",
+    "expected_state_and_signal": "A3/F1: rejected renderer move must preserve source and cannot insert undefined on corrective retry",
+    "classification": "corrupted state; F1 remains open",
+    "retry": "Repeat same rejected move twice, immediately send corrected move with current previousSpec; recover only by fresh authoritative state",
+    "cleanup": {
+      "owner": "hook unmount effect",
+      "deadline": "unmount",
+      "reader_cleanup": "simple response mock has no resource lease"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H01",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H01",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "corrupted state; F1 source lost, corrected retry cannot recover source",
+      "base_result": "baseline accepts noncanonical token; repeated move not idempotent"
+    },
+    "attribution": "existing confirmed finding"
+  },
+  {
+    "id": "H02",
+    "boundary": "CP5",
+    "faults": [
+      "dependency refusal",
+      "malformed response",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Refusal/503/no-body errors clear streaming; malformed JSONL skips bad lines and accepts valid line",
+    "classification": "graceful rejection/recoverable degradation",
+    "retry": "For each fault immediately send known-good stream; error null, count=2, streaming=false",
+    "cleanup": {
+      "owner": "hook finally/unmount",
+      "deadline": "send settles, then unmount",
+      "active_mock_operations": 0
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H02",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H02",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved invariant",
+      "base_result": "preserved invariant"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "H03-before-patch",
+    "boundary": "CP5",
+    "faults": [
+      "timeout before side effect",
+      "disconnect",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Pending read before first patch is observable; external deadline must settle send and clear flag",
+    "classification": "recoverable degradation; external timeout required",
+    "retry": "Force Error while read awaits, immediately send successful replacement; zero pending mock reads",
+    "cleanup": {
+      "owner": "transport mock settles pending read; hook clears flag",
+      "deadline": "send settlement",
+      "stats": {
+        "readers": 1,
+        "reads": 1,
+        "active": 0,
+        "aborts": 1,
+        "release": 0,
+        "cancel": 0,
+        "completions": 0
+      },
+      "lock_release": "not called by hook",
+      "real_fetch_timeout": "gap; no built-in deadline"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H03-before-patch",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H03-before-patch",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "recoverable partial state; external deadline required; no rollback promised for full stream",
+      "base_result": "recoverable partial state; external deadline required; no rollback promised for full stream"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "H03-after-first-patch",
+    "boundary": "CP5",
+    "faults": [
+      "timeout during side effects",
+      "disconnect",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Deadline after first visible patch retains partial state but signals error and settles send",
+    "classification": "recoverable partial state; external timeout required",
+    "retry": "Force Error while next read awaits, immediately retry as fresh send; no full-stream rollback promised",
+    "cleanup": {
+      "owner": "transport mock settles pending read; hook clears flag",
+      "deadline": "send settlement",
+      "stats": {
+        "readers": 1,
+        "reads": 2,
+        "active": 0,
+        "aborts": 1,
+        "release": 0,
+        "cancel": 0,
+        "completions": 0
+      },
+      "lock_release": "not called by hook",
+      "real_fetch_timeout": "gap; no built-in deadline"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H03-after-first-patch",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H03-after-first-patch",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "recoverable partial state; external deadline required; no rollback promised for full stream",
+      "base_result": "recoverable partial state; external deadline required; no rollback promised for full stream"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "H03-after-last-patch-before-eof",
+    "boundary": "CP5",
+    "faults": [
+      "timeout after side effects",
+      "pre-completion disconnect",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Deadline after last visible write but before EOF does not masquerade as successful completion",
+    "classification": "recoverable partial state; external timeout required",
+    "retry": "Force Error on EOF wait, inspect retained state, immediately retry fresh; error clears",
+    "cleanup": {
+      "owner": "transport mock settles pending read; hook clears flag",
+      "deadline": "send settlement",
+      "stats": {
+        "readers": 1,
+        "reads": 3,
+        "active": 0,
+        "aborts": 1,
+        "release": 0,
+        "cancel": 0,
+        "completions": 0
+      },
+      "lock_release": "not called by hook",
+      "real_fetch_timeout": "gap; no built-in deadline"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H03-after-last-patch-before-eof",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H03-after-last-patch-before-eof",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "recoverable partial state; external deadline required; no rollback promised for full stream",
+      "base_result": "recoverable partial state; external deadline required; no rollback promised for full stream"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "H04",
+    "boundary": "CP5",
+    "faults": [
+      "cancellation",
+      "shutdown",
+      "restart"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Unmount before/after patch aborts owned request, settles read without onComplete/onError",
+    "classification": "preserved cancellation invariant in abort-aware mock",
+    "retry": "Immediately remount and send successful request; no pending mock reads",
+    "cleanup": {
+      "owner": "hook effect aborts; transport mock rejects read",
+      "deadline": "unmount and pending promise settlement",
+      "active_reads": 0,
+      "real_reader_release": "gap"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H04",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H04",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved invariant",
+      "base_result": "preserved invariant"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "H05",
+    "boundary": "CP5",
+    "faults": [
+      "concurrent/conflicting sends",
+      "cancellation race"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Superseding request aborts old request and preserves new winning state; observe streaming flag during conflict",
+    "classification": "stale streaming flag during supersession; pre-existing",
+    "retry": "Second send starts while first settles cancellation; both promises settle, winner=second",
+    "cleanup": {
+      "owner": "hook abort + transport",
+      "deadline": "both sends settled",
+      "active_reads": 0
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H05",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H05",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "stale streaming flag during supersession; baseline attribution required",
+      "base_result": "stale streaming flag during supersession; baseline attribution required"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "H06",
+    "boundary": "CP5",
+    "faults": [
+      "repetition",
+      "concurrency",
+      "cancellation",
+      "resource cleanup"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Independent hooks must not cross-contaminate state; mock active reads return to zero after each round",
+    "classification": "preserved bounded mock in-flight resource invariant; heap/FD gap",
+    "retry": "10 rounds of 8 simultaneous streams, cancel 4 and complete 4 per round; remount next round",
+    "cleanup": {
+      "owner": "hook unmount and mock transport",
+      "deadline": "each round",
+      "active_reads_bound": 0,
+      "listeners": "mock signal objects dropped each round",
+      "process_and_fd": "real transport gap"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H06",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H06",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved invariant",
+      "base_result": "preserved invariant"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "H07",
+    "boundary": "CP5/CP6",
+    "faults": [
+      "completion callback failure",
+      "ambiguous success",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Observe completion callback failure after visible state separately from renderer state commit",
+    "classification": "duplicated state on replay; pre-existing",
+    "retry": "Immediate same append with previousSpec duplicates x; no operation id or automatic rollback",
+    "cleanup": {
+      "owner": "hook finally/unmount; callback owner for sink compensation",
+      "deadline": "send settlement",
+      "streaming": false
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H07",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H07",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "duplicated append after ambiguous callback success; no stream idempotency key",
+      "base_result": "duplicated append after ambiguous callback success; no stream idempotency key"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "P01",
+    "boundary": "CP1/CP6",
+    "faults": [
+      "caller-level partial write",
+      "repetition",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "fail",
+    "expected_state_and_signal": "A2/F2: callback must contain only committed accepted entries, not rejected /items/01",
+    "classification": "rejected write leaks into callback; F2 remains open",
+    "retry": "25 mixed updates; after each repeat exact update immediately, observe no extra callback",
+    "cleanup": {
+      "owner": "StateProvider/useSyncExternalStore",
+      "deadline": "unmount",
+      "callbacks_after_exact_retry": 0,
+      "external_sink_rollback": "not supplied"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#P01",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#P01",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "F2 callback claims rejected path was written; persists across repetition",
+      "base_result": "baseline callback matches coerced write"
+    },
+    "attribution": "existing confirmed finding"
+  },
+  {
+    "id": "P02",
+    "boundary": "CP6",
+    "faults": [
+      "forced caller-level durable-sink partitions",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Split local state commit from application persistence before/after sink commit; same retry cannot prove rollback",
+    "classification": "missing persistence before sink commit; pre-existing; post-sink retry no duplicate",
+    "retry": "Throw before and after mock sink write; same update immediately repeats, callback is suppressed",
+    "cleanup": {
+      "owner": "application callback sink",
+      "deadline": "application-defined; absent from library contract",
+      "pending": 0,
+      "automatic_compensation": false
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#P02",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#P02",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "caller-level persistence gap after local commit; identical retry suppresses callback instead of rolling back/redelivering",
+      "base_result": "caller-level persistence gap after local commit; identical retry suppresses callback instead of rolling back/redelivering"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "H08",
+    "boundary": "CP5",
+    "faults": [
+      "timeout before response",
+      "refusal",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Stalled fetch before response keeps work active until external rejection and then clears streaming",
+    "classification": "recoverable degradation; no built-in deadline",
+    "retry": "Force fetch rejection after controlled microtask suspension; immediate known-good retry aborts old signal",
+    "cleanup": {
+      "owner": "fetch implementation rejects; hook aborts old signal on retry",
+      "deadline": "external deadline and next send",
+      "pending_fetches": 0
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H08",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H08",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "recoverable rejection under externally supplied deadline; no hook timeout",
+      "base_result": "recoverable rejection under externally supplied deadline; no hook timeout"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "H09",
+    "boundary": "CP5/CP6",
+    "faults": [
+      "last fallible callback stage",
+      "post-commit cleanup",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Throwing onError after committed patch must not leave streaming true; caller observes rejected send",
+    "classification": "recoverable degradation; finally still executes; pre-existing",
+    "retry": "Disconnect reader then onError throws; immediately retry known-good stream",
+    "cleanup": {
+      "owner": "hook finally + caller catch",
+      "deadline": "send promise settlement",
+      "active_reads": 0,
+      "callback_sink": "application-owned"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H09",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H09",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "error callback exception propagates but finally clears streaming",
+      "base_result": "error callback exception propagates but finally clears streaming"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "H10",
+    "boundary": "CP5",
+    "faults": [
+      "malformed dependency schema",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Wrong-typed path/from produces observable stream error without visible state corruption",
+    "classification": "graceful rejection via caught runtime error",
+    "retry": "Immediately retry valid stream after each malformed shape",
+    "cleanup": {
+      "owner": "hook finally/unmount",
+      "deadline": "send settles",
+      "mock_requests_pending": 0
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H10",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H10",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "malformed schema is rejected at runtime, stream error signaled, retry recovers",
+      "base_result": "malformed schema is rejected at runtime, stream error signaled, retry recovers"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "H11",
+    "boundary": "CP5",
+    "faults": [
+      "overload",
+      "backpressure",
+      "recovery",
+      "memory growth"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Quantify rawLines growth and cleanup without claiming throughput or global memory bound",
+    "classification": "input-proportional uncapped retention until next send; pre-existing",
+    "retry": "4 bursts of 128 lines; clear retains 512 raw lines; immediate fresh send resets to 1",
+    "cleanup": {
+      "owner": "hook next send/unmount, application caps ingress",
+      "deadline": "new send",
+      "active_reads": 0,
+      "retained_raw_lines_after_new_send": 1,
+      "maximum_supported_load": "gap"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#H11",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#H11",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "raw line retention grows with input and survives clear; fresh send resets, no built-in overload cap",
+      "base_result": "raw line retention grows with input and survives clear; fresh send resets, no built-in overload cap"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "C11",
+    "boundary": "CP1/CP3",
+    "faults": [
+      "accessor exception",
+      "before-commit retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Throwing accessor before write cannot commit snapshot or mutate original array",
+    "classification": "recoverable degradation",
+    "retry": "Disable accessor failure and immediately repeat set; writes=1, old array remains a",
+    "cleanup": {
+      "owner": "accessor/adapter owner",
+      "deadline": "before immediate retry",
+      "fault_disabled": true,
+      "pending": 0
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C11",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C11",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved invariant",
+      "base_result": "preserved invariant"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "C12",
+    "boundary": "CP2",
+    "faults": [
+      "forced staging and post-removal failure",
+      "exception",
+      "rollback",
+      "retry"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Split staging failure from real destination setter failure after source removal; do not infer caller rollback from staging",
+    "classification": "frozen/always-throwing destination preserved on head; commit-only setter corrupts source on both; not new PR finding",
+    "retry": "Replace failing destination, retry same move immediately; explicit source restoration only if needed",
+    "cleanup": {
+      "owner": "caller supplying non-JSON object",
+      "deadline": "before safe retry",
+      "action": "replace failing destination and restore source from independent snapshot",
+      "automatic_rollback": false
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C12",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C12",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "frozen and always-throwing setter fail safely in staging; commit-only setter still corrupts source, outside plain JSON",
+      "base_result": "all three non-JSON destination failures occur after source removal"
+    },
+    "attribution": "pre-existing limitation or observed improvement, not a new regression"
+  },
+  {
+    "id": "C13",
+    "boundary": "CP2",
+    "faults": [
+      "cycles",
+      "repetition",
+      "path-local resource ownership"
+    ],
+    "execution": "executed",
+    "test_status": "pass",
+    "expected_state_and_signal": "Unrelated cyclic branch identity and self link survive path-local staging",
+    "classification": "preserved identity; GC unverified",
+    "retry": "100 repeated invalid moves; source preserved on head; no full-graph traversal required",
+    "cleanup": {
+      "owner": "caller drops graph after operation",
+      "deadline": "test return",
+      "garbage_collection": "gap; identity invariant only"
+    },
+    "evidence": {
+      "head": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-head-8.json#C13",
+      "base": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/traces-base-3.json#C13",
+      "probe": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/pressure.test.ts",
+      "head_result": "preserved invariant",
+      "base_result": "preserved invariant"
+    },
+    "attribution": "executed pressure observation; no new regression claimed"
+  },
+  {
+    "id": "G01",
+    "execution": "gap",
+    "boundary": "real fetch/browser/OS",
+    "reason": "Only abort-aware local mocks and jsdom were executed. TCP/TLS disconnects, real ReadableStream lock release, sockets/FD return, browser lifecycle and OS networking were not measured. releaseLock/cancel counters are zero, not proof of real resource leak or leak freedom.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "not verified",
+      "deadline": "not verified"
+    },
+    "retry": "not verified",
+    "classification": "verification gap"
+  },
+  {
+    "id": "G02",
+    "execution": "gap",
+    "boundary": "production resource bounds",
+    "reason": "1000 compiler inputs, 512-line hook bursts and 8 concurrent hooks are bounded experiments. No hard ingress cap, production throughput, browser scheduler pressure, heap plateau after forced GC, descriptor growth or RSS plateau was proved. Growth without reset is inferred from source after observed proportional samples, not a measured infinite execution.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "not verified",
+      "deadline": "not verified"
+    },
+    "retry": "not verified",
+    "classification": "verification gap"
+  },
+  {
+    "id": "G03",
+    "execution": "gap",
+    "boundary": "other renderer runtimes",
+    "reason": "Solid/Vue/Svelte/React Native callers are acknowledged from saved caller review, not dynamically exercised. No cross-framework pass is claimed.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "not verified",
+      "deadline": "not verified"
+    },
+    "retry": "not verified",
+    "classification": "verification gap"
+  },
+  {
+    "id": "G04",
+    "execution": "gap",
+    "boundary": "remote durable success and persistence",
+    "reason": "No authorized live API, DB or persistence substrate. Mock callback/sink partitions demonstrate local ordering only, not external rollback, exactly-once delivery, server-side generation/billing idempotence or recovery after remote commit.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "not verified",
+      "deadline": "not verified"
+    },
+    "retry": "not verified",
+    "classification": "verification gap"
+  },
+  {
+    "id": "G05",
+    "execution": "gap",
+    "boundary": "arbitrary JavaScript object adversaries",
+    "reason": "Frozen destination, throwing accessor/setter and unrelated cycle are forced. Arbitrary Proxies, getter-triggered reentrant mutation, touched cycles, massive nesting, allocation failure/OOM and hostile prototypes are not exhaustively exercised; no generalized transactional safety claim.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "not verified",
+      "deadline": "not verified"
+    },
+    "retry": "not verified",
+    "classification": "verification gap"
+  },
+  {
+    "id": "G06",
+    "execution": "gap",
+    "boundary": "independent challenge",
+    "reason": "Author identity and author/reviewer model identities/families are unknown. Local/native execution is not cross-family independence. Contract and direct state/callback oracles are evidence, not an independent model-family review.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "not verified",
+      "deadline": "not verified"
+    },
+    "retry": "not verified",
+    "classification": "verification gap"
+  },
+  {
+    "id": "N01",
+    "execution": "not_applicable",
+    "boundary": "filesystem commit partitions, rename/fsync/crash recovery",
+    "reason": "Reviewed operations and real callers mutate in-memory state only; no target filesystem writer or persistent artifact lifecycle in this diff. Audit evidence output is not product behavior. Therefore filesystem pre/post-commit partitions have no in-scope product commit point.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "no in-scope owner",
+      "deadline": "not applicable"
+    },
+    "retry": "not applicable",
+    "classification": "not applicable"
+  },
+  {
+    "id": "N02",
+    "execution": "not_applicable",
+    "boundary": "ACL/inherited permissions/alternate principals/confidentiality",
+    "reason": "A4 is prototype-path integrity, not a file-access/confidentiality property. No confidential file output or principal access mechanism is introduced. Mode-bit or API-response confidentiality proxies are not used.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "no in-scope owner",
+      "deadline": "not applicable"
+    },
+    "retry": "not applicable",
+    "classification": "not applicable"
+  },
+  {
+    "id": "N03",
+    "execution": "not_applicable",
+    "boundary": "process signals and durable daemon restart",
+    "reason": "No service process, daemon, worker ownership or restart persistence is introduced. Browser hook unmount and compiler reset/remount are exercised; killing the test runner would measure harness teardown, not this library contract.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "no in-scope owner",
+      "deadline": "not applicable"
+    },
+    "retry": "not applicable",
+    "classification": "not applicable"
+  },
+  {
+    "id": "N04",
+    "execution": "not_applicable",
+    "boundary": "OS/filesystem-specific implementations",
+    "reason": "Changed path parsing/state/compound code is synchronous TypeScript with no OS/filesystem branches or package platform selector. Darwin evidence is not a Windows/Linux/browser certification; real browser/transport differences remain G01.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "no in-scope owner",
+      "deadline": "not applicable"
+    },
+    "retry": "not applicable",
+    "classification": "not applicable"
+  },
+  {
+    "id": "N05",
+    "execution": "not_applicable",
+    "boundary": "built-in retry queue/broker/cache eviction",
+    "reason": "No worker queue, retry scheduler, idempotency-key store or broker is introduced. Store operations are synchronous and hook retries are explicit caller send operations. Compiler history and rawLines are applicable retention structures and are exercised in C10/H11.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "no in-scope owner",
+      "deadline": "not applicable"
+    },
+    "retry": "not applicable",
+    "classification": "not applicable"
+  },
+  {
+    "id": "N06",
+    "execution": "not_applicable",
+    "boundary": "clock interrupt between pure JSON synchronous validate and mutate",
+    "reason": "For ordinary JSON data there is no await or timer yield within core compound staging/commit. External timeout injection within that synchronous instruction interval is not a realizable JS event-loop partition. C12 forces actual later fallibility with an accessor setter instead; OOM/process death is G05/N03.",
+    "expected_state_and_signal": null,
+    "cleanup": {
+      "owner": "no in-scope owner",
+      "deadline": "not applicable"
+    },
+    "retry": "not applicable",
+    "classification": "not applicable"
+  }
+]

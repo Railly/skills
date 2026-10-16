@@ -1,0 +1,155 @@
+{
+  "kind": "macOS lifecycle SPIKE; no gate decision",
+  "date": "2026-09-18",
+  "workspace": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-probe",
+  "test": {
+    "command": [
+      "cargo",
+      "test",
+      "--offline",
+      "--locked",
+      "--bin",
+      "agent-browser",
+      "native::cdp::chrome::resource_probe::resource_lifecycle_spike",
+      "--",
+      "--ignored",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-probe/source/cli",
+    "CARGO_TARGET_DIR": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/candidate/cli/target",
+    "cargo_exit": 0,
+    "wrapper_exit": 0,
+    "passed": 1,
+    "failed": 0,
+    "filtered": 1523,
+    "seconds": 6.04,
+    "host_pid": 33712,
+    "samples": 63
+  },
+  "baseline": {
+    "threads": 2,
+    "readers": 0,
+    "fds": 4,
+    "samples": 5,
+    "observed_variation": 0
+  },
+  "cycles": {
+    "owned": 12,
+    "quiet": 6,
+    "burst_8_MiB": 6,
+    "explicit_kill_then_drop": 6,
+    "drop_only": 6,
+    "external_retained_then_drop": 12
+  },
+  "owned_live_counts": {
+    "threads": 3,
+    "readers": 1,
+    "fds": 5
+  },
+  "owned_recovered_counts": {
+    "threads": 2,
+    "readers": 0,
+    "fds": 4
+  },
+  "external_after_12_drops": {
+    "threads": 14,
+    "readers": 12,
+    "fds": 16,
+    "held_extra_seconds": 1
+  },
+  "after_external_fd_close": {
+    "threads": 2,
+    "readers": 0,
+    "fds": 4
+  },
+  "recovery_observation_upper_ms": {
+    "owned_min": 5.46,
+    "owned_max": 7.793,
+    "external_close": 7.897
+  },
+  "cleanup": {
+    "helpers_reaped": 24,
+    "helper_exit": -9,
+    "supervisor_kills": 0,
+    "post_action_live_helpers": 0,
+    "post_run_pid_query_exit": 1,
+    "post_run_pid_query_stdout": "",
+    "socket_removed": true
+  },
+  "measurement": {
+    "thread_sources": [
+      "ps -M",
+      "libproc PROC_PIDLISTTHREADS/PROC_PIDTHREADINFO"
+    ],
+    "fd_source": "libproc PROC_PIDLISTFDS",
+    "reader_name": "chrome-stderr-drain",
+    "ps_libproc_disagreements": 0,
+    "baseline_noise_observed": 0,
+    "timings": "Observation bounds including instrumentation, not exact EOF latency."
+  },
+  "attempts": [
+    {
+      "directory": "attempt-1",
+      "wrapper_exit": 1,
+      "cargo_exit": 101,
+      "issue": "Socket registration coalescing; zero launches."
+    },
+    {
+      "directory": "attempt-2",
+      "wrapper_exit": 101,
+      "cargo_exit": 101,
+      "issue": "ps continuation rows undercounted; RAII cleaned one launch."
+    },
+    {
+      "directory": "attempt-3",
+      "wrapper_exit": 0,
+      "cargo_exit": 0,
+      "host_pid": 29505,
+      "cycles": 24
+    },
+    {
+      "directory": "attempt-4",
+      "wrapper_exit": 0,
+      "cargo_exit": 0,
+      "host_pid": 31259,
+      "cycles": 24
+    },
+    {
+      "directory": "attempt-5",
+      "wrapper_exit": 101,
+      "cargo_exit": 101,
+      "issue": "Non-atomic progress marker read empty after 22 launches; fixed with atomic rename."
+    }
+  ],
+  "preservation": {
+    "archive_members_changed_in_disposable_copy": [
+      "cli/src/native/cdp/chrome.rs"
+    ],
+    "candidate_source_exact_except_test_module": true,
+    "sha256_final": {
+      "/Users/raillyhugo/Programming/vercel/agent-browser-1371-source.tar": "ab09242d72627ab5fd6f7d15441815a3b3277ae4ce2d4677193fd9b44c198d84",
+      "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/sealed/candidate.diff": "0c346e401d4d27e6501e2ab663f1303a560f84333180d013178373e2a6bfc15b",
+      "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/candidate/cli/src/native/cdp/chrome.rs": "20c75cc72c80a67d9fc062897905e6b031e3894e0ee826f271c7300c352ebe9d",
+      "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/candidate/cli/target/debug/agent-browser": "6d24863eef6216c684527fc6c1ffe5a084479020bec67ea01e5d7627ea595ead"
+    },
+    "runtime_incident": "Initial cargo test included integration targets and replaced debug runtime. Exact original bytes restored from cached executable using hash guards. Final --bin run preserved restored hash.",
+    "restoration_receipt": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-probe/runtime-restoration.json",
+    "post_ready_and_real_checkout": "Not written."
+  },
+  "evidence": {
+    "measurements.json": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-probe/measurements.json",
+    "final-validation.json": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-probe/final-validation.json",
+    "cargo.log": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-probe/cargo.log",
+    "probe.py": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-probe/probe.py",
+    "source/cli/src/native/cdp/resource_probe.rs": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-probe/source/cli/src/native/cdp/resource_probe.rs"
+  },
+  "limits": [
+    "Synthetic external writer, not normal Chrome escape evidence.",
+    "Finite same-process macOS observations; no Linux/Windows claim.",
+    "No fallback, retry, CDP, daemon idle, memory, default temp-profile or candidate-removal differential proof.",
+    "No join or bounded reader lifetime while external writers remain.",
+    "No gate decision or production source fix."
+  ]
+}

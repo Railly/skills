@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "stage": "resilience",
+  "required": true,
+  "status": "gaps",
+  "verdict": "new read-safety behavior preserved in executed model; documentation caveat and non-executed substrates remain",
+  "head": "fad78e9c5e3f1958558eca616d747313e4d4ba60",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;SKILL.md@sha256:aa1b09c3864bfca6e882e2c9ea11b63dd9f89279f36018e24e67edeee5edfa4f",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/stage-receipt.json",
+  "report_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/run-report.json",
+  "evidence": [
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/evidence.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/base-comparison.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/pressure-matrix.json"
+  ],
+  "fingerprint": {
+    "repository": "vercel-labs/portless",
+    "base_sha": "1ad573bb95810daf6cd50c1718707015450f3f09",
+    "head_sha": "fad78e9c5e3f1958558eca616d747313e4d4ba60",
+    "dirty_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed_paths_digest": "sha256:64466c3404cf6c95c03f8518fd67fa9e98be99281891c7c2c4a6a37557fa65f6",
+    "contract_digest": "sha256:8c7d51cd4dd35a7127e3a4f9a197ce6d07f445d1db8926c39dff9607f2a4ea63",
+    "contract_digest_scope": "Stage-local user/docs snapshot, parent manifest not yet available",
+    "command": "node /Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/pressure.mjs",
+    "environment_digest": "sha256:0f0bcfb85d8b4360f4bdae1c199aeed0952cbc12663bceeb4d9504e68a492237",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;SKILL.md@sha256:aa1b09c3864bfca6e882e2c9ea11b63dd9f89279f36018e24e67edeee5edfa4f",
+    "relevant_paths": [
+      "AGENTS.md",
+      "README.md",
+      "apps/docs/src/app/commands/page.mdx",
+      "package.json",
+      "packages/portless/package.json",
+      "packages/portless/src/clean-utils.ts",
+      "packages/portless/src/cli-utils.ts",
+      "packages/portless/src/cli.test.ts",
+      "packages/portless/src/cli.ts",
+      "packages/portless/src/hosts-sync-auth.ts",
+      "packages/portless/src/hosts.test.ts",
+      "packages/portless/src/hosts.ts",
+      "packages/portless/src/routes.ts",
+      "packages/portless/src/utils.ts",
+      "skills/portless/SKILL.md",
+      "packages/portless/dist/chunk-RQ7SS7J3.js",
+      "packages/portless/dist/cli.js",
+      "packages/portless/dist/index.js"
+    ],
+    "reusable": false,
+    "reuse_evidence": "No cross-head reuse claim. Dependency cone includes hosts helpers, CLI dispatch/elevation, state discovery and route loading, bundled outputs, and contract surfaces. Built CLI and extracted source checks are pinned to this head; future diff requires re-evaluation."
+  },
+  "started_at": "2026-09-14T18:45:41.723Z",
+  "completed_at": "2026-09-14T18:52:30.952Z",
+  "elapsed_ms": 409230,
+  "elapsed_scope": "From independent pressure-driver start through receipt generation; earlier skill/convention reading and source mapping time not instrumented.",
+  "measured_pressure_ms": 9657,
+  "commands": [
+    {
+      "command": "node --check preload.cjs && node --check pressure.mjs && node pressure.mjs > pressure.log 2>&1",
+      "cwd": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience",
+      "exit_code": 0,
+      "status": "pass",
+      "meaningful_output": "53 cells, 159 built CLI executions, unexpectedOracleFailures [], cleanCheckout true",
+      "evidence": "pressure.log"
+    },
+    {
+      "command": "node --check compare-base.mjs && node compare-base.mjs > base-comparison.log 2>&1",
+      "cwd": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience",
+      "exit_code": 0,
+      "status": "pass",
+      "meaningful_output": "144 module executions, unexpectedHarnessFailures []; exactly four first-attempt differences for initial read and empty verification contracts",
+      "evidence": "base-comparison.log"
+    },
+    {
+      "command": "bash /Users/raillyhugo/Programming/railly/skills/skills/review-gate/scripts/gate.sh surfaces /Users/raillyhugo/Programming/railly/skills/cases/portless/conventions.md 1ad573bb95810daf6cd50c1718707015450f3f09",
+      "cwd": "/tmp/portless-review-424-fad78e9c",
+      "exit_code": 0,
+      "status": "pass",
+      "meaningful_output": "PASS [surfaces]",
+      "evidence": "gate-surfaces.log"
+    },
+    {
+      "command": "git rev-parse HEAD; git status --porcelain=v1 --untracked-files=all",
+      "cwd": "/tmp/portless-review-424-fad78e9c",
+      "exit_code": 0,
+      "status": "pass",
+      "meaningful_output": "fad78e9c5e3f1958558eca616d747313e4d4ba60; empty worktree status",
+      "evidence": "final-verification.json"
+    }
+  ],
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "In-place hosts-file bytes replaced; partial bytes may become visible before API returns",
+      "owner": "syncHostsFile or cleanHostsFile",
+      "commit_event": "Actual disposable fixture write inside redirected fs.writeFileSync, logged with before/intended/after bytes",
+      "later_fallible_stages": [
+        "sync verification read",
+        "sync managed-block predicate",
+        "manual caller privileged retry after false",
+        "CLI error/status publication"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "readHostsFile / syncHostsFile / cleanHostsFile",
+          "covers": [
+            "initial read before commit"
+          ],
+          "forced": true,
+          "residual_observed": "EACCES on initial read: bytes unchanged, one read, zero writes for populated sync, empty sync and clean; uid0 exit1; uid501 one stubbed sudo then inherited status.",
+          "cleanup_owner": "No write occurred; no rollback necessary. Caller owns optional elevation.",
+          "retry": {
+            "attempted": true,
+            "outcome": "Persistent fault rejects again; immediate healthy invocation succeeds against original same fixture.",
+            "evidence": "evidence.json: *initial-read* cases, all three attempts"
+          },
+          "evidence": "Built CLI, plus base comparison: base populated sync writes from empty content; base empty sync/clean return success."
+        },
+        {
+          "ownership_region": "fs.writeFileSync",
+          "covers": [
+            "write rejected before side effect",
+            "write returns normally without applying bytes"
+          ],
+          "forced": true,
+          "residual_observed": "EIO preserves fixture. Sync noop is caught by verification. Clean noop falsely returns success with stale block intact, equally at base.",
+          "cleanup_owner": "No transactional rollback in writer or manual caller. Harness retains fixture, OS closes process descriptors at exit.",
+          "retry": {
+            "attempted": true,
+            "outcome": "Persistent fault repeat remains bounded; removing fault immediately reconciles valid block.",
+            "evidence": "evidence.json: *write-error*, *write-noop*"
+          },
+          "evidence": "Per-attempt JSONL records before, intended and actual after bytes."
+        },
+        {
+          "ownership_region": "post-write readHostsFile / syncHostsFile",
+          "covers": [
+            "verification read rejected after commit"
+          ],
+          "forced": true,
+          "residual_observed": "New bytes already committed, no rollback, root CLI exit1 and nonroot existing sudo/error path. Empty and nonempty sync both reject. Clean has no post-write read, so post-read fault is not reached there.",
+          "cleanup_owner": "Writer retains committed state; CLI only reports false or delegates once. No caller-level rollback claimed.",
+          "retry": {
+            "attempted": true,
+            "outcome": "Next invocation reads committed matching block and exits0 with zero writes. The post-write fault is stage-conditioned, not global unreadability across processes.",
+            "evidence": "evidence.json: sync-*-post-read*, repeat-post-read-0..9"
+          },
+          "evidence": "159 built executions; base empty verification returns success under identical injection, head returns failure."
+        },
+        {
+          "ownership_region": "manual handleHosts error handling",
+          "covers": [
+            "sudo status1",
+            "sudo status0",
+            "sudo ETIMEDOUT result"
+          ],
+          "forced": true,
+          "residual_observed": "One stubbed sudo call maximum; timeout and failed status yield generic Failed to update + exit1; status0 accepted without parent reread.",
+          "cleanup_owner": "No real child is created by preload. The existing caller owns the subprocess budget; 30000ms value captured, not waited.",
+          "retry": {
+            "attempted": true,
+            "outcome": "Immediate persistent-fault retry repeats one attempt; recovery succeeds without sudo.",
+            "evidence": "evidence.json: sync-sudo-0, sync-sudo-timeout, clean-sudo-0, clean-sudo-timeout, uid501 fault cells"
+          },
+          "evidence": "Full argv/environment forwarding and timeout stored in sudo-stub events; this does not prove real privileged child behavior."
+        },
+        {
+          "ownership_region": "in-place write / marker parser",
+          "covers": [
+            "partial commit and error",
+            "unrelated-data loss",
+            "orphaned marker block"
+          ],
+          "forced": true,
+          "residual_observed": "Partial nonempty writes leave orphan markers; retries can add nested blocks and still fail. Empty sync can return0 over orphan stale entries. Correct managed block can mask unrelated-data loss. All mechanisms reproduced in base source.",
+          "cleanup_owner": "No backup/atomic replacement/rollback owner exists in this diff. Damaged fixtures remain for evidence.",
+          "retry": {
+            "attempted": true,
+            "outcome": "Not generally safe: empty orphan never changes; nonempty partial immediate recovery can still fail; unrelated entries cannot be recovered from lost bytes.",
+            "evidence": "evidence.json: sync-orphan-0/1, sync-partial-0/1, clean-partial, sync-unrelated-loss; base-comparison.json same cells"
+          },
+          "evidence": "Preexisting limitations, not newly introduced data corruption."
+        }
+      ]
+    }
+  ],
+  "cleanup": {
+    "process_exits_observed": 159,
+    "expected_process_exits": 159,
+    "subordinate_processes": "No real sudo child or daemon created; runner waits each CLI synchronously.",
+    "fixtures": "Retained intentionally under authorized directory, no production state changed.",
+    "descriptor_claim": "Process exit observed; no per-descriptor enumeration or live-daemon leak/load bound established.",
+    "rss_range_bytes": [
+      64159744,
+      65732608
+    ],
+    "active_resources": [
+      "PipeWrap"
+    ]
+  },
+  "retries": "Every one of 53 built scenarios retains the same fixture for fault, immediate persistent retry, and immediate fault-free retry. Ten additional post-write failure sequences exercise repetition; no load/concurrency claim.",
+  "gaps": [
+    "Parent manifest absent during initial and repeated inspections; not edited per user. Contract digest/acceptance IDs are stage-local and require parent integration.",
+    "Native fallback after FX auth schema failure is user-reported; no failed FX worker receipt or author/reviewer family identity available. No independent cross-family challenge is claimed.",
+    "Only Darwin arm64 Node v24.18.0 executed. Linux, Windows, real sudo/Admin, ACLs, protected-file permission asymmetry, native resolver/cache and real hosts inode are unverified.",
+    "Routes are schema-valid hand-authored fixture JSON consumed by real RouteStore, not emitted by alias/app registration. Real daemon startup/reload/shutdown, IPC capability outcomes, warning delivery and real elevated child execution are unverified.",
+    "In-place partial writes/noops are bounded Node API injections, not actual ENOSPC, interrupted kernel writes, power loss or fsync tests. Concurrent writers, race windows and sustained process/descriptor/memory load were not exercised.",
+    "Authored tests were read only after the independent built run. They were not executed: CLI tests permit real proxy discovery and need extra isolation; a suite pass is not claimed. No source mutation/fix-absent mutation test was performed.",
+    "Provided build was not reproduced and has no source maps. Bundle hashes and agreement with native exact-head hosts source probes identify observed behavior, not an independently reproduced toolchain build."
+  ],
+  "findings": [
+    {
+      "id": "RA-DOC-1",
+      "state": "confirmed",
+      "severity": "P3",
+      "scope": "new wording overstates a preexisting cleanup capability",
+      "preexisting": "Underlying orphan-block parser/cleanup defect exists at the supplied base; this PR adds stronger success text and unqualified prose.",
+      "claim": "Empty sync can claim no stale entries remain while an orphaned managed block still contains stale.localhost.",
+      "changed_lines": [
+        "packages/portless/src/cli.ts:2486-2488",
+        "packages/portless/src/cli.ts:2423-2425",
+        "README.md:489",
+        "apps/docs/src/app/commands/page.mdx:276",
+        "skills/portless/SKILL.md:420"
+      ],
+      "mechanism_lines": [
+        "packages/portless/src/hosts.ts:31-34",
+        "packages/portless/src/hosts.ts:46-49",
+        "packages/portless/src/hosts.ts:104-107"
+      ],
+      "evidence": "evidence.json results[id=sync-orphan-0]: all 3 invocations exit0, reads1/writes0, print No stale portless entries remain, preserve stale.localhost; base-comparison.json sync-orphan-0 has identical residual state/success. New text is stronger than prior No active routes to sync.",
+      "resolution": "No fix authorized. Qualify reconciliation to parseable managed blocks or separately address the already-existing orphan-block recovery problem.",
+      "layer": "user-facing contract",
+      "source": "independent built-artifact pressure",
+      "path": "packages/portless/src/cli.ts:2487"
+    }
+  ],
+  "issue_candidates": [
+    {
+      "id": "RA-OLD-1",
+      "title": "Preexisting: hosts clean does not verify its write",
+      "evidence": "clean-empty-write-noop-uid0/501 return0 with stale bytes intact; clean post-read fault never triggers because no verification read exists. Base source and runtime have same behavior.",
+      "source_lines": "hosts.ts:128-137, especially unchanged write/return at133-134",
+      "why_out_of_scope": "This PR adds an initial read guard to clean, not verification. New docs explicitly promise verification for manual sync, not hosts clean."
+    },
+    {
+      "id": "RA-OLD-2",
+      "title": "Preexisting: in-place partial writes lack transactional rollback or reliable immediate recovery",
+      "evidence": "sync-partial-1 fails after partial bytes; immediate retry nests markers and healthy immediate recovery still exits1. sync-partial-0 and clean-partial can succeed on retries while unrelated bytes remain lost. Reproduced base/head source.",
+      "source_lines": "hosts.ts:46-52,108-117,133-134",
+      "why_out_of_scope": "Write algorithm, parser and atomicity model unchanged; no atomicity promise introduced by read guards."
+    },
+    {
+      "id": "RA-OLD-3",
+      "title": "Preexisting: verification checks managed entries, not whole-file integrity",
+      "evidence": "sync-unrelated-loss exits0 after fixture loses localhost and keep.example but retains exact app block. Same base/head source outcome.",
+      "source_lines": "hosts.ts:77-92,120-121",
+      "why_out_of_scope": "New verification line rejects null but continues the old managed-block predicate. Do not interpret verifies each write as whole-file integrity or atomicity."
+    }
+  ],
+  "reusable": false,
+  "manifest_update": {
+    "status": "deferred-to-parent",
+    "reason": "Explicit user prohibition on editing parent manifest; parent absent during inspections. Parent must register this exact-head artifact and reconcile contract fingerprint."
+  },
+  "execution": {
+    "mode": "native",
+    "degraded_from": "fx_worker",
+    "independence_gap": "Native fallback after FX auth schema failure is user-reported; no failed FX worker receipt or author/reviewer family identity available. No independent cross-family challenge is claimed.",
+    "receipt": null,
+    "schema_failures": 1,
+    "schema_failure_source": "User-provided upstream FX auth schema failure, not reproduced or independently inspected here",
+    "operations": [
+      {
+        "operation": "resilience audit fallback",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false,
+        "failure_origin": "upstream user report"
+      },
+      {
+        "operation": "native independent built fault drive",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "base/head source comparison",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  }
+}

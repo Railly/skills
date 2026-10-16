@@ -1,0 +1,17 @@
+import { execFileSync, spawn } from 'node:child_process';
+import {readFileSync,writeFileSync} from 'node:fs';
+const directory = new URL('./', import.meta.url);
+const started = new Date();
+const key=execFileSync('/usr/bin/security',['find-generic-password','-s','Vercel AI Gateway','-a','vercel-ai-gateway','-w'],{encoding:'utf8'}).trim();
+const args=['exec','--ephemeral','--sandbox','read-only','-m','openai/gpt-5.5','-c','model_reasoning_effort="high"','-c','mcp_servers={}','--output-last-message',new URL('codex-review.md',directory).pathname,'-'];
+const child=spawn('codex',args,{cwd:'/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps',env:{...process.env,AI_GATEWAY_API_KEY:key},stdio:['pipe','pipe','pipe']});
+let stdout='',stderr='';
+child.stdout.on('data',data=>{stdout+=data;});
+child.stderr.on('data',data=>{stderr+=data;});
+child.stdin.end(readFileSync(new URL('fx-prompt.md',directory),'utf8'));
+const timer=setTimeout(()=>child.kill('SIGTERM'),600000);
+const exit=await new Promise(resolve=>child.on('exit',resolve));clearTimeout(timer);
+const redact=value=>value.split(key).join('[REDACTED]');
+writeFileSync(new URL('codex-review.log',directory),redact(stdout+stderr));
+const receipt={runtime:'codex_cli_ephemeral',model:'openai/gpt-5.5',provider:'vercel-ai-gateway',credentialSource:'macos-keychain',readOnly:true,startedAt:started.toISOString(),finishedAt:new Date().toISOString(),exit,status:exit===0?'complete':'failed',degradedFrom:'fx_worker',reason:'FX selected a stored credential and reported auth=missing despite the process environment; no FX config was modified.'};
+writeFileSync(new URL('codex-review-receipt.json',directory),JSON.stringify(receipt,null,2));console.log(JSON.stringify(receipt));process.exitCode=exit===0?0:1;

@@ -1,0 +1,50 @@
+{
+  "date": "2026-09-18",
+  "status": "COMPILE_ONLY",
+  "production": false,
+  "gate_pass": false,
+  "credit": "Simon Ellefsen: underlying #1527 post-ready byte drain",
+  "crate": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/windows-cancellation-probe",
+  "windows_source_lines": 172,
+  "buffer_bytes": 4096,
+  "dependency": "windows-sys =0.52.0",
+  "features": ["Win32_Foundation", "Win32_System_IO"],
+  "typecheck": {
+    "command": "cargo check --offline --target x86_64-pc-windows-msvc --tests --target-dir target",
+    "exit_code": 0,
+    "attempts_succeeded": 2,
+    "final_duration_seconds": 0.52,
+    "log": "typecheck.log",
+    "linked": false,
+    "rustc": "1.98.1",
+    "cargo": "1.98.1"
+  },
+  "tests": {
+    "status": "NOT RUN",
+    "quiet_retained_writer": "NOT RUN",
+    "delayed_entry_cancel_race": "NOT RUN",
+    "burst_reader_stop": "NOT RUN",
+    "continuous_reader_stop": "NOT RUN",
+    "repeated_cycles": "NOT RUN",
+    "cycles": 32,
+    "completion_timeout_seconds": 5,
+    "timeout_action": "Abort test process; never report detached worker as success"
+  },
+  "runtime_blocker": "No Windows runtime/Wine on Darwin; Linux aarch64 Docker cannot execute Windows MSVC tests",
+  "next_command_not_run": "cargo test --offline --locked --target x86_64-pc-windows-msvc --target-dir target -- --test-threads=1",
+  "assumptions_unverified": [
+    "Cancellation support and thread-handle access rights",
+    "I/O completion and worker scheduling",
+    "Finite native thread/TLS finalization"
+  ],
+  "stop_or_drop_hard_bound": false,
+  "request_is_completion": false,
+  "production_integration_verified": false,
+  "resource_accounting_verified": false,
+  "inspection_excluded": {
+    "command": "git -C /Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/candidate diff -- cli/src/native/cdp/windows_process.rs cli/Cargo.toml",
+    "exit_code": 1,
+    "reason": "Non-Git snapshot; implicit file comparison, not change evidence"
+  },
+  "report": "windows-cancel.md"
+}

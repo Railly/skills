@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "repository": "vercel-labs/agent-browser",
+  "pr": 1691,
+  "target": {
+    "path": "/Users/raillyhugo/Programming/vercel/agent-browser-1691-review",
+    "head": "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+    "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+    "dirty_digest": "clean",
+    "changed_paths_digest": "sha256:9097d5b19b97d4b2cfe0f704d61fe9dca24f179bcca1a652723ac494af694005"
+  },
+  "authorization": {
+    "request": "$review-gate https://github.com/vercel-labs/agent-browser/pull/1691",
+    "scope": "local review, isolated build and bounded verification, durable reports"
+  },
+  "profile": "external-pr",
+  "risk": "high",
+  "risk_triggers": [
+    "remote billable browser creation and cleanup",
+    "process lifecycle",
+    "API credential handling"
+  ],
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "runtime": {
+    "execution_mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "Native reviewer is another OpenAI-family context and author model is unknown. Saved official API contract supplies an independent protocol oracle, but there is no complete cross-family lifecycle challenge.",
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/independent-correctness-review.json"
+  },
+  "stages": {
+    "review": {
+      "status": "incomplete",
+      "verdict": "incomplete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/run-report.json",
+      "head": "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+      "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+      "dirty_digest": "clean",
+      "changed_paths_digest": "sha256:9097d5b19b97d4b2cfe0f704d61fe9dca24f179bcca1a652723ac494af694005",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "confirmed_findings": [
+        "F1",
+        "F2"
+      ],
+      "gaps": [
+        "Required exact-head passing Test Strength receipt is unavailable. Authored green tests do not establish fix-absent falsification or a complete provider protocol matrix.",
+        "Required exact-head passing Resilience Audit receipt is unavailable. The two focused failure probes do not cover all post-create/CDP/cleanup ownership partitions.",
+        "No BROWSER_USE_API_KEY was present in the environment; live Cloud create, CDP attach, profile persistence, recording, stop and billing observations remain unverified.",
+        "Native reviewer is another OpenAI-family context and author model is unknown. Saved official API contract supplies an independent protocol oracle, but there is no complete cross-family lifecycle challenge.",
+        "Successful create with id but absent/null cdpUrl is permitted by the response schema and loses cleanup ownership in the parser. No live active-browser instance of that shape was observed; it remains a producer-verification gap."
+      ],
+      "report_digest": "sha256:20036ab9173ff0e773db74c609b14811cda7923c860bc32d8e0176a385ce5c21",
+      "independent_artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/independent-correctness-review.json",
+      "validation": {
+        "command": "gate.sh report run-report.json",
+        "exit_code": 1,
+        "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/validation.log",
+        "meaning": "Promotion rejected for confirmed open findings and explicit proof gaps. No invalid schema fields or identity mismatches remain."
+      },
+      "finished_at": "2026-09-17T06:43:40.513737+00:00"
+    },
+    "security_review": {
+      "status": "pass",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/security-review.json",
+      "fingerprint": {
+        "repository": "vercel-labs/agent-browser",
+        "base_sha": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+        "head_sha": "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+        "dirty_digest": "clean",
+        "changed_path_digest": "sha256:9097d5b19b97d4b2cfe0f704d61fe9dca24f179bcca1a652723ac494af694005",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+      }
+    }
+  },
+  "missing_upstream": [
+    "test_strength",
+    "resilience"
+  ],
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/contract.md",
+    "digest": "sha256:c9d82397d01d4db05851a8265ed92f6f0deebf27c07c4814c58ff12420a83339"
+  },
+  "created_at": "2026-09-17T06:27:56.929110+00:00",
+  "budget": {
+    "review_wall_time_ms": 1800000,
+    "independent_review_timeout_ms": 600000
+  }
+}

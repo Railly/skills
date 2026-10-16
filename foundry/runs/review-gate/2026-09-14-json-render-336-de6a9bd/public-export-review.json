@@ -1,0 +1,68 @@
+{
+  "head": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+  "reviewer_scope": "public package exports and independent compound-patch consumers",
+  "artifact": "public-export-probe.json",
+  "findings": [
+    {
+      "id": "CONSUMER-COMPOUND-001",
+      "severity": "P1",
+      "state": "confirmed",
+      "claim": "Wire compound-patch validation into renderer streaming hooks before making path writes reject malformed tokens",
+      "changed_location": {
+        "path": "packages/core/src/types.ts",
+        "start_line": 900,
+        "end_line": 913
+      },
+      "consumer_locations": [
+        "packages/react/src/hooks.ts:184",
+        "packages/svelte/src/streaming.svelte.ts:185",
+        "packages/vue/src/hooks.ts:191",
+        "packages/solid/src/hooks.ts:182",
+        "packages/react-native/src/hooks.ts:226"
+      ],
+      "evidence": [
+        "coordinator/hook-proof-head.json",
+        "coordinator/hook-proof-base-public.json",
+        "public-export-probe.json"
+      ],
+      "observed": "Built React useUIStream accepts a JSONL move from /state/source to /state/items/01, removes source, and silently rejects the destination. A malformed copy/move source inserts an own undefined property. Core compileSpecStream rejects the same malformed compound patches and preserves the source.",
+      "recommendation": "Apply the guarded compound semantics at each renderer stream dispatcher or delegate them to a shared helper, then exercise the built hook with invalid source and destination streams.",
+      "base_comparison": "Confirmed with built base core and identical built React hook; coordinator/hook-proof-base-public.json. Base moves the value into index 1 for malformed destination 01, whereas head drops it entirely. Base reads index 1 for malformed copy/move sources, whereas head inserts undefined. Valid move output is identical between base and head."
+    }
+  ],
+  "local_proof_results": {
+    "status": "pass",
+    "head": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+    "observations": [
+      {
+        "format": "esm",
+        "producer": "diffToPatches + JSON.stringify",
+        "patchCount": 3,
+        "fragmentedStream": "pass",
+        "moveCopyStream": "pass",
+        "rejectedSnapshotIdentity": true,
+        "notificationsAfterAcceptedBatch": 1
+      },
+      {
+        "format": "cjs",
+        "producer": "diffToPatches + JSON.stringify",
+        "patchCount": 3,
+        "fragmentedStream": "pass",
+        "moveCopyStream": "pass",
+        "rejectedSnapshotIdentity": true,
+        "notificationsAfterAcceptedBatch": 1
+      },
+      {
+        "export": "store-utils",
+        "rejectedWrites": 0,
+        "acceptedBatchWrites": 1,
+        "identityPreserved": true
+      }
+    ]
+  },
+  "notes": [
+    "No target source changes made.",
+    "Core ESM and CJS were imported by absolute built-artifact path.",
+    "Official Redux, Zustand, Jotai, and XState adapters were read and delegate their writes to createStoreAdapter; no additional independent immutable setter found."
+  ]
+}

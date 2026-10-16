@@ -1,0 +1,77 @@
+{
+  "head": "bfab0c4a6ce4d1a5a56ad2979577d28993dc1736",
+  "at": "2026-09-08T16:31:59.820229+00:00",
+  "steps": [
+    {
+      "args": [
+        "open",
+        "http://127.0.0.1:5173/error"
+      ],
+      "exit": 0,
+      "stdout": "\u2713 \n  http://127.0.0.1:5173/error\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "snapshot",
+        "-i"
+      ],
+      "exit": 0,
+      "stdout": "- generic \"OK routeFail onceSlow routeInvalidateSomething went wrongTransient failureTry again\" [ref=e1] clickable [onclick]\n  - button \"OK route\" [ref=e4]\n  - button \"Fail once\" [ref=e5]\n  - button \"Slow route\" [ref=e6]\n  - button \"Invalidate\" [ref=e7]\n  - heading \"Something went wrong\" [level=2, ref=e2]\n  - button \"Try again\" [ref=e3]\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "eval",
+        "({attempts:window.reviewAttempts,text:document.body.innerText,status:window.reviewRouter.state.matches.at(-1).status})"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"attempts\": 1,\n  \"status\": \"error\",\n  \"text\": \"OK routeFail onceSlow routeInvalidate\\nSomething went wrong\\n\\nTransient failure\\n\\nTry again\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "find",
+        "role",
+        "button",
+        "click",
+        "--name",
+        "Try again"
+      ],
+      "exit": 0,
+      "stdout": "\u2713 Done\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "eval",
+        "({attempts:window.reviewAttempts,text:document.body.innerText,status:window.reviewRouter.state.matches.at(-1).status})"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"attempts\": 1,\n  \"status\": \"error\",\n  \"text\": \"OK routeFail onceSlow routeInvalidate\\nSomething went wrong\\n\\nTransient failure\\n\\nTry again\"\n}\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "find",
+        "role",
+        "button",
+        "click",
+        "--name",
+        "Invalidate"
+      ],
+      "exit": 0,
+      "stdout": "\u2713 Done\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "eval",
+        "({attempts:window.reviewAttempts,text:document.body.innerText,status:window.reviewRouter.state.matches.at(-1).status})"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"attempts\": 2,\n  \"status\": \"success\",\n  \"text\": \"OK routeFail onceSlow routeInvalidate\\nRecovered\"\n}\n",
+      "stderr": ""
+    }
+  ]
+}

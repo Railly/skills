@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-27",
+    "repo": "vercel-labs/issue-graph",
+    "base": "9f34143ba67f87647735f532573dcb7dff6c90da",
+    "head": "79fe3355f673e94f151d5bdef74ae856cb2ef716",
+    "profile": "mechanical",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "sequential_isolated",
+    "degraded_from": null,
+    "independence_gap": "Same-author focused review; no independent approval. Mechanical documentation profile does not require an independent challenge.",
+    "receipt": "focused-review.json",
+    "schema_failures": 0,
+    "operations": [
+      {
+        "operation": "focused documentation review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "contract.md",
+    "spec_status": "not_required",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "Codex root agent",
+    "reviewer_model": "same Codex root agent",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [
+      "Package version and changelog metadata only; release workflow/runtime unchanged."
+    ],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": false,
+      "method": "not_required",
+      "artifact": null,
+      "evidence": "Mechanical profile uses a focused sequential review and real CLI/browser evidence."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Matched approved 0.4.0 identity, active release notes, generated docs and every merged PR since v0.3.2."
+    },
+    {
+      "source": "design",
+      "location": "focused-review.json",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Matched approved 0.4.0 identity, active release notes, generated docs and every merged PR since v0.3.2."
+    },
+    {
+      "source": "user_facing",
+      "location": "CHANGELOG.md and generated changelog",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Matched approved 0.4.0 identity, active release notes, generated docs and every merged PR since v0.3.2."
+    },
+    {
+      "source": "implementation",
+      "location": "package.json and unchanged release tooling",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Matched approved 0.4.0 identity, active release notes, generated docs and every merged PR since v0.3.2."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The release metadata and packed artifact identify the approved unpublished version 0.4.0.",
+      "kind": "metadata",
+      "status": "verified",
+      "oracle": {
+        "observes": "registry version history and manifest extracted from actual tarball",
+        "layer": "registry and archive bytes",
+        "method": "assertUnpublished and verifyArchive from production release tooling with SHA-256",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "source package.json says 0.4.0",
+        "counterexample": "stale build or existing registry version despite a source bump",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Registry latest remains 0.3.2; target 0.4.0 absent. Archive contains version0.4.0 and 119 allowlisted runtime files with Next assets, without caches or dependency trees."
+      },
+      "substrates": [
+        {
+          "name": "actual Bun-packed 0.4.0 archive and npm registry",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-0.4.0-2026-09-27/archive-identity.json"
+        }
+      ],
+      "evidence": "Archive verified by production helper and ten actual CLI commands with saved GitHub/Linear models."
+    },
+    {
+      "id": "P2",
+      "claim": "The active notes cover the newly merged release and the generated website includes the same entry while preserving historical notes.",
+      "kind": "documentation",
+      "status": "verified",
+      "oracle": {
+        "observes": "git release range, release-notes extractor and production documentation routes",
+        "layer": "source history and built artifacts",
+        "method": "enumerate v0.3.2..main, review each feature against its source, regenerate changelog and check idempotency, build and drive HTTP suite",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "a changelog section is present",
+        "counterexample": "notes select old version, omit a merged feature, claim live unmerged providers or drift from generated docs",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Extractor outputs only0.4.0; all seven merged PRs enumerated, historical entries retained, generated docs identical after rerun, live collection scope explicitly GitHub-only."
+      },
+      "substrates": [
+        {
+          "name": "release-notes tool and production Next docs",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-0.4.0-2026-09-27/release-notes.md and docs-routes.log"
+        }
+      ],
+      "evidence": "705 core and95 docs tests, types/lint, CLI/dashboard/docs builds and85 HTTP checks pass."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "Metadata and notes only; no new production behavior or tests."
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "Release lifecycle and durable write behavior are unchanged."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Git range and GitHub PR list",
+      "claim": "Only already merged changes are included; docs26 remains a separate open PR.",
+      "status": "verified",
+      "evidence": "Branch starts at main9f34143; only package.json, CHANGELOG.md and generated changelog differ. Source range records seven merged PRs."
+    },
+    {
+      "id": "A2",
+      "source": "User request and release workflow",
+      "claim": "The task authorizes a PR, without tag, release, workflow dispatch or package publication.",
+      "status": "verified",
+      "evidence": "No publish or merge action was performed; release workflow is unchanged and manual."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Reviewed release scope, direct archive identity, registry preflight, generated notes and built CLI/docs evidence."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Reviewed release scope, direct archive identity, registry preflight, generated notes and built CLI/docs evidence."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Reviewed release scope, direct archive identity, registry preflight, generated notes and built CLI/docs evidence."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Reviewed release scope, direct archive identity, registry preflight, generated notes and built CLI/docs evidence."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Reviewed release scope, direct archive identity, registry preflight, generated notes and built CLI/docs evidence."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "Version and changelog metadata do not trigger this runtime lens."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style and surfaces",
+      "outcome": "pass",
+      "reason": "gate.sh all and git diff --check pass."
+    },
+    {
+      "check": "source identity",
+      "outcome": "pass",
+      "reason": "Exactly three release metadata files changed; signed commit and clean worktree."
+    },
+    {
+      "check": "release notes sync",
+      "outcome": "pass",
+      "reason": "Generated changelog is idempotent, latest markers match0.4.0 and historical entries remain."
+    },
+    {
+      "check": "tests and builds",
+      "outcome": "pass",
+      "reason": "705 core+95 docs tests, types, lint, CLI/dashboard/docs builds and85 HTTP checks."
+    },
+    {
+      "check": "tarball identity and runtime",
+      "outcome": "pass",
+      "reason": "119 allowed files, SHA-256 verified, ten real-capture commands and registry preflight helper pass."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "Local docs build initially failed on linked dependencies",
+      "evidence": "Turbopack rejected out-of-root dependency symlinks; local APFS copies of the identical pinned packages resolved it, and final production build/routes pass without source changes."
+    },
+    {
+      "claim": "No independent review approval",
+      "evidence": "Mechanical metadata review uses one same-author focused pass; independent challenge is not required."
+    }
+  ],
+  "issue_candidates": []
+}

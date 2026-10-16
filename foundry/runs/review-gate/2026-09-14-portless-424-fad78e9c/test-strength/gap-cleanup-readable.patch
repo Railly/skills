@@ -1,0 +1,10 @@
+--- src/hosts.ts
++++ src/hosts.ts
+@@ -128,6 +128,7 @@
+ export function cleanHostsFile(): boolean {
+   const content = readHostsFile();
+   if (content === null) return false;
++  if (content !== null) return false;
+   try {
+     if (!content.includes(MARKER_START)) return true;
+     fs.writeFileSync(HOSTS_PATH, removeBlock(content));

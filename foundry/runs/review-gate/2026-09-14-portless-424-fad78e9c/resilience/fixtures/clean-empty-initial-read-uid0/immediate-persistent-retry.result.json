@@ -1,0 +1,78 @@
+{
+  "phase": "immediate-persistent-retry",
+  "fault": "initial-read",
+  "command": [
+    "/Users/raillyhugo/.nvm/versions/node/v24.18.0/bin/node",
+    "--require",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/preload.cjs",
+    "/tmp/portless-review-424-fad78e9c/packages/portless/dist/cli.js",
+    "hosts",
+    "clean"
+  ],
+  "cwd": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-initial-read-uid0",
+  "environment": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-initial-read-uid0/home",
+    "TMPDIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-initial-read-uid0/tmp",
+    "NO_COLOR": "1",
+    "PORTLESS_STATE_DIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-initial-read-uid0/state",
+    "PORTLESS_PORT": "65431",
+    "PORTLESS_SYNC_HOSTS": "1",
+    "AUDIT_ROOT": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience",
+    "AUDIT_HOSTS": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-initial-read-uid0/hosts",
+    "AUDIT_TRACE": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-initial-read-uid0/immediate-persistent-retry.jsonl",
+    "AUDIT_FAULT": "initial-read",
+    "AUDIT_UID": "0",
+    "AUDIT_SUDO": "1"
+  },
+  "exitCode": 1,
+  "signal": null,
+  "error": null,
+  "stdout": "",
+  "stderr": "Failed to update /etc/hosts.\n",
+  "durationMs": 50.11529200000041,
+  "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+  "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+  "reads": 1,
+  "writes": 0,
+  "sudoCalls": 0,
+  "events": [
+    {
+      "time": "2026-09-14T18:45:45.894Z",
+      "op": "preload-ready",
+      "fault": "initial-read",
+      "uid": 0,
+      "pid": 62305,
+      "node": "v24.18.0",
+      "platform": "darwin"
+    },
+    {
+      "time": "2026-09-14T18:45:45.916Z",
+      "op": "read",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/clean-empty-initial-read-uid0/hosts",
+      "ordinal": 1,
+      "result": "EACCES"
+    },
+    {
+      "time": "2026-09-14T18:45:45.916Z",
+      "op": "exit",
+      "code": 1,
+      "reads": 1,
+      "writes": 0,
+      "memory": {
+        "rss": 64389120,
+        "heapTotal": 13090816,
+        "heapUsed": 9094528,
+        "external": 4016478,
+        "arrayBuffers": 146599
+      },
+      "activeResources": [
+        "PipeWrap",
+        "PipeWrap"
+      ]
+    }
+  ],
+  "unrelatedPreserved": true,
+  "routesUnchanged": true
+}

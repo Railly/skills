@@ -1,0 +1,20 @@
+{
+  "repository": "vercel-labs/agent-browser",
+  "source": "vercel-labs/agent-browser#2117 (fixes #2081), author ctate",
+  "head": "ce64b1bd",
+  "base": "518f6e5d",
+  "formula": "pull-request review",
+  "profile": "external-pr",
+  "authorization": "Hunter: review this PR; no GitHub writes",
+  "stages": {
+    "dogfood": "built head, isolated namespace, serving pid verified; fixtures fill.html/frame.html/inner.html; main baseline on same fixtures",
+    "spec": "issue repro passes on head: editor 'new text', field 'old value more', React x '' with state ''",
+    "findings": {
+      "P1": "same-origin iframe <input>: fill appends ('newold' vs main 'new'), datetime-local fill is a silent no-op, type prepends; cause: instanceof HTMLInputElement/HTMLTextAreaElement and HTMLInputElement.prototype setter from the page realm; contenteditable in iframe ok",
+      "P2": "datetime-local '2026-10-15T10:00:00' rejected as malformed: Chrome stores '2026-10-15T10:00', so the exact-equality check fails",
+      "refuted": "Vercel Agent: email/number select() no-op -> head replaces email 'new@y.com' and number '7' correctly",
+      "dropped": "readonly/disabled report Done without change (main also reported Done and wrote readonly); not introduced"
+    },
+    "verdict": "comment (not approve)"
+  }
+}

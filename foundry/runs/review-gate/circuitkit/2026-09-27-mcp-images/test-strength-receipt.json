@@ -1,0 +1,148 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/test-strength-receipt.json",
+  "evidence": "Real stdio, installed Node executable and browser producer; 2530 full tests, 27 MCP cases, 30 browser checks. Isolated compiled mutants are killed at the intended assertions.",
+  "fingerprint": {
+    "head_sha": "327916f472096b07180f049d6d18cd63962096fc",
+    "changed_paths_digest": "sha256:bc9508fd7c9f5892b9fa29a0447e20e4f3aaecf20a96153f17dcca20c1ed0f50",
+    "contract_digest": "sha256:d34297fd8ccd3e231daa498c400674c9b394f3add4d679877b2b3c6fa2759dfd",
+    "command": "bun test ./tests; bun artifacts/mcp-image-first/mutations/wire.ts; bun artifacts/mcp-image-first/mutations/context.ts; bun scripts/check-mcp-browser.ts",
+    "environment_digest": "sha256:599aa3293913f7ce23468b301a74b7b3cc592e4b9898734b8f80f5e6ed100e7e",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "README.md",
+      "bun.lock",
+      "docs/mcp-apps.md",
+      "package.json",
+      "scripts/build-mcp.ts",
+      "scripts/build.ts",
+      "scripts/check-mcp-browser.ts",
+      "scripts/mcp-host.ts",
+      "scripts/preview-mcp.ts",
+      "src/mcp/canvas.tsx",
+      "src/mcp/circuit.ts",
+      "src/mcp/cli.ts",
+      "src/mcp/server.ts",
+      "src/mcp/view.css",
+      "src/mcp/view.tsx",
+      "tests/mcp.test.ts",
+      "tests/package-education-build.test.ts"
+    ],
+    "reusable": false,
+    "reuse_evidence": null,
+    "skill_package_digest": "sha256:a48126adf41ae16e2a3f29bb20b1da68b3a5b9db2a4cd6b5baa08b3c598b70ea"
+  },
+  "dimensions": {
+    "values": [
+      "Tool owner: show_circuit or explore_circuit",
+      "Host UI: HTML MIME present, extension absent, empty MIME list, wrong MIME",
+      "Input: nine known recipes, revised recipe document, valid source, ambiguous, unknown, oversized, malformed",
+      "Output: PNG content with structured circuit; UI payload; clean error",
+      "Prior viewer state: no circuit, recipe selection, source selection, cancelled, invalid result",
+      "Selection producer: real browser pointer on component/module/net; native keyboard Enter/Escape; authored scene select",
+      "Host message/context: supported, missing, rejected; theme light/dark; reduced motion; desktop/mobile"
+    ],
+    "exclusions": [
+      "Native Codex inline explorer compatibility is explicitly outside A6; reference host does not claim it.",
+      "Full electrical simulation is not part of CircuitKit.",
+      "PNG dependency repair is verified after process restart, since native module imports are process-cached."
+    ],
+    "evidence": "Tool x UI x input content assertions and browser checks are the per-class falsifiers. Image-content mutant affects every image class, explorer-payload affects both explorer modes, image-default/fallback isolates negotiation classes, stale-error covers malformed input, context-callsite covers shared selection emission owner. Other controls use direct DOM/message post-state assertions; no claim of exhaustive mutation across the pre-existing circuit renderer."
+  },
+  "oracle": {
+    "source": "Approved contract A1-A5, known RC declared connectivity and official MCP SDK consumer/bridge",
+    "independent": true,
+    "evidence": "Image presence and no UI metadata are explicit product requirements, not expectations copied from the new branch. RC nets are asserted explicitly; browser records actual host messages. Source fixture uses existing .ck examples."
+  },
+  "producer": {
+    "name": "Node-shebang installed bin + official MCP SDK stdio client + agent-browser events into sandboxed AppBridge iframe",
+    "status": "exercised",
+    "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/installed-package.json; /Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+  },
+  "falsification": [
+    {
+      "mutation": "image-content",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/image-content.log: returns declared RC connectivity for show_circuit with UI=",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+    },
+    {
+      "mutation": "explorer-payload",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/explorer-payload.log: returns declared RC connectivity for explore_circuit with UI=",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+    },
+    {
+      "mutation": "image-default",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/image-default.log: returns declared RC connectivity for show_circuit with UI=",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+    },
+    {
+      "mutation": "fallback",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/fallback.log: returns declared RC connectivity for explore_circuit with UI=",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+    },
+    {
+      "mutation": "stale-error",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/stale-error.log: bounded malformed source campaign never returns a circuit payload",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+    },
+    {
+      "mutation": "Actual view updateModelContext call site sends null selection",
+      "red_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/context/red.log: component selection reaches host context fails",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser-restored/receipt.json"
+    }
+  ],
+  "additional_evidence": {
+    "generated_cases": "24 deterministic RC resistance mutations preserve declared connectivity",
+    "fuzz": "32 malformed source strings over eight character families and four lengths",
+    "consumer_checks": [
+      "show_circuit ui=true input=recipe",
+      "show_circuit ui=true input=source",
+      "explore_circuit ui=true input=recipe",
+      "explore_circuit ui=true input=source",
+      "show_circuit ui=false input=recipe",
+      "show_circuit ui=false input=source",
+      "explore_circuit ui=false input=recipe",
+      "explore_circuit ui=false input=source",
+      "dependency failure show_circuit recipe",
+      "dependency failure show_circuit source",
+      "dependency failure explore_circuit recipe",
+      "dependency failure explore_circuit source",
+      "restored dependency and immediate process restart recover both renderers"
+    ],
+    "browser_checks": [
+      "default output is a PNG",
+      "default output does not mount a widget",
+      "RC circuit rendered",
+      "component selection reaches host context",
+      "explain message carries selected component",
+      "net selection reaches host",
+      "teaching scene reaches host",
+      "clear selection clears context",
+      "explanation action is contextual",
+      "keyboard selects a connection",
+      "Escape clears selection",
+      "source replaces recipe and clears selection",
+      "module selection happens on the drawing",
+      "source scene reaches host",
+      "flow routes exist",
+      "pause controls actual animation",
+      "play controls actual animation",
+      "host theme reaches widget",
+      "mobile controls remain available",
+      "zoom applies to circuit viewport",
+      "cancellation removes stale drawing and context",
+      "invalid source removes stale circuit",
+      "invalid source clears stale model context",
+      "valid result recovers after error",
+      "returning to image removes the explorer",
+      "explanation is disabled without host message capability",
+      "rejected message reports failure",
+      "rejected context keeps explicit explanation available",
+      "explanation carries selection after rejected context",
+      "reduced motion disables moving sweep"
+    ],
+    "repeat": "Focused MCP suite ran before and after type-only helper correction; original browser harness repeated after isolated context mutant."
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "work_item": "vercel-labs/agent-browser#1371",
+  "authorization": "Reproduce and run solution-gate if a problem exists; no production implementation, commit, push, PR, or GitHub comments requested",
+  "head": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+  "source_mode": "isolated source archives, unchanged production files",
+  "skill_revision": "a006c7a52acfdb112e7a4882063d0a3dbbe757d7",
+  "skills_checkout_head": "77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "skill_path": "skills/solution-gate",
+  "skill_dirty": false,
+  "mode": "greenfield",
+  "profile": "high-risk",
+  "budget": "Two isolated model-family shaping passes, one evidence-feedback pass each, focused local process-lifetime probes. No production implementation in this run.",
+  "execution_mode": "native_subagent",
+  "degraded_from": null,
+  "independence_gap": null,
+  "schema_failures": 0,
+  "frozen_input": "frozen-input.md",
+  "status": "completed_reshape",
+  "frozen_contract_sha256": "2382de7dc237cc817f151badc1fad434233b48c4943bc9f0e7676d1a55930f30",
+  "current_contract_sha256": "59897759f49ba0863311cf4d82fc24b6d869d0138266740f995e802d8c384c5f",
+  "started_at": "2026-09-17T18:52:07.107677+00:00",
+  "finished_at": "2026-09-17T19:07:18.164985+00:00",
+  "elapsed_ms": 911057,
+  "model_selections": [
+    "anthropic/claude-opus-5",
+    "openai/gpt-5.6-sol"
+  ],
+  "model_identity_evidence": "Successful parent launch metadata; exact model ids unavailable within children",
+  "solution_receipt": {
+    "verdict": "reshape",
+    "pass_to_detail": false,
+    "head": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+    "contract_digest": "59897759f49ba0863311cf4d82fc24b6d869d0138266740f995e802d8c384c5f",
+    "skill_revision": "a006c7a52acfdb112e7a4882063d0a3dbbe757d7",
+    "execution_mode": "native_subagent",
+    "elapsed_ms": 911057,
+    "decision": "decision.md",
+    "verification": "verification.json",
+    "carried_gaps": [
+      "Unexplained blank-page/omnibox CPU spin not reproduced",
+      "Production pre-spawn FD ownership and launch-phase matrix",
+      "Leader-first whole-tree cleanup and identity safety",
+      "Attached browser, second session and user-profile isolation",
+      "Guardian-first death containment policy",
+      "Linux and Windows non-regression; restore and full default-idle live validation"
+    ]
+  },
+  "verification_commands": [
+    {
+      "command": "cargo build --locked --manifest-path cli/Cargo.toml",
+      "exit_code": 0
+    },
+    {
+      "command": "bun repro-1371.ts",
+      "exit_code": 0,
+      "meaning": "Five reproduction cells, including two unfixed leaks"
+    },
+    {
+      "command": "cargo test --locked --manifest-path cli/Cargo.toml idle_timeout -- --test-threads=1",
+      "exit_code": 0,
+      "passed": 17,
+      "failed": 0
+    },
+    {
+      "command": "python3 spike-lifetime.py",
+      "exit_code": 0,
+      "meaning": "Final corrected stand-in fixture, not production guardian"
+    },
+    {
+      "command": "python3 verify-evidence.py",
+      "exit_code": 0
+    }
+  ]
+}

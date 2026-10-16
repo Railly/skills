@@ -1,0 +1,21 @@
+usage: issue-graph jira ISSUE-KEY [options]
+
+Trace Jira work-item relationships through an authenticated customer TWG CLI.
+This command is read-only and writes no snapshots.
+
+  --site SITE           Atlassian site prefix or cloud ID; uses TWG default when omitted
+  --depth N             same-project recursion depth, 0..10 (default 2)
+  --max-nodes N         total Jira nodes, 1..1000 (default 80)
+  --hub-threshold N     fetch but do not expand non-seed nodes above this degree (default 12)
+  --concurrency N       concurrent TWG reads, 1..32 (default 4)
+  --format FORMAT       auto (default), markdown, or json
+  --json                JSON stdout shorthand; takes no filename
+  -h, --help            show this help
+
+Auto output is Markdown in a terminal and versioned JSON in a pipe.
+Structured cross-project links are fetched as one-hop boundaries. Cross-project text matches and non-Jira links are reported but not fetched.
+
+Examples:
+  issue-graph jira PROJ-123
+  issue-graph jira PROJ-123 --site example --depth 1 --max-nodes 20
+  issue-graph jira PROJ-123 --site 00000000-0000-0000-0000-000000000000 --json

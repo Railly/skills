@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "name": "PR 1670 cuse assertion falsification",
+  "platforms": [
+    "macos"
+  ],
+  "vars": {
+    "binary": "/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli/target/preview/agent-browser-pr1670-darwin-arm64/agent-browser",
+    "run": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670",
+    "worktree": "/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670"
+  },
+  "defaultTimeoutMs": 30000,
+  "steps": [
+    {
+      "type": "cuse",
+      "action": "os",
+      "saveAs": "platform"
+    },
+    {
+      "type": "assert",
+      "actual": "${steps.platform.detail}",
+      "operator": "eq",
+      "expected": "windows"
+    }
+  ]
+}

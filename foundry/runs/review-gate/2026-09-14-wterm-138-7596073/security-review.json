@@ -1,0 +1,64 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/wterm",
+    "base_sha": "0065c68c9d90ed831608d3b17eced9a14bcde609",
+    "head_sha": "75960737e5a8e21934c94ffa7ee5acc93d460bf3",
+    "dirty_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed_path_digest": "sha256:3094383414009c9b96c39d0db9daabef8b7717ed1373435dcce8055828cfb1e4",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "The changed execution and cwd tracking do not grant additional authority over host resources, application secrets, other principals, or network policy.",
+    "attacker": "Terminal command author, including scripts executed in the same emulator session.",
+    "scope": "Direct just-bash exec replacing cd wrapper and command replay; result.env.PWD tracking. Not a general sandbox audit."
+  },
+  "trust_model": {
+    "assets": ["Application-supplied virtual files and environment", "Application network configuration", "Host resources outside emulator", "Session cwd/prompt/completion"],
+    "principals": [
+      {"name": "Embedding application", "authority": "Already chooses files, env, cwd, prompt, network and receives Bash instance."},
+      {"name": "Command author", "authority": "Already executes arbitrary emulator scripts, absolute paths, cd, assignments and virtual filesystem operations. Network access is whatever the embedding application grants."}
+    ],
+    "boundaries": [
+      "Input to interpreter: intentional arbitrary emulator-script execution before and after; cd wrapper was not confinement.",
+      "Mutable PWD to adapter state: correctness trust mismatch, not a higher-privilege destination in inspected callers.",
+      "Emulator to host/network: same interpreter, filesystem and application-owned network configuration; no new host shell or filesystem invocation."
+    ],
+    "entrypoints": ["BashShell.handleInput", "hero-terminal.tsx onData", "examples/nextjs/app/page.tsx onData", "examples/vite/src/main.ts term.onData"],
+    "sinks": ["just-bash.exec", "Virtual filesystem", "Terminal write callback", "Existing configured network capability"]
+  },
+  "observations": [
+    {
+      "id": "SEC-001", "classification": "non_security_defect", "scope": "unrelated_bug", "confidence": "high",
+      "prerequisites": ["Author can execute arbitrary emulator commands already."],
+      "chain": {"capability": "Assign/unset/localize PWD", "reachability": "handleInput to result.env.PWD", "control": "PWD can disagree with actual cwd", "boundary": "Same virtual session and filesystem authority", "impact": "Wrong prompt, completion and next relative execution; no additional security authority demonstrated"},
+      "evidence": ["packages/@wterm/just-bash/src/index.ts:60-64,113-125,234-256", "dogfood.log:6-84"]
+    },
+    {
+      "id": "SEC-002", "classification": "non_security_defect", "scope": "unrelated_bug", "confidence": "high",
+      "prerequisites": ["Embedding app configures relative cwd."],
+      "chain": {"capability": "Configure cwd", "reachability": "ShellOptions.cwd to exec and completion", "control": "Already application-owned execution context", "boundary": "No new protected principal/resource boundary", "impact": "Completion failure only"},
+      "evidence": ["packages/@wterm/just-bash/src/index.ts:113-116,234-256", "dogfood.log:140-149,177-185"]
+    },
+    {
+      "id": "SEC-003", "classification": "non_security_defect", "scope": "unrelated_bug", "confidence": "high",
+      "prerequisites": ["Default empty files configuration."],
+      "chain": {"capability": "Use default configuration", "reachability": "Removed cd no longer detects invalid initial cwd", "control": "Application initialization", "boundary": "No demonstrated cross-principal service boundary", "impact": "Repeated directory-dependent failures, a reliability defect"},
+      "evidence": ["packages/@wterm/just-bash/src/index.ts:36-39,70-75,113-116", "dogfood.log:151-169,187-205"]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "Read-only source/config/dependency inspection and existing bounded virtual-filesystem evidence.",
+    "commands": [
+      {"command": "git diff 0065c68c9d90ed831608d3b17eced9a14bcde609 75960737e5a8e21934c94ffa7ee5acc93d460bf3 -- packages/@wterm/just-bash/src/index.ts", "exit_code": 0},
+      {"command": "git diff --exit-code 0065c68c9d90ed831608d3b17eced9a14bcde609 75960737e5a8e21934c94ffa7ee5acc93d460bf3 -- apps/docs/src/components/hero-terminal.tsx examples/nextjs/app/page.tsx packages/@wterm/just-bash/package.json pnpm-lock.yaml", "exit_code": 0},
+      {"command": "git status --porcelain=v1 -z --untracked-files=all", "exit_code": 0, "output": "empty"}
+    ],
+    "cleanup": "No source changes or active network probes.",
+    "gaps": [],
+    "limitations": ["Not an audit of existing just-bash sandbox/network implementation", "No live network-policy enforcement tested", "No inspected caller uses cwd for authorization or tenant isolation", "No model-family independence claimed"]
+  },
+  "merge_relevance": {"security_blockers": [], "follow_ups": [], "routed_non_security_defects": ["F1", "F2", "F3"]},
+  "artifact": "security-review.json",
+  "provenance": "Focused native reviewer executed canonical experimental security-review and read both required references; parent persisted its scoped conclusion and evidence. Security pass is not a Review Gate pass."
+}

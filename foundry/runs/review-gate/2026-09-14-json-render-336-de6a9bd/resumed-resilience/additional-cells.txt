@@ -1,0 +1,68 @@
+
+cell('H08', 'fetch stalls before response and external logical deadline fires', async t => {
+  let rejectFetch: any, signals: AbortSignal[] = [];
+  globalThis.fetch = ((_: any, options: any) => { signals.push(options.signal); return new Promise((_, reject) => { rejectFetch = reject; }); }) as any;
+  const h = renderHook(() => useUIStream({ api: '/audit-local' })); let pending: Promise<void>;
+  await act(async () => { pending = h.result.current.send('no-response'); await settle(); });
+  const during = { streaming: h.result.current.isStreaming, spec: copy(h.result.current.spec), requests: signals.length };
+  await act(async () => { rejectFetch(new Error('fetch-external-deadline')); await pending!; });
+  const failed = { error: h.result.current.error?.message, streaming: h.result.current.isStreaming };
+  globalThis.fetch = (async () => response(line({ op: 'add', path: '/state/recovered', value: true }))) as any;
+  await act(async () => { await h.result.current.send('immediate retry'); });
+  t.observations.push({ during, failed, after_retry: copy(h.result.current.spec), first_signal_aborted_on_retry: signals[0].aborted });
+  expect(during.streaming).toBe(true); expect(failed.streaming).toBe(false); expect(h.result.current.error).toBeNull(); h.unmount();
+  t.result = 'recoverable rejection under externally supplied deadline; no hook timeout';
+  t.cleanup = { owner: 'fetch implementation rejects; hook aborts old signal on retry', deadline: 'external deadline and next send', pending_fetches: 0 };
+});
+
+cell('H09', 'onError throws at last fallible stage after a committed patch', async t => {
+  const source = controlled(); globalThis.fetch = source.fetch as any;
+  const h = renderHook(() => useUIStream({ api: '/audit-local', onError: () => { throw new Error('error-sink-failed'); } }));
+  let pending: Promise<void>, caught: any;
+  await act(async () => { pending = h.result.current.send('callback-error'); await settle(); });
+  await act(async () => { source.emit(line({ op: 'add', path: '/state/count', value: 1 })); await settle(); });
+  await act(async () => { source.fail(new Error('disconnect')); try { await pending!; } catch (e: any) { caught = e.message; } });
+  const afterFault = { spec: copy(h.result.current.spec), streaming: h.result.current.isStreaming, error: h.result.current.error?.message, rejected_send: caught };
+  globalThis.fetch = (async () => response(line({ op: 'add', path: '/state/count', value: 2 }))) as any;
+  await act(async () => { await h.result.current.send('retry'); });
+  t.observations.push({ afterFault, retry: copy(h.result.current.spec), stats: source.stats });
+  expect(caught).toBe('error-sink-failed'); expect(afterFault.streaming).toBe(false); expect(h.result.current.error).toBeNull(); h.unmount();
+  t.result = 'error callback exception propagates but finally clears streaming';
+  t.cleanup = { owner: 'hook finally + caller catch', deadline: 'send promise settlement', active_reads: source.stats.active, callback_sink: 'application-owned' };
+});
+
+cell('H10', 'malformed upstream patch shape is signaled and retry recovers', async t => {
+  for (const patch of [{ op: 'add', path: 17, value: 1 }, { op: 'move', from: 17, path: '/state/moved' }]) {
+    globalThis.fetch = (async () => response(line(patch))) as any;
+    const h = renderHook(() => useUIStream({ api: '/audit-local' }));
+    await act(async () => { await h.result.current.send('malformed shape', { previousSpec: initial() }); });
+    const afterFault = { spec: copy(h.result.current.spec), error: h.result.current.error?.message, streaming: h.result.current.isStreaming };
+    globalThis.fetch = (async () => response(line({ op: 'add', path: '/state/recovered', value: true }))) as any;
+    await act(async () => { await h.result.current.send('retry'); });
+    t.observations.push({ patch, afterFault, after_retry: copy(h.result.current.spec) });
+    expect(afterFault.streaming).toBe(false); expect(h.result.current.error).toBeNull(); expect(h.result.current.spec?.state?.recovered).toBe(true); h.unmount();
+  }
+  t.result = 'malformed schema is rejected at runtime, stream error signaled, retry recovers';
+  t.cleanup = { owner: 'hook finally/unmount', deadline: 'send settles', mock_requests_pending: 0 };
+});
+
+cell('H11', 'burst growth and explicit fresh-send cleanup of raw lines', async t => {
+  const source = controlled(); globalThis.fetch = source.fetch as any;
+  const h = renderHook(() => useUIStream({ api: '/audit-local' })); let pending: Promise<void>;
+  await act(async () => { pending = h.result.current.send('burst'); await settle(); });
+  const sizes: any[] = [];
+  for (let batch = 0; batch < 4; batch++) {
+    const burst = Array.from({ length: 128 }, (_, i) => line({ op: 'add', path: '/state/count', value: batch * 128 + i })).join('');
+    await act(async () => { source.emit(burst); await settle(); });
+    sizes.push({ delivered: (batch + 1) * 128, retained_raw_lines: h.result.current.rawLines.length, state: copy(h.result.current.spec) });
+  }
+  await act(async () => { source.finish(); await pending!; });
+  await act(async () => { h.result.current.clear(); });
+  const afterClear = { spec: h.result.current.spec, raw_lines: h.result.current.rawLines.length };
+  globalThis.fetch = (async () => response(line({ op: 'add', path: '/state/count', value: 0 }))) as any;
+  await act(async () => { await h.result.current.send('fresh retry'); });
+  t.observations.push({ sizes, afterClear, after_fresh_send: { raw_lines: h.result.current.rawLines.length, state: copy(h.result.current.spec) }, stats: source.stats });
+  expect(sizes[3].retained_raw_lines).toBe(512); expect(h.result.current.rawLines).toHaveLength(1); h.unmount();
+  t.result = 'raw line retention grows with input and survives clear; fresh send resets, no built-in overload cap';
+  t.cleanup = { owner: 'hook next send/unmount, application caps ingress', deadline: 'new send', active_reads: source.stats.active, retained_raw_lines_after_new_send: 1, maximum_supported_load: 'gap' };
+});

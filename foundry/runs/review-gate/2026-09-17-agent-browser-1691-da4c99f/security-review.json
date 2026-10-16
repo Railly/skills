@@ -1,0 +1,127 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/agent-browser",
+    "base_sha": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+    "head_sha": "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:9097d5b19b97d4b2cfe0f704d61fe9dca24f179bcca1a652723ac494af694005",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "API credentials are sent only to the authenticated Browser Use API endpoint; provider options do not introduce a lower-privilege credential reader",
+    "attacker": "remote network or web-page content attacker without TLS identity for api.browser-use.com; local operator and configured provider already trusted",
+    "scope": "changed Browser Use provider credential and response path"
+  },
+  "trust_model": {
+    "assets": [
+      "Browser Use API key",
+      "remote browser session with possible profile cookies",
+      "session recording and provider session ID"
+    ],
+    "principals": [
+      {
+        "name": "local operator/daemon",
+        "existing_authority": "sets and reads its own process environment and cloud credential"
+      },
+      {
+        "name": "Browser Use API",
+        "existing_authority": "authorized recipient of API key, creates remote browser and stores requested profile/recording"
+      },
+      {
+        "name": "browser page",
+        "existing_authority": "controls its own content, no changed path to provider environment"
+      },
+      {
+        "name": "network peer",
+        "existing_authority": "can fail or delay transport; lacks accepted API TLS certificate"
+      }
+    ],
+    "boundaries": [
+      "operator environment to daemon",
+      "daemon HTTPS to fixed Browser Use API host",
+      "provider response to CDP connection",
+      "remote page to browser automation"
+    ],
+    "entrypoints": [
+      "BROWSER_USE_API_KEY",
+      "BROWSER_USE_PROFILE_ID",
+      "BROWSER_USE_PROXY_COUNTRY",
+      "BROWSER_USE_ENABLE_RECORDING",
+      "HTTPS response body containing id and cdpUrl"
+    ],
+    "sinks": [
+      "X-Browser-Use-API-Key header on POST/PATCH",
+      "request JSON",
+      "returned CDP endpoint connection",
+      "API error text returned to same local caller"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-001",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": [
+        "operator supplies API credential",
+        "Browser Use API authenticated by reqwest TLS verification"
+      ],
+      "chain": {
+        "capability": "network attacker can interrupt transport",
+        "reachability": "new POST uses fixed https://api.browser-use.com/api/v4/browsers",
+        "control": "no user/page-controlled destination in new POST; custom env values are JSON serialized",
+        "boundary": "credential remains between authorized daemon and provider",
+        "impact": "no new unauthorized credential reader or injection demonstrated"
+      },
+      "confidence": "high",
+      "evidence": [
+        "cli/src/native/providers.rs:388-410 uses reqwest client with default certificate verification and header auth; it removes prior API key query-string connection URL",
+        "cli/Cargo.lock pins reqwest 0.12.28 and cli/Cargo.toml enables rustls-tls-webpki-roots",
+        "browser-use-v4-openapi.json specifies APIKeyHeader for POST and PATCH"
+      ]
+    },
+    {
+      "id": "SEC-002",
+      "classification": "non_security_defect",
+      "scope": "unrelated_bug",
+      "prerequisites": [
+        "provider transport stalls or stop fails"
+      ],
+      "chain": {
+        "capability": "failure of a dependency",
+        "reachability": "new create request holds daemon state lock; existing stop helper now receives Browser Use sessions",
+        "control": "bounded local proxy forced no-response; no hostile deployed service boundary assumed",
+        "boundary": "no additional attacker authority established",
+        "impact": "hang and cleanup loss are correctness failures, not proven security vulnerabilities"
+      },
+      "confidence": "high",
+      "evidence": [
+        "dogfood.json",
+        "cli/src/native/actions.rs:2067-2069 and 553-554 in daemon.rs",
+        "F1/F2 routed to Review Gate"
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "read-only source tracing and bounded localhost transport fixture with dummy API key; no cloud session creation or third-party account access",
+    "commands": [
+      "cargo build --locked --manifest-path cli/Cargo.toml",
+      "python3 /Users/raillyhugo/Programming/vercel/agent-browser-1691-proof/dogfood.py",
+      "read exact provider, caller, lockfile, and official OpenAPI source"
+    ],
+    "cleanup": "Fixture proxy released, isolated daemon closed, dummy credential only. Target worktree clean.",
+    "gaps": [],
+    "limits": [
+      "Static security review of changed transmission boundaries; this is not a cloud provider penetration test."
+    ]
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": [
+      "F1 bounded provider request",
+      "F2 failed stop acknowledgement and retry ownership"
+    ]
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/security-review.json"
+}

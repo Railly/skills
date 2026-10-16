@@ -1,0 +1,76 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/agent-browser",
+    "base_sha": "8a346a2cfc0afa5dc259b02b896355ac476fa6e2",
+    "head_sha": "0a53aefdcae889378132f54d8ea096805f3edcea",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:c2660dfcf1036a5c1e8ed88038cf6000a1e81713713def5ea4d152f2f0a5e401",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "partición funcional entre sesiones cooperativas",
+    "attacker": "no se promete aislamiento contra controladores con acceso CDP global",
+    "scope": "comportamiento local verificado de los dos findings y variantes"
+  },
+  "trust_model": {
+    "assets": [
+      "cookies/storage, archivos descargados, binding persistido"
+    ],
+    "principals": [
+      "usuario local/CLI autorizado",
+      "daemon de sesión",
+      "Chrome compartido"
+    ],
+    "boundaries": [
+      "BrowserContext lógico",
+      "memoria a binding durable"
+    ],
+    "entrypoints": [
+      "CLI, execute_command"
+    ],
+    "sinks": [
+      "Browser.setDownloadBehavior",
+      "Target.create/disposeBrowserContext",
+      "tab_binding.save"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-1",
+      "classification": "non_security_defect",
+      "scope": "unrelated_bug",
+      "prerequisites": [
+        "control autorizado del CLI/CDP"
+      ],
+      "chain": {
+        "capability": "controlador ya dispone de CDP global",
+        "reachability": "comandos normales y solicitudes fallidas",
+        "control": "flags propios",
+        "boundary": "partición accidental entre sesiones cooperativas",
+        "impact": "configuración o continuidad incorrectas; no nueva autoridad demostrada"
+      },
+      "confidence": "high",
+      "evidence": [
+        "cli-v3.log",
+        "isolation-e2e-v3.log"
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "worktree y Chrome efímeros locales",
+    "commands": [
+      "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; cargo test --manifest-path cli/Cargo.toml e2e_isolat -- --ignored --test-threads=1; AGENT_BROWSER_ISOLATION_STRESS_ROUNDS=10 cargo test --manifest-path cli/Cargo.toml --test isolate_context_cli -- --ignored --test-threads=1"
+    ],
+    "cleanup": "Sessions Drop y ChromeProcess Drop; sin cleanup global",
+    "gaps": []
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": [
+      "dos findings ctate y tres variantes corregidos"
+    ]
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/security.json"
+}

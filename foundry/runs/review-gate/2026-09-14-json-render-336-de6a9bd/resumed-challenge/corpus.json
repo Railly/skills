@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "oracle_definition": "Literal expected values transcribed from saved RFC examples or instantiated from cited normative clauses, before this corpus is executed. No production parser, diff generator, implementation output or original corpus classifier computes these expectations.",
+  "independence_type": "substrate_corpus_with_implementation_independent_normative_oracle",
+  "model_independence_claimed": false,
+  "sources": {
+    "pointer_example": { "path": "../rfc6901.txt", "lines": [231, 259], "section": "5", "authority": "external normative document, example input and expected table" },
+    "pointer_decode": { "path": "../rfc6901.txt", "lines": [133, 159], "section": "4", "authority": "external normative decoding and object-member rules" },
+    "array_grammar": { "path": "../rfc6901.txt", "lines": [175, 205], "section": "4", "authority": "external normative array grammar, no maximum integer bound specified" },
+    "pointer_errors": { "path": "../rfc6901.txt", "lines": [303, 320], "section": "7", "authority": "application defines error handling, not universal silent-no-op policy" },
+    "patch_add_remove": { "path": "../rfc6902.txt", "lines": [211, 314], "section": "4.1-4.3", "authority": "external normative mutation rules" },
+    "patch_move_copy": { "path": "../rfc6902.txt", "lines": [316, 362], "section": "4.4-4.5", "authority": "external normative source existence and remove-then-add ordering" },
+    "patch_examples": { "path": "../rfc6902.txt", "lines": [620, 982], "section": "Appendix A", "authority": "external examples, each case names its subsection" },
+    "patch_errors": { "path": "../rfc6902.txt", "lines": [417, 436], "section": "5", "authority": "patch failure and HTTP PATCH atomicity, not SpecStream recovery" },
+    "product_paths": { "path": "target:apps/web/app/(main)/docs/api/core/page.mdx", "lines": [454, 467], "authority": "same-PR product contract, NOT external normative independence" },
+    "product_store": { "path": "target:packages/core/README.md", "lines": [283, 329], "authority": "same-PR product contract, NOT external normative independence" },
+    "product_literal": { "path": "target:skills/core/SKILL.md", "lines": [248, 260], "authority": "same-PR product contract, NOT external normative independence" },
+    "product_compound": { "path": "../contract.json", "lines": [4, 7], "authority": "review acceptance A1-A4, supplemental policy oracle, NOT external provenance" }
+  },
+  "pointer_document": { "foo": ["bar", "baz"], "": 0, "a/b": 1, "c%d": 2, "e^f": 3, "g|h": 4, "i\\j": 5, "k\"l": 6, " ": 7, "m~n": 8 },
+  "pointer_cases": [
+    { "id": "6901-5-root", "path": "", "expected": { "foo": ["bar", "baz"], "": 0, "a/b": 1, "c%d": 2, "e^f": 3, "g|h": 4, "i\\j": 5, "k\"l": 6, " ": 7, "m~n": 8 }, "sources": ["pointer_example"] },
+    { "id": "6901-5-array", "path": "/foo", "expected": ["bar", "baz"], "sources": ["pointer_example"] },
+    { "id": "6901-5-index", "path": "/foo/0", "expected": "bar", "sources": ["pointer_example"] },
+    { "id": "6901-5-empty-member-diagnostic", "path": "/", "expected": 0, "sources": ["pointer_example"], "scope": "known-root-alias-divergence-not-changed-claim" },
+    { "id": "6901-5-slash", "path": "/a~1b", "expected": 1, "sources": ["pointer_example"] },
+    { "id": "6901-5-percent", "path": "/c%d", "expected": 2, "sources": ["pointer_example"] },
+    { "id": "6901-5-caret", "path": "/e^f", "expected": 3, "sources": ["pointer_example"] },
+    { "id": "6901-5-pipe", "path": "/g|h", "expected": 4, "sources": ["pointer_example"] },
+    { "id": "6901-5-backslash", "path": "/i\\j", "expected": 5, "sources": ["pointer_example"] },
+    { "id": "6901-5-quote", "path": "/k\"l", "expected": 6, "sources": ["pointer_example"] },
+    { "id": "6901-5-space", "path": "/ ", "expected": 7, "sources": ["pointer_example"] },
+    { "id": "6901-5-tilde", "path": "/m~0n", "expected": 8, "sources": ["pointer_example"] },
+    { "id": "6901-4-decode-order", "input": { "/": 9, "~1": 10 }, "path": "/~01", "expected": 10, "sources": ["pointer_decode"], "derivation": "Section 4 explicitly says ~01 becomes ~1, not /. Input also appears in RFC 6902 A.14." },
+    { "id": "6901-4-literal-01", "input": { "01": "literal", "1": "other" }, "path": "/01", "expected": "literal", "sources": ["pointer_decode", "product_paths"], "derivation": "Object member equality is literal; the leading-zero restriction is ONLY the array branch." },
+    { "id": "6901-4-literal-dash", "input": { "-": "literal" }, "path": "/-", "expected": "literal", "sources": ["pointer_decode", "product_literal"] },
+    { "id": "6901-4-nested-empty", "input": { "object": { "": 42 } }, "path": "/object/", "expected": 42, "sources": ["pointer_decode", "product_literal"] }
+  ],
+  "patch_cases": [
+    { "id": "6902-A1", "input": { "foo": "bar" }, "patches": [{ "op": "add", "path": "/baz", "value": "qux" }], "expected": { "baz": "qux", "foo": "bar" }, "sources": ["patch_examples"] },
+    { "id": "6902-A2", "input": { "foo": ["bar", "baz"] }, "patches": [{ "op": "add", "path": "/foo/1", "value": "qux" }], "expected": { "foo": ["bar", "qux", "baz"] }, "sources": ["patch_examples"] },
+    { "id": "6902-A3", "input": { "baz": "qux", "foo": "bar" }, "patches": [{ "op": "remove", "path": "/baz" }], "expected": { "foo": "bar" }, "sources": ["patch_examples"] },
+    { "id": "6902-A4", "input": { "foo": ["bar", "qux", "baz"] }, "patches": [{ "op": "remove", "path": "/foo/1" }], "expected": { "foo": ["bar", "baz"] }, "sources": ["patch_examples"] },
+    { "id": "6902-A5", "input": { "baz": "qux", "foo": "bar" }, "patches": [{ "op": "replace", "path": "/baz", "value": "boo" }], "expected": { "baz": "boo", "foo": "bar" }, "sources": ["patch_examples"] },
+    { "id": "6902-A6", "input": { "foo": { "bar": "baz", "waldo": "fred" }, "qux": { "corge": "grault" } }, "patches": [{ "op": "move", "from": "/foo/waldo", "path": "/qux/thud" }], "expected": { "foo": { "bar": "baz" }, "qux": { "corge": "grault", "thud": "fred" } }, "sources": ["patch_examples", "patch_move_copy"] },
+    { "id": "6902-A7", "input": { "foo": ["all", "grass", "cows", "eat"] }, "patches": [{ "op": "move", "from": "/foo/1", "path": "/foo/3" }], "expected": { "foo": ["all", "cows", "eat", "grass"] }, "sources": ["patch_examples", "patch_move_copy"] },
+    { "id": "6902-A10", "input": { "foo": "bar" }, "patches": [{ "op": "add", "path": "/child", "value": { "grandchild": {} } }], "expected": { "foo": "bar", "child": { "grandchild": {} } }, "sources": ["patch_examples"] },
+    { "id": "6902-A11", "input": { "foo": "bar" }, "patches": [{ "op": "add", "path": "/baz", "value": "qux", "xyz": 123 }], "expected": { "foo": "bar", "baz": "qux" }, "sources": ["patch_examples"] },
+    { "id": "6902-A16", "input": { "foo": ["bar"] }, "patches": [{ "op": "add", "path": "/foo/-", "value": ["abc", "def"] }], "expected": { "foo": ["bar", ["abc", "def"]] }, "sources": ["patch_examples", "patch_add_remove"] },
+    { "id": "6902-4.5-copy-literal-01", "input": { "records": { "01": "literal" }, "items": ["a"] }, "patches": [{ "op": "copy", "from": "/records/01", "path": "/items/-" }], "expected": { "records": { "01": "literal" }, "items": ["a", "literal"] }, "sources": ["pointer_decode", "patch_move_copy", "patch_add_remove"], "derivation": "Existing literal object member copied using add semantics; source remains, terminal array dash appends." },
+    { "id": "6902-4.4-move-to-literal-01", "input": { "source": "keep", "records": { "01": "old" } }, "patches": [{ "op": "move", "from": "/source", "path": "/records/01" }], "expected": { "records": { "01": "keep" } }, "sources": ["pointer_decode", "patch_move_copy", "patch_add_remove"], "derivation": "Remove existing source then replace existing literal object member, not array index coercion." }
+  ],
+  "array_policy": {
+    "input": { "items": ["zero", "one"] },
+    "invalid_tokens": ["01", "00", "1x", "1.5", "+1", "-1", "-0", "1e1", "0x10", "", " ", "1\n", "NaN", "Infinity"],
+    "expected_read": { "$type": "undefined" },
+    "write_value": "bad",
+    "expected_after_write_or_remove": { "items": ["zero", "one"] },
+    "expected_own_keys": ["0", "1"],
+    "positions": ["leaf", "intermediate"],
+    "sources": ["array_grammar", "pointer_errors", "product_paths"],
+    "derivation": "Each literal token violates the RFC array-index grammar. Undefined reads, unchanged writes/removals and hidden-key rejection come from product docs, not RFC 6902 error recovery. Intermediate path is /items/<token>/child."
+  },
+  "range_policy": {
+    "tokens": ["4294967295", "9007199254740992", "1234567890123456789012345678901234567890"],
+    "expected_read": { "$type": "undefined" },
+    "expected_after_write_or_remove": { "items": ["zero", "one"] },
+    "sources": ["product_paths"],
+    "derivation": "These strings satisfy RFC 6901 decimal grammar. Product rejection is its JavaScript array-index bound, NOT an RFC grammar prohibition. No giant array allocated."
+  },
+  "compound_policy_cases": [
+    { "id": "product-move-invalid-source", "input": { "source": "keep", "items": ["zero", "one"] }, "patches": [{ "op": "move", "from": "/items/01", "path": "/result" }], "expected": { "source": "keep", "items": ["zero", "one"] }, "sources": ["array_grammar", "patch_move_copy", "product_compound", "product_paths"] },
+    { "id": "product-copy-invalid-source", "input": { "source": "keep", "items": ["zero", "one"] }, "patches": [{ "op": "copy", "from": "/items/01", "path": "/result" }], "expected": { "source": "keep", "items": ["zero", "one"] }, "sources": ["array_grammar", "patch_move_copy", "product_compound", "product_paths"] },
+    { "id": "product-move-invalid-destination", "input": { "source": "keep", "items": ["zero", "one"] }, "patches": [{ "op": "move", "from": "/source", "path": "/items/01" }], "expected": { "source": "keep", "items": ["zero", "one"] }, "sources": ["array_grammar", "product_compound", "product_paths"] },
+    { "id": "product-copy-invalid-destination", "input": { "source": "keep", "items": ["zero", "one"] }, "patches": [{ "op": "copy", "from": "/source", "path": "/items/01" }], "expected": { "source": "keep", "items": ["zero", "one"] }, "sources": ["array_grammar", "product_compound", "product_paths"] }
+  ],
+  "store_policy_cases": [
+    { "id": "store-rejected", "input": { "items": ["zero", "one"], "count": 0 }, "updates": { "/items/01": "bad" }, "expected": { "items": ["zero", "one"], "count": 0 }, "expected_same_identity": true, "expected_events": 0, "sources": ["product_store"] },
+    { "id": "store-mixed", "input": { "items": ["zero", "one"], "count": 0 }, "updates": { "/items/01": "bad", "/count": 1 }, "expected": { "items": ["zero", "one"], "count": 1 }, "expected_same_identity": false, "expected_events": 1, "sources": ["product_store"] },
+    { "id": "store-progressive", "input": { "items": ["zero", "one"] }, "updates": { "/items": ["new"], "/items/0": "final" }, "expected": { "items": ["final"] }, "expected_same_identity": false, "expected_events": 1, "sources": ["product_store"] },
+    { "id": "store-unchanged", "input": { "items": ["zero", "one"] }, "updates": { "/items/0": "zero" }, "expected": { "items": ["zero", "one"] }, "expected_same_identity": true, "expected_events": 0, "sources": ["product_store"] },
+    { "id": "store-append", "input": { "items": ["zero"] }, "updates": { "/items/-": "one" }, "expected": { "items": ["zero", "one"] }, "expected_same_identity": false, "expected_events": 1, "sources": ["product_literal"] }
+  ],
+  "reserved_policy": {
+    "tokens": ["__proto__", "constructor", "prototype"],
+    "input": { "source": "keep", "records": { "__proto__": "literal", "constructor": "literal", "prototype": "literal" } },
+    "expected_read": { "$type": "undefined" },
+    "expected_after_mutation": { "source": "keep", "records": { "__proto__": "literal", "constructor": "literal", "prototype": "literal" } },
+    "sources": ["product_paths", "product_compound"],
+    "derivation": "Product blocks these decoded tokens even when they name own JSON members. RFC 6901 object-member rules would permit them. This is a product restriction, not an RFC security requirement. JSON.parse fixtures avoid JS object-literal __proto__ special semantics."
+  },
+  "limits": [
+    "Only independent_challenge is discharged, not Review Gate or failed/unavailable specialist stages.",
+    "No independent human/model family or normative reference implementation is claimed. Review author has inherited implementation exposure; external expected-value provenance is the independence.",
+    "RFC 6901 section 5 root slash example is kept with expected 0 even though saved model declares root aliases out of scope. A mismatch is a visible diagnostic, never relabeled RFC success.",
+    "This is a selected corpus, not full RFC 6901/6902 conformance or full Cartesian/falsifier coverage.",
+    "SpecStream JSONL is not an application/json-patch+json array or HTTP PATCH transport. Product no-op handling/continued streaming is not proof of RFC patch failure or HTTP atomicity.",
+    "No successful-test-operation proxy is counted as proof that test failures are enforced. RFC 6902 A.8/A.9/A.14/A.15 test-operation semantics are outside the changed claim.",
+    "URI fragments, malformed escapes, duplicate members, missing-parent creation, root replacement, out-of-bounds add, descendant moves, deep-copy aliasing and giant sparse-array writes are not certified.",
+    "No renderer parity, browser, React callback, resilience, hostile accessor/Proxy, cyclic/frozen object, deployment or security-stage completion claim.",
+    "Saved RFC texts are used locally with content hashes and excerpts, not network-retrieved or cryptographically authenticated in this resumption."
+  ]
+}

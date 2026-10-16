@@ -1,0 +1,93 @@
+{
+  "required": true,
+  "status": "unavailable",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/test-strength.json",
+  "evidence": "Cuatro mutaciones en v1 y tres regresiones adicionales nacidas rojas; restaurado verde en v3. No se afirma haber repetido las cuatro mutaciones sobre el último movimiento del commit. La matriz explícita conserva las lagunas, sin afirmar cobertura total.",
+  "fingerprint": {
+    "head_sha": "0a53aefdcae889378132f54d8ea096805f3edcea",
+    "changed_paths_digest": "sha256:c2660dfcf1036a5c1e8ed88038cf6000a1e81713713def5ea4d152f2f0a5e401",
+    "contract_digest": "sha256:273e39546dafb53cc3dda769fda45f88145862e8202929ff1bff5b42016ba2be",
+    "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; cargo test --manifest-path cli/Cargo.toml e2e_isolat -- --ignored --test-threads=1; AGENT_BROWSER_ISOLATION_STRESS_ROUNDS=10 cargo test --manifest-path cli/Cargo.toml --test isolate_context_cli -- --ignored --test-threads=1",
+    "environment_digest": "sha256:a29bc488ade3f46f58ce42a2e3e5e7a327bf5b5fb763028a07f7dad7d72967c7",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "cli/src/connection.rs",
+      "cli/src/doctor/launch.rs",
+      "cli/src/doctor/webgpu.rs",
+      "cli/src/main.rs",
+      "cli/src/native/actions.rs",
+      "cli/src/native/browser.rs",
+      "cli/src/native/e2e_tests.rs",
+      "cli/tests/isolate_context_cli.rs"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "dimensions": {
+    "values": [
+      "prior false/true; request true/omitted/false; close resets",
+      "explicit URL/port; implicit CDP; first CLI request; skip/policy deny/pending",
+      "invalid mode, refused transport, malformed storage, binding-write failure, malformed implicit action",
+      "default/A/B downloads; sequential/concurrent A/B; bytes and previous directory configuration",
+      "pinned default to isolated; successful reuse/reconnect; browser restart; daemon restart; recording"
+    ],
+    "exclusions": [
+      "Auto-connect por autodetección real no ejecutado. CDP URL, puerto e implícito por entorno sí ejecutados.",
+      "Windows/Linux, pérdida de transporte durante cleanup y error del drain final no ejercitados; este último recibió revisión estática. Resultados dinámicos limitados a macOS ARM64 con Chrome real."
+    ],
+    "evidence": "contract.md; final committed tests; seven red traces"
+  },
+  "oracle": {
+    "source": "ctate acceptance and baseline explicit-close semantics; real Chrome BrowserContexts and files",
+    "independent": true,
+    "evidence": "threads.json; pr.json; original handle_close at e2607d6; actual bytes/storage/target assertions"
+  },
+  "producer": {
+    "name": "Chrome 152 and compiled agent-browser CLI on macOS ARM64",
+    "status": "exercised",
+    "evidence": "cli-v3.log; isolation-e2e-v3.log"
+  },
+  "falsification": [
+    {
+      "mutation": "eager-sticky",
+      "red_evidence": "mutation-eager-sticky.log: exit 101, behavioral assertion or isolated download canceled",
+      "restored_green_evidence": "isolation-e2e-v3.log; cli-v3.log; full-tests-v3.log"
+    },
+    {
+      "mutation": "early-binding",
+      "red_evidence": "mutation-early-binding.log: exit 101, behavioral assertion or isolated download canceled",
+      "restored_green_evidence": "isolation-e2e-v3.log; cli-v3.log; full-tests-v3.log"
+    },
+    {
+      "mutation": "missing-sticky-commit",
+      "red_evidence": "mutation-missing-sticky-commit.log: exit 101, behavioral assertion or isolated download canceled",
+      "restored_green_evidence": "isolation-e2e-v3.log; cli-v3.log; full-tests-v3.log"
+    },
+    {
+      "mutation": "missing-download-context",
+      "red_evidence": "mutation-missing-download-context.log: exit 101, behavioral assertion or isolated download canceled",
+      "restored_green_evidence": "isolation-e2e-v3.log; cli-v3.log; full-tests-v3.log"
+    },
+    {
+      "mutation": "primer flag en entorno del daemon",
+      "red_evidence": "first-request-red.log",
+      "restored_green_evidence": "isolation-e2e-v3.log; cli-v3.log"
+    },
+    {
+      "mutation": "restaurar target pinned de contexto anterior",
+      "red_evidence": "pinned-implicit-red.log",
+      "restored_green_evidence": "isolation-e2e-v3.log; cli-v3.log"
+    },
+    {
+      "mutation": "commit implícito antes de validar acción",
+      "red_evidence": "implicit-red.log",
+      "restored_green_evidence": "isolation-e2e-v3.log; cli-v3.log"
+    }
+  ],
+  "gaps": [
+    "Auto-connect por autodetección real no ejecutado. CDP URL, puerto e implícito por entorno sí ejecutados.",
+    "Windows/Linux, pérdida de transporte durante cleanup y error del drain final no ejercitados; este último recibió revisión estática. Resultados dinámicos limitados a macOS ARM64 con Chrome real."
+  ],
+  "reason": "La evidencia local descrita pasó; falta la campaña completa de las particiones y sustratos declarados en gaps. No equivale a fallo de tests."
+}

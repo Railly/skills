@@ -1,0 +1,22 @@
+   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)
+warning: for loop on unbounded range
+    --> src/native/browser.rs:3494:13
+     |
+3494 | /             for i in 0u64.. {
+3495 | |                 let _ = tx.send(cdp_event(
+3496 | |                     "Network.requestWillBeSent",
+3497 | |                     session,
+...    |
+3500 | |                 sleep(Duration::from_millis(100)).await;
+3501 | |             }
+     | |_____________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#for_unbounded_range
+     = note: `#[warn(clippy::for_unbounded_range)]` on by default
+help: for loops over unbounded ranges will wrap around and may panic, consider adding an inclusive high bound
+     |
+3494 |             for i in 0u64..=u64::MAX {
+     |                            +++++++++
+
+warning: `agent-browser` (bin "agent-browser" test) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 19.60s

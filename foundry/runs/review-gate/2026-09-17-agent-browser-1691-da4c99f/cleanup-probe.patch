@@ -1,0 +1,60 @@
+diff --git a/cli/src/native/actions.rs b/cli/src/native/actions.rs
+index ae2b268..8c8c2c1 100644
+--- a/cli/src/native/actions.rs
++++ b/cli/src/native/actions.rs
+@@ -15137,3 +15137,55 @@ printf '%s' '{"protocol":"agent-browser.plugin.v1","success":true,"browser":{"cd
+         }
+     }
+ }
++
++#[cfg(test)]
++mod review_1691_probe {
++    use super::*;
++    use std::io::{Read, Write};
++    use std::sync::{Arc, atomic::{AtomicUsize, Ordering}};
++    #[tokio::test]
++    async fn review_1691_failed_stop_reports_closed_and_forgets_session() {
++        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
++        listener.set_nonblocking(true).unwrap();
++        let addr = listener.local_addr().unwrap();
++        let count = Arc::new(AtomicUsize::new(0));
++        let seen = count.clone();
++        let worker = std::thread::spawn(move || {
++            let start = std::time::Instant::now();
++            while start.elapsed() < std::time::Duration::from_secs(3) {
++                match listener.accept() {
++                    Ok((mut socket, _)) => {
++                        socket.set_read_timeout(Some(std::time::Duration::from_secs(1))).unwrap();
++                        let mut buffer = [0u8; 4096];
++                        let n = socket.read(&mut buffer).unwrap();
++                        let request = String::from_utf8_lossy(&buffer[..n]);
++                        assert!(request.starts_with("CONNECT api.browser-use.com:443"), "{request}");
++                        seen.fetch_add(1, Ordering::SeqCst);
++                        socket.write_all(b"HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\nConnection: close\r\n\r\n").unwrap();
++                    }
++                    Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => std::thread::sleep(std::time::Duration::from_millis(10)),
++                    Err(e) => panic!("{e}"),
++                }
++            }
++        });
++        let guard = crate::test_utils::EnvGuard::new(&["BROWSER_USE_API_KEY", "HTTPS_PROXY", "https_proxy", "ALL_PROXY", "all_proxy", "NO_PROXY", "no_proxy"]);
++        for name in ["https_proxy", "ALL_PROXY", "all_proxy", "NO_PROXY", "no_proxy"] { guard.remove(name); }
++        guard.set("BROWSER_USE_API_KEY", "review-dummy-no-real-credential");
++        guard.set("HTTPS_PROXY", &format!("http://{addr}"));
++        let mut state = DaemonState::new();
++        remember_active_provider_session(&mut state, Some(providers::ProviderSession {
++            provider: "browser-use".into(), session_id: "12345678-1234-4234-8234-123456789abc".into(),
++        }), &[]);
++        let first = execute_command(&json!({"id":"first","action":"close"}), &mut state).await;
++        println!("FIRST_CLOSE={first:?}");
++        println!("RETAINED_SESSION={}", state.active_provider_session.is_some());
++        let second = execute_command(&json!({"id":"second","action":"close"}), &mut state).await;
++        println!("SECOND_CLOSE={second:?}");
++        worker.join().unwrap();
++        println!("STOP_TRANSPORT_ATTEMPTS={}", count.load(Ordering::SeqCst));
++        assert_eq!(first["success"], true);
++        assert_eq!(second["success"], true);
++        assert!(state.active_provider_session.is_none());
++        assert_eq!(count.load(Ordering::SeqCst), 1);
++    }
++}

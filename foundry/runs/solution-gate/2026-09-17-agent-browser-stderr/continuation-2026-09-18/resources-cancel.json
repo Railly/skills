@@ -1,0 +1,163 @@
+{
+  "kind": "UNIX-ONLY DISPOSABLE SPIKE",
+  "production_fix": false,
+  "gate_approval": false,
+  "C6_validated": false,
+  "workspace": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe",
+  "host_pid": 70169,
+  "samples": 76,
+  "test_seconds": 4.95,
+  "commands": [
+    {
+      "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe",
+      "argv": [
+        "cp",
+        "-cR",
+        "../candidate/cli/target",
+        "target"
+      ],
+      "exit": 0
+    },
+    {
+      "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/source/cli",
+      "CARGO_TARGET_DIR": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/target",
+      "argv": [
+        "cargo",
+        "clean",
+        "--offline",
+        "-p",
+        "agent-browser"
+      ],
+      "exit": 0
+    },
+    {
+      "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe",
+      "argv": [
+        "/usr/bin/python3",
+        "probe.py"
+      ],
+      "exit": 0
+    },
+    {
+      "cwd": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/source/cli",
+      "CARGO_TARGET_DIR": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/target",
+      "TMPDIR": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/tmp",
+      "argv": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--bin",
+        "agent-browser",
+        "native::cdp::chrome::resource_probe::resource_lifecycle_spike",
+        "--",
+        "--ignored",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "result": "1 passed; 0 failed; 1523 filtered out"
+    }
+  ],
+  "counts_order": [
+    "threads",
+    "readers",
+    "fds"
+  ],
+  "baseline": [
+    2,
+    0,
+    4
+  ],
+  "live": [
+    3,
+    1,
+    7
+  ],
+  "after_every_kill_or_drop": [
+    2,
+    0,
+    4
+  ],
+  "baseline_variation": 0,
+  "ps_libproc_disagreements": 0,
+  "cycles": {
+    "owned_quiet": 6,
+    "owned_burst_8MiB": 6,
+    "external_writer_retained": 12,
+    "explicit_kill_then_drop": 12,
+    "drop_only": 12,
+    "direct_stop_before_kill": 2,
+    "injected_setup_errors": 2
+  },
+  "external_parent_fds_still_open_at_each_drop": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "direct_stop": [
+    {
+      "direct_mode": "quiet",
+      "polls_after_idle": 1,
+      "polls_after_join": 1,
+      "polls_before": 1,
+      "stop_us": 69
+    },
+    {
+      "direct_mode": "continuous",
+      "polls_after_idle": 20808,
+      "polls_after_join": 20808,
+      "polls_before": 415,
+      "stop_us": 75
+    }
+  ],
+  "setup_fault_stages": [
+    "before fcntl",
+    "after wake pair, before thread spawn"
+  ],
+  "cleanup": {
+    "chrome_launches": 28,
+    "helpers_reaped": 28,
+    "helper_exit": -9,
+    "supervisor_kills": 0,
+    "profiles_removed": 28,
+    "automatic_profiles_removed_on_setup_error": 2,
+    "socket_removed": true
+  },
+  "cleanup_pid_query_exit": 1,
+  "cleanup_pid_query_stdout": "",
+  "changed_runtime_locations": [
+    "source/cli/src/native/cdp/chrome.rs: ChromeProcess, kill, post-ready try_launch_chrome construction",
+    "source/cli/src/native/cdp/stderr_drain.rs: private owned poll/wake/stop/join worker"
+  ],
+  "test_locations": [
+    "source/cli/src/native/cdp/resource_probe.rs",
+    "probe.py"
+  ],
+  "private_non_test_runtime_absent": true,
+  "preservation_hashes_verified": true,
+  "evidence": [
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/runtime.diff",
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/measurements.json",
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/cargo.log",
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/final-validation.json",
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/preservation-before.json"
+  ],
+  "limits": [
+    "macOS only; not C6 or Pass",
+    "Synthetic writer ownership; no normal Chrome escape claim",
+    "No actual OS resource exhaustion or spawn failure injection",
+    "No CDP/session/fallback/retry/idle/RSS/removal-sensitive validation",
+    "Observed stop timings, not scheduling bounds"
+  ]
+}

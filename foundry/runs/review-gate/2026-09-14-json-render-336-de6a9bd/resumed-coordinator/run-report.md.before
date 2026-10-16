@@ -1,0 +1,103 @@
+# Review Gate: vercel-labs/json-render
+
+Date: 2026-09-14
+Repository: vercel-labs/json-render
+Base: `6c7164342a37fab055907f1666658e1333e2cb86`
+Head: `de6a9bdbc0100ac778dff1ad48ab2f732b7d181e`
+Profile: external-pr
+Skill revision: `git:77fdde3e8d7e13b7c27c7660f7c15619839e38af`
+Verdict: incomplete
+
+## Execution
+
+- Mode: unavailable
+- Runtime receipt: runtime-interruption.json
+- Degraded from: native_subagent
+- Schema failures: 2
+- Independence gap: Coordinator interrupted; required specialist receipts and complete independent challenge unavailable. Native partial reviews share the orchestrator model family.
+
+## Contract
+
+- Path: contract.json
+- Spec status: not_provided
+- Acceptance reviewed: A1, A2, A3, A4
+
+## Stage receipts
+
+- Test Strength: fail at `git:77fdde3e8d7e13b7c27c7660f7c15619839e38af`. Authored tests allow removal of the copy-source guard, and real renderer callers violate the newly hardened rejection contract.
+- Resilience Audit: unavailable at `git:77fdde3e8d7e13b7c27c7660f7c15619839e38af`. No method-complete exact-head specialist receipt was emitted before the coordinating runtime stopped. Existing test/build/caller probes are useful evidence but do not replace the required specialist method.
+- Security Review: unavailable
+
+## Verified properties
+
+- P1: Core canonical decimal array handling and literal object-key behavior pass the recorded public export probes. public-export-probe.json; coordinator-dogfood.log; core-tests.log. This is bounded direct evidence, not a Test Strength pass.
+- P2: Core rejected immutable writes retain snapshot identity and avoid store/adapter publication in the recorded scenarios. public-export-probe.json records rejected identity, zero rejected adapter writes, and one accepted-batch notification/write.
+- P3: UNSATISFIED: every public compound streaming patch preserves its source on malformed destination. F1; coordinator/hook-proof-head.json and hook-proof-base-public.json show actual data loss in built React while core compileSpecStream rejects safely.
+- P4: UNVERIFIED: reserved-token security claim across the complete changed surface. A complete Security Review receipt is unavailable; runtime-interruption.json. Static helper inspection and existing CI do not substitute for this receipt.
+- P5: UNSATISFIED: state-provider change callbacks report only accepted writes. F2; consumer/result.json versus resumed-caller-review/base-invalid-result.json. Head preserves items yet callback still reports rejected /items/01 write.
+
+## Deterministic checks
+
+- `covered`: finding-fixed. Initial exact-head run report was absent (covered_now.log); this report materializes the missing report. A covered result is coverage, not approval.
+- `exact-state`: pass. Live GitHub and local clean worktree still match base 6c7164342a37fab055907f1666658e1333e2cb86 and head de6a9bdbc0100ac778dff1ad48ab2f732b7d181e.
+- `skill-identity`: pass. identity.json ties canonical executing package tree to git revision; identity_recheck.log has no changes for review-gate or specialist packages.
+- `style`: pass. style.log
+- `surfaces`: pass. surfaces.log and conventions.used.md
+- `siblings`: acknowledged. sibling-contexts.txt: unaffected sources are terse provider/export listings or canonical path examples; core README/API/skill and data-binding path rule passages were updated.
+- `callers`: acknowledged. caller-contexts.txt and public-export-review.json; F1/F2 remain open.
+- `raw-input-consumers`: acknowledged. additional_callers.log plus legacy renderer compound patch handlers; F1.
+- `diff-check`: pass. git diff --check; diff-check.log
+- `core-build`: pass. core-build.log: ESM, CJS and DTS built successfully.
+- `core-tests`: pass. core-tests.log: 577 tests across 12 files passed after initial built-artifact dogfood.
+- `core-typecheck`: acknowledged. typecheck-comparison.json: exact base and head both have 115 equivalent diagnostics; no diagnostic delta after file/line normalization.
+- `workspace-typecheck`: acknowledged. root-typecheck.log and repo-typecheck.log: Turbo invokes pnpm dependency auto-install, which fails in the linked local worktree. Live exact-head CI Type Check is successful.
+- `version-sync`: pass. version-check.log: every public package is 0.20.0.
+- `stale/producers/timings/shellmeta/artifacts/flagsweep/execdeps`: acknowledged. No retired duplicated value, error classifier, timing constants, shell parser, persistent file writer, new flag or external executable changed.
+
+## Judgment lenses
+
+- Inverse regression surface: run. Strict array parsing changes lookup outcomes. Base/head public hook comparison found F1; negative-space completeness remains dependent on missing Test Strength receipt.
+- New-domain matrix: run. Missing-container and null handling inspected; complete falsifier matrix unavailable and explicitly left as a gap.
+- Resolution-rule consistency across consumers: run. Caller and raw parser sweeps found independent renderer compound dispatchers; F1. Official Redux/Zustand/Jotai/XState adapters delegate to shared core helper.
+- Shell re-parse append domain: skipped. No shell argument or script-string composition changed.
+- Emission channel and one-shot latch reachability: skipped. No daemon emission channel or one-shot latch changed.
+- Shim hermeticity: skipped. No external executable shim was authored in the diff.
+- Deliberate-default check: run. Exact base/head comparisons distinguish introduced F1/F2 from pre-existing overlapping valid-batch callback mismatch.
+- Fresh-seam scan: skipped. No runtime/framework signal-forwarding seam changed.
+- Substrate differential corpus: run. Built ESM/CJS and JSON.stringify/diffToPatches streams were exercised; method-complete independent corpus receipt remains missing.
+- Reference-implementation oracle: run. RFC 6901/6902 primary texts saved and contract inspected. Full independently defined conformance challenge remains incomplete.
+- New-failure-outcome propagation: run. Built React useUIStream loses move source or inserts undefined, and built React StateProvider callbacks report rejected entries; F1/F2.
+- Flag-propagation dispatch sweep: skipped. No new flag, mode or config bit.
+- Error-path forcing: run. Malformed source/destination and invalid/mixed batches were exercised through public boundaries. Full resilience partitions are unresolved.
+- Non-destructive recovery: skipped. No heuristic recovery action.
+- Cancellation and timeout hygiene: skipped. No new asynchronous operation, timeout or cancellation mechanism.
+- Boundary pipeline trace: skipped. No newly supported frame/process/platform boundary; existing consumer propagation was reviewed separately.
+- Substrate verification: run. Observed own undefined keys, serialized state, snapshot identity, callback records and rendered DOM rather than only command success.
+- Dogfood the built artifact: run. Core ESM/CJS/store-utils and public React hook/provider evidence saved in public-export-probe.json, coordinator and consumer.
+- Newly-asserted invariant ownership: run. Safe core compound helper does not own renderer-specific compound writers; F1. Core rejection does not own provider change-record generation; F2.
+- Docs-behavior parity: run. Canonical core behavior prose was compared to probes. Sibling provider listings make no independent malformed-path contract. Consumer guarantees fail at F1/F2.
+- Demonstrative example: run. Changed canonical/noncanonical path examples map to exercised cases. Exhaustive mutation proof remains missing.
+- Choice audit: skipped. No implementation decision trail was supplied.
+- Complexity budget: run. New path validation is linear in path depth; staging clones touched arrays, so cost includes touched array lengths. No performance guarantee is proved or claimed.
+
+## Findings
+
+- F1: confirmed, open. Propagate compound patch validation to renderer stream handlers. The new getByPath/setByPath rejection outcomes are not handled by the older renderer applyPatch implementations. Built React useUIStream processing move from /state/source to /state/items/01 removes source then silently rejects its destination. Copy/move from /state/items/01 to a valid key creates an own undefined property. Core applySpecStreamPatch safely rejects the same compound patches, but these handlers bypass it. This introduces data loss when noncanonical input previously coerced to index 1. Evidence: coordinator/hook-proof.test.ts; coordinator/hook-proof-head.json; caller-contexts.txt; coordinator/hook-proof-base-public.json; public-export-review.json
+- F2: confirmed, open. Exclude rejected batch entries from state-provider change callbacks. After update({"/items/01":"rejected","/count":1}), new core state correctly preserves items but StateProvider onStateChange reports both entries because it compares submitted values with the old snapshot. Applications persisting callbacks receive a write that never occurred. Exact base executed the coerced array write, so the same callback matched its state; the new rejection exposes this mismatch. Evidence: consumer/result.json; resumed-caller-review/base-invalid-result.json; resumed-caller-review/base-invalid-probe.mjs; resumed-caller-review/base-invalid.log
+- R1: refuted, not_applicable. The valid overlapping-path callback discrepancy is introduced by this PR. Evidence: resumed-caller-review/result.json and resumed-caller-review/base-result.json produce identical mismatch; exact base createStateStore already evaluates entries progressively.
+
+## Gaps
+
+- Review was interrupted by the recorded runtime content flag and then stopped at the user request for handoff. Existing artifacts were preserved and Test Strength receipt integrated; no security pass is claimed.
+- Required exact-state Resilience Audit receipt unavailable: caller failures were reproduced, but the full pressure matrix and retry/cleanup receipt was not emitted.
+- Required exact-state Security Review receipt unavailable. No security pass is claimed.
+- High-risk independent challenge was not fully discharged. Saved RFC texts and focused native reviews are useful inputs, but a complete independent conformance/challenge artifact is unavailable.
+- Full local workspace type-check unavailable due linked dependency setup; exact-head CI passed and direct core diagnostic delta is zero.
+- Test Strength receipt is now available with status fail: one copy-source guard mutant survives authored tests, downstream correctness findings remain, and full per-class falsification is incomplete. See test-strength/receipt.json.
+
+## Limits and provenance
+
+- Author model: unknown
+- Reviewer model: native Codex agents; exact model identifiers not recorded
+- Same family: no
+- Independent challenge: not satisfied. RFC primary texts and public-export probes saved; method-complete independent challenge is unavailable.

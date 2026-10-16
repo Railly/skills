@@ -1,0 +1,116 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "crafter-lab/circuitkit",
+    "base_sha": "3ec090185994b6f93d086c5a2f060e7f4ef8fdad",
+    "head_sha": "327916f472096b07180f049d6d18cd63962096fc",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:bc9508fd7c9f5892b9fa29a0447e20e4f3aaecf20a96153f17dcca20c1ed0f50",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "inert input, no input-selected filesystem or executable sink, isolated optional UI",
+    "attacker": "A circuit author controls recipe JSON and .ck source through tool arguments. The stdio launcher already has the current OS user authority.",
+    "scope": "New MCP server and optional browser resource; no public hosted server or native host implementation added."
+  },
+  "trust_model": {
+    "assets": [
+      "OS filesystem and process authority",
+      "host conversation selection",
+      "browser host document"
+    ],
+    "principals": [
+      {
+        "name": "circuit author",
+        "authority": "tool argument content only"
+      },
+      {
+        "name": "operator",
+        "authority": "launch server and configure optional audit path"
+      },
+      {
+        "name": "host",
+        "authority": "mount resource and decide supported message/context capabilities"
+      }
+    ],
+    "boundaries": [
+      "tool arguments to existing validating renderers",
+      "rendered SVG to data URI image and whitelisted path attributes",
+      "resource iframe to official SDK AppBridge"
+    ],
+    "entrypoints": [
+      "show_circuit",
+      "explore_circuit",
+      "ui://circuitkit/view-v1.html"
+    ],
+    "sinks": [
+      "fixed adjacent HTML read at startup",
+      "optional operator-selected JSONL audit",
+      "PNG renderer",
+      "host context/message on explicit selection/action"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-001",
+      "classification": "informational",
+      "scope": "in_scope_security_regression",
+      "prerequisites": [
+        "local operator runs stdio server"
+      ],
+      "chain": {
+        "capability": "author controls bounded input",
+        "reachability": "tools/call",
+        "control": "strict recipe/document/source fields",
+        "boundary": "input to renderer",
+        "impact": "No new file-read or code-execution sink reachable from arguments."
+      },
+      "confidence": "high",
+      "evidence": [
+        "src/mcp/circuit.ts: strict schema, 64 KiB bound, existing renderers",
+        "src/mcp/cli.ts: fixed HTML resource path; audit path comes only from launcher environment",
+        "tests/mcp.test.ts: path input, malformed, unknown, ambiguous and oversized data rejected"
+      ]
+    },
+    {
+      "id": "SEC-002",
+      "classification": "informational",
+      "scope": "in_scope_security_regression",
+      "prerequisites": [
+        "compatible host enforces declared resource policy"
+      ],
+      "chain": {
+        "capability": "author controls circuit labels and attributes accepted by renderer",
+        "reachability": "explore_circuit payload to view",
+        "control": "inert JSON revalidated; SVG placed in image; routes reduced to whitelisted d paths",
+        "boundary": "drawing to host document",
+        "impact": "No raw author HTML injection or host DOM access introduced."
+      },
+      "confidence": "high",
+      "evidence": [
+        "src/mcp/canvas.tsx uses data URI image and React attributes",
+        "resource declares empty connect/resource domains",
+        "reference iframe sandbox=allow-scripts, connect-src none; official SDK transport",
+        "browser receipt proves SDK messages at isolated iframe boundary"
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "User requested implementing and testing this local feature and creating a PR. Verification used disposable package consumer and local reference host.",
+    "commands": [
+      "bun test ./tests",
+      "bun scripts/check-mcp-browser.ts http://127.0.0.1:52924/ artifacts/mcp-image-first/browser",
+      "node artifacts/mcp-image-first/consumer/verify.mjs (cwd consumer)"
+    ],
+    "cleanup": "No production data or credentials entered artifacts. Disposable dependency renamed back in finally. Browser harness closes sessions.",
+    "gaps": []
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": [
+      "TS2345 in readonly test inputs fixed before final typecheck"
+    ]
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/security-receipt.json"
+}

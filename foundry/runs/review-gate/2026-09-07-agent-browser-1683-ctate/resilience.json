@@ -1,0 +1,189 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/resilience.json",
+  "fingerprint": {
+    "head_sha": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+    "changed_paths_digest": "sha256:c2660dfcf1036a5c1e8ed88038cf6000a1e81713713def5ea4d152f2f0a5e401",
+    "contract_digest": "sha256:273e39546dafb53cc3dda769fda45f88145862e8202929ff1bff5b42016ba2be",
+    "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; cargo test --manifest-path cli/Cargo.toml e2e_isolat -- --ignored --test-threads=1; AGENT_BROWSER_ISOLATION_STRESS_ROUNDS=10 cargo test --manifest-path cli/Cargo.toml --test isolate_context_cli -- --ignored --test-threads=1; cargo test --manifest-path cli/Cargo.toml test_isolation_commit_requires_a_durable_context_without_a_target -- --ignored --test-threads=1; Linux: mismas suites --locked con env de environment.json; bun completion/cdp-fault-probe.ts {late,late-drop,kill} {new,persisted}; python3 completion/linux-auto-connect.py",
+    "environment_digest": "sha256:1af9743f261ddf095c68a70bcb367c5b7b6517bc29bb95791eaa51948b8d2326",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "cli/src/connection.rs",
+      "cli/src/doctor/launch.rs",
+      "cli/src/doctor/webgpu.rs",
+      "cli/src/main.rs",
+      "cli/src/native/actions.rs",
+      "cli/src/native/browser.rs",
+      "cli/src/native/e2e_tests.rs",
+      "cli/tests/isolate_context_cli.rs"
+    ],
+    "reusable": false,
+    "reuse_evidence": null,
+    "evidence_scope": "HEAD final limpio; macOS/Linux ARM64. Árbol final inmutable salvo mutación reversible ya restaurada; hashes verificados. Ver completion/scope.json.",
+    "scope_digest": "sha256:5db5451765698a2ee34966de8383cd2fc37a462624b8bc382b29f00f4a2c28fb"
+  },
+  "evidence": "Fallos forzados de validación, transporte, storage, publicación, primer comando e implícito; reconexión y continuidad observadas. Contextos ya persistidos conservan conexión tras error de acción; target desaparecido en commit se probó con eventos Chrome reales, nuevo/persistido. Se forzaron drain final, corte de CDP durante disposición y SIGKILL; nuevos/persistidos discriminados. Repetición y cierre real de Chrome observados.",
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "nuevo BrowserContext remoto",
+      "owner": "BrowserManager",
+      "commit_event": "Target.createBrowserContext",
+      "later_fallible_stages": [
+        "attach/setup",
+        "storage load",
+        "binding save",
+        "implicit action",
+        "final event drain",
+        "missing bindable target at commit"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "storage",
+          "covers": [
+            "storage load"
+          ],
+          "forced": true,
+          "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+          "cleanup_owner": "rollback_failed_launch",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "isolation-e2e-v4.log"
+          },
+          "evidence": "isolation-e2e-v4.log: invalid JSON"
+        },
+        {
+          "ownership_region": "filesystem",
+          "covers": [
+            "binding save"
+          ],
+          "forced": true,
+          "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+          "cleanup_owner": "rollback_failed_launch",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "isolation-e2e-v4.log"
+          },
+          "evidence": "isolation-e2e-v4.log: target.tmp directory fault"
+        },
+        {
+          "ownership_region": "dispatch",
+          "covers": [
+            "implicit action"
+          ],
+          "forced": true,
+          "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+          "cleanup_owner": "rollback_failed_launch",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "isolation-e2e-v4.log"
+          },
+          "evidence": "isolation-e2e-v4.log: missing URL"
+        },
+        {
+          "ownership_region": "target lifecycle",
+          "covers": [
+            "missing bindable target at commit"
+          ],
+          "forced": true,
+          "residual_observed": "Nuevo contexto sin target: error, sin sticky/binding y contexto dispuesto. Persistido sin target: binding/intent conservados.",
+          "cleanup_owner": "rollback_failed_launch",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "cross-family-no-target-green.log: siguiente estado de misma sesión crea y persiste contexto antes del cierre externo"
+          },
+          "evidence": "cross-family-no-target-red.log; cross-family-no-target-green.log; helper aislado con Chrome real"
+        },
+        {
+          "ownership_region": "CDP target setup / final event drain",
+          "covers": [
+            "attach/setup",
+            "final event drain"
+          ],
+          "forced": true,
+          "residual_observed": "Nuevo: cero contextos residuales, sin binding. Persistido: binding/contexto anterior intactos. Error Runtime.enable devuelto sobre sessionId generado por Chrome tras Target.attachedToTarget real.",
+          "cleanup_owner": "rollback_failed_launch; BrowserManager dispose del contexto nuevo",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "completion/fault-repeat-late-new.json; completion/fault-repeat-late-persisted.json"
+          },
+          "evidence": "completion/cdp-fault-probe.ts; completion/fault-repeat-late-new.json; completion/late-commit-mutant.json"
+        },
+        {
+          "ownership_region": "transport disposal loss",
+          "covers": [
+            "cleanup transport interruption"
+          ],
+          "forced": true,
+          "residual_observed": "Un contexto remoto huérfano, sin binding/sticky nuevo; flagless posterior no aislado. No se confunde ausencia de binding con cleanup.",
+          "cleanup_owner": "Disposición imposible sin CDP; host Chrome conserva recurso hasta cierre; cierre host/CDP observado",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "completion/fault-repeat-late-drop-new.json"
+          },
+          "evidence": "completion/fault-repeat-late-drop-new.json",
+          "classification": "recoverable degradation with remote leak"
+        },
+        {
+          "ownership_region": "process death before publication",
+          "covers": [
+            "daemon SIGKILL before binding"
+          ],
+          "forced": true,
+          "residual_observed": "Un contexto remoto huérfano y ningún binding publicado; siguiente comando sin aislamiento permanece no aislado; retry y restart exitosos.",
+          "cleanup_owner": "Daemon muerto no puede rollback; recurso termina con host Chrome; cierre CDP host observado",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "completion/fault-repeat-kill-new.json"
+          },
+          "evidence": "completion/fault-repeat-kill-new.json",
+          "classification": "recoverable degradation with remote leak"
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "effect": "binding durable y booleano sticky",
+      "owner": "commit_isolated_connection",
+      "commit_event": "save/fsync/rename succeeded, then bool=true",
+      "later_fallible_stages": [],
+      "failure_partitions": []
+    }
+  ],
+  "gaps": [],
+  "reason": "Obligaciones del alcance local ejecutadas y falsificadas; exclusiones y degradaciones medidas explícitas, sin certificación Windows.",
+  "report_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/completion/resilience-matrix.json",
+  "elapsed_time_evidence": "Duraciones en logs de suites y timestamps de traces; no se inventa una duración total de etapas previas.",
+  "scope": {
+    "kind": "bounded_local_review",
+    "head": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+    "acceptance": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4"
+    ],
+    "platform_claim": "macOS ARM64 y Linux ARM64, Chrome/Chromium 152, sustratos realmente ejecutados",
+    "authorization": "Trabajo local autorizado por Hunter. No publicación. La pregunta opcional sobre Windows no recibió respuesta; el alcance local se declaró durante la ejecución, sin inferir aprobación del silencio.",
+    "exclusions": [
+      "Windows no ejecutado: sin entorno Windows disponible. No se certifica soporte Windows ni equivalencia del IPC Windows.",
+      "BrowserContexts entre sesiones cooperativas; no sandbox contra un controlador con autoridad CDP global.",
+      "No se promete atomicidad ante SIGKILL o pérdida del canal de disposición. Un contexto remoto puede quedar huérfano y los fallos repetidos pueden acumularlos hasta cerrar Chrome.",
+      "Matching de GUIDs de descargas simultáneas dentro de un mismo contexto y sesiones no aisladas que comparten default son comportamientos preexistentes fuera de estos dos findings.",
+      "No se afirma explorar todas las intercalaciones de procesos, todos los navegadores/versiones o todas las fallas de CDP."
+    ],
+    "historical_solution_gate": "Permanece incomplete. La revisión posterior de Claude no se presenta como shaping independiente previo. La auditoría nueva de admisión también queda incomplete y no se consume como evidencia aprobatoria del Review Gate.",
+    "basis": "review-gate/references/proof-obligations.md permite acotar la propiedad al sustrato ejecutado; no sustituir entornos ausentes con fixtures."
+  }
+}

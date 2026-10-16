@@ -1,0 +1,51 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "browser-falsification.json",
+  "evidence": "12 real-browser green/old-CSS/restored cases; old CSS prevents native PageDown page motion; restored CSS passes native PageDown in all three panels at 390px.",
+  "fingerprint": {
+    "head_sha": "d464e0efa043b2de48bea9e7c8bafb5bff520585",
+    "changed_paths_digest": "sha256:b5769b058d1436a1912b2ccaba2a7189b6c07491c25780d99ff5d38160d9b89f",
+    "contract_digest": "sha256:17f840f6fedd5ae5b0f5dec7959e62befc2cc0a86993706a0a80c2b10eae4ab5",
+    "command": "python3 verify-browser.py",
+    "environment_digest": "sha256:6c2d8c8ea4f23423c0c3b6a2a0932e9ed009d6612f3b6eb4e1aa9adf072c8f36",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "apps/docs/src/components/terminal-demo.css",
+      "apps/docs/src/components/terminal-demo.tsx",
+      "apps/docs/src/lib/terminal-examples.ts"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "dimensions": {
+    "values": [
+      "viewport 1440, 640, 390, 320 px",
+      "Graph, PR status, Backlog",
+      "current CSS, original fixed-height containment, restored current CSS"
+    ],
+    "exclusions": [
+      "Pointer-wheel coordinate targeting unavailable in installed browser automation; no pointer-wheel-specific claim.",
+      "Theme duplicates are omitted in this CSS falsification because the size/overflow rules are theme-independent; earlier light/dark layout checks remain available."
+    ],
+    "evidence": "All 12 geometry cells rejected the injected original CSS and passed after its removal. Native keyboard drives cover the overflowing baseline Graph case and every restored tab."
+  },
+  "oracle": {
+    "source": "User acceptance A6 plus browser page/panel scroll offsets and overflow dimensions",
+    "independent": true,
+    "evidence": "Expected page movement comes from user intent; PageDown is browser-generated input, not a dispatched synthetic DOM event."
+  },
+  "producer": {
+    "name": "Chromium driven by agent-browser against owned production server on 3437",
+    "status": "exercised",
+    "evidence": "browser-falsification.json records real geometry and native key results at exact head."
+  },
+  "falsification": [
+    {
+      "mutation": "Inject original height/overflow/containment at the rendered component via an ephemeral stylesheet",
+      "red_evidence": "Every cell violates the no-containment invariant; native PageDown on 390px Graph fails page movement.",
+      "restored_green_evidence": "Removing the stylesheet restores zero vertical panel overflow at all widths; native PageDown moves page in all three tabs."
+    }
+  ]
+}

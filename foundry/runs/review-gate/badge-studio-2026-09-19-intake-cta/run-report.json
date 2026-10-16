@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-19",
+    "repo": "crafter-station/badge-studio",
+    "base": "3179c13fcebfa4f0a3c5f589252ea62c8929bcb1",
+    "head": "74b4ae90cf756cdae3e9ad77ab32b1f87044d8fc",
+    "profile": "standard",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "fx_worker",
+    "receipt": "fx-review.json",
+    "degraded_from": "native_subagent",
+    "independence_gap": "Same model family; isolated context. No cross-family claim.",
+    "schema_failures": 1,
+    "operations": [
+      {
+        "operation": "isolated review",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "contract.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "gpt-6-astra",
+    "reviewer_model": "openai/gpt-6-astra",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [
+      "photo intake guidance",
+      "clipboard UX and website entry points"
+    ],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": true,
+      "method": "isolated_context_review",
+      "artifact": "fx-review.json",
+      "evidence": "Read-only FX review found no actionable findings."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The copied prompt, skill intake and documentation agree; production rollout is recorded separately after push."
+    },
+    {
+      "source": "design",
+      "location": "skill, landing and docs",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The copied prompt, skill intake and documentation agree; production rollout is recorded separately after push."
+    },
+    {
+      "source": "user_facing",
+      "location": "skill, landing and docs",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The copied prompt, skill intake and documentation agree; production rollout is recorded separately after push."
+    },
+    {
+      "source": "implementation",
+      "location": "apps/web/src/components/agent-prompt.tsx and ui/copy-button.tsx",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The copied prompt, skill intake and documentation agree; production rollout is recorded separately after push."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The trial asks for the actual portrait, exact name and treatment before composing.",
+      "kind": "user_interface",
+      "status": "verified",
+      "oracle": {
+        "observes": "The trial asks for the actual portrait, exact name and treatment before composing.",
+        "layer": "user-visible browser or agent reply",
+        "method": "drive the actual entry point",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "build or document validity alone",
+        "counterexample": "valid component with incorrect copy payload, missing fallback, or composition before user input",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/fresh-session/first-response.md"
+      },
+      "substrates": [
+        {
+          "name": "Fresh FX session using the exact public starter prompt, actual image and installed badgio 0.2.2",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/fresh-session-0.2.2/first-response.md"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/fresh-session-0.2.2/first-response.md"
+    },
+    {
+      "id": "P2",
+      "claim": "All three UI entry points copy the approved prompt and expose full text when copying fails.",
+      "kind": "user_interface",
+      "status": "verified",
+      "oracle": {
+        "observes": "All three UI entry points copy the approved prompt and expose full text when copying fails.",
+        "layer": "user-visible browser or agent reply",
+        "method": "drive the actual entry point",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "build or document validity alone",
+        "counterexample": "valid component with incorrect copy payload, missing fallback, or composition before user input",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log"
+      },
+      "substrates": [
+        {
+          "name": "Chromium browser",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log"
+    },
+    {
+      "id": "P3",
+      "claim": "badgio 0.2.2 installs and serves three bundled guides for a cold Node-only consumer.",
+      "kind": "user_interface",
+      "status": "verified",
+      "oracle": {
+        "observes": "badgio 0.2.2 installs and serves three bundled guides for a cold Node-only consumer.",
+        "layer": "user-visible browser or agent reply",
+        "method": "drive the actual entry point",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "build or document validity alone",
+        "counterexample": "valid component with incorrect copy payload, missing fallback, or composition before user input",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/package-consumer.log"
+      },
+      "substrates": [
+        {
+          "name": "Cold public npm/npx consumer without Bun",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/registry-consumer.log"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/registry-consumer.log"
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "sha256:a48126adf41ae16e2a3f29bb20b1da68b3a5b9db2a4cd6b5baa08b3c598b70ea",
+      "artifact": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log",
+      "evidence": "Three real UI entry points each pass write success, denied fallback and keyboard recovery; three mutants fail at the intended assertions for all three points, then restored source passes.",
+      "fingerprint": {
+        "head_sha": "74b4ae90cf756cdae3e9ad77ab32b1f87044d8fc",
+        "changed_paths_digest": "sha256:c5bad63655dfc36618ee82385eeb857980a9644b9a0e4aa3f191276a63aef657",
+        "contract_digest": "sha256:28b2cb208a08cd664e8edbd3b9c2a7636c177ab8c79aaa71bef3245438cc50b9",
+        "command": "bun /Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/verify-copy.mjs",
+        "environment_digest": "sha256:e27083dec30021019f9a02cc01b8dc3c158f2b425be377e0f7ea21774482cd17",
+        "skill_revision": "sha256:a48126adf41ae16e2a3f29bb20b1da68b3a5b9db2a4cd6b5baa08b3c598b70ea",
+        "relevant_paths": [
+          "README.md",
+          "apps/web/src/app/docs/page.tsx",
+          "apps/web/src/app/landing/landing.css",
+          "apps/web/src/app/landing/studio-landing.tsx",
+          "apps/web/src/components/agent-prompt.tsx",
+          "apps/web/src/components/ui/copy-button.tsx",
+          "apps/web/src/lib/agent-setup.ts",
+          "bun.lock",
+          "packages/cli/package.json",
+          "packages/cli/skill-data/core.md",
+          "packages/cli/skill-data/design.md",
+          "packages/cli/skill-data/images.md",
+          "skills/badge-studio/SKILL.md"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      },
+      "dimensions": {
+        "values": [
+          "entry point: hero, workflow, docs",
+          "prior state/transition: idle to copied, copied to error, error to copied",
+          "input: actual pointer activation, actual Enter key retry",
+          "clipboard: real write accepted, forced NotAllowedError"
+        ],
+        "exclusions": [
+          "Photo generation and public publishing implementations are unchanged.",
+          "No claim about rapid overlapping clicks or other OS clipboard implementations.",
+          "Manual text selection uses native read-only textarea; no custom copy engine."
+        ],
+        "evidence": "verify-copy.mjs drives all nine location/transition cases. Shared component equivalence is still verified at each caller."
+      },
+      "oracle": {
+        "source": "The exact prompt supplied by the user and the contract that success requires write completion, denied copy exposes all text, and keyboard retry can recover.",
+        "independent": true,
+        "evidence": "The test embeds the user-supplied prompt independently of the exported application constant."
+      },
+      "producer": {
+        "name": "agent-browser Chromium pointer and keyboard events",
+        "status": "exercised",
+        "evidence": "Actual browser events invoke the React controls; a wrapper calls the real Clipboard API for success and forces a browser-shaped NotAllowedError for rejection."
+      },
+      "falsification": [
+        {
+          "mutation": "Replace AgentPrompt CopyButton value with Incorrect prompt at the real call site.",
+          "red_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/wrong-copy-payload-red.log",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log"
+        },
+        {
+          "mutation": "Disable rendering of the manual textarea on error.",
+          "red_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/missing-manual-fallback-red.log",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log"
+        },
+        {
+          "mutation": "Prevent copied status when retrying from error.",
+          "red_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/broken-retry-red.log",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v21-intake/copy-restored-green.log"
+        }
+      ]
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "No new remote or durable lifecycle. Clipboard failure/retry and existing timer cleanup are covered by the scoped UI proof."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "repository and registry",
+      "claim": "This is a frontend/skill release; community auth, storage and public mutation routes are unchanged.",
+      "status": "verified",
+      "evidence": "Exact changed-path list and reviewer inspection."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "contract-drift",
+      "status": "run",
+      "reason": "Prompt, skill version and all UI entry points reviewed."
+    },
+    {
+      "name": "correctness",
+      "status": "run",
+      "reason": "Clipboard success, failure and keyboard retry exercised."
+    },
+    {
+      "name": "security",
+      "status": "skipped",
+      "reason": "No implementation changes to authentication, confidentiality, secrets, permissions or trust boundaries; image-processing consent guidance only."
+    },
+    {
+      "name": "resilience",
+      "status": "skipped",
+      "reason": "No new remote or durable state; UI fallback exercised."
+    },
+    {
+      "name": "performance",
+      "status": "skipped",
+      "reason": "No performance claim or critical algorithm change."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "gate.sh all passed"
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "gate.sh all passed"
+    },
+    {
+      "check": "callers",
+      "outcome": "pass",
+      "reason": "All changed CopyButton callers inspected, including unchanged manual setup semantics."
+    },
+    {
+      "check": "biome-types-tests-build",
+      "outcome": "pass",
+      "reason": "235 files, typecheck, 171 tests / 14448 assertions and production build."
+    },
+    {
+      "check": "package",
+      "outcome": "pass",
+      "reason": "18 catalog round trips and 18 overwrite rejections, aliases, three guides, preview, doctor and npm/npx cold install."
+    },
+    {
+      "check": "production",
+      "outcome": "pass",
+      "reason": "Git deployment Ready at the exact commit; all three public CTA locations passed copy, rejection and keyboard retry."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "Unchanged community Create with your agent links still target /#workflow.",
+      "evidence": "That target now displays the same copyable prompt; their navigation remains valid."
+    }
+  ],
+  "issue_candidates": []
+}

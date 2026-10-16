@@ -1,0 +1,591 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-08-31",
+    "repo": "vercel-labs/agent-browser#1749",
+    "base": "118af8eef1eebe21b949c3cf677d468330da7a46",
+    "head": "ae889c7d8d6a069971bb134ce7be790c91838313",
+    "profile": "external-pr",
+    "skill_revision": "git:a006c7a52acfdb112e7a4882063d0a3dbbe757d7",
+    "status": "complete",
+    "verdict": "incomplete",
+    "gaps": [
+      "No exact-head Test Strength receipt was available for the changed lifecycle, state machine, cancellation, and protocol behavior.",
+      "No exact-head Resilience Audit receipt was available for process lifecycle, forced failures, cleanup ownership, and immediate retry.",
+      "No exact-head Security Review receipt was available for ownership validation and raw PID termination behavior.",
+      "No work-item manifest or Issue Contract was provided for PR 1749.",
+      "Executing-skill identity is not stable: skills-doctor failed once with a script type error, so the canonical git revision is recorded without a successful installed-package digest tie.",
+      "Windows lifecycle and ownership substrate was not exercised.",
+      "Upstream Native E2E Tests and Windows Integration Test jobs were skipped for this head."
+    ]
+  },
+  "execution": {
+    "mode": "fx_worker",
+    "degraded_from": null,
+    "independence_gap": null,
+    "receipt": "evidence/2026-08-31-agent-browser-1749-ae889c7/fx-review.json",
+    "schema_failures": 0,
+    "operations": [
+      {
+        "operation": "packaged cross-family FX review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "skills-doctor identity check",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "not provided; GitHub PR 1749 body was the available user-facing contract",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [],
+    "gaps": [
+      "No canonical work-item manifest or Issue Contract exists for this external PR, so authorization and acceptance fingerprints cannot be consumed from the factory state."
+    ]
+  },
+  "provenance": {
+    "author_model": "unknown external contributor workflow",
+    "reviewer_model": "Codex plus zai/glm-5.3-flash",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "daemon process lifecycle",
+      "concurrency",
+      "cancellation",
+      "ownership validation",
+      "cleanup",
+      "durable session state"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "evidence/2026-08-31-agent-browser-1749-ae889c7/fx-review.json",
+      "evidence": "The packaged FX wrapper completed a different-family review through Vercel AI Gateway at the frozen checkout. Its candidates were independently dispositioned and direct probes confirmed the dropped-client daemon leak."
+    }
+  },
+  "security_review": {
+    "status": "unavailable",
+    "fingerprint": {
+      "repository": "vercel-labs/agent-browser",
+      "base_sha": "118af8eef1eebe21b949c3cf677d468330da7a46",
+      "head_sha": "ae889c7d8d6a069971bb134ce7be790c91838313",
+      "dirty_digest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "changed_path_digest": "sha256:a975df85939e68c0e3c4ba622b10e4a1f4e24fd85dd22563c7ebb4db0d3f5483",
+      "skill_revision": "missing"
+    },
+    "observations": [
+      {
+        "id": "SEC-GAP-001",
+        "classification": "verification_gap",
+        "scope": "adjacent_security_blocker",
+        "confidence": "high",
+        "evidence": [
+          "Ownership validation controls whether a diagnostic PID may be signaled, and direct dogfood showed an unrelated process can be killed."
+        ]
+      }
+    ],
+    "verification": {
+      "gaps": [
+        "No exact-head Security Review specialist receipt was supplied or created."
+      ]
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [
+        "Run Security Review at the frozen base and head with the ownership marker, PID signal target, and Windows termination path in scope."
+      ],
+      "routed_non_security_defects": [
+        "F2: unvalidated PID termination"
+      ]
+    },
+    "artifact": "missing exact-head Security Review receipt"
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "No Issue Contract or work-item manifest was provided",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "The PR body was available, but no canonical factory contract with acceptance IDs or fingerprints existed."
+    },
+    {
+      "source": "design",
+      "location": "PR 1749 summary and implementation comments",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "The design claims nonblocking normal admission, priority cancellation, bounded shutdown, advisory-lock ownership, safe stale-daemon recovery, and durable restore preservation."
+    },
+    {
+      "source": "user_facing",
+      "location": "PR body, README.md, cli/src/output.rs, docs/src/app/commands/page.mdx, docs/src/app/sessions/page.mdx, skill-data/core",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "The user-facing surfaces promise session_busy instead of queueing, close-based cancellation and recovery, bounded cleanup, and ownership-lock safety."
+    },
+    {
+      "source": "implementation",
+      "location": "14 changed files between frozen base and head",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "The full diff, changed callers, Radius Impact Map, tests, built CLI, Unix socket lifecycle, sidecars, ownership lock, and process identities were inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Normal commands fail promptly with session_busy instead of queueing behind a blocked command.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "the second command response and elapsed admission time while another command owns session state",
+        "layer": "built CLI and daemon protocol",
+        "method": "drive overlapping requests against a namespaced exact-head daemon and inspect the response code and active-action metadata",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "the new try_lock_owned branch exists and unit tests pass",
+        "counterexample": "the real CLI still blocks before reaching the branch or translates session_busy into a retry queue",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "Built-artifact overlap returned bounded session_busy behavior; no hidden CLI retry was found."
+      },
+      "substrates": [
+        {
+          "name": "macOS Unix-socket exact-head daemon",
+          "status": "exercised",
+          "evidence": "Overlapping requests reached nonblocking admission and exposed session_busy with active command data."
+        }
+      ],
+      "evidence": "The direct boundary behavior matched this narrow claim, although Test Strength remains missing for the full state matrix."
+    },
+    {
+      "id": "P2",
+      "claim": "Close reliably cancels active work before waiting for the state lock.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "whether every command admitted before close receives the cancellation value and releases its state guard",
+        "layer": "Tokio watch-channel state and daemon coordinator ordering",
+        "method": "trace the exact ordering and compare it with the installed Tokio sender semantics",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "begin_closing sets the atomic closing flag and calls send(true)",
+        "counterexample": "a command passes both closing checks while there are zero receivers, then subscribes after send discarded the cancellation value",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Tokio 1.53.1 send does not retain a value with zero receivers; the command subscribes only after it can own state. F1 refutes the property."
+      },
+      "substrates": [
+        {
+          "name": "exact source plus vendored Tokio 1.53.1 implementation",
+          "status": "exercised",
+          "evidence": "The production dependency explicitly returns SendError without replacing the watched value when receiver_count is zero."
+        }
+      ],
+      "evidence": "Verified as false by a deterministic counterexample at the claimed concurrency layer; recorded as open finding F1."
+    },
+    {
+      "id": "P3",
+      "claim": "Close completion always terminates the daemon and removes its endpoint sidecars.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "daemon process identity, socket, PID sidecar, and advisory lock after browser cleanup",
+        "layer": "operating-system process and filesystem substrate",
+        "method": "send a valid raw close and disconnect before reading, then inspect process and sidecars and retry a normal command",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "browser cleanup completed and terminal_response stored success",
+        "counterexample": "response write fails before close_notify, leaving the listener alive in closing state",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The browser closed while daemon, socket, PID, and lock persisted; normal commands returned session_closing until a second close."
+      },
+      "substrates": [
+        {
+          "name": "macOS process table and Unix socket sidecars",
+          "status": "exercised",
+          "evidence": "Direct built-artifact probe reproduced the stranded daemon and recovery by a second close."
+        }
+      ],
+      "evidence": "Verified as false at the process/filesystem layer; recorded as open finding F3."
+    },
+    {
+      "id": "P4",
+      "claim": "Advisory ownership validation prevents a reused or stale PID from causing termination of an unrelated process.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "which operating-system PID receives the termination signal and which process holds the advisory lock",
+        "layer": "operating-system process identity",
+        "method": "hold the real daemon ownership lock, substitute an unrelated live PID in the diagnostic sidecar, force close-all fallback, and inspect both processes",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "daemon_owner_is_live gates sidecar cleanup",
+        "counterexample": "the kill occurs before cleanup validation and targets the raw PID sidecar rather than the lock owner",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "close --all killed the unrelated sleep process and left the real ownership-lock holder alive."
+      },
+      "substrates": [
+        {
+          "name": "macOS PID signals plus fs2 advisory lock",
+          "status": "exercised",
+          "evidence": "Direct built-artifact probe distinguished diagnostic PID from the actual lock owner."
+        }
+      ],
+      "evidence": "Verified as false at the process-identity layer; recorded as open finding F2. Windows remains an explicit gap."
+    },
+    {
+      "id": "P5",
+      "claim": "User-facing command and skill documentation states the new lifecycle contract wherever the surface map requires it.",
+      "kind": "behavior",
+      "status": "verified",
+      "oracle": {
+        "observes": "presence and precision of session_busy, cancellation, recovery, and close semantics on every mapped surface",
+        "layer": "repository documentation surface map",
+        "method": "run gate.sh surfaces and inspect every affected command and MCP reference passage",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "README, help, sessions docs, and core skill were changed",
+        "counterexample": "the full command reference remains unchanged even though it is mapped from actions.rs and mcp.rs",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "gate.sh surfaces identified skill-data/core/references/commands.md as missing, and direct reading confirmed the old terse close/MCP contract."
+      },
+      "substrates": [
+        {
+          "name": "canonical agent-browser surface map and exact-head documentation tree",
+          "status": "exercised",
+          "evidence": "Mapped surface sweep and passage-level inspection confirmed the omission."
+        }
+      ],
+      "evidence": "Verified as false on the mapped documentation surface; recorded as open finding F4."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "The diff changes a daemon lifecycle state machine, cancellation channel, request protocol outcomes, and OS compatibility behavior, but no exact-head Test Strength receipt was supplied. Green authored tests and Review Gate probes cannot substitute for its independent oracle and fix-absent falsification."
+    },
+    "resilience": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "The diff changes durable sidecars, process ownership, cancellation cleanup, provider/browser shutdown, and retry behavior, but no exact-head Resilience Audit receipt with forced partitions and cleanup ownership was supplied."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "PR body and daemon coordinator design",
+      "claim": "Publishing closing=true through the watch sender is retained even when no active receiver exists.",
+      "status": "verified",
+      "evidence": "Verified false against Tokio 1.53.1 send semantics and production ordering; this assumption becomes F1."
+    },
+    {
+      "id": "A2",
+      "source": "PR body and ownership comments",
+      "claim": "Every forced termination target is validated as the current advisory-lock owner.",
+      "status": "verified",
+      "evidence": "Verified false by direct close-all dogfood and source inspection; this assumption becomes F2."
+    },
+    {
+      "id": "A3",
+      "source": "close lifecycle implementation",
+      "claim": "Once close_for_lifecycle returns a terminal response, the daemon loop will always receive close_notify.",
+      "status": "verified",
+      "evidence": "Verified false by disconnecting the close client before response delivery; this assumption becomes F3."
+    },
+    {
+      "id": "A4",
+      "source": "PR body and user-facing docs",
+      "claim": "Every mapped command reference communicates the new busy and recovery contract.",
+      "status": "verified",
+      "evidence": "Verified false by gate.sh surfaces and passage inspection; this assumption becomes F4."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "inverse regression surface",
+      "status": "skipped",
+      "reason": "No matcher, parser, lookup data source, or semantic replacement triggered this lens."
+    },
+    {
+      "name": "new-domain matrix",
+      "status": "run",
+      "reason": "Command admission gained busy, closing, cancellation, concurrent close, confirmation, and maintenance states; missing Test Strength leaves the full matrix incomplete."
+    },
+    {
+      "name": "resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No resolver or discovery rule was deepened."
+    },
+    {
+      "name": "shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command rewriting or appended flag logic changed."
+    },
+    {
+      "name": "emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "Close completion is a one-shot notification whose reachability depends on successful client response delivery; F3 confirmed the skipped latch."
+    },
+    {
+      "name": "shim hermeticity",
+      "status": "skipped",
+      "reason": "No shim or wrapper boundary changed."
+    },
+    {
+      "name": "deliberate-default check",
+      "status": "run",
+      "reason": "Seven-second concurrent-close waiting and five-second empty-marker grace were reviewed; the former remains unverified candidate F6."
+    },
+    {
+      "name": "fresh-seam scan",
+      "status": "run",
+      "reason": "New seams between atomic closing state, watch cancellation, state ownership, response delivery, and loop notification were inspected; F1 and F3 were found."
+    },
+    {
+      "name": "substrate differential corpus",
+      "status": "skipped",
+      "reason": "Only macOS was available; Windows differences remain an explicit gap."
+    },
+    {
+      "name": "reference-implementation oracle",
+      "status": "run",
+      "reason": "Tokio 1.53.1 watch sender semantics served as the normative oracle for F1."
+    },
+    {
+      "name": "new-failure-outcome propagation",
+      "status": "run",
+      "reason": "session_busy, session_closing, operation_cancelled, bounded connect failures, and close-all fallback callers were traced through CLI, MCP, doctor, and daemon restart paths."
+    },
+    {
+      "name": "flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No new flag propagation contract was introduced."
+    },
+    {
+      "name": "error-path forcing",
+      "status": "run",
+      "reason": "Forced unreachable close-all fallback, close-client disconnect, stale diagnostic PID, and closing-state recovery; F2 and F3 were confirmed."
+    },
+    {
+      "name": "non-destructive recovery",
+      "status": "run",
+      "reason": "PID-based recovery was tested against a false ownership signal and proved destructive in F2."
+    },
+    {
+      "name": "cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Watch publication, close wait ceiling, lifecycle cleanup budgets, recording waits, and cancelled ownership were inspected; F1, F5, and F6 remain open."
+    },
+    {
+      "name": "boundary pipeline trace",
+      "status": "run",
+      "reason": "Close was traced through CLI/MCP dispatch, daemon admission, cancellation, state cleanup, response write, notification, process exit, and sidecar cleanup."
+    },
+    {
+      "name": "substrate verification",
+      "status": "run",
+      "reason": "Process identity, advisory lock ownership, daemon survival, Unix socket, PID sidecar, and session-closing response were observed directly."
+    },
+    {
+      "name": "dogfood the built artifact",
+      "status": "run",
+      "reason": "The exact-head debug CLI drove namespaced daemon lifecycle, close-all fallback, raw close disconnect, and recovery."
+    },
+    {
+      "name": "newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Claims that the advisory lock is the sole liveness authority and cancellation always owns the priority path were checked against every termination and publication writer; F1 and F2 refute them."
+    },
+    {
+      "name": "docs-behavior parity",
+      "status": "run",
+      "reason": "README, help, docs, core skill, full command reference, and MCP reference passages were compared with built behavior; F4 confirmed a mapped omission."
+    },
+    {
+      "name": "demonstrative example",
+      "status": "skipped",
+      "reason": "No new documentation example was intended to demonstrate the lifecycle behavior."
+    },
+    {
+      "name": "choice audit",
+      "status": "skipped",
+      "reason": "No implementation decision trail was provided."
+    },
+    {
+      "name": "complexity budget",
+      "status": "skipped",
+      "reason": "The diff did not add a scale-sensitive per-element lookup or membership loop."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "The canonical run directory contains a schema-v1 report for exact HEAD ae889c7d8d6a069971bb134ce7be790c91838313."
+    },
+    {
+      "check": "exact-head identity",
+      "outcome": "pass",
+      "reason": "Detached checkout and GitHub head/base matched the frozen SHAs before and after."
+    },
+    {
+      "check": "cargo fmt --check",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo clippy -- -D warnings",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "cargo test",
+      "outcome": "pass",
+      "reason": "1,188 passed, 105 ignored, 0 failed."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "siblings session_busy",
+      "outcome": "pass",
+      "reason": ""
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "The gate found skill-data/core/references/commands.md missing from the diff. Direct inspection confirmed it omits the new lifecycle contract; open finding F4."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "Impact Map saved locally. Rust ambiguity warnings, 2,451 unresolved calls, and 81 SCIP-unmapped symbols limit it to attention guidance."
+    },
+    {
+      "check": "upstream CI",
+      "outcome": "acknowledged",
+      "reason": "Main Rust and package checks passed, but Native E2E Tests, Windows Integration Test, matrix Rust, and global-install matrix jobs were skipped."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "severity": "high",
+      "claim": "A close can lose its cancellation signal because watch::Sender::send(true) discards the value when no receiver exists; a command that subscribes after the closing checks can keep the state lock and hang close indefinitely.",
+      "evidence": "Production ordering is cli/src/native/daemon.rs:491-526 and publication is line 424. Tokio 1.53.1 explicitly does not retain send values with zero receivers. Vercel Agent Review independently reported the exact race at the frozen head.",
+      "layer": "concurrency and cancellation state",
+      "source": "reference oracle plus source trace and external review",
+      "path": "cli/src/native/daemon.rs:424",
+      "resolution": "open"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "severity": "high",
+      "claim": "PID fallback termination can kill an unrelated process because the target PID is not validated as the current advisory-lock owner before signaling.",
+      "evidence": "Direct exact-head dogfood substituted a live unrelated sleep PID while the real daemon retained the owner lock. close --all killed the sleep and left the real owner alive. The same raw-PID signaling hazard exists in kill_stale_daemon.",
+      "layer": "operating-system process identity",
+      "source": "built-artifact dogfood and substrate verification",
+      "path": "cli/src/main.rs:1268 and cli/src/connection.rs:839",
+      "resolution": "open"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "severity": "high",
+      "claim": "If a close client disconnects before the terminal response is written, the daemon skips close_notify and remains alive in session_closing state with socket, PID, and ownership lock intact.",
+      "evidence": "Direct raw-socket dogfood observed browser cleanup but persistent daemon and sidecars. A second close replayed the terminal response and released the daemon.",
+      "layer": "daemon process lifecycle and cleanup",
+      "source": "built-artifact dogfood and cross-family review",
+      "path": "cli/src/native/daemon.rs:982",
+      "resolution": "open"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "severity": "low",
+      "claim": "The full command reference omits the new session_busy, cancellation, close recovery, and MCP lifecycle contract required by the canonical surface map.",
+      "evidence": "gate.sh surfaces flagged skill-data/core/references/commands.md. Lines 27 and 363-393 still advertise terse close and MCP behavior without the new outcomes or recovery guidance.",
+      "layer": "user-facing documentation contract",
+      "source": "deterministic surface gate plus passage inspection",
+      "path": "skill-data/core/references/commands.md:27",
+      "resolution": "open"
+    },
+    {
+      "id": "F5",
+      "state": "unverified",
+      "severity": "medium",
+      "claim": "The recording task can fill its piped ffmpeg stderr, hit the two-second wait timeout, kill ffmpeg, and return success with a truncated recording.",
+      "evidence": "cli/src/native/recording.rs:117 keeps stderr piped while lines 201-208 changed from wait_with_output to wait and the timeout branch returns Ok. No long recording or controlled full-pipe producer was executed.",
+      "layer": "external encoder process and media artifact",
+      "source": "cross-family review and source inspection",
+      "path": "cli/src/native/recording.rs:117",
+      "resolution": "open"
+    },
+    {
+      "id": "F6",
+      "state": "unverified",
+      "severity": "medium",
+      "claim": "A losing concurrent close can return session_closing after seven seconds while the winning close is still completing a valid longer cleanup path.",
+      "evidence": "cli/src/native/daemon.rs:545-552 waits seven seconds. The graceful budget is five seconds and the forced provider, WebDriver, and Appium paths each contain sequential two-second waits. No delayed-backend substrate was executed.",
+      "layer": "concurrent lifecycle response",
+      "source": "cross-family review and timing trace",
+      "path": "cli/src/native/daemon.rs:545",
+      "resolution": "open"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Normal confirm and deny can receive session_busy under overlap.",
+      "evidence": "This follows the newly advertised nonblocking command admission contract. It was not promoted without a built confirmation flow showing an unrecoverable behavioral regression."
+    },
+    {
+      "claim": "A newly created empty owner marker is treated as live for five seconds.",
+      "evidence": "The window is narrow and self-healing; no sustained ownership split or unrelated cleanup was confirmed."
+    }
+  ],
+  "issue_candidates": []
+}

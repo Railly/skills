@@ -1,0 +1,157 @@
+{
+  "status": "incomplete",
+  "fingerprint": {
+    "repository": "vercel-labs/issue-graph",
+    "base_sha": "55714fa1d45642d00451bc0170aae54de87a966a",
+    "head_sha": "24d9e7d2b211e6eb6bf9bc1ec54f6792bd3bb475",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:570b6e715cfea0e4e836e74e4d8c821c2423076f16adb2fab090ba6ae94cfd5c",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "Read-only Jira retrieval, credential delegation, and safe rendering of untrusted Jira values",
+    "attacker": "Jira content author with no assumed control of the installed local TWG executable",
+    "scope": "New Jira command, Node TWG transport and Markdown report"
+  },
+  "trust_model": {
+    "assets": [
+      "caller Jira credentials managed by TWG",
+      "local filesystem and summary artifacts",
+      "report integrity"
+    ],
+    "principals": [
+      {
+        "name": "operator",
+        "authority": "controls argv, environment, selected site and installed binaries"
+      },
+      {
+        "name": "TWG executable",
+        "authority": "runs as the same OS user, has existing Jira credential access"
+      },
+      {
+        "name": "Jira content author",
+        "authority": "can edit accessible issue text and remote links, not assumed to control process stdout envelopes"
+      }
+    ],
+    "boundaries": [
+      "Jira text to graph evidence and Markdown",
+      "operator arguments to execFile argv",
+      "trusted TWG summary to local file read/removal"
+    ],
+    "entrypoints": [
+      "jira subcommand",
+      "JiraReader.getIssue",
+      "TWG stdout/stderr",
+      "Jira issue/comment/remoteLinks values"
+    ],
+    "sinks": [
+      "execFile with fixed command argv and no shell",
+      "JSON and Markdown stdout",
+      "readFile and rm for summary paths"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-1",
+      "classification": "informational",
+      "scope": "unrelated_bug",
+      "prerequisites": [
+        "trusted installed TWG binary"
+      ],
+      "chain": {
+        "capability": "operator selects binary/site",
+        "reachability": "twgJiraClient -> execFile",
+        "control": "operator-controlled argv; remote values do not become shell commands",
+        "boundary": "none demonstrated",
+        "impact": "no credential-reading code or Jira write command found"
+      },
+      "confidence": "high",
+      "evidence": [
+        "src/transports/twg.ts:95-102 uses execFile argument arrays; src/transports/twg.ts:130-131 invokes jira workitem get --full; no token access in new files"
+      ]
+    },
+    {
+      "id": "SEC-2",
+      "classification": "hardening",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": [
+        "TWG stdout supplies absolute paths"
+      ],
+      "chain": {
+        "capability": "installed local executable writes summary path metadata",
+        "reachability": "summaryOutputFiles -> decodeTwgOutput",
+        "control": "trusted local process output, not demonstrated remote issue control",
+        "boundary": "same-OS-user executable already has equivalent filesystem authority",
+        "impact": "restricting cleanup paths would be defense in depth, not a proven privilege gain"
+      },
+      "confidence": "high",
+      "evidence": [
+        "src/transports/twg.ts:39-84; no security payload execution performed"
+      ]
+    },
+    {
+      "id": "SEC-3",
+      "classification": "non_security_defect",
+      "scope": "unrelated_bug",
+      "prerequisites": [
+        "cross-site remote URL or multi-item envelope"
+      ],
+      "chain": {
+        "capability": "ordinary supported data",
+        "reachability": "normalization and graph traversal",
+        "control": "issue links and envelope item contents",
+        "boundary": "no new permissions or unauthorized data access established",
+        "impact": "incorrect graph evidence; routed as F1 and F2"
+      },
+      "confidence": "high",
+      "evidence": [
+        "built-dogfood.json",
+        "packed-batch-cli.json"
+      ]
+    },
+    {
+      "id": "SEC-4",
+      "classification": "verification_gap",
+      "scope": "in_scope_security_regression",
+      "prerequisites": [
+        "real customer TWG build and actual rendered Markdown consumer"
+      ],
+      "chain": {
+        "capability": "unknown beyond static source",
+        "reachability": "real summary-file behavior and downstream Markdown rendering",
+        "control": "not empirically verified",
+        "boundary": "remote content to rendering and temporary-file lifecycle",
+        "impact": "cannot assert complete safety/privacy guarantees from string assertions and a fake producer"
+      },
+      "confidence": "high",
+      "evidence": [
+        "TWG not installed; authored renderer tests only inspect string output; static HTTP(S) URL restriction and escaping reviewed"
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "Static defensive review and benign owned synthetic fixtures only; no exploits or customer data access",
+    "commands": [
+      "source tracing of src/transports/twg.ts and src/jira.ts",
+      "built-dogfood.json local read failure/cap/summary cases",
+      "bun run test"
+    ],
+    "cleanup": "Owned fixture files remain in Vercel proof directory; successful summary file was removed by tested artifact. Temporary docs server stopped after review.",
+    "gaps": [
+      "Real TWG output and failure cleanup not exercised",
+      "No rendered Markdown consumer or cross-platform security proof"
+    ]
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [
+      "Validate real TWG output envelope ownership and cleanup contract",
+      "Confirm rendered-output safety using a real Markdown consumer"
+    ],
+    "routed_non_security_defects": [
+      "F1",
+      "F2"
+    ]
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/security-review.json"
+}

@@ -1,0 +1,736 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-18",
+    "repo": "crafter-station/badge-studio",
+    "base": "2fd7cde7d5fafba1dc8046be2d2e308c7c5ad131",
+    "head": "66571296bd72f291a7e8be7c050b49aa1c4cdbe4",
+    "profile": "high-risk",
+    "skill_revision": "sha256:a39b92b1c9b803a28b3c94e854812d863e7197b301fed47e3e7a0acef93deba1",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "sequential_isolated",
+    "degraded_from": "native_subagent",
+    "independence_gap": "Native reviewer returned acknowledgements instead of review twice. Sequential self-review; independent native substrate and normative oracle separately recorded.",
+    "schema_failures": 1,
+    "operations": [
+      {
+        "operation": "bounded reviewer",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/badge-studio-2026-09-18-webmcp/contract.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-6",
+    "reviewer_model": "GPT-6 (sequential isolated pass)",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "New browser protocol boundary",
+      "concurrent lifecycle and cancellation",
+      "untrusted image/document parsing",
+      "local durable state"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "boundary-evidence.md",
+      "evidence": "Native host independently disproved cancellation-signal assumption; explicit fallback tested. User-preservation oracle plus real UI input and downloads checks state beyond tool receipts."
+    }
+  },
+  "security_review": {
+    "status": "pass",
+    "fingerprint": {
+      "repository": "crafter-station/badge-studio",
+      "base_sha": "2fd7cde7d5fafba1dc8046be2d2e308c7c5ad131",
+      "head_sha": "66571296bd72f291a7e8be7c050b49aa1c4cdbe4",
+      "dirty_digest": "clean",
+      "changed_path_digest": "sha256:012f6a3ab5c8498a97a27fdd749a45ada90f37bc822cb18c71d4d98bd2884209",
+      "skill_revision": "sha256:0254178afea32b2192e7d00446fe0dd99efc36420c72c8ffbc5a3b4b8082d1d9"
+    },
+    "claim": {
+      "property": "No browser credentials, model execution or arbitrary URL fetch through newly exposed tools",
+      "attacker": "untrusted document or tool arguments submitted by a connected local agent",
+      "scope": "WebMCP browser surface and local image-transfer helper"
+    },
+    "trust_model": {
+      "assets": [
+        "local badge document",
+        "participant photo bytes",
+        "local IndexedDB designs",
+        "caller-held AI Gateway credentials"
+      ],
+      "principals": [
+        "human browser user",
+        "connected coding agent with same-page authority",
+        "untrusted document text",
+        "external image provider only when caller chooses"
+      ],
+      "boundaries": [
+        "native same-origin tool registration",
+        "validated tool arguments to editor reducers",
+        "explicit raster export to caller local filesystem"
+      ],
+      "entrypoints": [
+        "nine registered native tools",
+        "image-transfer helper"
+      ],
+      "sinks": [
+        "React state",
+        "existing IndexedDB store",
+        "browser downloads",
+        "exclusive local image output"
+      ]
+    },
+    "observations": [
+      {
+        "id": "S1",
+        "classification": "informational",
+        "scope": "out_of_scope_hardening",
+        "confidence": "high",
+        "evidence": [
+          "Native catalog has nine tools and no generator, shell, credentials, or arbitrary code entrypoint.",
+          "Remote image URL, non-raster bytes and javascript QR URL rejected in real native calls.",
+          "Browser network evidence: 518 requests, all GET, no external origins during observed flow.",
+          "Server generation stays disabled on Vercel; legacy local experiment is not exposed by tools."
+        ]
+      }
+    ],
+    "verification": {
+      "authorized_scope": "Owned local browser sessions with fictional portrait and disposable local designs",
+      "commands": [
+        "exercise.py",
+        "faults.py",
+        "bun test",
+        "source sink review"
+      ],
+      "cleanup": "Owned browser sessions closed after production smoke; no keys or paid image calls used.",
+      "gaps": []
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": [
+        "Experimental native cancellation missing options.signal: addressed with explicit operation-ID cancellation and documented limitation."
+      ]
+    },
+    "artifact": "security-receipt.json"
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "Cross-checked against native proof, source review, actual downloads and forced failures."
+    },
+    {
+      "source": "design",
+      "location": "docs/webmcp-contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "Cross-checked against native proof, source review, actual downloads and forced failures."
+    },
+    {
+      "source": "user_facing",
+      "location": "README, Toolkit, companion skill, tool metadata",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "Cross-checked against native proof, source review, actual downloads and forced failures."
+    },
+    {
+      "source": "implementation",
+      "location": "exact committed diff plus sequential isolated source pass",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "Cross-checked against native proof, source review, actual downloads and forced failures."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Native tools change the live editable document and actual exports",
+      "kind": "behavior",
+      "status": "verified",
+      "oracle": {
+        "observes": "Document fields, visible badge faces and downloaded files",
+        "layer": "built native browser and actual state/output",
+        "method": "Drive real tools and manual UI, force rejections, inspect state and outputs",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "API success or green unit tests",
+        "counterexample": "Successful transport can contain rejected tool result or stale output",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "browser-checks.json; editor-after.png; reverse.png; downloads"
+      },
+      "substrates": [
+        {
+          "name": "macOS Chromium152 agent-browser0.38.0 local Next production build",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp"
+        }
+      ],
+      "evidence": "browser-checks.json; editor-after.png; reverse.png; downloads"
+    },
+    {
+      "id": "P2",
+      "claim": "Stale and locked edits are rejected without overwriting the current document",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "Current full document after actual rejected call",
+        "layer": "built native browser and actual state/output",
+        "method": "Drive real tools and manual UI, force rejections, inspect state and outputs",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "API success or green unit tests",
+        "counterexample": "Green helper tests alone miss disabled guards at production callsites",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "mutant-revision-callsite.log; restored-revision-callsite.log; mutant-lock-callsite.log; restored-lock-callsite.log"
+      },
+      "substrates": [
+        {
+          "name": "macOS Chromium152 agent-browser0.38.0 local Next production build",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp"
+        }
+      ],
+      "evidence": "mutant-revision-callsite.log; restored-revision-callsite.log; mutant-lock-callsite.log; restored-lock-callsite.log"
+    },
+    {
+      "id": "P3",
+      "claim": "Pending operations can cancel, fail and retry without a stuck operation",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Busy/operation state, preserved image/document and immediate retry",
+        "layer": "built native browser and actual state/output",
+        "method": "Drive real tools and manual UI, force rejections, inspect state and outputs",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "API success or green unit tests",
+        "counterexample": "Native transport cancellation alone can leave page work running",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "fault-checks.json; boundary-evidence.md; explicit cancellation and IDB failure/commit tests"
+      },
+      "substrates": [
+        {
+          "name": "macOS Chromium152 agent-browser0.38.0 local Next production build",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp"
+        }
+      ],
+      "evidence": "fault-checks.json; boundary-evidence.md; explicit cancellation and IDB failure/commit tests"
+    },
+    {
+      "id": "P4",
+      "claim": "Manual editor and shared GitHub/header remain usable without native API",
+      "kind": "behavior",
+      "status": "verified",
+      "oracle": {
+        "observes": "Human UI changes, missing native API and rendered mobile layout",
+        "layer": "built native browser and actual state/output",
+        "method": "Drive real tools and manual UI, force rejections, inspect state and outputs",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "API success or green unit tests",
+        "counterexample": "A registered tool catalog alone proves neither manual editing nor usable header",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "manual-fallback.png; toolkit-mobile.png; mobile.png; fault-checks.json"
+      },
+      "substrates": [
+        {
+          "name": "macOS Chromium152 agent-browser0.38.0 local Next production build",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp"
+        }
+      ],
+      "evidence": "manual-fallback.png; toolkit-mobile.png; mobile.png; fault-checks.json"
+    },
+    {
+      "id": "P5",
+      "claim": "The public tools do not execute a model or accept browser credentials",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "Native tool catalog, untrusted input rejection and observed network requests",
+        "layer": "built native browser and actual state/output",
+        "method": "Drive real tools and manual UI, force rejections, inspect state and outputs",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "API success or green unit tests",
+        "counterexample": "Documentation could promise no generation while a generator tool or network call remains",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "native-tools.json; browser-network.json; security-receipt.json"
+      },
+      "substrates": [
+        {
+          "name": "macOS Chromium152 agent-browser0.38.0 local Next production build",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp"
+        }
+      ],
+      "evidence": "native-tools.json; browser-network.json; security-receipt.json"
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "sha256:a48126adf41ae16e2a3f29bb20b1da68b3a5b9db2a4cd6b5baa08b3c598b70ea",
+      "artifact": "test-strength-receipt.json",
+      "evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp",
+      "fingerprint": {
+        "head_sha": "66571296bd72f291a7e8be7c050b49aa1c4cdbe4",
+        "changed_paths_digest": "sha256:012f6a3ab5c8498a97a27fdd749a45ada90f37bc822cb18c71d4d98bd2884209",
+        "contract_digest": "sha256:810ead0961251b2e669d0ac7505fe80f375d5e4fe1617045940f55335cdbbe4a",
+        "command": "bun test; exercise.py; stale-callsite.py; lock callsite mutant",
+        "environment_digest": "sha256:d60a2160b146a89d3e5bce1309ef290cea36f057f745fb3c0a6e8e82ed1e05d4",
+        "skill_revision": "sha256:a48126adf41ae16e2a3f29bb20b1da68b3a5b9db2a4cd6b5baa08b3c598b70ea",
+        "relevant_paths": [
+          "README.md",
+          "apps/web/.env.example",
+          "apps/web/package.json",
+          "apps/web/public/llms.txt",
+          "apps/web/src/app/design/browser-design-store.ts",
+          "apps/web/src/app/design/design-agent.test.ts",
+          "apps/web/src/app/design/design-agent.ts",
+          "apps/web/src/app/design/design-photo-picker.tsx",
+          "apps/web/src/app/design/design-studio.tsx",
+          "apps/web/src/app/design/use-design-studio.ts",
+          "apps/web/src/app/design/use-studio-webmcp.ts",
+          "apps/web/src/app/docs/page.tsx",
+          "apps/web/src/app/docs/toolkit.css",
+          "apps/web/src/app/shell.css",
+          "apps/web/src/components/participant-profile-provider.tsx",
+          "apps/web/src/components/site-header.tsx",
+          "apps/web/src/lib/design-edits.ts",
+          "apps/web/src/lib/webmcp.test.ts",
+          "apps/web/src/lib/webmcp.ts",
+          "bun.lock",
+          "docs/webmcp-contract.md",
+          "friction.md",
+          "skills/badge-studio/SKILL.md",
+          "skills/badge-studio/scripts/image-transfer.mjs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      },
+      "dimensions": {
+        "values": [
+          "Revision: current vs stale after agent change and manual input",
+          "Lock: unlocked vs locked; material, move/delete/reorder vs visibility",
+          "Native operation: valid mutation vs invalid document; returned receipt vs observed document"
+        ],
+        "exclusions": [
+          "No claim of exhaustive mutation coverage for every field or all asynchronous schedules; tests cover defined critical rejection classes.",
+          "Paid image model quality and third-party credentials are outside the browser contract."
+        ],
+        "evidence": "design-agent.test.ts covers 17 catalog documents and invariant classes; browser state and rendered/downloaded output independently checked."
+      },
+      "oracle": {
+        "source": "User contract: preserve current human edits, explicit locks and QR; native browser-mediated calls",
+        "independent": true,
+        "evidence": "Expected stale rejection and unchanged locked state are defined independently of reducer implementation."
+      },
+      "producer": {
+        "name": "Native Chromium 152 plus agent-browser 0.38.0 and real UI input",
+        "status": "exercised",
+        "evidence": "73 built-browser calls and forced fault scenarios with actual browser-native invoke."
+      },
+      "falsification": [
+        {
+          "mutation": "Remove assertLocks at editFromAgent production callsite",
+          "red_evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp/mutant-lock-callsite.log",
+          "restored_green_evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp/restored-lock-callsite.log"
+        },
+        {
+          "mutation": "Bypass expectedRevision condition in actual useStudioWebMcp hook",
+          "red_evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp/mutant-revision-callsite.log",
+          "restored_green_evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp/restored-revision-callsite.log"
+        }
+      ]
+    },
+    "resilience": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "sha256:aa1b09c3864bfca6e882e2c9ea11b63dd9f89279f36018e24e67edeee5edfa4f",
+      "artifact": "resilience-receipt.json",
+      "evidence": "/Users/raillyhugo/kai/output/badge-studio/v17-webmcp/fault-checks.json",
+      "fingerprint": {
+        "head_sha": "66571296bd72f291a7e8be7c050b49aa1c4cdbe4",
+        "changed_paths_digest": "sha256:012f6a3ab5c8498a97a27fdd749a45ada90f37bc822cb18c71d4d98bd2884209",
+        "contract_digest": "sha256:810ead0961251b2e669d0ac7505fe80f375d5e4fe1617045940f55335cdbbe4a",
+        "command": "faults.py http://127.0.0.1:3017; exercise.py",
+        "environment_digest": "sha256:d60a2160b146a89d3e5bce1309ef290cea36f057f745fb3c0a6e8e82ed1e05d4",
+        "skill_revision": "sha256:aa1b09c3864bfca6e882e2c9ea11b63dd9f89279f36018e24e67edeee5edfa4f",
+        "relevant_paths": [
+          "README.md",
+          "apps/web/.env.example",
+          "apps/web/package.json",
+          "apps/web/public/llms.txt",
+          "apps/web/src/app/design/browser-design-store.ts",
+          "apps/web/src/app/design/design-agent.test.ts",
+          "apps/web/src/app/design/design-agent.ts",
+          "apps/web/src/app/design/design-photo-picker.tsx",
+          "apps/web/src/app/design/design-studio.tsx",
+          "apps/web/src/app/design/use-design-studio.ts",
+          "apps/web/src/app/design/use-studio-webmcp.ts",
+          "apps/web/src/app/docs/page.tsx",
+          "apps/web/src/app/docs/toolkit.css",
+          "apps/web/src/app/shell.css",
+          "apps/web/src/components/participant-profile-provider.tsx",
+          "apps/web/src/components/site-header.tsx",
+          "apps/web/src/lib/design-edits.ts",
+          "apps/web/src/lib/webmcp.test.ts",
+          "apps/web/src/lib/webmcp.ts",
+          "bun.lock",
+          "docs/webmcp-contract.md",
+          "friction.md",
+          "skills/badge-studio/SKILL.md",
+          "skills/badge-studio/scripts/image-transfer.mjs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      },
+      "commit_points": [
+        {
+          "id": "C1",
+          "effect": "Atomic in-memory document replacement",
+          "owner": "validated shared reducer",
+          "commit_event": "React state update after semantic validation",
+          "later_fallible_stages": [],
+          "failure_partitions": [
+            {
+              "ownership_region": "validation",
+              "covers": [],
+              "forced": true,
+              "residual_observed": "Invalid QR and locked edits leave prior document unchanged",
+              "cleanup_owner": "validation",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "Same scenario restores dependency and immediately repeats successfully; fault-checks.json."
+              },
+              "evidence": "Built native calls verify unchanged full document before successful retry."
+            }
+          ]
+        },
+        {
+          "id": "C2",
+          "effect": "Image available in shared profile",
+          "owner": "ParticipantProfileProvider",
+          "commit_event": "Prepared raster assigned to profile before asynchronous persistence",
+          "later_fallible_stages": [
+            "profile persistence"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "profile persistence",
+              "covers": [
+                "profile persistence"
+              ],
+              "forced": true,
+              "residual_observed": "Image remains usable in session; visible storage warning appears",
+              "cleanup_owner": "profile persistence",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "Same scenario restores dependency and immediately repeats successfully; fault-checks.json."
+              },
+              "evidence": "Profile readwrite transaction refusal after image state commit, warning asserted, restore and photo retry clears warning."
+            }
+          ]
+        },
+        {
+          "id": "C3",
+          "effect": "Saved design durable in IndexedDB",
+          "owner": "BrowserDesignStore then useDesignStudio",
+          "commit_event": "IndexedDB transaction oncomplete",
+          "later_fallible_stages": [
+            "UI history and library publication"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "UI history and library publication",
+              "covers": [
+                "UI history and library publication"
+              ],
+              "forced": true,
+              "residual_observed": "Save reports failure after injected history.replaceState throw; saved ID and incremented version remain inspectable; retry updates same ID",
+              "cleanup_owner": "UI history and library publication",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "Same scenario restores dependency and immediately repeats successfully; fault-checks.json."
+              },
+              "evidence": "faults.py forces post-commit UI failure then verifies immediate retry produces one saved entry, not duplicate."
+            }
+          ]
+        },
+        {
+          "id": "C4",
+          "effect": "Browser download initiated",
+          "owner": "browser download API",
+          "commit_event": "download anchor activation",
+          "later_fallible_stages": [],
+          "failure_partitions": []
+        }
+      ],
+      "precommit_pressure": [
+        "Delayed example fetch: explicit cancellation twice, no commit, clean retry",
+        "Concurrent mutation returns BUSY while read inspection remains available",
+        "Ten-second sample fetch timeout releases busy state",
+        "Storage refused before save: error and unchanged saved version, then successful retry",
+        "Route navigation unregisters native tools and cancels held load; returning allows edits"
+      ],
+      "limitations": [
+        "A native transport cancellation without callback signal cannot stop page work automatically; explicit badge_cancel is verified.",
+        "Completed profile writes, saved data and started downloads are not rolled back."
+      ]
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "native WebMCP contract",
+      "claim": "Installed browser exposes document.modelContext and native registration/invoke/cleanup",
+      "status": "verified",
+      "evidence": "Nine native tools discovered and navigation away removes them; unsupported API path tested separately."
+    },
+    {
+      "id": "A2",
+      "source": "deployment and local default",
+      "claim": "Public/browser mode uses IndexedDB rather than model routes",
+      "status": "verified",
+      "evidence": "browserStorageEnabled default, Vercel server-generation guard, native flow had no external origin or non-GET requests."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No changed resolver indirection, shell detector, shim, external flag dispatch, emit latch or decision trail in this change."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No changed resolver indirection, shell detector, shim, external flag dispatch, emit latch or decision trail in this change."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No changed resolver indirection, shell detector, shim, external flag dispatch, emit latch or decision trail in this change."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No changed resolver indirection, shell detector, shim, external flag dispatch, emit latch or decision trail in this change."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No changed resolver indirection, shell detector, shim, external flag dispatch, emit latch or decision trail in this change."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No changed resolver indirection, shell detector, shim, external flag dispatch, emit latch or decision trail in this change."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Source review plus native proof and fault/callsite evidence in boundary-evidence.md"
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "tests",
+      "outcome": "pass",
+      "reason": "145 passing, 14231 assertions"
+    },
+    {
+      "check": "typecheck",
+      "outcome": "pass",
+      "reason": "web and CLI"
+    },
+    {
+      "check": "Biome",
+      "outcome": "pass",
+      "reason": "188 files"
+    },
+    {
+      "check": "production build",
+      "outcome": "pass",
+      "reason": "complete"
+    },
+    {
+      "check": "style/surfaces/siblings",
+      "outcome": "pass",
+      "reason": "native/toolkit/README/skill/llms parity"
+    },
+    {
+      "check": "callers",
+      "outcome": "acknowledged",
+      "reason": "Existing design-profile.tsx callers intentionally void the new boolean; feedback is owned by profile state and both manual UI paths still work."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "Native transport cancellation does not forward callback AbortSignal in installed Chromium",
+      "evidence": "Temporary native probe observed undefined options; held fetch continued after transport cancel",
+      "layer": "browser producer",
+      "source": "native proof",
+      "path": "use-studio-webmcp.ts",
+      "resolution": "fixed",
+      "fix": "Explicit operation-ID badge_cancel and scoped docs"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No npm version change",
+      "evidence": "CLI implementation/schema unchanged; only web and repository-distributed skill changed."
+    },
+    {
+      "claim": "No paid image generation validation",
+      "evidence": "Only external image transfer and actual ai-cli help verified; no claim of model execution or output quality."
+    }
+  ],
+  "issue_candidates": []
+}

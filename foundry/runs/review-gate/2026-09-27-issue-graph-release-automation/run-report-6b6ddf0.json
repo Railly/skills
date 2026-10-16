@@ -1,0 +1,717 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-27",
+    "repo": "vercel-labs/issue-graph",
+    "base": "8de9132367c6f69859160df40f8235cb6676894b",
+    "head": "6b6ddf05c43c4955b00c11f6ce0a90a4658d6f73",
+    "profile": "high-risk",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "sequential_isolated",
+    "degraded_from": null,
+    "independence_gap": "Native reviewer shares model family and reviewed unchanged runtime. Root reviewed docs-only delta; independent challenge remains captured pre-change production GitHub/npm evidence.",
+    "receipt": "security-receipt.json",
+    "schema_failures": 2,
+    "operations": [
+      {
+        "operation": "initial native reviewer launch",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "default native reviewer launch",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "contract.md",
+    "spec_status": "not_required",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "Codex root",
+    "reviewer_model": "native gpt-6-astra source reviewer on e78e205; root inspected docs-only6b6ddf0 delta",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "Automatic privileged package publication, externally persistent npm/GitHub state, and release authorization policy"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "independent-release-history.log",
+      "evidence": "Captured pre-change real GitHub Actions run accepted npm0.3.2 but failed verification after15seconds on404; live registry state independently supplies absent0.4.0/published0.3.2 classes. Byte identity and immutable version behavior come from the existing publisher/consumer boundary. Native review additionally challenges the frozen diff."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "Exact source readiness scope A1-A4; runtime deployment acceptance A5 is recorded after merge rather than assumed from local checks."
+    },
+    {
+      "source": "design",
+      "location": "test-strength-receipt.json",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "Exact source readiness scope A1-A4; runtime deployment acceptance A5 is recorded after merge rather than assumed from local checks."
+    },
+    {
+      "source": "user_facing",
+      "location": "CONTRIBUTING.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "Exact source readiness scope A1-A4; runtime deployment acceptance A5 is recorded after merge rather than assumed from local checks."
+    },
+    {
+      "source": "implementation",
+      "location": ".github/workflows/release.yml and scripts/release.ts",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "Exact source readiness scope A1-A4; runtime deployment acceptance A5 is recorded after merge rather than assumed from local checks."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Release plan accepts only canonical main push/dispatch identities and skips published versions",
+      "kind": "release lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Release plan accepts only canonical main push/dispatch identities and skips published versions",
+        "layer": "Node release CLI and live npm registry",
+        "method": "Drive real plan on pending0.4.0 and published0.3.2, process-level injected statuses and event contexts",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Adding a push trigger alone",
+        "counterexample": "Old validator rejects push; hardcoding needed allows duplicate publication",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/real-plan.outputs; real-published-skip.log; mutation-push-support.log; mutation-plan-command-wiring.log"
+      },
+      "substrates": [
+        {
+          "name": "Node release CLI and live npm registry",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/real-plan.outputs; real-published-skip.log; mutation-push-support.log; mutation-plan-command-wiring.log"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/real-plan.outputs; real-published-skip.log; mutation-push-support.log; mutation-plan-command-wiring.log"
+    },
+    {
+      "id": "P2",
+      "claim": "Failed publish recovery uses verified retained bytes and outputs publish=false only for identical registry archive",
+      "kind": "release lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Failed publish recovery uses verified retained bytes and outputs publish=false only for identical registry archive",
+        "layer": "Real Node prepare-publish process, tar filesystem and registry API boundary fixtures",
+        "method": "Record archive then prepare with absent/published/changed/unavailable registry; assert filesystem and output",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Skipping npm on version existence alone",
+        "counterexample": "Existing version can contain different bytes; lookup errors can resemble absence",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/check-0.log; mutation-retry-byte-verification.log; mutation-prepare-command-wiring.log"
+      },
+      "substrates": [
+        {
+          "name": "Real Node prepare-publish process, tar filesystem and registry API boundary fixtures",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/check-0.log; mutation-retry-byte-verification.log; mutation-prepare-command-wiring.log"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/check-0.log; mutation-retry-byte-verification.log; mutation-prepare-command-wiring.log"
+    },
+    {
+      "id": "P3",
+      "claim": "GitHub release shell preserves matching tags and recovers ambiguous or partial creation without duplicate writes",
+      "kind": "release lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "GitHub release shell preserves matching tags and recovers ambiguous or partial creation without duplicate writes",
+        "layer": "Actual workflow bash script with persistent local GitHub API stub",
+        "method": "Fail before and after release creation, rerun three times and count actual state writes",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Successful shell exit alone",
+        "counterexample": "API creates a release but loses response; retry can duplicate or move tag",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/pressure-results.json; github-release-pressure.sh"
+      },
+      "substrates": [
+        {
+          "name": "Actual workflow bash script with persistent local GitHub API stub",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/pressure-results.json; github-release-pressure.sh"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/pressure-results.json; github-release-pressure.sh"
+    },
+    {
+      "id": "P4",
+      "claim": "Automatic publication retains scoped OIDC permissions, all consumer dependencies, exact artifact IDs and main-only Release environment",
+      "kind": "release lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Automatic publication retains scoped OIDC permissions, all consumer dependencies, exact artifact IDs and main-only Release environment",
+        "layer": "Parsed workflow, script context guards and live GitHub environment API",
+        "method": "Validate workflow job graph/artifact identity; reject fork/ref/SHA/version mismatches; read back main-only environment",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Environment label or successful local tests alone",
+        "counterexample": "Environment can still require approval or permit other branches",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/environment-before.json; environment-after.json; environment-branch-policy.json; check-0.log"
+      },
+      "substrates": [
+        {
+          "name": "Parsed workflow, script context guards and live GitHub environment API",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/environment-before.json; environment-after.json; environment-branch-policy.json; check-0.log"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/environment-before.json; environment-after.json; environment-branch-policy.json; check-0.log"
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-results.json",
+      "evidence": "157 release tests, 736 total tests; seven meaningful mutations fail intended assertions including real process command call sites; restored clean tree and green tests.",
+      "fingerprint": {
+        "head_sha": "e78e205b141537c6d28486b3c8e1cf68dd166938",
+        "changed_paths_digest": "sha256:f33d2379498ed789a24f1463bd12a473f68f72f074e70b814fc3c71154b37581",
+        "contract_digest": "sha256:4e51c732ec46ba92d6cfff4e78c4e24c714405bebf7aa4cf53b873593dad77a4",
+        "command": "bun run check; bun x --no-install vitest run --config vitest.config.ts src/release.test.ts",
+        "environment_digest": "sha256:54cc32c3e878b8f9ddc01de58b21edfad8ed4fb7691f0a3e6d73108053fc9a01",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          ".github/workflows/release.yml",
+          "scripts/release.ts",
+          "src/release.test.ts"
+        ],
+        "reusable": true,
+        "reuse_evidence": "The only later change is CONTRIBUTING.md visibility wording; exact workflow/script/tests bytes match e78e205 and157focused tests passed on6b6ddf0.",
+        "reuse": {
+          "source_head_sha": "e78e205b141537c6d28486b3c8e1cf68dd166938",
+          "target_head_sha": "6b6ddf05c43c4955b00c11f6ce0a90a4658d6f73",
+          "changed_paths": [
+            "CONTRIBUTING.md"
+          ],
+          "contract_digest": "sha256:4e51c732ec46ba92d6cfff4e78c4e24c714405bebf7aa4cf53b873593dad77a4",
+          "environment_digest": "sha256:54cc32c3e878b8f9ddc01de58b21edfad8ed4fb7691f0a3e6d73108053fc9a01",
+          "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+        }
+      },
+      "dimensions": {
+        "values": [
+          "Event: canonical main push, canonical main dispatch, PR, PR-target, workflow_run, fork, branch, tag; identity: exact, mismatched, malformed",
+          "Registry: absent-newer, published-latest, published-older, published-ahead, absent-not-newer, bad identity/history/dist-tags, HTTP failure, network failure",
+          "Recovery: unpublished, identical published bytes, changed integrity, changed tarball bytes, changed local metadata; process outputs and exit codes checked",
+          "Propagation: metadata/tarball delayed, retry budget exhausted, delayed beyond prior15-second window, forbidden URL/redirect/oversized body/nonretryable status",
+          "GitHub: missing tag, matching tag, conflicting tag, release missing, release existing, lookup error, failure before/after creation"
+        ],
+        "exclusions": [
+          "Registry metadata fetch and tarball streams retain existing malformed-data, network and bounds coverage; source change does not introduce new parser formats.",
+          "No Windows shell claim: the production workflow runs Ubuntu bash; platform-independent package consumers remain Node20/22/24.",
+          "Remote side effects are never fault-injected on real npm/GitHub; actual release shell is exercised against a persistent local API stub."
+        ],
+        "evidence": "src/release.test.ts partitions plus pressure-results.json cover these classes; no production implementation-derived outputs used as the semantic oracle."
+      },
+      "oracle": {
+        "source": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-issue-graph-release-automation/independent-release-history.log",
+        "independent": true,
+        "evidence": "Existing production0.3.2 run reported accepted package processing followed by404; user requires automatic main publication and no duplicate immutable npm version. Prior artifact tests define byte equivalence independently."
+      },
+      "producer": {
+        "name": "Real Node release CLI with live npm read-only plan and process-level registry fault fixtures; actual workflow GitHub shell with persistent API stub",
+        "status": "exercised",
+        "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/real-plan.outputs; real-published-skip.log; check-0.log; pressure-results.json"
+      },
+      "falsification": [
+        {
+          "mutation": "push-support",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-push-support.log:  FAIL  src/release.test.ts > release context > resolves the version from the manifest on main pushes; AssertionError: release requires a main push or manual dispatch;  FAIL  src/release.test.ts > retained artifact metadata > plans a real push process against a absent registry;  FAIL  src/release.test.ts > retained artifact metadata > plans a real push process against a published registry; AssertionError: node:internal/modules/run_main:107",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+        },
+        {
+          "mutation": "existing-version-duplicate",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-existing-version-duplicate.log:  FAIL  src/release.test.ts > fail-closed registry check > rejects an existing exact version even when it is not latest; AssertionError: promise resolved \"undefined\" instead of rejecting;  FAIL  src/release.test.ts > automatic release planning and retry > skips an existing version when latest is 0.2.0;  FAIL  src/release.test.ts > automatic release planning and retry > skips an existing version when latest is 0.3.0; AssertionError: expected true to be false // Object.is equality;  FAIL  src/release.test.ts > automatic release planning and retry > retries after npm accepted the archive, changed bytes: false; AssertionError: expected true to be false // Object.is equality;  FAIL  src/release.test.ts > automatic release planning and retry > retries after npm accepted the archive, changed bytes: true",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+        },
+        {
+          "mutation": "retry-byte-verification",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-retry-byte-verification.log:  FAIL  src/release.test.ts > automatic release planning and retry > retries after npm accepted the archive, changed bytes: true; AssertionError: promise resolved \"false\" instead of rejecting;  FAIL  src/release.test.ts > retained artifact metadata > prepares the retained archive through the workflow command: changed; AssertionError: expected +0 to be 1 // Object.is equality",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+        },
+        {
+          "mutation": "plan-command-wiring",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-plan-command-wiring.log:  FAIL  src/release.test.ts > retained artifact metadata > plans a real push process against a published registry; AssertionError: expected 'needed=true\\nversion=0.4.0\\n' to be 'needed=false\\nversion=0.4.0\\n' // Object.is equality;  FAIL  src/release.test.ts > retained artifact metadata > plans a real push process against a unavailable registry; AssertionError: expected +0 to be 1 // Object.is equality",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+        },
+        {
+          "mutation": "prepare-command-wiring",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-prepare-command-wiring.log:  FAIL  src/release.test.ts > retained artifact metadata > prepares the retained archive through the workflow command: published; AssertionError: expected 'publish=true\\n' to be 'publish=false\\n' // Object.is equality;  FAIL  src/release.test.ts > retained artifact metadata > prepares the retained archive through the workflow command: changed;  FAIL  src/release.test.ts > retained artifact metadata > prepares the retained archive through the workflow command: unavailable; AssertionError: expected +0 to be 1 // Object.is equality",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+        },
+        {
+          "mutation": "publish-guard",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-publish-guard.log:  FAIL  src/release.test.ts > automatic release workflow contract > rechecks retained bytes before retry and never republishes an existing archive; AssertionError: expected 'always()' to be 'steps.preflight.outputs.publish == \\'…' // Object.is equality",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+        },
+        {
+          "mutation": "propagation-window",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-propagation-window.log:  FAIL  src/release.test.ts > read-only published archive verification > stops after twelve propagation attempts and never changes the retained archive; AssertionError: promise resolved \"undefined\" instead of rejecting;  FAIL  src/release.test.ts > read-only published archive verification > allows registry propagation beyond the previous fifteen-second window; AssertionError: expected 5 to be 9 // Object.is equality",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+        }
+      ]
+    },
+    "resilience": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/pressure-results.json",
+      "evidence": "Forced failure before/after GitHub release creation, conflict and lookup failure, plus retained archive after npm acceptance and propagation failures. Recovery never changes archive or tag.",
+      "fingerprint": {
+        "head_sha": "e78e205b141537c6d28486b3c8e1cf68dd166938",
+        "changed_paths_digest": "sha256:f33d2379498ed789a24f1463bd12a473f68f72f074e70b814fc3c71154b37581",
+        "contract_digest": "sha256:4e51c732ec46ba92d6cfff4e78c4e24c714405bebf7aa4cf53b873593dad77a4",
+        "command": "bun run check; bun x --no-install vitest run --config vitest.config.ts src/release.test.ts",
+        "environment_digest": "sha256:54cc32c3e878b8f9ddc01de58b21edfad8ed4fb7691f0a3e6d73108053fc9a01",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          ".github/workflows/release.yml",
+          "scripts/release.ts",
+          "src/release.test.ts"
+        ],
+        "reusable": true,
+        "reuse_evidence": "The only later change is CONTRIBUTING.md visibility wording; exact workflow/script/tests bytes match e78e205 and157focused tests passed on6b6ddf0.",
+        "reuse": {
+          "source_head_sha": "e78e205b141537c6d28486b3c8e1cf68dd166938",
+          "target_head_sha": "6b6ddf05c43c4955b00c11f6ce0a90a4658d6f73",
+          "changed_paths": [
+            "CONTRIBUTING.md"
+          ],
+          "contract_digest": "sha256:4e51c732ec46ba92d6cfff4e78c4e24c714405bebf7aa4cf53b873593dad77a4",
+          "environment_digest": "sha256:54cc32c3e878b8f9ddc01de58b21edfad8ed4fb7691f0a3e6d73108053fc9a01",
+          "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+        }
+      },
+      "commit_points": [
+        {
+          "id": "C1",
+          "effect": "Immutable npm package accepted",
+          "owner": "npm registry",
+          "commit_event": "npm publish accepts tested tarball",
+          "later_fallible_stages": [
+            "registry propagation and byte verification",
+            "GitHub tag/release creation"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "registry verification",
+              "covers": [
+                "registry propagation and byte verification"
+              ],
+              "forced": true,
+              "residual_observed": "Local approved archive unchanged; existing published version reused only after identical integrity and downloaded bytes",
+              "cleanup_owner": "No rollback of immutable npm version; retained artifact and failed-job rerun own recovery",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/check-0.log: retained artifact prepare-publish published returns publish=false; changed bytes fail"
+              },
+              "evidence": "src/release.test.ts process-level registry fixture and bounded propagation tests"
+            },
+            {
+              "ownership_region": "GitHub publisher",
+              "covers": [
+                "GitHub tag/release creation"
+              ],
+              "forced": true,
+              "residual_observed": "One matching tag remains before release failure; one release remains after ambiguous create success",
+              "cleanup_owner": "Original workflow failed-job rerun; do not delete or move tags",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/pressure-results.json: both fault partitions recover without new tag or duplicate release"
+              },
+              "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/github-release-pressure.sh uses extracted production shell"
+            }
+          ]
+        },
+        {
+          "id": "C2",
+          "effect": "GitHub version tag exists",
+          "owner": "github-release job",
+          "commit_event": "Git refs POST succeeds",
+          "later_fallible_stages": [
+            "release creation"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "GitHub Release API",
+              "covers": [
+                "release creation"
+              ],
+              "forced": true,
+              "residual_observed": "Tag retains exact SHA after rejection; no release before successful retry",
+              "cleanup_owner": "Retry validates matching tag; mismatch rejects before mutation",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/pressure-results.json: fail-before second attempt succeeds, third performs no writes"
+              },
+              "evidence": "Persistent local stub tracks every tag/release write, not just process output."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A-main-policy",
+      "source": "User explicitly requests fully automatic publication",
+      "claim": "Release environment no longer requires a second approval and still permits only the main branch",
+      "status": "verified",
+      "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/environment-after.json and environment-branch-policy.json"
+    },
+    {
+      "id": "A-publisher",
+      "source": "Existing successful OIDC publication",
+      "claim": "Existing release.yml and Release-bound npm publisher accepts direct OIDC publication without stored tokens",
+      "status": "verified",
+      "evidence": "Captured original0.3.2 publish log; workflow retains its identity and publish command. Actual new-version deployment will recheck this in A5."
+    },
+    {
+      "id": "A-artifact-recovery",
+      "source": "Workflow artifact contract and updated contributor documentation",
+      "claim": "Recovery uses failed jobs from the original run within artifact retention, not a fresh workflow or repack",
+      "status": "verified",
+      "evidence": "Needs/build outputs and artifact ID retained;30-day retention unchanged; process tests reject source/digest mismatch."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No matching change: shell parsing/shims/heuristic recovery/decision trail/per-element complexity/reference implementation replacement are absent."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No matching change: shell parsing/shims/heuristic recovery/decision trail/per-element complexity/reference implementation replacement are absent."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No matching change: shell parsing/shims/heuristic recovery/decision trail/per-element complexity/reference implementation replacement are absent."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No matching change: shell parsing/shims/heuristic recovery/decision trail/per-element complexity/reference implementation replacement are absent."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No matching change: shell parsing/shims/heuristic recovery/decision trail/per-element complexity/reference implementation replacement are absent."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Scoped to exact release lifecycle, process/registry boundaries, source identity, artifact wiring, bounded failures, and contributor recovery guidance."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No matching change: shell parsing/shims/heuristic recovery/decision trail/per-element complexity/reference implementation replacement are absent."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No matching change: shell parsing/shims/heuristic recovery/decision trail/per-element complexity/reference implementation replacement are absent."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "bun run check",
+      "outcome": "pass",
+      "reason": "Lint/typecheck/736 tests/build on frozen source;157 focused release tests; existing informational dashboard lint diagnostics unchanged."
+    },
+    {
+      "check": "style and surfaces",
+      "outcome": "pass",
+      "reason": "deterministic-1.log"
+    },
+    {
+      "check": "stale release policy and callsites",
+      "outcome": "pass",
+      "reason": "Retired manual-only statement absent; all affected callers inspected in changed files."
+    },
+    {
+      "check": "siblings",
+      "outcome": "acknowledged",
+      "reason": "Only untouched match is the test reading release.yml from disk; it makes no release policy claim."
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": "12 attempts, max30second delays,211seconds total wait plus at most360seconds of requests; publish job15minute ceiling. HTTP status retries and exhausted budget tested."
+    },
+    {
+      "check": "force red and restored green",
+      "outcome": "pass",
+      "reason": "Seven killed mutants,157 tests restored green, isolated worktree clean."
+    },
+    {
+      "check": "final-head focus and diff check",
+      "outcome": "pass",
+      "reason": "6b6ddf0 differs only in3documentation lines;157release tests pass, diff check clean; all runtime/workflow bytes match reviewed e78e205."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "No website or provider source edits",
+      "evidence": "Four-file diff only changes release automation and its guide/tests; docs26 remains separate."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Other docs may retain internal repository language",
+      "evidence": "Reviewer and root verified GitHub visibility public. CONTRIBUTING is corrected here.",
+      "why_out_of_scope": "Broader website visibility wording belongs to open docs PR26."
+    }
+  ],
+  "deployment_acceptance": {
+    "status": "pending_main_push",
+    "acceptance_id": "A5",
+    "evidence": "Source/config readiness gate does not claim publication before the automatic workflow executes."
+  },
+  "security_review": {
+    "status": "pass",
+    "fingerprint": {
+      "repository": "vercel-labs/issue-graph",
+      "base_sha": "8de9132367c6f69859160df40f8235cb6676894b",
+      "head_sha": "6b6ddf05c43c4955b00c11f6ce0a90a4658d6f73",
+      "dirty_digest": "clean",
+      "changed_path_digest": "sha256:f33d2379498ed789a24f1463bd12a473f68f72f074e70b814fc3c71154b37581",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+    },
+    "claim": {
+      "property": "Only canonical main release code can publish the tested retained artifact with the existing OIDC identity; no stored npm credentials or widened GitHub job permissions.",
+      "attacker": "Untrusted pull-request/fork author or malformed registry response; main writers are trusted release principals under the explicitly requested policy.",
+      "scope": "Four-file release automation diff and Release environment reviewer-policy change."
+    },
+    "trust_model": {
+      "assets": [
+        "npm issue-graph immutable versions",
+        "GitHub version tags and releases",
+        "Release-bound OIDC identity",
+        "Exact tested archive and source identity"
+      ],
+      "principals": [
+        "PR/fork author: no canonical main push event or Release environment access",
+        "Canonical main writer: user-authorized release principal after this policy change",
+        "Build/consumer: contents read, no OIDC",
+        "Publish: contents/actions read and id-token write, no contents write",
+        "github-release: contents write only, no OIDC"
+      ],
+      "boundaries": [
+        "Event/repository/ref guards before candidate outputs",
+        "Manifest stable version and event SHA checked against actual checkout",
+        "Immutable artifact ID, release.json and SHA256 verified across build/consumers/publish",
+        "Registry metadata and bytes treated as untrusted; URL allowlist/no redirects/checksums",
+        "Main-only Release deployment policy verified after removing human reviewer gate"
+      ],
+      "entrypoints": [
+        "push main",
+        "workflow_dispatch main with exact version/SHA; publish defaults false"
+      ],
+      "sinks": [
+        "npm publish exact tarball with ignore-scripts and OIDC",
+        "Git refs POST at expected commit; gh release create verify-tag"
+      ]
+    },
+    "observations": [
+      {
+        "id": "SEC-POLICY",
+        "classification": "informational",
+        "scope": "out_of_scope_hardening",
+        "prerequisites": [
+          "User explicitly requests publication without manual approval"
+        ],
+        "chain": {
+          "capability": "Canonical main write permission",
+          "reachability": "Push triggers source version candidate",
+          "control": "Main source controls publish script and package",
+          "boundary": "Release manual reviewer approval removed as requested; main-only binding retained",
+          "impact": "Main writes now carry release authority, which is the requested policy rather than an unintended escalation"
+        },
+        "confidence": "high",
+        "evidence": [
+          "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/environment-before.json",
+          "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/environment-after.json",
+          "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/environment-branch-policy.json",
+          "Canonical main rule read: enterprise signed commits; source docs do not claim enforced PR review."
+        ]
+      },
+      {
+        "id": "SEC-INPUTS",
+        "classification": "informational",
+        "scope": "out_of_scope_hardening",
+        "confidence": "high",
+        "evidence": [
+          "157 release tests reject noncanonical repos, non-main refs, invalid events, SHA/version mismatch, registry failures, foreign URLs and altered bytes.",
+          "Production callsite mutations disabling registry byte verification or forcing publish are rejected by real process tests.",
+          ".github/workflows/release.yml retains exact event checkout and scoped permissions; no new secret source or registry mutation command."
+        ]
+      }
+    ],
+    "verification": {
+      "authorized_scope": "Read-only source/registry review, isolated local process/network doubles, and user-requested Release environment policy update. No remote fault injection.",
+      "commands": [
+        "bun run check",
+        "bun x --no-install vitest run --config vitest.config.ts src/release.test.ts",
+        "gh api repos/vercel-labs/issue-graph/environments/Release",
+        "gh api repos/vercel-labs/issue-graph/environments/Release/deployment-branch-policies"
+      ],
+      "cleanup": "Mutation worktree source restored clean; production fixture archive not altered; environment main policy preserved.",
+      "gaps": [],
+      "results": "Exact runtime/workflow/tests bytes unchanged since independent e78e205 review; three visibility wording changes inspected on6b6ddf0;157tests rerun green."
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": []
+    },
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-issue-graph-release-automation/security-review-root-6b6ddf0.json"
+  }
+}

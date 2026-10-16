@@ -1,0 +1,563 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-28",
+    "repo": "vercel-labs/agent-browser",
+    "base": "fad34d20403e67619cde5340731575745e2762e6",
+    "head": null,
+    "profile": "standard",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-tree:54c8a332dab0febea175fc4fc375785e8745e6c4",
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Native reviewer attempts exceeded the per-operation failure limit; two acknowledgements are not counted as reviews.",
+      "Independent FX review completed via stored Fireworks credential, but no packaged vercel-ai-gateway/API-key-mode receipt exists."
+    ]
+  },
+  "execution": {
+    "mode": "fx_worker",
+    "degraded_from": "native_subagent",
+    "independence_gap": "Independent cross-family review exists; packaged runtime identity requirement is unmet. Final requested visible-click assertion was checked locally and by final E2E.",
+    "receipt": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/review-fx.json",
+    "schema_failures": 2,
+    "operations": [
+      {
+        "operation": "Native test-reduction reviewer",
+        "attempted_calls": 6,
+        "schema_failures": 2,
+        "capability_failures": 2,
+        "identical_retry": null,
+        "outcome": "Two acknowledgements, two empty-override schema failures, two capacity failures; no completed native verdict. Exact invalid-call equality not preserved in durable summary."
+      },
+      {
+        "operation": "Direct FX frozen packet review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false,
+        "outcome": "Completed Moonshot Kimi K3 Fast via Fireworks stored credential; review and disposition saved."
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/contract.md",
+    "spec_status": "not_required",
+    "acceptance_reviewed": [
+      "Preserve distinct invariants",
+      "Production unchanged",
+      "Reduce duplicated fixtures",
+      "Signed append-only update"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "Codex",
+    "reviewer_model": "moonshotai/kimi-k3-fast via Fireworks",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "Preservation of authentication regression protection; no production changes"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/review-fx.json",
+      "evidence": "Reviewer traced each removed row to retained invariant coverage; false compile finding refuted by compiler and later module import, visible-click assertion restored."
+    }
+  },
+  "security_review": {
+    "status": "pass",
+    "fingerprint": {
+      "repository": "vercel-labs/agent-browser",
+      "base_sha": "fad34d20403e67619cde5340731575745e2762e6",
+      "head_sha": null,
+      "dirty_digest": null,
+      "changed_path_digest": "sha256:7e35523a2fa94c0a7a43323b71a04614a761e2bcfd6b471731ee49c14d09f9dd",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-tree:1b2b7858d65a24124a3f49ac29c85825eb893f99"
+    },
+    "claim": {
+      "property": "The test reduction introduces no new runtime credential exposure or authorization change.",
+      "attacker": "Page script on an already authorized origin or an unrelated origin; same principals as parent review.",
+      "scope": "Only parent-to-reduction diff; does not re-certify the full parent implementation."
+    },
+    "trust_model": {
+      "assets": [
+        "User credential store",
+        "Disposable test credentials",
+        "Selected DOM destination"
+      ],
+      "principals": [
+        "Local test runner already owns local credential permissions",
+        "Authorized origin already controls its DOM",
+        "Unrelated origin remains rejected by existing E2E"
+      ],
+      "boundaries": [
+        "Saved credentials to authorized login page; runtime paths byte-identical"
+      ],
+      "entrypoints": [
+        "Existing test auth_save/auth_login/auth_delete and local HTTP/CDP fixtures"
+      ],
+      "sinks": [
+        "Existing credential filling",
+        "Ephemeral saved test profile"
+      ]
+    },
+    "observations": [
+      {
+        "id": "SEC-REDUCTION-1",
+        "classification": "informational",
+        "scope": "out_of_scope_hardening",
+        "prerequisites": [],
+        "confidence": "high",
+        "evidence": [
+          "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/production-and-lint-proof.json",
+          "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/auth-final.log"
+        ],
+        "chain": {
+          "capability": "Same local runner and page-origin authority as parent.",
+          "reachability": "Changes are entirely under cfg(test) or E2E test module.",
+          "control": "Only disposable local profile and page fixtures changed.",
+          "boundary": "No runtime trust boundary changes.",
+          "impact": "No new principal gains credentials or authority."
+        }
+      }
+    ],
+    "verification": {
+      "authorized_scope": "User-authorized local test reduction and existing PR update.",
+      "commands": [
+        "git diff parent -- two test paths",
+        "cargo test e2e_auth_login -- --ignored --test-threads=1",
+        "byte comparison of production prefix to parent"
+      ],
+      "cleanup": "Consolidated E2E removes its saved profile, closes the browser and aborts fixture before final row assertions; final run passes.",
+      "gaps": []
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": []
+    },
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-2014-test-reduction/security-review.json"
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "User requested 80/20 test reduction while preserving feature and blocker fix."
+    },
+    {
+      "source": "design",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/coverage-model.json",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "Shared browser and WebSocket fixtures; four ownership/failure classes retained."
+    },
+    {
+      "source": "user_facing",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/pr-body.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Final claims distinguish current test validation from historical unchanged-production campaigns."
+    },
+    {
+      "source": "implementation",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/final-diff.patch",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2"
+      ],
+      "evidence": "Only tests change; exact file and production digests recorded."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The reduced tests detect incorrect credential destinations and missing remote-handle cleanup.",
+      "kind": "regression coverage",
+      "status": "verified",
+      "oracle": {
+        "observes": "Real DOM input destinations and exact CDP release multiset.",
+        "layer": "Chrome daemon commands and real WebSocket CDP client",
+        "method": "26 real-browser rows, four protocol failure partitions, four targeted mutations.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Green suite or failed login alone.",
+        "counterexample": "Login rejects after credential already reaches decoy; successful fill can still leak remote handles.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/red-stale-target-guards.log and red-fill-exception-release.log"
+      },
+      "substrates": [
+        {
+          "name": "Chrome",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/auth-final.log"
+        },
+        {
+          "name": "CDP client over real WebSocket fixture",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/unit-final.log"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/coverage-model.json"
+    },
+    {
+      "id": "P2",
+      "claim": "PR additions fall from 731 to 483, including test additions from 496 to 248, with production unchanged.",
+      "kind": "scope and size",
+      "status": "verified",
+      "oracle": {
+        "observes": "Git diff additions by test boundary and production prefix byte equality.",
+        "layer": "Source tree and Git blobs",
+        "method": "before/after metrics plus exact diff and hashes.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Smaller total diff.",
+        "counterexample": "Deleting production behavior would reduce lines but violate contract.",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "All changed actions.rs hunks are under cfg(test); e2e_tests.rs is test-only; no other reduction paths."
+      },
+      "substrates": [
+        {
+          "name": "Exact staged source",
+          "status": "exercised",
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/validated-state.json"
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/after-metrics.json"
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "scope": "Four independent failure families protected by the consolidated tests; no exhaustive mutation-coverage claim.",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-tree:369ace973c03bda72436c007404164de98aa6dca",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-2014-test-reduction/test-strength.json",
+      "evidence": "coverage-model.json, four intentional force-red logs, full restored final unit and auth runs; independent Kimi invariant assessment.",
+      "fingerprint": {
+        "head_sha": null,
+        "changed_paths_digest": "sha256:7e35523a2fa94c0a7a43323b71a04614a761e2bcfd6b471731ee49c14d09f9dd",
+        "contract_digest": "sha256:bb8b189c51edd1821963a63b794cd089a54a2d40b5f22c23f25cd1bd4d003fcb",
+        "command": "cargo test -- --test-threads=1; cargo test e2e_auth_login -- --ignored --test-threads=1; four isolated force-red mutations",
+        "environment_digest": "sha256:8df108a13517af637c39bd69a24ff50fe0c13f1a238595cc2f2e9527bc511c2e",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-tree:369ace973c03bda72436c007404164de98aa6dca",
+        "relevant_paths": [
+          "cli/src/native/actions.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/src/native/element.rs",
+          "cli/src/native/interaction.rs",
+          "cli/src/native/cdp/client.rs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      },
+      "dimensions": {
+        "values": [
+          "Browser: user and password x 13 phases = 26 rows, with hidden twins and visible submit in every fixture.",
+          "CDP: selection exception, descriptor error, fill JavaScript exception, fill protocol error.",
+          "Fault classes: stale target, redirected focus after selection, rejected-selection handle leak, fill-exception handle leak."
+        ],
+        "exclusions": [
+          "No production logic changed; historical cross-engine/React/Unicode campaigns were not repeated.",
+          "Non-node, malformed descriptor, and false-fill mock rows share ownership invariants with retained partitions; independent review maps each removal.",
+          "Per-row exhaustive mutation score is not claimed; tests retain compatibility examples as practical regression guards."
+        ],
+        "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/coverage-model.json"
+      },
+      "oracle": {
+        "source": "User contract: intended credential destination, untouched decoy/hidden controls, real button click; CDP ownership from returned remote object handles.",
+        "independent": true,
+        "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/review.md"
+      },
+      "producer": {
+        "name": "Actual Chrome through native daemon execute_command and a real WebSocket CDP client with bounded protocol fixture.",
+        "status": "exercised",
+        "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/auth-final.log and unit-final.log"
+      },
+      "falsification": [
+        {
+          "mutation": "stale-target-guards",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/red-stale-target-guards.log",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/auth-final.log"
+        },
+        {
+          "mutation": "post-select-focus",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/red-post-select-focus.log",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/auth-final.log"
+        },
+        {
+          "mutation": "selection-object-release",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/red-selection-object-release.log",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/unit-final.log"
+        },
+        {
+          "mutation": "fill-exception-release",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/red-fill-exception-release.log",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/unit-final.log"
+        }
+      ],
+      "limits": [
+        "The four mutants establish four independent failure families, not an exhaustive per-row mutation score.",
+        "Chrome is the real producer for the consolidated E2E; earlier actual Lightpanda and React runs are historical unchanged-production evidence.",
+        "The final visible-click observation was added after the independent review and passed the final auth E2E; the reviewer requested it but did not re-review the final added lines."
+      ],
+      "elapsed_time": "Final suite: 164.14s unit, 1.56s integration, 52.30s auth E2E; focused and mutation runs in individual logs."
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "Parent-to-reduction diff changes test scaffolding only. No production persistence, retry, cleanup, concurrency, or recovery implementation changed. Parent resilience receipt remains historical, not re-fingerprinted as a current full-PR pass."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "Simplify contract",
+      "claim": "Production runtime behavior is unchanged.",
+      "status": "verified",
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/production-and-lint-proof.json"
+    },
+    {
+      "id": "A2",
+      "source": "Independent review compile observation",
+      "claim": "Later module-level use super::* resolves the merged test imports.",
+      "status": "verified",
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/import-proof.txt and unit-final.log"
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Independent frozen-packet review and accepted disposition; review.md."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Independent frozen-packet review and accepted disposition; review.md."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Independent frozen-packet review and accepted disposition; review.md."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changes in this test-only diff; prior full implementation review remains historical."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Independent frozen-packet review and accepted disposition; review.md."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "rust unit and integration",
+      "outcome": "pass",
+      "reason": "1392 unit, 6 integration; unit-final.log."
+    },
+    {
+      "check": "auth e2e",
+      "outcome": "pass",
+      "reason": "6 tests including consolidated 26-row matrix; auth-final.log."
+    },
+    {
+      "check": "fmt",
+      "outcome": "pass",
+      "reason": "fmt-final.log; subsequent Clippy ran after set -e."
+    },
+    {
+      "check": "CI Clippy",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/clippy-ci-final.log"
+    },
+    {
+      "check": "all-target Clippy",
+      "outcome": "acknowledged",
+      "reason": "Three base-present warnings outside changed code: browser.rs unbounded range, cdp/client.rs large error, e2e screenshot chunks_exact; production-and-lint-proof.json."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "gate-style-final.log"
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "Mechanical file-level trigger only: actions.rs changes exclusively test module, so user-facing surfaces have no reduction delta."
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": "No added wait ceiling."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "No whitespace errors."
+    },
+    {
+      "check": "exact reviewed state",
+      "outcome": "pass",
+      "reason": "validated-state.json records the two final file digests and staged diff."
+    }
+  ],
+  "findings": [
+    {
+      "id": "R1",
+      "state": "refuted",
+      "claim": "Merged mock fails to compile from removed imports.",
+      "evidence": "Module-wide use super::* exists later; final 1392 tests compiled and passed.",
+      "layer": "Rust compiler",
+      "source": "independent review",
+      "path": "cli/src/native/actions.rs",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "R2",
+      "state": "confirmed",
+      "claim": "Visible submit click assertion was dropped.",
+      "evidence": "Added visibleClicked marker and assertion; final auth E2E passes.",
+      "layer": "Real browser",
+      "source": "independent review",
+      "path": "cli/src/native/e2e_tests.rs",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No new docs/MCP/CLI help changes in reduction.",
+      "evidence": "Production behavior byte-identical; original PR surfaces remain present."
+    },
+    {
+      "claim": "Original-auth-wiring mutant is excluded from intended blocker proof.",
+      "evidence": "Its first failure was an empty-clear event; stale-target and focus mutations fail the intended destination assertion."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Existing all-target Clippy warnings on Rust 1.98.1",
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/production-and-lint-proof.json",
+      "why_out_of_scope": "Three unrelated existing test implementation paths; CI command passes."
+    }
+  ],
+  "outcome": {
+    "external_findings": 2,
+    "review_rounds": 1,
+    "human_corrections": [
+      "User identified excessive test additions and requested 80/20 selection."
+    ],
+    "escaped_finding_class": "visible-click assertion preservation",
+    "code_verdict": "no open code finding",
+    "promotion_verdict": "incomplete due runtime protocol"
+  }
+}

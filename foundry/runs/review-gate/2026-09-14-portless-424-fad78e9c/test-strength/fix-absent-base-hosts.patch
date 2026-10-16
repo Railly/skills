@@ -1,0 +1,61 @@
+--- src/hosts.ts
++++ src/hosts.ts
+@@ -13,13 +13,13 @@
+ 
+ /**
+  * Read the current /etc/hosts file content.
+- * Returns null if the file cannot be read, including when it does not exist.
++ * Returns empty string if the file cannot be read.
+  */
+-function readHostsFile(): string | null {
++function readHostsFile(): string {
+   try {
+     return fs.readFileSync(HOSTS_PATH, "utf-8");
+   } catch {
+-    return null;
++    return "";
+   }
+ }
+ 
+@@ -103,7 +103,6 @@
+  */
+ export function syncHostsFile(hostnames: string[]): boolean {
+   const content = readHostsFile();
+-  if (content === null) return false;
+   if (blockMatchesHostnames(content, hostnames)) return true;
+   try {
+     const cleaned = removeBlock(content);
+@@ -117,8 +116,7 @@
+     return false;
+   }
+   // Re-read rather than assume the write landed.
+-  const verification = readHostsFile();
+-  return verification !== null && blockMatchesHostnames(verification, hostnames);
++  return blockMatchesHostnames(readHostsFile(), hostnames);
+ }
+ 
+ /**
+@@ -126,9 +124,8 @@
+  * Returns true on success, false on failure.
+  */
+ export function cleanHostsFile(): boolean {
+-  const content = readHostsFile();
+-  if (content === null) return false;
+   try {
++    const content = readHostsFile();
+     if (!content.includes(MARKER_START)) return true;
+     fs.writeFileSync(HOSTS_PATH, removeBlock(content));
+     return true;
+@@ -139,12 +136,9 @@
+ 
+ /**
+  * Return the current portless-managed hostnames from /etc/hosts.
+- * A read failure returns an empty array for best-effort callers; it does not
+- * prove that the hosts file is empty or was read successfully.
+  */
+ export function getManagedHostnames(): string[] {
+   const content = readHostsFile();
+-  if (content === null) return [];
+   return extractManagedBlock(content).flatMap((line) => {
+     const [, ...aliases] = line.split("#", 1)[0].trim().split(/\s+/);
+     return aliases;

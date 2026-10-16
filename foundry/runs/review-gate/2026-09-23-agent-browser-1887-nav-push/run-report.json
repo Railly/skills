@@ -1,0 +1,370 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-23",
+    "repo": "vercel-labs/agent-browser",
+    "base": "c32c6e83a9408e0ca6fa4784a3757851f1e29274",
+    "head": "b88f469c7c05ed3abaf2264ef940dbbf67e6203a",
+    "profile": "mechanical",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "single_context",
+    "degraded_from": "native_subagent",
+    "independence_gap": "Native worker acknowledged instructions but did not perform the requested review, including follow-up. Parent performed the focused mechanical review. No independent or cross-family review is claimed.",
+    "schema_failures": 2,
+    "operations": [
+      {
+        "operation": "Launch focused mechanical reviewer",
+        "attempted_calls": 3,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "Inspect live-agent capability after schema failure",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-23-agent-browser-1887-nav-push/contract.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-6",
+    "reviewer_model": "GPT-6 (parent focused review)",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [
+      "Documentation navigation metadata and regression assertions only."
+    ],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": false,
+      "method": "not_required",
+      "artifact": null,
+      "evidence": "Mechanical profile requires one focused review, not a cross-family high-risk challenge."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-23-agent-browser-1887-nav-push/contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "User authorized correction of the reproduced review finding."
+    },
+    {
+      "source": "design",
+      "location": "docs/content/docs/meta.json",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "Existing Fumadocs separators and folder extraction restore the frozen original sections."
+    },
+    {
+      "source": "user_facing",
+      "location": "Local headed browser and search result screenshots",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "Changelog, Browserbase and Lightpanda show the corrected breadcrumbs; sidebar has separate sections."
+    },
+    {
+      "source": "implementation",
+      "location": "Three-file diff in identity.json",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "Source paths and full diff hash exactly match the tested tree."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "All nine affected pages have the original independent section in native search, while the existing routes, content and Features membership remain intact.",
+      "kind": "navigation",
+      "status": "verified",
+      "oracle": {
+        "observes": "Actual native-search breadcrumb arrays and rendered navigation plus frozen route/content checks.",
+        "layer": "HTTP search output and rendered browser DOM",
+        "method": "Nine route tests, real browser searches and 516 production checks.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Successful HTTP response or a search result exists.",
+        "counterexample": "Original metadata returns valid results under the wrong Features ancestor.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "All nine breadcrumb equality checks fail against the original metadata while search still responds; all pass on the fixed tree."
+      },
+      "substrates": [
+        {
+          "name": "Owned Next.js production server",
+          "status": "exercised",
+          "evidence": "routes.log: 516 passed, no failures."
+        },
+        {
+          "name": "Headed Chrome on exact local docs source",
+          "status": "exercised",
+          "evidence": "before.png, after.png, browserbase-after.png, lightpanda-after.png, sidebar-after.png."
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1887-nav-verification/fix-validation.json; identity.json maps the tested dirty tree to the exact commit."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:152b1f2073db38ee43657fc15a138424cb231f05c5b4d643d4228ac306efb833",
+      "artifact": "/Users/raillyhugo/Programming/vercel/agent-browser-1887-nav-verification/fix-validation.json",
+      "evidence": "The exact tested dirty tree is now committed without any content changes. identity.json verifies the full binary diff and all recorded input hashes. Nine breadcrumb cases failed before the fix and passed after; production suite passed 516 checks.",
+      "fingerprint": {
+        "head_sha": "b88f469c7c05ed3abaf2264ef940dbbf67e6203a",
+        "changed_paths_digest": "009414190aeb2a5f3a32efb116a2df0244c4cc8086fe5e1541f2688518ab084f",
+        "contract_digest": "05e679f622f406c8a085559bb248afebb3d57521b03e423162b0d5fdd1b82330",
+        "command": "DOCS_TEST_URL=http://127.0.0.1:3887 bun run node --test --test-name-pattern=\"native search preserves original section breadcrumbs\" tests/docs-routes.test.mjs; bun run test:routes",
+        "environment_digest": "bc236d72d4332eeacb64a6d31e404542407580cfac5afc3a9543fe5e87fd5cc7",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:152b1f2073db38ee43657fc15a138424cb231f05c5b4d643d4228ac306efb833",
+        "relevant_paths": [
+          "docs/content/docs/meta.json",
+          "docs/tests/docs-baseline.test.mjs",
+          "docs/tests/docs-routes.test.mjs",
+          "docs/tests/fixtures/docs-baseline.json"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      },
+      "dimensions": {
+        "values": [
+          "/changelog",
+          "/engines/chrome",
+          "/engines/lightpanda",
+          "/providers/agentcore",
+          "/providers/browser-use",
+          "/providers/browserbase",
+          "/providers/browserless",
+          "/providers/kernel",
+          "/providers/remote-agent-browser"
+        ],
+        "exclusions": [
+          "No protocol, parser, lifecycle, security or durable-state implementation changed."
+        ],
+        "evidence": "All six providers, two engines and Changelog checked against the frozen independent navigation fixture."
+      },
+      "oracle": {
+        "source": "docs/tests/fixtures/docs-baseline.json from pre-migration commit aff6125",
+        "independent": true,
+        "evidence": "Expected navigation sections come from the unchanged legacy fixture, not the changed metadata."
+      },
+      "producer": {
+        "name": "Actual local Next.js search endpoint and headed Chrome",
+        "status": "exercised",
+        "evidence": "regression-before.log, regression-after.log, routes.log, before.png and after.png."
+      },
+      "falsification": [
+        {
+          "mutation": "Leave original meta.json grouping active while the new regression tests are installed.",
+          "red_evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1887-nav-verification/regression-before.log: nine breadcrumb equality failures caused by the extra Features ancestor.",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1887-nav-verification/regression-after.log: all nine pass after the metadata correction."
+        }
+      ]
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "No runtime state, resource acquisition, retry, cancellation, external mutation or cleanup changes."
+    }
+  },
+  "assumptions": [],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Frozen legacy oracle, WebMCP control, real search/DOM and production route checks verify the narrowed navigation change."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Frozen legacy oracle, WebMCP control, real search/DOM and production route checks verify the narrowed navigation change."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Frozen legacy oracle, WebMCP control, real search/DOM and production route checks verify the narrowed navigation change."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Frozen legacy oracle, WebMCP control, real search/DOM and production route checks verify the narrowed navigation change."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No corresponding runtime mechanism changed; this diff contains only navigation metadata and test assertions."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "gate.sh style passed."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "No runtime command path in the surface map changed; legacy navigation already expresses the intended sections."
+    },
+    {
+      "check": "force-red",
+      "outcome": "pass",
+      "reason": "Nine intended breadcrumb failures before, nine passes after."
+    },
+    {
+      "check": "Biome format staged JSON",
+      "outcome": "pass",
+      "reason": "No formatting changes needed."
+    },
+    {
+      "check": "Exact tested-state identity",
+      "outcome": "pass",
+      "reason": "Full diff and recorded source hashes match committed content."
+    },
+    {
+      "check": "Docs test/type-check/build/routes",
+      "outcome": "pass",
+      "reason": "90 unit/oracle checks and 516 production-suite checks; type-check/build pass."
+    },
+    {
+      "check": "Head coverage",
+      "outcome": "finding-fixed",
+      "reason": "New commit initially had no report; this report covers the exact commit."
+    },
+    {
+      "check": "Focused mechanical review",
+      "outcome": "pass",
+      "reason": "focused-review.md: no findings; same-context limitation documented."
+    }
+  ],
+  "findings": [],
+  "exemptions": [
+    {
+      "claim": "No CLI/MCP/README/skill edits.",
+      "evidence": "Only documentation hierarchy changes; command semantics and prose are untouched, and legacy navigation already has the correct sections."
+    },
+    {
+      "claim": "No repeated full docs build or suite in the publication turn.",
+      "evidence": "identity.json verifies that the committed tree exactly matches the previously tested dirty tree; no intervening edits."
+    }
+  ],
+  "issue_candidates": []
+}

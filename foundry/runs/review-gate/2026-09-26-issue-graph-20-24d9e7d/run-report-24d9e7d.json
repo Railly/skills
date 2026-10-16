@@ -1,0 +1,788 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-26",
+    "repo": "vercel-labs/issue-graph",
+    "base": "55714fa1d45642d00451bc0170aae54de87a966a",
+    "head": "24d9e7d2b211e6eb6bf9bc1ec54f6792bd3bb475",
+    "profile": "external-pr",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "skill_package_digest": "sha256:049bcf85c5e91f53c72352da0455a4f45b33f82ff36f2c9ef8f2f88f7b4763fa",
+    "status": "complete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Required Test Strength receipt is absent for Jira normalization, TWG decoding, and shared traversal changes.",
+      "Required Resilience Audit receipt is absent for subprocess timeout, output-file cleanup, failure partitions, and retry.",
+      "Customer TWG is unavailable; real envelopes, --full completeness, raw/stats compatibility and failure-file behavior were not verified.",
+      "Security Review retains real-producer/rendered-consumer verification gaps; static review confirms no attacker boundary crossing.",
+      "FX wrapper rejected its prescribed auth status. Native review is a separate context but same family as root, and contributor model is unknown; qualifying high-risk independent challenge is not established.",
+      "Node 20/22 and Linux/Windows package behavior were not exercised. Local checks use Node 24 on macOS.",
+      "Live GitHub rollup has a Vercel authorization failure; no successful preview or full source-CI run is established by the available rollup."
+    ],
+    "dirty_digest": "clean",
+    "changed_paths_digest": "sha256:570b6e715cfea0e4e836e74e4d8c821c2423076f16adb2fab090ba6ae94cfd5c"
+  },
+  "execution": {
+    "mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "FX credential status did not satisfy wrapper contract. Native reviewers are separate contexts in the same model family as root; contributor model is unknown.",
+    "schema_failures": 2,
+    "operations": [
+      {
+        "operation": "FX independent review",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false,
+        "evidence": "FX wrapper: unsupported auth mode missing; inspected fx status keys and fx ask help once."
+      },
+      {
+        "operation": "native reviewer dispatch",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false,
+        "evidence": "First dispatch rejected empty optional reasoning_effort; corrected dispatch succeeded."
+      }
+    ],
+    "receipt": "correctness-review.md"
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/contract.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "exact identity",
+      "Jira source fidelity",
+      "bounded crawl",
+      "TWG compatibility and cleanup",
+      "output and package contracts"
+    ],
+    "gaps": [
+      "No formal issue contract/design gate or upstream specialist receipts were supplied; review contract recorded from PR and user request."
+    ]
+  },
+  "provenance": {
+    "author_model": "unknown external contributor",
+    "reviewer_model": "gpt-6-astra native separate context",
+    "same_family": null
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "subprocess concurrency and timeout lifecycle",
+      "TWG temporary-file reads and removal",
+      "untrusted payload and link rendering; integrity claims"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": false,
+      "method": "unavailable",
+      "artifact": "correctness-review.md",
+      "evidence": "Separate native correctness review plus security review completed. Same parent model family and unknown contributor author model do not establish cross-family or normative producer independence."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md and pr-metadata.json",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "evidence": "User requested exact PR gate; PR describes read-only Jira discovery and preserved GitHub behavior."
+    },
+    {
+      "source": "design",
+      "location": "No separate design artifact supplied; design claims in PR body",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "No Solution Gate assumptions or formal design receipt available."
+    },
+    {
+      "source": "user_facing",
+      "location": "PR body, Jira docs, CLI help, schema and canonical skill",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "evidence": "Read-only relationships, completeness, immediate cleanup, compatibility and package claims inventoried."
+    },
+    {
+      "source": "implementation",
+      "location": "diff.patch and impact-map.json",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "evidence": "Shared traversal, normalization, transport, CLI dispatch, renderer, export and docs changes inspected."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "PARTIALLY VERIFIED: Minimum-depth traversal, cap evidence and error exits preserve bounded graph behavior.",
+      "kind": "behavior",
+      "status": "partially_verified",
+      "oracle": {
+        "observes": "Fetched node keys/depths, child argv, explicit capped keys and exit codes.",
+        "layer": "public CLI or exported library boundary",
+        "method": "Inspect minimum pending-depth algorithm, existing traversal tests and reviewer-built cap/denial runs.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Tests are green.",
+        "counterexample": "A passing test suite could omit cap/denial at the CLI boundary; those paths were driven before authored tests.",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "tests.log: 636 pass. built-smoke.json: cap returns exit1 with PROJ-2 capped; denied node stays explicit. correctness-review.md found no introduced traversal regression."
+      },
+      "substrates": [
+        {
+          "name": "built Node 24 artifact with reviewer-owned synthetic data",
+          "status": "exercised",
+          "evidence": "tests.log: 636 pass. built-smoke.json: cap returns exit1 with PROJ-2 capped; denied node stays explicit. correctness-review.md found no introduced traversal regression."
+        }
+      ],
+      "evidence": "tests.log: 636 pass. built-smoke.json: cap returns exit1 with PROJ-2 capped; denied node stays explicit. correctness-review.md found no introduced traversal regression. Full behavioral falsification remains pending in Test Strength."
+    },
+    {
+      "id": "P2",
+      "claim": "REFUTED: A remote Jira link identifies the work item at its referenced site.",
+      "kind": "behavior",
+      "status": "refuted",
+      "oracle": {
+        "observes": "The actual site passed to TWG and the URL of the hydrated target.",
+        "layer": "public CLI or exported library boundary",
+        "method": "Drive built CLI with a link from alpha to beta and inspect child argv plus JSON report.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The linked key was fetched successfully.",
+        "counterexample": "An unrelated same-key local issue is returned successfully for an external-site link.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "built-smoke.json site-link: beta/PROJ-2 causes alpha/PROJ-2 read and complete output. F1."
+      },
+      "substrates": [
+        {
+          "name": "built Node 24 artifact with reviewer-owned synthetic data",
+          "status": "exercised",
+          "evidence": "built-smoke.json site-link: beta/PROJ-2 causes alpha/PROJ-2 read and complete output. F1."
+        }
+      ],
+      "evidence": "built-smoke.json site-link: beta/PROJ-2 causes alpha/PROJ-2 read and complete output. F1."
+    },
+    {
+      "id": "P3",
+      "claim": "REFUTED: Selected issue normalization attributes only that issue’s relationships.",
+      "kind": "behavior",
+      "status": "refuted",
+      "oracle": {
+        "observes": "Normalized edges against independently labeled batch ownership.",
+        "layer": "public CLI or exported library boundary",
+        "method": "Call exported built normalizeJiraPayload with one empty target and a different item owning two references.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The selected title/key are correct.",
+        "counterexample": "The selected title is correct while sibling comments and remote links are attributed to it.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "batch-normalization.json: unrelated item contributes PROJ-99 and PROJ-88 to PROJ-1. F2."
+      },
+      "substrates": [
+        {
+          "name": "built Node 24 artifact with reviewer-owned synthetic data",
+          "status": "exercised",
+          "evidence": "batch-normalization.json: unrelated item contributes PROJ-99 and PROJ-88 to PROJ-1. F2."
+        }
+      ],
+      "evidence": "batch-normalization.json: unrelated item contributes PROJ-99 and PROJ-88 to PROJ-1. F2."
+    },
+    {
+      "id": "P4",
+      "claim": "UNVERIFIED: TWG raw and summary variants are compatible and temporary outputs are removed immediately.",
+      "kind": "lifecycle",
+      "status": "unverified",
+      "oracle": {
+        "observes": "Real TWG bytes, process outcomes and residual output files.",
+        "layer": "public CLI or exported library boundary",
+        "method": "Inspect transport and run packaged synthetic stats fallback; retain real-producer/failure cleanup gap.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Synthetic summary fixture passes.",
+        "counterexample": "A real TWG build or post-read removal failure can diverge from the fixture; real producer is unavailable.",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "package-smoke-native.log: 48 commands, synthetic stats fallback and cleanup succeed. security-review.json and missing resilience receipt retain error-path limitations."
+      },
+      "substrates": [
+        {
+          "name": "Customer TWG and full cleanup failure partitions",
+          "status": "unavailable",
+          "evidence": "package-smoke-native.log: 48 commands, synthetic stats fallback and cleanup succeed. security-review.json and missing resilience receipt retain error-path limitations."
+        }
+      ],
+      "evidence": "package-smoke-native.log: 48 commands, synthetic stats fallback and cleanup succeed. security-review.json and missing resilience receipt retain error-path limitations."
+    },
+    {
+      "id": "P5",
+      "claim": "UNVERIFIED: The command performs read-only requests and renders untrusted content within documented safety boundaries.",
+      "kind": "integrity",
+      "status": "unverified",
+      "oracle": {
+        "observes": "Actual child command identity and static data flow to renderer/file sinks.",
+        "layer": "public CLI or exported library boundary",
+        "method": "Read exact argv and renderer and consume static Security Review receipt; no security exploitation performed.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "No Jira mutation calls appear in source.",
+        "counterexample": "Absence of mutation calls alone does not establish confidentiality or external producer behavior.",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "built-smoke.json shows only jira workitem get --full invocations. Security receipt owns classification and producer gaps."
+      },
+      "substrates": [
+        {
+          "name": "Static exact-tree analysis plus benign built argv fixtures",
+          "status": "exercised",
+          "evidence": "built-smoke.json shows only jira workitem get --full invocations. Security receipt owns classification and producer gaps."
+        }
+      ],
+      "evidence": "built-smoke.json shows only jira workitem get --full invocations. Security receipt owns classification and producer gaps."
+    },
+    {
+      "id": "P6",
+      "claim": "Published-style package exports, CLI dispatch and documentation build work on tested environment.",
+      "kind": "packaging",
+      "status": "verified",
+      "oracle": {
+        "observes": "Installed archive outside checkout and built docs.",
+        "layer": "public CLI or exported library boundary",
+        "method": "Run repository-native package verifier plus docs check and production build.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Source compiles.",
+        "counterexample": "Compilation alone can miss missing packaged transport or documentation generation; the packed installed artifact and production docs build were exercised.",
+        "attempted": true,
+        "outcome": "not_separated",
+        "evidence": "package-smoke-native.log: 48 package commands pass on Node24, isolated PATH/network guard and exports. docs-check.log and docs-build.log pass."
+      },
+      "substrates": [
+        {
+          "name": "built Node 24 artifact with reviewer-owned synthetic data",
+          "status": "exercised",
+          "evidence": "package-smoke-native.log: 48 package commands pass on Node24, isolated PATH/network guard and exports. docs-check.log and docs-build.log pass. After pinned pnpm10.34.5 install applies committed Next patch, production docs rebuild and90 HTTP route checks pass (docs-pinned-checks.json)."
+        }
+      ],
+      "evidence": "package-smoke-native.log: 48 package commands pass on Node24, isolated PATH/network guard and exports. docs-check.log and docs-build.log pass. After pinned pnpm10.34.5 install applies committed Next patch, production docs rebuild and90 HTTP route checks pass (docs-pinned-checks.json)."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "Required Test Strength receipt is absent for Jira normalization, TWG decoding, and shared traversal changes."
+    },
+    "resilience": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "Required Resilience Audit receipt is absent for subprocess timeout, output-file cleanup, failure partitions, and retry."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "PR compatibility claim",
+      "claim": "The customer TWG producer matches raw/stats fixtures and full-read coverage assumptions.",
+      "status": "unverified",
+      "evidence": "No TWG executable or customer environment here; contributor live-smoke claim not independently retained."
+    },
+    {
+      "id": "A2",
+      "source": "Review state",
+      "claim": "Review checkout equals live PR head and is clean.",
+      "status": "verified",
+      "evidence": "identity.json and final-pr.json match24d9e7d; target status clean."
+    },
+    {
+      "id": "A3",
+      "source": "Packaging support",
+      "claim": "All supported Node versions/platforms behave like the tested Node24/macOS environment.",
+      "status": "unverified",
+      "evidence": "Only Node24/macOS was exercised locally."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "skipped",
+      "reason": "Existing GitHub reference parser/data source not replaced; traversal changes covered separately."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Jira key, output, relationship/site and payload ownership domains reviewed; real-producer matrix remains unavailable."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Normalized key drops remote site and whole-envelope auxiliary scans cross item ownership; F1/F2."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "Production transport uses execFile argv, no shell command rewriting."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No background daemon or one-shot latch in the changed command."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "run",
+      "reason": "Package verifier isolated tool PATH, forbids network, and validates fake child argv; 48 commands pass."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Existing GitHub tests and base crawl reviewed. New depth ordering follows prior documented shallow-node precedence; no confirmed default regression."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No framework/runtime patch or forwarded event seam."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Triggered by TWG summary decoder and URL interpretation; inspected fixtures, but real TWG corpus unavailable and required Test Strength receipt missing."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "TWG customer producer unavailable; cannot establish normative compatibility from contributor fixture alone."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "crawl caller sweep resolved: verify-transports readers do not mutate state before call. CLI errors and rejected reads exercised."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "Jira dispatch forwards site/limits; captured child argv confirms site. Wrong remote-site resolution remains F1."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Built invalid args, denied reads and caps exercised; full lifecycle forcing/retry belongs to missing Resilience receipt."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No heuristic-driven recovery action."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Transport has execFile timeout and output cap; true timeout/cancellation/cleanup partitions are unverified without Resilience receipt."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Trace normalization through crawl to TWG and report. Site boundary breaks at normalization, F1; batch ownership breaks before traversal, F2."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Child argv, installed exports, serialized report and actual package cleanup checked with owned fixtures; actual TWG unavailable."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Built CLI ran before authored tests, then installed package verifier passed. Evidence built-smoke.json and package-smoke-native.log."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Immediate output-file removal depends on external TWG plus rm outcomes; keep claim gap. Bounded completion does not prove site or attribution correctness."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Read Jira docs, usage, schema, README and skill changes against output. Wrong-site and ownership claims fail; terse GitHub surfaces exempted."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Jira examples require new command. Library/transport exports and Jira package example exercised; live credentials omitted."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No author decision trail was supplied."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "Pending scan costs O(D*V+E) under CLI depth<=10; Jira renderer scans nodes per edge O(E*V); normalization queue shifts can be quadratic. No measured regression claimed."
+    },
+    {
+      "name": "Security Review",
+      "status": "run",
+      "reason": "Static specialist receipt; no active vulnerability reproduction."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "identity",
+      "outcome": "pass",
+      "reason": "identity.json pins full base/head, clean target, source revision and package digest; doctor linked source clean."
+    },
+    {
+      "check": "covered initial",
+      "outcome": "acknowledged",
+      "reason": "No previous exact-head report existed. This run supplies coverage with an incomplete verdict, not a pass."
+    },
+    {
+      "check": "style",
+      "outcome": "acknowledged",
+      "reason": "style.log flags em dash in Jira output at src/jira.ts:465. Minor house-style note; no source change made."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "No mapped required surface omitted."
+    },
+    {
+      "check": "siblings Jira",
+      "outcome": "pass",
+      "reason": "Every Jira doc match touched and checked."
+    },
+    {
+      "check": "callers crawl",
+      "outcome": "acknowledged",
+      "reason": "Two calls in scripts/verify-transports.ts are read-only comparisons with unchanged FetchNode signature; no prior state mutation or added recovery obligation."
+    },
+    {
+      "check": "flagsweep --site versus --depth",
+      "outcome": "acknowledged",
+      "reason": "agents.mdx and graph.mdx demonstrate GitHub modes; index.mdx is a terse routing table linking dedicated Jira guide; src/cli.ts routes jira --help. --site is Jira-only, absent surfaces are not full Jira contracts."
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": "Helper reports no named wait ceiling; transport inline default timeout 30000ms inspected manually and covered by resilience gap."
+    },
+    {
+      "check": "execdeps",
+      "outcome": "acknowledged",
+      "reason": "No first-party installer/bootstrap dependency map exists. TWG is explicitly user-provided and never installed automatically."
+    },
+    {
+      "check": "artifact cleanup registration",
+      "outcome": "acknowledged",
+      "reason": "No new app-owned persistent state file; TWG owns summary file production, cleanup paths reviewed and specialist gap retained."
+    },
+    {
+      "check": "stale, producers, rawinput, shellmeta",
+      "outcome": "acknowledged",
+      "reason": "No retired duplicated flag/value, narrowed existing classifier, deepened existing resolver, or shell-metacharacter detector in diff."
+    },
+    {
+      "check": "force-red",
+      "outcome": "acknowledged",
+      "reason": "Required Test Strength receipt absent; Review Gate did not manufacture mutation evidence."
+    },
+    {
+      "check": "PR staleness and silent-revert signature",
+      "outcome": "acknowledged",
+      "reason": "PR base equals current main in captured metadata; not a revival or claim of a silently reverted existing fix."
+    },
+    {
+      "check": "configuration example compatibility",
+      "outcome": "acknowledged",
+      "reason": "New CLI/library examples, no multi-option config validator changes; package smoke exercises published usage."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "pass",
+      "reason": "impact-map.json generated; attention guidance only."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "diff-check.log empty, exit0."
+    },
+    {
+      "check": "lint, types, build",
+      "outcome": "pass",
+      "reason": "lint.log, typecheck.log, build.log pass."
+    },
+    {
+      "check": "core tests",
+      "outcome": "pass",
+      "reason": "636 tests across32 files pass, tests.log."
+    },
+    {
+      "check": "docs checks and build",
+      "outcome": "pass",
+      "reason": "96 tests across10 files plus docs lint/types and production build pass, docs-check.log/docs-build.log."
+    },
+    {
+      "check": "package smoke",
+      "outcome": "pass",
+      "reason": "48 commands and14 fixture calls pass via repository-native pnpm10.34.5/Node24. Full retained log package-smoke-pinned.log; prior bun/direct node entrypoint mismatch was invocation friction."
+    },
+    {
+      "check": "built dogfood",
+      "outcome": "pass",
+      "reason": "Reviewer-owned scenarios inspect CLI output and child argv; findings F1/F2 demonstrate that green suite is insufficient. Packed CLI confirmation retained in packed-batch-cli.json."
+    },
+    {
+      "check": "docs HTTP routes",
+      "outcome": "pass",
+      "reason": "90 production routes pass after frozen pnpm10.34.5 install restores existing Next Vary-header patch. Earlier unpatched Bun install failures were environment-only. docs-http-pinned.log."
+    },
+    {
+      "check": "callers components",
+      "outcome": "acknowledged",
+      "reason": "Caller sites in html.ts/render.ts read-only rendering of unchanged node maps. Generic type extraction preserves algorithm and result shape; callers-components.log."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "priority": "P2",
+      "state": "confirmed",
+      "claim": "Preserve site identity before following remote Jira links.",
+      "evidence": "A beta.atlassian.net/browse/PROJ-2 link from alpha triggers get PROJ-2 --site alpha, returns an unrelated alpha node and coverageComplete true. built-smoke.json site-link and correctness-review.md.",
+      "layer": "built CLI and actual child argv",
+      "source": "root and isolated reviewer",
+      "path": "src/jira.ts:291-293",
+      "resolution": "open",
+      "recommendation": "Keep links to other sites external/unfetched unless node identity and fetch dispatch explicitly retain and use the target site."
+    },
+    {
+      "id": "F2",
+      "priority": "P2",
+      "state": "confirmed",
+      "claim": "Scope comment and remote-link collection to the selected batch item.",
+      "evidence": "PROJ-1 with no own links acquires PROJ-99 and PROJ-88 from OTHER-1 in the same batch. Confirmed through built public export in batch-normalization.json. packed-batch-cli.json independently confirms extra fetched nodes through installed CLI.",
+      "layer": "exported built library normalization",
+      "source": "isolated reviewer, root confirmation",
+      "path": "src/jira.ts:219-227",
+      "resolution": "open",
+      "recommendation": "Preserve the selected issue’s enclosing item and collect auxiliary comments/remote links only from that item."
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "No --site addition needed in GitHub-only flag tables.",
+      "evidence": "Those routes remain GitHub-specific; dedicated Jira guide/help enumerate --site and overview links that guide."
+    },
+    {
+      "claim": "Unrestricted summary cleanup paths are not automatically an attacker vulnerability.",
+      "evidence": "Trusted local TWG/custom runner already runs with equivalent user authority; specialist receipt classifies this separately from lifecycle defects."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Incomplete comment pagination metadata may overstate coverage",
+      "evidence": "Synthetic partial-comments case reports complete despite total2/maxResults1, but actual TWG --full behavior unavailable.",
+      "why_out_of_scope": "Retained as compatibility verification question, not a confirmed defect without a real producer contract."
+    }
+  ],
+  "outcome": {
+    "external_findings": 2,
+    "external_findings_detail": "Existing bot findings on cross-project text tokens and same-layer BFS refetch are resolved in the frozen head; captured in external-comments.json.",
+    "review_rounds": 1,
+    "human_corrections": 0,
+    "escaped_finding_class": [
+      "site identity collapse",
+      "cross-item evidence contamination"
+    ],
+    "source_changes": false,
+    "github_review_posted": false,
+    "environment_corrections": [
+      "Bun import did not apply the existing Next patch. Pinned frozen pnpm install, rebuild and90 HTTP checks resolve the documentation verification failure.",
+      "Native reviewer was successfully allocated by root; subsidiary fallback failures do not replace the root runtime record.",
+      "Official package smoke passed; preliminary worker statement that it was not run is superseded."
+    ]
+  },
+  "security_review": {
+    "status": "incomplete",
+    "fingerprint": {
+      "repository": "vercel-labs/issue-graph",
+      "base_sha": "55714fa1d45642d00451bc0170aae54de87a966a",
+      "head_sha": "24d9e7d2b211e6eb6bf9bc1ec54f6792bd3bb475",
+      "dirty_digest": "clean",
+      "changed_path_digest": "sha256:570b6e715cfea0e4e836e74e4d8c821c2423076f16adb2fab090ba6ae94cfd5c",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+    },
+    "claim": {
+      "property": "Read-only Jira retrieval, credential delegation, and safe rendering of untrusted Jira values",
+      "attacker": "Jira content author with no assumed control of the installed local TWG executable",
+      "scope": "New Jira command, Node TWG transport and Markdown report"
+    },
+    "trust_model": {
+      "assets": [
+        "caller Jira credentials managed by TWG",
+        "local filesystem and summary artifacts",
+        "report integrity"
+      ],
+      "principals": [
+        {
+          "name": "operator",
+          "authority": "controls argv, environment, selected site and installed binaries"
+        },
+        {
+          "name": "TWG executable",
+          "authority": "runs as the same OS user, has existing Jira credential access"
+        },
+        {
+          "name": "Jira content author",
+          "authority": "can edit accessible issue text and remote links, not assumed to control process stdout envelopes"
+        }
+      ],
+      "boundaries": [
+        "Jira text to graph evidence and Markdown",
+        "operator arguments to execFile argv",
+        "trusted TWG summary to local file read/removal"
+      ],
+      "entrypoints": [
+        "jira subcommand",
+        "JiraReader.getIssue",
+        "TWG stdout/stderr",
+        "Jira issue/comment/remoteLinks values"
+      ],
+      "sinks": [
+        "execFile with fixed command argv and no shell",
+        "JSON and Markdown stdout",
+        "readFile and rm for summary paths"
+      ]
+    },
+    "observations": [
+      {
+        "id": "SEC-1",
+        "classification": "informational",
+        "scope": "unrelated_bug",
+        "prerequisites": [
+          "trusted installed TWG binary"
+        ],
+        "chain": {
+          "capability": "operator selects binary/site",
+          "reachability": "twgJiraClient -> execFile",
+          "control": "operator-controlled argv; remote values do not become shell commands",
+          "boundary": "none demonstrated",
+          "impact": "no credential-reading code or Jira write command found"
+        },
+        "confidence": "high",
+        "evidence": [
+          "src/transports/twg.ts:95-102 uses execFile argument arrays; src/transports/twg.ts:130-131 invokes jira workitem get --full; no token access in new files"
+        ]
+      },
+      {
+        "id": "SEC-2",
+        "classification": "hardening",
+        "scope": "out_of_scope_hardening",
+        "prerequisites": [
+          "TWG stdout supplies absolute paths"
+        ],
+        "chain": {
+          "capability": "installed local executable writes summary path metadata",
+          "reachability": "summaryOutputFiles -> decodeTwgOutput",
+          "control": "trusted local process output, not demonstrated remote issue control",
+          "boundary": "same-OS-user executable already has equivalent filesystem authority",
+          "impact": "restricting cleanup paths would be defense in depth, not a proven privilege gain"
+        },
+        "confidence": "high",
+        "evidence": [
+          "src/transports/twg.ts:39-84; no security payload execution performed"
+        ]
+      },
+      {
+        "id": "SEC-3",
+        "classification": "non_security_defect",
+        "scope": "unrelated_bug",
+        "prerequisites": [
+          "cross-site remote URL or multi-item envelope"
+        ],
+        "chain": {
+          "capability": "ordinary supported data",
+          "reachability": "normalization and graph traversal",
+          "control": "issue links and envelope item contents",
+          "boundary": "no new permissions or unauthorized data access established",
+          "impact": "incorrect graph evidence; routed as F1 and F2"
+        },
+        "confidence": "high",
+        "evidence": [
+          "built-dogfood.json",
+          "packed-batch-cli.json"
+        ]
+      },
+      {
+        "id": "SEC-4",
+        "classification": "verification_gap",
+        "scope": "in_scope_security_regression",
+        "prerequisites": [
+          "real customer TWG build and actual rendered Markdown consumer"
+        ],
+        "chain": {
+          "capability": "unknown beyond static source",
+          "reachability": "real summary-file behavior and downstream Markdown rendering",
+          "control": "not empirically verified",
+          "boundary": "remote content to rendering and temporary-file lifecycle",
+          "impact": "cannot assert complete safety/privacy guarantees from string assertions and a fake producer"
+        },
+        "confidence": "high",
+        "evidence": [
+          "TWG not installed; authored renderer tests only inspect string output; static HTTP(S) URL restriction and escaping reviewed"
+        ]
+      }
+    ],
+    "verification": {
+      "authorized_scope": "Static defensive review and benign owned synthetic fixtures only; no exploits or customer data access",
+      "commands": [
+        "source tracing of src/transports/twg.ts and src/jira.ts",
+        "built-dogfood.json local read failure/cap/summary cases",
+        "bun run test"
+      ],
+      "cleanup": "Owned fixture files remain in Vercel proof directory; successful summary file was removed by tested artifact. Temporary docs server stopped after review.",
+      "gaps": [
+        "Real TWG output and failure cleanup not exercised",
+        "No rendered Markdown consumer or cross-platform security proof"
+      ]
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [
+        "Validate real TWG output envelope ownership and cleanup contract",
+        "Confirm rendered-output safety using a real Markdown consumer"
+      ],
+      "routed_non_security_defects": [
+        "F1",
+        "F2"
+      ]
+    },
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-26-issue-graph-20-24d9e7d/security-review.json"
+  }
+}

@@ -1,0 +1,128 @@
+diff --git a/apps/web/app/(main)/docs/api/core/page.mdx b/apps/web/app/(main)/docs/api/core/page.mdx
+index 020a014..5c728eb 100644
+--- a/apps/web/app/(main)/docs/api/core/page.mdx
++++ b/apps/web/app/(main)/docs/api/core/page.mdx
+@@ -451,6 +451,21 @@ const value = getByPath(state, '/user/name');  // "Alice"
+ setByPath(state, '/user/email', 'alice@example.com');
+ ```
+ 
++Array tokens must use canonical decimal indices: `0` or a non-zero digit
++followed by digits, from `0` through `4294967294`. For example, `/items/1` is
++valid, but `/items/01`, `/items/1.5`, and `/items/1e1` are not. Object keys are
++always literal, so `{ "01": "value" }` can be addressed with `/01` when the
++current value is an object.
++
++`setByPath` and `addByPath` accept a terminal `-` to append to an array.
++Invalid array reads return `undefined`, and invalid writes or removals are
++no-ops. A `-` token is not valid for reads, removals, or intermediate array
++segments.
++
++For prototype safety, path utilities, state stores, and SpecStream patches
++reject JSON Pointer paths containing `__proto__`, `constructor`, or `prototype`
++tokens. Compound patches validate both `path` and `from` before mutating data.
++
+ ### resolveDynamicValue
+ 
+ ```typescript
+diff --git a/apps/web/app/(main)/docs/data-binding/page.mdx b/apps/web/app/(main)/docs/data-binding/page.mdx
+index 6bdc3bb..9fd3a58 100644
+--- a/apps/web/app/(main)/docs/data-binding/page.mdx
++++ b/apps/web/app/(main)/docs/data-binding/page.mdx
+@@ -47,6 +47,17 @@ Given this state:
+ "/todos/1/done"   -> true
+ ```
+ 
++When a token addresses an array, write the index in canonical decimal form:
++`0` or a non-zero digit followed by digits. `/todos/1` is valid; `/todos/01`,
++`/todos/1.5`, and `/todos/1e1` are not. This rule applies only to arrays, so
++an object key named `"01"` remains a literal key. Invalid array paths resolve
++to `undefined` instead of coercing to another item.
++
++For writes, a final `-` token appends to an array (for example,
++`/todos/-`). It cannot be used to read, remove, or traverse through an array.
++Rejected array writes are no-ops and do not create hidden named properties on
++arrays.
++
+ ## Expressions
+ 
+ Expressions are special objects you place in props to read dynamic values instead of hardcoding them. There are six expression types.
+diff --git a/packages/core/README.md b/packages/core/README.md
+index 3e40a08..d7a288e 100644
+--- a/packages/core/README.md
++++ b/packages/core/README.md
+@@ -126,6 +126,8 @@ SpecStream format uses [RFC 6902 JSON Patch](https://datatracker.ietf.org/doc/ht
+ 
+ All six RFC 6902 operations are supported: `add`, `remove`, `replace`, `move`, `copy`, `test`.
+ 
++For prototype safety, JSON Pointer paths containing `__proto__`, `constructor`, or `prototype` tokens are rejected by path utilities, state stores, and SpecStream. This applies to both `path` and `from` in compound patches.
++
+ ### Low-Level Utilities
+ 
+ ```typescript
+@@ -278,6 +280,21 @@ const unsubscribe = store.subscribe(() => {
+ 
+ Pass the store to `StateProvider` in any renderer package (`@json-render/react`, `@json-render/react-native`, `@json-render/react-pdf`) for controlled mode.
+ 
++#### Array paths and no-op writes
++
++When a JSON Pointer token addresses an array, it must be a canonical decimal
++index: `0` or a non-zero digit followed by digits, from `0` through
++`4294967294`. For example, `/items/1` is valid, while `/items/01`,
++`/items/1.5`, and `/items/1e1` are not. Object keys remain literal, so an
++object can still contain a key named `"01"`.
++
++`setByPath` and `addByPath` accept a terminal `-` to append to an array. It is
++not valid for array reads, removals, or intermediate traversal. Invalid array
++writes are no-ops: they do not create named array properties, change a store
++snapshot, or notify subscribers. A batched `update` applies accepted entries
++against the progressively updated snapshot and notifies once only when at
++least one entry changes state.
++
+ ### Store Utilities (for adapter authors)
+ 
+ Available via `@json-render/core/store-utils`:
+@@ -307,6 +324,10 @@ const store = createStoreAdapter({
+ 
+ The official adapter packages (`@json-render/redux`, `@json-render/zustand`, `@json-render/jotai`) are all built on top of `createStoreAdapter`.
+ 
++Like `createStateStore`, adapters skip their `setSnapshot` call when every
++write in a batch is unchanged or rejected. This keeps externally managed
++snapshots stable for all-invalid updates.
++
+ ### Types
+ 
+ | Export | Purpose |
+diff --git a/skills/core/SKILL.md b/skills/core/SKILL.md
+index 7d869db..1eafc60 100644
+--- a/skills/core/SKILL.md
++++ b/skills/core/SKILL.md
+@@ -77,6 +77,8 @@ const { result, newPatches } = compiler.push(chunk);
+ const finalSpec = compiler.getResult();
+ ```
+ 
++JSON Pointer paths containing `__proto__`, `constructor`, or `prototype` tokens are rejected by path utilities, state stores, and SpecStream. For `move` and `copy`, this applies to both `path` and `from`.
++
+ ## Dynamic Prop Expressions
+ 
+ Any prop value can be a dynamic expression resolved at render time:
+@@ -243,6 +245,20 @@ store.subscribe(() => {
+ 
+ The `StateStore` interface: `get(path)`, `set(path, value)`, `update(updates)`, `getSnapshot()`, `subscribe(listener)`.
+ 
++### State path rules
++
++Use JSON Pointer paths. When a token addresses an array, it must be a canonical
++decimal index (`0` or a non-zero digit followed by digits) in the JavaScript
++array-index range. Do not use leading zeros, fractions, signs, exponents, or
++whitespace: use `/items/1`, not `/items/01` or `/items/1e1`. Object keys remain
++literal, including keys such as `"01"`, `""`, and `"-"`.
++
++`set` and `update` accept a final `-` token to append to an array. It is not
++valid for reads, removals, or intermediate array traversal. Invalid array
++writes are silent no-ops: they preserve snapshot identity and do not notify
++subscribers or call an adapter's snapshot writer. A batch applies valid entries
++in order and emits at most one notification/write when state changes.
++
+ ## Key Exports
+ 
+ | Export | Purpose |

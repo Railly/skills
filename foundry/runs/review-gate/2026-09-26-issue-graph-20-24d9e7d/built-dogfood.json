@@ -1,0 +1,628 @@
+[
+  {
+    "case": "happy",
+    "command": [
+      "node",
+      "/Users/raillyhugo/Programming/vercel/issue-graph-review-pr20/dist/bin.js",
+      "jira",
+      "PROJ-1",
+      "--site",
+      "site-a",
+      "--depth",
+      "1",
+      "--json"
+    ],
+    "exitCode": 0,
+    "stderr": "",
+    "report": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:28:50.124Z",
+      "site": "site-a",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 1,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": true,
+      "coverage": {
+        "fetched": 1,
+        "failed": [],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Root",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://site-a.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1"
+        ]
+      ]
+    },
+    "calls": [
+      {
+        "key": "PROJ-1",
+        "args": [
+          "--site",
+          "site-a",
+          "--output",
+          "json",
+          "--output-summary=none",
+          "jira",
+          "workitem",
+          "get",
+          "PROJ-1",
+          "--full"
+        ]
+      }
+    ],
+    "summaryFileRemains": false
+  },
+  {
+    "case": "cross-site",
+    "command": [
+      "node",
+      "/Users/raillyhugo/Programming/vercel/issue-graph-review-pr20/dist/bin.js",
+      "jira",
+      "PROJ-1",
+      "--site",
+      "site-a",
+      "--depth",
+      "1",
+      "--json"
+    ],
+    "exitCode": 0,
+    "stderr": "",
+    "report": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:28:50.252Z",
+      "site": "site-a",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 1,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": true,
+      "coverage": {
+        "fetched": 2,
+        "failed": [],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Root",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://site-a.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [
+            {
+              "to": "jira:PROJ-2",
+              "via": "remote-link",
+              "url": "https://site-b.atlassian.net/browse/PROJ-2"
+            }
+          ],
+          "externalLinks": [
+            "https://site-b.atlassian.net/browse/PROJ-2"
+          ]
+        },
+        {
+          "key": "jira:PROJ-2",
+          "source": "jira",
+          "issueKey": "PROJ-2",
+          "title": "Unrelated local issue",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://site-a.atlassian.net/browse/PROJ-2",
+          "depth": 1,
+          "fetched": true,
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1",
+          "jira:PROJ-2"
+        ]
+      ]
+    },
+    "calls": [
+      {
+        "key": "PROJ-1",
+        "args": [
+          "--site",
+          "site-a",
+          "--output",
+          "json",
+          "--output-summary=none",
+          "jira",
+          "workitem",
+          "get",
+          "PROJ-1",
+          "--full"
+        ]
+      },
+      {
+        "key": "PROJ-2",
+        "args": [
+          "--site",
+          "site-a",
+          "--output",
+          "json",
+          "--output-summary=none",
+          "jira",
+          "workitem",
+          "get",
+          "PROJ-2",
+          "--full"
+        ]
+      }
+    ],
+    "summaryFileRemains": false
+  },
+  {
+    "case": "non-jira",
+    "command": [
+      "node",
+      "/Users/raillyhugo/Programming/vercel/issue-graph-review-pr20/dist/bin.js",
+      "jira",
+      "PROJ-1",
+      "--site",
+      "site-a",
+      "--depth",
+      "1",
+      "--json"
+    ],
+    "exitCode": 0,
+    "stderr": "",
+    "report": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:28:50.409Z",
+      "site": "site-a",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 1,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": true,
+      "coverage": {
+        "fetched": 2,
+        "failed": [],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Root",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://site-a.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [
+            {
+              "to": "jira:PROJ-2",
+              "via": "remote-link",
+              "url": "https://docs.example.test/browse/PROJ-2"
+            }
+          ],
+          "externalLinks": [
+            "https://docs.example.test/browse/PROJ-2"
+          ]
+        },
+        {
+          "key": "jira:PROJ-2",
+          "source": "jira",
+          "issueKey": "PROJ-2",
+          "title": "Unrelated local issue",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://site-a.atlassian.net/browse/PROJ-2",
+          "depth": 1,
+          "fetched": true,
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1",
+          "jira:PROJ-2"
+        ]
+      ]
+    },
+    "calls": [
+      {
+        "key": "PROJ-1",
+        "args": [
+          "--site",
+          "site-a",
+          "--output",
+          "json",
+          "--output-summary=none",
+          "jira",
+          "workitem",
+          "get",
+          "PROJ-1",
+          "--full"
+        ]
+      },
+      {
+        "key": "PROJ-2",
+        "args": [
+          "--site",
+          "site-a",
+          "--output",
+          "json",
+          "--output-summary=none",
+          "jira",
+          "workitem",
+          "get",
+          "PROJ-2",
+          "--full"
+        ]
+      }
+    ],
+    "summaryFileRemains": false
+  },
+  {
+    "case": "partial-comments",
+    "command": [
+      "node",
+      "/Users/raillyhugo/Programming/vercel/issue-graph-review-pr20/dist/bin.js",
+      "jira",
+      "PROJ-1",
+      "--site",
+      "site-a",
+      "--depth",
+      "1",
+      "--json"
+    ],
+    "exitCode": 0,
+    "stderr": "",
+    "report": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:28:50.513Z",
+      "site": "site-a",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 1,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": true,
+      "coverage": {
+        "fetched": 1,
+        "failed": [],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Root",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://site-a.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1"
+        ]
+      ]
+    },
+    "calls": [
+      {
+        "key": "PROJ-1",
+        "args": [
+          "--site",
+          "site-a",
+          "--output",
+          "json",
+          "--output-summary=none",
+          "jira",
+          "workitem",
+          "get",
+          "PROJ-1",
+          "--full"
+        ]
+      }
+    ],
+    "summaryFileRemains": false
+  },
+  {
+    "case": "failure",
+    "command": [
+      "node",
+      "/Users/raillyhugo/Programming/vercel/issue-graph-review-pr20/dist/bin.js",
+      "jira",
+      "PROJ-1",
+      "--site",
+      "site-a",
+      "--depth",
+      "1",
+      "--json"
+    ],
+    "exitCode": 1,
+    "stderr": "INCOMPLETE_JIRA_GRAPH: inspect coverage.failed and coverage.cappedOut before acting.\n",
+    "report": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:28:50.595Z",
+      "site": "site-a",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 1,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": false,
+      "coverage": {
+        "fetched": 0,
+        "failed": [
+          "PROJ-1"
+        ],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "",
+          "status": "UNKNOWN",
+          "issueType": "Issue",
+          "url": "",
+          "depth": 0,
+          "fetched": false,
+          "fetchError": "twg jira workitem get failed: fixture read denied",
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1"
+        ]
+      ]
+    },
+    "calls": [
+      {
+        "key": "PROJ-1",
+        "args": [
+          "--site",
+          "site-a",
+          "--output",
+          "json",
+          "--output-summary=none",
+          "jira",
+          "workitem",
+          "get",
+          "PROJ-1",
+          "--full"
+        ]
+      }
+    ],
+    "summaryFileRemains": false
+  },
+  {
+    "case": "cap",
+    "command": [
+      "node",
+      "/Users/raillyhugo/Programming/vercel/issue-graph-review-pr20/dist/bin.js",
+      "jira",
+      "PROJ-1",
+      "--site",
+      "site-a",
+      "--depth",
+      "1",
+      "--json",
+      "--max-nodes",
+      "1"
+    ],
+    "exitCode": 1,
+    "stderr": "INCOMPLETE_JIRA_GRAPH: inspect coverage.failed and coverage.cappedOut before acting.\n",
+    "report": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:28:50.683Z",
+      "site": "site-a",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 1,
+        "maxNodes": 1,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": false,
+      "coverage": {
+        "fetched": 1,
+        "failed": [],
+        "cappedOut": [
+          "jira:PROJ-2"
+        ]
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Root",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://site-a.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [
+            {
+              "to": "jira:PROJ-2",
+              "via": "issue-link"
+            }
+          ],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1"
+        ]
+      ]
+    },
+    "calls": [
+      {
+        "key": "PROJ-1",
+        "args": [
+          "--site",
+          "site-a",
+          "--output",
+          "json",
+          "--output-summary=none",
+          "jira",
+          "workitem",
+          "get",
+          "PROJ-1",
+          "--full"
+        ]
+      }
+    ],
+    "summaryFileRemains": false
+  },
+  {
+    "case": "summary",
+    "command": [
+      "node",
+      "/Users/raillyhugo/Programming/vercel/issue-graph-review-pr20/dist/bin.js",
+      "jira",
+      "PROJ-1",
+      "--site",
+      "site-a",
+      "--depth",
+      "1",
+      "--json"
+    ],
+    "exitCode": 0,
+    "stderr": "",
+    "report": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:28:50.815Z",
+      "site": "site-a",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 1,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": true,
+      "coverage": {
+        "fetched": 1,
+        "failed": [],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Root",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://site-a.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1"
+        ]
+      ]
+    },
+    "calls": [
+      {
+        "key": "PROJ-1",
+        "args": [
+          "--site",
+          "site-a",
+          "--output",
+          "json",
+          "--output-summary=none",
+          "jira",
+          "workitem",
+          "get",
+          "PROJ-1",
+          "--full"
+        ]
+      },
+      {
+        "key": "PROJ-1",
+        "args": [
+          "--site",
+          "site-a",
+          "--output",
+          "json",
+          "--output-summary=stats",
+          "jira",
+          "workitem",
+          "get",
+          "PROJ-1",
+          "--full"
+        ]
+      }
+    ],
+    "summaryFileRemains": false
+  }
+]

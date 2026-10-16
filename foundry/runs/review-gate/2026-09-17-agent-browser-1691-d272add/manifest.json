@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "repository": "vercel-labs/agent-browser",
+  "pr": 1691,
+  "target": {
+    "path": "/Users/raillyhugo/Programming/vercel/agent-browser-1691-fix",
+    "head": "d272adda97a8c4d94d2111c846a304c0c0e4b0fa",
+    "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+    "dirty_digest": "clean",
+    "changed_paths_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83"
+  },
+  "authorization": {
+    "request": "$solution-gate for it, so we can clone the branch and push our changes towards it + coauthoring to the respective author",
+    "scope": "solution shaping, implementation, isolated tests, signed fix commits preserving contributor credit, push updates to PR branch; no merge or release",
+    "runtime_authorization": "User explicitly permits FX with Keychain API key, Claude CLI or Codex CLI."
+  },
+  "profile": "external-pr",
+  "risk": "high",
+  "risk_triggers": [
+    "remote billable browser creation and cleanup",
+    "process lifecycle",
+    "API credential handling"
+  ],
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "runtime": {
+    "execution_mode": "claude_cli_and_gateway_isolated",
+    "degraded_from": "fx_worker",
+    "independence_gap": null
+  },
+  "stages": {
+    "security_review": {
+      "status": "pass",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-d272add/security-review.json",
+      "fingerprint": {
+        "repository": "vercel-labs/agent-browser",
+        "base_sha": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+        "head_sha": "d272adda97a8c4d94d2111c846a304c0c0e4b0fa",
+        "dirty_digest": "clean",
+        "changed_path_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+      }
+    },
+    "previous_review": {
+      "status": "incomplete",
+      "verdict": "incomplete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/run-report.json",
+      "head": "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+      "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+      "dirty_digest": "clean",
+      "changed_paths_digest": "sha256:9097d5b19b97d4b2cfe0f704d61fe9dca24f179bcca1a652723ac494af694005",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "confirmed_findings": [
+        "F1",
+        "F2"
+      ],
+      "gaps": [
+        "Required exact-head passing Test Strength receipt is unavailable. Authored green tests do not establish fix-absent falsification or a complete provider protocol matrix.",
+        "Required exact-head passing Resilience Audit receipt is unavailable. The two focused failure probes do not cover all post-create/CDP/cleanup ownership partitions.",
+        "No BROWSER_USE_API_KEY was present in the environment; live Cloud create, CDP attach, profile persistence, recording, stop and billing observations remain unverified.",
+        "Native reviewer is another OpenAI-family context and author model is unknown. Saved official API contract supplies an independent protocol oracle, but there is no complete cross-family lifecycle challenge.",
+        "Successful create with id but absent/null cdpUrl is permitted by the response schema and loses cleanup ownership in the parser. No live active-browser instance of that shape was observed; it remains a producer-verification gap."
+      ],
+      "report_digest": "sha256:20036ab9173ff0e773db74c609b14811cda7923c860bc32d8e0176a385ce5c21",
+      "independent_artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/independent-correctness-review.json",
+      "validation": {
+        "command": "gate.sh report run-report.json",
+        "exit_code": 1,
+        "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/validation.log",
+        "meaning": "Promotion rejected for confirmed open findings and explicit proof gaps. No invalid schema fields or identity mismatches remain."
+      },
+      "finished_at": "2026-09-17T06:43:40.513737+00:00"
+    },
+    "solution": {
+      "status": "pass",
+      "mode": "candidate-audit",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "started_at": "2026-09-17T06:48:18.218494+00:00",
+      "execution_mode": "claude_cli_and_gateway_isolated",
+      "degraded_from": "fx_worker",
+      "independence_gap": null,
+      "budget_ms": 1800000,
+      "runtime_failures": [
+        "FX v0.0.10 reports auth missing with Keychain credential environment",
+        "Codex CLI not logged in; 401",
+        "Native OpenAI agents returned only instruction acknowledgments, no requested contract analysis"
+      ],
+      "verdict": "Pass to detail",
+      "candidate_disposition": "amend",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/selected-shape.md",
+      "completed_at": "2026-09-17T07:03:34.756990+00:00",
+      "feedback": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/shape-feedback.md",
+      "open_flag": null,
+      "final_shape": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/timing-feedback.md",
+      "timing_correction": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/timing-correction.md",
+      "final_amendment": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/final-shape-amendment.md"
+    },
+    "implementation": {
+      "status": "complete",
+      "execution_mode": "claude_cli",
+      "session_id": null,
+      "worktree": "/Users/raillyhugo/Programming/vercel/agent-browser-1691-fix",
+      "branch": "fix/browser-use-v4-lifecycle-1691",
+      "initial_shape": "C1-C6",
+      "required_followup": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/implementation-c7-corrections.md",
+      "owned_by": "parent after all Claude writers exited",
+      "tests_target_dir": "/Users/raillyhugo/Programming/vercel/agent-browser-1691-probe-build",
+      "latest_focused_tests": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/final-focused.log",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/final-source-identity.json"
+    },
+    "test_strength": {
+      "status": "incomplete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-d272add/test-strength.json",
+      "fingerprint": {
+        "head_sha": "d272adda97a8c4d94d2111c846a304c0c0e4b0fa",
+        "base_sha": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+        "dirty_digest": "clean",
+        "changed_paths_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83",
+        "contract_digest": "sha256:9f7393cfc54f6bb0f97cb1a93745eaffbafba7c287298be4a57e7a585b761efd",
+        "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; seven reversible production mutations; built CLI dogfood/continuity/idle proofs",
+        "environment_digest": "sha256:106d9fe5308898de1969757545a061b7cf3e6aee394cf5c3c7ba7f9350422aa8",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "README.md",
+          "cli/src/native/actions.rs",
+          "cli/src/native/providers.rs",
+          "cli/src/output.rs",
+          "docs/src/app/providers/browser-use/page.mdx",
+          "skill-data/core/references/commands.md"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "source_identity": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/final-source-identity.json"
+      }
+    },
+    "resilience": {
+      "status": "incomplete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-d272add/resilience.json",
+      "fingerprint": {
+        "head_sha": "d272adda97a8c4d94d2111c846a304c0c0e4b0fa",
+        "base_sha": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+        "dirty_digest": "clean",
+        "changed_paths_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83",
+        "contract_digest": "sha256:9f7393cfc54f6bb0f97cb1a93745eaffbafba7c287298be4a57e7a585b761efd",
+        "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; seven reversible production mutations; built CLI dogfood/continuity/idle proofs",
+        "environment_digest": "sha256:106d9fe5308898de1969757545a061b7cf3e6aee394cf5c3c7ba7f9350422aa8",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "README.md",
+          "cli/src/native/actions.rs",
+          "cli/src/native/providers.rs",
+          "cli/src/output.rs",
+          "docs/src/app/providers/browser-use/page.mdx",
+          "skill-data/core/references/commands.md"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "source_identity": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/final-source-identity.json"
+      }
+    },
+    "review": {
+      "status": "incomplete",
+      "verdict": "incomplete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-d272add/run-report.json",
+      "head": "d272adda97a8c4d94d2111c846a304c0c0e4b0fa",
+      "gaps": [
+        "No live Browser Use Cloud credential: hosted create/CDP/stop, billing, profile persistence, recording and repeated-stop semantics remain unverified.",
+        "A positive stop is covered by real HTTP adapter bytes, while caller retries are covered separately; successful stop through the complete CLI wire was not exercised.",
+        "Seven critical mutations were killed, but exhaustive per-partition parser/caller mutations, property generation and structured fuzz campaigns were not run.",
+        "Windows/filesystem-specific fault partitions, receipt deletion permission failure, post-attach provider state-load rollback and cancellation during stream status publication were not directly forced."
+      ],
+      "validation": {
+        "command": "gate.sh report run-report.json",
+        "exit_code": 1,
+        "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-d272add/validation.log",
+        "meaning": "No schema or identity mismatch; promotion incomplete for explicit Cloud and specialist proof gaps."
+      },
+      "completed_at": "2026-09-17T14:54:44.732595+00:00"
+    }
+  },
+  "missing_upstream": [
+    "passing test_strength",
+    "passing resilience"
+  ],
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/reconciled-contract.md",
+    "digest": "sha256:9f7393cfc54f6bb0f97cb1a93745eaffbafba7c287298be4a57e7a585b761efd",
+    "amendment": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/final-shape-amendment.md"
+  },
+  "created_at": "2026-09-17T06:27:56.929110+00:00",
+  "budget": {
+    "review_wall_time_ms": 1800000,
+    "independent_review_timeout_ms": 600000
+  },
+  "upstream_review_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/manifest.json",
+  "commit": {
+    "sha": "d272adda97a8c4d94d2111c846a304c0c0e4b0fa",
+    "signed": true,
+    "author": "Railly Hugo <railly.hugoquispe@vercel.com>",
+    "coauthor": "Magnus M\u00fcller <mamagnus00@gmail.com>"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/agent-browser",
+    "base_sha": "fad34d20403e67619cde5340731575745e2762e6",
+    "head_sha": "498ee9bc59e6451db7be31a6c7c8d637c77e1ad0",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:7e35523a2fa94c0a7a43323b71a04614a761e2bcfd6b471731ee49c14d09f9dd",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-tree:1b2b7858d65a24124a3f49ac29c85825eb893f99"
+  },
+  "claim": {
+    "property": "The test reduction introduces no new runtime credential exposure or authorization change.",
+    "attacker": "Page script on an already authorized origin or an unrelated origin; same principals as parent review.",
+    "scope": "Only parent-to-reduction diff; does not re-certify the full parent implementation."
+  },
+  "trust_model": {
+    "assets": [
+      "User credential store",
+      "Disposable test credentials",
+      "Selected DOM destination"
+    ],
+    "principals": [
+      "Local test runner already owns local credential permissions",
+      "Authorized origin already controls its DOM",
+      "Unrelated origin remains rejected by existing E2E"
+    ],
+    "boundaries": [
+      "Saved credentials to authorized login page; runtime paths byte-identical"
+    ],
+    "entrypoints": [
+      "Existing test auth_save/auth_login/auth_delete and local HTTP/CDP fixtures"
+    ],
+    "sinks": [
+      "Existing credential filling",
+      "Ephemeral saved test profile"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-REDUCTION-1",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": [],
+      "confidence": "high",
+      "evidence": [
+        "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/production-and-lint-proof.json",
+        "/Users/raillyhugo/Programming/railly/skills/foundry/runs/simplify/2026-09-28-agent-browser-2014/auth-final.log"
+      ],
+      "chain": {
+        "capability": "Same local runner and page-origin authority as parent.",
+        "reachability": "Changes are entirely under cfg(test) or E2E test module.",
+        "control": "Only disposable local profile and page fixtures changed.",
+        "boundary": "No runtime trust boundary changes.",
+        "impact": "No new principal gains credentials or authority."
+      }
+    }
+  ],
+  "verification": {
+    "authorized_scope": "User-authorized local test reduction and existing PR update.",
+    "commands": [
+      "git diff parent -- two test paths",
+      "cargo test e2e_auth_login -- --ignored --test-threads=1",
+      "byte comparison of production prefix to parent"
+    ],
+    "cleanup": "Consolidated E2E removes its saved profile, closes the browser and aborts fixture before final row assertions; final run passes.",
+    "gaps": []
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": []
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-2014-test-reduction/security-review.json"
+}

@@ -1,0 +1,63 @@
+{
+  "name": "portless",
+  "version": "0.15.6",
+  "description": "Replace port numbers with stable, named .localhost URLs. For humans and agents.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "bin": {
+    "portless": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "prepublishOnly": "cp ../../README.md . && pnpm build",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "local",
+    "development",
+    "proxy",
+    "localhost"
+  ],
+  "author": "Vercel Labs",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vercel-labs/portless.git"
+  },
+  "homepage": "https://portless.sh",
+  "bugs": {
+    "url": "https://github.com/vercel-labs/portless/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.4",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^9.39.2",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vitest": "^4.0.18"
+  }
+}

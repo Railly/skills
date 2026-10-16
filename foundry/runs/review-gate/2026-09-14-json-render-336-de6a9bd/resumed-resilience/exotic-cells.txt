@@ -1,0 +1,44 @@
+
+cell('C11', 'accessor refuses read before immutable commit and retry succeeds', t => {
+  let fault = true, writes = 0;
+  const items = ['a'];
+  let snapshot: any = Object.defineProperty({ count: 0 }, 'items', { enumerable: true, get: () => { if (fault) throw new Error('accessor-refused'); return items; } });
+  const before = snapshot;
+  const adapter = createStoreAdapter({ getSnapshot: () => snapshot, setSnapshot: n => { snapshot = n; writes++; }, subscribe: () => () => {} });
+  expect(() => adapter.set('/items/0', 'b')).toThrow('accessor-refused');
+  const atFault = { same_snapshot: snapshot === before, writes, original_array: [...items] };
+  fault = false; adapter.set('/items/0', 'b');
+  t.observations.push({ atFault, after_retry: copy(snapshot), writes, original_array: [...items] });
+  expect(atFault.same_snapshot).toBe(true); expect(atFault.writes).toBe(0); expect(writes).toBe(1); expect(items).toEqual(['a']);
+  t.cleanup = { owner: 'accessor/adapter owner', deadline: 'before immediate retry', fault_disabled: true, pending: 0 };
+});
+
+cell('C12', 'frozen destination throws after source removal, then immediate retry', t => {
+  for (const mode of ['frozen', 'throwing-setter']) {
+    let obj: any = { source: 'keep', locked: { value: 'before' } };
+    if (mode === 'frozen') Object.freeze(obj.locked);
+    else Object.defineProperty(obj.locked, 'value', { enumerable: true, configurable: true, get: () => 'before', set: () => { throw new Error('setter-refused'); } });
+    const before = copy(obj); let error: any;
+    try { applySpecStreamPatch(obj, { op: 'move', from: '/source', path: '/locked/value' }); } catch (e: any) { error = e.message; }
+    const afterFault = copy(obj); const sourceGone = !Object.hasOwn(obj, 'source');
+    obj.locked = { value: 'before' };
+    applySpecStreamPatch(obj, { op: 'move', from: '/source', path: '/locked/value' });
+    const retried = copy(obj);
+    obj.source = before.source;
+    applySpecStreamPatch(obj, { op: 'move', from: '/source', path: '/locked/value' });
+    t.observations.push({ mode, before, error, afterFault, sourceGone, after_immediate_retry: retried, explicit_compensation: copy(obj) });
+    expect(error).toBeTruthy(); expect(sourceGone).toBe(true); expect(obj.locked.value).toBe('keep');
+  }
+  t.result = 'corrupted state on non-JSON frozen/accessor destination; same retry cannot restore source; compare base, not automatically a PR regression';
+  t.cleanup = { owner: 'caller supplying non-JSON object', deadline: 'before safe retry', action: 'replace failing destination and restore source from independent snapshot', automatic_rollback: false };
+});
+
+cell('C13', 'unrelated cyclic branch survives repeated rejected move without traversal', t => {
+  const cycle: any = { label: 'cycle' }; cycle.self = cycle;
+  const obj: any = { source: 'keep', items: ['a', 'b'], unrelated: cycle };
+  for (let i = 0; i < 100; i++) applySpecStreamPatch(obj, { op: 'move', from: '/source', path: '/items/01' });
+  t.observations.push({ repeats: 100, same_cycle: obj.unrelated === cycle, cycle_intact: obj.unrelated.self === cycle, source_present: Object.hasOwn(obj, 'source'), items: copy(obj.items) });
+  expect(obj.unrelated).toBe(cycle); expect(obj.unrelated.self).toBe(cycle);
+  if (head) expect(obj.source).toBe('keep');
+  t.cleanup = { owner: 'caller drops graph after operation', deadline: 'test return', garbage_collection: 'gap; identity invariant only' };
+});

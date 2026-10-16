@@ -1,0 +1,108 @@
+{
+  "phase": "immediate-recovery",
+  "fault": "none",
+  "command": [
+    "/Users/raillyhugo/.nvm/versions/node/v24.18.0/bin/node",
+    "--require",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/preload.cjs",
+    "/tmp/portless-review-424-fad78e9c/packages/portless/dist/cli.js",
+    "hosts",
+    "sync"
+  ],
+  "cwd": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-empty-initial-read-uid0",
+  "environment": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-empty-initial-read-uid0/home",
+    "TMPDIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-empty-initial-read-uid0/tmp",
+    "NO_COLOR": "1",
+    "PORTLESS_STATE_DIR": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-empty-initial-read-uid0/state",
+    "PORTLESS_PORT": "65431",
+    "PORTLESS_SYNC_HOSTS": "1",
+    "AUDIT_ROOT": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience",
+    "AUDIT_HOSTS": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-empty-initial-read-uid0/hosts",
+    "AUDIT_TRACE": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-empty-initial-read-uid0/immediate-recovery.jsonl",
+    "AUDIT_FAULT": "none",
+    "AUDIT_UID": "0",
+    "AUDIT_SUDO": "1"
+  },
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "stdout": "No stale portless entries remain in /etc/hosts.\n",
+  "stderr": "",
+  "durationMs": 77.424084,
+  "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+  "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n",
+  "reads": 2,
+  "writes": 1,
+  "sudoCalls": 0,
+  "events": [
+    {
+      "time": "2026-09-14T18:45:42.440Z",
+      "op": "preload-ready",
+      "fault": "none",
+      "uid": 0,
+      "pid": 62096,
+      "node": "v24.18.0",
+      "platform": "darwin"
+    },
+    {
+      "time": "2026-09-14T18:45:42.466Z",
+      "op": "network-blocked",
+      "result": "ECONNREFUSED"
+    },
+    {
+      "time": "2026-09-14T18:45:42.468Z",
+      "op": "network-blocked",
+      "result": "ECONNREFUSED"
+    },
+    {
+      "time": "2026-09-14T18:45:42.470Z",
+      "op": "read",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-empty-initial-read-uid0/hosts",
+      "ordinal": 1,
+      "result": "ok"
+    },
+    {
+      "time": "2026-09-14T18:45:42.471Z",
+      "op": "write",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-empty-initial-read-uid0/hosts",
+      "ordinal": 1,
+      "outcome": "ok",
+      "before": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n\n# portless-start\n127.0.0.1 stale.localhost\n# portless-end\n",
+      "intended": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n",
+      "after": "127.0.0.1 localhost\n::1 localhost\n192.0.2.19 keep.example\n"
+    },
+    {
+      "time": "2026-09-14T18:45:42.471Z",
+      "op": "read",
+      "path": "/etc/hosts",
+      "redirected": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/fixtures/sync-empty-initial-read-uid0/hosts",
+      "ordinal": 2,
+      "result": "ok"
+    },
+    {
+      "time": "2026-09-14T18:45:42.472Z",
+      "op": "exit",
+      "code": 0,
+      "reads": 2,
+      "writes": 1,
+      "memory": {
+        "rss": 65404928,
+        "heapTotal": 13615104,
+        "heapUsed": 9947496,
+        "external": 4016478,
+        "arrayBuffers": 146599
+      },
+      "activeResources": [
+        "PipeWrap",
+        "PipeWrap",
+        "PipeWrap"
+      ]
+    }
+  ],
+  "unrelatedPreserved": true,
+  "routesUnchanged": true
+}

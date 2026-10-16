@@ -1,0 +1,31 @@
+   Compiling agent-browser v0.38.1 (/Users/raillyhugo/Programming/vercel/agent-browser-1691-fix/cli)
+warning: unused variable: `deadline`
+   --> src/native/providers.rs:415:5
+    |
+415 |     deadline: Duration,
+    |     ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_deadline`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `agent-browser` (bin "agent-browser" test) generated 1 warning (run `cargo fix --bin "agent-browser" -p agent-browser --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.57s
+     Running unittests src/main.rs (/Users/raillyhugo/Programming/vercel/agent-browser-1691-probe-build/debug/deps/agent_browser-445f2c75b50aa6d3)
+
+running 1 test
+test native::providers::tests::test_browser_use_create_and_stop_body_deadlines ... FAILED
+
+failures:
+
+---- native::providers::tests::test_browser_use_create_and_stop_body_deadlines stdout ----
+
+thread 'native::providers::tests::test_browser_use_create_and_stop_body_deadlines' (33215723) panicked at src/native/providers.rs:1191:13:
+assertion failed: result.unwrap_err().contains("timed out")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    native::providers::tests::test_browser_use_create_and_stop_body_deadlines
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1530 filtered out; finished in 0.52s
+
+error: test failed, to rerun pass `--bin agent-browser`

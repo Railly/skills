@@ -1,0 +1,139 @@
+{
+  "kind": "independent-focused-review",
+  "schema_version": 1,
+  "repository": "vercel-labs/agent-browser",
+  "head": "323449d9618693c85d2191f7dd10010ad22f640b",
+  "base": "eb05921bad874cd2a1b4fa5d1149f1ed26576cae",
+  "dirty_digest": "clean",
+  "reviewer_runtime": "native_subagent",
+  "reviewer_model": "GPT-6 Astra",
+  "author_model": "unknown",
+  "independence_gap": "Diff author model unknown; this is a distinct native reviewer context, not established cross-family independence. Browser observations are independently specified fixture oracles.",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "scope": "Read changed selection implementation, handlers, MCP/parser surfaces, docs, and contributor e2e fixtures; reproduce nonempty filter and popup-removal edge cases through exact built CLI. No target source edits.",
+  "environment": {
+    "os": "macOS 26.6.2 (25G83)",
+    "rustc": "1.98.1 (48a229cea 2026-09-01)",
+    "binary_sha256": "64cf637b12b8cf82693163597b82e6721224f4266f261376ded0d3476ed51605",
+    "namespace": "rg1770-independent-20260909"
+  },
+  "findings": [
+    {
+      "id": "IR1",
+      "state": "confirmed",
+      "severity": "P2",
+      "path": "cli/src/native/interaction.rs",
+      "line_start": 1149,
+      "line_end": 1155,
+      "title": "Clear a nonempty filter with a supported browser editing operation",
+      "claim": "On macOS the newly added Meta+A/Backspace filter replacement leaves all but the last character of the previous value, then appends the requested filter. Selecting Blue from an input initially containing Red sends ReBlue and fails to discover Blue.",
+      "evidence": "independent-dogfood.json entries 1-3: input events Red, Re, ReB, ReBl, ReBlu, ReBlue; final value ReBlue; zero commits; select failed after 0.765 s with a 700 ms timeout.",
+      "mechanism": "press_key_with_modifiers sends CDP Meta+A without the macOS selectAll edit command. The combo selection branch assumes it selected all and then Backspace removes one character. This is a new consumer of the existing helper.",
+      "resolution": "open"
+    },
+    {
+      "id": "IR2",
+      "state": "exempted",
+      "severity": null,
+      "path": "cli/src/native/interaction.rs",
+      "line_start": 1620,
+      "line_end": 1623,
+      "title": "Filtered popup removal with unchanged value cannot satisfy conservative verification",
+      "claim": "The real click commits Blue and unmounts the popup, but select rejects because filtering already set the input to Blue before activation.",
+      "evidence": "independent-dogfood.json entries 4-6: commit log [blue], final input Blue, aria-expanded false, no remaining options, select returns timeout.",
+      "resolution": "not_applicable",
+      "exemption": "The fixture supplies no distinct standard committed-state change after filtering. PR explicitly rejects unverifiable controls, and popup closure plus unchanged text is indistinguishable from filter cancellation. Kept as empirical support limitation, not a separate blocker; alias-to-label mismatch in parent dogfood is stronger."
+    }
+  ],
+  "additional_confirmed_source_observations": [
+    {
+      "claim": "Active-descendant Enter branch has no timeout check before its continue.",
+      "path": "cli/src/native/interaction.rs:1277",
+      "evidence": "Source confirms existing external review; parent dogfood independently measured over-budget repeated Enter."
+    },
+    {
+      "claim": "Known aria-selected options can return true without activation or checking active-descendant commitment.",
+      "path": "cli/src/native/interaction.rs:1603-1612",
+      "evidence": "Source confirms parent dogfood false-success path."
+    },
+    {
+      "claim": "Unmounted popup fallback compares committed values only to requested strings, dropping previously observed option aliases.",
+      "path": "cli/src/native/interaction.rs:1632-1637",
+      "evidence": "Source confirms parent value ca -> display Canada false rejection."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "inverse regression surface",
+      "status": "run",
+      "evidence": "Native behavior inspected; existing primitive called by new filter branch surfaced Mac input corruption."
+    },
+    {
+      "name": "new-domain matrix",
+      "status": "run",
+      "evidence": "Crossed empty/nonempty input, surviving/removed option state, exact request vs value-label alias, active-descendant vs click; no exhaustive coverage claimed."
+    },
+    {
+      "name": "resolution-rule consistency across consumers",
+      "status": "run",
+      "evidence": "Native JS normalizes labels while ARIA helper treats explicit label exact; fallback loses value-label mapping. Parent alias finding."
+    },
+    {
+      "name": "boundary pipeline trace",
+      "status": "run",
+      "evidence": "CLI select -> handle_select -> select_option -> select_aria_option -> CDP keyboard; real input event sequence observed."
+    },
+    {
+      "name": "error-path forcing",
+      "status": "run",
+      "evidence": "Two failed select calls inspected post-state; both sessions closed cleanly."
+    },
+    {
+      "name": "cancellation and timeout hygiene",
+      "status": "run",
+      "evidence": "Source confirms unbounded Enter loop, already independently driven by parent."
+    },
+    {
+      "name": "newly-asserted invariant ownership",
+      "status": "run",
+      "evidence": "Selection verification predicates distinguish navigation and commitment incompletely; parent aria-selected false success."
+    },
+    {
+      "name": "docs-behavior parity",
+      "status": "run",
+      "evidence": "Explicit unsupported/unverifiable boundary prevents overclaiming filtered-removal case as a defect; Mac filter path contradicts documented typing semantics."
+    },
+    {
+      "name": "complexity budget",
+      "status": "run",
+      "evidence": "State collection is O(N*V) plus DOM style/geometry per option; enumeration uses Set for option dedup. Unbounded repeated Enter is the concrete cost defect."
+    }
+  ],
+  "verification_gaps": [
+    "Linux/Windows remote-browser modifier behavior not exercised.",
+    "No source mutations performed by independent reviewer.",
+    "No claimed complete Test Strength or Resilience stage receipt; delegated Test Strength owns its separate artifacts."
+  ],
+  "artifacts": [
+    "independent-dogfood.py",
+    "independent-dogfood.json",
+    "xref.json",
+    "xref.log"
+  ],
+  "runtime_failures": [
+    {
+      "operation": "FX reviewer wrapper",
+      "schema_failures": 1,
+      "message": "fx reported unsupported auth mode: missing",
+      "identical_retry": false,
+      "fallback": "native_subagent"
+    },
+    {
+      "operation": "spawn Test Strength native specialist",
+      "schema_failures": 1,
+      "message": "Empty reasoning_effort optional string rejected; corrected with concrete supported arguments",
+      "identical_retry": false
+    }
+  ],
+  "verdict": "findings"
+}

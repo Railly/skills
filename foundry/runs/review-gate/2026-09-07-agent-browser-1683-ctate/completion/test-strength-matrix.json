@@ -1,0 +1,101 @@
+{
+  "scope": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/completion/scope.json",
+  "partition_basis": "Clases por propiedad y dueño de falla, derivadas de R0-R4 y ciclo Chrome/proceso/archivo. No es el producto cartesiano de todos los flags y transportes.",
+  "dimensions": [
+    "prior false/true; request true/omitted/false; close resets",
+    "explicit URL/port; implicit CDP; first CLI request; skip/policy deny/pending",
+    "invalid mode, refused transport, malformed storage, binding-write failure, malformed implicit action",
+    "default/A/B downloads; sequential/concurrent A/B; bytes and previous directory configuration",
+    "pinned default to isolated; successful reuse/reconnect; browser restart; daemon restart; recording",
+    "reconexión a contexto persistido + error de acción conserva conexión; recreación ya persistida + launch inválido conserva contexto",
+    "target desaparecido antes del commit: contexto nuevo falla y se dispone; contexto persistido conserva binding e intención",
+    "auto-connect real, drain final real, corte de disposición, SIGKILL antes de binding; reintento inmediato y restart"
+  ],
+  "classes": [
+    {
+      "id": "T1",
+      "pre_state_and_event": "Sin aislamiento previo; solicitud inválida/denegada/skip",
+      "expected": "Error/skip sin nuevo sticky; siguiente comando conserva default",
+      "green": "isolation-e2e-v4.log; cli-v4.log; completion/linux-isolation-e2e.log",
+      "falsifier": "v4-mutation-eager-sticky.log; first-request-red.log"
+    },
+    {
+      "id": "T2",
+      "pre_state_and_event": "Nueva conexión rechazada o fallo post-create de storage/publicación/acción implícita",
+      "expected": "No binding nuevo; disposición cuando CDP alcanzable; reintento válido exitoso",
+      "green": "isolation-e2e-v4.log; completion/linux-isolation-e2e.log",
+      "falsifier": "v4-mutation-early-binding.log; implicit-red.log"
+    },
+    {
+      "id": "T3",
+      "pre_state_and_event": "Conexión compatible exitosa; solicitud true, false u omitida; reuse/restart/close",
+      "expected": "Contexto y target persistidos; false no es clear; close sí limpia intención",
+      "green": "isolation-e2e-v4.log; cli-v4.log; completion/linux-cli-subreaper.log; completion/linux-auto-connect.json",
+      "falsifier": "v4-mutation-missing-sticky-commit.log"
+    },
+    {
+      "id": "T4",
+      "pre_state_and_event": "Sesión pinned default solicita aislamiento",
+      "expected": "No restaurar target extranjero; crear/persistir contexto propio",
+      "green": "isolation-e2e-v4.log; completion/linux-isolation-e2e.log",
+      "falsifier": "pinned-implicit-red.log"
+    },
+    {
+      "id": "T5",
+      "pre_state_and_event": "Contexto persistido se reconecta y luego falla la acción",
+      "expected": "Conservar conexión, binding e intención previos",
+      "green": "isolation-e2e-v4.log; completion/fault-repeat-late-persisted.json",
+      "falsifier": "cross-family-reconnect-red.log"
+    },
+    {
+      "id": "T6",
+      "pre_state_and_event": "Contexto recreado ya persistido seguido de launch inválido",
+      "expected": "No disponerlo por flag histórico de recreación",
+      "green": "isolation-e2e-v4.log; completion/linux-isolation-e2e.log",
+      "falsifier": "cross-family-red.log: primer fallo; PoisonError secundarios excluidos"
+    },
+    {
+      "id": "T7",
+      "pre_state_and_event": "Target desaparece antes de commit: contexto nuevo o previamente persistido",
+      "expected": "Nuevo: error y disposición; persistido: conservar binding/intención",
+      "green": "cross-family-no-target-green.log; completion/linux-no-target.log",
+      "falsifier": "cross-family-no-target-red.log; helper con eventos Chrome reales, sin claim de carrera completa"
+    },
+    {
+      "id": "T8",
+      "pre_state_and_event": "Error en drain final tras evento real de auto-attach",
+      "expected": "No publicar binding nuevo; conservar binding anterior; reintento funciona",
+      "green": "completion/fault-repeat-late-new.json; completion/fault-repeat-late-persisted.json",
+      "falsifier": "completion/late-commit-mutant.json: call site movido antes del drain; completion/late-commit-restored.json"
+    },
+    {
+      "id": "T9",
+      "pre_state_and_event": "Descarga aislada con default y A/B previamente configurados",
+      "expected": "Bytes correctos en destino propio; posteriores default/B conservan destinos",
+      "green": "cli-v4.log; completion/linux-cli-subreaper.log",
+      "falsifier": "v4-mutation-missing-download-context.log"
+    },
+    {
+      "id": "T10",
+      "pre_state_and_event": "Corte de CDP durante disposición o muerte de daemon antes de binding",
+      "expected": "No nuevo sticky/binding; flagless no aislado; reintento y reinicio funcionan; residual remoto medido",
+      "green": "completion/fault-repeat-late-drop-new.json; completion/fault-repeat-kill-new.json",
+      "falsifier": "Fault injection en conexión real/SIGKILL real; oracle distingue binding ausente de leak remoto; sin claim de cleanup infalible"
+    }
+  ],
+  "methods": {
+    "mutation": "Cinco mutaciones sobre árbol final: cuatro v4 y mover el commit antes del drain. Todas fallan por assertion conductual, no compilación; restauración verde.",
+    "properties": "Campaña determinista de 10 rondas con dos sesiones y valores por ronda: cookies, localStorage, sessionStorage, IndexedDB/cache, targets y descargas; intercalación secuencial y concurrente real. Repetida en macOS y Linux. No se presenta como fuzzing aleatorio o prueba exhaustiva.",
+    "differential": "Oracle externo: BrowserContexts/targets de Chrome y bytes/archivos observados, comparados con R0-R4 de ctate. Protocolo Browser/Target archivado en completion, no constantes derivadas del helper bajo prueba.",
+    "structured_fuzzing": "No aplica al diff: no cambia parser/serializer ni gramática de entrada; clases inválidas de modo, transporte, storage y acción se fuerzan determinísticamente.",
+    "replay": "Logs v4; completion/cdp-fault-probe.ts; linux-auto-connect.py; linux-subreaper.py. Puertos/IDs reales en cada trace; secuencias deterministas. Harnesses externos no agregados al repo."
+  },
+  "exclusions": [
+    "Windows no ejecutado: sin entorno Windows disponible. No se certifica soporte Windows ni equivalencia del IPC Windows.",
+    "BrowserContexts entre sesiones cooperativas; no sandbox contra un controlador con autoridad CDP global.",
+    "No se promete atomicidad ante SIGKILL o pérdida del canal de disposición. Un contexto remoto puede quedar huérfano y los fallos repetidos pueden acumularlos hasta cerrar Chrome.",
+    "Matching de GUIDs de descargas simultáneas dentro de un mismo contexto y sesiones no aisladas que comparten default son comportamientos preexistentes fuera de estos dos findings.",
+    "No se afirma explorar todas las intercalaciones de procesos, todos los navegadores/versiones o todas las fallas de CDP."
+  ],
+  "coverage_limits": "Los red previos CF1-CF3 y variantes se ejecutaron antes de corregirlos; los greens son del HEAD actual. No se los etiqueta como mutantes repetidos en HEAD final. La integración de recording conserva pruebas existentes, no se afirma mutación específica de recording."
+}

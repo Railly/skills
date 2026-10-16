@@ -1,0 +1,3 @@
+Real Chromium file URL: mouse and ArrowUp + Enter each created a GitHub tab while the original game remained on title. ArrowDown + Enter still opened character select, where the GitHub link has no client rect. Screenshots inspected at 1440x900 and 390x844; measured at 320x568 and 844x390 after the short-height spacing fix. Link bottom 66px; logo top 87.27px and 85.17px. No browser errors. git diff --check passed. Product has no build, dependencies, or test suite.
+
+Proof: /Users/raillyhugo/Programming/crafter-games/crafter-smash-artifacts/2026-09-27-github-link/2026-09-27-github-link-before-after.html

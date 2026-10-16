@@ -1,0 +1,15 @@
+d272adda97a8c4d94d2111c846a304c0c0e4b0fa
+da4c99fa1c781b6bd6a440348c147287f0cdb603
+Railly Hugo <railly.hugoquispe@vercel.com>
+fix(browser-use): bound setup and preserve cleanup ownership
+
+Bound V4 create, CDP attachment and setup so provider failures cannot hold
+the daemon indefinitely. Retain the remote browser ID until a matching
+stopped acknowledgment, including cancellation and rollback failures.
+
+Write credential-free recovery receipts, restore failed-launch settings,
+clear local cleanup state before awaits, and document manual recovery.
+Cover protocol failures, cancellation, caller retries and Chrome continuity.
+
+Co-authored-by: Magnus Müller <mamagnus00@gmail.com>
+

@@ -1,0 +1,84 @@
+{
+  "status": "review_completed_with_blockers",
+  "verdict": "incomplete",
+  "head": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+  "base": "6c7164342a37fab055907f1666658e1333e2cb86",
+  "authorization": "read-only",
+  "created_at": "2026-09-14T18:52:12.051292+00:00",
+  "execution": {
+    "mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "Author and exact reviewer model identities/families are unknown. Native specialists are not cross-family evidence. Independent challenge is satisfied only by the saved implementation-independent normative oracle corpus; no blinded model/human review is claimed.",
+    "receipt": "resumed-coordinator/resumption.json",
+    "schema_failures": 0,
+    "operations": [
+      {
+        "operation": "Resume Security Review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "Resume Resilience Audit",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "Normative independent challenge",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "Security receipt schema normalization",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ],
+    "upstream_fallback": "Prior FX wrapper auth failure retained in archived manifest; not retried. Current native subagents completed."
+  },
+  "artifacts": {
+    "security": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-security/security-receipt.json",
+    "resilience": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-resilience/receipt.json",
+    "challenge": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-challenge/receipt.json"
+  },
+  "stage_statuses": {
+    "test_strength": "fail",
+    "resilience": "fail",
+    "security": "pass",
+    "independent_challenge": "satisfied"
+  },
+  "open_findings": [
+    "F1",
+    "F2",
+    "TS-3"
+  ],
+  "saved_test_strength_unchanged": true,
+  "normalizations": [
+    "Security confidence narratives moved to confidence_detail; five nonmaterial gaps retained as limitations, no evidence removed; prior receipt preserved.",
+    "Embedded Security artifact resolves to canonical receipt; original relative report path retained in source receipt.",
+    "Canonical renderer prints no for unknown model family and labels refuted properties verified. Generated view receives two deterministic display-only corrections; raw view preserved."
+  ],
+  "archive": {
+    "manifest.json": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-coordinator/manifest.json.before",
+    "run-report.json": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-coordinator/run-report.json.before",
+    "run-report.md": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-coordinator/run-report.md.before",
+    "report-validation.log": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-coordinator/report-validation.log.before"
+  },
+  "audit_note": "Specialist validators bind pre-integration aggregate metadata. Their captured validations remain evidence; verify-integration.py checks archived inputs and current product/receipt hashes after writeback.",
+  "source_changes": false,
+  "publications": false,
+  "ci": {
+    "total": 23,
+    "unsuccessful": []
+  },
+  "report_validation": {
+    "command": "bash /Users/raillyhugo/Programming/railly/skills/skills/review-gate/scripts/gate.sh report /Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/run-report.json",
+    "cwd": "/Users/raillyhugo/Programming/vercel/json-render-336-review",
+    "exit_code": 1,
+    "expected": "1: blocked promotion, not a passed review",
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-coordinator/report-validation.log"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "observed_at": "2026-09-17T14:56:44.635349+00:00",
+  "pr": 1691,
+  "state": "open",
+  "head": "d272adda97a8c4d94d2111c846a304c0c0e4b0fa",
+  "branch": "magnus/fix-browser-use-provider-v4",
+  "repo": "MagMueller/agent-browser",
+  "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+  "mergeable": false,
+  "mergeable_state": "dirty",
+  "github_signature": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAg6locUB2zKMPBxxveqqxSHyF3No\n46BdEZ/egkq+nlQTcAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQG0yQkVJsG0S4NQ5MMjZ+/eeGNrIl5uf4QRuw/Pu6DQ6KLmODON7xXVw4ACVyCsZ4Y\nKzR7Xz6qyBY1CBeWzKqAY=\n-----END SSH SIGNATURE-----",
+    "payload": "tree 7268700fcb4bf89e0d508f67955df88981bb7a9a\nparent da4c99fa1c781b6bd6a440348c147287f0cdb603\nauthor Railly Hugo <railly.hugoquispe@vercel.com> 1789656859 -0300\ncommitter Railly Hugo <railly.hugoquispe@vercel.com> 1789656859 -0300\n\nfix(browser-use): bound setup and preserve cleanup ownership\n\nBound V4 create, CDP attachment and setup so provider failures cannot hold\nthe daemon indefinitely. Retain the remote browser ID until a matching\nstopped acknowledgment, including cancellation and rollback failures.\n\nWrite credential-free recovery receipts, restore failed-launch settings,\nclear local cleanup state before awaits, and document manual recovery.\nCover protocol failures, cancellation, caller retries and Chrome continuity.\n\nCo-authored-by: Magnus M\u00fcller <mamagnus00@gmail.com>\n",
+    "verified_at": "2026-09-17T14:56:23Z"
+  },
+  "checks": [
+    {
+      "name": "Vercel Security Review",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/vercel-labs/agent-browser/runs/105255139759"
+    },
+    {
+      "name": "Socket Security: Project Report",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/vercel-labs/agent-browser/runs/105255124850"
+    }
+  ],
+  "combined_status": "failure",
+  "statuses": [
+    {
+      "context": "Vercel \u2013 agent-browser-env-demo",
+      "state": "failure",
+      "description": "Authorization required to deploy.",
+      "url": "https://vercel.com/git/authorize?team=Vercel%20Labs&slug=vercel-labs&teamId=team_nO2mCG4W8IxPIeKoSsqwAxxB&type=github&job=%7B%22headInfo%22%3A%7B%22sha%22%3A%22d272adda97a8c4d94d2111c846a304c0c0e4b0fa%22%7D%2C%22id%22%3A%22QmTDCxvC4PZAkeqFyaqXcpmwBvhez71kQT9ELfvuB2RmXW%22%2C%22org%22%3A%22vercel-labs%22%2C%22prId%22%3A1691%2C%22repo%22%3A%22agent-browser%22%7D"
+    },
+    {
+      "context": "Vercel \u2013 agent-browser",
+      "state": "failure",
+      "description": "Authorization required to deploy.",
+      "url": "https://vercel.com/git/authorize?team=Vercel%20Labs&slug=vercel-labs&teamId=team_nO2mCG4W8IxPIeKoSsqwAxxB&type=github&job=%7B%22headInfo%22%3A%7B%22sha%22%3A%22d272adda97a8c4d94d2111c846a304c0c0e4b0fa%22%7D%2C%22id%22%3A%22QmdUy4PnNEhgftPxA38HZ2Vk2UQJ2zx32TxgAPWoHvu26o%22%2C%22org%22%3A%22vercel-labs%22%2C%22prId%22%3A1691%2C%22repo%22%3A%22agent-browser%22%7D"
+    }
+  ]
+}

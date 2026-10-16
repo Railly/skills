@@ -1,0 +1,91 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/agent-browser",
+    "base_sha": "d01253d9db28d75080e36da3c1c31ef89454731e",
+    "head_sha": "1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:bb0ffb563e95aeef2f4bbb131dc0bf4c1f4df17721c432aee2c4f71d29075023",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "The change must not grant a lower-trust principal new access to credentials or bypass the existing no-navigate origin binding.",
+    "attacker": "Page JavaScript on the authorized origin; unrelated origins; untrusted selector text",
+    "scope": "PR 1999 exact diff. This receipt does not approve credential delivery correctness."
+  },
+  "trust_model": {
+    "assets": [
+      "Decrypted credentials",
+      "Bound top-level browser page"
+    ],
+    "principals": [
+      "Local user already authorizes auth login and selects the credential profile.",
+      "Authorized page JavaScript already reads values in both intended credential inputs.",
+      "An unrelated origin must not receive no-navigate credential entry."
+    ],
+    "boundaries": [
+      "Local credential store to authorized browser page",
+      "No-navigate effective credential origin to active page"
+    ],
+    "entrypoints": [
+      "auth_login",
+      "Credential selector overrides",
+      "Browser-controlled DOM changes"
+    ],
+    "sinks": [
+      "interaction::fill / Input.insertText",
+      "interaction::click"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-001",
+      "classification": "non_security_defect",
+      "scope": "unrelated_bug",
+      "prerequisites": [
+        "Selected input is replaced between detection and filling",
+        "Detached DOM object remains resolvable"
+      ],
+      "chain": {
+        "capability": "Page may replace and retain its own DOM nodes.",
+        "reachability": "Confirmed with local real-browser A/B fixture.",
+        "control": "The same authorized page controls both the intended input and alternate focused input.",
+        "boundary": "No newly empowered principal was demonstrated; page JS already had access to the intended password input.",
+        "impact": "Password is displayed in the username field and the login is falsely reported successful. Blocking correctness defect F1; no separate exploitable security boundary is claimed."
+      },
+      "confidence": "high",
+      "evidence": [
+        "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/race-results.json",
+        "cli/src/native/element.rs:700-706",
+        "cli/src/native/interaction.rs:146-189"
+      ]
+    },
+    {
+      "id": "SEC-002",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": [],
+      "confidence": "high",
+      "evidence": [
+        "All 8 current auth E2E tests pass, including cross-origin no-navigate rejection and preservation of the active page with local/provider credentials.",
+        "The diff leaves origin validation call sites intact and serializes selectors through serde_json before JavaScript evaluation."
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "Read-only code review and bounded local fixtures with disposable credentials only.",
+    "commands": [
+      "bun verify.mjs; bun pressure.mjs race; bun pressure.mjs matrix; cargo test e2e_auth_login -- --ignored --test-threads=1"
+    ],
+    "cleanup": "All CLI fixture profiles deleted and sessions closed. Three profiles left by intentional red E2E assertions removed with auth delete; cleanup.json.",
+    "gaps": []
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": [
+      "F1: detached node credential misdelivery is a correctness blocker, not a demonstrated new attacker capability."
+    ]
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-1b4cacd/security-review.json"
+}

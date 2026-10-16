@@ -1,0 +1,486 @@
+{
+  "started_at": "2026-09-17T15:41:17.933Z",
+  "repository": "vercel-labs/agent-browser",
+  "pr": 1879,
+  "head": "427d7a4ba970ae3227a3f4edd24acae6e3797bb9",
+  "credential_source": "clipboard via process environment",
+  "run_id": "b2398da4",
+  "cases": [
+    {
+      "name": "authenticated-baseline",
+      "observed_at": "2026-09-17T15:41:18.856Z",
+      "active_browser_count": 0
+    },
+    {
+      "name": "temporary-profile-created",
+      "observed_at": "2026-09-17T15:41:19.058Z",
+      "id": "f03e1b37-e190-4439-98ec-f9429466e70d",
+      "http_status": 201
+    },
+    {
+      "name": "cli--p",
+      "observed_at": "2026-09-17T15:41:24.853Z",
+      "session": "ab2398da4",
+      "args": [
+        "-p",
+        "browseruse",
+        "open",
+        "https://example.com"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 5.793,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":5198814276681667390},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"targetId\":\"847EB6631C01357E90D93C9C7638A489\",\"title\":\"Example Domain\",\"url\":\"https://example.com/\"},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "ownership-receipt",
+      "observed_at": "2026-09-17T15:41:24.859Z",
+      "id": "93c2b824-6caf-4527-ac72-d8bcf6253910",
+      "credential_free": true
+    },
+    {
+      "name": "cloud-active-after-cli-create",
+      "observed_at": "2026-09-17T15:41:25.069Z",
+      "http_status": 200,
+      "seconds": 0.209,
+      "id": "93c2b824-6caf-4527-ac72-d8bcf6253910",
+      "status": "active",
+      "startedAt": "2026-09-17T15:41:20.462603Z",
+      "finishedAt": null,
+      "browserCost": "0.02000000000000000000000000000",
+      "proxyCost": "0",
+      "proxyUsedMb": "0",
+      "recordingAvailable": true,
+      "recording_url_present": false,
+      "cdp_url_present": true
+    },
+    {
+      "name": "cli-snapshot",
+      "observed_at": "2026-09-17T15:41:26.429Z",
+      "session": "ab2398da4",
+      "args": [
+        "snapshot",
+        "-i"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 1.36,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":5198814276681667390},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"https://example.com/\",\"refs\":{\"e1\":{\"name\":\"Example Domain\",\"role\":\"heading\"},\"e2\":{\"name\":\"Learn more\",\"role\":\"link\"}},\"removedRefs\":[],\"snapshot\":\"- heading \\\"Example Domain\\\" [level=1, ref=e1]\\n- link \\\"Learn more\\\" [ref=e2]\"},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "cli-eval",
+      "observed_at": "2026-09-17T15:41:27.009Z",
+      "session": "ab2398da4",
+      "args": [
+        "eval",
+        "(() => { window.__pr1879 = \"pr1879-b2398da4\"; document.cookie = \"pr1879=pr1879-b2398da4; Max-Age=600; Path=/; Secure; SameSite=Lax\"; localStorage.setItem(\"pr1879\", \"pr1879-b2398da4\"); return {title:document.title, cookie:document.cookie, sentinel:window.__pr1879}; })()"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.577,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":5198814276681667390},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"https://example.com/\",\"result\":{\"cookie\":\"pr1879=pr1879-b2398da4\",\"sentinel\":\"pr1879-b2398da4\",\"title\":\"Example Domain\"}},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "cli-tab",
+      "observed_at": "2026-09-17T15:41:27.206Z",
+      "session": "ab2398da4",
+      "args": [
+        "tab",
+        "list"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.197,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":5198814276681667390},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"tabs\":[{\"active\":true,\"label\":null,\"tabId\":\"t1\",\"targetId\":\"847EB6631C01357E90D93C9C7638A489\",\"title\":\"example.com\",\"type\":\"page\",\"url\":\"https://example.com/\"}]},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "cli-eval",
+      "observed_at": "2026-09-17T15:41:27.787Z",
+      "session": "ab2398da4",
+      "args": [
+        "eval",
+        "({title:document.title,cookie:document.cookie,sentinel:window.__pr1879,storage:localStorage.getItem('pr1879')})"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.58,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":5198814276681667390},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"https://example.com/\",\"result\":{\"cookie\":\"pr1879=pr1879-b2398da4\",\"sentinel\":\"pr1879-b2398da4\",\"storage\":\"pr1879-b2398da4\",\"title\":\"Example Domain\"}},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "cli-tab",
+      "observed_at": "2026-09-17T15:41:27.985Z",
+      "session": "ab2398da4",
+      "args": [
+        "tab",
+        "list"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.198,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":5198814276681667390},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"tabs\":[{\"active\":true,\"label\":null,\"tabId\":\"t1\",\"targetId\":\"847EB6631C01357E90D93C9C7638A489\",\"title\":\"example.com\",\"type\":\"page\",\"url\":\"https://example.com/\"}]},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "live-command-continuity",
+      "observed_at": "2026-09-17T15:41:27.985Z",
+      "same_target": true,
+      "sentinel_preserved": true
+    },
+    {
+      "name": "cli-close",
+      "observed_at": "2026-09-17T15:41:28.733Z",
+      "session": "ab2398da4",
+      "args": [
+        "close"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.747,
+      "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "cloud-stopped-after-cli-close",
+      "observed_at": "2026-09-17T15:41:28.943Z",
+      "http_status": 200,
+      "seconds": 0.209,
+      "id": "93c2b824-6caf-4527-ac72-d8bcf6253910",
+      "status": "stopped",
+      "startedAt": "2026-09-17T15:41:20.462603Z",
+      "finishedAt": "2026-09-17T15:41:28.676115Z",
+      "browserCost": "0.0003333333333333333333333333333",
+      "proxyCost": "0",
+      "proxyUsedMb": "0",
+      "recordingAvailable": true,
+      "recording_url_present": false,
+      "cdp_url_present": false
+    },
+    {
+      "name": "receipt-removed-after-close",
+      "observed_at": "2026-09-17T15:41:28.944Z",
+      "id": "93c2b824-6caf-4527-ac72-d8bcf6253910",
+      "removed": true
+    },
+    {
+      "name": "producer-repeated-stop",
+      "observed_at": "2026-09-17T15:41:29.153Z",
+      "http_status": 200,
+      "seconds": 0.208,
+      "id": "93c2b824-6caf-4527-ac72-d8bcf6253910",
+      "status": "stopped",
+      "startedAt": "2026-09-17T15:41:20.462603Z",
+      "finishedAt": "2026-09-17T15:41:28.676115Z",
+      "browserCost": "0.0003333333333333333333333333333",
+      "proxyCost": "0",
+      "proxyUsedMb": "0",
+      "recordingAvailable": true,
+      "recording_url_present": false,
+      "cdp_url_present": false
+    },
+    {
+      "name": "cloud-still-stopped-after-repeated-stop",
+      "observed_at": "2026-09-17T15:41:29.366Z",
+      "http_status": 200,
+      "seconds": 0.213,
+      "id": "93c2b824-6caf-4527-ac72-d8bcf6253910",
+      "status": "stopped",
+      "startedAt": "2026-09-17T15:41:20.462603Z",
+      "finishedAt": "2026-09-17T15:41:28.676115Z",
+      "browserCost": "0.0003333333333333333333333333333",
+      "proxyCost": "0",
+      "proxyUsedMb": "0",
+      "recordingAvailable": true,
+      "recording_url_present": false,
+      "cdp_url_present": false
+    },
+    {
+      "name": "cli-open",
+      "observed_at": "2026-09-17T15:41:34.502Z",
+      "session": "bb2398da4",
+      "args": [
+        "open",
+        "https://example.com"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 5.136,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":5198814276681667390},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"targetId\":\"847EB6631C01357E90D93C9C7638A489\",\"title\":\"Example Domain\",\"url\":\"https://example.com/\"},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "ownership-receipt",
+      "observed_at": "2026-09-17T15:41:34.503Z",
+      "id": "6abd2d4b-4275-4199-b4c2-6671e617c365",
+      "credential_free": true
+    },
+    {
+      "name": "cli-eval",
+      "observed_at": "2026-09-17T15:41:35.057Z",
+      "session": "bb2398da4",
+      "args": [
+        "eval",
+        "({cookie:document.cookie,storage:localStorage.getItem('pr1879'),freshRuntime:typeof window.__pr1879 === 'undefined'})"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.554,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":5198814276681667390},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"https://example.com/\",\"result\":{\"cookie\":\"pr1879=pr1879-b2398da4\",\"freshRuntime\":true,\"storage\":\"pr1879-b2398da4\"}},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "profile-persistence-across-browsers",
+      "observed_at": "2026-09-17T15:41:35.058Z",
+      "cookie_preserved": true,
+      "fresh_runtime": true,
+      "local_storage_preserved": true
+    },
+    {
+      "name": "cli-close",
+      "observed_at": "2026-09-17T15:41:35.822Z",
+      "session": "bb2398da4",
+      "args": [
+        "close"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.763,
+      "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "second-cloud-stopped-after-cli-close",
+      "observed_at": "2026-09-17T15:41:36.026Z",
+      "http_status": 200,
+      "seconds": 0.204,
+      "id": "6abd2d4b-4275-4199-b4c2-6671e617c365",
+      "status": "stopped",
+      "startedAt": "2026-09-17T15:41:30.271079Z",
+      "finishedAt": "2026-09-17T15:41:35.764085Z",
+      "browserCost": "0.0003333333333333333333333333333",
+      "proxyCost": "0",
+      "proxyUsedMb": "0",
+      "recordingAvailable": false,
+      "recording_url_present": false,
+      "cdp_url_present": false
+    },
+    {
+      "name": "receipt-removed-after-close",
+      "observed_at": "2026-09-17T15:41:36.027Z",
+      "id": "6abd2d4b-4275-4199-b4c2-6671e617c365",
+      "removed": true
+    },
+    {
+      "name": "cli-close",
+      "observed_at": "2026-09-17T15:41:36.143Z",
+      "session": "bb2398da4",
+      "args": [
+        "close"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.116,
+      "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "cli--p",
+      "observed_at": "2026-09-17T15:41:41.367Z",
+      "session": "ib2398da4",
+      "args": [
+        "-p",
+        "browseruse",
+        "open",
+        "about:blank"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 5.224,
+      "stdout": "{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":5198814276681667390},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"targetId\":\"847EB6631C01357E90D93C9C7638A489\",\"title\":\"\",\"url\":\"about:blank\"},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "ownership-receipt",
+      "observed_at": "2026-09-17T15:41:41.368Z",
+      "id": "afe982d9-0d6b-4b01-b0e5-ec6566488dc8",
+      "credential_free": true
+    },
+    {
+      "name": "hosted-idle-cleanup",
+      "observed_at": "2026-09-17T15:41:43.962Z",
+      "http_status": 200,
+      "seconds": 0.209,
+      "id": "afe982d9-0d6b-4b01-b0e5-ec6566488dc8",
+      "status": "stopped",
+      "startedAt": "2026-09-17T15:41:36.971552Z",
+      "finishedAt": "2026-09-17T15:41:43.566694Z",
+      "browserCost": "0.0003333333333333333333333333333",
+      "proxyCost": "0",
+      "proxyUsedMb": "0",
+      "recordingAvailable": false,
+      "recording_url_present": false,
+      "cdp_url_present": false
+    },
+    {
+      "name": "recording-producer-result",
+      "observed_at": "2026-09-17T15:41:44.168Z",
+      "http_status": 200,
+      "seconds": 0.205,
+      "id": "93c2b824-6caf-4527-ac72-d8bcf6253910",
+      "status": "stopped",
+      "startedAt": "2026-09-17T15:41:20.462603Z",
+      "finishedAt": "2026-09-17T15:41:28.676115Z",
+      "browserCost": "0.0003333333333333333333333333333",
+      "proxyCost": "0",
+      "proxyUsedMb": "0",
+      "recordingAvailable": true,
+      "recording_url_present": true,
+      "cdp_url_present": false
+    },
+    {
+      "name": "recording-retrievable",
+      "observed_at": "2026-09-17T15:41:44.810Z",
+      "http_status": 206,
+      "content_type": "video/mp4",
+      "sample_bytes_received": 1024
+    },
+    {
+      "name": "billing-and-finished-state-recheck",
+      "observed_at": "2026-09-17T15:41:45.019Z",
+      "http_status": 200,
+      "seconds": 0.209,
+      "id": "93c2b824-6caf-4527-ac72-d8bcf6253910",
+      "status": "stopped",
+      "startedAt": "2026-09-17T15:41:20.462603Z",
+      "finishedAt": "2026-09-17T15:41:28.676115Z",
+      "browserCost": "0.0003333333333333333333333333333",
+      "proxyCost": "0",
+      "proxyUsedMb": "0",
+      "recordingAvailable": true,
+      "recording_url_present": true,
+      "cdp_url_present": false
+    },
+    {
+      "name": "final-active-owned-browsers",
+      "observed_at": "2026-09-17T15:41:45.312Z",
+      "owned_active_count": 0,
+      "unrelated_active_count": 0
+    },
+    {
+      "name": "cli-close",
+      "observed_at": "2026-09-17T15:41:45.497Z",
+      "session": "ab2398da4",
+      "args": [
+        "close"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.185,
+      "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "cli-close",
+      "observed_at": "2026-09-17T15:41:45.612Z",
+      "session": "bb2398da4",
+      "args": [
+        "close"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.114,
+      "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+      "stderr": ""
+    },
+    {
+      "name": "cli-close",
+      "observed_at": "2026-09-17T15:41:45.732Z",
+      "session": "ib2398da4",
+      "args": [
+        "close"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.12,
+      "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+      "stderr": ""
+    }
+  ],
+  "owned_browsers": [
+    "93c2b824-6caf-4527-ac72-d8bcf6253910",
+    "6abd2d4b-4275-4199-b4c2-6671e617c365",
+    "afe982d9-0d6b-4b01-b0e5-ec6566488dc8"
+  ],
+  "cleanup": [
+    {
+      "id": "93c2b824-6caf-4527-ac72-d8bcf6253910",
+      "final_state": {
+        "http_status": 200,
+        "seconds": 0.205,
+        "id": "93c2b824-6caf-4527-ac72-d8bcf6253910",
+        "status": "stopped",
+        "startedAt": "2026-09-17T15:41:20.462603Z",
+        "finishedAt": "2026-09-17T15:41:28.676115Z",
+        "browserCost": "0.0003333333333333333333333333333",
+        "proxyCost": "0",
+        "proxyUsedMb": "0",
+        "recordingAvailable": true,
+        "recording_url_present": true,
+        "cdp_url_present": false
+      }
+    },
+    {
+      "id": "6abd2d4b-4275-4199-b4c2-6671e617c365",
+      "final_state": {
+        "http_status": 200,
+        "seconds": 0.213,
+        "id": "6abd2d4b-4275-4199-b4c2-6671e617c365",
+        "status": "stopped",
+        "startedAt": "2026-09-17T15:41:30.271079Z",
+        "finishedAt": "2026-09-17T15:41:35.764085Z",
+        "browserCost": "0.0003333333333333333333333333333",
+        "proxyCost": "0",
+        "proxyUsedMb": "0",
+        "recordingAvailable": false,
+        "recording_url_present": false,
+        "cdp_url_present": false
+      }
+    },
+    {
+      "id": "afe982d9-0d6b-4b01-b0e5-ec6566488dc8",
+      "final_state": {
+        "http_status": 200,
+        "seconds": 0.188,
+        "id": "afe982d9-0d6b-4b01-b0e5-ec6566488dc8",
+        "status": "stopped",
+        "startedAt": "2026-09-17T15:41:36.971552Z",
+        "finishedAt": "2026-09-17T15:41:43.566694Z",
+        "browserCost": "0.0003333333333333333333333333333",
+        "proxyCost": "0",
+        "proxyUsedMb": "0",
+        "recordingAvailable": false,
+        "recording_url_present": false,
+        "cdp_url_present": false
+      }
+    },
+    {
+      "profile_id": "f03e1b37-e190-4439-98ec-f9429466e70d",
+      "delete_http_status": 204
+    }
+  ],
+  "gaps": [],
+  "binary": "/Users/raillyhugo/Programming/vercel/agent-browser-1691-probe-build/debug/agent-browser",
+  "binary_sha256": "15f77ad70a964239b16cb9ae3e1dd1034edfb73bed00f44a4b2eaafb0e9553c5",
+  "temporary_profile_id": "f03e1b37-e190-4439-98ec-f9429466e70d",
+  "status": "pass",
+  "credential_artifact_scan": {
+    "leaked_files": [],
+    "passed": true
+  },
+  "all_owned_browsers_stopped": true,
+  "completed_at": "2026-09-17T15:41:46.597Z"
+}

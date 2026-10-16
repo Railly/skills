@@ -1,0 +1,52 @@
+packages/core/src/store-utils.ts:2:  immutableSetByPath,
+packages/core/src/store-utils.ts:4:  createStoreAdapter,
+packages/core/README.md:304:| `createStoreAdapter(config)` | Build a full `StateStore` from a minimal `{ getSnapshot, setSnapshot, subscribe }` config |
+packages/core/README.md:305:| `immutableSetByPath(root, path, value)` | Immutably set a value at a JSON Pointer path with structural sharing |
+packages/core/README.md:307:| `StoreAdapterConfig` | Config type for `createStoreAdapter` |
+packages/core/README.md:310:import { createStoreAdapter, immutableSetByPath, flattenToPointers } from "@json-render/core/store-utils";
+packages/core/README.md:313:`createStoreAdapter` handles `get`, `set` (with no-op detection), batched `update`, `getSnapshot`, `getServerSnapshot`, and `subscribe` -- adapter authors only need to supply the snapshot source, write API, and subscribe mechanism:
+packages/core/README.md:316:import { createStoreAdapter } from "@json-render/core/store-utils";
+packages/core/README.md:318:const store = createStoreAdapter({
+packages/core/README.md:325:The official adapter packages (`@json-render/redux`, `@json-render/zustand`, `@json-render/jotai`) are all built on top of `createStoreAdapter`.
+packages/codegen/CHANGELOG.md:86:  - Store utilities (`createStoreAdapter`, `immutableSetByPath`, `flattenToPointers`) available via `@json-render/core/store-utils` for building custom adapters
+packages/core/src/types.ts:279:export function parseJsonPointer(path: string): string[] {
+packages/core/src/types.ts:301:  return !hasBlockedJsonPointerToken(parseJsonPointer(path));
+packages/core/src/types.ts:307:export function getByPath(obj: unknown, path: string): unknown {
+packages/core/src/types.ts:330:  const segments = parseJsonPointer(path);
+packages/core/src/types.ts:494:function setByPathInternal(
+packages/core/src/types.ts:499:  const segments = parseJsonPointer(path);
+packages/core/src/types.ts:519:function addByPathInternal(
+packages/core/src/types.ts:524:  const segments = parseJsonPointer(path);
+packages/core/src/types.ts:548:export function setByPath(
+packages/core/src/types.ts:561:export function addByPath(
+packages/core/src/types.ts:574:export function removeByPath(obj: Record<string, unknown>, path: string): void {
+packages/core/src/types.ts:578:function removeByPathInternal(
+packages/core/src/types.ts:583:  const segments = parseJsonPointer(path);
+packages/core/src/types.ts:731:      parseJsonPointer(from),
+packages/core/src/types.ts:743:      parseJsonPointer(path),
+packages/core/CHANGELOG.md:196:  - Store utilities (`createStoreAdapter`, `immutableSetByPath`, `flattenToPointers`) available via `@json-render/core/store-utils` for building custom adapters
+packages/core/src/state-store.ts:4:  parseJsonPointer,
+packages/core/src/state-store.ts:72:export function immutableSetByPath(
+packages/core/src/state-store.ts:79:  const segments = parseJsonPointer(path);
+packages/core/src/state-store.ts:151:      const next = immutableSetByPath(state, path, value);
+packages/core/src/state-store.ts:163:          const updated = immutableSetByPath(next, path, value);
+packages/core/src/state-store.ts:193: * Configuration for {@link createStoreAdapter}. Adapter authors supply these
+packages/core/src/state-store.ts:214:export function createStoreAdapter(config: StoreAdapterConfig): StateStore {
+packages/core/src/state-store.ts:224:      const next = immutableSetByPath(current, path, value);
+packages/core/src/state-store.ts:235:          const updated = immutableSetByPath(next, path, value);
+packages/zustand/src/index.ts:2:import { createStoreAdapter } from "@json-render/core/store-utils";
+packages/zustand/src/index.ts:66:  return createStoreAdapter({
+packages/remotion/CHANGELOG.md:86:  - Store utilities (`createStoreAdapter`, `immutableSetByPath`, `flattenToPointers`) available via `@json-render/core/store-utils` for building custom adapters
+packages/react/CHANGELOG.md:156:  - Store utilities (`createStoreAdapter`, `immutableSetByPath`, `flattenToPointers`) available via `@json-render/core/store-utils` for building custom adapters
+packages/shadcn/CHANGELOG.md:166:  - Store utilities (`createStoreAdapter`, `immutableSetByPath`, `flattenToPointers`) available via `@json-render/core/store-utils` for building custom adapters
+packages/zustand/CHANGELOG.md:86:  - Store utilities (`createStoreAdapter`, `immutableSetByPath`, `flattenToPointers`) available via `@json-render/core/store-utils` for building custom adapters
+packages/redux/src/index.ts:2:import { createStoreAdapter } from "@json-render/core/store-utils";
+packages/redux/src/index.ts:71:  return createStoreAdapter({
+packages/redux/CHANGELOG.md:86:  - Store utilities (`createStoreAdapter`, `immutableSetByPath`, `flattenToPointers`) available via `@json-render/core/store-utils` for building custom adapters
+packages/xstate/src/index.ts:2:import { createStoreAdapter } from "@json-render/core/store-utils";
+packages/xstate/src/index.ts:35:  return createStoreAdapter({
+packages/jotai/src/index.ts:2:import { createStoreAdapter } from "@json-render/core/store-utils";
+packages/jotai/src/index.ts:57:  return createStoreAdapter({
+packages/react-pdf/CHANGELOG.md:87:  - Store utilities (`createStoreAdapter`, `immutableSetByPath`, `flattenToPointers`) available via `@json-render/core/store-utils` for building custom adapters
+packages/jotai/CHANGELOG.md:86:  - Store utilities (`createStoreAdapter`, `immutableSetByPath`, `flattenToPointers`) available via `@json-render/core/store-utils` for building custom adapters
+packages/react-native/CHANGELOG.md:87:  - Store utilities (`createStoreAdapter`, `immutableSetByPath`, `flattenToPointers`) available via `@json-render/core/store-utils` for building custom adapters

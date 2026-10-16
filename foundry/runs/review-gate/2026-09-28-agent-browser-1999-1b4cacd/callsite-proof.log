@@ -1,0 +1,43 @@
+        let session_id = self.active_session_id()?;
+        let mut params = json!({ "accept": accept });
+        if let Some(text) = prompt_text {
+            params["promptText"] = Value::String(text.to_string());
+        }
+        self.client
+            .send_command(
+                "Page.handleJavaScriptDialog",
+                Some(params),
+                Some(session_id),
+            )
+            .await?;
+        Ok(())
+    }
+
+    pub async fn upload_files(
+        &self,
+        selector: &str,
+        files: &[String],
+        ref_map: &RefMap,
+        iframe_sessions: &HashMap<String, String>,
+    ) -> Result<(), String> {
+        let session_id = self.active_session_id()?;
+
+        let (object_id, effective_session_id) =
+            resolve_element_object_id(&self.client, session_id, ref_map, selector, iframe_sessions)
+                .await?;
+
+        let describe: Value = self
+            .client
+            .send_command(
+                "DOM.describeNode",
+                Some(json!({ "objectId": object_id })),
+                Some(&effective_session_id),
+            )
+            .await?;
+
+        let backend_node_id = describe
+            .get("node")
+            .and_then(|n| n.get("backendNodeId"))
+            .and_then(|v| v.as_i64())
+            .ok_or("Could not get backendNodeId for file input")?;
+

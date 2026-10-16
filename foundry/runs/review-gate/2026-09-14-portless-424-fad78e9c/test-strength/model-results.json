@@ -1,0 +1,92 @@
+[
+  {
+    "cell": "I-P",
+    "falsifiers": "initial-source; fix-absent-base-hosts",
+    "result": "Existing helper test red on second read after initial failure; restored zero-write assertions pass. Built populated initial failure remains parent boundary evidence, not a separately killed populated CLI mutant."
+  },
+  {
+    "cell": "I-E",
+    "falsifiers": "initial-source; initial-built; cli-empty-bypass",
+    "result": "Existing helper and built CLI red; true/exit0 instead of false/exit1."
+  },
+  {
+    "cell": "I-C",
+    "falsifiers": "cleanup-source; cleanup-built; cli-ignore-clean-result",
+    "result": "Existing helper and built cleanup guard red; false/exit1 restored."
+  },
+  {
+    "cell": "V-P",
+    "falsifiers": "verification-null-source",
+    "result": "Existing populated helper rejects accepting null verification. Populated CLI verification path was driven by resilience, not independently falsified by authored populated CLI test."
+  },
+  {
+    "cell": "V-E",
+    "falsifiers": "verification-empty-source; verification-built; fix-absent-base-hosts",
+    "result": "Existing helper and CLI reject null-as-empty success."
+  },
+  {
+    "cell": "M-P",
+    "falsifiers": "mismatch-source",
+    "result": "Existing helper red when predicate is skipped."
+  },
+  {
+    "cell": "M-E",
+    "falsifiers": "empty-mismatch-source; gap-empty-mismatch",
+    "result": "Original suite survivor; scratch test red on stale readable result, restored false."
+  },
+  {
+    "cell": "W-P",
+    "falsifiers": "write-error-source",
+    "result": "Existing helper red on swallowed write error."
+  },
+  {
+    "cell": "N-E",
+    "falsifiers": "falsey-initial-source; noop-source",
+    "result": "Existing helper detects conflating readable empty with failure and unnecessary write."
+  },
+  {
+    "cell": "N-P",
+    "falsifiers": "noop-source",
+    "result": "Existing helper detects unnecessary rewrite of exact block."
+  },
+  {
+    "cell": "R-E",
+    "falsifiers": "cli-empty-bypass",
+    "result": "Existing built CLI test red on zero writes instead of stale reconciliation."
+  },
+  {
+    "cell": "R-P",
+    "falsifiers": "cli-wrong-argument; gap-cli-wrong-argument",
+    "result": "Original suite survivor at real CLI call site; scratch populated test red on absent app.test record. Route fixture uses live test PID and two independently specified records."
+  },
+  {
+    "cell": "C-E",
+    "falsifiers": "cleanup-readable-source; gap-cleanup-readable",
+    "result": "Original suite survivor; scratch no-block cleanup test red on false instead of true."
+  },
+  {
+    "cell": "C-S",
+    "falsifiers": "cleanup-readable-source; gap-cleanup-readable",
+    "result": "Original suite survivor; scratch stale cleanup test red on false instead of true; healthy assertions check writes and retained records."
+  },
+  {
+    "cell": "C-W",
+    "falsifiers": "gap-cleanup-write-error",
+    "result": "No original selected test exercises cleanup write failure; scratch-only fault changes catch to true and fails expected false. Not included in original 18-mutant survivor count."
+  },
+  {
+    "cell": "B-R",
+    "falsifiers": "cli-ignore-sync-result; cli-ignore-clean-result",
+    "result": "Existing CLI failure assertions detect ignored helper return values."
+  },
+  {
+    "cell": "B-U",
+    "falsifiers": "initial-built; cli-empty-bypass",
+    "result": "Existing sudo-success test fails when escalation is bypassed. Only stubbed sudo, not actual privileged child."
+  },
+  {
+    "cell": "B-F",
+    "falsifiers": "cli-ignore-sudo-failure; gap-cli-sudo-failure",
+    "result": "Original suite survivor; scratch failed-sudo test red on exit0 instead of exit1."
+  }
+]

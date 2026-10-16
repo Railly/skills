@@ -1,0 +1,687 @@
+{
+  "changed": [
+    {
+      "symbol": "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+      "file": "packages/portless/src/cli.test.ts"
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+      "file": "packages/portless/src/cli.test.ts"
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#runWithHostsFileMock",
+      "file": "packages/portless/src/cli.test.ts"
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#<module>",
+      "file": "packages/portless/src/cli.test.ts"
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#printHelp",
+      "file": "packages/portless/src/cli.ts"
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#handleHosts",
+      "file": "packages/portless/src/cli.ts"
+    },
+    {
+      "symbol": "packages/portless/src/hosts.test.ts#readFileSync",
+      "file": "packages/portless/src/hosts.test.ts"
+    },
+    {
+      "symbol": "packages/portless/src/hosts.test.ts#writeFileSync",
+      "file": "packages/portless/src/hosts.test.ts"
+    },
+    {
+      "symbol": "packages/portless/src/hosts.test.ts#<module>",
+      "file": "packages/portless/src/hosts.test.ts"
+    },
+    {
+      "symbol": "packages/portless/src/hosts.ts#readHostsFile",
+      "file": "packages/portless/src/hosts.ts"
+    },
+    {
+      "symbol": "packages/portless/src/hosts.ts#syncHostsFile",
+      "file": "packages/portless/src/hosts.ts"
+    },
+    {
+      "symbol": "packages/portless/src/hosts.ts#cleanHostsFile",
+      "file": "packages/portless/src/hosts.ts"
+    },
+    {
+      "symbol": "packages/portless/src/hosts.ts#getManagedHostnames",
+      "file": "packages/portless/src/hosts.ts"
+    },
+    {
+      "symbol": "packages/portless/src/hosts.ts#<module>",
+      "file": "packages/portless/src/hosts.ts"
+    }
+  ],
+  "impacted": [
+    {
+      "symbol": "packages/portless/src/cli.ts#main",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#printHelp",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#startProxyServer",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/hosts.ts#syncHostsFile",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#handleClean",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/hosts.ts#cleanHostsFile",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#handleDoctor",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/hosts.ts#getManagedHostnames",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli-utils.ts#syncHostsWithWarning",
+      "file": "packages/portless/src/cli-utils.ts",
+      "confidence": 1,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "use",
+          "from": "packages/portless/src/hosts.ts#syncHostsFile",
+          "provenance": "EXTRACTED"
+        },
+        {
+          "via": "cochange",
+          "from": "22 co-changes in history",
+          "provenance": "INFERRED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli-utils.ts#reportHostsSync",
+      "file": "packages/portless/src/cli-utils.ts",
+      "confidence": 1,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "use",
+          "from": "packages/portless/src/hosts.ts#getManagedHostnames",
+          "provenance": "EXTRACTED"
+        },
+        {
+          "via": "cochange",
+          "from": "22 co-changes in history",
+          "provenance": "INFERRED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#<module>",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 2,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#main",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#reportHostsSyncHere",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 2,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli-utils.ts#reportHostsSync",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#handleProxy",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 2,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#startProxyServer",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli-utils.test.ts#<module>",
+      "file": "packages/portless/src/cli-utils.test.ts",
+      "confidence": 1,
+      "depth": 2,
+      "reachedBy": [
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli-utils.ts#syncHostsWithWarning",
+          "provenance": "EXTRACTED"
+        },
+        {
+          "via": "cochange",
+          "from": "15 co-changes in history",
+          "provenance": "INFERRED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#runApp",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 3,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#reportHostsSyncHere",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#handleAlias",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 3,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#reportHostsSyncHere",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#handleDefaultSingle",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 3,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#runApp",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#spawnProxiedApp",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 3,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#reportHostsSyncHere",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#handleDefaultMulti",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 3,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#runWithTurbo",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#runWithTurbo",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 3,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#reportHostsSyncHere",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#runWithDirectSpawn",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 3,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#spawnProxiedApp",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#handleRunMode",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 3,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#runApp",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#handleNamedMode",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 1,
+      "depth": 3,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#runApp",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.ts#handleDefaultMode",
+      "file": "packages/portless/src/cli.ts",
+      "confidence": 0.9759487500000001,
+      "depth": 3,
+      "reachedBy": [
+        "packages/portless/src/cli.ts#handleHosts",
+        "packages/portless/src/cli.ts#printHelp",
+        "packages/portless/src/hosts.ts#cleanHostsFile",
+        "packages/portless/src/hosts.ts#getManagedHostnames",
+        "packages/portless/src/hosts.ts#readHostsFile",
+        "packages/portless/src/hosts.ts#syncHostsFile"
+      ],
+      "reasons": [
+        {
+          "via": "call",
+          "from": "packages/portless/src/cli.ts#handleDefaultSingle",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#__dirname",
+      "file": "packages/portless/src/cli.test.ts",
+      "confidence": 0.58,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.test.ts#<module>",
+        "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+        "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+        "packages/portless/src/cli.test.ts#runWithHostsFileMock"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "packages/portless/src/cli.test.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#CLI_PATH",
+      "file": "packages/portless/src/cli.test.ts",
+      "confidence": 0.58,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.test.ts#<module>",
+        "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+        "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+        "packages/portless/src/cli.test.ts#runWithHostsFileMock"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "packages/portless/src/cli.test.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#TEST_CA_PEM",
+      "file": "packages/portless/src/cli.test.ts",
+      "confidence": 0.58,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.test.ts#<module>",
+        "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+        "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+        "packages/portless/src/cli.test.ts#runWithHostsFileMock"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "packages/portless/src/cli.test.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#run",
+      "file": "packages/portless/src/cli.test.ts",
+      "confidence": 0.58,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.test.ts#<module>",
+        "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+        "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+        "packages/portless/src/cli.test.ts#runWithHostsFileMock"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "packages/portless/src/cli.test.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#writeExpoShim",
+      "file": "packages/portless/src/cli.test.ts",
+      "confidence": 0.58,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.test.ts#<module>",
+        "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+        "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+        "packages/portless/src/cli.test.ts#runWithHostsFileMock"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "packages/portless/src/cli.test.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#captureBypassedExpo",
+      "file": "packages/portless/src/cli.test.ts",
+      "confidence": 0.58,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.test.ts#<module>",
+        "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+        "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+        "packages/portless/src/cli.test.ts#runWithHostsFileMock"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "packages/portless/src/cli.test.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#getFreePort",
+      "file": "packages/portless/src/cli.test.ts",
+      "confidence": 0.58,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.test.ts#<module>",
+        "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+        "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+        "packages/portless/src/cli.test.ts#runWithHostsFileMock"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "packages/portless/src/cli.test.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#startMockProxy",
+      "file": "packages/portless/src/cli.test.ts",
+      "confidence": 0.58,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.test.ts#<module>",
+        "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+        "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+        "packages/portless/src/cli.test.ts#runWithHostsFileMock"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "packages/portless/src/cli.test.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#waitForHttpHeader",
+      "file": "packages/portless/src/cli.test.ts",
+      "confidence": 0.58,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.test.ts#<module>",
+        "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+        "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+        "packages/portless/src/cli.test.ts#runWithHostsFileMock"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "packages/portless/src/cli.test.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    },
+    {
+      "symbol": "packages/portless/src/cli.test.ts#stopChild",
+      "file": "packages/portless/src/cli.test.ts",
+      "confidence": 0.58,
+      "depth": 1,
+      "reachedBy": [
+        "packages/portless/src/cli.test.ts#<module>",
+        "packages/portless/src/cli.test.ts#HostsFileMockCapture",
+        "packages/portless/src/cli.test.ts#HostsFileMockOptions",
+        "packages/portless/src/cli.test.ts#runWithHostsFileMock"
+      ],
+      "reasons": [
+        {
+          "via": "module",
+          "from": "packages/portless/src/cli.test.ts#<module>",
+          "provenance": "EXTRACTED"
+        }
+      ]
+    }
+  ],
+  "visibilityBoundary": {
+    "unresolvedCalls": 6439,
+    "dynamicImports": 0
+  },
+  "stats": {
+    "filesIndexed": 123,
+    "symbols": 832,
+    "edges": 1632,
+    "reconciledFiles": 0,
+    "elapsedMs": 87
+  }
+}

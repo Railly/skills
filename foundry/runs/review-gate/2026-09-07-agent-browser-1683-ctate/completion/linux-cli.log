@@ -1,0 +1,26 @@
+    Finished `test` profile [unoptimized] target(s) in 0.06s
+     Running tests/isolate_context_cli.rs (cli/target/debug/deps/isolate_context_cli-de5648d65174d5b6)
+
+running 3 tests
+test invalid_first_isolation_request_does_not_poison_daemon ... ok
+test isolated_downloads_preserve_other_context_destinations ... ok
+test shared_chrome_real_world_isolation_stress ... FAILED
+
+failures:
+
+---- shared_chrome_real_world_isolation_stress stdout ----
+
+thread '<unnamed>' (21192) panicked at tests/isolate_context_cli.rs:159:9:
+daemon isolate-stress-agent-a did not stop after SIGTERM
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'shared_chrome_real_world_isolation_stress' (20266) panicked at tests/isolate_context_cli.rs:649:29:
+called `Result::unwrap()` on an `Err` value: Any { .. }
+
+
+failures:
+    shared_chrome_real_world_isolation_stress
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.23s
+
+error: test failed, to rerun pass `--test isolate_context_cli`

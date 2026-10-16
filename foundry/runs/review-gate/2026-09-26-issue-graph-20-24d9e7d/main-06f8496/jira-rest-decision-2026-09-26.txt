@@ -1,0 +1,131 @@
+The Jira Cloud platform REST API Developer Documentation Resources News and Updates Get Support Sign in Developer Get Support Sign in DOCUMENTATION Cloud Data Center Resources News and Updates Get support Sign in Developer Sign in DOCUMENTATION Cloud Data Center Resources News and Updates Get support Sign in Jira Cloud platform Guides Reference REST API Document Format Jira expressions Entity properties JQL search extensibility Connect Resources Changelog Jira Cloud platform Guides Reference Resources Changelog REST API v3 About Version Authentication and authorization Permissions Expansion, pagination, and ordering Timestamps Special headers Anonymous operations Asynchronous operations Experimental features Status codes Announcement banner App data policies App migration App properties Application roles Audit records Avatars Classification levels Dashboards Dynamic modules Field schemes Filter sharing Filters Group and user picker Groups Issue attachments Issue bulk operations Issue comment properties Issue comments Issue custom field associations Issue custom field configuration (apps) Issue custom field contexts Issue custom field options Issue custom field options (apps) Issue custom field values (apps) Issue field configurations Issue fields Issue link types Issue links Issue navigator settings Issue notification schemes Issue panels Issue priorities Issue properties Issue redaction Issue remote links Issue resolutions Issue search Issue security level Issue security schemes Issue type properties Issue type schemes Issue type screen schemes Issue types Issue votes Issue watchers Issue worklog properties Issue worklogs Issues JQL JQL functions (apps) Jira expressions Jira settings Labels License metrics Migration of Connect modules to Forge Myself Permission schemes Permissions Plans Priority schemes Project avatars Project categories Project classification levels Project components Project email Project features Project key and name validation Project permission schemes Project properties Project role actors Project roles Project templates Project types Project versions Projects Screen schemes Screen tab fields Screen tabs Screens Server info Service Registry Status Tasks Teams in plan Time tracking UI modifications (apps) User properties User search Users Webhooks Workflow scheme drafts Workflow scheme project associations Workflow schemes Workflow status categories Workflow statuses Workflow transition rules Workflows Other operations Cloud Jira Cloud platform / Reference / REST API v3 About Postman Collection OpenAPI The Jira REST API enables you to interact with Jira programmatically. Use this API to build apps , script interactions with
+Jira, or develop any other type of integration. This page documents the REST resources available in Jira Cloud, including
+the HTTP response codes and example requests and responses. Version This documentation is for version 3 of the Jira Cloud platform REST API, which is the latest
+version. Version 2 and
+version 3 of the API offer the same collection of operations. However, version 3 provides support for
+the Atlassian Document Format (ADF) in: body in comments, including where comments are used in issue, issue link, and transition resources. comment in worklogs. description and environment fields in issues. textarea type custom fields (multi-line text fields) in issues. Single line custom fields
+( textfield ) accept a string and don't handle Atlassian Document Format content. Authentication and authorization Forge apps For Forge apps, REST API scopes are used when authenticating with Jira Cloud platform. See Add scopes to call an Atlassian REST API for more details. The URIs for Forge app REST API calls have this structure: /rest/api/3/<resource-name> For example, /rest/api/3/issue/DEMO-1 Connect apps For Connect apps, authentication (JWT-based) is built into the Connect libraries. Authorization is implemented using either
+scopes (shown as App scope required for operations on this page) or user impersonation. See Security for Connect apps for details. The URIs for Connect app REST API calls have this structure: https://<site-url>/rest/api/3/<resource-name> For example, https://your-domain.atlassian.net/rest/api/3/issue/DEMO-1 Other integrations For integrations that are not Forge or Connect apps, use OAuth 2.0 authorization code grants (3LO) for security
+(3LO scopes are shown as for operations OAuth scopes required ). See OAuth 2.0 (3LO) apps for details. The URIs for OAuth 2.0 (3LO) app REST API calls have this structure: https://api.atlassian.com/ex/jira/<cloudId>/rest/api/3/<resource-name> For example, https://api.atlassian.com/ex/jira/35273b54-3f06-40d2-880f-dd28cf8daafa/rest/api/3/issue/DEMO-1 Ad-hoc API calls For personal scripts, bots, and ad-hoc execution of the REST APIs use basic authentication. See Basic auth for REST APIs for details. The URIs for basic authentication REST API calls have this structure: https://<site-url>/rest/api/3/<resource-name> For example, https://your-domain.atlassian.net/rest/api/3/issue/DEMO-1 Permissions Operation permissions Most operations in this API require permissions. The calling user must have the required permissions for an operation to
+use it. Note that for Connect apps, the app user must have the required permissions for the operation and the app must
+have scopes that permit the operation. A permission can be granted to a group, project role, or issue role that the user is a member of, or granted directly to a user.
+See Permissions overview for details. The most common permissions are: Administer the Cloud site : Users in the site-admins group have this
+permission. See Manage groups for details. Administer Jira : Granted by the Jira Administrators global permission. There is a default group for this permission.
+See Manage groups and Managing global permissions for details. Administer a project in Jira : Granted by the Administer projects project permission for a project. This can be
+granted to a user, a group, a project role, and more.
+See Managing project permissions for details. Access a project in Jira : Granted by the Browse projects project permission for a project. This can be
+granted to a user, a group, a project role, and more.
+See Managing project permissions for details. Access Jira : Granted by the Jira Users global permission. Users in the default product access group (for example, jira-software-users-acmesite ) have this permission.
+See Manage groups and Managing global permissions for details. Anonymous access Some operations provide support for anonymous access. However, anonymous access is only available if
+the Jira permission needed to access the object or records returned by the operation is granted to
+the Public group. See Allowing anonymous access to your project for details. If an operation is called anonymously and anonymous access is not available, the operation will return
+an error. Note that not all operations that correspond to objects that can be given public access
+provide for anonymous access. Expansion, pagination, and ordering Expansion The Jira REST API uses resource expansion, which means that some parts of a resource are not returned unless specified
+in the request. This simplifies responses and minimizes network traffic. To expand part of a resource in a request, use the expand query parameter and specify the object(s) to be expanded.
+If you need to expand nested objects, use the . dot notation. If you need to expand multiple objects, use a
+comma-separated list. For example, the following request expands the names and renderedFields properties for the JRACLOUD-34423 issue: GET issue/JRACLOUD-34423?expand=names,renderedFields To discover which object can be expanded, refer to the expand property in the object.
+In the JSON example below, the resource declares widgets as expandable. 1
+2
+3
+4
+5
+6
+7
+8
+9 {
+  "expand": "widgets", 
+  "self": "https://your-domain.atlassian.net/rest/api/3/resource/KEY-1", 
+  "widgets": {
+    "widgets": [],
+    "size": 5
+   }
+} Pagination The Jira REST API uses pagination to improve performance. Pagination is enforced for operations that could return a large
+collection of items. When you make a request to a paginated resource, the response wraps the returned array of values in
+a JSON object with paging metadata. For example: 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12 {
+    "startAt" : 0,
+    "maxResults" : 10,
+    "total": 200,
+    "isLast": false,
+    "values": [
+        { /* result 0 */ },
+        { /* result 1 */ },
+        { /* result 2 */ }
+    ]
+} startAt is the index of the first item returned in the page. maxResults is the maximum number of items that a page can return. Each operation can have a different limit for
+the number of items returned, and these limits may change without notice. To find the maximum number of items
+that an operation could return, set maxResults to a large number—for example, over 1000—and if the returned value of maxResults is less than the requested value, the returned value is the maximum. total is the total number of items contained in all pages. This number may change as the client
+requests the subsequent pages, therefore the client should always assume that the requested page can be empty. Note
+that this property is not returned for all operations. isLast indicates whether the page returned is the last one. Note that this property is not returned for all operations. Ordering Some operations support ordering the elements of a response by a field. Check the documentation for the operation to
+confirm whether ordering of a response is supported and which fields can be used. Responses are listed in ascending order
+by default. You can change the order using the orderby query parameter with a - or + symbol. For example: ?orderBy=name to order by name field ascending. ?orderBy=+name to order by name field ascending. ?orderBy=-name to order by name field descending. Timestamps By default, top-level timestamps (e.g. updated and created) are returned in ISO 8601 format, in the system default user time zone. To return date time data in the logged in user's timezone, please refer to renderedFields property under the expand query parameter in relevant APIs. Special headers The following request and response headers define important metadata for the Jira Cloud REST API resources. X-Atlassian-Token (request): Operations that accept multipart/form-data must include the X-Atlassian-Token: no-check header in requests. Otherwise the request is blocked by cross-site request forgery (CSRF/XSRF) protection. X-Force-Accept-Language (request): controls how the standard HTTP Accept-Language header is processed.
+By default Accept-Language is ignored and the response is in the language configured in the user's profile or,
+when no language is configured for the user, the default Jira instance language. For the response to recognize Accept-Language send X-Force-Accept-Language = true as well. If Accept-Language requests a language that Jira
+can return the response is in that language, otherwise Jira returns the response in the default language. If Accept-Language is not specified the response is in the default language. X-AAccountId (response): This response header contains the Atlassian account ID of the authenticated user. Anonymous operations Jira provides for all permissions, except the global permission Administer Jira, to be assigned to Anyone . Once a permission is assigned to Anyone , anyone knowing a project's URL is able to use the features in Jira enabled by the permission. However, the Jira REST API does not enable anonymous access for operations by default. This means that an anonymous user who may be able to perform an action through Jira, may not be able to perform the same action where it's enabled by the REST API. The operations that provide anonymous access are annotated "This operation can be accessed anonymously." Asynchronous operations Some Jira REST API operations may trigger long-running or computationally expensive tasks. In these cases, the operation
+will schedule an asynchronous task and return a 303 (See Other) response, indicating the location of the queued task
+in the Location header. You can query this task to get progress updates. When the task finishes, the response object will contain the result field. The content of the field is specific to the
+operation that created the task. Refer to the operation’s documentation for more information. Note that asynchronous tasks are not guaranteed to be run in order. In other words, if you need your tasks to execute
+in a certain order, you should start a task only after the prerequisite task(s) have finished. Experimental features Features and methods marked as experimental may change without notice. Feedback on experimental functionality is welcome.
+Report issues to Developer and Marketplace support (preferred) or use the Give docs feedback link at the top of this page. Status codes The Jira Cloud platform REST API uses the standard HTTP status codes . Operations that return an error status code may also return a response body containing details of the error or errors.
+The schema for the response body is shown below: 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27 {
+  "id": "https://docs.atlassian.com/jira/REST/schema/error-collection#",
+  "title": "Error Collection",
+  "type": "object",
+  "properties": {
+    "errorMessages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "errors": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": { 
+      "type": "integer"
+    }
+  },
+  "additionalProperties": false
+} Rate this page: Unusable Poor Okay Good Excellent Changelog System status Privacy Notice at Collection Developer Terms Trademark Cookie preferences © 2026 Atlassian

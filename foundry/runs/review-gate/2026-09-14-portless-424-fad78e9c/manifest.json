@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-09-14T19:01:17.070634+00:00",
+  "work_item": {
+    "source": "https://github.com/vercel-labs/portless/pull/424",
+    "repository": "vercel-labs/portless",
+    "cwd": "/tmp/portless-review-424-fad78e9c",
+    "base_sha": "1ad573bb95810daf6cd50c1718707015450f3f09",
+    "main_sha": "c7f38a6f33de1322ca628470be594d907da5aa71",
+    "head_sha": "fad78e9c5e3f1958558eca616d747313e4d4ba60",
+    "dirty_digest": "clean",
+    "changed_paths_digest": "sha256:0e706a14d1231e6c9b59877e7826b714ff3d2cf62f990b75a1fcdf365c6327df",
+    "contract_digest": "sha256:1145366d2e069448221017ea1dbac36a2374ae6a3f8f249705c398c07a4b5659",
+    "authorization": "review-only; isolated verification/artifacts, no source fixes or GitHub mutations",
+    "profile": "external-pr",
+    "budget_minutes": null,
+    "budget_note": "No user deadline or prior manifest budget supplied."
+  },
+  "skill_revisions": {
+    "review-gate": {
+      "revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "digest": "git-tree:54c8a332dab0febea175fc4fc375785e8745e6c4",
+      "path": "/Users/raillyhugo/Programming/railly/skills/skills/review-gate",
+      "status": "exact"
+    }
+  },
+  "orchestration": {
+    "mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "Separate native reviewers were used after the FX wrapper rejected its status response (unsupported auth mode: missing). Cross-family independence is unverified; author model is unknown.",
+    "receipt": "runtime-fallback.json",
+    "schema_failures": 1,
+    "operations": [
+      {
+        "operation": "FX independent review wrapper",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "Inspect available FX status once",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "Native specialists",
+        "attempted_calls": 4,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "stages": {
+    "test_strength": {
+      "status": "fail",
+      "raw_status": "gaps",
+      "head_sha": "fad78e9c5e3f1958558eca616d747313e4d4ba60",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/test-strength/stage-receipt.json"
+    },
+    "resilience": {
+      "status": "unavailable",
+      "raw_status": "gaps",
+      "head_sha": "fad78e9c5e3f1958558eca616d747313e4d4ba60",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/resilience/stage-receipt.json"
+    },
+    "security": {
+      "status": "pass",
+      "head_sha": "fad78e9c5e3f1958558eca616d747313e4d4ba60",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/security/security-receipt.json",
+      "scope": "Exact-head change and commit message: reject unreadable hosts files before mutation, distinguish them from readable empty files, reject unreadable post-write verification, reconcile empty route sets, and preserve existing elevation/error paths and best-effort inspection."
+    },
+    "review": {
+      "status": "incomplete",
+      "verdict": "incomplete",
+      "head_sha": "fad78e9c5e3f1958558eca616d747313e4d4ba60",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/run-report.json",
+      "gaps": [
+        "Required Test Strength receipt has gaps: four representative mutants survive the selected committed tests. Scratch-only probes kill them but do not add regression coverage to this PR.",
+        "Required Resilience receipt has gaps: actual elevated child execution, Linux/Windows fault injection, live daemon/route producers and concurrent real filesystem writers were not exercised. Remote Linux/Windows CI is green but is not those fault-injection campaigns.",
+        "Separate native reviewers were used after the FX wrapper rejected its status response (unsupported auth mode: missing). Cross-family independence is unverified; author model is unknown.",
+        "No preexisting work-item manifest or formal issue/design contract was found. This manifest is materialized after specialist execution; stage-local contract/environment digests remain preserved rather than falsely presented as a shared pre-run fingerprint.",
+        "P3 F1 remains open: stronger no-stale-entries success wording is false for an orphaned managed block. Underlying parser behavior predates this PR."
+      ],
+      "validation": {
+        "exit_code": 1,
+        "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-portless-424-fad78e9c/report-validation.log",
+        "schema_gap": "Security confidence fields not normalized; safety-held edit did not run."
+      }
+    }
+  },
+  "provenance_gap": "No preexisting work-item manifest or formal issue/design contract was found. This manifest is materialized after specialist execution; stage-local contract/environment digests remain preserved rather than falsely presented as a shared pre-run fingerprint."
+}

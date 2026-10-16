@@ -1,0 +1,1 @@
+The optional --all-targets -D warnings check failed on Rust 1.98 clippy::for_unbounded_range in existing browser.rs:3494 test code. git show HEAD:cli/src/native/browser.rs is byte-identical to the current file. The documented repository check is cargo clippy; run that without expanding the fix scope. No new warning from changed code was reported.

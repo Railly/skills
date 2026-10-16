@@ -1,0 +1,140 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-fix-fad34d20/resilience.json",
+  "fingerprint": {
+    "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+    "changed_paths_digest": "sha256:953d342155af221f951cf886cd063bff7c8124764e58a29982630913ea24bd6b",
+    "contract_digest": "sha256:a7efe4ddf2ff2d778d5b8855e0e6257287add38f308afbcd3780e615576b1fa6",
+    "command": "cargo test -- --test-threads=1; cargo test e2e_auth_login -- --ignored --test-threads=1; cargo clippy -- -D warnings; bun compatibility.mjs; bun lifecycle-final.mjs; bun pressure-fix.mjs fix-race; bun lightpanda-probe.mjs lightpanda-race; bun react-cli-probe.mjs; bun react-lightpanda-probe.mjs",
+    "environment_digest": "sha256:53215f2b9610e304972e09c15b04d73bd6d0cbcc49279f041b29a437fa20639d",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+    "relevant_paths": [
+      "README.md",
+      "cli/src/mcp.rs",
+      "cli/src/native/actions.rs",
+      "cli/src/native/e2e_tests.rs",
+      "cli/src/native/element.rs",
+      "cli/src/output.rs",
+      "docs/src/app/commands/page.mdx",
+      "docs/src/app/security/page.mdx",
+      "skill-data/core/references/authentication.md",
+      "skill-data/core/references/commands.md",
+      "cli/src/native/interaction.rs",
+      "cli/src/native/cdp/client.rs"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lifecycle-final-results.json: 32 rejections and 32 immediate retries; both engine missing-control matrices; CDP unit partitions.",
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "Username becomes page-visible.",
+      "owner": "AuthLoginElement::fill",
+      "commit_event": "Native insertText or exact-element native value setter",
+      "later_fallible_stages": [
+        "password selection and entry",
+        "submit selection",
+        "synchronous input callback"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "password selection and entry",
+          "covers": [
+            "password selection and entry"
+          ],
+          "forced": true,
+          "residual_observed": "Username remains correct; password absent or unchanged; no submission or wrong-field delivery.",
+          "cleanup_owner": "Page owns already-entered values; caller retries after restoring the field.",
+          "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/fix-matrix-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lightpanda-matrix-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lifecycle-final-results.json",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Both missing-password matrices and all password lifecycle cells immediately repeat auth successfully after removing the page fault."
+          }
+        },
+        {
+          "ownership_region": "submit selection",
+          "covers": [
+            "submit selection"
+          ],
+          "forced": true,
+          "residual_observed": "Both correct credentials remain; no command submission.",
+          "cleanup_owner": "Page retains form values; no transaction rollback is promised.",
+          "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/fix-matrix-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lightpanda-matrix-results.json",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Missing-submit fixture restores the button then repeats the same auth operation successfully."
+          }
+        },
+        {
+          "ownership_region": "input callback",
+          "covers": [
+            "synchronous input callback"
+          ],
+          "forced": true,
+          "residual_observed": "Input reaches selected field; immediate field removal is detected; no submit and decoy unchanged.",
+          "cleanup_owner": "Page owns its DOM mutation; command rejects without credential retarget.",
+          "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lifecycle-final-results.json",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "All input-detach cells restore the page fault and retry successfully on both engines."
+          }
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "effect": "CDP remote element handle acquired.",
+      "owner": "wait_for_any_selector / AuthLoginElement::fill",
+      "commit_event": "Runtime.evaluate / DOM.resolveNode",
+      "later_fallible_stages": [
+        "selection description",
+        "focus and edit"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "selection description",
+          "covers": [
+            "selection description"
+          ],
+          "forced": true,
+          "residual_observed": "Rejected result/exception handles and described node handle are released; selector polling resumes.",
+          "cleanup_owner": "Selection helper releases each observed handle once.",
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/unit-final.log: test_auth_login_selection_releases_rejected_objects",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Each exception/non-node/descriptor-error/malformed-descriptor cell immediately repolls and succeeds on attempt two."
+          }
+        },
+        {
+          "ownership_region": "focus and edit",
+          "covers": [
+            "focus and edit"
+          ],
+          "forced": true,
+          "residual_observed": "Safe rejection; resolved element handle release attempted on success, false, JS exception and protocol error.",
+          "cleanup_owner": "Fill helper owns acquired handles; transport/context destruction is best effort.",
+          "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/unit-final.log: test_auth_login_fill_releases_remote_object; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/lifecycle-final-results.json",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Same user operation succeeds after removing every injected page fault; protocol cleanup directly observed by CDP mock."
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Existing daemon awaits execute_command under its state lock; a CLI disconnect does not cancel this future.",
+    "No guarantee of release completion after arbitrary task abortion, renderer destruction, or unavailable transport.",
+    "No automatic credential retry or rollback of credentials already entered into intended fields.",
+    "Lightpanda document-level input-event bubbling differs from Chrome. Its destination/value and React controlled-state proof are separate."
+  ],
+  "gaps": []
+}

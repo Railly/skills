@@ -1,0 +1,297 @@
+{
+  "required": true,
+  "status": "incomplete",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/test-strength.json",
+  "fingerprint": {
+    "head_sha": "a45f1b656cb13c74bf1dca2f1439b77e8020360c",
+    "dirty_digest": "1c50ffee94cbae40be0971be6d1e1862a3eaed1d879d426094baa8a444c5c54d",
+    "changed_paths_digest": "fc8dcb0c5ec25ad65c7f8a1f79127967afa294c82dc1161f1763a9964b0f72bc",
+    "contract_digest": "9908e06eddd8a767958d0cdaa5de1514d4c9d3c3897034de3baa924711b7e70b",
+    "command": "cargo test --manifest-path cli/Cargo.toml --locked -- --test-threads=1; tls_cli Chrome ignored test; mutations; MCP smoke",
+    "environment_digest": "fd42a3dfa9ff29ecc4c9c8371fddaf55aaa6cf48c38bc5f0e3b604ca507b2b39",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "cli/src/chat.rs",
+      "cli/src/commands.rs",
+      "cli/src/connection.rs",
+      "cli/src/doctor/network.rs",
+      "cli/src/flags.rs",
+      "cli/src/install.rs",
+      "cli/src/main.rs",
+      "cli/src/mcp.rs",
+      "cli/src/native/actions.rs",
+      "cli/src/native/cdp/discovery.rs",
+      "cli/src/native/providers.rs",
+      "cli/src/native/stream/chat.rs",
+      "cli/src/output.rs",
+      "cli/src/read.rs",
+      "cli/src/tls.rs",
+      "cli/src/upgrade.rs",
+      "cli/tests/fixtures/tls/ca-a.pem",
+      "cli/tests/fixtures/tls/ca-b.pem",
+      "cli/tests/fixtures/tls/expired.pem",
+      "cli/tests/fixtures/tls/install.key",
+      "cli/tests/fixtures/tls/install.pem",
+      "cli/tests/fixtures/tls/server-a.key",
+      "cli/tests/fixtures/tls/server-a.pem",
+      "cli/tests/fixtures/tls/server-b.key",
+      "cli/tests/fixtures/tls/server-b.pem",
+      "cli/tests/tls_cli.rs"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "evidence": "1176 tests pass; 3 production mutations killed and restored; separate Chrome/MCP real-boundary evidence. Unexecuted cells explicitly named below. pool-proof.json exercises an old in-flight pooled HTTP operation, root replacement, rejection of the previous issuer at the next acquisition, and success after server certificate rotation, all with one daemon. Follow-up verified all 36 explicit/native selection transition cells, 32 structured input classes, six additional killed faults, cancellation/timeout/disconnect/shutdown recovery, CPU-width concurrent requests, and real Debian native-store plus Chromium NSS behavior.",
+  "dimensions": {
+    "values": [
+      "consumer: daemon read, WSS handshake, standalone install, MCP read",
+      "prior CA: unset, explicit A, explicit B, cleared",
+      "update: set, omit, explicit false, clear, invalid replacement",
+      "material: unchanged, duplicate-equivalent, same-path changed, symlink target changed, corrupt",
+      "peer: trusted issuer, other issuer, wrong hostname, expired",
+      "native: off, on via dependency SSL_CERT_FILE override, explicit false",
+      "lifecycle: no browser, live Chrome, separate daemon, old protocol daemon",
+      "Full finite transition matrix: extra bundle absent/A/B \u00d7 native off/on \u00d7 omit/setA/setB/clear/nativeFalse/nativeTrue = 36 cells",
+      "JSON field-type partitions and certificate grammar truncation corpus = 32 classes"
+    ],
+    "exclusions": [
+      "Corporate MDM/keychain deployment is outside the local synthetic fixture suite and remains a preview verification target.",
+      "No retroactive termination of acquired clients is promised.",
+      "No user-facing claim that changing native override env paths affects a daemon already spawned."
+    ],
+    "evidence": "cli/tests/tls_cli.rs, tls::tests, MCP smoke and migration artifact"
+  },
+  "oracle": {
+    "source": "ctate and SugeethK comments plus X.509 certificate acceptance and actual daemon/browser identity",
+    "independent": true,
+    "evidence": "Fixture issuers A/B, localhost SAN, expired certificate. Successful read body requires real TLS; marker survives only same page."
+  },
+  "producer": {
+    "name": "Rustls local TLS peers, built CLI subprocesses and MCP stdio, Google Chrome",
+    "status": "exercised",
+    "evidence": "CLI tests and mcp-smoke.json; real Chrome continuity test passed."
+  },
+  "falsification": [
+    {
+      "mutant": "browserless-dispatch",
+      "site": "cli/src/main.rs",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--test",
+        "tls_cli",
+        "read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart",
+        "--",
+        "--exact",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 24.0,
+      "stdout": "\nrunning 1 test\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... FAILED\n\nfailures:\n\n---- read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart stdout ----\n\nthread 'read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart' (14234510) panicked at tests/tls_cli.rs:208:5:\nassertion `left == right` failed: [\"--ca-cert\", \"/var/folders/t_/srzvjq016kn2zdmpxsr841b00000gn/T/.tmpnJKsQA/ca.pem\", \"read\", \"https://localhost:62704\", \"--timeout\", \"2000\"]: {\"error\":\"--ca-cert is currently supported only on Linux\",\"success\":false}\n  left: Bool(false)\n right: true\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 1.18s\n\n",
+      "stderr": "    Blocking waiting for file lock on build directory\n   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.30s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+    },
+    {
+      "mutant": "command-trust-wiring",
+      "site": "cli/src/native/actions.rs",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--test",
+        "tls_cli",
+        "read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart",
+        "--",
+        "--exact",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 7.93,
+      "stdout": "\nrunning 1 test\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... FAILED\n\nfailures:\n\n---- read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart stdout ----\n\nthread 'read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart' (14235141) panicked at tests/tls_cli.rs:208:5:\nassertion `left == right` failed: [\"--ca-cert\", \"/var/folders/t_/srzvjq016kn2zdmpxsr841b00000gn/T/.tmpLEZg7K/ca.pem\", \"read\", \"https://localhost:62747\", \"--timeout\", \"2000\"]: {\"data\":null,\"error\":\"Read request failed: error sending request for url (https://localhost:62747/): client error (Connect): invalid peer certificate: UnknownIssuer\",\"success\":false}\n  left: Bool(false)\n right: true\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 1.17s\n\n",
+      "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.23s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+    },
+    {
+      "mutant": "stale-client-generation",
+      "site": "cli/src/tls.rs",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--test",
+        "tls_cli",
+        "read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart",
+        "--",
+        "--exact",
+        "--test-threads=1"
+      ],
+      "exit": 101,
+      "seconds": 8.64,
+      "stdout": "\nrunning 1 test\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... FAILED\n\nfailures:\n\n---- read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart stdout ----\n\nthread 'read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart' (14235655) panicked at tests/tls_cli.rs:208:5:\nassertion `left == right` failed: [\"read\", \"https://localhost:62794\", \"--timeout\", \"2000\"]: {\"data\":null,\"error\":\"Read request failed: error sending request for url (https://localhost:62794/): client error (Connect): invalid peer certificate: UnknownIssuer\",\"success\":false}\n  left: Bool(false)\n right: true\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 1.37s\n\n",
+      "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.74s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+    },
+    {
+      "restored": true,
+      "exit": 0,
+      "stdout": "\nrunning 7 tests\ntest install_fetches_manifest_with_explicit_and_native_trust ... ok\ntest install_rejects_an_invalid_explicit_ca_before_network_or_daemon ... ok\ntest read_follows_ca_symlink_rotation ... ok\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... ok\ntest system_roots_refresh_and_explicit_false_overrides_environment ... ok\ntest trust_preserves_hostname_and_expiry_validation ... ok\ntest wss_uses_refreshed_trust_on_the_same_daemon ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.61s\n\n",
+      "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.17s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\n"
+    },
+    {
+      "mutation": "drop-explicit-false",
+      "site": "cli/src/tls.rs",
+      "exit": 101,
+      "seconds": 9.56,
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--test",
+        "tls_cli",
+        "system_roots_refresh_and_explicit_false_overrides_environment",
+        "--",
+        "--exact",
+        "--test-threads=1"
+      ],
+      "stdout": "\nrunning 1 test\ntest system_roots_refresh_and_explicit_false_overrides_environment ... FAILED\n\nfailures:\n\n---- system_roots_refresh_and_explicit_false_overrides_environment stdout ----\n\nthread 'system_roots_refresh_and_explicit_false_overrides_environment' (14323783) panicked at tests/tls_cli.rs:310:5:\nassertion `left == right` failed: {\"data\":{\"content\":\"TLS works\\n\",\"contentType\":\"text/markdown\",\"finalUrl\":\"https://localhost:55711/\",\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_attempted\"},\"source\":\"accept-markdown\",\"status\":200,\"truncated\":false,\"url\":\"https://localhost:55711/\"},\"error\":null,\"success\":true}\n  left: Bool(true)\n right: false\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    system_roots_refresh_and_explicit_false_overrides_environment\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 1.74s\n\n",
+      "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.27s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+    },
+    {
+      "mutation": "drop-clear",
+      "site": "cli/src/tls.rs",
+      "exit": 101,
+      "seconds": 7.18,
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--test",
+        "tls_cli",
+        "read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart",
+        "--",
+        "--exact",
+        "--test-threads=1"
+      ],
+      "stdout": "\nrunning 1 test\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... FAILED\n\nfailures:\n\n---- read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart stdout ----\n\nthread 'read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart' (14324401) panicked at tests/tls_cli.rs:208:5:\nassertion `left == right` failed: [\"--no-ca-cert\", \"read\", \"https://localhost:55757\", \"--timeout\", \"2000\"]: {\"data\":{\"content\":\"TLS works\\n\",\"contentType\":\"text/markdown\",\"finalUrl\":\"https://localhost:55757/\",\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_attempted\"},\"source\":\"accept-markdown\",\"status\":200,\"truncated\":false,\"url\":\"https://localhost:55757/\"},\"error\":null,\"success\":true}\n  left: Bool(true)\n right: false\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 1.80s\n\n",
+      "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.83s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+    },
+    {
+      "mutation": "omit-forgets-selection",
+      "site": "cli/src/tls.rs",
+      "exit": 101,
+      "seconds": 8.18,
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--test",
+        "tls_cli",
+        "read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart",
+        "--",
+        "--exact",
+        "--test-threads=1"
+      ],
+      "stdout": "\nrunning 1 test\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... FAILED\n\nfailures:\n\n---- read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart stdout ----\n\nthread 'read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart' (14325546) panicked at tests/tls_cli.rs:208:5:\nassertion `left == right` failed: [\"read\", \"https://localhost:55849\", \"--timeout\", \"2000\"]: {\"data\":null,\"error\":\"Read request failed: error sending request for url (https://localhost:55849/): client error (Connect): invalid peer certificate: UnknownIssuer\",\"success\":false}\n  left: Bool(false)\n right: true\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 1.96s\n\n",
+      "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.10s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+    },
+    {
+      "mutation": "invalid-retained-reuses-roots",
+      "site": "cli/src/tls.rs",
+      "exit": 101,
+      "seconds": 9.54,
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--test",
+        "tls_cli",
+        "read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart",
+        "--",
+        "--exact",
+        "--test-threads=1"
+      ],
+      "stdout": "\nrunning 1 test\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... FAILED\n\nfailures:\n\n---- read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart stdout ----\n\nthread 'read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart' (14326407) panicked at tests/tls_cli.rs:208:5:\nassertion `left == right` failed: [\"read\", \"https://localhost:55907\", \"--timeout\", \"2000\"]: {\"data\":{\"content\":\"TLS works\\n\",\"contentType\":\"text/markdown\",\"finalUrl\":\"https://localhost:55907/\",\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_attempted\"},\"source\":\"accept-markdown\",\"status\":200,\"truncated\":false,\"url\":\"https://localhost:55907/\"},\"error\":null,\"success\":true}\n  left: Bool(true)\n right: false\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 2.16s\n\n",
+      "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.87s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+    },
+    {
+      "mutation": "symlink-resolved-once",
+      "site": "cli/src/tls.rs",
+      "exit": 101,
+      "seconds": 8.37,
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--test",
+        "tls_cli",
+        "read_follows_ca_symlink_rotation",
+        "--",
+        "--exact",
+        "--test-threads=1"
+      ],
+      "stdout": "\nrunning 1 test\ntest read_follows_ca_symlink_rotation ... FAILED\n\nfailures:\n\n---- read_follows_ca_symlink_rotation stdout ----\n\nthread 'read_follows_ca_symlink_rotation' (14327325) panicked at tests/tls_cli.rs:208:5:\nassertion `left == right` failed: [\"read\", \"https://localhost:55981\", \"--timeout\", \"2000\"]: {\"data\":null,\"error\":\"Read request failed: error sending request for url (https://localhost:55981/): client error (Connect): invalid peer certificate: UnknownIssuer\",\"success\":false}\n  left: Bool(false)\n right: true\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    read_follows_ca_symlink_rotation\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 1.84s\n\n",
+      "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.98s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+    },
+    {
+      "mutation": "discard-new-http-generation",
+      "site": "cli/src/tls.rs",
+      "exit": 101,
+      "seconds": 8.94,
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--bin",
+        "agent-browser",
+        "tls::tests::trust_generation_tracks_material_and_preserves_omitted_selection",
+        "--",
+        "--exact",
+        "--test-threads=1"
+      ],
+      "stdout": "\nrunning 1 test\ntest tls::tests::trust_generation_tracks_material_and_preserves_omitted_selection ... FAILED\n\nfailures:\n\n---- tls::tests::trust_generation_tracks_material_and_preserves_omitted_selection stdout ----\n\nthread 'tls::tests::trust_generation_tracks_material_and_preserves_omitted_selection' (14327945) panicked at src/tls.rs:468:9:\nassertion failed: cache.http.is_none()\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    tls::tests::trust_generation_tracks_material_and_preserves_omitted_selection\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1268 filtered out; finished in 0.01s\n\n",
+      "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.40s\n     Running unittests src/main.rs (cli/target/debug/deps/agent_browser-1ead484821ed88d0)\nerror: test failed, to rerun pass `--bin agent-browser`\n"
+    },
+    {
+      "restored": true,
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--test",
+        "tls_cli",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "stdout": "\nrunning 9 tests\ntest install_fetches_manifest_with_explicit_and_native_trust ... ok\ntest install_rejects_an_invalid_explicit_ca_before_network_or_daemon ... ok\ntest read_follows_ca_symlink_rotation ... ok\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... ok\ntest system_roots_refresh_and_explicit_false_overrides_environment ... ok\ntest tls_changes_preserve_a_live_browser_page ... ignored, requires AGENT_BROWSER_TEST_CHROME pointing to a local Chrome binary\ntest trust_option_transition_matrix_preserves_effective_roots ... ok\ntest trust_preserves_hostname_and_expiry_validation ... ok\ntest wss_uses_refreshed_trust_on_the_same_daemon ... ok\n\ntest result: ok. 8 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 9.23s\n\n",
+      "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.25s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\n"
+    }
+  ],
+  "gaps": [
+    "Zscaler interception with MDM-managed macOS Keychain rotation on the reporter machine.",
+    "Native Windows store acceptance and rotation not executed."
+  ],
+  "additional_evidence": [
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pool-proof.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pool-proof.py",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/transition-matrix.log",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/protocol-proof.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/extended-mutations.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pressure-proof.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/linux-native-proof.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/linux-nss-proof.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/linux-final.log",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/preview-artifact.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/preview-smoke.json"
+  ],
+  "bounded_campaign_scope": "Nine representative production faults killed; no universal random-input coverage percentage claimed."
+}

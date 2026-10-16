@@ -1,0 +1,70 @@
+{
+  "review_receipt": "fx-cross-family-packet.json",
+  "reviewed_head": "0a53aefdcae889378132f54d8ea096805f3edcea",
+  "findings": [
+    {
+      "id": "CF1",
+      "reviewer_id": "F1",
+      "disposition": "confirmed_fixed",
+      "claim": "Rollback unconditionally closes a persisted context after implicit reconnect and action error",
+      "evidence": "cross-family-reconnect-red.log; isolation-e2e-v4.log",
+      "scope": "Existing persisted contexts are retained. Newly created unpersisted contexts still roll back on failed action, including after browser restart."
+    },
+    {
+      "id": "CF2",
+      "reviewer_id": "F2",
+      "disposition": "confirmed_fixed",
+      "claim": "Historical context_recreated flag triggers rollback on later invalid launch",
+      "evidence": "cross-family-red.log first failure; isolation-e2e-v4.log",
+      "scope": "Rollback now queries actual unpersisted context ownership, not historical recreation."
+    },
+    {
+      "id": "CF3",
+      "reviewer_id": "F3",
+      "disposition": "confirmed_fixed",
+      "claim": "No binding snapshot can make commit report success without durable context",
+      "evidence": "cross-family-no-target-red.log returns Ok after real Chrome target closure; cross-family-no-target-green.log",
+      "scope": "The test exercises commit helper with real Chrome events, not a whole command race. Existing persisted context with no target remains valid; fresh one fails and disposes."
+    },
+    {
+      "id": "CF4",
+      "reviewer_id": "F4",
+      "disposition": "accepted_limitation",
+      "claim": "Abrupt process death before persistence may leave unrecorded context",
+      "evidence": "completion/fault-repeat-kill-new.json; completion/fault-repeat-late-drop-new.json",
+      "scope": "SIGKILL y corte de disposición medidos: huérfano remoto, sin contaminación sticky; cierre host observado. Sin garantía de crash-atomicity."
+    },
+    {
+      "id": "CF5",
+      "reviewer_id": "F5",
+      "disposition": "refuted",
+      "claim": "Binding-error response loses required lifecycle envelope",
+      "evidence": "actions.rs inject_lifecycle returns immediately for success!=true; existing error_response contract has id/success/error and optional tab_gone. Rollback clears browser before any tab_gone state can apply.",
+      "scope": "No promised lifecycle fields on error; no API change made."
+    },
+    {
+      "id": "CF6",
+      "reviewer_id": "F6",
+      "disposition": "refuted",
+      "claim": "CLI may omit isolateContext after removal of spawn env override",
+      "evidence": "main.rs attach_isolate_context_to_command called for main parsed command, CDP prelaunch, auto prelaunch, batch parsed command; compiled CLI suite was explicitly run with --ignored, including first failed request and successful connect/restart. DaemonState::new restores isolation from binding.",
+      "scope": "Actual user-defined isolation environment remains supported."
+    },
+    {
+      "id": "CF7",
+      "reviewer_id": "F7",
+      "disposition": "refuted",
+      "claim": "Chrome may ignore browserContextId when sent with page sessionId",
+      "evidence": "Real Chrome compiled CLI downloads preserve default and other context destinations and payload bytes. browser.rs other setDownloadBehavior call belongs only to BrowserManager::launch owned Chrome.",
+      "scope": "Dynamic evidence on macOS Chrome 152, not universal platform claim."
+    },
+    {
+      "id": "CF8",
+      "reviewer_id": "F8",
+      "disposition": "unconfirmed_risk",
+      "claim": "Browser download events could cross-talk between sessions",
+      "evidence": "Matching is unchanged by fix. Real simultaneous downloads and ten stress rounds passed with separate payload/directory oracles; missing-context mutation makes download test fail.",
+      "scope": "No forced hostile event interleaving injected. Timing coverage is evidence, not proof against every possible ordering."
+    }
+  ]
+}

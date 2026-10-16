@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "name": "Agent Browser Windows native Root store rotation",
+  "platforms": [
+    "windows"
+  ],
+  "vars": {},
+  "defaultTimeoutMs": 900000,
+  "steps": [
+    {
+      "type": "cuse",
+      "action": "os",
+      "saveAs": "platform"
+    },
+    {
+      "type": "assert",
+      "actual": "${steps.platform.detail}",
+      "operator": "eq",
+      "expected": "windows"
+    },
+    {
+      "type": "exec",
+      "argv": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "cli/Cargo.toml",
+        "--locked",
+        "--test",
+        "tls_cli",
+        "--",
+        "--test-threads=1"
+      ],
+      "saveAs": "tls"
+    },
+    {
+      "type": "assert",
+      "actual": "${steps.tls.stdout}",
+      "operator": "contains",
+      "expected": "test result: ok."
+    },
+    {
+      "type": "exec",
+      "argv": [
+        "python",
+        ".github/scenarios/windows-native-store.py",
+        "--binary",
+        "cli/target/debug/agent-browser.exe",
+        "--fixtures",
+        "cli/tests/fixtures/tls",
+        "--output",
+        "windows-native-store-result.json",
+        "--allow-disposable-runner"
+      ],
+      "saveAs": "nativeStore"
+    },
+    {
+      "type": "assert",
+      "actual": "${steps.nativeStore.stdout}",
+      "operator": "contains",
+      "expected": "\"status\": \"passed\""
+    }
+  ]
+}

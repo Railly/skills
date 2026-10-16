@@ -1,0 +1,53 @@
+   Compiling agent-browser v0.36.0 (/Users/raillyhugo/Programming/vercel/agent-browser-1683/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.57s
+     Running unittests src/main.rs (cli/target/debug/deps/agent_browser-70383ef64e0f5fc2)
+
+running 5 tests
+test native::e2e_tests::e2e_isolated_context_recreates_after_chrome_restart_and_restores_state ... FAILED
+test native::e2e_tests::e2e_isolated_contexts_separate_storage_targets_restart_and_close ... FAILED
+test native::e2e_tests::e2e_isolated_recording_preserves_context_and_close_disposes_primary ... FAILED
+test native::e2e_tests::e2e_isolation_commits_only_after_successful_connection ... FAILED
+test native::e2e_tests::e2e_isolation_pinned_transition_and_implicit_validation ... FAILED
+
+failures:
+
+---- native::e2e_tests::e2e_isolated_context_recreates_after_chrome_restart_and_restores_state stdout ----
+
+thread 'native::e2e_tests::e2e_isolated_context_recreates_after_chrome_restart_and_restores_state' (14487089) panicked at src/native/e2e_tests.rs:10607:5:
+{"error":"--isolate-context requires --cdp, --auto-connect, or connect <port|url>","id":"invalid-after-recreation","success":false}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- native::e2e_tests::e2e_isolated_contexts_separate_storage_targets_restart_and_close stdout ----
+
+thread 'e2e-isolated-contexts' (14487918) panicked at src/test_utils.rs:15:37:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+
+thread 'native::e2e_tests::e2e_isolated_contexts_separate_storage_targets_restart_and_close' (14487917) panicked at src/native/e2e_tests.rs:10524:10:
+called `Result::unwrap()` on an `Err` value: Any { .. }
+
+---- native::e2e_tests::e2e_isolated_recording_preserves_context_and_close_disposes_primary stdout ----
+
+thread 'native::e2e_tests::e2e_isolated_recording_preserves_context_and_close_disposes_primary' (14487919) panicked at src/test_utils.rs:15:37:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+
+---- native::e2e_tests::e2e_isolation_commits_only_after_successful_connection stdout ----
+
+thread 'native::e2e_tests::e2e_isolation_commits_only_after_successful_connection' (14487920) panicked at src/test_utils.rs:15:37:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+
+---- native::e2e_tests::e2e_isolation_pinned_transition_and_implicit_validation stdout ----
+
+thread 'native::e2e_tests::e2e_isolation_pinned_transition_and_implicit_validation' (14487921) panicked at src/test_utils.rs:15:37:
+called `Result::unwrap()` on an `Err` value: PoisonError { .. }
+
+
+failures:
+    native::e2e_tests::e2e_isolated_context_recreates_after_chrome_restart_and_restores_state
+    native::e2e_tests::e2e_isolated_contexts_separate_storage_targets_restart_and_close
+    native::e2e_tests::e2e_isolated_recording_preserves_context_and_close_disposes_primary
+    native::e2e_tests::e2e_isolation_commits_only_after_successful_connection
+    native::e2e_tests::e2e_isolation_pinned_transition_and_implicit_validation
+
+test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 1368 filtered out; finished in 2.59s
+
+error: test failed, to rerun pass `--bin agent-browser`

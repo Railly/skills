@@ -1,0 +1,360 @@
+[
+  {
+    "scenario": "help",
+    "exit": 0,
+    "stdout": "usage: issue-graph jira ISSUE-KEY [options]\n\nTrace Jira work-item relationships through an authenticated customer TWG CLI.\nThis command is read-only and writes no snapshots.\n\n  --site SITE           Atlassian site prefix or cloud ID; uses TWG default when omitted\n  --depth N             same-project recursion depth, 0..10 (default 2)\n  --max-nodes N         total Jira nodes, 1..1000 (default 80)\n  --hub-threshold N     fetch but do not expand non-seed nodes above this degree (default 12)\n  --concurrency N       concurrent TWG reads, 1..32 (default 4)\n  --format FORMAT       auto (default), markdown, or json\n  --json                JSON stdout shorthand; takes no filename\n  -h, --help            show this help\n\nAuto output is Markdown in a terminal and versioned JSON in a pipe.\nStructured cross-project links are fetched as one-hop boundaries. Cross-project text matches and non-Jira links are reported but not fetched.\n\nExamples:\n  issue-graph jira PROJ-123\n  issue-graph jira PROJ-123 --site example --depth 1 --max-nodes 20\n  issue-graph jira PROJ-123 --site 00000000-0000-0000-0000-000000000000 --json\n",
+    "stderr": "",
+    "calls": []
+  },
+  {
+    "scenario": "happy",
+    "exit": 0,
+    "stdout": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:30:20.832Z",
+      "site": "alpha",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 2,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": true,
+      "coverage": {
+        "fetched": 1,
+        "failed": [],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Synthetic PROJ-1",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://alpha.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1"
+        ]
+      ]
+    },
+    "stderr": "",
+    "calls": [
+      [
+        "--site",
+        "alpha",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-1",
+        "--full"
+      ]
+    ]
+  },
+  {
+    "scenario": "denied",
+    "exit": 1,
+    "stdout": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:30:20.905Z",
+      "site": "alpha",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 2,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": false,
+      "coverage": {
+        "fetched": 0,
+        "failed": [
+          "PROJ-1"
+        ],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "",
+          "status": "UNKNOWN",
+          "issueType": "Issue",
+          "url": "",
+          "depth": 0,
+          "fetched": false,
+          "fetchError": "twg jira workitem get failed: permission denied",
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1"
+        ]
+      ]
+    },
+    "stderr": "INCOMPLETE_JIRA_GRAPH: inspect coverage.failed and coverage.cappedOut before acting.\n",
+    "calls": [
+      [
+        "--site",
+        "alpha",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-1",
+        "--full"
+      ]
+    ]
+  },
+  {
+    "scenario": "cap",
+    "exit": 1,
+    "stdout": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:30:20.981Z",
+      "site": "alpha",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 2,
+        "maxNodes": 1,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": false,
+      "coverage": {
+        "fetched": 1,
+        "failed": [],
+        "cappedOut": [
+          "jira:PROJ-2"
+        ]
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Synthetic PROJ-1",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://alpha.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [
+            {
+              "to": "jira:PROJ-2",
+              "via": "issue-link"
+            }
+          ],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1"
+        ]
+      ]
+    },
+    "stderr": "INCOMPLETE_JIRA_GRAPH: inspect coverage.failed and coverage.cappedOut before acting.\n",
+    "calls": [
+      [
+        "--site",
+        "alpha",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-1",
+        "--full"
+      ]
+    ]
+  },
+  {
+    "scenario": "site-link",
+    "exit": 0,
+    "stdout": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:30:21.075Z",
+      "site": "alpha",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 2,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": true,
+      "coverage": {
+        "fetched": 2,
+        "failed": [],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Synthetic PROJ-1",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://alpha.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [
+            {
+              "to": "jira:PROJ-2",
+              "via": "remote-link",
+              "url": "https://beta.atlassian.net/browse/PROJ-2"
+            }
+          ],
+          "externalLinks": [
+            "https://beta.atlassian.net/browse/PROJ-2"
+          ]
+        },
+        {
+          "key": "jira:PROJ-2",
+          "source": "jira",
+          "issueKey": "PROJ-2",
+          "title": "Synthetic PROJ-2",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://alpha.atlassian.net/browse/PROJ-2",
+          "depth": 1,
+          "fetched": true,
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1",
+          "jira:PROJ-2"
+        ]
+      ]
+    },
+    "stderr": "",
+    "calls": [
+      [
+        "--site",
+        "alpha",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-1",
+        "--full"
+      ],
+      [
+        "--site",
+        "alpha",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-2",
+        "--full"
+      ]
+    ]
+  },
+  {
+    "scenario": "partial-comments",
+    "exit": 0,
+    "stdout": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T20:30:21.139Z",
+      "site": "alpha",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 2,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": true,
+      "coverage": {
+        "fetched": 1,
+        "failed": [],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Synthetic PROJ-1",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://alpha.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1"
+        ]
+      ]
+    },
+    "stderr": "",
+    "calls": [
+      [
+        "--site",
+        "alpha",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-1",
+        "--full"
+      ]
+    ]
+  },
+  {
+    "scenario": "bad-args",
+    "exit": 2,
+    "stdout": "",
+    "stderr": "jira requires an issue key such as PROJ-123\n",
+    "calls": []
+  }
+]

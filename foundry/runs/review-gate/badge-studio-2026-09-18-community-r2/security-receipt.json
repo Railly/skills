@@ -1,0 +1,88 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "crafter-station/badge-studio",
+    "base_sha": "11f7abaed7f2ba6afae621077f2aacc0fce9d0bb",
+    "head_sha": "3179c13fcebfa4f0a3c5f589252ea62c8929bcb1",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:d13c41d5d2e223413d2842363f6c69852773183adc9e937708931ef2a739a3fc",
+    "skill_revision": "sha256:1bc1c02daa56ef7df0158c35c868e34051c9a802ce54b273a9586e3310726c9c"
+  },
+  "claim": {
+    "property": "Only the authenticated author can publish, replace or withdraw a complete approved snapshot; draft media are not anonymous public assets.",
+    "attacker": "Anonymous caller, another signed-in author, hostile origin, or malformed badge payload.",
+    "scope": "Community routes, ownership checks, private R2 media and explicit publication approval."
+  },
+  "trust_model": {
+    "assets": [
+      "Private draft media",
+      "Public documents and versions",
+      "Clerk ownership",
+      "Provider credentials"
+    ],
+    "principals": [
+      "Anonymous visitor with design/read authority",
+      "Authenticated author with authority over own publications",
+      "Server with dedicated Neon and R2 credentials",
+      "Public badge text treated as untrusted"
+    ],
+    "boundaries": [
+      "Anonymous editor to first-party Clerk confirmation",
+      "Client intent to server schema and live-session checks",
+      "Neon visibility to private R2 object reads"
+    ],
+    "entrypoints": [
+      "/api/community/*",
+      "badge_community",
+      "badge_publication_confirm"
+    ],
+    "sinks": [
+      "Neon transactions",
+      "Private R2 objects",
+      "Public gallery"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-1",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "confidence": "high",
+      "evidence": [
+        "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/r2-database-followup.log",
+        "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/r2-lifecycle-followup.log",
+        "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/clerk-github-production-verified.json"
+      ],
+      "detail": "Wrong-owner updates and draft reads rejected; approval gates complete promotion; real OAuth user published both approved badges."
+    },
+    {
+      "id": "SEC-2",
+      "classification": "hardening",
+      "scope": "out_of_scope_hardening",
+      "confidence": "high",
+      "evidence": [
+        "/Users/raillyhugo/Programming/crafter-station/badge-studio-artifacts/v20-community/r2-review.json"
+      ],
+      "detail": "Private review-media reads use Clerk JWT session semantics. Checking live session revocation on each private read remains optional hardening; no anonymous or cross-owner disclosure was observed."
+    }
+  ],
+  "verification": {
+    "authorized_scope": "Owned project and isolated fictional fixtures; real user OAuth and the two explicitly approved sample badges.",
+    "commands": [
+      "14 real Neon transaction cases",
+      "6 real Neon/R2 lifecycle cases",
+      "Real GitHub OAuth login",
+      "Native WebMCP publication and anonymous gallery/remix"
+    ],
+    "cleanup": "Disposable lifecycle scripts clean their own fixtures; QA browser publication withdrawn; remaining cleanup recorded separately.",
+    "gaps": []
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [
+      "Consider live-session validation for private-review media reads if immediate revocation is required."
+    ],
+    "routed_non_security_defects": []
+  },
+  "artifact": "security-receipt.json"
+}

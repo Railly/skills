@@ -1,0 +1,18 @@
+{
+  "source": "User request and exact-head documentation; parent work-item manifest absent at three inspections during this stage",
+  "repository": "vercel-labs/portless",
+  "pr": 424,
+  "base": "1ad573bb95810daf6cd50c1718707015450f3f09",
+  "head": "fad78e9c5e3f1958558eca616d747313e4d4ba60",
+  "acceptance_ids": ["RA1", "RA2", "RA3", "RA4", "RA5"],
+  "claims": {
+    "RA1": "Initial unreadability prevents hosts writes for both nonempty and empty routes and cleanup.",
+    "RA2": "Manual sync rereads after successful writes, and unreadable verification is failure even for empty routes.",
+    "RA3": "Empty routes remove stale managed entries while preserving unrelated hosts content.",
+    "RA4": "New read failures use the unchanged caller elevation/error path; no new retry loop or rollback is promised.",
+    "RA5": "Immediate retries are inspected after faults before, at, and after the write commit point. Preexisting partial-write and atomicity defects are not attributed to this PR."
+  },
+  "source_locations": ["README.md:489", "apps/docs/src/app/commands/page.mdx:276", "skills/portless/SKILL.md:420", "packages/portless/src/cli.ts:1996-2000,2422-2425,2483-2488"],
+  "safety": "Only disposable fixture hosts I/O, fake getuid and sudo. No real hosts access, elevation, trust-store operation, proxy operation, user-state access, source fixes, or target git mutation. All artifacts only in the authorized resilience directory; parent manifest must not be edited.",
+  "contract_digest_scope": "Provisional stage-local contract, not an invented digest for the unavailable parent manifest. Parent orchestration must reconcile acceptance IDs/digest before treating this as an integrated gate receipt."
+}

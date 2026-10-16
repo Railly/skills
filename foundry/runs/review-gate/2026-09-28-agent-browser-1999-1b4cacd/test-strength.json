@@ -1,0 +1,62 @@
+{
+  "required": true,
+  "status": "fail",
+  "reason": "The three added tests protect hidden-first examples but pass while detached-node credential misdelivery remains possible.",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-1b4cacd/test-strength.json",
+  "evidence": "Three contributor regressions fail for selector timeouts on parent production code and pass on PR head. All eight auth E2E tests pass, but none guards detached-node credential delivery. The independent race oracle fails on head.",
+  "fingerprint": {
+    "head_sha": "1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51",
+    "changed_paths_digest": "sha256:bb0ffb563e95aeef2f4bbb131dc0bf4c1f4df17721c432aee2c4f71d29075023",
+    "contract_digest": "sha256:7c8382720c66a5ece76bbcd60318f1d598b0cfb2f9d406f0fcdd597cee885b7b",
+    "command": "bun verify.mjs; bun pressure.mjs race; bun pressure.mjs matrix; cargo test e2e_auth_login -- --ignored --test-threads=1",
+    "environment_digest": "sha256:e3ef4b63db7f88cedcd38cef02f4c232dfa609e5b589fd5e5934e819dd1b388a",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "cli/src/native/actions.rs",
+      "cli/src/native/e2e_tests.rs",
+      "cli/src/native/element.rs",
+      "cli/src/native/interaction.rs",
+      "cli/src/native/cdp/client.rs"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "dimensions": {
+    "values": [
+      "control: username, password, submit",
+      "first match: hidden, disabled, readonly, normal",
+      "selector source: automatic, explicit CSS",
+      "node lifetime: attached, replaced between selection and action",
+      "partial progress: no missing control, missing password, missing submit, immediate retry",
+      "navigation: ordinary, no-navigate, cross-origin rejection, delayed SPA"
+    ],
+    "exclusions": [
+      "Readonly only applies to input controls; submit has no readonly semantics.",
+      "Only macOS Chrome 152 was exercised; no claim of a Linux/Chrome 154 rerun.",
+      "No fix-absent mutation for every disabled/readonly cell or transient CDP-failure partition. Those cells cannot establish exhaustive protection."
+    ],
+    "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/before-after-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/matrix-results.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/race-results.json; force-red.log; auth-e2e.log"
+  },
+  "oracle": {
+    "source": "Issue 1998 requires visible form values and submission. The PR separately promises exact-node action and safe stale failure. DOM input-event targets and actual submitted values are observed independently of CLI success.",
+    "independent": true,
+    "evidence": "Both builds report success during the race, while only head writes the password into the username field. The DOM oracle separates the property from the success proxy."
+  },
+  "producer": {
+    "name": "Exact compiled agent-browser binaries and real Chrome DOM mutation, input events, and form submission",
+    "status": "exercised",
+    "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/verify.mjs; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/pressure.mjs"
+  },
+  "falsification": [
+    {
+      "mutation": "Retain PR's new e2e_tests.rs on an isolated parent production tree with the complete fix absent.",
+      "red_evidence": "force-red.log: 0 passed, 3 failed at the intended username/password/submit timeout assertions; no compilation or setup failure.",
+      "restored_green_evidence": "auth-e2e.log: exact untouched PR head passes all 8 auth E2E tests, including the same 3 added regressions."
+    }
+  ],
+  "gaps": [
+    "Current authored suite passes despite the detached-node misdelivery in F1.",
+    "Descriptor failure, cancellation, and per-class disabled/readonly mutations were not exhaustively forced."
+  ]
+}

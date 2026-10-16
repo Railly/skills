@@ -1,0 +1,12 @@
+--- dist/chunk-RQ7SS7J3.js
++++ dist/chunk-RQ7SS7J3.js
+@@ -1027,8 +1027,7 @@
+   return verification !== null && blockMatchesHostnames(verification, hostnames);
+ }
+ function cleanHostsFile() {
+-  const content = readHostsFile();
+-  if (content === null) return false;
++  const content = readHostsFile() ?? "";
+   try {
+     if (!content.includes(MARKER_START)) return true;
+     fs3.writeFileSync(HOSTS_PATH, removeBlock(content));

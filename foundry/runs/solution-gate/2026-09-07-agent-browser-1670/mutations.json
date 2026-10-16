@@ -1,0 +1,68 @@
+[
+  {
+    "mutant": "browserless-dispatch",
+    "site": "cli/src/main.rs",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "cli/Cargo.toml",
+      "--test",
+      "tls_cli",
+      "read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart",
+      "--",
+      "--exact",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 24.0,
+    "stdout": "\nrunning 1 test\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... FAILED\n\nfailures:\n\n---- read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart stdout ----\n\nthread 'read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart' (14234510) panicked at tests/tls_cli.rs:208:5:\nassertion `left == right` failed: [\"--ca-cert\", \"/var/folders/t_/srzvjq016kn2zdmpxsr841b00000gn/T/.tmpnJKsQA/ca.pem\", \"read\", \"https://localhost:62704\", \"--timeout\", \"2000\"]: {\"error\":\"--ca-cert is currently supported only on Linux\",\"success\":false}\n  left: Bool(false)\n right: true\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 1.18s\n\n",
+    "stderr": "    Blocking waiting for file lock on build directory\n   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.30s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+  },
+  {
+    "mutant": "command-trust-wiring",
+    "site": "cli/src/native/actions.rs",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "cli/Cargo.toml",
+      "--test",
+      "tls_cli",
+      "read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart",
+      "--",
+      "--exact",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 7.93,
+    "stdout": "\nrunning 1 test\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... FAILED\n\nfailures:\n\n---- read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart stdout ----\n\nthread 'read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart' (14235141) panicked at tests/tls_cli.rs:208:5:\nassertion `left == right` failed: [\"--ca-cert\", \"/var/folders/t_/srzvjq016kn2zdmpxsr841b00000gn/T/.tmpLEZg7K/ca.pem\", \"read\", \"https://localhost:62747\", \"--timeout\", \"2000\"]: {\"data\":null,\"error\":\"Read request failed: error sending request for url (https://localhost:62747/): client error (Connect): invalid peer certificate: UnknownIssuer\",\"success\":false}\n  left: Bool(false)\n right: true\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 1.17s\n\n",
+    "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.23s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+  },
+  {
+    "mutant": "stale-client-generation",
+    "site": "cli/src/tls.rs",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "cli/Cargo.toml",
+      "--test",
+      "tls_cli",
+      "read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart",
+      "--",
+      "--exact",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 8.64,
+    "stdout": "\nrunning 1 test\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... FAILED\n\nfailures:\n\n---- read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart stdout ----\n\nthread 'read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart' (14235655) panicked at tests/tls_cli.rs:208:5:\nassertion `left == right` failed: [\"read\", \"https://localhost:62794\", \"--timeout\", \"2000\"]: {\"data\":null,\"error\":\"Read request failed: error sending request for url (https://localhost:62794/): client error (Connect): invalid peer certificate: UnknownIssuer\",\"success\":false}\n  left: Bool(false)\n right: true\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 1.37s\n\n",
+    "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.74s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\nerror: test failed, to rerun pass `--test tls_cli`\n"
+  },
+  {
+    "restored": true,
+    "exit": 0,
+    "stdout": "\nrunning 7 tests\ntest install_fetches_manifest_with_explicit_and_native_trust ... ok\ntest install_rejects_an_invalid_explicit_ca_before_network_or_daemon ... ok\ntest read_follows_ca_symlink_rotation ... ok\ntest read_trust_changes_rotate_and_clear_without_browser_or_daemon_restart ... ok\ntest system_roots_refresh_and_explicit_false_overrides_environment ... ok\ntest trust_preserves_hostname_and_expiry_validation ... ok\ntest wss_uses_refreshed_trust_on_the_same_daemon ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.61s\n\n",
+    "stderr": "   Compiling agent-browser v0.35.0 (/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.17s\n     Running tests/tls_cli.rs (cli/target/debug/deps/tls_cli-5b207287d6fe3863)\n"
+  }
+]

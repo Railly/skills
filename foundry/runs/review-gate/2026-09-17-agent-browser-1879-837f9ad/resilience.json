@@ -1,0 +1,210 @@
+{
+  "status": "incomplete",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "fingerprint": {
+    "head_sha": "837f9adf6f28345f072638cfd2832b722edfafe1",
+    "base_sha": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+    "dirty_digest": "clean",
+    "changed_paths_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83",
+    "contract_digest": "sha256:d47c7f97ca877b085937f00ea6abe35d5e184a664ac6fe05002504a75766b91c",
+    "command": "cargo test; cargo clippy -D warnings; cargo fmt --check; eight reversible mutations; real Chrome; built CLI; bun run build --webpack",
+    "environment_digest": "sha256:e6303226f7e29fcfe51e729ead2d734cef9c14c145b1b69585a5fa3cbedf333a",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "README.md",
+      "cli/src/native/actions.rs",
+      "cli/src/native/providers.rs",
+      "cli/src/output.rs",
+      "docs/src/app/providers/browser-use/page.mdx",
+      "skill-data/core/references/commands.md"
+    ],
+    "reusable": false,
+    "reuse_evidence": null,
+    "source_identity": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/validated-source-identity.json"
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/invariant-matrix.json",
+  "evidence": [
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/final-checks.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/mutations.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/dogfood.json"
+  ],
+  "matrix": [
+    {
+      "id": "C1",
+      "boundary": "V4 wire and options",
+      "test": "test_browser_use_v4_protocol",
+      "partitions": [
+        "create path/header/body and returned ownership",
+        "ws/wss/http/https/empty endpoint transfer",
+        "profile/country/recording options",
+        "absent vs null proxy",
+        "matching stopped acknowledgment",
+        "active/wrong ID/invalid JSON/404/500 rejection"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": [
+        "create_wire_route",
+        "stop_acknowledgment"
+      ]
+    },
+    {
+      "id": "C2",
+      "boundary": "Identity and safe errors",
+      "test": "test_browser_use_rejects_invalid_identity_without_exposing_secrets",
+      "partitions": [
+        "create HTTP error",
+        "malformed JSON",
+        "missing/malformed UUID",
+        "UUID-shaped credential reflection",
+        "invalid stop ID and missing key"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": []
+    },
+    {
+      "id": "C3",
+      "boundary": "Request body deadlines",
+      "test": "test_browser_use_create_and_stop_body_deadlines",
+      "partitions": [
+        "create body stall",
+        "stop body stall"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": [
+        "create_body_deadline",
+        "stop_body_deadline"
+      ]
+    },
+    {
+      "id": "C4",
+      "boundary": "Caller configuration rollback",
+      "test": "test_browser_use_failed_launches_restore_configuration",
+      "partitions": [
+        "explicit launch failure",
+        "automatic launch failure"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": [
+        "explicit_config_rollback",
+        "automatic_config_rollback"
+      ]
+    },
+    {
+      "id": "C5",
+      "boundary": "Cancellation",
+      "test": "test_browser_use_canceled_setup_and_stop_preserve_state",
+      "partitions": [
+        "setup timeout while HTTPS CONNECT is stalled",
+        "cancel close while stop CONNECT is stalled"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": [
+        "retain_same_id"
+      ]
+    },
+    {
+      "id": "C6",
+      "boundary": "CDP validation and ownership",
+      "test": "test_browser_use_cdp_failure_retains_ownership_without_exposing_credentials",
+      "partitions": [
+        "empty endpoint",
+        "invalid scheme",
+        "refused connection with credential-bearing URL"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log",
+      "falsifiers": [
+        "remember_before_cdp_validation"
+      ]
+    },
+    {
+      "id": "C7",
+      "boundary": "Public close/replacement commands",
+      "test": "test_browser_use_failed_close_retains_id_and_blocks_replacement",
+      "partitions": [
+        "first failed close",
+        "same-ID close retry",
+        "replacement launch refused"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/final-rust-full.log",
+      "falsifiers": [
+        "retain_same_id, via shared close helper"
+      ]
+    },
+    {
+      "id": "C8",
+      "boundary": "Real Chrome command continuity",
+      "test": "e2e_browser_use_owned_connection_preserves_plain_command_state",
+      "partitions": [
+        "plain commands retain target and page memory",
+        "external Chrome survives attachment close"
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/final-chrome.log",
+      "falsifiers": []
+    }
+  ],
+  "commit_points": [
+    {
+      "point": "Remote POST allocates browser before its response arrives",
+      "owner": "Cloud until the client receives a valid ID",
+      "failure": "Unknown outcome is surfaced with dashboard inspection guidance; no blind create retry."
+    },
+    {
+      "point": "Valid ID returned to attachment helper",
+      "owner": "Daemon, synchronously before endpoint validation or CDP await",
+      "failure": "Stop failure/cancellation retains same ID and blocks replacement; close retries it."
+    },
+    {
+      "point": "Matching stopped response",
+      "owner": "Provider acknowledgment",
+      "failure": "Only a matching ID/status clears daemon ownership; a 404 remains unacknowledged."
+    }
+  ],
+  "forced_partitions": [
+    [
+      "create path/header/body and returned ownership",
+      "ws/wss/http/https/empty endpoint transfer",
+      "profile/country/recording options",
+      "absent vs null proxy",
+      "matching stopped acknowledgment",
+      "active/wrong ID/invalid JSON/404/500 rejection"
+    ],
+    [
+      "create HTTP error",
+      "malformed JSON",
+      "missing/malformed UUID",
+      "UUID-shaped credential reflection",
+      "invalid stop ID and missing key"
+    ],
+    [
+      "create body stall",
+      "stop body stall"
+    ],
+    [
+      "explicit launch failure",
+      "automatic launch failure"
+    ],
+    [
+      "setup timeout while HTTPS CONNECT is stalled",
+      "cancel close while stop CONNECT is stalled"
+    ],
+    [
+      "empty endpoint",
+      "invalid scheme",
+      "refused connection with credential-bearing URL"
+    ],
+    [
+      "first failed close",
+      "same-ID close retry",
+      "replacement launch refused"
+    ],
+    [
+      "plain commands retain target and page memory",
+      "external Chrome survives attachment close"
+    ]
+  ],
+  "gaps": [
+    "The simplified binary was not rerun against live Browser Use Cloud because the clipboard credential was no longer available. Earlier same-day live evidence verifies the producer contract, not this exact source.",
+    "Eight representative mutations were killed. Exhaustive per-partition falsification, structured fuzz/property campaigns, and all post-attach caller-failure partitions were not executed."
+  ],
+  "scope_result": "All selected local checks passed; removed disk-recovery partitions are outside the revised contract."
+}

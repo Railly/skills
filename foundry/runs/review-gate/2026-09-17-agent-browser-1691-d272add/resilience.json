@@ -1,0 +1,84 @@
+{
+  "status": "incomplete",
+  "scope_status": "forced local failure partitions passed",
+  "fingerprint": {
+    "head_sha": "d272adda97a8c4d94d2111c846a304c0c0e4b0fa",
+    "base_sha": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+    "dirty_digest": "clean",
+    "changed_paths_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83",
+    "contract_digest": "sha256:9f7393cfc54f6bb0f97cb1a93745eaffbafba7c287298be4a57e7a585b761efd",
+    "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; seven reversible production mutations; built CLI dogfood/continuity/idle proofs",
+    "environment_digest": "sha256:106d9fe5308898de1969757545a061b7cf3e6aee394cf5c3c7ba7f9350422aa8",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "README.md",
+      "cli/src/native/actions.rs",
+      "cli/src/native/providers.rs",
+      "cli/src/output.rs",
+      "docs/src/app/providers/browser-use/page.mdx",
+      "skill-data/core/references/commands.md"
+    ],
+    "reusable": false,
+    "reuse_evidence": null,
+    "source_identity": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/final-source-identity.json"
+  },
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "report": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/specialist-model.md",
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "remote allocation before an observed ID",
+      "owner": "Cloud; client has unknown outcome",
+      "forced_partitions": [
+        "stalled CONNECT",
+        "stalled response body",
+        "malformed create response"
+      ],
+      "retry": "No automatic replay; inspect Cloud guidance."
+    },
+    {
+      "id": "C2",
+      "effect": "validated ID handed synchronously to daemon before receipt write",
+      "owner": "active_provider_session",
+      "forced_partitions": [
+        "blocked receipt write cancellation",
+        "null CDP endpoint with rollback success/failure",
+        "unwritable preflight"
+      ],
+      "retry": "Known ID retained for close; missing-key same-ID retry exercised."
+    },
+    {
+      "id": "C3",
+      "effect": "CDP manager attached and state published",
+      "owner": "daemon",
+      "forced_partitions": [
+        "local/external Chrome continuity",
+        "configuration rollback",
+        "canceled stop cleanup bookkeeping"
+      ],
+      "retry": "Normal next command and owned-connection continuity exercised; hosted post-attach failure remains a gap."
+    },
+    {
+      "id": "C4",
+      "effect": "positive remote stopped acknowledgment",
+      "owner": "provider plus daemon",
+      "forced_partitions": [
+        "matching acknowledgment",
+        "wrong ID",
+        "active status",
+        "bad JSON",
+        "404",
+        "500"
+      ],
+      "retry": "Non-ack leaves ID; acknowledged stop clears ID and best-effort removes receipt."
+    }
+  ],
+  "commands": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; seven reversible production mutations; built CLI dogfood/continuity/idle proofs",
+  "gaps": [
+    "No live Browser Use Cloud credential: hosted create/CDP/stop, billing, profile persistence, recording and repeated-stop semantics remain unverified.",
+    "A positive stop is covered by real HTTP adapter bytes, while caller retries are covered separately; successful stop through the complete CLI wire was not exercised.",
+    "Seven critical mutations were killed, but exhaustive per-partition parser/caller mutations, property generation and structured fuzz campaigns were not run.",
+    "Windows/filesystem-specific fault partitions, receipt deletion permission failure, post-attach provider state-load rollback and cancellation during stream status publication were not directly forced."
+  ],
+  "reusable": false
+}

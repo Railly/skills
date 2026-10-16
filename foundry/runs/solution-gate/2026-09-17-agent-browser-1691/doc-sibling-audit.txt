@@ -1,0 +1,51 @@
+cli/src/output.rs:3815:  BROWSER_USE_API_KEY            Browser Use Cloud API key
+cli/src/output.rs:3816:  BROWSER_USE_PROFILE_ID         Browser Use profile UUID
+cli/src/output.rs:3817:  BROWSER_USE_PROXY_COUNTRY      Managed proxy country; none/direct disables proxy
+cli/src/output.rs:3818:  BROWSER_USE_ENABLE_RECORDING   Record the Browser Use Cloud session
+cli/src/output.rs:3819:                                 Browser Use setup: 18s total, plus up to 4s timeout cleanup.
+cli/src/output.rs:3821:                                 stopped. Recovery: <socket-dir>/browser-use-<id>.receipt
+README.md:1015:- **Session creation**: create new sessions from the UI with local engines (Chrome, Lightpanda) or cloud providers (AgentCore, Browserbase, Browserless, Browser Use, Kernel)
+README.md:1799:### Browser Use
+README.md:1801:[Browser Use](https://browser-use.com) is an open-source browser automation project for AI agents with [over 100,000 GitHub stars](https://github.com/browser-use/browser-use), plus a managed Cloud browser service. Browser Use Cloud is useful when running agent-browser in environments where a local browser isn't available, such as serverless and CI environments.
+README.md:1803:To enable Browser Use, use the `-p` flag:
+README.md:1806:export BROWSER_USE_API_KEY="your-api-key"
+README.md:1814:export BROWSER_USE_API_KEY="your-api-key"
+README.md:1818:Optional Browser Use Cloud settings:
+README.md:1822:| `BROWSER_USE_PROFILE_ID`       | Profile UUID for persistent cookies and logins             |
+README.md:1823:| `BROWSER_USE_PROXY_COUNTRY`    | Managed proxy country, or `none`/`direct` to disable proxy |
+README.md:1824:| `BROWSER_USE_ENABLE_RECORDING` | Record the Cloud browser session                           |
+README.md:1827:export BROWSER_USE_PROFILE_ID="your-profile-uuid"
+README.md:1828:export BROWSER_USE_PROXY_COUNTRY="de"
+README.md:1829:export BROWSER_USE_ENABLE_RECORDING="true"
+README.md:1833:When enabled, agent-browser creates a Browser Use Cloud V4 session and connects to its CDP endpoint. Browser Use setup is limited to 18 seconds, with up to 4 more seconds for cleanup if setup times out. Within setup, creation waits up to 10 seconds and CDP attachment up to 8 seconds; each stop request waits up to 4 seconds. Navigation and other page commands keep their existing timeouts. If creation fails before a browser id is returned, the outcome is unknown; inspect the Browser Use Cloud dashboard before retrying, since a browser may still have been created.
+README.md:1837:`close` succeeds only after Browser Use acknowledges the browser as stopped. On a failed stop, `close` returns an error and keeps the session id, so running `agent-browser close` again retries the same browser, and a new launch is blocked until the pending browser is released.
+README.md:1839:Before attaching, agent-browser writes a recovery receipt to `<socket dir>/browser-use-<id>.receipt` (the socket directory is shown by `agent-browser session info`, typically `~/.agent-browser/`). The receipt contains only the browser id and manual stop instructions, never your API key. Removal after an acknowledged stop is best effort. If a receipt remains after the daemon exits, verify the browser status in Cloud before stopping it or deleting the receipt.
+README.md:1841:If a stop keeps returning 404, verify the browser status in Browser Use Cloud. After confirming it has stopped, use a new `--session` name to continue; agent-browser does not treat 404 as proof of a successful stop.
+README.md:1843:Get your API key from the [Browser Use Cloud Dashboard](https://cloud.browser-use.com/settings?tab=api-keys).
+skill-data/core/references/commands.md:495:BROWSER_USE_API_KEY="your-api-key"           # Browser Use Cloud API key
+skill-data/core/references/commands.md:496:BROWSER_USE_PROFILE_ID="profile-uuid"        # Optional Browser Use profile UUID
+skill-data/core/references/commands.md:497:BROWSER_USE_PROXY_COUNTRY="de"               # Managed proxy country; none/direct disables proxy
+skill-data/core/references/commands.md:498:BROWSER_USE_ENABLE_RECORDING="true"          # Record the Browser Use Cloud session
+skill-data/core/references/commands.md:506:Browser Use Cloud lifecycle: setup is bounded to 18s plus up to 4s for timeout cleanup (10s create, 8s CDP attach, 4s stop). `close` succeeds only after the Cloud session acknowledges it stopped; a failed stop returns an error, keeps the session id for retrying `close`, and blocks a new launch until released. If create fails before an id arrives, the outcome is unknown; inspect the Browser Use Cloud dashboard before retrying. Each session writes a recovery receipt at `<socket dir>/browser-use-<id>.receipt` (contains the browser id and manual stop steps, never the API key); removal after an acknowledged stop is best effort, so verify the status in Cloud before acting on a leftover receipt.
+docs/src/app/cdp-mode/page.mdx:147:See the [Providers](/providers/browser-use) section for setup and configuration of each built-in provider: [Browser Use](/providers/browser-use), [Browserbase](/providers/browserbase), [Browserless](/providers/browserless), [Kernel](/providers/kernel), and [AgentCore](/providers/agentcore).
+docs/src/app/installation/page.mdx:104:<tr><td>Providers</td><td>Env vars for Browserless, Browserbase, Browser Use, Kernel, AgentCore (AWS creds), Appium (for <code>--provider ios</code>), and <code>AI_GATEWAY_API_KEY</code> for chat</td></tr>
+docs/src/app/changelog/page.mdx:505:- **Dashboard session creation** - Sessions can now be created directly from the dashboard UI. A new session dialog provides a unified selector grid for local engines (Chrome, Lightpanda) and cloud providers (Browserbase, Browserless, Browser Use, Kernel) with async creation, loading state, and error display (#1092)
+docs/src/app/changelog/page.mdx:510:- Fixed **Browser Use** provider using an intermediate API call instead of connecting directly via WSS, which caused connection failures (#1092)
+docs/src/app/changelog/page.mdx:1376:- **Cloud browser providers** - Connect to Browserbase or Browser Use for remote browser infrastructure
+docs/src/app/dashboard/page.mdx:56:      <td>Create new sessions from the dashboard with local engines (Chrome, Lightpanda) or cloud providers (AgentCore, Browserbase, Browserless, Browser Use, Kernel)</td>
+docs/src/app/providers/browser-use/layout.tsx:3:export const metadata = pageMetadata("providers/browser-use");
+docs/src/app/providers/browser-use/page.mdx:1:# Browser Use
+docs/src/app/providers/browser-use/page.mdx:3:[Browser Use](https://browser-use.com) is an open-source browser automation project for AI agents with [over 100,000 GitHub stars](https://github.com/browser-use/browser-use), plus a managed Cloud browser service. Browser Use Cloud is useful when running agent-browser in environments where a local browser isn't available, such as serverless and CI environments.
+docs/src/app/providers/browser-use/page.mdx:8:export BROWSER_USE_API_KEY="your-api-key"
+docs/src/app/providers/browser-use/page.mdx:16:export BROWSER_USE_API_KEY="your-api-key"
+docs/src/app/providers/browser-use/page.mdx:29:    <tr><td><code>BROWSER_USE_PROFILE_ID</code></td><td>Profile UUID for persistent cookies and logins</td></tr>
+docs/src/app/providers/browser-use/page.mdx:30:    <tr><td><code>BROWSER_USE_PROXY_COUNTRY</code></td><td>Managed proxy country, or <code>none</code>/<code>direct</code> to disable proxy</td></tr>
+docs/src/app/providers/browser-use/page.mdx:31:    <tr><td><code>BROWSER_USE_ENABLE_RECORDING</code></td><td>Record the Cloud browser session</td></tr>
+docs/src/app/providers/browser-use/page.mdx:36:export BROWSER_USE_PROFILE_ID="your-profile-uuid"
+docs/src/app/providers/browser-use/page.mdx:37:export BROWSER_USE_PROXY_COUNTRY="de"
+docs/src/app/providers/browser-use/page.mdx:38:export BROWSER_USE_ENABLE_RECORDING="true"
+docs/src/app/providers/browser-use/page.mdx:42:When enabled, agent-browser creates a Browser Use Cloud V4 session and connects to its CDP endpoint. Browser Use setup is limited to 18 seconds, with up to 4 more seconds for cleanup if setup times out. Within setup, creation waits up to 10 seconds and CDP attachment up to 8 seconds; each stop request waits up to 4 seconds. Navigation and other page commands keep their existing timeouts. If creation fails before a browser id is returned, the outcome is unknown; inspect the Browser Use Cloud dashboard before retrying, since a browser may still have been created.
+docs/src/app/providers/browser-use/page.mdx:48:If a stop keeps returning 404, verify the browser status in Browser Use Cloud. After confirming it has stopped, use a new `--session` name to continue; agent-browser does not treat 404 as proof of a successful stop.
+docs/src/app/providers/browser-use/page.mdx:50:`close` succeeds only after Browser Use acknowledges the browser as stopped. On a failed stop, `close` returns an error and keeps the session id, so running `agent-browser close` again retries the same browser, and a new launch is blocked until the pending browser is released.
+docs/src/app/providers/browser-use/page.mdx:52:Before attaching, agent-browser writes a recovery receipt to `<socket dir>/browser-use-<id>.receipt` (the socket directory is shown by `agent-browser session info`, typically `~/.agent-browser/`). The receipt contains only the browser id and manual stop instructions, never your API key. Removal after an acknowledged stop is best effort. If a receipt remains after the daemon exits, verify the browser status in Cloud before stopping it or deleting the receipt.
+docs/src/app/providers/browser-use/page.mdx:54:Get your API key from the [Browser Use Cloud Dashboard](https://cloud.browser-use.com/settings?tab=api-keys).

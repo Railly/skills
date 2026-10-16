@@ -1,0 +1,102 @@
+{
+  "required": true,
+  "status": "fail",
+  "reason": "Forced node replacement silently corrupts the credential destination and returns success; descriptor and cancellation partitions also remain unverified.",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-1b4cacd/resilience.json",
+  "evidence": "Missing password and submit produce bounded errors and permit immediate retry after the fixture restores the missing control. Replacement of selected username/password instead silently corrupts input and returns loggedIn:true, reproduced twice for each control on head; the parent remains correct.",
+  "fingerprint": {
+    "head_sha": "1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51",
+    "changed_paths_digest": "sha256:bb0ffb563e95aeef2f4bbb131dc0bf4c1f4df17721c432aee2c4f71d29075023",
+    "contract_digest": "sha256:7c8382720c66a5ece76bbcd60318f1d598b0cfb2f9d406f0fcdd597cee885b7b",
+    "command": "bun verify.mjs; bun pressure.mjs race; bun pressure.mjs matrix; cargo test e2e_auth_login -- --ignored --test-threads=1",
+    "environment_digest": "sha256:e3ef4b63db7f88cedcd38cef02f4c232dfa609e5b589fd5e5934e819dd1b388a",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "cli/src/native/actions.rs",
+      "cli/src/native/e2e_tests.rs",
+      "cli/src/native/element.rs",
+      "cli/src/native/interaction.rs",
+      "cli/src/native/cdp/client.rs"
+    ],
+    "reusable": false,
+    "reuse_evidence": null
+  },
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "Username text becomes visible in the page.",
+      "owner": "handle_auth_login -> interaction::fill",
+      "commit_event": "Input.insertText",
+      "later_fallible_stages": [
+        "password selection and fill",
+        "submit selection and click"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "password selection",
+          "covers": [
+            "password selection and fill"
+          ],
+          "forced": true,
+          "residual_observed": "Username remains filled; password absent; no submission.",
+          "cleanup_owner": "The page retains input; next auth_login overwrites it. No rollback is promised by this existing contract.",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "matrix-results.json missing-pass restores only the missing DOM control and immediately repeats auth_login successfully."
+          },
+          "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/matrix-results.json"
+        },
+        {
+          "ownership_region": "submit selection",
+          "covers": [
+            "submit selection and click"
+          ],
+          "forced": true,
+          "residual_observed": "Both intended fields remain filled; no submission.",
+          "cleanup_owner": "Existing page state, overwritten by the next auth_login.",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "matrix-results.json missing-submit restores only the missing button and immediately repeats auth_login successfully."
+          },
+          "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/matrix-results.json"
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "effect": "A backend node is retained for a credential fill.",
+      "owner": "wait_for_any_selector and resolve_element_object_id",
+      "commit_event": "DOM.describeNode yields backendNodeId; local exact ref is created.",
+      "later_fallible_stages": [
+        "node lifetime",
+        "focus",
+        "keyboard insertion"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "DOM node replacement before fill",
+          "covers": [
+            "node lifetime",
+            "focus",
+            "keyboard insertion"
+          ],
+          "forced": true,
+          "residual_observed": "Detached object resolves successfully. Focus no-ops; the real browser inserts the credential into the previously focused field, then submits and reports success.",
+          "cleanup_owner": "No stale-node rejection before Input.insertText; F1 remains open.",
+          "retry": {
+            "attempted": false,
+            "outcome": "not_attempted",
+            "evidence": "The first operation falsely reports success, leaving no error that could trigger safe retry. No repair was authorized."
+          },
+          "evidence": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/race-results-first.json; /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/race-results.json"
+        }
+      ]
+    }
+  ],
+  "gaps": [
+    "DOM.describeNode refusal/retry and Runtime.releaseObject failure were not forced; cancellation cleanup is not proven."
+  ]
+}

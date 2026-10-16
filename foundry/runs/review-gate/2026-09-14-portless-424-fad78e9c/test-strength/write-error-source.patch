@@ -1,0 +1,11 @@
+--- src/hosts.ts
++++ src/hosts.ts
+@@ -114,7 +114,7 @@
+       fs.writeFileSync(HOSTS_PATH, cleaned.trimEnd() + "\n\n" + block + "\n");
+     }
+   } catch {
+-    return false;
++    return true;
+   }
+   // Re-read rather than assume the write landed.
+   const verification = readHostsFile();

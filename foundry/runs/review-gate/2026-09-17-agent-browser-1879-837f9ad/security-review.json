@@ -1,0 +1,77 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/agent-browser",
+    "base_sha": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+    "head_sha": "837f9adf6f28345f072638cfd2832b722edfafe1",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "Changed Browser Use errors do not echo API credentials, CDP endpoint credentials or response bodies; the API key is sent to the fixed HTTPS API endpoint without following redirects.",
+    "attacker": "Untrusted transport/content without provider TLS identity; operator and Cloud already have key authority.",
+    "scope": "Changed provider request, response and CDP error boundaries."
+  },
+  "trust_model": {
+    "assets": [
+      "API credential",
+      "remote browser/profile state",
+      "provider session ID"
+    ],
+    "principals": [
+      {
+        "name": "operator/daemon",
+        "existing_authority": "Reads its own environment and supplies the Cloud key."
+      },
+      {
+        "name": "Browser Use API",
+        "existing_authority": "Authorized recipient of credential and remote browser state."
+      },
+      {
+        "name": "network/page peer",
+        "existing_authority": "Can delay transport or supply page data; cannot impersonate accepted provider TLS identity."
+      }
+    ],
+    "boundaries": [
+      "environment to fixed HTTPS API",
+      "provider response to CDP attachment",
+      "network errors to CLI output"
+    ],
+    "entrypoints": [
+      "BROWSER_USE_API_KEY",
+      "V4 response JSON",
+      "cdpUrl"
+    ],
+    "sinks": [
+      "API-key request header",
+      "categorized errors and validated UUID",
+      "CDP connector without API header forwarding"
+    ]
+  },
+  "observations": [],
+  "verification": {
+    "authorized_scope": "Read-only source review and isolated fixtures with dummy credentials; no new live account operation.",
+    "commands": [
+      "cargo test; cargo clippy -D warnings; cargo fmt --check; eight reversible mutations; real Chrome; built CLI; bun run build --webpack"
+    ],
+    "cleanup": "Fixture sockets and Chrome processes closed; temporary dependency symlinks removed; no live credential persisted.",
+    "gaps": [],
+    "limits": [
+      "Scoped source/fixture evidence; no hosted penetration test or general security audit."
+    ],
+    "evidence": [
+      "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/independent-review.md",
+      "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/final-independent-review.md",
+      "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/simplify-2026-09-17/restored-focused.log"
+    ]
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": [
+      "Review F3 (CDP/provider precedence) fixed and independently accepted."
+    ]
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1879-837f9ad/security-review.json"
+}

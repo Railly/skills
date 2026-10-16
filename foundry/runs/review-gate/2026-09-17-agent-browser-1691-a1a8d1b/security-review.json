@@ -1,0 +1,101 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/agent-browser",
+    "base_sha": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+    "head_sha": "a1a8d1bda39a18a4d78d2ff40ad6b63452b2c6f9",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:56591e716e9db3dadf44dc40bd6a3d4df23ae1b4f65202507ad4fc1abf3b4d83",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "API key is sent only in the fixed HTTPS provider header; changed lifecycle diagnostics and receipts do not echo the credential, CDP endpoint or hostile response body.",
+    "attacker": "untrusted network/page content without provider TLS identity; operator and Cloud provider already have key authority",
+    "scope": "changed Browser Use API/receipt/error boundaries"
+  },
+  "trust_model": {
+    "assets": [
+      "Browser Use API key",
+      "remote browser session with possible profile cookies",
+      "session recording and provider session ID"
+    ],
+    "principals": [
+      {
+        "name": "local operator/daemon",
+        "existing_authority": "sets and reads its own process environment and cloud credential"
+      },
+      {
+        "name": "Browser Use API",
+        "existing_authority": "authorized recipient of API key, creates remote browser and stores requested profile/recording"
+      },
+      {
+        "name": "browser page",
+        "existing_authority": "controls its own content, no changed path to provider environment"
+      },
+      {
+        "name": "network peer",
+        "existing_authority": "can fail or delay transport; lacks accepted API TLS certificate"
+      }
+    ],
+    "boundaries": [
+      "operator environment to daemon",
+      "daemon HTTPS to fixed Browser Use API host",
+      "provider response to CDP connection",
+      "remote page to browser automation"
+    ],
+    "entrypoints": [
+      "BROWSER_USE_API_KEY",
+      "BROWSER_USE_PROFILE_ID",
+      "BROWSER_USE_PROXY_COUNTRY",
+      "BROWSER_USE_ENABLE_RECORDING",
+      "HTTPS response body containing id and cdpUrl"
+    ],
+    "sinks": [
+      "API-key header to fixed HTTPS API endpoint",
+      "credential-free UUID recovery receipt",
+      "categorized lifecycle errors",
+      "CDP attachment without forwarding the API header"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-1",
+      "classification": "hardening",
+      "scope": "out_of_scope_hardening",
+      "confidence": "high",
+      "prerequisites": [
+        "operator configures Browser Use API key"
+      ],
+      "chain": {
+        "capability": "provider responses may contain unexpected or secret-shaped text",
+        "reachability": "response fields enter local diagnostics and receipt creation",
+        "control": "ID parsed as UUID; reflected credential UUID rejected; response bodies and raw CDP errors omitted",
+        "boundary": "returned text and local receipt cannot inherit API-key/CDP credential content through the changed error paths",
+        "impact": "reduces accidental disclosure without demonstrating a new attacker authority crossing"
+      },
+      "evidence": [
+        "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutations-restored-green.log",
+        "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-1691/main-aff6125/mutations-restored-green.log",
+        "providers.rs browser_use_client disables redirects and retains TLS validation; safe constant receipt body",
+        "actions.rs attach_provider_cdp replaces raw connector errors"
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "isolated localhost fixtures with dummy key and read-only source review; no third-party account access",
+    "commands": [
+      "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; seven reversible production mutations; built CLI dogfood/continuity/idle proofs"
+    ],
+    "cleanup": "Temporary fixture sockets/Chrome processes cleaned up; no live credential in artifacts.",
+    "gaps": [],
+    "limits": [
+      "Changed-boundary source/fixture review only; no hosted penetration test, ACL confidentiality or power-loss durability assertion."
+    ]
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": []
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-a1a8d1b/security-review.json"
+}

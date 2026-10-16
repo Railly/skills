@@ -1,0 +1,1151 @@
+After the blind passes and source probes, update Shaping for selected composite C. Review the supplied selected-shape artifact, reconciled R and official schema. Correct any invalid fit cells; no vague optional improvements. Return final native Shaping verdict: C parts, binary full fit, concrete unresolved flags or pass-to-detail. Hosted behavior remains a carried verification limit, not a claim. This is post-reveal; candidate source excerpts follow. Source-only spikes establish architectural feasibility, implementation evidence is explicitly owed. Limit 1500 words.
+
+selected-shape.md
+# Shape C: bounded Browser Use ownership with a recovery receipt
+
+C composes the existing-state ownership of both blind A proposals with OpenAI A4's receipt-before-attach. This is a new checked shape, not an unexamined graft.
+
+## Probe return and corrections
+P0: frozen official V4 schema has POST /browsers, PATCH /browsers/{session_id}, UUID IDs, nullable cdpUrl, status active/stopped and a 200 BrowserSessionView stop response. Source URL and candidate-independent official document are provider-openapi.json. Correct Claude A1's v2 endpoint to the V4 API base; legacy v2 strings in descriptive schema prose do not change the V4 endpoint. Fields profileId, proxyCountryCode (nullable), enableRecording are specified. OpenAI R5/R6 flags are resolved by this supplied schema, which was inadvertently absent from its second prompt, and UUID validation.
+P1: installed reqwest 0.12 exposes a request deadline covering response-body consumption. Source command/output recorded in source-probes-and-candidate-reveal.json. Existing CDP client can wait 30s per command, so request timeouts alone fail R8: use a Browser Use-only attachment deadline too.
+P2: no authoritative 404-as-stopped guarantee. Treat 404 as failure. A successful HTTP response alone is an insufficient acknowledgment: validate returned id and status=stopped. No hosted billing claim is made.
+P3: callsite sweep identifies auto and explicit attach rollback, restore-key close, auto relaunch, explicit relaunch and all daemon close paths. External BrowserManager::close at browser.rs:1278 does not send Browser.close or await a provider request. Therefore provider cleanup can be bounded without rewriting local/browser manager shutdown.
+P4: detached daemon stderr is invisible. Claude A5 writing only at failed shutdown creates a late filesystem failure boundary. Use a receipt written before attachment; no automatic stop replay or startup reconciler. A documented file is the operator handoff on silent shutdown. Failed write is handled immediately by bounded stop plus direct actionable failure.
+
+## Parts
+| Part | Mechanism |
+|---|---|
+| C1 | Keep the candidate V4 HTTP creation, aliases and environment mapping. Browser Use requests disable redirects and use a 10s full create/read deadline and 4s stop deadline. Never automatically replay create. Transport/read/invalid no-ID outcomes state that Cloud may have allocated a browser and require inspection before retry. |
+| C2 | Validate UUID resource ID, create a per-resource recovery receipt under the socket directory before attaching. It contains provider, validated ID and fixed manual stop guidance only, with no API key/CDP URL/server body. Receipt storage is preflighted before allocation. Known-ID parse or receipt failure attempts bounded rollback and returns ID on unresolved cleanup. |
+| C3 | Browser Use stop returns Result and validates 2xx + matching UUID + stopped status. Error, body stall, missing key, malformed/contradictory response and 404 retain ownership/receipt. Other provider/plugin cleanup behavior remains unchanged. Remove the receipt only after acknowledgment; stale file removal failure cannot be misreported as remote stop failure. |
+| C4 | Keep active provider session until successful stop. Both attach paths remember ownership before their Browser Use-only 8s CDP attachment. Failed attach calls retained-state cleanup and combines safe errors. Relaunch and restore paths propagate Browser Use cleanup failure before replacement; existing non-Browser-Use behavior remains intact. |
+| C5 | Use existing close functions for explicit, internal, idle and signal shutdown. On stop failure the receipt remains retrievable after exit. No persistence-driven retries, new process, queue, session settings, or launch hash semantics. |
+| C6 | New Browser Use errors contain fixed categories, numeric HTTP status and validated ID only. Never forward response bodies or raw CDP/transport errors. Document deadlines, close retry, unknown-create inspection and recovery receipt paths on all required documentation surfaces. MCP delegates to the same close result and retains error parity. |
+
+## Full binary fit check
+| R | C | Mechanism |
+|---|---|---|
+| R0 | ✅ | C1/C3/C4 bound provider lifecycle I/O and release existing lock |
+| R1 | ✅ | C2/C3/C4 preserve identity, error truthful, receipt/direct recovery |
+| R2 | ✅ | C5 leaves effective configuration and target reuse unchanged |
+| R3 | ✅ | C2 receipt precedes attach; C4 caller sweep; C5 shutdown |
+| R4 | ✅ | C3 preserves non-Browser-Use outcome behavior; C4 conditionally propagates only new errors |
+| R5 | ✅ | C1 retains candidate-independent specified fields and aliases |
+| R6 | ✅ | UUID identity, no remote body/URL interpolation, C6 |
+| R7 | ✅ | C5 has no automatic durable retries or forced-death guarantee |
+| R8 | ✅ | previous stop4 + create10 + attach8 + rollback4 = 26s; ordinary existing browser liveness max3 gives 29s. Existing optional page/restore operations retain their own user-facing timeouts; no new whole-command deadline is promised. |
+| R9 | ✅ | C1 performs one create, terminal classified error prevents CLI transport retry |
+| R10 | ✅ | C2/C4 handle known-ID malformed response/attach error and block replacement |
+| R11 | ✅ | C5 preserves current omission semantics |
+
+## Forward risk chains and verification targets
+1. C1 request deadline (source-supported) → task resolves and releases daemon mutex (inferred from caller) → concurrent close/idle regain progress (to execute on fixed binary). Harm: too short provisioning budget rejects slow Cloud; accepted 10s limit, live latency unverified, truthfully reported.
+2. C3 result plus C4 retention (mechanism) → failed stop preserves same UUID (to test) → close retry targets same browser, relaunch cannot overwrite it (to test at execute_command). Harm: expired/404 session blocks automatic replacement; accepted conservative operator recovery, no false acknowledgment.
+3. C2 pre-attach receipt (mechanism) → shutdown failure has previously saved identity (to test) → manual Cloud stop possible despite lost stderr (inferred from API contract). Harm: stale receipts after removal failure and storage outage; remove only on ack, no automatic replay, test write failure and secret exclusion.
+4. C5 unchanged launch identity (observed source scope) → omitted flags reuse manager (to drive) → same target/URL/DOM persists (real Chrome proof owed). Harm: accidental pending-state guard catches active sessions; test plain second command explicitly.
+
+## Failure catalog
+| Case | Disposition |
+|---|---|
+| S1 overreach | Designed out: Browser Use-only deadlines/errors; no scheduler, other-provider cleanup or hash rewrite. |
+| S2 underreach | CONNECT/header/body, both attach callers, failed stop retry/relaunch, nullable endpoint and shutdown included. |
+| S3 direction | Both acquisition failure and stop failure retain accounting; start after failed stop blocked. |
+| S4 proxy property | Require matching ID and stopped response, not merely HTTP success. |
+| S5 unregistered state | Receipt is independent manual recovery artifact, created before attachment, removed on ack, documented intentional retention. |
+| S6 peer versions | No new CLI/daemon wire requirement, automatic receipt reader or mixed-version retry protocol. |
+| S7 delivery | Direct error for commands; prewritten receipt for invisible shutdown, not stderr. |
+| S8 guard-derived tests | Matrix came from independent contract/spec before shape. |
+| S9 weak tests | Mutate timeout, acknowledgment, retention and launch guard; require intended assertions. |
+| S10 prose | Local wire plus real Chrome proof owed; hosted profile/recording/billing explicitly unverified. |
+| S11 asymmetric authority | UUID validation before stop URL and file path; no raw hostile ID authority. |
+| S12 wrong primitive | Explicit stop acknowledgment, not CDP disconnect; full request deadline, not socket read retry. |
+| S13 omission | Existing effective settings untouched; multi-invocation continuity proof required. |
+
+## Candidate reveal and verdict
+Candidate da4c99f implements V4 creation, option mapping, ownership return and lifecycle integration. Reuse that work. Its unbounded create and swallowed stop fail D0/D1; missing endpoint loses known ID. Existing tests cover mapping but do not discriminate these lifecycle errors. Reviewed probes independently established both failures. The selected C shape amends those gaps without recreating the contributor's work.
+
+**Pass to detail. Candidate disposition: Amend.** Preserve all four original contributor commits; add signed fix commit with Co-authored-by: Magnus Müller <mamagnus00@gmail.com>. No merge/release. This is architectural permission to implement and probe, not a final correctness pass.
+
+Carried limits: no live Browser Use credential; hosted latency, repeated-stop implementation, billing, actual profile persistence and recording remain unverified. Mock schema conformance cannot erase these. Exact fixed-tree Test Strength, Resilience and built-artifact proof are mandatory downstream; not claimed here.
+
+## Detailing / breadboard / slice
+Single independently reviewable fix slice: provider create/stop/receipt methods → active provider state → both attachment callers → close and replacement transitions → existing CLI/MCP response mapping. Document recovery alongside provider usage.
+Validation before promotion: Cargo fmt/clippy/full serial suite; local HTTP response matrix with real bytes; execute_command failed close/retry/relaunch; real Chrome same-session continuity and external browser survival; built CLI stalled proxy and finite close; independent reduction/hardening and mutation pass. Complexity threshold: no new daemon worker, dependencies, generic lifecycle framework, or automatic recovery subsystem; at most one small provider helper module and bounded conditionals at existing ownership sites.
+
+reconciled-contract.md
+# Reconciled contract
+
+Scope: amend the Browser Use V4 repair. Preserve all other providers' public behavior. This reconciles claude-contract.md and openai-contract.md before any proposals are revealed.
+
+| R | Status | Observable requirement |
+|---|---|---|
+| R0 | settled | Browser Use create/read/attach/stop is finite, returns truthful failures, and releases the existing serialized daemon so commands and shutdown regain progress. Immediate preemption is not required. |
+| R1 | settled | A known owned browser is retained until acknowledged stop, or explicit actionable provider/ID recovery information reaches the operator. Stop failure must not report success. |
+| R2 | settled | Plain subsequent commands with omitted provider options preserve the same browser, target, URL and DOM state. |
+| R3 | settled | Failed setup after allocation, explicit close, auto/explicit relaunch, restore-key changes, internal shutdown, idle and signal shutdown account for the Browser Use resource. |
+| R4 | settled | Local and external CDP browsers, other built-in providers and plugins keep their existing ownership, behavior and options. External browsers are detached without remote stop. |
+| R5 | settled | Browser Use aliases, required credentials and V4 profile/proxy/recording options remain supported. |
+| R6 | settled | Keys, token URLs and echoed secrets never enter new errors or recovery artifacts. Recovery records must contain only validated resource identity and safe instructions. |
+| R7 | scoped | This repair does not introduce automatic durable retries or guarantee cleanup after forced death. Bounded orderly cleanup plus operator recovery is sufficient. |
+| R8 | derived accepted | Compose create, attachment and rollback deadlines inside the normal 30-second minimum CLI response budget, with margin. A response-body stall must be bounded. |
+| R9 | settled | Do not automatically replay a non-idempotent create after unknown remote outcome. Clearly direct operator to inspect Cloud if no ID was received. |
+| R10 | derived accepted | Missing/null/unusable cdpUrl after a known ID requires cleanup or actionable recovery. Failed active stop remains retryable with the same ID; new launch cannot overwrite pending ownership. |
+| R11 | derived accepted | Preserve omission/same/changed/explicit-clear semantics. No new setting equality or relaunch behavior is introduced. |
+
+## Reconciliation decisions and evidence
+Claude's R0.2 could imply immediate nonblocking concurrency; OpenAI explicitly distinguished idle timeout from an in-flight deadline. Adopt the frozen packet's finite-outcome promise, not a scheduler redesign. Exact bounded waits are implementation choices within R8. An unacknowledged close is an error, consistent with R0 truthfulness and existing Result-based close callers. Scope is Browser Use; other provider lifecycle debts are compatibility constraints, not new repair targets. No promise of forced-death recovery exists in this PR repair, so R7 excludes automatic persistence/retry. Mechanisms for operator handoff are still to be shaped.
+
+Source probe: connection.rs:889/910 pipes daemon stderr and returns at readiness, dropping the pipe. daemon.rs:333/350 discards shutdown cleanup errors. Therefore eprintln alone is not a visible recovery mechanism. Source probe: automatic relaunch and restore-key transitions discard close errors; explicit relaunch already propagates them. All must be considered if error contracts change.
+
+## Discriminator matrix
+| D | Cases | Required observation |
+|---|---|---|
+| D0 | CONNECT/header/body stalls; stalled CDP; concurrent close; idle/signal | finite error and restored daemon progress; full composite within budget |
+| D1 | stop 2xx acknowledgment, 4xx including 404, 5xx, missing key, disconnect, timeout | only actual acknowledgment clears ID; failed close errors; same-ID retry reaches wire |
+| D2 | open, set DOM sentinel, plain next command, close | same remote session/target/URL/state across invocations; one create, one stop |
+| D3 | create with ID but invalid endpoint; attach failure; stop failure; relaunch/restore/internal shutdown | ownership retained or operator recovery provided, no replacement create while pending |
+| D4 | idle and signal while stop fails | user-retrievable ID survives loss of daemon, not invisible stderr alone |
+| D5 | other provider/plugin/local/external CDP paths | preserve existing contract and avoid remote stop of unowned browser |
+| D6 | aliases/options plus hostile echoed body/credential-bearing endpoint | compatible request fields; no credential in errors/artifacts |
+| D7 | ambiguous create with no ID | error says outcome unknown; one create attempt per command, no transport-triggered blind replay |
+
+HTTP 404 is not assumed successful stop. Stop is an explicit requested terminal state, but hosted repeated-stop/billing semantics remain unverified. Tests can prove client conformance to the official schema; they cannot prove Cloud billing/profile/recording effects without a live key. No live Browser Use credential is available. These are carried evidence limits, not invented guarantees.
+
+source-probes-and-candidate-reveal.json
+[
+  {
+    "command": [
+      "rg",
+      "-n",
+      "pub fn (timeout|connect_timeout)|timeout is applied",
+      "/Users/raillyhugo/.cargo/registry/src",
+      "-g",
+      "client.rs"
+    ],
+    "exit": 0,
+    "stdout": "/Users/raillyhugo/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.12.28/src/blocking/client.rs:388:    pub fn timeout<T>(mut self, timeout: T) -> ClientBuilder\n/Users/raillyhugo/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.12.28/src/blocking/client.rs:399:    pub fn connect_timeout<T>(self, timeout: T) -> ClientBuilder\n/Users/raillyhugo/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.12.28/src/async_impl/client.rs:1437:    /// The timeout is applied from when the request starts connecting until the\n/Users/raillyhugo/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.12.28/src/async_impl/client.rs:1441:    pub fn timeout(mut self, timeout: Duration) -> ClientBuilder {\n/Users/raillyhugo/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.12.28/src/async_impl/client.rs:1466:    pub fn connect_timeout(mut self, timeout: Duration) -> ClientBuilder {\n/Users/raillyhugo/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wreq-6.0.0-rc.29/src/client.rs:1023:    /// The timeout is applied from when the request starts connecting until the\n/Users/raillyhugo/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wreq-6.0.0-rc.29/src/client.rs:1028:    pub fn timeout(mut self, timeout: Duration) -> ClientBuilder {\n/Users/raillyhugo/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wreq-6.0.0-rc.29/src/client.rs:1051:    pub fn connect_timeout(mut self, timeout: Duration) -> ClientBuilder {\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "rg",
+      "-n",
+      "close_provider_session|close_current_browser",
+      "cli/src/native/actions.rs",
+      "cli/src/native/daemon.rs"
+    ],
+    "exit": 0,
+    "stdout": "cli/src/native/daemon.rs:15:    auto_save_restore_state, close_all_browser_backends, close_current_browser, execute_command,\ncli/src/native/daemon.rs:286:                    let _ = close_current_browser(&mut s).await;\ncli/src/native/daemon.rs:440:                    let _ = close_current_browser(&mut s).await;\ncli/src/native/actions.rs:2048:        let _ = close_current_browser(state).await;\ncli/src/native/actions.rs:2069:        providers::close_provider_session_with_plugins(&active.session, &active.plugins).await;\ncli/src/native/actions.rs:2074:pub(crate) async fn close_current_browser(state: &mut DaemonState) -> Result<(), String> {\ncli/src/native/actions.rs:2098:/// Lifecycle shutdown paths use this instead of `close_current_browser`\ncli/src/native/actions.rs:2101:    let close_result = close_current_browser(state).await;\ncli/src/native/actions.rs:2124:    let close_error = close_current_browser(state).await.err();\ncli/src/native/actions.rs:2452:                let _ = close_current_browser(state).await;\ncli/src/native/actions.rs:3530:                    providers::close_provider_session_with_plugins(ps, &plugins).await;\ncli/src/native/actions.rs:3575:                        providers::close_provider_session_with_plugins(ps, &plugins).await;\ncli/src/native/actions.rs:4117:    let close_result = close_current_browser(state).await;\ncli/src/native/actions.rs:4364:            close_current_browser(state).await?;\ncli/src/native/actions.rs:4477:                        providers::close_provider_session_with_plugins(ps, &command_plugins).await;\ncli/src/native/actions.rs:4544:                            providers::close_provider_session_with_plugins(ps, &command_plugins)\ncli/src/native/actions.rs:12961:    async fn test_close_current_browser_closes_active_provider_plugin_session() {\ncli/src/native/actions.rs:12995:        close_current_browser(&mut state).await.unwrap();\ncli/src/native/actions.rs:13025:    async fn test_close_current_browser_clears_iframe_sessions() {\ncli/src/native/actions.rs:13032:        close_current_browser(&mut state).await.unwrap();\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+      "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+      "--",
+      "cli/src/native/providers.rs"
+    ],
+    "exit": 0,
+    "stdout": "diff --git a/cli/src/native/providers.rs b/cli/src/native/providers.rs\nindex c6848c0..1fef5f2 100644\n--- a/cli/src/native/providers.rs\n+++ b/cli/src/native/providers.rs\n@@ -141,7 +141,7 @@ pub async fn close_provider_session_with_plugins(\n             if let Ok(api_key) = env::var(\"BROWSER_USE_API_KEY\") {\n                 let _ = client\n                     .patch(format!(\n-                        \"https://api.browser-use.com/api/v2/browsers/{}\",\n+                        \"https://api.browser-use.com/api/v4/browsers/{}\",\n                         session.session_id\n                     ))\n                     .header(\"X-Browser-Use-API-Key\", &api_key)\n@@ -385,9 +385,92 @@ async fn connect_browser_use() -> Result<(String, Option<ProviderSession>), Stri\n     let api_key = env::var(\"BROWSER_USE_API_KEY\")\n         .map_err(|_| \"BROWSER_USE_API_KEY environment variable is not set\")?;\n \n-    let ws_url = format!(\"wss://connect.browser-use.com?apiKey={}\", api_key);\n+    let response = reqwest::Client::new()\n+        .post(\"https://api.browser-use.com/api/v4/browsers\")\n+        .header(\"X-Browser-Use-API-Key\", &api_key)\n+        .header(\"Content-Type\", \"application/json\")\n+        .json(&browser_use_create_body_from_lookup(|name| {\n+            env::var(name).ok()\n+        }))\n+        .send()\n+        .await\n+        .map_err(|e| format!(\"Browser Use request failed: {}\", e))?;\n \n-    Ok((ws_url, None))\n+    let status = response.status();\n+    let body = response\n+        .text()\n+        .await\n+        .map_err(|e| format!(\"Failed to read Browser Use response: {}\", e))?;\n+    if !status.is_success() {\n+        return Err(format!(\n+            \"Browser Use API error ({}): {}\",\n+            status.as_u16(),\n+            body\n+        ));\n+    }\n+\n+    let response: Value =\n+        serde_json::from_str(&body).map_err(|e| format!(\"Invalid Browser Use response: {}\", e))?;\n+    parse_browser_use_connection(&response)\n+}\n+\n+/// Build the supported Browser Use Cloud V4 options. Custom proxies are not exposed.\n+fn browser_use_create_body_from_lookup<F>(mut lookup: F) -> Value\n+where\n+    F: FnMut(&str) -> Option<String>,\n+{\n+    let mut body = serde_json::Map::new();\n+\n+    if let Some(profile_id) = lookup(\"BROWSER_USE_PROFILE_ID\").filter(|value| !value.is_empty()) {\n+        body.insert(\"profileId\".to_string(), json!(profile_id));\n+    }\n+\n+    if let Some(proxy_country) =\n+        lookup(\"BROWSER_USE_PROXY_COUNTRY\").filter(|value| !value.is_empty())\n+    {\n+        let proxy_country = proxy_country.to_ascii_lowercase();\n+        body.insert(\n+            \"proxyCountryCode\".to_string(),\n+            if matches!(proxy_country.as_str(), \"none\" | \"direct\") {\n+                Value::Null\n+            } else {\n+                json!(proxy_country)\n+            },\n+        );\n+    }\n+\n+    if let Some(recording) = lookup(\"BROWSER_USE_ENABLE_RECORDING\") {\n+        body.insert(\n+            \"enableRecording\".to_string(),\n+            json!(!matches!(\n+                recording.to_ascii_lowercase().as_str(),\n+                \"0\" | \"false\" | \"no\" | \"\"\n+            )),\n+        );\n+    }\n+\n+    Value::Object(body)\n+}\n+\n+fn parse_browser_use_connection(\n+    response: &Value,\n+) -> Result<(String, Option<ProviderSession>), String> {\n+    let session_id = response\n+        .get(\"id\")\n+        .and_then(Value::as_str)\n+        .ok_or_else(|| \"Browser Use response missing id\".to_string())?;\n+    let ws_url = response\n+        .get(\"cdpUrl\")\n+        .and_then(Value::as_str)\n+        .ok_or_else(|| \"Browser Use response missing cdpUrl\".to_string())?;\n+\n+    Ok((\n+        ws_url.to_string(),\n+        Some(ProviderSession {\n+            provider: \"browser-use\".to_string(),\n+            session_id: session_id.to_string(),\n+        }),\n+    ))\n }\n \n async fn connect_kernel() -> Result<(String, Option<ProviderSession>), String> {\n@@ -869,6 +952,43 @@ mod tests {\n     use super::*;\n     use crate::test_utils::EnvGuard;\n \n+    #[test]\n+    fn test_browser_use_v4_options_and_response() {\n+        let values = std::collections::HashMap::from([\n+            (\"BROWSER_USE_PROFILE_ID\", \"profile-123\"),\n+            (\"BROWSER_USE_PROXY_COUNTRY\", \"DE\"),\n+            (\"BROWSER_USE_ENABLE_RECORDING\", \"true\"),\n+        ]);\n+        let body = browser_use_create_body_from_lookup(|name| {\n+            values.get(name).map(|value| (*value).to_string())\n+        });\n+        assert_eq!(\n+            body,\n+            json!({\n+                \"profileId\": \"profile-123\",\n+                \"proxyCountryCode\": \"de\",\n+                \"enableRecording\": true,\n+            })\n+        );\n+        assert!(body.get(\"customProxy\").is_none());\n+\n+        let (ws_url, session) = parse_browser_use_connection(&json!({\n+            \"id\": \"browser-123\",\n+            \"cdpUrl\": \"wss://browser.example/devtools/browser/123\",\n+        }))\n+        .unwrap();\n+        assert_eq!(ws_url, \"wss://browser.example/devtools/browser/123\");\n+        assert_eq!(session.unwrap().session_id, \"browser-123\");\n+    }\n+\n+    #[test]\n+    fn test_browser_use_managed_proxy_can_be_disabled() {\n+        let body = browser_use_create_body_from_lookup(|name| {\n+            (name == \"BROWSER_USE_PROXY_COUNTRY\").then(|| \"direct\".to_string())\n+        });\n+        assert_eq!(body, json!({ \"proxyCountryCode\": null }));\n+    }\n+\n     #[test]\n     fn test_connect_provider_unknown() {\n         let guard = EnvGuard::new(&[\"AGENT_BROWSER_PLUGINS\"]);\n",
+    "stderr": ""
+  }
+]
+Official schema
+{
+  "source": "https://docs.browser-use.com/cloud/openapi/v4.json",
+  "observed_at": "2026-09-17",
+  "paths": {
+    "/browsers": {
+      "get": {
+        "tags": [
+          "Browsers"
+        ],
+        "summary": "List Browser Sessions",
+        "description": "Get paginated list of browser sessions with optional status filtering.\n\nList responses intentionally omit per-session presigned recording URLs\n(`recording_url` is always `null` here). Each recording URL requires a\nsynchronous boto3 SigV4 signing call (plus an S3 HEAD) that holds the GIL\nand blocks the event loop. With page_size up to the max this CPU-pegs the\nworker and starves the DB pool, cascading into pool exhaustion across the\nfleet. Clients should fetch the recording URL on demand via\n`GET /api/v2/browsers/{id}`, which signs exactly one URL for a single\nsession. Mirrors the v3 sessions list fix (ENG-4904, PR #4621).",
+        "operationId": "list_browser_sessions_browsers_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "metadata",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only browsers tagged with every one of these terms. `key` matches any value; `key=value` matches exactly. Repeat the param to require more than one (AND).",
+              "title": "Metadata"
+            },
+            "description": "Only browsers tagged with every one of these terms. `key` matches any value; `key=value` matches exactly. Repeat the param to require more than one (AND)."
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 10,
+              "title": "Pagesize"
+            }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Pagenumber"
+            }
+          },
+          {
+            "name": "filterBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/BrowserSessionStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Filterby"
+            }
+          },
+          {
+            "name": "agentSessionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Agentsessionid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserSessionListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Browsers"
+        ],
+        "summary": "Create Browser Session",
+        "description": "Create a new browser session.\n\n**Pricing:** Browser sessions are charged at $0.02/hour for all users.\n\nThe full rate is charged upfront when the session starts.\nWhen you stop the session, any unused time is automatically refunded proportionally.\n\nBilling is rounded up to the minute (minimum 1 minute).\nFor example, if you stop a session after 30 minutes, you'll be refunded half the charged amount.\n\n**Session Limits:**\n- All users: Up to 4 hours per session",
+        "operationId": "create_browser_session_browsers_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBrowserSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserSessionItemView"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient credits, or the API key reached its monthly spend limit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIKeySpendLimitError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session timeout limit exceeded (maximum 4 hours)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionTimeoutLimitExceededError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Profile not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileNotFoundError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many concurrent active sessions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyConcurrentActiveSessionsError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/browsers/{session_id}": {
+      "get": {
+        "tags": [
+          "Browsers"
+        ],
+        "summary": "Get Browser Session",
+        "description": "Get detailed browser session information including status and URLs.",
+        "operationId": "get_browser_session_browsers__session_id__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserSessionView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionNotFoundError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Browsers"
+        ],
+        "summary": "Update Browser Session",
+        "description": "Stop a browser session.\n\n**Refund:** When you stop a session, unused time is automatically refunded.\nIf the session ran for less than 1 hour, you'll receive a proportional refund.\nBilling is ceil to the nearest minute (minimum 1 minute).",
+        "operationId": "update_browser_session_browsers__session_id__patch",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBrowserSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserSessionView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionNotFoundError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "schemas": {
+    "CreateBrowserSessionRequest": {
+      "properties": {
+        "profileId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Profile ID",
+          "description": "The ID of the profile to use for the session"
+        },
+        "proxyCountryCode": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/ProxyCountryCode"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Proxy Country Code",
+          "description": "Country code for proxy location. Defaults to US. Set to null to disable proxy.",
+          "default": "us"
+        },
+        "metadata": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Metadata",
+          "description": "Labels for this browser. Up to 10 key-value pairs. Filterable on the browsers list and in the dashboard history."
+        },
+        "timeout": {
+          "type": "integer",
+          "title": "Timeout",
+          "description": "The timeout for the session in minutes. All users can use up to 240 minutes (4 hours). Browser sessions are charged $0.02/hour.",
+          "default": 60,
+          "ge": 1,
+          "le": 240
+        },
+        "browserScreenWidth": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "maximum": 6144.0,
+              "minimum": 320.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Browser Screen Width",
+          "description": "Custom screen width in pixels for the browser."
+        },
+        "browserScreenHeight": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "maximum": 3456.0,
+              "minimum": 320.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Browser Screen Height",
+          "description": "Custom screen height in pixels for the browser."
+        },
+        "allowResizing": {
+          "type": "boolean",
+          "title": "Allow Resizing",
+          "description": "Whether to allow the browser to be resized during the session (not recommended since it reduces stealthiness).",
+          "default": false
+        },
+        "pdfRendererEnabled": {
+          "type": "boolean",
+          "title": "PDF Renderer Enabled",
+          "description": "Whether Chrome renders PDFs in a tab. Set to false to stop the in-tab render; the file is saved to the session's download directory either way.",
+          "default": true
+        },
+        "solveCaptchas": {
+          "type": "boolean",
+          "title": "Solve Captchas",
+          "description": "Whether the browser detects and solves CAPTCHAs on its own. Set to false to handle CAPTCHAs yourself. Defaults to true.",
+          "default": true
+        },
+        "customProxy": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/CustomProxy"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Custom Proxy",
+          "description": "Custom proxy settings to use for the session. If not provided, our proxies will be used."
+        },
+        "enableRecording": {
+          "type": "boolean",
+          "title": "Enable Recording",
+          "description": "If True, enables session recording. Defaults to False.",
+          "default": false
+        }
+      },
+      "type": "object",
+      "title": "CreateBrowserSessionRequest",
+      "description": "Request model for creating a browser session."
+    },
+    "UpdateBrowserSessionRequest": {
+      "properties": {
+        "action": {
+          "$ref": "#/components/schemas/BrowserSessionUpdateAction",
+          "title": "Action",
+          "description": "The action to perform on the session"
+        }
+      },
+      "type": "object",
+      "required": [
+        "action"
+      ],
+      "title": "UpdateBrowserSessionRequest",
+      "description": "Request model for updating browser session state."
+    },
+    "BrowserSessionItemView": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "title": "ID",
+          "description": "Unique identifier for the session"
+        },
+        "status": {
+          "$ref": "#/components/schemas/BrowserSessionStatus",
+          "title": "Status",
+          "description": "Current status of the session (active/stopped)"
+        },
+        "liveUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Live URL",
+          "description": "URL where the browser can be viewed live in real-time"
+        },
+        "cdpUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "CDP URL",
+          "description": "Chrome DevTools Protocol URL for browser automation"
+        },
+        "timeoutAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timeout At",
+          "description": "Timestamp when the session will timeout"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Started At",
+          "description": "Timestamp when the session was created and started"
+        },
+        "finishedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Finished At",
+          "description": "Timestamp when the session was stopped (None if still active)"
+        },
+        "proxyUsedMb": {
+          "type": "string",
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "title": "Proxy Used MB",
+          "description": "Amount of proxy data used in MB",
+          "default": "0"
+        },
+        "proxyCost": {
+          "type": "string",
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "title": "Proxy Cost",
+          "description": "Cost of proxy usage in USD",
+          "default": "0"
+        },
+        "browserCost": {
+          "type": "string",
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "title": "Browser Cost",
+          "description": "Cost of browser session hosting in USD",
+          "default": "0"
+        },
+        "agentSessionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Agent Session ID",
+          "description": "ID of the agent session that created this browser (None for standalone BaaS sessions)"
+        },
+        "recordingUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Recording URL",
+          "description": "Presigned URL to download the session recording. Only populated on `GET /api/v2/browsers/{id}`; always `null` in list responses."
+        },
+        "metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object",
+          "title": "Metadata",
+          "description": "Caller-supplied labels set when the browser was created.",
+          "default": {}
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "status",
+        "timeoutAt",
+        "startedAt"
+      ],
+      "title": "BrowserSessionItemView",
+      "description": "View model for representing a browser session in list views."
+    },
+    "BrowserSessionView": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "title": "ID",
+          "description": "Unique identifier for the session"
+        },
+        "status": {
+          "$ref": "#/components/schemas/BrowserSessionStatus",
+          "title": "Status",
+          "description": "Current status of the session (active/stopped)"
+        },
+        "liveUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Live URL",
+          "description": "URL where the browser can be viewed live in real-time"
+        },
+        "cdpUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "CDP URL",
+          "description": "Chrome DevTools Protocol URL for browser automation"
+        },
+        "timeoutAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timeout At",
+          "description": "Timestamp when the session will timeout"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Started At",
+          "description": "Timestamp when the session was created and started"
+        },
+        "finishedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Finished At",
+          "description": "Timestamp when the session was stopped (None if still active)"
+        },
+        "proxyUsedMb": {
+          "type": "string",
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "title": "Proxy Used MB",
+          "description": "Amount of proxy data used in MB",
+          "default": "0"
+        },
+        "proxyCost": {
+          "type": "string",
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "title": "Proxy Cost",
+          "description": "Cost of proxy usage in USD",
+          "default": "0"
+        },
+        "browserCost": {
+          "type": "string",
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "title": "Browser Cost",
+          "description": "Cost of browser session hosting in USD",
+          "default": "0"
+        },
+        "agentSessionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Agent Session ID",
+          "description": "ID of the agent session that created this browser (None for standalone BaaS sessions)"
+        },
+        "recordingUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Recording URL",
+          "description": "Presigned URL to download the session recording, if recording was enabled. Only populated on GET /api/v2/browsers/{session_id}: the upload starts when the browser stops, so it is never ready in the stop response."
+        },
+        "recordingAvailable": {
+          "type": "boolean",
+          "title": "Recording Available",
+          "description": "False when a recording can never appear for this session: recording was disabled, or the browser stopped long enough ago that the upload is not coming. Only ever false from proof, so a failed recording lookup leaves it true. Clients polling for `recordingUrl` must stop when this is false.",
+          "default": true
+        },
+        "metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object",
+          "title": "Metadata",
+          "description": "Caller-supplied labels set when the browser was created.",
+          "default": {}
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "status",
+        "timeoutAt",
+        "startedAt"
+      ],
+      "title": "BrowserSessionView",
+      "description": "View model for representing a browser session."
+    },
+    "BrowserSessionStatus": {
+      "type": "string",
+      "enum": [
+        "active",
+        "stopped"
+      ],
+      "title": "BrowserSessionStatus",
+      "description": "Enumeration of possible browser session states\n\nAttributes:\n    ACTIVE: Session is currently active and running (browser is running)\n    STOPPED: Session has been stopped and is no longer active (browser is stopped)"
+    },
+    "ProxyCountryCode": {
+      "type": "string",
+      "enum": [
+        "ad",
+        "ae",
+        "af",
+        "ag",
+        "ai",
+        "al",
+        "am",
+        "an",
+        "ao",
+        "aq",
+        "ar",
+        "as",
+        "at",
+        "au",
+        "aw",
+        "az",
+        "ba",
+        "bb",
+        "bd",
+        "be",
+        "bf",
+        "bg",
+        "bh",
+        "bi",
+        "bj",
+        "bl",
+        "bm",
+        "bn",
+        "bo",
+        "bq",
+        "br",
+        "bs",
+        "bt",
+        "bv",
+        "bw",
+        "by",
+        "bz",
+        "ca",
+        "cc",
+        "cd",
+        "cf",
+        "cg",
+        "ch",
+        "ci",
+        "ck",
+        "cl",
+        "cm",
+        "co",
+        "cr",
+        "cs",
+        "cu",
+        "cv",
+        "cw",
+        "cx",
+        "cy",
+        "cz",
+        "de",
+        "dj",
+        "dk",
+        "dm",
+        "do",
+        "dz",
+        "ec",
+        "ee",
+        "eg",
+        "eh",
+        "er",
+        "es",
+        "et",
+        "fi",
+        "fj",
+        "fk",
+        "fm",
+        "fo",
+        "fr",
+        "ga",
+        "gd",
+        "ge",
+        "gf",
+        "gg",
+        "gh",
+        "gi",
+        "gl",
+        "gm",
+        "gn",
+        "gp",
+        "gq",
+        "gr",
+        "gs",
+        "gt",
+        "gu",
+        "gw",
+        "gy",
+        "hk",
+        "hm",
+        "hn",
+        "hr",
+        "ht",
+        "hu",
+        "id",
+        "ie",
+        "il",
+        "im",
+        "in",
+        "iq",
+        "ir",
+        "is",
+        "it",
+        "je",
+        "jm",
+        "jo",
+        "jp",
+        "ke",
+        "kg",
+        "kh",
+        "ki",
+        "km",
+        "kn",
+        "kp",
+        "kr",
+        "kw",
+        "ky",
+        "kz",
+        "la",
+        "lb",
+        "lc",
+        "li",
+        "lk",
+        "lr",
+        "ls",
+        "lt",
+        "lu",
+        "lv",
+        "ly",
+        "ma",
+        "mc",
+        "md",
+        "me",
+        "mf",
+        "mg",
+        "mh",
+        "mk",
+        "ml",
+        "mm",
+        "mn",
+        "mo",
+        "mp",
+        "mq",
+        "mr",
+        "ms",
+        "mt",
+        "mu",
+        "mv",
+        "mw",
+        "mx",
+        "my",
+        "mz",
+        "na",
+        "nc",
+        "ne",
+        "nf",
+        "ng",
+        "ni",
+        "nl",
+        "no",
+        "np",
+        "nr",
+        "nu",
+        "nz",
+        "om",
+        "pa",
+        "pe",
+        "pf",
+        "pg",
+        "ph",
+        "pk",
+        "pl",
+        "pm",
+        "pn",
+        "pr",
+        "ps",
+        "pt",
+        "pw",
+        "py",
+        "qa",
+        "re",
+        "ro",
+        "rs",
+        "ru",
+        "rw",
+        "sa",
+        "sb",
+        "sc",
+        "sd",
+        "se",
+        "sg",
+        "sh",
+        "si",
+        "sj",
+        "sk",
+        "sl",
+        "sm",
+        "sn",
+        "so",
+        "sr",
+        "ss",
+        "st",
+        "sv",
+        "sx",
+        "sy",
+        "sz",
+        "tc",
+        "td",
+        "tf",
+        "tg",
+        "th",
+        "tj",
+        "tk",
+        "tl",
+        "tm",
+        "tn",
+        "to",
+        "tr",
+        "tt",
+        "tv",
+        "tw",
+        "tz",
+        "ua",
+        "ug",
+        "uk",
+        "us",
+        "uy",
+        "uz",
+        "va",
+        "vc",
+        "ve",
+        "vg",
+        "vi",
+        "vn",
+        "vu",
+        "wf",
+        "ws",
+        "xk",
+        "ye",
+        "yt",
+        "za",
+        "zm",
+        "zw"
+      ],
+      "title": "ProxyCountryCode"
+    }
+  },
+  "lifecycle": "A completed run or closed CDP connection does not immediately stop its cloud browser. Stop owned browsers explicitly."
+}

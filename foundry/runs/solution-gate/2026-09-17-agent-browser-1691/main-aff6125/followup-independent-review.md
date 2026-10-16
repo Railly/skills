@@ -1,0 +1,46 @@
+## Independent merge-integration review — d272add + main aff6125 / Revisión independiente de la integración del merge
+
+**Scope honored / Alcance respetado:** only the conflict-resolution and its integration relative to live main aff6125; hosted Cloud gaps and previously reviewed PR1691 code are not relitigated.
+
+### Conflict resolution (adjacent additions) / Resolución del conflicto
+
+Both blocks are present and intact in the supplied source (`cli/src/native/actions.rs`):
+
+- Browser Use helpers: `BROWSER_USE_SETUP_DEADLINE`, `browser_use_setup_timeout`, `connect_owned_provider` (lines 3843–3898).
+- Upstream replay helpers: `session_setup_pending` and `apply_session_setup` (lines 3900–4033), unmodified, including init-script identifier tracking and the `Fetch.enable` coverage for routes/origin headers.
+
+No interleaving damage; the two additions are cleanly adjacent. **Ambos bloques están completos y adyacentes; no hay daño por entrelazado.**
+
+### Snapshot/restore of upstream `session_setup` / Instantánea y restauración
+
+- Explicit launch: `handle_launch_with_deadline` (actions.rs:4857–4884) snapshots `domain_filter`, `proxy_credentials`, `plugin_init_scripts`, **and** `session_setup` before `handle_launch_inner`, restoring all four on any error, including the cancellation/timeout branch that runs `browser_use_setup_timeout`. This correctly covers upstream's new resets at actions.rs:5074 area (`state.session_setup = SessionSetup::default()` at 5119) and `SessionSetup::from_launch_options` at 5300.
+- Auto launch: the `auto_launch` wrapper (actions.rs:4035–4061) does the same minus `domain_filter`, which `auto_launch_inner` never writes — correct omission. `auto_launch_inner` resets `session_setup` at 4074 and rebuilds it at 4307 only on the local path; provider failures are restored by the wrapper.
+- Non-Browser-Use providers keep upstream semantics unchanged (reset-without-restore), matching the stated scope. **Los proveedores ordinarios, la ruta local y externa (cdp/auto-connect) conservan el comportamiento de main.**
+
+### Interaction with `close_current_browser` ordering / Interacción con el orden de cierre
+
+`close_current_browser` (actions.rs:2475–2505) completes local bookkeeping (browser take, `launch_hash`, `webmcp_enabled`, iframe/webmcp/screencast/input, stream client) before the fallible awaits, so the 4-second inner timeout in `browser_use_setup_timeout` (3845–3874) cannot cancel mid-bookkeeping and strand stale launch state. It does **not** touch `session_setup`, so the wrapper's restore is the sole owner of that field — no double-reset conflict. The `webmcp_enabled` reset and `webmcp.clear_all()` from upstream are preserved. **Correcto: la restauración del wrapper es la única propietaria de `session_setup`.**
+
+### Ownership under cancellation / Propiedad bajo cancelación
+
+`connect_owned_provider` (3876–3898) installs the session via the `on_session` callback before the receipt write awaits inside `connect_browser_use_at_with_owner` (providers.rs), so dropping `handle_launch_inner` at the outer deadline leaves ownership in daemon state; `browser_use_setup_timeout` then attempts bounded cleanup and, on cleanup timeout, reports the pending id. The exact-string check `active.session.provider == "browser-use"` at 3860 is safe because providers.rs only ever constructs `ProviderSession { provider: "browser-use" }`; the `"browseruse"` alias exists only as user input normalized by `provider_is_browser_use`.
+
+### Test coverage of the integration / Cobertura de pruebas
+
+- `test_browser_use_canceled_launch_restores_domain_filter` asserts `session_setup.user_agent == "previous-agent"` survives the cancellation/timeout path.
+- `test_browser_use_failed_launch_restores_domain_filter` covers ordinary failure.
+- `test_browser_use_failed_auto_launch_restores_configuration` covers the automatic-launch rollback (proxy credentials, plugin scripts, user_agent), matching the amendment's stated follow-up.
+
+These are assertions in the supplied diff; no execution is claimed. **No se afirma ejecución de pruebas; solo se verifica el código de las aserciones.**
+
+### Minor non-blocking observations / Observaciones menores, no bloqueantes
+
+1. If `load_storage_state_or_rollback` fails **and** its rollback also fails after a successful Browser Use attach (actions.rs:5261), the wrapper restores the `session_setup` snapshot while a browser may remain with the newer setup applied. This is a double-failure edge already surfaced in the combined error message; not a blocker.
+2. Closing a pre-existing browser (`close_before_implicit_relaunch`, 2379–2390, invoked at 4068) is charged against the 18-second setup deadline. This matches the amendment's stated budget semantics; flagging only for awareness.
+3. `close_before_implicit_relaunch` swallows close errors for non-Browser-Use sessions, preserving main's prior `let _ = close_current_browser(...)` behavior — intentional, not a regression.
+
+### Verdict / Veredicto
+
+**No blocking findings.** The merge resolution preserves both adjacent additions, correctly extends the failed-launch snapshot/restore to upstream's `session_setup` in both explicit (`cli/src/native/actions.rs:4857–4884`) and automatic (`cli/src/native/actions.rs:4035–4061`) Browser Use paths, and leaves upstream webmcp handling, session replay (`apply_session_setup`), and ordinary provider/local/external launch paths unchanged.
+
+**Sin hallazgos bloqueantes.** La resolución del merge preserva ambas adiciones, extiende correctamente la restauración de `session_setup` a las rutas explícita y automática de Browser Use, y mantiene intactos webmcp, la reproducción de sesión y las rutas ordinarias de proveedor/local/externa respecto a main aff6125.

@@ -1,0 +1,38 @@
+{
+  "execution_mode": "native_subagent",
+  "degraded_from": "fx_worker",
+  "author_model": "unknown",
+  "reviewer_model": "inherited runtime; exact model not exposed",
+  "independence_gap": "Separate reviewer context, but no different-family provenance established.",
+  "fx_failure": "Packaged wrapper exited 1: ERROR fx reported unsupported auth mode: missing. Inspected fx status --help once; did not retry wrapper.",
+  "head": "75960737e5a8e21934c94ffa7ee5acc93d460bf3",
+  "base": "0065c68c9d90ed831608d3b17eced9a14bcde609",
+  "findings": [
+    {
+      "id": "F1",
+      "priority": "P2",
+      "path": "packages/@wterm/just-bash/src/index.ts:60-64",
+      "claim": "Mutable PWD is not authoritative cwd.",
+      "reproductions": ["PWD=/tmp; pwd", "cd /tmp; unset PWD; pwd", "f() { local PWD; cd /tmp; }; f; pwd"],
+      "result": "Head misdirects next execution or loses actual cd; base preserves actual cwd."
+    },
+    {
+      "id": "F2",
+      "priority": "P2",
+      "path": "packages/@wterm/just-bash/src/index.ts:113-116",
+      "claim": "Relative initial cwd is no longer normalized and completion breaks.",
+      "reproduction": "cwd='home/user', file /home/user/homefile; submit pwd then type cat home and Tab.",
+      "result": "Base normalizes to /home/user and completes 'file'; head keeps home/user and does not complete."
+    },
+    {
+      "id": "F3",
+      "priority": "P2",
+      "path": "packages/@wterm/just-bash/src/index.ts:113-116",
+      "claim": "Default shell remains in nonexistent /home/user.",
+      "reproduction": "new BashShell(); submit pwd, ls, ls.",
+      "result": "Base reports missing cd then recovers to /; head repeatedly fails ls."
+    }
+  ],
+  "non_regressions": ["Explicit 'cd /tmp; exit 1' loses cwd in both versions; the newly added blanket docs claim is too broad."],
+  "verification": "Reviewer ran read-only in-memory old/new probes with just-bash 2.14.2; parent independently reproduced all findings using built dist in dogfood.mjs and persisted dogfood.log. Target source unchanged."
+}

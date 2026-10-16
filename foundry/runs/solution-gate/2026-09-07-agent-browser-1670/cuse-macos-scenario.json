@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "name": "PR 1670 macOS TLS preview verification",
+  "platforms": [
+    "macos"
+  ],
+  "vars": {
+    "binary": "/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670/cli/target/preview/agent-browser-pr1670-darwin-arm64/agent-browser",
+    "run": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670",
+    "worktree": "/Users/raillyhugo/Programming/vercel/agent-browser-cli-tls-1670"
+  },
+  "defaultTimeoutMs": 30000,
+  "steps": [
+    {
+      "type": "cuse",
+      "action": "os",
+      "saveAs": "platform"
+    },
+    {
+      "type": "assert",
+      "actual": "${steps.platform.detail}",
+      "operator": "eq",
+      "expected": "macos"
+    },
+    {
+      "type": "exec",
+      "argv": [
+        "${vars.binary}",
+        "--version"
+      ],
+      "cwd": "${vars.worktree}",
+      "saveAs": "version"
+    },
+    {
+      "type": "assert",
+      "actual": "${steps.version.stdout}",
+      "operator": "contains",
+      "expected": "agent-browser 0.35.0"
+    },
+    {
+      "type": "exec",
+      "argv": [
+        "env",
+        "AB_TLS_TEST_BINARY=${vars.binary}",
+        "python3",
+        "${vars.run}/protocol-proof.py"
+      ],
+      "cwd": "${vars.worktree}",
+      "saveAs": "protocol"
+    },
+    {
+      "type": "assert",
+      "actual": "${steps.protocol.stdout}",
+      "operator": "contains",
+      "expected": "PASS: 32"
+    },
+    {
+      "type": "exec",
+      "argv": [
+        "env",
+        "AB_TLS_TEST_BINARY=${vars.binary}",
+        "python3",
+        "${vars.run}/pressure-proof.py"
+      ],
+      "cwd": "${vars.worktree}",
+      "saveAs": "pressure"
+    },
+    {
+      "type": "assert",
+      "actual": "${steps.pressure.stdout}",
+      "operator": "contains",
+      "expected": "\"immediate_retry\": \"success\""
+    }
+  ]
+}

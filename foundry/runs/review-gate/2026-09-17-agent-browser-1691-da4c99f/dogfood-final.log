@@ -1,0 +1,84 @@
+{
+  "binary": "/Users/raillyhugo/Programming/vercel/agent-browser-1691-review/cli/target/debug/agent-browser",
+  "sha256": "2319bc96c9534cddca929b80e48339b013acc1ee32b5695ce10fecaf0bf2f71c",
+  "cases": [
+    {
+      "name": "missing-key",
+      "result": {
+        "args": [
+          "-p",
+          "browseruse",
+          "open",
+          "about:blank",
+          "--json"
+        ],
+        "exit": 1,
+        "seconds": 0.582,
+        "stdout": "{\"error\":\"BROWSER_USE_API_KEY environment variable is not set\",\"success\":false}\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "missing-key-close",
+      "result": {
+        "args": [
+          "close",
+          "--json"
+        ],
+        "exit": 0,
+        "seconds": 0.009,
+        "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+        "stderr": ""
+      }
+    },
+    {
+      "name": "stalled-proxy",
+      "proxy_reached": true,
+      "request_headers": [
+        "CONNECT api.browser-use.com:443 HTTP/1.1\r\nHost: api.browser-use.com:443\r\n\r\n"
+      ],
+      "open": {
+        "args": [
+          "-p",
+          "browseruse",
+          "open",
+          "about:blank",
+          "--json"
+        ],
+        "outer_timeout": 36,
+        "seconds": 36.004,
+        "stdout": "",
+        "stderr": ""
+      },
+      "close": {
+        "args": [
+          "close",
+          "--json"
+        ],
+        "outer_timeout": 5,
+        "seconds": 5.004,
+        "stdout": "",
+        "stderr": ""
+      },
+      "daemon_alive_after_1_second_idle_budget": [
+        {
+          "pid": 27003,
+          "process": "/Users/raillyhugo/Programming/vercel/agent-browser-1691-review/cli/target/debug/agent-browser"
+        }
+      ]
+    },
+    {
+      "name": "after-proxy-release",
+      "result": {
+        "args": [
+          "close",
+          "--json"
+        ],
+        "exit": 0,
+        "seconds": 1.557,
+        "stdout": "{\"success\":true,\"data\":{\"closed\":true,\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":false,\"engine\":\"chrome\",\"launchHash\":null},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":false,\"saveStatus\":\"not_configured\"},\"restoreStatus\":\"not_configured\",\"saveStatus\":\"not_configured\"},\"error\":null}\n",
+        "stderr": ""
+      }
+    }
+  ]
+}

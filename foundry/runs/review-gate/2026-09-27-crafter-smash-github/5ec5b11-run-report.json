@@ -1,0 +1,294 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-27",
+    "repo": "crafter-games/crafter-smash",
+    "base": "3b38d550e2003b0c30a14adcfa111ef94e27dc01",
+    "head": "5ec5b11df437270c9d8083093f23271d02a43cc0",
+    "profile": "mechanical",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "single_context",
+    "degraded_from": null,
+    "independence_gap": "Mechanical HTML/CSS diff received a focused self-review and direct browser verification; no independent reviewer.",
+    "schema_failures": 0,
+    "operations": [
+      {
+        "operation": "focused diff and browser review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-crafter-smash-github/contract.md",
+    "spec_status": "not_applicable",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-6",
+    "reviewer_model": "GPT-6",
+    "same_family": true
+  },
+  "risk": {
+    "level": "standard",
+    "triggers": [],
+    "independent_challenge": {
+      "required": false,
+      "satisfied": false,
+      "method": "not_required",
+      "evidence": "Mechanical static presentation change."
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-crafter-smash-github/contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "Add a visible GitHub repository link on the title screen and open a PR. A1: opens crafter-games/crafter-smash in another tab by mouse and the existing arrow/Enter controls. A2: matches menu styling, fits desktop and narrow/short screens, and disappears with the title screen. A3: supply an actual browser preview. No gameplay or deployment changes."
+    },
+    {
+      "source": "design",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-crafter-smash-github/contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "Add a visible GitHub repository link on the title screen and open a PR. A1: opens crafter-games/crafter-smash in another tab by mouse and the existing arrow/Enter controls. A2: matches menu styling, fits desktop and narrow/short screens, and disappears with the title screen. A3: supply an actual browser preview. No gameplay or deployment changes."
+    },
+    {
+      "source": "user_facing",
+      "location": "index.html, style.css, browser preview",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "Add a visible GitHub repository link on the title screen and open a PR. A1: opens crafter-games/crafter-smash in another tab by mouse and the existing arrow/Enter controls. A2: matches menu styling, fits desktop and narrow/short screens, and disappears with the title screen. A3: supply an actual browser preview. No gameplay or deployment changes."
+    },
+    {
+      "source": "implementation",
+      "location": "index.html, style.css, browser preview",
+      "status": "reviewed",
+      "properties": [
+        "P1"
+      ],
+      "evidence": "Add a visible GitHub repository link on the title screen and open a PR. A1: opens crafter-games/crafter-smash in another tab by mouse and the existing arrow/Enter controls. A2: matches menu styling, fits desktop and narrow/short screens, and disappears with the title screen. A3: supply an actual browser preview. No gameplay or deployment changes."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "The title screen exposes a usable repository link without obstructing the menu.",
+      "kind": "presentation",
+      "status": "verified",
+      "oracle": {
+        "observes": "Actual browser destination, current game screen and element rectangles",
+        "layer": "browser",
+        "method": "Mouse, ArrowUp/Enter, menu selection and responsive screenshots",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Anchor href and a desktop screenshot look correct",
+        "counterexample": "The global game keyboard handler might activate a game mode instead, or the link might overlap the logo on a short screen.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Real key input opened the correct GitHub tab. The 320x568 overlap was observed, fixed with reserved top spacing, and remeasured."
+      },
+      "substrates": [
+        {
+          "name": "Google Chrome for Testing 152.0.7977.64, macOS, file URL",
+          "status": "exercised",
+          "evidence": "Real Chromium file URL: mouse and ArrowUp + Enter each created a GitHub tab while the original game remained on title. ArrowDown + Enter still opened character select, where the GitHub link has no client rect. Screenshots inspected at 1440x900 and 390x844; measured at 320x568 and 844x390 after the short-height spacing fix. Link bottom 66px; logo top 87.27px and 85.17px. No browser errors. git diff --check passed. Product has no build, dependencies, or test suite."
+        }
+      ],
+      "evidence": "Real Chromium file URL: mouse and ArrowUp + Enter each created a GitHub tab while the original game remained on title. ArrowDown + Enter still opened character select, where the GitHub link has no client rect. Screenshots inspected at 1440x900 and 390x844; measured at 320x568 and 844x390 after the short-height spacing fix. Link bottom 66px; logo top 87.27px and 85.17px. No browser errors. git diff --check passed. Product has no build, dependencies, or test suite."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "No protocol, parser, event handler or tests changed; the anchor reuses existing menu dispatch and was directly exercised."
+    },
+    "resilience": {
+      "required": false,
+      "status": "not_triggered",
+      "reason": "No persistence, requests, resource ownership or failure-path code changed."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "README and js/menu.js",
+      "claim": "The project runs from index.html and its menu dispatch includes .btn anchors.",
+      "status": "verified",
+      "evidence": "Real Chromium file URL: mouse and ArrowUp + Enter each created a GitHub tab while the original game remained on title. ArrowDown + Enter still opened character select, where the GitHub link has no client rect. Screenshots inspected at 1440x900 and 390x844; measured at 320x568 and 844x390 after the short-height spacing fix. Link bottom 66px; logo top 87.27px and 85.17px. No browser errors. git diff --check passed. Product has no build, dependencies, or test suite."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface (promoted)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "New-domain matrix (promoted)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers (promoted)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Shell re-parse append domain (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Shim hermeticity (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Deliberate-default check (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Fresh-seam scan (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Substrate differential corpus (promoted)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Reference-implementation oracle (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "New-failure-outcome propagation (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Error-path forcing (promoted)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Non-destructive recovery (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Cancellation and timeout hygiene (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Boundary pipeline trace (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Substrate verification (promoted)",
+      "status": "run",
+      "evidence": "Real Chromium file URL: mouse and ArrowUp + Enter each created a GitHub tab while the original game remained on title. ArrowDown + Enter still opened character select, where the GitHub link has no client rect. Screenshots inspected at 1440x900 and 390x844; measured at 320x568 and 844x390 after the short-height spacing fix. Link bottom 66px; logo top 87.27px and 85.17px. No browser errors. git diff --check passed. Product has no build, dependencies, or test suite."
+    },
+    {
+      "name": "Dogfood the built artifact (candidate)",
+      "status": "run",
+      "evidence": "Real Chromium file URL: mouse and ArrowUp + Enter each created a GitHub tab while the original game remained on title. ArrowDown + Enter still opened character select, where the GitHub link has no client rect. Screenshots inspected at 1440x900 and 390x844; measured at 320x568 and 844x390 after the short-height spacing fix. Link bottom 66px; logo top 87.27px and 85.17px. No browser errors. git diff --check passed. Product has no build, dependencies, or test suite."
+    },
+    {
+      "name": "Newly-asserted invariant ownership (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Docs-behavior parity (candidate)",
+      "status": "run",
+      "evidence": "Real Chromium file URL: mouse and ArrowUp + Enter each created a GitHub tab while the original game remained on title. ArrowDown + Enter still opened character select, where the GitHub link has no client rect. Screenshots inspected at 1440x900 and 390x844; measured at 320x568 and 844x390 after the short-height spacing fix. Link bottom 66px; logo top 87.27px and 85.17px. No browser errors. git diff --check passed. Product has no build, dependencies, or test suite."
+    },
+    {
+      "name": "Demonstrative example (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Choice audit (candidate, needs a decision trail to fire)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    },
+    {
+      "name": "Complexity budget (candidate)",
+      "status": "skipped",
+      "reason": "Static anchor and scoped CSS only; no matching runtime, parsing, state, documentation or algorithm change."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "git diff --check",
+      "outcome": "pass"
+    },
+    {
+      "check": "native build and unit suite",
+      "outcome": "acknowledged",
+      "reason": "Not present; the repository is a dependency-free static game."
+    },
+    {
+      "check": "gate.sh all",
+      "outcome": "pass"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "resolution": "fixed",
+      "evidence": "Short-height logo overlap corrected and verified at 320x568 and 844x390."
+    }
+  ],
+  "exemptions": [
+    "No JavaScript changed, so no formatter or runtime test infrastructure was introduced."
+  ],
+  "issue_candidates": [
+    {
+      "id": "I1",
+      "evidence": "The pre-existing character portrait row overflows at mobile widths in the baseline and changed screenshots; outside the repository-link request."
+    },
+    {
+      "id": "I2",
+      "evidence": "Review Gate falsely treats the word link in a CSS class as a filesystem side effect. The new private class is named github-button to match its presentation; both HTML and CSS were renamed together and browser keyboard activation was rerun on the final commit."
+    }
+  ]
+}

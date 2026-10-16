@@ -1,0 +1,922 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-14",
+    "repo": "vercel-labs/json-render",
+    "base": "6c7164342a37fab055907f1666658e1333e2cb86",
+    "head": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+    "profile": "external-pr",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Review was interrupted by the recorded runtime content flag and then stopped at the user request for handoff. Existing artifacts were preserved and Test Strength receipt integrated; no security pass is claimed.",
+      "Required exact-state Resilience Audit receipt unavailable: caller failures were reproduced, but the full pressure matrix and retry/cleanup receipt was not emitted.",
+      "Required exact-state Security Review receipt unavailable. No security pass is claimed.",
+      "High-risk independent challenge was not fully discharged. Saved RFC texts and focused native reviews are useful inputs, but a complete independent conformance/challenge artifact is unavailable.",
+      "Full local workspace type-check unavailable due linked dependency setup; exact-head CI passed and direct core diagnostic delta is zero.",
+      "Test Strength receipt is now available with status fail: one copy-source guard mutant survives authored tests, downstream correctness findings remain, and full per-class falsification is incomplete. See test-strength/receipt.json."
+    ]
+  },
+  "execution": {
+    "mode": "unavailable",
+    "degraded_from": "native_subagent",
+    "independence_gap": "Coordinator interrupted; required specialist receipts and complete independent challenge unavailable. Native partial reviews share the orchestrator model family.",
+    "receipt": "runtime-interruption.json",
+    "schema_failures": 2,
+    "operations": [
+      {
+        "operation": "FX independent review",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "Inspect FX status capability once",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "Native specialist launch",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "Native resilience launch",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "Native security launch",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ],
+    "upstream_fallback": "fx_worker to native_subagent after recorded FX auth capability failure."
+  },
+  "contract": {
+    "path": "contract.json",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "unknown",
+    "reviewer_model": "native Codex agents; exact model identifiers not recorded",
+    "same_family": null
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "externally visible partial state",
+      "prototype-chain integrity",
+      "protocol/parser behavior"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": false,
+      "method": "reference_oracle",
+      "artifact": "runtime-interruption.json",
+      "evidence": "RFC primary texts and public-export probes saved; method-complete independent challenge is unavailable."
+    }
+  },
+  "security_review": {
+    "status": "unavailable",
+    "artifact": "runtime-interruption.json",
+    "fingerprint": {
+      "repository": "vercel-labs/json-render",
+      "base_sha": "6c7164342a37fab055907f1666658e1333e2cb86",
+      "head_sha": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+      "dirty_digest": "clean",
+      "changed_path_digest": "sha256:5075366f1b59aab71166e07d0c980e1a0e431328ac9261c3a5ec6596834da83a",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+    },
+    "observations": [],
+    "verification": {
+      "gaps": [
+        "No completed exact-state Security Review receipt was available when the coordinator runtime stopped."
+      ]
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": [
+        "F1",
+        "F2"
+      ]
+    }
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.json",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "A1-A4 preserve path, batching, compound-patch and security claims."
+    },
+    {
+      "source": "design",
+      "location": "No independent design receipt supplied",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "No solution-stage receipt was supplied; review derives acceptance from PR and documented behavior."
+    },
+    {
+      "source": "user_facing",
+      "location": "pr-metadata.json; changed core README/API/data-binding and skills/core passages",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "PR and docs promise canonical tokens, no-op rejected writes, compound validation and reserved-token rejection."
+    },
+    {
+      "source": "implementation",
+      "location": "diff.patch and caller-contexts.txt",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5"
+      ],
+      "evidence": "Core parser, mutable/immutable writers and move staging changed; untouched renderer/provider consumers expose F1/F2."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Core canonical decimal array handling and literal object-key behavior pass the recorded public export probes.",
+      "kind": "protocol",
+      "status": "verified",
+      "oracle": {
+        "observes": "returned and serialized state, snapshot identity and actual consumer effects",
+        "layer": "public package API and React consumer",
+        "method": "Drive built ESM/CJS with generated serialized patches and invalid array writes.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Core authored tests are green and public calls return without throwing.",
+        "counterexample": "A consumer can return normally while applying a partial write or emitting a change that did not occur.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Core 577 tests pass, while built consumer evidence demonstrates F1/F2."
+      },
+      "substrates": [
+        {
+          "name": "Core ESM and CJS on Node/Bun, macOS arm64",
+          "status": "exercised",
+          "evidence": "public-export-probe.json; coordinator-dogfood.log; core-tests.log. This is bounded direct evidence, not a Test Strength pass."
+        }
+      ],
+      "evidence": "public-export-probe.json; coordinator-dogfood.log; core-tests.log. This is bounded direct evidence, not a Test Strength pass."
+    },
+    {
+      "id": "P2",
+      "claim": "Core rejected immutable writes retain snapshot identity and avoid store/adapter publication in the recorded scenarios.",
+      "kind": "atomicity",
+      "status": "verified",
+      "oracle": {
+        "observes": "returned and serialized state, snapshot identity and actual consumer effects",
+        "layer": "public package API and React consumer",
+        "method": "Observe actual snapshot references and subscriber/adapter counters.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Core authored tests are green and public calls return without throwing.",
+        "counterexample": "A consumer can return normally while applying a partial write or emitting a change that did not occur.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Core 577 tests pass, while built consumer evidence demonstrates F1/F2."
+      },
+      "substrates": [
+        {
+          "name": "Built core and store-utils",
+          "status": "exercised",
+          "evidence": "public-export-probe.json records rejected identity, zero rejected adapter writes, and one accepted-batch notification/write."
+        }
+      ],
+      "evidence": "public-export-probe.json records rejected identity, zero rejected adapter writes, and one accepted-batch notification/write."
+    },
+    {
+      "id": "P3",
+      "claim": "UNSATISFIED: every public compound streaming patch preserves its source on malformed destination.",
+      "kind": "atomicity",
+      "status": "refuted",
+      "oracle": {
+        "observes": "returned and serialized state, snapshot identity and actual consumer effects",
+        "layer": "public package API and React consumer",
+        "method": "Feed JSONL through built useUIStream using an actual Response body; observe final state and own keys.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Core authored tests are green and public calls return without throwing.",
+        "counterexample": "A consumer can return normally while applying a partial write or emitting a change that did not occur.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Core 577 tests pass, while built consumer evidence demonstrates F1/F2."
+      },
+      "substrates": [
+        {
+          "name": "Built React useUIStream in jsdom",
+          "status": "exercised",
+          "evidence": "F1; coordinator/hook-proof-head.json and hook-proof-base-public.json show actual data loss in built React while core compileSpecStream rejects safely."
+        }
+      ],
+      "evidence": "F1; coordinator/hook-proof-head.json and hook-proof-base-public.json show actual data loss in built React while core compileSpecStream rejects safely."
+    },
+    {
+      "id": "P4",
+      "claim": "UNVERIFIED: reserved-token security claim across the complete changed surface.",
+      "kind": "integrity",
+      "status": "unverified",
+      "oracle": {
+        "observes": "returned and serialized state, snapshot identity and actual consumer effects",
+        "layer": "public package API and React consumer",
+        "method": "Security Review method incomplete.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Core authored tests are green and public calls return without throwing.",
+        "counterexample": "A consumer can return normally while applying a partial write or emitting a change that did not occur.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Core 577 tests pass, while built consumer evidence demonstrates F1/F2."
+      },
+      "substrates": [
+        {
+          "name": "Required Security Review stage unavailable",
+          "status": "unavailable",
+          "evidence": "A complete Security Review receipt is unavailable; runtime-interruption.json. Static helper inspection and existing CI do not substitute for this receipt."
+        }
+      ],
+      "evidence": "A complete Security Review receipt is unavailable; runtime-interruption.json. Static helper inspection and existing CI do not substitute for this receipt."
+    },
+    {
+      "id": "P5",
+      "claim": "UNSATISFIED: state-provider change callbacks report only accepted writes.",
+      "kind": "atomicity",
+      "status": "refuted",
+      "oracle": {
+        "observes": "returned and serialized state, snapshot identity and actual consumer effects",
+        "layer": "public package API and React consumer",
+        "method": "Drive built StateProvider; compare snapshot, callback record and rendered DOM with exact-base core.",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Core authored tests are green and public calls return without throwing.",
+        "counterexample": "A consumer can return normally while applying a partial write or emitting a change that did not occur.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Core 577 tests pass, while built consumer evidence demonstrates F1/F2."
+      },
+      "substrates": [
+        {
+          "name": "Built React StateProvider in jsdom",
+          "status": "exercised",
+          "evidence": "F2; consumer/result.json versus resumed-caller-review/base-invalid-result.json. Head preserves items yet callback still reports rejected /items/01 write."
+        }
+      ],
+      "evidence": "F2; consumer/result.json versus resumed-caller-review/base-invalid-result.json. Head preserves items yet callback still reports rejected /items/01 write."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "schema_version": 1,
+      "skill": "test-strength",
+      "required": true,
+      "status": "fail",
+      "reason": "Authored tests allow removal of the copy-source guard, and real renderer callers violate the newly hardened rejection contract.",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/test-strength/receipt.json",
+      "head_sha": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+      "base_sha": "6c7164342a37fab055907f1666658e1333e2cb86",
+      "repository": "vercel-labs/json-render",
+      "started_at": "2026-09-14T15:39:45.992Z",
+      "finished_at": "2026-09-14T15:46:09.316Z",
+      "elapsed_ms": 383324,
+      "fingerprint": {
+        "head_sha": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+        "changed_paths_digest": "sha256:5075366f1b59aab71166e07d0c980e1a0e431328ac9261c3a5ec6596834da83a",
+        "contract_digest": "sha256:966d5e729ab34ac0eb09368cdf0864277c5f7f8d51a63468e6c23c8221d90be5",
+        "environment_digest": "sha256:01fac53dae36e7db4f6769938fde029c853238dc864d81899a47ce062a3f7ae1",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "command": "node test-strength/mutations.mjs; bun test-strength/copy-survivor.mjs; node test-strength/corpus.mjs; built React consumer probes",
+        "relevant_paths": [
+          "packages/core/src/path-utils.ts",
+          "packages/core/src/types.ts",
+          "packages/core/src/types.test.ts",
+          "packages/core/src/state-store.ts",
+          "packages/core/src/state-store.test.ts",
+          "packages/react/src/hooks.ts",
+          "packages/react-state/src/index.tsx",
+          "packages/solid/src/hooks.ts",
+          "packages/vue/src/hooks.ts",
+          "packages/svelte/src/streaming.svelte.ts",
+          "packages/react-native/src/hooks.ts"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      },
+      "dimensions": {
+        "values": [
+          "container: object, array, missing branch, null or primitive branch",
+          "position: leaf, intermediate, source, destination",
+          "token: canonical existing index, canonical missing index, canonical upper bound, leading zero, numeric suffix, fraction, signed, exponent, hexadecimal, empty, whitespace, line terminator, nonfinite name, array-range overflow, precision overflow, very long number, terminal append, nonterminal append, escaped slash or tilde, reserved decoded token",
+          "operation: get, set, add, remove, immutable set, store set, store update, adapter set, adapter update, copy, move",
+          "batch: all rejected, unchanged, mixed accepted and rejected, parent before child, child before parent",
+          "boundary: core helper, built ESM and CJS exports, serialized SpecStream compiler, built React useUIStream, built React StateProvider callback"
+        ],
+        "exclusions": [
+          "No claim of full RFC 6902 conformance: pre-existing root aliases, missing-parent creation, descendant moves, shallow copy behavior, and add bounds are outside this diff.",
+          "No giant dense array is allocated: the upper canonical bound is tested as a sparse read or own-property classification.",
+          "No cross-platform browser claim: React was exercised in jsdom on macOS Node; other renderer dispatchers are statically traced only.",
+          "Hostile accessor, Proxy, frozen-container, and cyclic object behavior belongs to the Resilience and Security receipts; this receipt does not infer safety for those inputs."
+        ],
+        "evidence": "model.json enumerates classes and exclusions; no full Cartesian-matrix claim."
+      },
+      "oracle": {
+        "source": "RFC 6901 section 4; RFC 6902 sections 4.4-4.5; product contract A1-A4; ECMAScript Array exotic property semantics",
+        "independent": true,
+        "evidence": "Corpus classifies tokens by Object.defineProperty effect on a real array length. Own-key and DOM/callback observations are independent of production helper results. Normative artifacts: ../rfc6901.txt and ../rfc6902.txt."
+      },
+      "producer": {
+        "name": "JSON.stringify JSONL, built diffToPatches, fragmented core compiler, built React useUIStream and StateProvider",
+        "status": "exercised",
+        "evidence": "corpus-results.json: 9042 assertions, 220 deterministic tokens, ESM/CJS and seven-character chunks. ../public-export-probe.json uses built diffToPatches. ../coordinator/hook-proof-recheck.json and ../consumer/result.json exercise renderer boundaries."
+      },
+      "falsification": [
+        {
+          "mutation": "invalid-token-0",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-0.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-1",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-1.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-2",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-2.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-3",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-3.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-4",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-4.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-5",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-5.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-6",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-6.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-7",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-7.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-8",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-8.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-9",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-9.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-10",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-10.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-11",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-11.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-12",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-12.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-13",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-13.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-14",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-14.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-15",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-15.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "invalid-token-16",
+          "site": "parseArrayIndex definition",
+          "outcome": "killed",
+          "red_evidence": "logs/invalid-token-16.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "move-callsite-preflight",
+          "site": "production operation call site",
+          "outcome": "killed",
+          "red_evidence": "logs/move-callsite-preflight.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "copy-callsite-source",
+          "site": "production operation call site",
+          "outcome": "survived",
+          "red_evidence": "No authored red: logs/copy-callsite-source.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        },
+        {
+          "mutation": "store-set-notification",
+          "site": "production operation call site",
+          "outcome": "killed",
+          "red_evidence": "logs/store-set-notification.log",
+          "restored_green_evidence": "logs/restored-green.log (203 tests); restoration.json matches exact frozen source"
+        }
+      ],
+      "campaign": {
+        "corpus": {
+          "seed": 336,
+          "tokenCount": 220,
+          "assertions": 9042,
+          "observations": [
+            {
+              "format": "esm",
+              "invalidTokens": 215,
+              "canonicalReads": 4
+            },
+            {
+              "format": "cjs",
+              "invalidTokens": 215,
+              "canonicalReads": 4
+            }
+          ],
+          "duration_ms": 25,
+          "oracle": "ECMAScript Array exotic own-property behavior through Object.defineProperty; no production parser used for expected classification.",
+          "producer": "JSON.stringify emits line-delimited operations; the built compiler consumes every stream in seven-character fragments.",
+          "status": "pass"
+        },
+        "repeated_corpus": "corpus-results-first.json and corpus-results.json agree on cases and assertions; 26ms and 25ms",
+        "authored_tests": {
+          "baseline": 203,
+          "restored": 203,
+          "full_core_existing_run": 577
+        },
+        "mutants": {
+          "total": 20,
+          "killed": 19,
+          "survived": 1
+        },
+        "copy_survivor": {
+          "mutation": "Remove only source valid/exists guard in applySpecStreamPatch copy arm, line 918",
+          "full_narrow_suite": "203 tests remain green in logs/copy-mutant-full-suite.log",
+          "direct_oracle": "Own copy property with undefined observed in copy-mutant-own-key.json",
+          "supplemental_red": "logs/copy-mutant-own-key.log fails intended assertion",
+          "restored_green": "logs/copy-restored-own-key.log passes against built exact head"
+        }
+      },
+      "findings": [
+        {
+          "id": "TS-1",
+          "severity": "P1",
+          "kind": "production_regression",
+          "claim": "Legacy renderer compound dispatchers bypass rejection preflight and lose move source data.",
+          "location": "packages/core/src/types.ts:907",
+          "consumer_location": "packages/react/src/hooks.ts:186",
+          "evidence": [
+            "../coordinator/hook-proof-recheck.json",
+            "../coordinator/hook-proof-base.json"
+          ],
+          "detail": "Move /state/source to /state/items/01 through built useUIStream deletes source and rejects destination; malformed copy source creates own undefined. Base transfers a value instead. React directly exercised; sibling frameworks statically traced."
+        },
+        {
+          "id": "TS-2",
+          "severity": "P2",
+          "kind": "production_regression",
+          "claim": "StateProvider reports rejected batch entries as actual changes.",
+          "location": "packages/core/src/state-store.ts:164",
+          "consumer_location": "packages/react-state/src/index.tsx:163",
+          "evidence": [
+            "../consumer/result.json",
+            "../consumer/base-result.json"
+          ],
+          "detail": "Mixed /items/01 and /count update preserves array at head but callback still includes rejected value; base callback matched the coerced write."
+        },
+        {
+          "id": "TS-3",
+          "severity": "P2",
+          "kind": "coverage_gap",
+          "claim": "Malformed copy-source test ignores an own undefined property and survives removal of its fix.",
+          "location": "packages/core/src/types.test.ts:624",
+          "evidence": [
+            "copy-survivor-results.json",
+            "logs/copy-mutant-full-suite.log",
+            "copy-mutant-own-key.json",
+            "copy-restored-own-key.json"
+          ],
+          "detail": "toEqual ignores an extra undefined-valued own property. An own-key assertion or strict equality protects the claimed no-undefined insertion behavior."
+        }
+      ],
+      "gaps": [
+        "No passing receipt while TS-1, TS-2 and the authored copy-guard survivor remain unresolved.",
+        "No complete per-cell falsifier coverage for canonical upper-bound acceptance, literal-key inference, null/primitive branch replacement, reserved tokens, or every batch ordering; positive examples do not discharge those obligations.",
+        "Only React runtime exercised for downstream consumers; Solid/Vue/Svelte/React Native are static traces.",
+        "Inherited implementation exposure preceded the model; independent oracle evidence is host semantics and normative text, not cross-family reviewer provenance."
+      ],
+      "scope": {
+        "source_edits": false,
+        "mutations": "Only disposable copy in isolation.json; restored content hashes in restoration.json.",
+        "manifest_ownership": "Coordinator merges this receipt atomically; specialist did not edit shared manifest."
+      },
+      "verification_notes": [
+        "A Bun-run Vitest setup failure was excluded; final authored-test falsification commands execute Node v24.18.0.",
+        "Source, head and status rechecked: exact de6a9bd and clean target.",
+        "Canonical artifact root: /Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd"
+      ]
+    },
+    "resilience": {
+      "required": true,
+      "status": "unavailable",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "runtime-interruption.json",
+      "evidence": "No method-complete exact-head specialist receipt was emitted before the coordinating runtime stopped. Existing test/build/caller probes are useful evidence but do not replace the required specialist method.",
+      "reason": "Coordinating runtime interrupted; required receipt unavailable.",
+      "fingerprint": {
+        "head_sha": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+        "changed_paths_digest": "sha256:5075366f1b59aab71166e07d0c980e1a0e431328ac9261c3a5ec6596834da83a",
+        "contract_digest": "sha256:966d5e729ab34ac0eb09368cdf0864277c5f7f8d51a63468e6c23c8221d90be5",
+        "command": "not completed; see runtime-interruption.json",
+        "environment_digest": "sha256:01fac53dae36e7db4f6769938fde029c853238dc864d81899a47ce062a3f7ae1",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "packages/core/src/path-utils.ts",
+          "packages/core/src/types.ts",
+          "packages/core/src/state-store.ts"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      }
+    }
+  },
+  "assumptions": [
+    {
+      "id": "ASSUMPTION-1",
+      "source": "work-item manifest",
+      "claim": "Review-only authorization; target tree stays frozen.",
+      "status": "verified",
+      "evidence": "Target is clean at exact head; no PR comments, source fixes, commits, pushes or merges performed."
+    },
+    {
+      "id": "ASSUMPTION-2",
+      "source": "consumer inspection",
+      "claim": "Shared adapter packages obtain changed write semantics through createStoreAdapter.",
+      "status": "verified",
+      "evidence": "Read Redux, Zustand, Jotai and XState adapter implementations; public-export-review.json."
+    },
+    {
+      "id": "ASSUMPTION-3",
+      "source": "public compound-patch claim",
+      "claim": "Core safe compound helper owns every public streaming dispatcher.",
+      "status": "refuted",
+      "evidence": "F1 identifies independent React/Solid/Vue/Svelte/React Native dispatchers."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Strict array parsing changes lookup outcomes. Base/head public hook comparison found F1; negative-space completeness remains dependent on missing Test Strength receipt."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Missing-container and null handling inspected; complete falsifier matrix unavailable and explicitly left as a gap."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "run",
+      "reason": "Caller and raw parser sweeps found independent renderer compound dispatchers; F1. Official Redux/Zustand/Jotai/XState adapters delegate to shared core helper."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell argument or script-string composition changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "skipped",
+      "reason": "No daemon emission channel or one-shot latch changed."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No external executable shim was authored in the diff."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Exact base/head comparisons distinguish introduced F1/F2 from pre-existing overlapping valid-batch callback mismatch."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No runtime/framework signal-forwarding seam changed."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "Built ESM/CJS and JSON.stringify/diffToPatches streams were exercised; method-complete independent corpus receipt remains missing."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "RFC 6901/6902 primary texts saved and contract inspected. Full independently defined conformance challenge remains incomplete."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Built React useUIStream loses move source or inserts undefined, and built React StateProvider callbacks report rejected entries; F1/F2."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No new flag, mode or config bit."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Malformed source/destination and invalid/mixed batches were exercised through public boundaries. Full resilience partitions are unresolved."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No heuristic recovery action."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "skipped",
+      "reason": "No new asynchronous operation, timeout or cancellation mechanism."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "skipped",
+      "reason": "No newly supported frame/process/platform boundary; existing consumer propagation was reviewed separately."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Observed own undefined keys, serialized state, snapshot identity, callback records and rendered DOM rather than only command success."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Core ESM/CJS/store-utils and public React hook/provider evidence saved in public-export-probe.json, coordinator and consumer."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Safe core compound helper does not own renderer-specific compound writers; F1. Core rejection does not own provider change-record generation; F2."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "Canonical core behavior prose was compared to probes. Sibling provider listings make no independent malformed-path contract. Consumer guarantees fail at F1/F2."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "Changed canonical/noncanonical path examples map to exercised cases. Exhaustive mutation proof remains missing."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No implementation decision trail was supplied."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "New path validation is linear in path depth; staging clones touched arrays, so cost includes touched array lengths. No performance guarantee is proved or claimed."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "covered",
+      "outcome": "finding-fixed",
+      "reason": "Initial exact-head run report was absent (covered_now.log); this report materializes the missing report. A covered result is coverage, not approval."
+    },
+    {
+      "check": "exact-state",
+      "outcome": "pass",
+      "reason": "Live GitHub and local clean worktree still match base 6c7164342a37fab055907f1666658e1333e2cb86 and head de6a9bdbc0100ac778dff1ad48ab2f732b7d181e."
+    },
+    {
+      "check": "skill-identity",
+      "outcome": "pass",
+      "reason": "identity.json ties canonical executing package tree to git revision; identity_recheck.log has no changes for review-gate or specialist packages."
+    },
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "style.log"
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "surfaces.log and conventions.used.md"
+    },
+    {
+      "check": "siblings",
+      "outcome": "acknowledged",
+      "reason": "sibling-contexts.txt: unaffected sources are terse provider/export listings or canonical path examples; core README/API/skill and data-binding path rule passages were updated."
+    },
+    {
+      "check": "callers",
+      "outcome": "acknowledged",
+      "reason": "caller-contexts.txt and public-export-review.json; F1/F2 remain open."
+    },
+    {
+      "check": "raw-input-consumers",
+      "outcome": "acknowledged",
+      "reason": "additional_callers.log plus legacy renderer compound patch handlers; F1."
+    },
+    {
+      "check": "diff-check",
+      "outcome": "pass",
+      "reason": "git diff --check; diff-check.log"
+    },
+    {
+      "check": "core-build",
+      "outcome": "pass",
+      "reason": "core-build.log: ESM, CJS and DTS built successfully."
+    },
+    {
+      "check": "core-tests",
+      "outcome": "pass",
+      "reason": "core-tests.log: 577 tests across 12 files passed after initial built-artifact dogfood."
+    },
+    {
+      "check": "core-typecheck",
+      "outcome": "acknowledged",
+      "reason": "typecheck-comparison.json: exact base and head both have 115 equivalent diagnostics; no diagnostic delta after file/line normalization."
+    },
+    {
+      "check": "workspace-typecheck",
+      "outcome": "acknowledged",
+      "reason": "root-typecheck.log and repo-typecheck.log: Turbo invokes pnpm dependency auto-install, which fails in the linked local worktree. Live exact-head CI Type Check is successful."
+    },
+    {
+      "check": "version-sync",
+      "outcome": "pass",
+      "reason": "version-check.log: every public package is 0.20.0."
+    },
+    {
+      "check": "stale/producers/timings/shellmeta/artifacts/flagsweep/execdeps",
+      "outcome": "acknowledged",
+      "reason": "No retired duplicated value, error classifier, timing constants, shell parser, persistent file writer, new flag or external executable changed."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "priority": "P1",
+      "state": "confirmed",
+      "claim": "Propagate compound patch validation to renderer stream handlers. The new getByPath/setByPath rejection outcomes are not handled by the older renderer applyPatch implementations. Built React useUIStream processing move from /state/source to /state/items/01 removes source then silently rejects its destination. Copy/move from /state/items/01 to a valid key creates an own undefined property. Core applySpecStreamPatch safely rejects the same compound patches, but these handlers bypass it. This introduces data loss when noncanonical input previously coerced to index 1.",
+      "evidence": "coordinator/hook-proof.test.ts; coordinator/hook-proof-head.json; caller-contexts.txt; coordinator/hook-proof-base-public.json; public-export-review.json",
+      "layer": "built public React consumer and observable state",
+      "source": "lens",
+      "path": "packages/react/src/hooks.ts:186",
+      "changed_location": {
+        "path": "packages/core/src/types.ts",
+        "line_start": 340,
+        "line_end": 341
+      },
+      "resolution": "open",
+      "recommendation": "Route all public streaming patch handlers through the safe compound helper, or validate source and post-removal destination before mutating."
+    },
+    {
+      "id": "F2",
+      "priority": "P2",
+      "state": "confirmed",
+      "claim": "Exclude rejected batch entries from state-provider change callbacks. After update({\"/items/01\":\"rejected\",\"/count\":1}), new core state correctly preserves items but StateProvider onStateChange reports both entries because it compares submitted values with the old snapshot. Applications persisting callbacks receive a write that never occurred. Exact base executed the coerced array write, so the same callback matched its state; the new rejection exposes this mismatch.",
+      "evidence": "consumer/result.json; resumed-caller-review/base-invalid-result.json; resumed-caller-review/base-invalid-probe.mjs; resumed-caller-review/base-invalid.log",
+      "layer": "built public React consumer and observable state",
+      "source": "lens",
+      "path": "packages/react-state/src/index.tsx:156",
+      "changed_location": {
+        "path": "packages/core/src/state-store.ts",
+        "line_start": 160,
+        "line_end": 168
+      },
+      "resolution": "open",
+      "recommendation": "Derive emitted change records from accepted writes and the committed state, preserving append and sequential batch semantics."
+    },
+    {
+      "id": "R1",
+      "state": "refuted",
+      "claim": "The valid overlapping-path callback discrepancy is introduced by this PR.",
+      "evidence": "resumed-caller-review/result.json and resumed-caller-review/base-result.json produce identical mismatch; exact base createStateStore already evaluates entries progressively.",
+      "layer": "base/head React StateProvider differential",
+      "source": "lens",
+      "path": "packages/react-state/src/index.tsx:156",
+      "resolution": "not_applicable"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Unchanged documentation siblings need no repeated malformed-path paragraph.",
+      "evidence": "sibling-contexts.txt shows terse API/provider listings and examples; canonical core contract passages contain the added rules."
+    },
+    {
+      "claim": "Existing core TypeScript diagnostics are not introduced regressions.",
+      "evidence": "typecheck-comparison.json has head_count=115, base_count=115, head_only=[], base_only=[]."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Pre-existing overlapping valid-batch callback omits restoration",
+      "evidence": "resumed-caller-review/result.json and base-result.json show identical discrepancy.",
+      "why_out_of_scope": "Reproduces on exact base; explicitly refuted as introduced."
+    }
+  ],
+  "outcome": {
+    "external_findings": 1,
+    "review_rounds": 1,
+    "human_corrections": 0,
+    "escaped_finding_classes": [
+      "prototype-path validation, resolved at current head by prior external review"
+    ],
+    "delivery": "review_only",
+    "runtime_interrupted": true
+  }
+}

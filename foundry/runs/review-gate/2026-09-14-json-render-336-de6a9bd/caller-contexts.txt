@@ -1,0 +1,871 @@
+packages/react-email/src/contexts/state.tsx
+43:       initialStateJsonRef.current = newJson;
+44:       if (initialState && Object.keys(initialState).length > 0) {
+45:         setStateInternal((prev) => ({ ...prev, ...initialState }));
+46:       }
+47:     }
+48:   }, [initialState]);
+49: 
+50:   const get = useCallback(
+51:     (path: string) => getByPath(stateRef.current, path),
+52:     [],
+53:   );
+54: 
+55:   const set = useCallback(
+56:     (path: string, value: unknown) => {
+57:       setStateInternal((prev) => {
+58:         const next = { ...prev };
+59:         setByPath(next, path, value);
+60:         return next;
+61:       });
+62:       onStateChange?.(path, value);
+63:     },
+64:     [onStateChange],
+65:   );
+66: 
+67:   const update = useCallback(
+68:     (updates: Record<string, unknown>) => {
+69:       const entries = Object.entries(updates);
+70:       setStateInternal((prev) => {
+71:         const next = { ...prev };
+72:         for (const [path, value] of entries) {
+73:           setByPath(next, path, value);
+74:         }
+75:         return next;
+76:       });
+77:       for (const [path, value] of entries) {
+78:         onStateChange?.(path, value);
+79:       }
+80:     },
+81:     [onStateChange],
+96:   if (!ctx) {
+97:     throw new Error("useStateStore must be used within a StateProvider");
+98:   }
+99:   return ctx;
+100: }
+101: 
+102: export function useStateValue<T>(path: string): T | undefined {
+103:   const { state } = useStateStore();
+104:   return getByPath(state, path) as T | undefined;
+105: }
+106: 
+107: export function useStateBinding<T>(
+108:   path: string,
+109: ): [T | undefined, (value: T) => void] {
+110:   const { state, set } = useStateStore();
+111:   const value = getByPath(state, path) as T | undefined;
+112:   const setValue = useCallback(
+113:     (newValue: T) => set(path, newValue),
+114:     [path, set],
+115:   );
+116:   return [value, setValue];
+117: }
+
+packages/react-native/src/hooks.ts
+128:   if (path === "/state") {
+129:     newSpec.state = value as Record<string, unknown>;
+130:     return;
+131:   }
+132: 
+133:   if (path.startsWith("/state/")) {
+134:     if (!newSpec.state) newSpec.state = {};
+135:     const statePath = path.slice("/state".length);
+136:     setByPath(newSpec.state as Record<string, unknown>, statePath, value);
+137:     return;
+138:   }
+139: 
+140:   if (path.startsWith("/elements/")) {
+141:     const pathParts = path.slice("/elements/".length).split("/");
+142:     const elementKey = pathParts[0];
+143:     if (!elementKey) return;
+144: 
+145:     if (pathParts.length === 1) {
+146:       newSpec.elements[elementKey] = value as UIElement;
+147:     } else {
+148:       const element = newSpec.elements[elementKey];
+149:       if (element) {
+150:         const propPath = "/" + pathParts.slice(1).join("/");
+151:         const newElement = { ...element };
+152:         setByPath(
+153:           newElement as unknown as Record<string, unknown>,
+154:           propPath,
+155:           value,
+156:         );
+157:         newSpec.elements[elementKey] = newElement;
+158:       }
+159:     }
+160:   }
+198:   }
+199: }
+200: 
+201: /**
+202:  * Get a value at a spec path.
+203:  */
+204: function getSpecValue(spec: Spec, path: string): unknown {
+205:   if (path === "/root") return spec.root;
+206:   return getByPath(spec as unknown as Record<string, unknown>, path);
+207: }
+208: 
+209: /**
+210:  * Apply an RFC 6902 JSON patch to the current spec.
+211:  * Supports add, remove, replace, move, copy, and test operations.
+212:  */
+213: function applyPatch(spec: Spec, patch: JsonPatch): Spec {
+214:   const newSpec = { ...spec, elements: { ...spec.elements } };
+
+packages/react/src/hooks.ts
+77:   if (path === "/state") {
+78:     newSpec.state = value as Record<string, unknown>;
+79:     return;
+80:   }
+81: 
+82:   if (path.startsWith("/state/")) {
+83:     if (!newSpec.state) newSpec.state = {};
+84:     const statePath = path.slice("/state".length); // e.g. "/posts"
+85:     setByPath(newSpec.state as Record<string, unknown>, statePath, value);
+86:     return;
+87:   }
+88: 
+89:   if (path.startsWith("/elements/")) {
+90:     const pathParts = path.slice("/elements/".length).split("/");
+91:     const elementKey = pathParts[0];
+92:     if (!elementKey) return;
+93: 
+94:     if (pathParts.length === 1) {
+95:       newSpec.elements[elementKey] = value as UIElement;
+96:     } else {
+97:       const element = newSpec.elements[elementKey];
+98:       if (element) {
+99:         const propPath = "/" + pathParts.slice(1).join("/");
+100:         const newElement = { ...element };
+101:         setByPath(
+102:           newElement as unknown as Record<string, unknown>,
+103:           propPath,
+104:           value,
+105:         );
+106:         newSpec.elements[elementKey] = newElement;
+107:       }
+108:     }
+109:   }
+150: /**
+151:  * Get a value at a spec path.
+152:  */
+153: function getSpecValue(spec: Spec, path: string): unknown {
+154:   if (path === "/root") return spec.root;
+155:   if (path === "/state") return spec.state;
+156:   if (path.startsWith("/state/") && spec.state) {
+157:     const statePath = path.slice("/state".length);
+158:     return getByPath(spec.state as Record<string, unknown>, statePath);
+159:   }
+160:   return getByPath(spec as unknown as Record<string, unknown>, path);
+161: }
+162: 
+163: /**
+164:  * Apply an RFC 6902 JSON patch to the current spec.
+165:  * Supports add, remove, replace, move, copy, and test operations.
+166:  */
+167: function applyPatch(spec: Spec, patch: JsonPatch): Spec {
+168:   const newSpec = {
+
+packages/solid/src/hooks.ts
+75:   if (path === "/state") {
+76:     newSpec.state = value as Record<string, unknown>;
+77:     return;
+78:   }
+79: 
+80:   if (path.startsWith("/state/")) {
+81:     if (!newSpec.state) newSpec.state = {};
+82:     const statePath = path.slice("/state".length); // e.g. "/posts"
+83:     setByPath(newSpec.state as Record<string, unknown>, statePath, value);
+84:     return;
+85:   }
+86: 
+87:   if (path.startsWith("/elements/")) {
+88:     const pathParts = path.slice("/elements/".length).split("/");
+89:     const elementKey = pathParts[0];
+90:     if (!elementKey) return;
+91: 
+92:     if (pathParts.length === 1) {
+93:       newSpec.elements[elementKey] = value as UIElement;
+94:     } else {
+95:       const element = newSpec.elements[elementKey];
+96:       if (element) {
+97:         const propPath = "/" + pathParts.slice(1).join("/");
+98:         const newElement = { ...element };
+99:         setByPath(
+100:           newElement as unknown as Record<string, unknown>,
+101:           propPath,
+102:           value,
+103:         );
+104:         newSpec.elements[elementKey] = newElement;
+105:       }
+106:     }
+107:   }
+148: /**
+149:  * Get a value at a spec path.
+150:  */
+151: function getSpecValue(spec: Spec, path: string): unknown {
+152:   if (path === "/root") return spec.root;
+153:   if (path === "/state") return spec.state;
+154:   if (path.startsWith("/state/") && spec.state) {
+155:     const statePath = path.slice("/state".length);
+156:     return getByPath(spec.state as Record<string, unknown>, statePath);
+157:   }
+158:   return getByPath(spec as unknown as Record<string, unknown>, path);
+159: }
+160: 
+161: /**
+162:  * Apply an RFC 6902 JSON patch to the current spec.
+163:  * Supports add, remove, replace, move, copy, and test operations.
+164:  */
+165: function applyPatch(spec: Spec, patch: JsonPatch): Spec {
+166:   const newSpec = {
+
+packages/svelte/src/streaming.svelte.ts
+88:   if (path === "/state") {
+89:     newSpec.state = value as Record<string, unknown>;
+90:     return;
+91:   }
+92: 
+93:   if (path.startsWith("/state/")) {
+94:     if (!newSpec.state) newSpec.state = {};
+95:     const statePath = path.slice("/state".length);
+96:     setByPath(newSpec.state as Record<string, unknown>, statePath, value);
+97:     return;
+98:   }
+99: 
+100:   if (path.startsWith("/elements/")) {
+101:     const pathParts = path.slice("/elements/".length).split("/");
+102:     const elementKey = pathParts[0];
+103:     if (!elementKey) return;
+104: 
+105:     if (pathParts.length === 1) {
+106:       newSpec.elements[elementKey] = value as Spec["elements"][string];
+107:     } else {
+108:       const element = newSpec.elements[elementKey];
+109:       if (element) {
+110:         const propPath = "/" + pathParts.slice(1).join("/");
+111:         const newElement = { ...element };
+112:         setByPath(
+113:           newElement as unknown as Record<string, unknown>,
+114:           propPath,
+115:           value,
+116:         );
+117:         newSpec.elements[elementKey] = newElement;
+118:       }
+119:     }
+120:   }
+155:   }
+156: }
+157: 
+158: function getSpecValue(spec: Spec, path: string): unknown {
+159:   if (path === "/root") return spec.root;
+160:   if (path === "/state") return spec.state;
+161:   if (path.startsWith("/state/") && spec.state) {
+162:     const statePath = path.slice("/state".length);
+163:     return getByPath(spec.state as Record<string, unknown>, statePath);
+164:   }
+165:   return getByPath(spec as unknown as Record<string, unknown>, path);
+166: }
+167: 
+168: function applyPatch(spec: Spec, patch: JsonPatch): Spec {
+169:   const newSpec = {
+170:     ...spec,
+171:     elements: { ...spec.elements },
+172:     ...(spec.state ? { state: { ...spec.state } } : {}),
+173:   };
+
+packages/vue/src/hooks.ts
+84:   if (path === "/state") {
+85:     newSpec.state = value as Record<string, unknown>;
+86:     return;
+87:   }
+88: 
+89:   if (path.startsWith("/state/")) {
+90:     if (!newSpec.state) newSpec.state = {};
+91:     const statePath = path.slice("/state".length); // e.g. "/posts"
+92:     setByPath(newSpec.state as Record<string, unknown>, statePath, value);
+93:     return;
+94:   }
+95: 
+96:   if (path.startsWith("/elements/")) {
+97:     const pathParts = path.slice("/elements/".length).split("/");
+98:     const elementKey = pathParts[0];
+99:     if (!elementKey) return;
+100: 
+101:     if (pathParts.length === 1) {
+102:       newSpec.elements[elementKey] = value as UIElement;
+103:     } else {
+104:       const element = newSpec.elements[elementKey];
+105:       if (element) {
+106:         const propPath = "/" + pathParts.slice(1).join("/");
+107:         const newElement = { ...element };
+108:         setByPath(
+109:           newElement as unknown as Record<string, unknown>,
+110:           propPath,
+111:           value,
+112:         );
+113:         newSpec.elements[elementKey] = newElement;
+114:       }
+115:     }
+116:   }
+157: /**
+158:  * Get a value at a spec path.
+159:  */
+160: function getSpecValue(spec: Spec, path: string): unknown {
+161:   if (path === "/root") return spec.root;
+162:   if (path === "/state") return spec.state;
+163:   if (path.startsWith("/state/") && spec.state) {
+164:     const statePath = path.slice("/state".length);
+165:     return getByPath(spec.state as Record<string, unknown>, statePath);
+166:   }
+167:   return getByPath(spec as unknown as Record<string, unknown>, path);
+168: }
+169: 
+170: /**
+171:  * Apply an RFC 6902 JSON patch to the current spec.
+172:  * Supports add, remove, replace, move, copy, and test operations.
+173:  */
+174: function applyPatch(spec: Spec, patch: JsonPatch): Spec {
+175:   const newSpec = {
+
+packages/core/src/props.ts
+204:   ctx: PropResolutionContext,
+205: ): unknown {
+206:   if (value === null || value === undefined) {
+207:     return value;
+208:   }
+209: 
+210:   // $state: read from global state model
+211:   if (isStateExpression(value)) {
+212:     return getByPath(ctx.stateModel, value.$state);
+213:   }
+214: 
+215:   // $item: read from current repeat item
+216:   if (isItemExpression(value)) {
+217:     if (ctx.repeatItem === undefined) return undefined;
+218:     // "" means the whole item, "field" means a field on the item
+219:     return value.$item === ""
+220:       ? ctx.repeatItem
+221:       : getByPath(ctx.repeatItem, value.$item);
+222:   }
+223: 
+224:   // $index: return current repeat array index
+225:   if (isIndexExpression(value)) {
+226:     return ctx.repeatIndex;
+227:   }
+228: 
+229:   // $bindState: two-way binding to global state path
+230:   if (isBindStateExpression(value)) {
+231:     return getByPath(ctx.stateModel, value.$bindState);
+232:   }
+233: 
+234:   // $bindItem: two-way binding to repeat item field
+235:   if (isBindItemExpression(value)) {
+236:     const resolvedPath = resolveBindItemPath(value.$bindItem, ctx);
+237:     if (resolvedPath === undefined) return undefined;
+238:     return getByPath(ctx.stateModel, resolvedPath);
+239:   }
+240: 
+241:   // $cond/$then/$else: evaluate condition and pick branch
+242:   if (isCondExpression(value)) {
+243:     const result = evaluateVisibility(value.$cond, ctx);
+244:     return resolvePropValue(result ? value.$then : value.$else, ctx);
+245:   }
+246: 
+269:   // Absolute paths (starting with "/") resolve against the state model.
+270:   // Bare names resolve against the current repeat item first, then fall
+271:   // back to the state model at "/<name>".
+272:   if (isTemplateExpression(value)) {
+273:     return value.$template.replace(
+274:       /\$\{([^}]+)\}/g,
+275:       (_match, rawPath: string) => {
+276:         if (rawPath.startsWith("/")) {
+277:           const resolved = getByPath(ctx.stateModel, rawPath);
+278:           return resolved != null ? String(resolved) : "";
+279:         }
+280:         // Bare name: try repeat item first
+281:         if (ctx.repeatItem !== undefined) {
+282:           const fromItem = getByPath(ctx.repeatItem, rawPath);
+283:           if (fromItem != null) return String(fromItem);
+284:         }
+285:         // Fall back to state model
+286:         const resolved = getByPath(ctx.stateModel, "/" + rawPath);
+287:         return resolved != null ? String(resolved) : "";
+288:       },
+289:     );
+290:   }
+291: 
+292:   // Arrays: resolve each element
+293:   if (Array.isArray(value)) {
+294:     return value.map((item) => resolvePropValue(item, ctx));
+
+packages/core/src/spec-validator.ts
+253:         });
+254:         childRepeatBasePath = undefined;
+255:         childSampleAvailable = false;
+256:       } else {
+257:         const canCheckSample =
+258:           spec.state !== undefined &&
+259:           (typeof element.repeat.statePath === "string" || sampleAvailable);
+260:         const value = canCheckSample
+261:           ? getByPath(spec.state, statePath)
+262:           : undefined;
+263: 
+264:         if (canCheckSample && !Array.isArray(value)) {
+265:           issues.push({
+266:             severity: "error",
+267:             message: `Element "${key}" repeats over "${statePath}" but state${value === undefined ? " has no value there" : ` has a ${typeof value} there`}. Repeat statePath must reference an array in state; add sample items to state at that path.`,
+268:             elementKey: key,
+269:             code: "repeat_state_mismatch",
+
+packages/core/src/visibility.ts
+183:   value: unknown,
+184:   ctx: VisibilityContext,
+185: ): unknown {
+186:   if (typeof value === "object" && value !== null) {
+187:     if (
+188:       "$state" in value &&
+189:       typeof (value as Record<string, unknown>).$state === "string"
+190:     ) {
+191:       return getByPath(ctx.stateModel, (value as { $state: string }).$state);
+192:     }
+193:   }
+194:   return value;
+195: }
+196: 
+197: /**
+198:  * Type guards for condition sources.
+199:  */
+214: ): unknown {
+215:   if (isIndexCondition(cond)) {
+216:     return ctx.repeatIndex;
+217:   }
+218:   if (isItemCondition(cond)) {
+219:     if (ctx.repeatItem === undefined) return undefined;
+220:     return cond.$item === ""
+221:       ? ctx.repeatItem
+222:       : getByPath(ctx.repeatItem, cond.$item);
+223:   }
+224:   // StateCondition
+225:   return getByPath(ctx.stateModel, (cond as StateCondition).$state);
+226: }
+227: 
+228: /**
+229:  * Evaluate a single condition against the context.
+230:  *
+231:  * When `not` is `true`, the final result is inverted — this applies to
+232:  * whichever operator is present (or to the truthiness check if no operator
+233:  * is given).  For example:
+
+packages/image/src/render.tsx
+67:     if (statePath === undefined) {
+68:       console.warn(
+69:         "[json-render/image] $item in repeat.statePath used outside of a repeat scope",
+70:       );
+71:       return null;
+72:     }
+73: 
+74:     const items =
+75:       (getByPath(stateModel, statePath) as unknown[] | undefined) ?? [];
+76: 
+77:     const fragments = items.map((item, index) => {
+78:       const key =
+79:         repeat.key && typeof item === "object" && item !== null
+80:           ? String((item as Record<string, unknown>)[repeat.key!] ?? index)
+81:           : String(index);
+82: 
+83:       const childPath = resolveRepeatItemStatePath(statePath, index);
+
+packages/ink/src/renderer.tsx
+330:   );
+331:   if (statePath === undefined) {
+332:     console.warn(
+333:       "[json-render/ink] $item in repeat.statePath used outside of a repeat scope",
+334:     );
+335:     return null;
+336:   }
+337: 
+338:   const raw = getByPath(state, statePath);
+339:   const items = Array.isArray(raw) ? raw : [];
+340: 
+341:   return (
+342:     <>
+343:       {items.map((itemValue, index) => {
+344:         const key =
+345:           repeat.key && typeof itemValue === "object" && itemValue !== null
+346:             ? String(
+
+packages/react-email/src/render.tsx
+64:     if (statePath === undefined) {
+65:       console.warn(
+66:         "[json-render/react-email] $item in repeat.statePath used outside of a repeat scope",
+67:       );
+68:       return null;
+69:     }
+70: 
+71:     const items =
+72:       (getByPath(stateModel, statePath) as unknown[] | undefined) ?? [];
+73: 
+74:     const fragments = items.map((item, index) => {
+75:       const repeatKey = repeat.key;
+76:       const key =
+77:         repeatKey && typeof item === "object" && item !== null
+78:           ? String((item as Record<string, unknown>)[repeatKey] ?? index)
+79:           : String(index);
+80: 
+
+packages/react-email/src/renderer.tsx
+258:   );
+259:   if (statePath === undefined) {
+260:     console.warn(
+261:       "[json-render/react-email] $item in repeat.statePath used outside of a repeat scope",
+262:     );
+263:     return null;
+264:   }
+265: 
+266:   const items = (getByPath(state, statePath) as unknown[] | undefined) ?? [];
+267: 
+268:   return (
+269:     <>
+270:       {items.map((itemValue, index) => {
+271:         const key =
+272:           repeat.key && typeof itemValue === "object" && itemValue !== null
+273:             ? String(
+274:                 (itemValue as Record<string, unknown>)[repeat.key] ?? index,
+
+packages/react-native/src/renderer.tsx
+310:   );
+311:   if (statePath === undefined) {
+312:     console.warn(
+313:       "[json-render/react-native] $item in repeat.statePath used outside of a repeat scope",
+314:     );
+315:     return null;
+316:   }
+317: 
+318:   const items = (getByPath(state, statePath) as unknown[] | undefined) ?? [];
+319: 
+320:   return (
+321:     <>
+322:       {items.map((itemValue, index) => {
+323:         // Use a stable key: prefer key field, fall back to index
+324:         const key =
+325:           repeat.key && typeof itemValue === "object" && itemValue !== null
+326:             ? String(
+
+packages/react-pdf/src/render.tsx
+68:     if (statePath === undefined) {
+69:       console.warn(
+70:         "[json-render/react-pdf] $item in repeat.statePath used outside of a repeat scope",
+71:       );
+72:       return null;
+73:     }
+74: 
+75:     const items =
+76:       (getByPath(stateModel, statePath) as unknown[] | undefined) ?? [];
+77: 
+78:     const fragments = items.map((item, index) => {
+79:       const key =
+80:         repeat.key && typeof item === "object" && item !== null
+81:           ? String((item as Record<string, unknown>)[repeat.key!] ?? index)
+82:           : String(index);
+83: 
+84:       const childPath = resolveRepeatItemStatePath(statePath, index);
+
+packages/react-pdf/src/renderer.tsx
+266:   );
+267:   if (statePath === undefined) {
+268:     console.warn(
+269:       "[json-render/react-pdf] $item in repeat.statePath used outside of a repeat scope",
+270:     );
+271:     return null;
+272:   }
+273: 
+274:   const items = (getByPath(state, statePath) as unknown[] | undefined) ?? [];
+275: 
+276:   return (
+277:     <>
+278:       {items.map((itemValue, index) => {
+279:         const key =
+280:           repeat.key && typeof itemValue === "object" && itemValue !== null
+281:             ? String(
+282:                 (itemValue as Record<string, unknown>)[repeat.key] ?? index,
+
+packages/react-state/src/index.tsx
+155: 
+156:   const update = useCallback((updates: Record<string, unknown>) => {
+157:     const s = storeRef.current;
+158:     const prev = s.getSnapshot();
+159:     s.update(updates);
+160:     if (!isControlledRef.current && s.getSnapshot() !== prev) {
+161:       const changes: Array<{ path: string; value: unknown }> = [];
+162:       for (const [path, value] of Object.entries(updates)) {
+163:         if (getByPath(prev, path) !== value) {
+164:           changes.push({ path, value });
+165:         }
+166:       }
+167:       if (changes.length > 0) {
+168:         onStateChangeRef.current?.(changes);
+169:       }
+170:     }
+171:   }, []);
+195:   return ctx;
+196: }
+197: 
+198: /**
+199:  * Hook to get a value from the state model
+200:  */
+201: export function useStateValue<T>(path: string): T | undefined {
+202:   const { state } = useStateStore();
+203:   return getByPath(state, path) as T | undefined;
+204: }
+205: 
+206: /**
+207:  * Hook to get and set a value from the state model (like useState).
+208:  *
+209:  * @deprecated Use {@link useBoundProp} with `$bindState` expressions instead.
+210:  * `useStateBinding` takes a raw state path string, while `useBoundProp` works
+211:  * with the renderer's `bindings` map and supports both `$bindState` and
+212:  * `$bindItem` expressions.
+213:  */
+214: export function useStateBinding<T>(
+215:   path: string,
+216: ): [T | undefined, (value: T) => void] {
+217:   const { state, set } = useStateStore();
+218:   const value = getByPath(state, path) as T | undefined;
+219:   const setValue = useCallback(
+220:     (newValue: T) => set(path, newValue),
+221:     [path, set],
+222:   );
+223:   return [value, setValue];
+224: }
+
+packages/react/src/renderer.tsx
+578:     undefined,
+579:   );
+580:   const stableResolvedPropsRef = useRef<Record<string, unknown>>({});
+581: 
+582:   const watchedValues = useMemo(() => {
+583:     if (!watchConfig) return undefined;
+584:     const values: Record<string, unknown> = {};
+585:     for (const path of Object.keys(watchConfig)) {
+586:       values[path] = getByPath(watchState, path);
+587:     }
+588:     const prev = stableWatchRef.current;
+589:     if (prev) {
+590:       const keys = Object.keys(values);
+591:       if (
+592:         keys.length === Object.keys(prev).length &&
+593:         keys.every((k) => values[k] === prev[k])
+594:       ) {
+832:   );
+833:   if (statePath === undefined) {
+834:     console.warn(
+835:       "[json-render] $item in repeat.statePath used outside of a repeat scope",
+836:     );
+837:     return null;
+838:   }
+839: 
+840:   const items = (getByPath(state, statePath) as unknown[] | undefined) ?? [];
+841: 
+842:   // Per-item filter from the container's own $item/$index visible condition.
+843:   // Original indices are preserved so item state paths still point at the
+844:   // right array entry.
+845:   const entries = items
+846:     .map((itemValue, index) => ({ itemValue, index }))
+847:     .filter(
+848:       ({ itemValue, index }) =>
+
+packages/solid/src/contexts/state.tsx
+131:       setState(s.getSnapshot());
+132:     });
+133:     onCleanup(unsubscribe);
+134:   });
+135: 
+136:   const set = (path: string, value: unknown) => {
+137:     const s = store();
+138:     const prev = s.getSnapshot();
+139:     const prevValue = getByPath(prev, path);
+140:     s.set(path, value);
+141:     if (prevValue !== value) {
+142:       const changes = [{ path, value }];
+143:       notifyChanges(changes);
+144:       if (!props.store && s.getSnapshot() !== prev) {
+145:         props.onStateChange?.(changes);
+146:       }
+147:     }
+148:   };
+149: 
+150:   const update = (updates: Record<string, unknown>) => {
+151:     const s = store();
+152:     const prev = s.getSnapshot();
+153:     s.update(updates);
+154:     const changes: Array<{ path: string; value: unknown }> = [];
+155:     for (const [path, value] of Object.entries(updates)) {
+156:       if (getByPath(prev, path) !== value) {
+157:         changes.push({ path, value });
+158:       }
+159:     }
+160:     if (changes.length > 0) {
+161:       notifyChanges(changes);
+162:       if (!props.store && s.getSnapshot() !== prev) {
+163:         props.onStateChange?.(changes);
+164:       }
+190:   if (!ctx) {
+191:     throw new Error("useStateStore must be used within a StateProvider");
+192:   }
+193:   return ctx;
+194: }
+195: 
+196: export function useStateValue<T>(path: string): Accessor<T | undefined> {
+197:   const store = useStateStore();
+198:   return createMemo(() => getByPath(store.state, path) as T | undefined);
+199: }
+200: 
+201: export function useStateBinding<T>(
+202:   path: string,
+203: ): [Accessor<T | undefined>, (value: T) => void] {
+204:   const store = useStateStore();
+205:   const value = createMemo(() => getByPath(store.state, path) as T | undefined);
+206:   const setValue = (newValue: T) => store.set(path, newValue);
+207:   return [value, setValue];
+208: }
+
+packages/solid/src/renderer.tsx
+441:       );
+442:     }
+443:     return resolved;
+444:   };
+445: 
+446:   const items = () =>
+447:     statePath() === undefined
+448:       ? []
+449:       : ((getByPath(stateStore.state, statePath()!) as unknown[] | undefined) ??
+450:         []);
+451: 
+452:   return (
+453:     <For each={items()}>
+454:       {(itemValue, index) => {
+455:         const key = () => {
+456:           const r = repeat();
+457:           return r.key && typeof itemValue === "object" && itemValue !== null
+
+packages/svelte/src/RepeatChildren.svelte
+36:       );
+37:     }
+38:     return resolved;
+39:   });
+40: 
+41:   let items = $derived(
+42:     statePath === undefined
+43:       ? []
+44:       : ((getByPath(stateCtx.state, statePath) as unknown[] | undefined) ?? []),
+45:   );
+46: </script>
+47: 
+48: {#each items as itemValue, index (element.repeat?.key && typeof itemValue === "object" && itemValue !== null ? String((itemValue as any)[element.repeat.key] ?? index) : String(index))}
+49:   {@const basePath = resolveRepeatItemStatePath(statePath!, index)}
+50: 
+51:   {#if element.children}
+52:     <RepeatScopeProvider item={itemValue} {index} {basePath}>
+
+packages/svelte/src/contexts/StateProvider.svelte
+160:       const currentStore = activeStore();
+161:       const prev = currentStore.getSnapshot();
+162:       currentStore.update(updates);
+163:       const next = currentStore.getSnapshot();
+164:       model = next;
+165:       if (!store && next !== prev) {
+166:         const changes: Array<{ path: string; value: unknown }> = [];
+167:         for (const [path, value] of Object.entries(updates)) {
+168:           if (getByPath(prev, path) !== value) {
+169:             changes.push({ path, value });
+170:           }
+171:         }
+172:         if (changes.length > 0) {
+173:           onStateChange?.(changes);
+174:         }
+175:       }
+176:     },
+
+packages/vue/src/composables/state.ts
+152:     };
+153: 
+154:     const update = (updates: Record<string, unknown>) => {
+155:       const prev = store.getSnapshot();
+156:       store.update(updates);
+157:       if (!isControlled && store.getSnapshot() !== prev) {
+158:         const changes: Array<{ path: string; value: unknown }> = [];
+159:         for (const [path, value] of Object.entries(updates)) {
+160:           if (getByPath(prev, path) !== value) {
+161:             changes.push({ path, value });
+162:           }
+163:         }
+164:         if (changes.length > 0) {
+165:           onStateChangeRef.value?.(changes);
+166:         }
+167:       }
+168:     };
+190:   return ctx;
+191: }
+192: 
+193: /**
+194:  * Composable to get a value from the state model (reactive)
+195:  */
+196: export function useStateValue<T>(path: string): ComputedRef<T | undefined> {
+197:   const { state } = useStateStore();
+198:   return computed(() => getByPath(state.value, path) as T | undefined);
+199: }
+200: 
+201: /**
+202:  * Composable to get and set a value from the state model by path.
+203:  *
+204:  * This is the path-based variant for use in arbitrary composables. For
+205:  * registry components that receive `bindings` from the renderer, prefer
+206:  * `useBoundProp` which reads the already-resolved prop value and writes back
+207:  * to the bound path.
+208:  */
+209: export function useStateBinding<T>(
+210:   path: string,
+211: ): [ComputedRef<T | undefined>, (value: T) => void] {
+212:   const { state, set } = useStateStore();
+213:   const value = computed(() => getByPath(state.value, path) as T | undefined);
+214:   const setValue = (newValue: T) => set(path, newValue);
+215:   return [value, setValue];
+216: }
+
+packages/vue/src/renderer.ts
+328:     };
+329: 
+330:     // Watch effect: fire actions when watched state paths change.
+331:     const watchedValues = computed(() => {
+332:       const cfg = props.element.watch;
+333:       if (!cfg) return undefined;
+334:       const values: Record<string, unknown> = {};
+335:       for (const path of Object.keys(cfg)) {
+336:         values[path] = getByPath(watchState.value, path);
+337:       }
+338:       return values;
+339:     });
+340: 
+341:     watch(
+342:       watchedValues,
+343:       (current, prev, onCleanup) => {
+344:         const cfg = props.element.watch;
+542:         parentScope?.basePath,
+543:       );
+544:       if (statePath === undefined) {
+545:         console.warn(
+546:           "[json-render/vue] $item in repeat.statePath used outside of a repeat scope",
+547:         );
+548:         return null;
+549:       }
+550:       const raw = getByPath(state.value, statePath);
+551:       const items = Array.isArray(raw) ? (raw as unknown[]) : [];
+552: 
+553:       return items.map((itemValue, index) => {
+554:         const key =
+555:           repeat.key && typeof itemValue === "object" && itemValue !== null
+556:             ? String(
+557:                 (itemValue as Record<string, unknown>)[repeat.key] ?? index,
+558:               )

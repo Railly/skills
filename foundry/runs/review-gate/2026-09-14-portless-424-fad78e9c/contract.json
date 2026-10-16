@@ -1,0 +1,19 @@
+{
+  "source": "https://github.com/vercel-labs/portless/pull/424",
+  "basis": "PR body and changed README, CLI help, command docs and agent skill. No linked issue or separate design specification supplied.",
+  "acceptance": {
+    "A1": "An initial hosts-file read failure prevents writes and returns failure.",
+    "A2": "Readable empty content is distinct from an unreadable file.",
+    "A3": "Sync fails when its post-write hosts read fails or the managed block mismatches.",
+    "A4": "Manual zero-route sync reconciles valid managed blocks and reports errors through existing privilege/error paths.",
+    "A5": "getManagedHostnames stays best-effort on read failure.",
+    "A6": "Docs and success text accurately describe the supported cleanup scope."
+  },
+  "non_goals": [
+    "Transactional/atomic whole-file writes",
+    "Malformed-block parser repair",
+    "Route-store error semantics",
+    "Privilege redesign",
+    "Actual system hosts mutation during review"
+  ]
+}

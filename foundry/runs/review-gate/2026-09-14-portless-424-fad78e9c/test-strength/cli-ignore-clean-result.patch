@@ -1,0 +1,11 @@
+--- dist/cli.js
++++ dist/cli.js
+@@ -6243,7 +6243,7 @@
+     process.exit(0);
+   }
+   if (args[1] === "clean") {
+-    if (cleanHostsFile()) {
++    if ((cleanHostsFile(), true)) {
+       console.log(colors_default.green(`Removed portless entries from ${HOSTS_DISPLAY2}.`));
+       return;
+     }

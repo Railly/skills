@@ -1,0 +1,32 @@
+[
+  {
+    "check": "lint",
+    "exit": 0,
+    "seconds": 0.38,
+    "tail": "Checked 71 files in 36ms. No fixes applied.\n$ biome check src tests vitest.config.ts scripts/build.ts scripts/verify-package.ts scripts/release.ts scripts/release-notes.ts\n"
+  },
+  {
+    "check": "typecheck",
+    "exit": 0,
+    "seconds": 1.47,
+    "tail": "$ tsc --noEmit\n"
+  },
+  {
+    "check": "tests",
+    "exit": 0,
+    "seconds": 3.13,
+    "tail": "\n RUN  v4.1.11 /Users/raillyhugo/Programming/vercel/issue-graph-review-pr20\n\n\n Test Files  32 passed (32)\n      Tests  636 passed (636)\n   Start at  17:30:29\n   Duration  2.75s (transform 1.78s, setup 0ms, import 2.93s, tests 6.31s, environment 1ms)\n\n$ vitest run --config vitest.config.ts\n"
+  },
+  {
+    "check": "docs-tests",
+    "exit": 0,
+    "seconds": 1.31,
+    "tail": "\n RUN  v4.1.11 /Users/raillyhugo/Programming/vercel/issue-graph-review-pr20/apps/docs\n\n\n Test Files  10 passed (10)\n      Tests  96 passed (96)\n   Start at  17:30:29\n   Duration  925ms (transform 1.21s, setup 0ms, import 1.76s, tests 389ms, environment 0ms)\n\n$ vitest run\n"
+  },
+  {
+    "check": "package-smoke",
+    "exit": 1,
+    "seconds": 0.36,
+    "tail": "$ tsx scripts/verify-package.ts\nnode:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: pnpm must expose its JavaScript CLI entrypoint\n    at <anonymous> (/Users/raillyhugo/Programming/vercel/issue-graph-review-pr20/scripts/verify-package.ts:269:8) {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: '/Users/raillyhugo/.bun/bin/bun',\n  expected: /\\.(?:c|m)?js$/,\n  operator: 'match',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\nerror: script \"test:package\" exited with code 1\n"
+  }
+]

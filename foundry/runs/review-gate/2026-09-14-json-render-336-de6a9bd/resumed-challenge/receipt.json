@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "obligation": "independent_challenge",
+  "repository": "vercel-labs/json-render",
+  "pr": 336,
+  "head_sha": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+  "base_sha": "6c7164342a37fab055907f1666658e1333e2cb86",
+  "dirty_digest": "clean",
+  "required": true,
+  "satisfied": true,
+  "status": "satisfied",
+  "method": "reference_oracle",
+  "independence_type": "substrate_corpus_with_implementation_independent_normative_oracle",
+  "model_independence_claimed": false,
+  "execution_mode": "sequential_local_reference_corpus",
+  "degraded_from": "inherited fx_worker/native_subagent attempt, not retried",
+  "independence_gap": "No cross-model-family, independent human or blinded reviewer provenance. Corpus authorship follows inherited implementation exposure; its external normative oracle does not derive from production.",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-challenge/corpus.json",
+  "evidence": [
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-challenge/oracle-freeze.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-challenge/execution.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-challenge/reused-corpus-results.json",
+    "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-challenge/provenance.md"
+  ],
+  "evidence_sha256": {
+    "corpus": "sha256:d936a900e5691d35bfffe6cced40fcef951addcea29253abe7c55002a63bd4c4",
+    "execution": "sha256:1033cec9086f711e43bb3cc8071079641dabd4086f116086a3135eade6903461",
+    "runner": "sha256:edf290ac15048edf54c47d345de2f3a04f0473d6df412e217b09395564b9f254"
+  },
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "command": "bun /Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/resumed-challenge/verify.mjs",
+  "exit_code": 0,
+  "summary": {
+    "checks": 744,
+    "passed": 742,
+    "unexpected_failures": 0,
+    "normative_diagnostic_mismatches": 2,
+    "full_rfc_conformance_claimed": false
+  },
+  "normative_diagnostic_mismatches": [
+    {
+      "id": "esm/6901-5-empty-member-diagnostic",
+      "pass": false,
+      "diagnostic": true,
+      "sources": [
+        "pointer_example"
+      ],
+      "expected": "0",
+      "actual": "{\n  ' ': 7,\n  '': 0,\n  'a/b': 1,\n  'c%d': 2,\n  'e^f': 3,\n  'g|h': 4,\n  'i\\\\j': 5,\n  'k\"l': 6,\n  'm~n': 8,\n  foo: [ 'bar', 'baz' ]\n}"
+    },
+    {
+      "id": "cjs/6901-5-empty-member-diagnostic",
+      "pass": false,
+      "diagnostic": true,
+      "sources": [
+        "pointer_example"
+      ],
+      "expected": "0",
+      "actual": "{\n  ' ': 7,\n  '': 0,\n  'a/b': 1,\n  'c%d': 2,\n  'e^f': 3,\n  'g|h': 4,\n  'i\\\\j': 5,\n  'k\"l': 6,\n  'm~n': 8,\n  foo: [ 'bar', 'baz' ]\n}"
+    }
+  ],
+  "blocker": null,
+  "reason": "The saved RFC 6901/6902 texts supply explicit example outputs and object/array, decoding, insertion and move/copy rules independent of production. Frozen fixtures exercise both existing public package formats and actual JSONL compiler boundaries. Product-only expected values are separately attributed and not passed off as RFC requirements. Root-slash normative mismatches remain explicit. This closes only the independent challenge-source obligation.",
+  "review_gate_pass": false,
+  "existing_stage_receipts_changed": false,
+  "manifest_or_run_report_changed": false,
+  "fixes_publication_installs_builds_mutations": false,
+  "limits": [
+    "Only independent_challenge is discharged, not Review Gate or failed/unavailable specialist stages.",
+    "No independent human/model family or normative reference implementation is claimed. Review author has inherited implementation exposure; external expected-value provenance is the independence.",
+    "RFC 6901 section 5 root slash example is kept with expected 0 even though saved model declares root aliases out of scope. A mismatch is a visible diagnostic, never relabeled RFC success.",
+    "This is a selected corpus, not full RFC 6901/6902 conformance or full Cartesian/falsifier coverage.",
+    "SpecStream JSONL is not an application/json-patch+json array or HTTP PATCH transport. Product no-op handling/continued streaming is not proof of RFC patch failure or HTTP atomicity.",
+    "No successful-test-operation proxy is counted as proof that test failures are enforced. RFC 6902 A.8/A.9/A.14/A.15 test-operation semantics are outside the changed claim.",
+    "URI fragments, malformed escapes, duplicate members, missing-parent creation, root replacement, out-of-bounds add, descendant moves, deep-copy aliasing and giant sparse-array writes are not certified.",
+    "No renderer parity, browser, React callback, resilience, hostile accessor/Proxy, cyclic/frozen object, deployment or security-stage completion claim.",
+    "Saved RFC texts are used locally with content hashes and excerpts, not network-retrieved or cryptographically authenticated in this resumption."
+  ]
+}

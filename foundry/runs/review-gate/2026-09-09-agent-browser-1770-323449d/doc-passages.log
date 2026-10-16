@@ -1,0 +1,372 @@
+packages/@agent-browser/eve/README.md:90:| `select_option` | Pick an option from a native or supported ARIA dropdown |
+cli/src/output.rs:416:                    // axe represents a selector that crosses one or more
+cli/src/output.rs:1562:  --outline            Print a heading outline for the selected page
+cli/src/output.rs:1590:Usage: agent-browser click <selector> [--new-tab]
+cli/src/output.rs:1592:Clicks on the specified element. The selector can be a CSS selector,
+cli/src/output.rs:1618:Usage: agent-browser dblclick <selector>
+cli/src/output.rs:1620:Double-clicks on the specified element. Useful for text selection
+cli/src/output.rs:1636:Usage: agent-browser fill <selector> <text>
+cli/src/output.rs:1655:Usage: agent-browser type <selector> <text>
+cli/src/output.rs:1670:  without a selector, use 'keyboard type' instead:
+cli/src/output.rs:1678:Usage: agent-browser hover <selector>
+cli/src/output.rs:1696:Usage: agent-browser focus <selector>
+cli/src/output.rs:1713:Usage: agent-browser check <selector>
+cli/src/output.rs:1730:Usage: agent-browser uncheck <selector>
+cli/src/output.rs:1743:        "select" => {
+cli/src/output.rs:1745:agent-browser select - Select a dropdown option
+cli/src/output.rs:1747:Usage: agent-browser select <selector> <value...>
+cli/src/output.rs:1749:Selects options in a native <select> or supported role="combobox"/role="listbox"
+cli/src/output.rs:1751:resulting selection state. Input-backed comboboxes receive the requested value
+cli/src/output.rs:1753:Single-select native and ARIA controls accept one value. Native multiple selects
+cli/src/output.rs:1755:multiselectable listbox and represent its final set. Unmatched, disabled,
+cli/src/output.rs:1763:  agent-browser select "#country" "US"
+cli/src/output.rs:1764:  agent-browser select @e5 "option2"
+cli/src/output.rs:1765:  agent-browser select "#menu" "opt1" "opt2" "opt3"
+cli/src/output.rs:1789:Usage: agent-browser upload <selector> <files...>
+cli/src/output.rs:1806:Usage: agent-browser download <selector> <path>
+cli/src/output.rs:1811:  selector             Element to click (CSS selector or @ref)
+cli/src/output.rs:1894:agent-browser keyboard - Raw keyboard input (no selector needed)
+cli/src/output.rs:1899:Unlike 'type' which requires a selector, 'keyboard' operates on
+cli/src/output.rs:1943:  -s, --selector <sel> CSS selector for a scrollable container
+cli/src/output.rs:1954:  agent-browser scroll down 500 --selector "div.scroll-container"
+cli/src/output.rs:1961:Usage: agent-browser scrollintoview <selector>
+cli/src/output.rs:1982:Usage: agent-browser wait <selector|ms|option>
+cli/src/output.rs:1987:  <selector>           Wait for element to appear
+cli/src/output.rs:2026:Usage: agent-browser screenshot [selector] [path]
+cli/src/output.rs:2096:  -s, --selector <sel> Scope snapshot to CSS selector
+cli/src/output.rs:2196:  text <selector>            Get text content of element
+cli/src/output.rs:2197:  html <selector>            Get inner HTML of element
+cli/src/output.rs:2198:  value <selector>           Get value of input element
+cli/src/output.rs:2199:  attr <selector> <name>     Get attribute value
+cli/src/output.rs:2202:  count <selector>           Count matching elements
+cli/src/output.rs:2203:  box <selector>             Get bounding box (x, y, width, height)
+cli/src/output.rs:2204:  styles <selector>          Get computed styles of elements
+cli/src/output.rs:2230:Usage: agent-browser is <subcommand> <selector>
+cli/src/output.rs:2235:  visible <selector>   Check if element is visible
+cli/src/output.rs:2236:  enabled <selector>   Check if element is enabled (not disabled)
+cli/src/output.rs:2237:  checked <selector>   Check if checkbox/radio is checked
+cli/src/output.rs:2267:  first <selector>         First matching element
+cli/src/output.rs:2268:  last <selector>          Last matching element
+cli/src/output.rs:2269:  nth <index> <selector>   Nth matching element (0-based)
+cli/src/output.rs:2565:Usage: agent-browser frame <selector|main>
+cli/src/output.rs:2570:  <selector>           CSS selector for iframe
+cli/src/output.rs:2603:  --username-selector <s>  Custom CSS selector for username field
+cli/src/output.rs:2604:  --password-selector <s>  Custom CSS selector for password field
+cli/src/output.rs:2605:  --submit-selector <s>    Custom CSS selector for submit button
+cli/src/output.rs:2611:  --username-selector <s>   Username selector override for this login
+cli/src/output.rs:2612:  --password-selector <s>   Password selector override for this login
+cli/src/output.rs:2613:  --submit-selector <s>     Submit selector override for this login
+cli/src/output.rs:2616:  auth login waits for form selectors to appear before filling/clicking.
+cli/src/output.rs:2832:Usage: agent-browser highlight <selector>
+cli/src/output.rs:2858:  copy                 Copy current selection (simulates Ctrl+C)
+cli/src/output.rs:3173:Usage: agent-browser tap <selector>
+cli/src/output.rs:3246:    -s, --selector <sel>     Scope snapshot to a CSS selector or @ref
+cli/src/output.rs:3260:    -s, --selector <sel>     Scope screenshot to element
+cli/src/output.rs:3271:    -s, --selector <sel>     Scope snapshots to a CSS selector or @ref
+cli/src/output.rs:3341:  -s, --selector <css> Scope the audit to a matching subtree
+cli/src/output.rs:3344:Structured node targets preserve axe selector paths. Nested arrays identify
+cli/src/output.rs:3351:  agent-browser a11y --selector "#main"
+cli/src/output.rs:3443:  agent_browser_click      Click an element by @ref or selector
+cli/src/output.rs:3449:Each tool has typed fields such as url, selector, text, key, and session.
+cli/src/output.rs:3598:  patterns, ref/selector usage, and copy-paste examples. Prefer this over
+cli/src/output.rs:3617:  keyboard type <text>       Type text with real keystrokes (no selector)
+cli/src/output.rs:3623:  select <sel> <val...>      Select native or ARIA dropdown option(s)
+cli/src/output.rs:3642:Get Info:  agent-browser get <what> [selector]
+cli/src/output.rs:3645:Check State:  agent-browser is <what> <selector>
+cli/src/output.rs:3716:  a11y [url] [--tags <t1,t2>] [--selector <css>] [--json]
+cli/src/output.rs:3719:                             selectors and fix guidance
+cli/src/output.rs:3738:  auth login <name> --username-selector <s> --password-selector <s>
+cli/src/output.rs:3739:                             Override selectors for one login
+cli/src/output.rs:3785:  -s, --selector <sel>       Scope to CSS selector
+cli/src/output.rs:3975:  agent-browser stream enable            # Start runtime streaming on an auto-selected port
+README.md:121:agent-browser keyboard type <text>    # Type with real keystrokes (no selector, current focus)
+README.md:122:agent-browser keyboard inserttext <text>  # Insert text without key events (no selector)
+README.md:126:agent-browser select <sel> <val...>   # Select native or ARIA dropdown option(s)
+README.md:129:agent-browser scroll <dir> [px]       # Scroll (up/down/left/right, --selector <sel>)
+README.md:248:agent-browser wait <selector>         # Wait for element to be visible
+README.md:287:agent-browser clipboard copy                      # Copy current selection (Ctrl+C)
+README.md:400:agent-browser diff snapshot --selector "#main" --compact # Scoped snapshot diff
+README.md:407:agent-browser diff url https://v1.com https://v2.com --selector "#main"  # Scope to element
+README.md:480:Run an [axe-core](https://github.com/dequelabs/axe-core) accessibility audit against the current page or a URL. The axe-core engine is embedded in the binary, so it works offline and under strict CSP. It runs private partial audits across the page's frame tree and merges serialized results without page messaging, so page-provided `window.axe` values remain intact and iframe violations retain their frame selector paths. Accessibility audits require a CDP browser and are not available with Safari or iOS WebDriver sessions.
+README.md:486:agent-browser a11y --selector "#main"              # Scope the audit to a subtree
+README.md:490:The default output lists each violation with its impact, rule id, fix guidance URL, and the CSS selectors of failing nodes:
+README.md:506:`--json` returns the same data structured for automation (`counts`, `violations`, `incomplete`, each violation's `nodes` with `target`, `html`, and `failureSummary`). Each `target` preserves axe's selector path arrays, including nested arrays for shadow DOM boundaries. Rules that axe could not evaluate automatically are reported under `incomplete` for manual review.
+README.md:577:- `agent_browser_wait_for_selector`
+README.md:583:Each tool has typed fields such as `url`, `selector`, `text`, `key`, `session`, and `allowedDomains`, so MCP clients show meaningful approval prompts instead of raw command arrays. The common `allowedDomains` array maps to `--allowed-domains` and activates the same WebRTC containment and launch-mode restrictions. Each tool also accepts `extraArgs` for advanced CLI flags and exact CLI parity. Tool discovery is paginated and includes read-only/open-world annotations so modern MCP clients can load the large typed surface incrementally.
+README.md:808:- **Authentication Vault**: Store credentials locally (always encrypted), reference by name. The LLM never sees passwords. `auth login` navigates with `load` and then waits for login form selectors to appear (SPA-friendly, timeout follows the default action timeout). A key is auto-generated at `~/.agent-browser/.encryption-key` if `AGENT_BROWSER_ENCRYPTION_KEY` is not set: `echo "pass" | agent-browser auth save github --url https://github.com/login --username user --password-stdin` then `agent-browser auth login github`
+README.md:811:- **Domain Allowlist**: Restrict navigation to trusted domains (wildcards like `*.example.com` also match the bare domain): `--allowed-domains "example.com,*.example.com"`. Sub-resource requests (scripts, images, fetch), WebSocket/EventSource connections, and `sendBeacon` calls to non-allowed domains are blocked. WebRTC peer connections are disabled in supported Chromium sessions while the allowlist is active to prevent STUN, TURN, and DNS traffic from bypassing HTTP interception. Dedicated and shared workers are guarded with a bootstrap wrapper; if a page CSP forbids that wrapper, the worker fails closed rather than running without the allowlist guard. Pre-existing CDP sessions, auto-connect, Chrome profiles, direct-page provider plugins, agent-browser restore or state-file replay, raw Chrome args that select profiles, restore sessions, or open startup pages, iOS, and Safari reject this option because agent-browser cannot install equivalent containment before page scripts run. Include any CDN domains your target pages depend on (e.g., `*.cdn.example.com`).
+README.md:882:agent-browser auth login my-app --credential-provider vault --item "My App" --url https://app.example.com/login --username-selector "#email" --password-selector "#password" --submit-selector "button[type=submit]"
+README.md:925:agent-browser snapshot -s "#main"         # Scope to CSS selector
+README.md:935:| `-s, --selector <sel>` | Scope to CSS selector                                                   |
+README.md:1173:Refs provide deterministic element selection from snapshots:
+README.md:1193:`select` accepts native `<select>` elements and standard ARIA `combobox` or `listbox` controls. Values match an option's exact value, label, or whitespace-normalized accessible text. A single-select native or ARIA control accepts one value; native multiple selects retain multi-value behavior, while multiple values for ARIA controls require an explicitly multiselectable listbox and represent its final set. The command opens comboboxes with browser input, types the requested value into input-backed filters when needed, waits for associated options, and verifies the widget's selected or committed state. It fails when an option is unknown, disabled, hidden, unsupported, or exposes no standard state that can confirm the selection. Re-snapshot after a widget opens or rerenders before using newly exposed option refs. This action uses the CDP browser path; WebDriver backends report it as unsupported.
+README.md:1196:agent-browser select @e4 "United States"
+README.md:1197:agent-browser select "#country-combobox" "us"
+README.md:1635:**Browser Engine:** Uses Chrome (from Chrome for Testing) by default. The `--engine` flag selects between `chrome` and `lightpanda`. Supported browsers: Chromium/Chrome (via CDP) and Safari (via WebDriver for iOS).
+cli/src/mcp.rs:42:const TOOL_SELECT: &str = "agent_browser_select";
+cli/src/mcp.rs:49:const TOOL_WAIT_FOR_SELECTOR: &str = "agent_browser_wait_for_selector";
+cli/src/mcp.rs:828:                "outline": { "type": "boolean", "description": "Return a heading outline for the selected page instead of the full page text." },
+cli/src/mcp.rs:842:                "selector": { "type": "string", "description": "Scope the snapshot to a CSS selector." },
+cli/src/mcp.rs:850:            "Click an element by @ref or CSS selector.",
+cli/src/mcp.rs:852:                "selector": selector_schema(),
+cli/src/mcp.rs:855:            &["selector"],
+cli/src/mcp.rs:860:            "Clear and fill an input by @ref or CSS selector.",
+cli/src/mcp.rs:862:                "selector": selector_schema(),
+cli/src/mcp.rs:865:            &["selector", "text"],
+cli/src/mcp.rs:870:            "Type text into an element by @ref or CSS selector.",
+cli/src/mcp.rs:872:                "selector": selector_schema(),
+cli/src/mcp.rs:877:            &["selector", "text"],
+cli/src/mcp.rs:888:        tool(TOOL_HOVER, "Hover element", "Hover an element.", json!({ "selector": selector_schema() }), &["selector"]),
+cli/src/mcp.rs:889:        tool(TOOL_FOCUS, "Focus element", "Focus an element.", json!({ "selector": selector_schema() }), &["selector"]),
+cli/src/mcp.rs:890:        tool(TOOL_CHECK, "Check element", "Check a checkbox or switch.", json!({ "selector": selector_schema() }), &["selector"]),
+cli/src/mcp.rs:891:        tool(TOOL_UNCHECK, "Uncheck element", "Uncheck a checkbox or switch.", json!({ "selector": selector_schema() }), &["selector"]),
+cli/src/mcp.rs:895:            "Select options in a native select or supported ARIA combobox/listbox using exact values, labels, or normalized accessible text, then verify the resulting widget state.",
+cli/src/mcp.rs:897:                "selector": selector_schema(),
+cli/src/mcp.rs:902:                    "description": "Option values or labels to select."
+cli/src/mcp.rs:905:            &["selector", "values"],
+cli/src/mcp.rs:914:                "selector": { "type": "string", "description": "Optional element selector to scroll." }
+cli/src/mcp.rs:918:        tool(TOOL_SCROLL_INTO_VIEW, "Scroll into view", "Scroll an element into view.", json!({ "selector": selector_schema() }), &["selector"]),
+cli/src/mcp.rs:920:        wait_tool(TOOL_WAIT_FOR_SELECTOR, "Wait for selector", "Wait for an element to appear.", json!({ "selector": selector_schema() }), &["selector"]),
+cli/src/mcp.rs:931:                "selector": { "type": "string", "description": "Optional @ref or CSS selector to capture." },
+cli/src/mcp.rs:940:        tool(TOOL_GET_TEXT, "Get text", "Get visible text from an element.", json!({ "selector": selector_schema() }), &["selector"]),
+cli/src/mcp.rs:941:        tool(TOOL_GET_HTML, "Get HTML", "Get innerHTML from an element.", json!({ "selector": selector_schema() }), &["selector"]),
+cli/src/mcp.rs:942:        tool(TOOL_GET_VALUE, "Get value", "Get an input value.", json!({ "selector": selector_schema() }), &["selector"]),
+cli/src/mcp.rs:978:            json!({ "selector": selector_schema() }),
+cli/src/mcp.rs:979:            &["selector"],
+cli/src/mcp.rs:985:            json!({ "source": selector_schema(), "target": selector_schema() }),
+cli/src/mcp.rs:992:            json!({ "selector": selector_schema(), "files": string_array_schema("File paths to upload.") }),
+cli/src/mcp.rs:993:            &["selector", "files"],
+cli/src/mcp.rs:999:            json!({ "selector": selector_schema(), "path": { "type": "string" } }),
+cli/src/mcp.rs:1000:            &["selector", "path"],
+cli/src/mcp.rs:1048:            json!({ "selector": selector_schema(), "name": { "type": "string" } }),
+cli/src/mcp.rs:1049:            &["selector", "name"],
+cli/src/mcp.rs:1055:            json!({ "selector": selector_schema() }),
+cli/src/mcp.rs:1056:            &["selector"],
+cli/src/mcp.rs:1062:            json!({ "selector": selector_schema() }),
+cli/src/mcp.rs:1063:            &["selector"],
+cli/src/mcp.rs:1069:            json!({ "selector": selector_schema() }),
+cli/src/mcp.rs:1070:            &["selector"],
+cli/src/mcp.rs:1076:            json!({ "selector": selector_schema() }),
+cli/src/mcp.rs:1077:            &["selector"],
+cli/src/mcp.rs:1083:            json!({ "selector": selector_schema() }),
+cli/src/mcp.rs:1084:            &["selector"],
+cli/src/mcp.rs:1090:            json!({ "selector": selector_schema() }),
+cli/src/mcp.rs:1091:            &["selector"],
+cli/src/mcp.rs:1099:                "value": { "type": "string", "description": "Role, text, label, selector, or test id." },
+cli/src/mcp.rs:1308:            "Switch frame by selector, ref, or id.",
+cli/src/mcp.rs:1407:            json!({ "selector": selector_schema() }),
+cli/src/mcp.rs:1408:            &["selector"],
+cli/src/mcp.rs:1434:            "Copy current selection.",
+cli/src/mcp.rs:1541:            json!({ "selector": selector_schema() }),
+cli/src/mcp.rs:1542:            &["selector"],
+cli/src/mcp.rs:1562:            json!({ "baseline": { "type": "string" }, "selector": { "type": "string" }, "compact": { "type": "boolean" }, "depth": { "type": "integer" } }),
+cli/src/mcp.rs:1569:            json!({ "baseline": { "type": "string" }, "output": { "type": "string" }, "threshold": number_schema(), "selector": { "type": "string" }, "fullPage": { "type": "boolean" } }),
+cli/src/mcp.rs:1576:            json!({ "url1": { "type": "string" }, "url2": { "type": "string" }, "screenshot": { "type": "boolean" }, "fullPage": { "type": "boolean" }, "waitUntil": { "type": "string" }, "selector": { "type": "string" }, "compact": { "type": "boolean" }, "depth": { "type": "integer" } }),
+cli/src/mcp.rs:1635:                "selector": { "type": "string" },
+cli/src/mcp.rs:1848:fn selector_schema() -> Value {
+cli/src/mcp.rs:1851:        "description": "Element @ref from snapshot, or a CSS selector."
+cli/src/mcp.rs:2167:        TOOL_DBLCLICK => call_simple_selector(arguments, "dblclick"),
+cli/src/mcp.rs:2175:        TOOL_HOVER => call_simple_selector(arguments, "hover"),
+cli/src/mcp.rs:2176:        TOOL_FOCUS => call_simple_selector(arguments, "focus"),
+cli/src/mcp.rs:2177:        TOOL_CHECK => call_simple_selector(arguments, "check"),
+cli/src/mcp.rs:2178:        TOOL_UNCHECK => call_simple_selector(arguments, "uncheck"),
+cli/src/mcp.rs:2179:        TOOL_SELECT => call_select(arguments),
+cli/src/mcp.rs:2184:        TOOL_SCROLL_INTO_VIEW => call_simple_selector(arguments, "scrollintoview"),
+cli/src/mcp.rs:2186:        TOOL_WAIT_FOR_SELECTOR => call_wait_flag(arguments, None, "selector"),
+cli/src/mcp.rs:2194:        TOOL_GET_TEXT => call_get_selector(arguments, "text"),
+cli/src/mcp.rs:2195:        TOOL_GET_HTML => call_get_selector(arguments, "html"),
+cli/src/mcp.rs:2196:        TOOL_GET_VALUE => call_get_selector(arguments, "value"),
+cli/src/mcp.rs:2198:        TOOL_GET_COUNT => call_get_selector(arguments, "count"),
+cli/src/mcp.rs:2199:        TOOL_GET_BOX => call_get_selector(arguments, "box"),
+cli/src/mcp.rs:2200:        TOOL_GET_STYLES => call_get_selector(arguments, "styles"),
+cli/src/mcp.rs:2271:        TOOL_HIGHLIGHT => call_simple_selector(arguments, "highlight"),
+cli/src/mcp.rs:2289:        TOOL_TAP => call_simple_selector(arguments, "tap"),
+cli/src/mcp.rs:2571:    if let Some(selector) = optional_string(arguments, "selector")? {
+cli/src/mcp.rs:2573:        args.push(selector);
+cli/src/mcp.rs:2579:fn call_simple_selector(arguments: &Value, command: &str) -> Result<Value, ProtocolError> {
+cli/src/mcp.rs:2580:    let selector = required_string(arguments, "selector")?;
+cli/src/mcp.rs:2581:    call_cli_tool(arguments, vec![command.to_string(), selector], None)
+cli/src/mcp.rs:2585:    let selector = required_string(arguments, "selector")?;
+cli/src/mcp.rs:2586:    let mut args = vec!["click".to_string(), selector];
+cli/src/mcp.rs:2598:    let selector = required_string(arguments, "selector")?;
+cli/src/mcp.rs:2600:    call_cli_tool(arguments, vec!["fill".to_string(), selector, text], None)
+cli/src/mcp.rs:2604:    let selector = required_string(arguments, "selector")?;
+cli/src/mcp.rs:2606:    let mut args = vec!["type".to_string(), selector, text];
+cli/src/mcp.rs:2629:    let selector = required_string(arguments, "selector")?;
+cli/src/mcp.rs:2631:    let mut args = vec!["upload".to_string(), selector];
+cli/src/mcp.rs:2637:    let selector = required_string(arguments, "selector")?;
+cli/src/mcp.rs:2641:        vec!["download".to_string(), selector, path],
+cli/src/mcp.rs:2646:fn call_select(arguments: &Value) -> Result<Value, ProtocolError> {
+cli/src/mcp.rs:2647:    call_cli_tool(arguments, select_command_args(arguments)?, None)
+cli/src/mcp.rs:2650:fn select_command_args(arguments: &Value) -> Result<Vec<String>, ProtocolError> {
+cli/src/mcp.rs:2651:    let selector = required_string(arguments, "selector")?;
+cli/src/mcp.rs:2653:    let mut args = vec!["select".to_string(), selector];
+cli/src/mcp.rs:2662:    if let Some(selector) = optional_string(arguments, "selector")? {
+cli/src/mcp.rs:2663:        args.push("--selector".to_string());
+cli/src/mcp.rs:2664:        args.push(selector);
+cli/src/mcp.rs:2725:    if let Some(selector) = optional_string(arguments, "selector")? {
+cli/src/mcp.rs:2726:        args.push(selector);
+cli/src/mcp.rs:2737:fn call_get_selector(arguments: &Value, what: &str) -> Result<Value, ProtocolError> {
+cli/src/mcp.rs:2738:    let selector = required_string(arguments, "selector")?;
+cli/src/mcp.rs:2741:        vec!["get".to_string(), what.to_string(), selector],
+cli/src/mcp.rs:2747:    let selector = required_string(arguments, "selector")?;
+cli/src/mcp.rs:2751:        vec!["get".to_string(), "attr".to_string(), selector, name],
+cli/src/mcp.rs:2757:    let selector = required_string(arguments, "selector")?;
+cli/src/mcp.rs:2760:        vec!["is".to_string(), what.to_string(), selector],
+cli/src/mcp.rs:3085:        ("usernameSelector", "--username-selector"),
+cli/src/mcp.rs:3086:        ("passwordSelector", "--password-selector"),
+cli/src/mcp.rs:3087:        ("submitSelector", "--submit-selector"),
+cli/src/mcp.rs:3181:    if let Some(selector) = optional_string(arguments, "selector")? {
+cli/src/mcp.rs:3182:        args.push("--selector".to_string());
+cli/src/mcp.rs:3183:        args.push(selector);
+cli/src/mcp.rs:3200:        ("selector", "--selector"),
+cli/src/mcp.rs:3231:    if let Some(selector) = optional_string(arguments, "selector")? {
+cli/src/mcp.rs:3232:        args.push("--selector".to_string());
+cli/src/mcp.rs:3233:        args.push(selector);
+cli/src/mcp.rs:3352:    if let Some(selector) = optional_string(arguments, "selector")? {
+cli/src/mcp.rs:3353:        args.push("--selector".to_string());
+cli/src/mcp.rs:3354:        args.push(selector);
+cli/src/mcp.rs:4016:    fn select_tool_schema_describes_native_and_aria_controls() {
+cli/src/mcp.rs:4017:        let select = tools()
+cli/src/mcp.rs:4020:            .expect("select tool should be registered");
+cli/src/mcp.rs:4022:            select["inputSchema"]["required"],
+cli/src/mcp.rs:4023:            json!(["selector", "values"])
+cli/src/mcp.rs:4025:        assert_eq!(select["inputSchema"]["properties"]["values"]["minItems"], 1);
+cli/src/mcp.rs:4026:        let description = select["description"].as_str().unwrap();
+cli/src/mcp.rs:4027:        assert!(description.contains("native select"));
+cli/src/mcp.rs:4033:    fn select_forwards_selector_and_all_values_to_the_cli_command() {
+cli/src/mcp.rs:4034:        let args = select_command_args(&json!({
+cli/src/mcp.rs:4035:            "selector": "@e4",
+cli/src/mcp.rs:4039:        assert_eq!(args, vec!["select", "@e4", "red", "Blue Label"]);
+cli/src/mcp.rs:4043:    fn select_requires_selector_and_values() {
+cli/src/mcp.rs:4044:        assert!(select_command_args(&json!({ "values": ["red"] })).is_err());
+cli/src/mcp.rs:4045:        assert!(select_command_args(&json!({ "selector": "#menu" })).is_err());
+cli/src/mcp.rs:4046:        assert!(select_command_args(&json!({ "selector": "#menu", "values": [] })).is_err());
+cli/src/mcp.rs:4347:            "selector": "@e1",
+cli/src/mcp.rs:4637:        let value = required_string(&json!({ "selector": "@e1" }), "selector").unwrap();
+cli/src/mcp.rs:4673:        let err = required_string(&json!({}), "selector").unwrap_err();
+docs/src/lib/page-titles.ts:10:  selectors: "Selectors",
+docs/src/lib/docs-navigation.ts:28:      { name: "Selectors", href: "/selectors" },
+skill-data/electron/SKILL.md:223:- Try `agent-browser keyboard type "text"` to type at the current focus without a selector
+skill-data/core/templates/form-automation.sh:35:#   agent-browser select @e4 "Option Value"     # Dropdown
+skill-data/derive-client/SKILL.md:44:  | select(.response.content.mimeType | test("json"))
+skill-data/derive-client/SKILL.md:54:jq '.log.entries[] | select(.request.url | test("api/search"))
+skill-data/core/SKILL.md:3:description: Core agent-browser usage guide. Read this before running any agent-browser commands. Covers the snapshot-and-ref workflow, navigating pages, interacting with elements (click, fill, type, select), extracting text and data, taking screenshots, managing tabs, handling forms and auth, waiting for content, running multiple browser sessions in parallel, and troubleshooting common failures. Use when the user asks to interact with a website, fill a form, click something, extract data, take a screenshot, log into a site, test a web app, or automate any browser task.
+skill-data/core/SKILL.md:85:agent-browser snapshot -s "#main"         # scope to a CSS selector
+skill-data/core/SKILL.md:122:For sessions that handle sensitive data, use `--allowed-domains` to restrict navigations and page-initiated network traffic. Supported Chromium sessions also disable `RTCPeerConnection` while the allowlist is active so WebRTC STUN, TURN, and related DNS traffic cannot bypass the HTTP filter. Dedicated and shared workers are guarded with a bootstrap wrapper; if a page CSP forbids that wrapper, the worker fails closed rather than running without the allowlist guard. Pre-existing CDP sessions, auto-connect, Chrome profiles, direct-page provider plugins, agent-browser restore or state-file replay, raw Chrome args that select profiles, restore sessions, or open startup pages, iOS, and Safari reject this option because agent-browser cannot install equivalent containment before page scripts run. This is browser-level containment, not an operating-system firewall; see [Trust boundaries](references/trust-boundaries.md) for deployment guidance.
+skill-data/core/SKILL.md:138:agent-browser select @e4 "option-value"   # select native or ARIA dropdown option
+skill-data/core/SKILL.md:139:agent-browser select @e4 "a" "b"          # final set in multiselectable listbox
+skill-data/core/SKILL.md:146:For a native `<select>` or standard ARIA `combobox`/`listbox`, use `select` with an exact option value or label. Closed comboboxes are opened with real browser input; input-backed comboboxes receive the requested value as a filter when needed; dynamically rendered associated options are re-queried; and the command verifies selected state, a committed combobox value/display, or an associated form value before returning success. Use one value for a single-select control. Native multiple selects retain multi-value behavior; multiple ARIA values are a final set and require `aria-multiselectable="true"` on a listbox. After a widget opens or rerenders, take a fresh snapshot before using any newly exposed refs. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
+skill-data/core/SKILL.md:164:Or a raw CSS selector:
+skill-data/core/SKILL.md:176:Agents fail more often from bad waits than from bad selectors. Pick the right wait for the situation:
+skill-data/core/SKILL.md:228:agent-browser auth login my-app --credential-provider vault --item "My App" --url https://app.example.com/login --username-selector "#email" --password-selector "#password"
+skill-data/core/SKILL.md:419:agent-browser keyboard type "text"          # raw keystrokes, no selector
+skill-data/core/SKILL.md:476:agent-browser a11y --selector "#main"               # Scope to one subtree
+skill-data/core/SKILL.md:480:The default output lists violations and incomplete checks with failing selector paths. Use the MCP `debug` or `all` tools profile for the typed `agent_browser_a11y` tool. See `references/commands.md` for the full result schema.
+skill-data/core/references/authentication.md:208:Use `--url`, `--username-selector`, `--password-selector`, and `--submit-selector` on `auth login` to override plugin-provided metadata for the current login only.
+skill-data/slack/SKILL.md:220:- **Scroll in sidebar**: Use `agent-browser scroll down 300 --selector ".p-sidebar"` to scroll within the Slack sidebar if channel list is long.
+skill-data/core/references/session-management.md:53:Full isolation applies when each session launches its own browser. When sessions instead share one Chrome over `--cdp <port>`, cookies and storage are shared, and only the tab selection separates the sessions. Add `--pin-tab` so each session sticks to its own tab:
+skill-data/slack/references/slack-tasks.md:67:   agent-browser scroll down 500 --selector ".p-sidebar"
+skill-data/slack/references/slack-tasks.md:333:   agent-browser scroll down 300 --selector ".p-sidebar"
+skill-data/core/references/trust-boundaries.md:48:- `--allowed-domains` blocks non-allowlisted HTTP traffic, WebSocket and EventSource connections, and `sendBeacon` calls. It also disables `RTCPeerConnection` for supported Chromium sessions because STUN, TURN, and related DNS traffic do not pass through CDP HTTP interception. Dedicated and shared workers are guarded with a bootstrap wrapper; if a page CSP forbids that wrapper, the worker fails closed rather than running without the allowlist guard. Locally launched Chrome additionally disables non-proxied WebRTC UDP. Pre-existing CDP sessions, auto-connect, Chrome profiles, direct-page provider plugins, agent-browser restore or state-file replay, raw Chrome args that select profiles, restore sessions, or open startup pages, iOS, and Safari reject this option because agent-browser cannot install equivalent containment before page scripts run. Treat this as browser-level containment and combine it with host or container egress controls when you need an operating-system security boundary.
+skill-data/core/references/commands.md:50:agent-browser snapshot -s "#main" # Scope to CSS selector
+skill-data/core/references/commands.md:69:agent-browser select @e1 "value"  # Select a native or ARIA option
+skill-data/core/references/commands.md:70:agent-browser select @e1 "a" "b"  # Select final set in multiselectable ARIA listbox
+skill-data/core/references/commands.md:79:`select <selector> <value...>` supports native `<select>` elements and standard ARIA `combobox` or `listbox` controls. Matching is exact against an option value or label, with whitespace-normalized accessible text as a third match. Custom controls are opened and changed with browser input; input-backed comboboxes receive the requested value as a filter when needed; and the result is verified through selected options, the committed combobox value/display, or an associated form value. A single-select native or ARIA control accepts one value; native multiple selects retain multi-value behavior, while multiple ARIA values require `aria-multiselectable="true"` on a listbox and mean its final selected set. Unknown, disabled, hidden, unsupported, or unverifiable controls fail with an actionable error, bounded by the configured action timeout. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
+skill-data/core/references/commands.md:90:agent-browser select @e4 "United States"
+skill-data/core/references/commands.md:255:agent-browser frame "#iframe"     # Switch to iframe by CSS selector
+skill-data/core/references/commands.md:282:- **CSS selectors** — `frame "#payment-iframe"` finds the iframe by selector
+skill-data/core/references/commands.md:322:agent-browser auth login <name> --username-selector <s> --password-selector <s> [--submit-selector <s>]
+skill-data/core/references/commands.md:410:- `agent_browser_wait_for_selector`
+skill-data/core/references/commands.md:482:Runs an embedded axe-core audit with no CDN fetch. The vendored engine runs private partial audits through CDP across the page's frame tree and merges serialized results without page messaging, so page CSP does not block it, page-provided `window.axe` values remain intact, and iframe violations retain their frame selector paths. Accessibility audits require a CDP browser and are not available with Safari or iOS WebDriver sessions. Reports WCAG violations with impact, rule id, fix guidance URL, and failing-node selectors.
+skill-data/core/references/commands.md:488:agent-browser a11y --selector "#main"               # Scope audit to a subtree
+skill-data/core/references/commands.md:492:`--json` returns `counts` plus `violations`/`incomplete` arrays; each entry has `id`, `impact`, `help`, `helpUrl`, `tags`, `nodeCount`, and up to 10 `nodes` (`target` selector path arrays, `html` snippet, `failureSummary`). Nested `target` arrays preserve shadow DOM boundaries. `incomplete` lists rules axe could not evaluate automatically — review those manually.
+skill-data/core/references/snapshot-refs.md:21:Full DOM/HTML → AI parses → CSS selector → Action (~3000-5000 tokens)
+skill-data/core/references/snapshot-refs.md:129:`select @e1 "value"` also supports a native `<select>` or a standard ARIA `combobox`/`listbox`. It opens closed comboboxes, types into input-backed filters when needed, waits for associated options, matches exact values or labels, and verifies selected or committed state. Use a single value for single-select controls. Native multiple selects retain multi-value behavior; multiple ARIA values require `aria-multiselectable="true"` on a listbox and represent its final set. If the widget rerenders, `select` re-resolves its associated options; take a fresh snapshot before using any newly shown option refs. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
+skill-data/core/references/snapshot-refs.md:159:@e5 [select]                             # Dropdown
+skill-data/core/references/snapshot-refs.md:164:@e10 [radio] selected                    # Selected radio
+docs/src/app/selectors/page.mdx:5:Refs provide deterministic element selection from snapshots. Best for AI agents.
+docs/src/app/selectors/page.mdx:29:## CSS selectors
+docs/src/app/selectors/page.mdx:38:Use the same CSS selector or snapshot ref with `select` for native `<select>` elements and supported ARIA `combobox` or `listbox` controls. Matching is exact against option values, labels, or normalized accessible text. Input-backed comboboxes receive the requested value as a filter when needed. Re-snapshot after a custom widget opens or rerenders if you need refs for its options; the select command itself re-queries the associated option set and verifies the final state. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
+docs/src/app/eve/page.mdx:64:Have the agent navigate, snapshot, then act on snapshot refs. Snapshot refs like `[ref=e12]` become `@e12` selectors for interaction tools.
+docs/src/app/security/page.mdx:23:- **Pre-existing attach modes, profiles, saved state, and startup args do not support the domain allowlist.** agent-browser rejects `--allowed-domains` with `--cdp`, `--auto-connect`, `--profile`, `--restore`, `--state`, `state load`, and raw Chrome args that select profiles, restore sessions, or open startup pages because pages or saved origins may run before agent-browser can verify containment.
+docs/src/app/security/page.mdx:56:`auth login` navigates with the `load` lifecycle event and then waits for form selectors to appear before filling/clicking. This makes delayed SPA login pages more reliable while avoiding `networkidle` hangs on pages with long-lived background requests.
+docs/src/app/security/page.mdx:58:Custom selectors can be specified if auto-detection fails:
+docs/src/app/security/page.mdx:64:  --username-selector "#email" \
+docs/src/app/security/page.mdx:65:  --password-selector "#password" \
+docs/src/app/security/page.mdx:66:  --submit-selector "button.login"
+docs/src/app/security/page.mdx:131:Credential plugins receive `credential.resolve` and return username, password, and optionally URL or selector metadata. Browser provider plugins receive `browser.launch` and return a CDP WebSocket URL. Launch mutator plugins receive `launch.mutate` and can append local launch args, extensions, or init script source before Chrome starts. Generic command plugins receive the request type passed to `plugin run`.
+docs/src/app/security/page.mdx:187:Supports exact match (`github.com`) and wildcard prefix (`*.example.com`, which also matches the bare domain `example.com`). Both page navigations and sub-resource requests (scripts, images, fetch, XHR, etc.) to non-allowed domains are blocked. WebSocket and EventSource connections are blocked via constructor-level patching, and `sendBeacon` returns `false` for blocked destinations. Dedicated and shared workers are guarded with a bootstrap wrapper; if a page CSP forbids that wrapper, the worker fails closed rather than running without the allowlist guard. WebRTC peer connections are disabled entirely in supported Chromium sessions while the allowlist is active because STUN, TURN, and DNS traffic do not pass through CDP Fetch interception. Locally launched Chrome also uses `disable_non_proxied_udp` as a second layer. Pre-existing CDP sessions, auto-connect, Chrome profiles, direct-page provider plugins, agent-browser restore or state-file replay, raw Chrome args that select profiles, restore sessions, or open startup pages, iOS, and Safari reject this option because agent-browser cannot install equivalent containment before page scripts run. Non-http(s) sub-resources such as data URIs and blobs remain allowed. When a request is blocked, the command returns an error.
+docs/src/app/security/page.mdx:240:    <tr><td><code>fill</code></td><td>fill, type, keyboard type/inserttext, select, check, uncheck</td></tr>
+docs/src/app/changelog/page.mdx:9:- Added experimental **WebMCP support** for discovering and invoking tools provided by the current page, including frame-aware tool selection, detached results, cancellation, bounded metadata and output handling, and an opt-in MCP tool profile. WebMCP is enabled by default for locally managed Chrome and can be disabled with `--no-webmcp` or `AGENT_BROWSER_NO_WEBMCP`.
+docs/src/app/changelog/page.mdx:43:- Fixed **Windows ARM64 launcher selection** to prefer a native ARM64 executable when present and fall back to the published x64 executable through Windows emulation when it is not (#1725)
+docs/src/app/changelog/page.mdx:81:- Fixed **parallel sessions sharing one Chrome hijacking each other's tabs**. Event-discovered targets no longer steal a pinned session's active tab, re-attach restores the persisted target instead of selecting index 0, and preliminary plus existing-daemon `--cdp` and `--auto-connect` paths preserve explicit pin enable and disable. Agent skill guidance now requires a named `--session` before the first command (#1589)
+docs/src/app/changelog/page.mdx:118:- Fixed **tab recovery and selection** to avoid daemon hangs on Memory Saver-discarded tabs by selecting a live renderer on CDP connect, reviving tabs on switch or after close, treating dialog-blocked tabs as live, preserving refs on rejected operations, and surfacing recovery state across CLI, JSON, and MCP output (#1543)
+docs/src/app/changelog/page.mdx:119:- Fixed **a11y selector errors** to report invalid CSS selectors cleanly instead of exposing raw browser evaluation stack traces in text and JSON output (#1604)
+docs/src/app/changelog/page.mdx:129:- Added **axe-core accessibility audits** with `agent-browser a11y [url]`, WCAG tag filtering, selector scoping, iframe-aware text and JSON results, an embedded offline and CSP-safe audit engine, and a matching MCP tool (#1596)
+docs/src/app/changelog/page.mdx:140:- Fixed **element-not-found errors** to preserve the locator detail (selector, role, name, or index) instead of flattening every miss into one generic message, and aligned the advertised `find` actions with the set the dispatcher actually accepts (#1553)
+docs/src/app/changelog/page.mdx:316:- Fixed **frame-scoped selectors and waits** so CSS-selector actions and `wait` respect the selected iframe, including cross-process iframes, with translated click coordinates (#1432)
+docs/src/app/changelog/page.mdx:318:- Fixed **agent-facing form commands** so `find label` matches `aria-label` and `aria-labelledby`, `select` errors when no option matches, and `type` parses `--clear` and `--delay` instead of typing them as text (#1432)
+docs/src/app/changelog/page.mdx:470:- Fixed **`getByRole`** matching wrong elements (e.g. `<link>` stylesheet elements instead of `<a>` anchors) by rewriting the implementation to use the CDP accessibility tree with ref-based element resolution instead of CSS selectors (#1145)
+docs/src/app/changelog/page.mdx:471:- Fixed **`upload` command** not supporting accessibility tree refs (`@eN`) for file upload element selection (#1156)
+docs/src/app/changelog/page.mdx:492:- Fixed **idle timeout** not being respected because the sleep future was recreated on every select loop iteration, preventing the deadline from being reached (#1110)
+docs/src/app/changelog/page.mdx:539:- **Dashboard session creation** - Sessions can now be created directly from the dashboard UI. A new session dialog provides a unified selector grid for local engines (Chrome, Lightpanda) and cloud providers (Browserbase, Browserless, Browser Use, Kernel) with async creation, loading state, and error display (#1092)
+docs/src/app/changelog/page.mdx:687:- **Auth login readiness** - `agent-browser auth login` now navigates with `load`, waits for usable login form selectors, and uses staged username detection (targeted email/username selectors first, then broad text-input fallback). This reduces SPA timing failures, avoids false matches on unrelated text fields, and prevents `networkidle` hangs on pages with continuous background requests.
+docs/src/app/changelog/page.mdx:698:- **XPath selector support** - Fixed element resolution to correctly handle the `xpath=` selector prefix (#908)
+docs/src/app/changelog/page.mdx:778:- Fixed `snapshot --selector` scoping to the matched element's subtree
+docs/src/app/changelog/page.mdx:884:- Fixed HTML retrieval by using `browser.getLocator()` for selector operations
+docs/src/app/changelog/page.mdx:942:- **Lightpanda browser engine support** -- Added `--engine <name>` flag to select the browser engine (`chrome` by default, or `lightpanda`), implying `--native` mode. Configurable via `AGENT_BROWSER_ENGINE` environment variable.
+docs/src/app/changelog/page.mdx:1037:- **`--selector` flag for scroll** -- Scroll within a specific container element instead of the page: `agent-browser scroll down 500 --selector "div.scroll-container"`
+docs/src/app/changelog/page.mdx:1051:agent-browser scroll down 500 --selector "div.content"
+docs/src/app/changelog/page.mdx:1066:- **`keyboard` command** -- Type with real keystrokes, insert text, and press shortcuts at the currently focused element without needing a selector (`keyboard type`, `keyboard inserttext`).
+docs/src/app/changelog/page.mdx:1090:- **Diff commands** -- Compare snapshots, screenshots, and URLs between page states. Run visual pixel diffs against baseline images, compare accessibility tree snapshots with customizable depth and selectors, and diff two URLs side-by-side with optional screenshot comparison.
+docs/src/app/changelog/page.mdx:1523:- `select` command now uses `values` field (supports multiple selections)
+docs/src/app/selectors/layout.tsx:3:export const metadata = pageMetadata("selectors");
+docs/src/app/globals.css:48:::selection {
+docs/src/app/globals.css:54:  ::selection {
+docs/src/app/dashboard/page.mdx:82:  "params": { "selector": "@e5" },
+docs/src/app/snapshots/page.mdx:14:agent-browser snapshot -s "#main"         # Scope to CSS selector
+docs/src/app/snapshots/page.mdx:27:    <tr><td><code>-s, --selector</code></td><td>Scope to CSS selector</td></tr>
+docs/src/app/engines/lightpanda/page.mdx:33:Use the `--engine` flag to select Lightpanda:
+docs/src/app/plugins/page.mdx:409:- Let agent-browser handle navigation, selectors, screenshots, state, and policy
+docs/src/app/sessions/page.mdx:41:Full isolation applies when each session launches its own browser. When sessions instead share one Chrome over `--cdp`, only the tab selection separates them. Each session remembers which tab it is bound to (by CDP target id, persisted across daemon restarts), so a restarted daemon reattaches to the session's own tab instead of adopting the most recently active one.
+docs/src/app/diffing/page.mdx:35:agent-browser diff snapshot --selector "#main" --compact
+docs/src/app/diffing/page.mdx:48:    <tr><td><code>-s, --selector &lt;sel&gt;</code></td><td>Scope the current snapshot to a CSS selector or @ref</td></tr>
+docs/src/app/diffing/page.mdx:76:agent-browser diff screenshot --baseline before.png --threshold 0.2 --selector "#hero"
+docs/src/app/diffing/page.mdx:89:    <tr><td><code>-s, --selector &lt;sel&gt;</code></td><td>Scope the current screenshot to an element</td></tr>
+docs/src/app/diffing/page.mdx:129:    <tr><td><code>-s, --selector &lt;sel&gt;</code></td><td>Scope snapshots to a CSS selector or @ref</td></tr>
+docs/src/app/installation/page.mdx:105:<tr><td>Network</td><td>Reachability of the Chrome for Testing CDN, AI Gateway (if configured), and any currently selected provider endpoint (skipped under <code>--offline</code>)</td></tr>
+docs/src/app/page.mdx:17:- **Ref-based**: Snapshot returns accessibility tree with refs for deterministic element selection
+docs/src/app/quick-start/page.mdx:37:## Traditional selectors
+docs/src/app/quick-start/page.mdx:39:CSS selectors and semantic locators also supported:
+docs/src/app/quick-start/page.mdx:45:agent-browser select "#country-combobox" "United States"
+docs/src/app/quick-start/page.mdx:48:The `select` command works with native `<select>` controls and standard ARIA `combobox` or `listbox` widgets. It matches exact values or labels, types into input-backed filters when needed, waits for associated custom options to render, and verifies the committed state. Use one value for single-select controls; native multiple selects retain multi-value behavior, while multiple ARIA values require an explicitly multiselectable listbox. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
+docs/src/app/commands/page.mdx:14:agent-browser keyboard type <text>    # Type at current focus (no selector needed)
+docs/src/app/commands/page.mdx:20:agent-browser select <sel> <val...>   # Select native or ARIA dropdown option(s)
+docs/src/app/commands/page.mdx:23:agent-browser scroll <dir> [px]       # Scroll (up/down/left/right, --selector <sel>)
+docs/src/app/commands/page.mdx:49:`select` supports native `<select>` elements and standard ARIA `combobox` and `listbox` controls. Option matching is exact against the value, label, or whitespace-normalized accessible text. The command uses browser input to open and choose custom widgets, types into input-backed combobox filters when needed, waits for dynamically rendered associated options, and verifies selected state, the committed combobox display/value, or an associated standard form value. A single-select native or ARIA control accepts one value. Native multiple selects retain multi-value behavior; multiple ARIA values require `aria-multiselectable="true"` on an ARIA listbox and are treated as the final desired set. Unknown, disabled, hidden, unsupported, or unverifiable controls return an error. The wait is bounded by the configured default action timeout. The action uses CDP-managed browser sessions; WebDriver backends report it as unsupported.
+docs/src/app/commands/page.mdx:52:agent-browser select "#native-country" "us"
+docs/src/app/commands/page.mdx:53:agent-browser select "#country-combobox" "United States"
+docs/src/app/commands/page.mdx:55:agent-browser select @e12 "United States"
+docs/src/app/commands/page.mdx:137:agent-browser wait <selector>         # Wait for element
+docs/src/app/commands/page.mdx:173:agent-browser clipboard copy                      # Copy current selection (Ctrl+C)
+docs/src/app/commands/page.mdx:244:agent-browser frame <sel>                      # Switch to iframe by CSS selector
+docs/src/app/commands/page.mdx:299:The `frame` command accepts element refs (`@e3`), CSS selectors (`"#my-iframe"`), or frame name/URL.
+docs/src/app/commands/page.mdx:316:agent-browser stream enable           # Start runtime WebSocket streaming on an auto-selected port
+docs/src/app/commands/page.mdx:354:agent-browser auth login <name> --username-selector <s> --password-selector <s> [--submit-selector <s>]
+docs/src/app/commands/page.mdx:355:                                          # Override selectors for one login
+docs/src/app/commands/page.mdx:372:- `--username-selector <sel>`: custom CSS selector for username field
+docs/src/app/commands/page.mdx:373:- `--password-selector <sel>`: custom CSS selector for password field
+docs/src/app/commands/page.mdx:374:- `--submit-selector <sel>`: custom CSS selector for submit button
+docs/src/app/commands/page.mdx:376:`auth login` navigates with `load` and then waits for the username/password/submit selectors to appear before interacting. This improves reliability on SPA login pages where fields render after initial page load.
+docs/src/app/commands/page.mdx:383:- `--username-selector <sel>`: selector override for this login
+docs/src/app/commands/page.mdx:384:- `--password-selector <sel>`: selector override for this login
+docs/src/app/commands/page.mdx:385:- `--submit-selector <sel>`: selector override for this login
+docs/src/app/commands/page.mdx:542:Run an embedded axe-core audit against the current page or navigate to a URL first. The vendored engine works without a CDN request and runs under strict page CSP. It runs private partial audits across the page's frame tree and merges serialized results without page messaging, so page-provided `window.axe` values remain intact and iframe violations retain their frame selector paths. Accessibility audits require a CDP browser and are not available with Safari or iOS WebDriver sessions.
+docs/src/app/commands/page.mdx:548:agent-browser a11y --selector "#main"              # Scope to a subtree
+docs/src/app/commands/page.mdx:552:The default output lists violations and incomplete checks with impact, rule ID, fix guidance, and failing-node paths. JSON output preserves axe's `target` selector path arrays, including nested arrays for shadow DOM boundaries and multiple entries for frame boundaries.
+docs/src/app/commands/page.mdx:696:- `agent_browser_wait_for_selector`
+docs/src/app/commands/page.mdx:702:Each tool has typed fields such as `url`, `selector`, `text`, `key`, `session`, `allowedDomains`, and `idleTimeout`, so MCP clients show meaningful approval prompts instead of raw command arrays. The common `allowedDomains` array maps to `--allowed-domains` and activates the same WebRTC containment and launch-mode restrictions. The common `idleTimeout` string maps to `--idle-timeout`, accepts values such as `30s`, `5m`, `1h`, or raw milliseconds, and accepts `0` to disable idle shutdown. Each tool also accepts `extraArgs` for advanced CLI flags and exact CLI parity. Tool discovery is paginated and includes read-only/open-world annotations so modern MCP clients can load the large typed surface incrementally.
+docs/src/app/providers/agentcore/page.mdx:71:If using SSO, run `aws sso login` before launching agent-browser. Set `AWS_PROFILE` to select a specific named profile.
+docs/src/app/files/page.mdx:13:The selector must resolve to a file input. Multiple file paths are accepted for multi-file inputs.
+docs/src/app/files/page.mdx:73:`copy` and `paste` simulate the platform keyboard shortcuts for the current selection or focused element. Use `write` when you want to set clipboard text directly.

@@ -1,0 +1,78 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "crafter-station/badge-studio",
+    "base_sha": "2fd7cde7d5fafba1dc8046be2d2e308c7c5ad131",
+    "head_sha": "66571296bd72f291a7e8be7c050b49aa1c4cdbe4",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:012f6a3ab5c8498a97a27fdd749a45ada90f37bc822cb18c71d4d98bd2884209",
+    "skill_revision": "sha256:0254178afea32b2192e7d00446fe0dd99efc36420c72c8ffbc5a3b4b8082d1d9"
+  },
+  "claim": {
+    "property": "No browser credentials, model execution or arbitrary URL fetch through newly exposed tools",
+    "attacker": "untrusted document or tool arguments submitted by a connected local agent",
+    "scope": "WebMCP browser surface and local image-transfer helper"
+  },
+  "trust_model": {
+    "assets": [
+      "local badge document",
+      "participant photo bytes",
+      "local IndexedDB designs",
+      "caller-held AI Gateway credentials"
+    ],
+    "principals": [
+      "human browser user",
+      "connected coding agent with same-page authority",
+      "untrusted document text",
+      "external image provider only when caller chooses"
+    ],
+    "boundaries": [
+      "native same-origin tool registration",
+      "validated tool arguments to editor reducers",
+      "explicit raster export to caller local filesystem"
+    ],
+    "entrypoints": [
+      "nine registered native tools",
+      "image-transfer helper"
+    ],
+    "sinks": [
+      "React state",
+      "existing IndexedDB store",
+      "browser downloads",
+      "exclusive local image output"
+    ]
+  },
+  "observations": [
+    {
+      "id": "S1",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "confidence": "high",
+      "evidence": [
+        "Native catalog has nine tools and no generator, shell, credentials, or arbitrary code entrypoint.",
+        "Remote image URL, non-raster bytes and javascript QR URL rejected in real native calls.",
+        "Browser network evidence: 518 requests, all GET, no external origins during observed flow.",
+        "Server generation stays disabled on Vercel; legacy local experiment is not exposed by tools."
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "Owned local browser sessions with fictional portrait and disposable local designs",
+    "commands": [
+      "exercise.py",
+      "faults.py",
+      "bun test",
+      "source sink review"
+    ],
+    "cleanup": "Owned browser sessions closed after production smoke; no keys or paid image calls used.",
+    "gaps": []
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": [
+      "Experimental native cancellation missing options.signal: addressed with explicit operation-ID cancellation and documented limitation."
+    ]
+  },
+  "artifact": "security-receipt.json"
+}

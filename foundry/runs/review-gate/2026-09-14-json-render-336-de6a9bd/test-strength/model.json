@@ -1,0 +1,40 @@
+{
+  "contract": "Malformed array paths are safe no-ops; valid and literal object paths retain intended behavior through public consumers.",
+  "oracle_sources": [
+    "../rfc6901.txt, section 4, canonical decimal array tokens and decoded reference tokens",
+    "../rfc6902.txt, sections 4.4 and 4.5, source existence and move ordering",
+    "../contract.json, A1-A4, product no-op and progressive batching extensions",
+    "JavaScript observation of own keys, array length, object identity, callback payloads and rendered state"
+  ],
+  "dimensions": {
+    "container": ["object", "array", "missing branch", "null or primitive branch"],
+    "position": ["leaf", "intermediate", "source", "destination"],
+    "token": ["canonical existing index", "canonical missing index", "canonical upper bound", "leading zero", "numeric suffix", "fraction", "signed", "exponent", "hexadecimal", "empty", "whitespace", "line terminator", "nonfinite name", "array-range overflow", "precision overflow", "very long number", "terminal append", "nonterminal append", "escaped slash or tilde", "reserved decoded token"],
+    "operation": ["get", "set", "add", "remove", "immutable set", "store set", "store update", "adapter set", "adapter update", "copy", "move"],
+    "batch": ["all rejected", "unchanged", "mixed accepted and rejected", "parent before child", "child before parent"],
+    "boundary": ["core helper", "built ESM and CJS exports", "serialized SpecStream compiler", "built React useUIStream", "built React StateProvider callback"]
+  },
+  "equivalence_rules": [
+    "Invalid decimal spellings share rejection behavior, but each spelling below is separately faulted to ensure the rejection is protected.",
+    "Leaf versus intermediate invalid tokens are separate classes because intermediate writes could partially create containers.",
+    "Store and adapter identities and counts must be observed separately from equal JSON values.",
+    "Compiler success is a proxy for renderer safety; both public boundaries must reject malformed compound operations.",
+    "Successful batches do not prove accurate change records; callbacks and rendered state are observed independently."
+  ],
+  "invalid_tokens": ["01", "00", "1x", "1.5", "+1", "-1", "-0", "1e1", "0x10", "", " ", "1\n", "NaN", "Infinity", "4294967295", "9007199254740992", "1234567890123456789012345678901234567890"],
+  "exclusions": [
+    "No claim of full RFC 6902 conformance: pre-existing root aliases, missing-parent creation, descendant moves, shallow copy behavior, and add bounds are outside this diff.",
+    "No giant dense array is allocated: the upper canonical bound is tested as a sparse read or own-property classification.",
+    "No cross-platform browser claim: React was exercised in jsdom on macOS Node; other renderer dispatchers are statically traced only.",
+    "Hostile accessor, Proxy, frozen-container, and cyclic object behavior belongs to the Resilience and Security receipts; this receipt does not infer safety for those inputs."
+  ],
+  "smallest_faults": [
+    "Accept one invalid array token as index 1.",
+    "Remove store unchanged-snapshot suppression.",
+    "Remove move destination preflight at the compound operation call site.",
+    "Remove copy source validation at the compound operation call site.",
+    "Apply the unchanged renderer compound dispatcher to newly rejected core paths.",
+    "Emit every submitted changed value after core rejects part of a mixed batch."
+  ],
+  "process_note": "This model was assembled after inherited review context exposed the implementation; oracle expectations come from the listed contract and normative texts, not the implementation output."
+}

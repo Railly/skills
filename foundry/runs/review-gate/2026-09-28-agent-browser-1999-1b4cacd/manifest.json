@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "work_item": "vercel-labs/agent-browser#1999",
+  "repository": "vercel-labs/agent-browser",
+  "checkout": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-review",
+  "base_sha": "d01253d9db28d75080e36da3c1c31ef89454731e",
+  "head_sha": "1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51",
+  "dirty_digest": "clean",
+  "changed_paths": [
+    "cli/src/native/actions.rs",
+    "cli/src/native/e2e_tests.rs",
+    "cli/src/native/element.rs"
+  ],
+  "changed_paths_digest": "sha256:bb0ffb563e95aeef2f4bbb131dc0bf4c1f4df17721c432aee2c4f71d29075023",
+  "contract": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-1b4cacd/contract.md",
+  "contract_digest": "sha256:7c8382720c66a5ece76bbcd60318f1d598b0cfb2f9d406f0fcdd597cee885b7b",
+  "environment": {
+    "os": "darwin",
+    "arch": "arm64",
+    "rust": "1.98.1",
+    "browser": "Chrome 152",
+    "fixture_root": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence"
+  },
+  "environment_digest": "sha256:e3ef4b63db7f88cedcd38cef02f4c232dfa609e5b589fd5e5934e819dd1b388a",
+  "authorization": {
+    "source": "2026-09-28 user: verify the before after, and if that works, review-gate",
+    "scope": "read-only review; isolated local test fixtures and builds; no GitHub writes"
+  },
+  "profile": "external-pr",
+  "risk": "high",
+  "risk_triggers": [
+    "authentication",
+    "credentials",
+    "node lifetime and retry"
+  ],
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "package_identity": "skills-doctor exact-copy review-gate source=clean",
+  "runtime": {
+    "preferred": "fx_worker",
+    "fallback": "native_subagent",
+    "review_budget_ms": 900000
+  },
+  "stages": {
+    "before_after": {
+      "status": "pass",
+      "artifact": "/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/before-after-results.json"
+    },
+    "test_strength": {
+      "status": "fail",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-1b4cacd/test-strength.json",
+      "fingerprint": {
+        "head_sha": "1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51",
+        "changed_paths_digest": "sha256:bb0ffb563e95aeef2f4bbb131dc0bf4c1f4df17721c432aee2c4f71d29075023",
+        "contract_digest": "sha256:7c8382720c66a5ece76bbcd60318f1d598b0cfb2f9d406f0fcdd597cee885b7b",
+        "command": "bun verify.mjs; bun pressure.mjs race; bun pressure.mjs matrix; cargo test e2e_auth_login -- --ignored --test-threads=1",
+        "environment_digest": "sha256:e3ef4b63db7f88cedcd38cef02f4c232dfa609e5b589fd5e5934e819dd1b388a",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "cli/src/native/actions.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/src/native/element.rs",
+          "cli/src/native/interaction.rs",
+          "cli/src/native/cdp/client.rs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      }
+    },
+    "resilience": {
+      "status": "fail",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-1b4cacd/resilience.json",
+      "fingerprint": {
+        "head_sha": "1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51",
+        "changed_paths_digest": "sha256:bb0ffb563e95aeef2f4bbb131dc0bf4c1f4df17721c432aee2c4f71d29075023",
+        "contract_digest": "sha256:7c8382720c66a5ece76bbcd60318f1d598b0cfb2f9d406f0fcdd597cee885b7b",
+        "command": "bun verify.mjs; bun pressure.mjs race; bun pressure.mjs matrix; cargo test e2e_auth_login -- --ignored --test-threads=1",
+        "environment_digest": "sha256:e3ef4b63db7f88cedcd38cef02f4c232dfa609e5b589fd5e5934e819dd1b388a",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "cli/src/native/actions.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/src/native/element.rs",
+          "cli/src/native/interaction.rs",
+          "cli/src/native/cdp/client.rs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null
+      }
+    },
+    "security": {
+      "status": "pass",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-1b4cacd/security-review.json",
+      "fingerprint": {
+        "repository": "vercel-labs/agent-browser",
+        "base_sha": "d01253d9db28d75080e36da3c1c31ef89454731e",
+        "head_sha": "1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51",
+        "dirty_digest": "clean",
+        "changed_path_digest": "sha256:bb0ffb563e95aeef2f4bbb131dc0bf4c1f4df17721c432aee2c4f71d29075023",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+      }
+    },
+    "review": {
+      "status": "complete",
+      "verdict": "incomplete",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-1b4cacd/run-report-1b4cacd0.json",
+      "head_sha": "1b4cacd0f1a7f9ee5cdf365882fc3ea01e763d51",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "blocking_findings": [
+        "F1"
+      ],
+      "validation": {
+        "exit_code": 1,
+        "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-28-agent-browser-1999-1b4cacd/validation.log",
+        "covered_exit_code": 0
+      }
+    }
+  }
+}

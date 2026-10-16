@@ -1,0 +1,830 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-28",
+    "repo": "vercel-labs/agent-browser",
+    "base": "d01253d9db28d75080e36da3c1c31ef89454731e",
+    "head": "fad34d20403e67619cde5340731575745e2762e6",
+    "profile": "high-risk",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:02dbea86720f75b4d8bd513340bc5a2590b915ced95790a7d6729e6da7d2d80d",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": []
+  },
+  "execution": {
+    "mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "The native reviewer was independent in context but same-family; high-risk independence is satisfied by the independently defined Chrome/Lightpanda substrate corpus, not by a cross-family model claim.",
+    "receipt": null,
+    "schema_failures": 0,
+    "operations": [
+      {
+        "operation": "Independent native code review",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "Cross-engine built-artifact substrate challenge",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/contract.md",
+    "spec_status": "pass",
+    "acceptance_reviewed": [
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5",
+      "C3"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "GPT-6",
+    "reviewer_model": "GPT-6 native isolated reviewer plus independently defined browser substrate corpus",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "authentication",
+      "credentials",
+      "exact DOM-node integrity",
+      "browser and CDP lifecycle"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "substrate_corpus",
+      "artifact": "independent-challenge.md",
+      "evidence": "A contract-defined oracle drove the built CLI through Chrome and actual Lightpanda before trusting authored tests; original and fixed artifacts separate at DOM and submit boundaries."
+    }
+  },
+  "security_review": {
+    "status": "pass",
+    "fingerprint": {
+      "repository": "vercel-labs/agent-browser",
+      "base_sha": "d01253d9db28d75080e36da3c1c31ef89454731e",
+      "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+      "dirty_digest": "clean",
+      "changed_path_digest": "sha256:ff529690c5e679d2c9a9bff9b58c2ccc570233b4879144b68af2469c603311fd",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:0d81ec048ec1229f916132cc9226f5fa594cb9e71033d89c3da9d86be3f85743"
+    },
+    "claim": {
+      "property": "Credentials are delivered only to the exact usable controls selected for the intended origin, and replacement or focus redirection rejects before submit.",
+      "attacker": "Page script or dynamic UI capable of replacing fields or redirecting focus within the current origin.",
+      "scope": "Auth login control selection, credential insertion, origin binding, submission ordering, and remote-object lifetime in the exact commit."
+    },
+    "trust_model": {
+      "assets": [
+        "username and password values",
+        "intended page origin",
+        "exact selected DOM node identity"
+      ],
+      "principals": [
+        "local operator and credential provider",
+        "agent-browser process",
+        "browser/CDP runtime",
+        "scripts executing in the current page origin"
+      ],
+      "boundaries": [
+        "credential provider to CLI memory",
+        "CLI through CDP to the selected page node",
+        "current origin to navigation destination"
+      ],
+      "entrypoints": [
+        "auth login CLI action",
+        "MCP auth_login delegation",
+        "explicit CSS selector inputs"
+      ],
+      "sinks": [
+        "native browser edit on the selected node",
+        "input event dispatch",
+        "submit control click"
+      ]
+    },
+    "observations": [
+      {
+        "id": "SEC-001",
+        "classification": "hardening",
+        "scope": "out_of_scope_hardening",
+        "confidence": "high",
+        "evidence": [
+          "The old implementation could type into a same-origin decoy after focus redirection. Same-origin scripts already have page-level access to entered credentials, so this does not establish a new privilege crossing; exact-node binding still removes the unsafe delivery path."
+        ]
+      },
+      {
+        "id": "SEC-002",
+        "classification": "informational",
+        "scope": "out_of_scope_hardening",
+        "confidence": "high",
+        "evidence": [
+          "The diff adds no credential logging, persistence, network destination, origin relaxation, public flag, or protocol input. Cross-origin no-navigate rejection remains green."
+        ]
+      },
+      {
+        "id": "SEC-003",
+        "classification": "informational",
+        "scope": "out_of_scope_hardening",
+        "confidence": "high",
+        "evidence": [
+          "Remote-object cleanup is best effort after cancellation or transport destruction; object handles are renderer-internal capabilities and the destroyed renderer/transport bounds their remaining lifetime."
+        ]
+      }
+    ],
+    "verification": {
+      "commands": [
+        "cargo test",
+        "cargo test e2e_auth_login -- --ignored --test-threads=1",
+        "Chrome and Lightpanda replacement-race probes"
+      ],
+      "cleanup": "Disposable local browser fixtures only; no external credentials or third-party accounts were used.",
+      "gaps": []
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [
+        "Keep cancellation/transport-destruction cleanup documented as a best-effort lifecycle limit."
+      ],
+      "routed_non_security_defects": []
+    },
+    "artifact": "security-review.md"
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "R1-R5 and C3 define usable selection, exact-node delivery, compatibility, bounded retry/cleanup, and coauthor constraints."
+    },
+    {
+      "source": "design",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/solution.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The selected shape uses exact remote-object identity and synchronous target-bound editing with an absent-capability engine fallback."
+    },
+    {
+      "source": "user_facing",
+      "location": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/pr-body.md plus README/docs/skill-data changes",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The prose claims usable duplicate selection, fail-closed replacement handling, and bounded cross-engine compatibility."
+    },
+    {
+      "source": "implementation",
+      "location": "git diff d01253d9db28d75080e36da3c1c31ef89454731e..fad34d20403e67619cde5340731575745e2762e6 (sha256:88606d5ecdf3077762826cb20d55079964a3ffdd409cd352a1d423b473d9cf39)",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "evidence": "The exact signed ten-file commit implements selection, exact-node fill, cleanup, E2E coverage, output context, and matching documentation."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Auth login selects a visible, enabled, editable username/password control and a visible enabled submit control, including explicit CSS selectors.",
+      "kind": "integrity",
+      "status": "verified",
+      "oracle": {
+        "observes": "DOM values and submission state for usable and unusable duplicate controls",
+        "layer": "built CLI against real browser DOM",
+        "method": "hidden, disabled, readonly, and visible duplicate matrices plus explicit-selector E2E",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The command exits successfully.",
+        "counterexample": "A command can exit successfully after filling a hidden first match while the visible form remains empty.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "The original PR baseline and duplicate-control matrices inspect the exact DOM targets, not only exit status."
+      },
+      "substrates": [
+        {
+          "name": "Chrome 152 built CLI",
+          "status": "exercised",
+          "evidence": "Visible duplicate username, password, and submit auth E2E pass."
+        },
+        {
+          "name": "Lightpanda nightly9842 built CLI",
+          "status": "exercised",
+          "evidence": "Actual Lightpanda matrix passes usable-control selection."
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/auth-exact.log and browser matrix artifacts under /Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence."
+    },
+    {
+      "id": "P2",
+      "claim": "Each credential is inserted only into the exact selected backend node; replacement or focus redirection rejects before submission and never writes to the decoy.",
+      "kind": "confidentiality",
+      "status": "verified",
+      "oracle": {
+        "observes": "selected-node identity, decoy value, intended field value, form submission, and command result",
+        "layer": "browser DOM and CLI process boundary",
+        "method": "replace the selected node or redirect focus at selection/focus/input phases and inspect all sinks",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "The intended field is empty after the command.",
+        "counterexample": "The credential may have been delivered to the previously focused decoy and the form may still submit.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Original PR runs show empty intended fields together with credential-bearing decoys and submission; fixed runs show empty decoys and no submission."
+      },
+      "substrates": [
+        {
+          "name": "Chrome 152 replacement-race corpus",
+          "status": "exercised",
+          "evidence": "Both username and password replacement reject with no decoy write or submit."
+        },
+        {
+          "name": "Lightpanda nightly9842 replacement-race corpus",
+          "status": "exercised",
+          "evidence": "Both replacement races reject with no decoy write or submit."
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/final-fix-race.log and /Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/final-lightpanda-race.log."
+    },
+    {
+      "id": "P3",
+      "claim": "The bounded editing and cleanup lifecycle preserves Chrome trusted input, Lightpanda compatibility, controlled React state, textarea/contenteditable behavior, immediate retry, and observed remote-object release.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "event trust, React model state, final values, cleanup calls, failure result, and immediate retry outcome",
+        "layer": "browser event/runtime boundary and CDP object lifecycle",
+        "method": "cross-engine compatibility corpus, forced lifecycle partitions, unit cleanup spies, and retry drive",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "A value appears in the DOM after a JavaScript setter.",
+        "counterexample": "React controlled state can remain stale, Chrome input events can become untrusted, or a failed native edit can silently fall back and target the wrong field.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "React model output, trusted Chrome events, absent-capability Lightpanda fallback, and false/throw rejection are all asserted separately."
+      },
+      "substrates": [
+        {
+          "name": "Chrome 152 native editing and React 19.2 fixture",
+          "status": "exercised",
+          "evidence": "Trusted input and submitted React model match Unicode credentials."
+        },
+        {
+          "name": "Lightpanda nightly9842 native-setter path and React 19.2 fixture",
+          "status": "exercised",
+          "evidence": "Controlled model and submitted values match; false/throw native edits still reject."
+        }
+      ],
+      "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/final-react-cli-probe.mjs.log, /Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/final-react-lightpanda-probe.mjs.log, /Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/lifecycle-final.log, and compatibility-results.json."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:152b1f2073db38ee43657fc15a138424cb231f05c5b4d643d4228ac306efb833",
+      "artifact": "test-strength.md",
+      "evidence": "Real-browser matrices and four fix-absent mutations reject the wrong implementations at the user-visible boundary.",
+      "fingerprint": {
+        "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+        "changed_paths_digest": "sha256:ff529690c5e679d2c9a9bff9b58c2ccc570233b4879144b68af2469c603311fd",
+        "contract_digest": "sha256:a7efe4ddf2ff2d778d5b8855e0e6257287add38f308afbcd3780e615576b1fa6",
+        "environment_digest": "sha256:27081eb99b9633cb7412d4a50b1b0d8ece3c0f291e2772f53584079c424ea6c9",
+        "relevant_paths": [
+          "README.md",
+          "cli/src/mcp.rs",
+          "cli/src/native/actions.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/src/native/element.rs",
+          "cli/src/output.rs",
+          "docs/src/app/commands/page.mdx",
+          "docs/src/app/security/page.mdx",
+          "skill-data/core/references/authentication.md",
+          "skill-data/core/references/commands.md"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "command": "cargo test; cargo test e2e_auth_login -- --ignored --test-threads=1; node fix-race/lightpanda-race/compatibility probes; three isolated mutants",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:152b1f2073db38ee43657fc15a138424cb231f05c5b4d643d4228ac306efb833"
+      },
+      "dimensions": {
+        "values": [
+          "selector: built-in username/password/submit candidates and explicit CSS",
+          "usability: visible, hidden, disabled, readonly, editable",
+          "lifecycle: stable, replaced, detached, focus redirected, readonly transition",
+          "field: username, password, submit",
+          "engine: Chrome 152 and Lightpanda nightly9842",
+          "editor: input, textarea, contenteditable, React controlled input",
+          "native capability: present-success, absent, returns false, throws",
+          "value: existing replacement, Unicode username and password",
+          "navigation: navigate, no-navigate, cross-origin rejection, delayed SPA render"
+        ],
+        "exclusions": [
+          "Cleanup after cancellation or a destroyed renderer/CDP transport is outside the bounded release claim."
+        ],
+        "evidence": "The matrix crosses selector usability and node lifecycle with both supported browser engines; compatibility probes cover editor and framework variants."
+      },
+      "oracle": {
+        "source": "Issue contract R1-R5 plus observed DOM values, event targets, submission state, and process exit codes",
+        "independent": true,
+        "evidence": "Expected target identity and no-submit outcomes were defined before the final implementation and do not reuse production helper output."
+      },
+      "producer": {
+        "name": "Built agent-browser CLI driving Chrome and actual Lightpanda pages",
+        "status": "exercised",
+        "evidence": "The browser engines produced focus, input, replacement, detach, React state, textarea, and contenteditable behavior through CDP."
+      },
+      "falsification": [
+        {
+          "mutation": "Run the regression test against the original PR focus-based implementation.",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/regression-red.log fails because the decoy receives target@example.test and the form submits.",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/post-cleanup-checks.log passes the exact-node replacement regression on the final implementation."
+        },
+        {
+          "mutation": "Remove exact selected-node protection at the production call site.",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/mutant-select.log fails because the redirected decoy receives the credential and submission proceeds.",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/auth-exact.log passes all nine auth E2E cases."
+        },
+        {
+          "mutation": "Remove the absent-execCommand fallback used by Lightpanda.",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/mutant-no-fallback.log fails at the no-native-edit compatibility assertion.",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/final-react-lightpanda-probe.mjs.log and compatibility-results.json pass on actual Lightpanda."
+        },
+        {
+          "mutation": "Skip release of rejected CDP remote objects.",
+          "red_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/mutant-rejected-object.log fails the rejected-object release assertion.",
+          "restored_green_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/post-cleanup-checks.log passes after restoring release on rejection."
+        }
+      ]
+    },
+    "resilience": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:91035714a452a14fb4efacb5afd24e37fa5f34a6a25faa606aec925916a786f3",
+      "artifact": "resilience.md",
+      "evidence": "All bounded failure regions reject without submission, release observed handles while transport is usable, and permit immediate caller retry.",
+      "fingerprint": {
+        "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+        "changed_paths_digest": "sha256:ff529690c5e679d2c9a9bff9b58c2ccc570233b4879144b68af2469c603311fd",
+        "contract_digest": "sha256:a7efe4ddf2ff2d778d5b8855e0e6257287add38f308afbcd3780e615576b1fa6",
+        "environment_digest": "sha256:27081eb99b9633cb7412d4a50b1b0d8ece3c0f291e2772f53584079c424ea6c9",
+        "relevant_paths": [
+          "README.md",
+          "cli/src/mcp.rs",
+          "cli/src/native/actions.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/src/native/element.rs",
+          "cli/src/output.rs",
+          "docs/src/app/commands/page.mdx",
+          "docs/src/app/security/page.mdx",
+          "skill-data/core/references/authentication.md",
+          "skill-data/core/references/commands.md"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "command": "node lifecycle-final.mjs; cargo test remote-object release checks; cargo test e2e_auth_login -- --ignored --test-threads=1",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:91035714a452a14fb4efacb5afd24e37fa5f34a6a25faa606aec925916a786f3"
+      },
+      "limitations": [
+        "Best-effort remote-object release cannot be guaranteed after cancellation or renderer/CDP transport destruction."
+      ],
+      "commit_points": [
+        {
+          "id": "C1",
+          "effect": "Credential value and input event become visible to the selected page control.",
+          "owner": "auth-specific exact-node fill helper",
+          "commit_event": "Synchronous native edit succeeds on the selected remote object.",
+          "later_fallible_stages": [
+            "post-edit identity validation",
+            "next credential fill",
+            "submit control selection and click"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "selected-node edit and validation",
+              "covers": [
+                "post-edit identity validation"
+              ],
+              "forced": true,
+              "residual_observed": "No decoy write or submission; a value already written to the intended node may remain when detachment occurs during input.",
+              "cleanup_owner": "auth helper releases observed remote handles while CDP remains usable",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "All 32 lifecycle cells report retryOk=true after the fixture restores the form."
+              },
+              "evidence": "focus-detach, focus-redirect, select-redirect, readonly transition, input-detach, exception, native-false, and native-throw were forced for both credential fields on both engines."
+            },
+            {
+              "ownership_region": "subsequent credential stage",
+              "covers": [
+                "next credential fill"
+              ],
+              "forced": true,
+              "residual_observed": "The correctly targeted earlier credential may remain; the later field stays empty and submit is not attempted.",
+              "cleanup_owner": "caller restores or re-renders the form before retry; auth helper does not roll back a correct earlier edit",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "Password-stage failures were followed immediately by successful complete retries in Chrome and Lightpanda."
+              },
+              "evidence": "The lifecycle matrix forces every password-stage partition after a successful username edit."
+            },
+            {
+              "ownership_region": "submit selection and activation",
+              "covers": [
+                "submit control selection and click"
+              ],
+              "forced": true,
+              "residual_observed": "No submission occurs when a usable submit control is unavailable or the origin changes.",
+              "cleanup_owner": "auth action returns the existing bounded error; caller may retry after restoring the page",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "Auth E2E covers usable duplicate submit, delayed render, active-page validation, and cross-origin rejection; subsequent restored-form runs pass."
+              },
+              "evidence": "Serial auth E2E exercises the submit and origin boundaries after both credentials are entered."
+            }
+          ]
+        },
+        {
+          "id": "C2",
+          "effect": "CDP remote-object handles are acquired for selected controls and call results.",
+          "owner": "auth selection/fill cleanup path",
+          "commit_event": "Runtime.callFunctionOn or selection returns an objectId.",
+          "later_fallible_stages": [
+            "JavaScript rejection",
+            "CDP command error while transport remains usable",
+            "normal completion"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "JavaScript rejection cleanup",
+              "covers": [
+                "JavaScript rejection"
+              ],
+              "forced": true,
+              "residual_observed": "All observed selection, call-result, and exception object IDs are released.",
+              "cleanup_owner": "auth fill rejection path",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "The release unit test restores the fixture and the next fill succeeds."
+              },
+              "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/implementation/2026-09-28-agent-browser-1999-fix/fill-exception-red.log proves the mutant red; restored release passes in the final unit checks."
+            },
+            {
+              "ownership_region": "CDP error cleanup",
+              "covers": [
+                "CDP command error while transport remains usable"
+              ],
+              "forced": true,
+              "residual_observed": "Known remote handles are released before returning the CDP error.",
+              "cleanup_owner": "auth fill error path",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "Unit mocks keep the transport usable and verify a following attempt can proceed."
+              },
+              "evidence": "Exact-head unit tests cover selection and fill CDP error paths and release calls."
+            },
+            {
+              "ownership_region": "normal completion cleanup",
+              "covers": [
+                "normal completion"
+              ],
+              "forced": true,
+              "residual_observed": "The selected remote handle is released after the synchronous edit result is consumed.",
+              "cleanup_owner": "auth fill success path",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "Repeated auth E2E and compatibility probes complete without retained-handle interference."
+              },
+              "evidence": "Exact-head unit checks and repeated built-artifact probes cover normal cleanup."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "C3 contract refinement",
+      "claim": "Chrome 152 exposes execCommand and produces trusted input through the chosen synchronous edit path.",
+      "status": "verified",
+      "evidence": "Chrome compatibility and lifecycle probes record trusted=true input events and correct controlled-state updates."
+    },
+    {
+      "id": "A2",
+      "source": "C3 contract refinement",
+      "claim": "Actual Lightpanda nightly9842 lacks execCommand and requires the native value-setter path.",
+      "status": "verified",
+      "evidence": "Primitive Lightpanda probe and actual compatibility matrix exercise the absent capability and pass."
+    },
+    {
+      "id": "A3",
+      "source": "R4 bounded cleanup claim",
+      "claim": "Observed remote handles can be released on completion and rejection while CDP remains usable.",
+      "status": "verified",
+      "evidence": "Unit cleanup spies cover success, JavaScript rejection, and CDP errors with a live transport; the claim excludes destroyed transport."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Ordinary fill, textarea, contenteditable, and existing auth modes were exercised to detect behavior erased by the new exact-node path."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "run",
+      "reason": "Usability states, selectors, engines, editors, framework control, lifecycle phases, and native-edit outcomes were enumerated and exercised."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No config or resolution rule changed."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command construction changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "Input events and one submit action were observed directly; rejection paths prove submit is unreachable after fill failure."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "No shim or test-only production override was added."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Built-in selector candidates retain order while filtering unusable controls; explicit CSS selectors use the same usability rule."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "run",
+      "reason": "Remote-object acquisition/release and engine fallback are the new seams and received direct unit and browser pressure."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "run",
+      "reason": "The same replacement, compatibility, React, and lifecycle scenarios ran on Chrome and actual Lightpanda."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "skipped",
+      "reason": "No normative browser reference implementation exists for this auth helper; the contract-defined DOM oracle is direct."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "Callers return the auth fill error and stop before submit; MCP delegates the same parser/action path."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "skipped",
+      "reason": "No public flag was added or changed."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Detach, redirection, readonly, exceptions, false/throw edits, origin change, and missing active page were forced."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "run",
+      "reason": "Each forced lifecycle failure was followed by an immediate successful caller retry after restoring the form."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Bounded selector polling remains unchanged; cleanup after cancellation or destroyed transport is explicitly outside the claim."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Credential provider/CLI input, selector resolution, exact remote object, native edit, event, and submit ordering were traced end to end."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Both supported browser engines were exercised directly."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Before/after, replacement races, React, compatibility, and lifecycle probes used built binaries."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "The auth-specific fill helper owns exact-node validation and remote-handle cleanup; ordinary fill remains unchanged."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "README, docs, skill references, output context, and MCP delegation match the bounded behavior."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "The preserved before/after artifact shows credential misdelivery and corrected rejection on the same replacement scenarios."
+    },
+    {
+      "name": "Choice audit",
+      "status": "run",
+      "reason": "Synchronous native editing avoids focus retargeting; absent-capability fallback is limited to Lightpanda and does not run after false or throw."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "run",
+      "reason": "One auth-specific fill helper was added; interaction::fill, polling budgets, storage, and dependencies remain unchanged."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "gate.sh style passed on the exact commit."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "gate.sh surfaces passed using agent-browser conventions."
+    },
+    {
+      "check": "doc siblings",
+      "outcome": "acknowledged",
+      "reason": "Every generated sibling finding was read and dispositioned in siblings-disposition.md."
+    },
+    {
+      "check": "callers wait_for_any_selector",
+      "outcome": "pass",
+      "reason": "Every call site is in the diff and was reviewed for the new failure outcome."
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": "The diff adds no new wait ceiling."
+    },
+    {
+      "check": "force-red and mutation strength",
+      "outcome": "pass",
+      "reason": "Original PR and three production mutants fail intended assertions; restored exact head passes."
+    },
+    {
+      "check": "git diff --check",
+      "outcome": "pass",
+      "reason": "No whitespace errors."
+    },
+    {
+      "check": "cargo fmt --check",
+      "outcome": "pass",
+      "reason": "Exact-head formatting check passed."
+    },
+    {
+      "check": "cargo clippy -- -D warnings",
+      "outcome": "pass",
+      "reason": "Exact-head strict Clippy passed."
+    },
+    {
+      "check": "full cargo test",
+      "outcome": "pass",
+      "reason": "1,393 passed, 146 ignored; dashboard and doctor integration suites add six passes."
+    },
+    {
+      "check": "serial auth E2E",
+      "outcome": "pass",
+      "reason": "All nine ignored auth browser tests passed with --ignored --test-threads=1."
+    },
+    {
+      "check": "exact signed commit identity",
+      "outcome": "pass",
+      "reason": "HEAD fad34d20403e67619cde5340731575745e2762e6 is clean, signed, and matches the validated ten-file tree."
+    },
+    {
+      "check": "independent review",
+      "outcome": "pass",
+      "reason": "Native isolated review found no blocker; same-family limitation is recorded and substrate-corpus independence closes the high-risk requirement."
+    },
+    {
+      "check": "head coverage",
+      "outcome": "pass",
+      "reason": "This report is authored for the exact current HEAD and is checked by gate.sh covered after rendering."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "The original PR can deliver credentials to a previously focused field after the selected node is replaced and can submit the wrong form state.",
+      "evidence": "Chrome and Lightpanda before/after race artifacts reproduce decoy delivery and submission on the original implementation.",
+      "layer": "browser DOM and auth action",
+      "source": "before/after and independent review",
+      "path": "cli/src/native/actions.rs auth login fill path",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "CHANGELOG.md",
+      "evidence": "Historical readiness, no-navigate, and encryption release entries remain accurate."
+    },
+    {
+      "claim": "README.md untouched auth passages",
+      "evidence": "Read in full; they remain accurate and the new behavior is documented adjacent to them."
+    },
+    {
+      "claim": "agent-browser.schema.json",
+      "evidence": "The match is a credential-provider name description; schema shape and provider behavior are unchanged."
+    },
+    {
+      "claim": "cli/src/commands.rs",
+      "evidence": "Parser and flag definitions only; it contains no control-selection or insertion semantics."
+    },
+    {
+      "claim": "cli/src/native/actions.rs untouched auth passages",
+      "evidence": "Dispatch, existing lifecycle, and tests remain consistent with the changed helper."
+    },
+    {
+      "claim": "cli/src/output.rs untouched auth passages",
+      "evidence": "Formatting only; no target-selection claim."
+    },
+    {
+      "claim": "docs/public/schema.json",
+      "evidence": "Generated public copy of the unchanged credential-provider schema description."
+    },
+    {
+      "claim": "docs/src/app/changelog/page.mdx",
+      "evidence": "Historical release entries remain unchanged."
+    },
+    {
+      "claim": "docs/src/app/commands/page.mdx untouched passages",
+      "evidence": "Existing command behavior remains accurate; the new guarantee is added on the canonical page."
+    },
+    {
+      "claim": "docs/src/app/configuration/page.mdx",
+      "evidence": "Configuration keys and examples only."
+    },
+    {
+      "claim": "docs/src/app/plugins/page.mdx",
+      "evidence": "Credential-provider configuration is unaffected."
+    },
+    {
+      "claim": "docs/src/app/security/page.mdx untouched passages",
+      "evidence": "Existing security guidance remains accurate and the fail-closed behavior is added."
+    },
+    {
+      "claim": "skill-data/core/SKILL.md",
+      "evidence": "Terse command inventory only."
+    },
+    {
+      "claim": "skill-data/core/references/authentication.md untouched passages",
+      "evidence": "Existing auth guidance remains accurate and the exact-node rule is added."
+    },
+    {
+      "claim": "skill-data/core/references/commands.md untouched passages",
+      "evidence": "Existing command guidance remains accurate and the exact-node rule is added."
+    },
+    {
+      "claim": "skill-data/core/templates/authenticated-session.sh",
+      "evidence": "Invocation template only; no duplicate-control assumption."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "title": "Known lifecycle limit: cancellation or renderer/CDP destruction can prevent best-effort remote-object release",
+      "evidence": "Cleanup calls require a live transport; normal completion, JavaScript rejection, and CDP errors with usable transport are covered.",
+      "why_out_of_scope": "The accepted contract explicitly bounds cleanup to observed handles while the transport remains usable; changing cancellation ownership or transport lifecycle would be a separate architectural change."
+    }
+  ]
+}

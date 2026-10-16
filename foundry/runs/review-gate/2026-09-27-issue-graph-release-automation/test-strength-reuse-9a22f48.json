@@ -1,0 +1,95 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-results.json",
+  "evidence": "157 release tests, 736 total tests; seven meaningful mutations fail intended assertions including real process command call sites; restored clean tree and green tests.",
+  "fingerprint": {
+    "head_sha": "e78e205b141537c6d28486b3c8e1cf68dd166938",
+    "changed_paths_digest": "sha256:f33d2379498ed789a24f1463bd12a473f68f72f074e70b814fc3c71154b37581",
+    "contract_digest": "sha256:4e51c732ec46ba92d6cfff4e78c4e24c714405bebf7aa4cf53b873593dad77a4",
+    "command": "bun run check; bun x --no-install vitest run --config vitest.config.ts src/release.test.ts",
+    "environment_digest": "sha256:54cc32c3e878b8f9ddc01de58b21edfad8ed4fb7691f0a3e6d73108053fc9a01",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      ".github/workflows/release.yml",
+      "scripts/release.ts",
+      "src/release.test.ts"
+    ],
+    "reusable": true,
+    "reuse_evidence": "Only release guide wording and its docs content test changed since e78e205; exact workflow/script/release-test bytes unchanged.157release tests and95docs tests pass.",
+    "reuse": {
+      "source_head_sha": "e78e205b141537c6d28486b3c8e1cf68dd166938",
+      "target_head_sha": "9a22f48f5e73cd072fcadddfa833f60ff82a8da1",
+      "changed_paths": [
+        "CONTRIBUTING.md",
+        "apps/docs/tests/content.test.ts"
+      ],
+      "contract_digest": "sha256:4e51c732ec46ba92d6cfff4e78c4e24c714405bebf7aa4cf53b873593dad77a4",
+      "environment_digest": "sha256:54cc32c3e878b8f9ddc01de58b21edfad8ed4fb7691f0a3e6d73108053fc9a01",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+    }
+  },
+  "dimensions": {
+    "values": [
+      "Event: canonical main push, canonical main dispatch, PR, PR-target, workflow_run, fork, branch, tag; identity: exact, mismatched, malformed",
+      "Registry: absent-newer, published-latest, published-older, published-ahead, absent-not-newer, bad identity/history/dist-tags, HTTP failure, network failure",
+      "Recovery: unpublished, identical published bytes, changed integrity, changed tarball bytes, changed local metadata; process outputs and exit codes checked",
+      "Propagation: metadata/tarball delayed, retry budget exhausted, delayed beyond prior15-second window, forbidden URL/redirect/oversized body/nonretryable status",
+      "GitHub: missing tag, matching tag, conflicting tag, release missing, release existing, lookup error, failure before/after creation"
+    ],
+    "exclusions": [
+      "Registry metadata fetch and tarball streams retain existing malformed-data, network and bounds coverage; source change does not introduce new parser formats.",
+      "No Windows shell claim: the production workflow runs Ubuntu bash; platform-independent package consumers remain Node20/22/24.",
+      "Remote side effects are never fault-injected on real npm/GitHub; actual release shell is exercised against a persistent local API stub."
+    ],
+    "evidence": "src/release.test.ts partitions plus pressure-results.json cover these classes; no production implementation-derived outputs used as the semantic oracle."
+  },
+  "oracle": {
+    "source": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-27-issue-graph-release-automation/independent-release-history.log",
+    "independent": true,
+    "evidence": "Existing production0.3.2 run reported accepted package processing followed by404; user requires automatic main publication and no duplicate immutable npm version. Prior artifact tests define byte equivalence independently."
+  },
+  "producer": {
+    "name": "Real Node release CLI with live npm read-only plan and process-level registry fault fixtures; actual workflow GitHub shell with persistent API stub",
+    "status": "exercised",
+    "evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/real-plan.outputs; real-published-skip.log; check-0.log; pressure-results.json"
+  },
+  "falsification": [
+    {
+      "mutation": "push-support",
+      "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-push-support.log:  FAIL  src/release.test.ts > release context > resolves the version from the manifest on main pushes; AssertionError: release requires a main push or manual dispatch;  FAIL  src/release.test.ts > retained artifact metadata > plans a real push process against a absent registry;  FAIL  src/release.test.ts > retained artifact metadata > plans a real push process against a published registry; AssertionError: node:internal/modules/run_main:107",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+    },
+    {
+      "mutation": "existing-version-duplicate",
+      "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-existing-version-duplicate.log:  FAIL  src/release.test.ts > fail-closed registry check > rejects an existing exact version even when it is not latest; AssertionError: promise resolved \"undefined\" instead of rejecting;  FAIL  src/release.test.ts > automatic release planning and retry > skips an existing version when latest is 0.2.0;  FAIL  src/release.test.ts > automatic release planning and retry > skips an existing version when latest is 0.3.0; AssertionError: expected true to be false // Object.is equality;  FAIL  src/release.test.ts > automatic release planning and retry > retries after npm accepted the archive, changed bytes: false; AssertionError: expected true to be false // Object.is equality;  FAIL  src/release.test.ts > automatic release planning and retry > retries after npm accepted the archive, changed bytes: true",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+    },
+    {
+      "mutation": "retry-byte-verification",
+      "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-retry-byte-verification.log:  FAIL  src/release.test.ts > automatic release planning and retry > retries after npm accepted the archive, changed bytes: true; AssertionError: promise resolved \"false\" instead of rejecting;  FAIL  src/release.test.ts > retained artifact metadata > prepares the retained archive through the workflow command: changed; AssertionError: expected +0 to be 1 // Object.is equality",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+    },
+    {
+      "mutation": "plan-command-wiring",
+      "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-plan-command-wiring.log:  FAIL  src/release.test.ts > retained artifact metadata > plans a real push process against a published registry; AssertionError: expected 'needed=true\\nversion=0.4.0\\n' to be 'needed=false\\nversion=0.4.0\\n' // Object.is equality;  FAIL  src/release.test.ts > retained artifact metadata > plans a real push process against a unavailable registry; AssertionError: expected +0 to be 1 // Object.is equality",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+    },
+    {
+      "mutation": "prepare-command-wiring",
+      "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-prepare-command-wiring.log:  FAIL  src/release.test.ts > retained artifact metadata > prepares the retained archive through the workflow command: published; AssertionError: expected 'publish=true\\n' to be 'publish=false\\n' // Object.is equality;  FAIL  src/release.test.ts > retained artifact metadata > prepares the retained archive through the workflow command: changed;  FAIL  src/release.test.ts > retained artifact metadata > prepares the retained archive through the workflow command: unavailable; AssertionError: expected +0 to be 1 // Object.is equality",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+    },
+    {
+      "mutation": "publish-guard",
+      "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-publish-guard.log:  FAIL  src/release.test.ts > automatic release workflow contract > rechecks retained bytes before retry and never republishes an existing archive; AssertionError: expected 'always()' to be 'steps.preflight.outputs.publish == \\'…' // Object.is equality",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+    },
+    {
+      "mutation": "propagation-window",
+      "red_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/mutation-propagation-window.log:  FAIL  src/release.test.ts > read-only published archive verification > stops after twelve propagation attempts and never changes the retained archive; AssertionError: promise resolved \"undefined\" instead of rejecting;  FAIL  src/release.test.ts > read-only published archive verification > allows registry propagation beyond the previous fifteen-second window; AssertionError: expected 5 to be 9 // Object.is equality",
+      "restored_green_evidence": "/Users/raillyhugo/Programming/vercel/issue-graph-evidence/release-automation-2026-09-27/restored-green.log:157 passed"
+    }
+  ]
+}

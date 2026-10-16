@@ -1,0 +1,177 @@
+[
+  {
+    "scenario": "help",
+    "exit": 0,
+    "stdout": "usage: issue-graph <url|number> --repo owner/repo [options]\n       issue-graph --seeds 1,2,3 --repo owner/repo [options]\n       issue-graph --label bug --repo owner/repo [options]\n       issue-graph reconcile --repo owner/repo [options]\n       issue-graph plan --repo owner/repo [options]\n       issue-graph status --repo owner/repo --author login[,login] [options]\n       issue-graph jira ISSUE-KEY [options]\n       issue-graph dashboard [--open] [--html PATH]\n       issue-graph schema\n       issue-graph skills [list]\n       issue-graph skills get core [--full] [--json]\n\n  skills --help      bundled agent guides, no network or authentication\n  status --help      PR counts by author/project and an evidence ledger\n  jira --help        Jira relationship graph through an authenticated TWG CLI\n  --repo owner/repo   required for a bare number, --seeds, or --label\n  --depth N           same-repo recursion depth (default 2); cross-repo refs\n                      are fetched one hop and not expanded\n  --seeds a,b,c       multi-seed backlog survey; adds connected components\n  --label L           seed from every open issue carrying this label\n  --max-nodes N       stop after this many nodes (default 80)\n  --hub-threshold N   fetch but do not expand a node with more refs than this\n                      (default 12), so one tracking issue cannot pull the\n                      whole tracker\n  --concurrency N     GitHub node requests in flight (default 4, max 32)\n  --prioritize        rank open nodes by discussion heat\n  --cluster           print a root-cause clustering prompt for your agent\n  --cluster-run A     run that prompt through 'claude' or 'codex' instead\n  --json PATH         write the machine-readable graph\n  --html PATH         graph only: write a self-contained HTML explorer\n  --clusters PATH     group the explorer by agent-named clusters\n  --open              write the explorer (to a temp file unless --html) and open it\n  --format F          auto (default), text, markdown, or json\n                      graph: TTY text / pipe markdown; --json PATH exports JSON\n                      graph --format json retains Markdown stdout\n                      plan: TTY text / pipe JSON; reconcile: TTY markdown / pipe JSON\n                      text is graph/plan only; bold/dim requires TTY\n                      NO_COLOR, CI, or TERM=dumb disables styling\n  --no-snapshot       do not persist this run to ~/.issue-graph/\n  -h, --help          show this\n",
+    "stderr": "",
+    "calls": []
+  },
+  {
+    "scenario": "jira-help",
+    "exit": 0,
+    "stdout": "usage: issue-graph jira ISSUE-KEY [options]\n\nTrace Jira work-item relationships through an authenticated customer TWG CLI.\nThis command is read-only and writes no snapshots.\n\n  --site SITE           Atlassian site prefix or cloud ID; uses TWG default when omitted\n  --depth N             same-project recursion depth, 0..10 (default 2)\n  --max-nodes N         total Jira nodes, 1..1000 (default 80)\n  --hub-threshold N     fetch but do not expand non-seed nodes above this degree (default 12)\n  --concurrency N       concurrent TWG reads, 1..32 (default 4)\n  --format FORMAT       auto (default), markdown, or json\n  --json                JSON stdout shorthand; takes no filename\n  -h, --help            show this help\n\nAuto output is Markdown in a terminal and versioned JSON in a pipe.\nStructured cross-project links are fetched as one-hop boundaries. Cross-project text matches and non-Jira links are reported but not fetched.\n\nExamples:\n  issue-graph jira PROJ-123\n  issue-graph jira PROJ-123 --site example --depth 1 --max-nodes 20\n  issue-graph jira PROJ-123 --site 00000000-0000-0000-0000-000000000000 --json\n",
+    "stderr": "",
+    "calls": []
+  },
+  {
+    "scenario": "site-link",
+    "exit": 0,
+    "stdout": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T21:09:38.765Z",
+      "site": "alpha",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 2,
+        "maxNodes": 80,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": true,
+      "coverage": {
+        "fetched": 2,
+        "failed": [],
+        "cappedOut": []
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Synthetic PROJ-1",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://alpha.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [
+            {
+              "to": "jira:PROJ-2",
+              "via": "remote-link",
+              "url": "https://beta.atlassian.net/browse/PROJ-2"
+            }
+          ],
+          "externalLinks": [
+            "https://beta.atlassian.net/browse/PROJ-2"
+          ]
+        },
+        {
+          "key": "jira:PROJ-2",
+          "source": "jira",
+          "issueKey": "PROJ-2",
+          "title": "Synthetic PROJ-2",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://alpha.atlassian.net/browse/PROJ-2",
+          "depth": 1,
+          "fetched": true,
+          "edges": [],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1",
+          "jira:PROJ-2"
+        ]
+      ]
+    },
+    "stderr": "",
+    "calls": [
+      [
+        "--site",
+        "alpha",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-1",
+        "--full"
+      ],
+      [
+        "--site",
+        "alpha",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-2",
+        "--full"
+      ]
+    ]
+  },
+  {
+    "scenario": "cap",
+    "exit": 1,
+    "stdout": {
+      "schemaVersion": 1,
+      "source": "jira-twg",
+      "generatedAt": "2026-09-26T21:09:38.831Z",
+      "site": "alpha",
+      "seeds": [
+        "PROJ-1"
+      ],
+      "limits": {
+        "maxDepth": 2,
+        "maxNodes": 1,
+        "hubThreshold": 12,
+        "concurrency": 4
+      },
+      "coverageComplete": false,
+      "coverage": {
+        "fetched": 1,
+        "failed": [],
+        "cappedOut": [
+          "jira:PROJ-2"
+        ]
+      },
+      "nodes": [
+        {
+          "key": "jira:PROJ-1",
+          "source": "jira",
+          "issueKey": "PROJ-1",
+          "title": "Synthetic PROJ-1",
+          "status": "Open",
+          "issueType": "Issue",
+          "url": "https://alpha.atlassian.net/browse/PROJ-1",
+          "depth": 0,
+          "fetched": true,
+          "edges": [
+            {
+              "to": "jira:PROJ-2",
+              "via": "issue-link"
+            }
+          ],
+          "externalLinks": []
+        }
+      ],
+      "components": [
+        [
+          "jira:PROJ-1"
+        ]
+      ]
+    },
+    "stderr": "INCOMPLETE_JIRA_GRAPH: inspect coverage.failed and coverage.cappedOut before acting.\n",
+    "calls": [
+      [
+        "--site",
+        "alpha",
+        "--output",
+        "json",
+        "--output-summary=none",
+        "jira",
+        "workitem",
+        "get",
+        "PROJ-1",
+        "--full"
+      ]
+    ]
+  }
+]

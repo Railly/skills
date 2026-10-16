@@ -1,0 +1,145 @@
+{
+  "required": true,
+  "status": "pass",
+  "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/circuitkit/2026-09-27-mcp-images/resilience-receipt.json",
+  "evidence": "Forced invalid input, dependency refusal, host rejection, cancellation and recovery at actual ownership boundaries. Render tools have no durable writes; optional audit append is caller configured and non-fatal.",
+  "fingerprint": {
+    "head_sha": "327916f472096b07180f049d6d18cd63962096fc",
+    "changed_paths_digest": "sha256:bc9508fd7c9f5892b9fa29a0447e20e4f3aaecf20a96153f17dcca20c1ed0f50",
+    "contract_digest": "sha256:d34297fd8ccd3e231daa498c400674c9b394f3add4d679877b2b3c6fa2759dfd",
+    "command": "node consumer/verify.mjs; bun test tests/mcp.test.ts; bun scripts/check-mcp-browser.ts",
+    "environment_digest": "sha256:599aa3293913f7ce23468b301a74b7b3cc592e4b9898734b8f80f5e6ed100e7e",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "relevant_paths": [
+      "README.md",
+      "bun.lock",
+      "docs/mcp-apps.md",
+      "package.json",
+      "scripts/build-mcp.ts",
+      "scripts/build.ts",
+      "scripts/check-mcp-browser.ts",
+      "scripts/mcp-host.ts",
+      "scripts/preview-mcp.ts",
+      "src/mcp/canvas.tsx",
+      "src/mcp/circuit.ts",
+      "src/mcp/cli.ts",
+      "src/mcp/server.ts",
+      "src/mcp/view.css",
+      "src/mcp/view.tsx",
+      "tests/mcp.test.ts",
+      "tests/package-education-build.test.ts"
+    ],
+    "reusable": false,
+    "reuse_evidence": null,
+    "skill_package_digest": "sha256:aa1b09c3864bfca6e882e2c9ea11b63dd9f89279f36018e24e67edeee5edfa4f"
+  },
+  "commit_points": [
+    {
+      "id": "C1",
+      "effect": "viewer adopts a result and publishes selection context (ephemeral state)",
+      "owner": "Viewer/CircuitView",
+      "commit_event": "valid tool result mounted",
+      "later_fallible_stages": [
+        "context publication",
+        "explanation request",
+        "next input/result or cancellation"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "AppBridge context/message",
+          "covers": [
+            "context publication",
+            "explanation request"
+          ],
+          "forced": true,
+          "residual_observed": "Rejected context is visible; explicit explanation retains target. Rejected message shows failure and clears sending state.",
+          "cleanup_owner": "CircuitView async rejection/finally paths",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "After rejected context, Explain selection sends the selected R1 in a separate message."
+          },
+          "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+        },
+        {
+          "ownership_region": "Viewer lifecycle",
+          "covers": [
+            "next input/result or cancellation"
+          ],
+          "forced": true,
+          "residual_observed": "cancelled/invalid state removes the drawing and clears host context; next RC result renders successfully; returning to PNG removes iframe",
+          "cleanup_owner": "Viewer handlers and reference host render ownership counter",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "browser valid result recovers after error check"
+          },
+          "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/browser/receipt.json"
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "effect": "validated request before result publication; no durable state committed",
+      "owner": "server render closure",
+      "commit_event": "prepared circuit retained only within request",
+      "later_fallible_stages": [
+        "native PNG import/render",
+        "result publication"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "PNG renderer",
+          "covers": [
+            "native PNG import/render",
+            "result publication"
+          ],
+          "forced": true,
+          "residual_observed": "missing native dependency produces isError with no structured content/widget payload; no image fabricated",
+          "cleanup_owner": "render catch; disposable dependency restored in finally; stdio client closed",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "Restored dependency and immediately restarted installed process returns PNG for recipe and source. Invalid-input recovery succeeds in same live stdio client."
+          },
+          "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/installed-package.json; /Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/mutations/restored-green.log"
+        }
+      ]
+    },
+    {
+      "id": "C3",
+      "effect": "Optional capability audit append to an operator-selected path",
+      "owner": "CLI audit callback",
+      "commit_event": "appendFileSync of one JSONL record",
+      "later_fallible_stages": [
+        "later optional audit append",
+        "next tool result"
+      ],
+      "failure_partitions": [
+        {
+          "ownership_region": "audit filesystem",
+          "covers": [
+            "later optional audit append",
+            "next tool result"
+          ],
+          "forced": true,
+          "residual_observed": "A directory at the audit filename refuses append. Stderr reports failure; actual SDK still receives a valid PNG result. After repair, same process immediately succeeds and appends valid JSONL without source data.",
+          "cleanup_owner": "CLI catches append errors without contaminating protocol stdout; test repairs only its own disposable target",
+          "retry": {
+            "attempted": true,
+            "outcome": "success",
+            "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/audit-recovery.json"
+          },
+          "evidence": "/Users/raillyhugo/Programming/railly/circuitkit-mcp-apps/artifacts/mcp-image-first/audit-recovery.json"
+        }
+      ]
+    }
+  ],
+  "pressure_exclusions": [
+    "No transaction, persisted circuit state, authentication, deployment or public HTTP service added.",
+    "Native desktop host cancellation implementation is outside this package.",
+    "No throughput/DoS or all-platform support claim; Node 20/24 CI will be recorded separately."
+  ],
+  "resource_ownership": "Clients close in afterAll/finally. Browser harness closes sessions. Preview owns a single server client and handles SIGINT/SIGTERM. Events capped at 100; UI requests generation-tagged and aborted on replacement."
+}

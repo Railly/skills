@@ -1,0 +1,57 @@
+    Checking bitflags v2.11.0
+   Compiling agent-browser v0.38.1 (/Users/raillyhugo/Programming/vercel/agent-browser-1999-fix/cli)
+    Checking fastrand v2.4.1
+    Checking tower-http v0.6.8
+    Checking png v0.18.1
+    Checking rustix v1.1.3
+    Checking reqwest v0.12.28
+    Checking image v0.25.9
+    Checking tempfile v3.25.0
+error: for loop on unbounded range
+    --> src/native/browser.rs:3886:13
+     |
+3886 | /             for i in 0u64.. {
+3887 | |                 let _ = tx.send(cdp_event(
+3888 | |                     "Network.requestWillBeSent",
+3889 | |                     session,
+...    |
+3892 | |                 sleep(Duration::from_millis(100)).await;
+3893 | |             }
+     | |_____________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#for_unbounded_range
+     = note: `-D clippy::for-unbounded-range` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::for_unbounded_range)]`
+help: for loops over unbounded ranges will wrap around and may panic, consider adding an inclusive high bound
+     |
+3886 |             for i in 0u64..=u64::MAX {
+     |                            +++++++++
+
+error: the `Err`-variant returned from this closure is very large
+    --> src/native/cdp/client.rs:1108:17
+     |
+1108 | /                 move |
+1109 | |                     request: &tokio_tungstenite::tungstenite::handshake::server::Request,
+1110 | |                     response: tokio_tungstenite::tungstenite::handshake::server::Response,
+1111 | |                 | {
+...    |
+1120 | |                     Ok(response)
+1121 | |                 },
+     | |_________________^ the `Err`-variant is at least 136 bytes
+     |
+     = help: try reducing the size of `tokio_tungstenite::tungstenite::http::Response<std::option::Option<std::string::String>>`, for example by boxing large elements or replacing it with `Box<tokio_tungstenite::tungstenite::http::Response<std::option::Option<std::string::String>>>`
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#result_large_err
+     = note: `-D clippy::result-large-err` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::result_large_err)]`
+
+error: using `chunks_exact` with a constant chunk size
+    --> src/native/e2e_tests.rs:9224:32
+     |
+9224 |     for bytes in output.stdout.chunks_exact(640 * 80 * 3) {
+     |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<640 * 80 * 3>().0`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#chunks_exact_to_as_chunks
+     = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: could not compile `agent-browser` (bin "agent-browser" test) due to 3 previous errors

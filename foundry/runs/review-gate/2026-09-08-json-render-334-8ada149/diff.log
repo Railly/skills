@@ -1,0 +1,326 @@
+diff --git a/apps/web/app/(main)/docs/api/tanstack-start/page.mdx b/apps/web/app/(main)/docs/api/tanstack-start/page.mdx
+index 3a76a3c..e59303a 100644
+--- a/apps/web/app/(main)/docs/api/tanstack-start/page.mdx
++++ b/apps/web/app/(main)/docs/api/tanstack-start/page.mdx
+@@ -218,6 +218,10 @@ content is a slash-delimited string under `_splat`. Parameter values supplied
+ through `staticParams` are URL-encoded in the paths returned by
+ `getStaticPaths()`.
+ 
++Route matching treats trailing slashes as optional and accepts both encoded and
++decoded pathname representations. This keeps loader data and route metadata in
++sync for static paths containing spaces or non-ASCII characters.
++
+ For prerendered dynamic routes, provide `staticParams`:
+ 
+ ```typescript
+@@ -340,6 +344,9 @@ Pass named functions through `functions` when props use `$computed`:
+   route's fallback specs when they are used as TanStack Router boundary
+   components and the provider receives `spec`.
+ 
++The default `StartErrorBoundary` fallback invalidates the router and reruns the
++failed loader when the user selects **Try again**.
++
+ `Slot` and `Link` are automatically added to the page registry.
+ 
+ ## Server Utilities
+diff --git a/packages/tanstack-start/README.md b/packages/tanstack-start/README.md
+index 10d95c1..8430ad1 100644
+--- a/packages/tanstack-start/README.md
++++ b/packages/tanstack-start/README.md
+@@ -186,6 +186,9 @@ matched route's `loading`, `error`, and `notFound` specs. An explicit
+ application spec is server-only, omit `spec` from the provider and supply those
+ explicit props from client-safe fallback specs.
+ 
++The default `StartErrorBoundary` fallback invalidates the router and reruns the
++failed loader when the user selects **Try again**.
++
+ Pass named functions through the provider when generated props use
+ `$computed`:
+ 
+@@ -213,6 +216,10 @@ when their route spec supplies `staticParams`. Loader parameters are URL-decoded
+ and splat content is a slash-delimited string under `_splat`. Parameter values
+ emitted by `getStaticPaths()` are URL-encoded.
+ 
++Route matching treats trailing slashes as optional and accepts both encoded and
++decoded pathname representations. This keeps loader data and route metadata in
++sync for static paths containing spaces or non-ASCII characters.
++
+ Initial state is merged in this order: application state, layout state, page
+ state, then loader data. Later sources override earlier values.
+ 
+diff --git a/packages/tanstack-start/src/components/error-boundary.test.tsx b/packages/tanstack-start/src/components/error-boundary.test.tsx
+new file mode 100644
+index 0000000..2cf6445
+--- /dev/null
++++ b/packages/tanstack-start/src/components/error-boundary.test.tsx
+@@ -0,0 +1,65 @@
++import React from "react";
++import {
++  Outlet,
++  RouterProvider,
++  createMemoryHistory,
++  createRootRoute,
++  createRoute,
++  createRouter,
++} from "@tanstack/react-router";
++import {
++  cleanup,
++  fireEvent,
++  render,
++  screen,
++  waitFor,
++} from "@testing-library/react";
++import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
++import { StartErrorBoundary } from "./error-boundary";
++
++afterEach(() => {
++  cleanup();
++  vi.restoreAllMocks();
++});
++
++beforeAll(() => {
++  window.scrollTo = () => {};
++});
++
++describe("StartErrorBoundary", () => {
++  it("reruns a failed loader when the user tries again", async () => {
++    vi.spyOn(console, "warn").mockImplementation(() => {});
++    vi.spyOn(console, "error").mockImplementation(() => {});
++    let attempts = 0;
++    const rootRoute = createRootRoute({ component: Outlet });
++    const route = createRoute({
++      getParentRoute: () => rootRoute,
++      path: "$",
++      loader: () => {
++        attempts++;
++        if (attempts === 1) throw new Error("Temporary failure");
++        return { message: "Loaded" };
++      },
++      component: Page,
++      errorComponent: StartErrorBoundary,
++    });
++
++    function Page() {
++      return <div>{route.useLoaderData().message}</div>;
++    }
++
++    const router = createRouter({
++      routeTree: rootRoute.addChildren([route]),
++      history: createMemoryHistory({ initialEntries: ["/retry"] }),
++    });
++    await router.load();
++    render(<RouterProvider router={router} />);
++
++    expect(attempts).toBe(1);
++    expect(screen.getByText("Temporary failure")).toBeTruthy();
++    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
++
++    await waitFor(() => expect(screen.getByText("Loaded")).toBeTruthy());
++    expect(attempts).toBe(2);
++  });
++});
+diff --git a/packages/tanstack-start/src/components/error-boundary.tsx b/packages/tanstack-start/src/components/error-boundary.tsx
+index d57efa1..a1bb55c 100644
+--- a/packages/tanstack-start/src/components/error-boundary.tsx
++++ b/packages/tanstack-start/src/components/error-boundary.tsx
+@@ -1,4 +1,5 @@
+ import React from "react";
++import { useRouter } from "@tanstack/react-router";
+ import type { Spec } from "@json-render/core";
+ import { PageRenderer } from "./page-renderer";
+ import { resolveRouteFallback } from "./route-fallback";
+@@ -18,7 +19,11 @@ export function StartErrorBoundary({
+   reset,
+   errorSpec,
+ }: StartErrorBoundaryProps) {
++  const router = useRouter();
+   const context = useOptionalStartApp();
++  const retry = React.useCallback(() => {
++    void router.invalidate().then(reset, reset);
++  }, [reset, router]);
+   const resolvedSpec = resolveRouteFallback(
+     context?.spec,
+     context?.pathname,
+@@ -36,7 +41,7 @@ export function StartErrorBoundary({
+         {error.message || "An unexpected error occurred."}
+       </p>
+       <button
+-        onClick={reset}
++        onClick={retry}
+         style={{
+           padding: "0.5rem 1rem",
+           borderRadius: "0.375rem",
+diff --git a/packages/tanstack-start/src/create-app.test.ts b/packages/tanstack-start/src/create-app.test.ts
+index 9a8cdcf..4295593 100644
+--- a/packages/tanstack-start/src/create-app.test.ts
++++ b/packages/tanstack-start/src/create-app.test.ts
+@@ -92,4 +92,24 @@ describe("createStartApp", () => {
+     });
+     expect(await app.getStaticPaths()).toEqual(["/about", "/blog/hello"]);
+   });
++
++  it("resolves route metadata from an encoded static pathname", async () => {
++    const spec: StartAppSpec = {
++      metadata: { title: "Global" },
++      routes: {
++        "/café": {
++          page: page(),
++          metadata: { title: "Café" },
++        },
++      },
++    };
++    const app = createStartApp({ spec });
++
++    expect(await app.getPageData({ pathname: "/café" })).not.toBeNull();
++    expect((await app.getHead({ pathname: "/caf%C3%A9" })).meta).toContainEqual(
++      {
++        title: "Café",
++      },
++    );
++  });
+ });
+diff --git a/packages/tanstack-start/src/router.test.ts b/packages/tanstack-start/src/router.test.ts
+index 6ed7170..428f8f6 100644
+--- a/packages/tanstack-start/src/router.test.ts
++++ b/packages/tanstack-start/src/router.test.ts
+@@ -43,6 +43,20 @@ describe("matchRoute", () => {
+     });
+   });
+ 
++  it("matches route patterns that end in trailing slashes", () => {
++    const spec = specWith({ "/about/": {}, "/blog/$slug/": {} });
++    expect(matchRoute(spec, "/about/")?.pattern).toBe("/about/");
++    expect(matchRoute(spec, "/blog/hello/")?.params).toEqual({
++      slug: "hello",
++    });
++  });
++
++  it("matches encoded and decoded static pathnames", () => {
++    const spec = specWith({ "/café": {} });
++    expect(matchRoute(spec, "/café")?.pattern).toBe("/café");
++    expect(matchRoute(spec, "/caf%C3%A9")?.pattern).toBe("/café");
++  });
++
+   it("decodes dynamic and splat parameters", () => {
+     expect(
+       matchRoute(specWith({ "/blog/$slug": {} }), "/blog/hello%20world")
+@@ -54,6 +68,18 @@ describe("matchRoute", () => {
+     ).toEqual({ _splat: "guides/hello world" });
+   });
+ 
++  it("decodes percent signs in dynamic and splat parameters exactly once", () => {
++    expect(
++      matchRoute(specWith({ "/coupon/$code": {} }), "/coupon/100%25")?.params,
++    ).toEqual({ code: "100%" });
++    expect(
++      matchRoute(specWith({ "/coupon/$code": {} }), "/coupon/%2525")?.params,
++    ).toEqual({ code: "%25" });
++    expect(
++      matchRoute(specWith({ "/docs/$": {} }), "/docs/rates/100%25")?.params,
++    ).toEqual({ _splat: "rates/100%" });
++  });
++
+   it("does not match malformed encoded parameters", () => {
+     expect(
+       matchRoute(specWith({ "/blog/$slug": {} }), "/blog/%E0%A4%A"),
+@@ -139,4 +165,36 @@ describe("static paths", () => {
+       "/search/hello%20world",
+     ]);
+   });
++
++  it("emits matchable paths for route patterns with trailing slashes", () => {
++    const spec = specWith({
++      "/about/": {},
++      "/blog/$slug/": { staticParams: [{ slug: "hello" }] },
++    });
++    const paths = collectStaticPaths(spec);
++
++    expect(paths).toEqual(["/about/", "/blog/hello/"]);
++    expect(
++      paths.map((pathname) => matchRoute(spec, pathname)?.pattern),
++    ).toEqual(["/about/", "/blog/$slug/"]);
++  });
++
++  it("round trips percent signs in static params", () => {
++    const spec = specWith({
++      "/coupon/$code": {
++        staticParams: [{ code: "100%" }, { code: "%25" }],
++      },
++      "/docs/$": { staticParams: [{ _splat: "rates/100%" }] },
++    });
++    const paths = collectStaticPaths(spec);
++
++    expect(paths).toEqual([
++      "/coupon/100%25",
++      "/coupon/%2525",
++      "/docs/rates/100%25",
++    ]);
++    expect(paths.map((pathname) => matchRoute(spec, pathname)?.params)).toEqual(
++      [{ code: "100%" }, { code: "%25" }, { _splat: "rates/100%" }],
++    );
++  });
+ });
+diff --git a/packages/tanstack-start/src/router.ts b/packages/tanstack-start/src/router.ts
+index 4c3a3e3..c345c0e 100644
+--- a/packages/tanstack-start/src/router.ts
++++ b/packages/tanstack-start/src/router.ts
+@@ -15,7 +15,9 @@ const SPLAT_SEGMENT_RANK = 1;
+ /** Compile a TanStack Router pattern into a pathname matcher. */
+ function compileRoute(pattern: string): CompiledRoute {
+   const paramNames: string[] = [];
+-  const segments = pattern === "/" ? [""] : pattern.split("/").slice(1);
++  const normalizedPattern = normalizePathname(pattern);
++  const segments =
++    normalizedPattern === "/" ? [""] : normalizedPattern.split("/").slice(1);
+   const regexParts: string[] = [];
+   const segmentRanks: number[] = [];
+ 
+@@ -37,7 +39,7 @@ function compileRoute(pattern: string): CompiledRoute {
+   return {
+     pattern,
+     regex: new RegExp(
+-      pattern === "/" ? "^/$" : `^${regexParts.join("")}$`,
++      normalizedPattern === "/" ? "^/$" : `^${regexParts.join("")}$`,
+       "i",
+     ),
+     paramNames,
+@@ -96,8 +98,14 @@ export function matchRoute(
+ }
+ 
+ function normalizePathname(pathname: string): string {
+-  if (pathname === "" || pathname === "/") return "/";
+-  return pathname.replace(/\/+$/, "") || "/";
++  const withoutTrailingSlash = pathname.replace(/\/+$/, "") || "/";
++  try {
++    // TanStack preserves encoded percent signs in pathnames so route params
++    // can decode them exactly once. Shield them while decoding static text.
++    return decodeURI(withoutTrailingSlash.replace(/%25/gi, "%2525"));
++  } catch {
++    return withoutTrailingSlash;
++  }
+ }
+ 
+ /** Convert TanStack Router splat content to a pathname. */
+diff --git a/skills/tanstack-start/SKILL.md b/skills/tanstack-start/SKILL.md
+index 60e5472..3218aa7 100644
+--- a/skills/tanstack-start/SKILL.md
++++ b/skills/tanstack-start/SKILL.md
+@@ -115,6 +115,9 @@ loader data. `getHead` merges app and route metadata into TanStack `meta` and
+ routes with `staticParams`. Convert its strings to `{ path }` objects for
+ TanStack Start's top-level `pages` plugin option. Loader params are URL-decoded,
+ while values from `staticParams` are URL-encoded in generated paths.
++Route matching treats trailing slashes as optional and accepts encoded or
++decoded pathname representations so loader data and metadata resolve the same
++static route.
+ 
+ ## Route Wiring
+ 
+@@ -188,6 +191,8 @@ Router's `pendingComponent`, `errorComponent`, and `notFoundComponent` options.
+ When `StartAppProvider` receives `spec`, each component selects the matched
+ route's corresponding fallback. Explicit fallback props override that lookup.
+ Pass named `$computed` implementations through `StartAppProvider.functions`.
++The default error boundary invalidates the router and reruns a failed loader
++when the user selects **Try again**.
+ 
+ Import React components from `@json-render/tanstack-start`. Import `schema`,
+ `createStartApp`, `matchRoute`, `resolveMetadata`, and static path helpers from

@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "receipt_id": "security-review:vercel-labs/json-render:336:de6a9bd:resumed",
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/json-render",
+    "base_sha": "6c7164342a37fab055907f1666658e1333e2cb86",
+    "head_sha": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:5075366f1b59aab71166e07d0c980e1a0e431328ac9261c3a5ec6596834da83a",
+    "contract_digest": "sha256:966d5e729ab34ac0eb09368cdf0864277c5f7f8d51a63468e6c23c8221d90be5",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "skill_tree": "git-tree:1b2b7858d65a24124a3f49ac29c85825eb893f99"
+  },
+  "provenance": {
+    "execution_mode": "native",
+    "runtime": "fx native resumed Security Review execution",
+    "reused_evidence_origin": "Historical native-review run; manifest records fallback from fx_worker to native_subagent",
+    "author_model": "unknown",
+    "reviewer_exact_model_identifier": "not asserted",
+    "independent_family_claimed": false,
+    "same_family": null,
+    "independence_gap": "No independent-family review was performed. Prior report Markdown's 'Same family: no' is not substantiated by its manifest/JSON provenance and is not inherited.",
+    "scope": "Security Review receipt only; no Review Gate promotion verdict or other specialist stage completion"
+  },
+  "claim": {
+    "property": "Prototype integrity and rejection of reserved-token reads/writes across the core JSON Pointer data-to-runtime boundary",
+    "attacker": "Lower-trust JSON/SpecStream producer or path/value supplier, without arbitrary same-process JavaScript authority",
+    "scope": "Contract A4 and changed core API/README claims: decoded __proto__, constructor and prototype tokens rejected by core path utilities, stores/adapters and core SpecStream, with both path/from guarded before compound mutation",
+    "exact_state": "Base 6c7164342a37fab055907f1666658e1333e2cb86 to clean head de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+    "assumptions": [
+      "Ordinary JSON state/spec objects and arrays, with no host-installed accessor/proxy or explicit reference to a shared prototype",
+      "Producer controls its supplied spec/state and element definitions; no restricted per-path authorization capability is documented",
+      "Host owns adapter callback implementations, component registry code and any downstream persistence authorization"
+    ],
+    "distinctions": [
+      "Core A4 security protection is supported. The literal claim that every legacy renderer rejects every reserved token is not supported: SEC-004 records a local dictionary-prototype exception, and SEC-002 records compound rejection defects.",
+      "No deployment-specific remote unauthenticated access, tenant isolation, service availability or privileged persistence property is inferred.",
+      "A1-A3, F1/F2, Test Strength and Resilience are not converted into security blockers without a demonstrated new authority or boundary."
+    ],
+    "evidence": ["../contract.json", "../docs_diff.log", "../manifest.json", "identity-check.json", "boundary-results.json", "renderer-boundary-results.json"]
+  },
+  "trust_model": {
+    "assets": [
+      "Object.prototype, Array.prototype and Function.prototype integrity",
+      "Data and object references outside the host-supplied JSON state/spec graph",
+      "Store snapshot integrity and externally owned adapter state",
+      "Trusted application callback and component implementation authority"
+    ],
+    "principals": [
+      {
+        "id": "json_producer",
+        "authority_already_held": "Choose JSON patch op, path/from, values and spec element definitions; ordinary allowed operations already replace/remove the supplied state/spec",
+        "authority_not_granted": "Arbitrary JavaScript execution, global prototype mutation, another principal's data or privileged persistence"
+      },
+      {
+        "id": "core_library",
+        "authority_already_held": "Read/mutate application-provided objects, enforce path validation, invoke configured store publication callbacks",
+        "authority_not_granted": "Independent deployment authentication/authorization decisions"
+      },
+      {
+        "id": "host_application",
+        "authority_already_held": "Select initial state and object graph, install executable callbacks/components, configure persistence and its authorization",
+        "authority_not_granted": "No lesser-trust status is assumed for same-process executable code"
+      },
+      {
+        "id": "local_operator",
+        "authority_already_held": "Install/run application code in the same process; already capable of direct prototype access",
+        "authority_not_granted": "Not treated as a remote JSON-only attacker"
+      }
+    ],
+    "boundaries": [
+      {"id": "B1", "source": "json_producer paths and serialized patches", "destination": "core object traversal and mutation", "expected_rule": "No reserved-token traversal into shared prototypes or data outside the supplied graph"},
+      {"id": "B2", "source": "accepted/rejected store update", "destination": "host-owned publication callback", "expected_rule": "Core only publishes accepted changes; an inaccurate wrapper callback needs a demonstrated privileged sink before security classification"},
+      {"id": "B3", "source": "stream JSON", "destination": "legacy renderer local spec/element dictionary", "expected_rule": "Distinguish local producer-owned dictionary prototype from global prototypes and additional authority"},
+      {"id": "B4", "source": "host-installed non-JSON objects or executable callbacks", "destination": "runtime object behavior", "expected_rule": "Existing same-process authority is not a new attacker capability"}
+    ],
+    "entrypoints": [
+      "getByPath, setByPath, addByPath, removeByPath",
+      "immutableSetByPath, createStateStore get/set/update, createStoreAdapter get/set/update",
+      "applySpecStreamPatch and exported applySpecPatch wrapper",
+      "compileSpecStream and createSpecStreamCompiler parsed/fragmented JSONL",
+      "React useUIStream legacy applyPatch dispatcher and sibling renderer dispatchers",
+      "React-state StateProvider update callback-record path"
+    ],
+    "sinks": [
+      "Mutable property reads/writes/deletion and array splice",
+      "Immutable snapshot cloning and publication",
+      "Object.create-backed move staging",
+      "Legacy newSpec.elements[elementKey] assignment",
+      "Host setSnapshot/onStateChange callbacks, with no evidenced privileged deployment sink"
+    ],
+    "wiring_evidence": "security-review.md#trust-map-and-actual-wiring"
+  },
+  "observations": [
+    {
+      "id": "SEC-001",
+      "title": "Reserved-token core boundary rejects before read, mutation and publication",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "scope_note": "Satisfied in-scope protection, not an outstanding regression or vulnerability blocker; the contract has no dedicated scope enum for a refuted candidate.",
+      "prerequisites": ["Ordinary JSON object/array state", "Attacker-selected string path/from reaches a core API"],
+      "chain": {
+        "capability": "Supply reserved-token JSON paths and values",
+        "reachability": "Public core APIs, stores/adapters and serialized/fragmented SpecStream call the changed path logic",
+        "control": "Path/from token spelling, operation and JSON value",
+        "boundary": "B1 crossing is rejected after JSON/Pointer decoding and before traversal, staging or publication",
+        "impact": "No new cross-authority read/write; 1251 cases pass and global prototype descriptors remain unchanged"
+      },
+      "confidence": "high within stated JSON/API scope",
+      "severity": null,
+      "evidence": ["boundary-probe.mjs", "boundary-results.json", "boundary-probe.log", "public-export-probe.json", "identity-check.json", "security-review.md"]
+    },
+    {
+      "id": "SEC-002",
+      "title": "F1 remains a compound-patch correctness defect, including reserved-token rejection propagation",
+      "classification": "non_security_defect",
+      "scope": "unrelated_bug",
+      "prerequisites": ["Producer-supplied patch reaches legacy useUIStream dispatcher", "Destination is rejected after a separate removal, or source read is rejected before a separate assignment"],
+      "chain": {
+        "capability": "Choose stream patches over its supplied spec/state",
+        "reachability": "React hooks.ts applyPatch is called by useUIStream parsed response processing",
+        "control": "Move/copy source and destination paths",
+        "boundary": "No additional security boundary demonstrated: producer already can remove/replace the affected supplied state",
+        "impact": "Source data loss or own undefined destination in that state; no established new privilege, protected-principal data access or security-relevant service denial"
+      },
+      "missing_links_for_vulnerability": ["Restricted producer authority over a protected destination/source", "Supported deployment and security-sensitive sink unavailable through existing allowed patches"],
+      "confidence": "high in correctness defect; security impact not demonstrated",
+      "severity": null,
+      "evidence": ["../coordinator/hook-proof-head.json", "../coordinator/hook-proof.test.ts", "renderer-boundary-results.json", "renderer-resolved-identity.json", "caller-base-identity.json", "security-review.md"]
+    },
+    {
+      "id": "SEC-003",
+      "title": "F2 remains an inaccurate callback-record correctness defect",
+      "classification": "non_security_defect",
+      "scope": "unrelated_bug",
+      "prerequisites": ["Mixed update changes at least one entry", "Uncontrolled StateProvider has an onStateChange callback"],
+      "chain": {
+        "capability": "Submit path/value updates to application state",
+        "reachability": "react-state index.tsx:156-171 constructs records from submitted entries and previous snapshot",
+        "control": "Rejected and accepted entries in the same batch",
+        "boundary": "B2 reaches a host-configured callback, but no less-authorized sender to privileged persistence/authorization sink is established",
+        "impact": "Callback may report a write absent from actual state. Unauthorized persistence is not established by that mismatch alone"
+      },
+      "missing_links_for_vulnerability": ["Actual privileged persistence or authorization consumer", "Attacker's inability to request equivalent accepted writes", "Concrete protected state impacted across that boundary"],
+      "confidence": "high in saved correctness evidence and static callback wiring; no security impact demonstrated",
+      "severity": null,
+      "evidence": ["../consumer/result.json", "../resumed-caller-review/base-invalid-result.json", "identity-check.json", "caller-base-identity.json", "security-review.md"]
+    },
+    {
+      "id": "SEC-004",
+      "title": "Legacy renderer local element dictionary bypasses universal reserved-token rejection",
+      "classification": "hardening",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": ["JSON producer controls legacy React stream element definitions", "Direct element-key path handled by hooks.ts:89-107 rather than core"],
+      "chain": {
+        "capability": "Select element keys and JSON element definitions",
+        "reachability": "Actual useUIStream with in-process JSONL Response reaches direct dictionary assignment",
+        "control": "Reserved dictionary key and its object value",
+        "boundary": "Local spec.elements prototype changes, but producer already owns equivalent element definitions; no global prototype or separate protected principal is reached",
+        "impact": "Broad all-renderer rejection contract is not satisfied; inherited local entries are possible. Equivalent ordinary own-key entry is already supported, so no additional security capability demonstrated"
+      },
+      "confidence": "high for local behavior and modeled authority equivalence",
+      "severity": null,
+      "evidence": ["renderer-boundary-results.json", "renderer-boundary-resolved.log", "renderer-resolved-identity.json", "caller-base-identity.json", "security-review.md"]
+    },
+    {
+      "id": "SEC-005",
+      "title": "Non-JSON host object graphs need separate threat assumptions",
+      "classification": "hardening",
+      "scope": "out_of_scope_hardening",
+      "prerequisites": ["Host introduces inherited mutable objects, accessors/proxies or explicit shared-prototype aliases beyond plain JSON"],
+      "chain": {
+        "capability": "Host can install non-JSON objects or executable runtime behavior",
+        "reachability": "Ordinary property lookup uses inherited properties; move preflight intentionally uses Object.create-backed local clones",
+        "control": "Host-controlled object graph, not a capability expressible by JSON paths/values alone",
+        "boundary": "No supported lower-trust JSON-only crossing into this precondition has been established",
+        "impact": "Own-property/type restrictions could reduce exposure, but existing host authority is not a new vulnerability"
+      },
+      "confidence": "high in static behavior; medium for broader deployment implications",
+      "severity": null,
+      "evidence": ["security-review.md", "identity-check.json"]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "User-authorized review-only resumption. Safe read-only source/Git inspection and small local probes in disposable processes; new artifacts only in resumed-security. No target or node_modules writes, target builds, installs, Git mutations, real services, third-party testing, secrets or publication.",
+    "working_directory": "run/resumed-security",
+    "commands": [
+      {"command": "python3 verify-identity.py", "attempt": "initial raw-digest assumption", "exit_code": 1, "status": "failed_then_diagnosed", "output": "AssertionError: raw contract bytes do not equal saved compact-JSON digest; later normalization diagnostic found exact matching serialization", "evidence": "security-review.md"},
+      {"command": "python3 - <<'PY' [compact JSON digest diagnostic] PY", "exit_code": 0, "status": "pass", "output": "Contract and path digests both match compact JSON separators (',', ':'), without trailing newline", "command_note": "Inline diagnostic summarized here; tool output retained in fx-command-replay-21171c701f5d0bbb3824d4fbf68abbe8-d1cba5d282889b2e.bin. Corrected verify-identity.py contains the durable exact digest checks."},
+      {"command": "python3 verify-identity.py", "attempt": "corrected compact JSON verification", "exit_code": 0, "status": "pass", "output": "Exact clean head, base, contract, path digest, unchanged skill tree; five core source maps checked", "evidence": "identity-check.json"},
+      {"command": "bun --no-env-file boundary-probe.mjs > boundary-probe.log 2>&1; code=$?; cat boundary-probe.log; exit $code", "exit_code": 0, "status": "pass", "output": "1251 cases passed: exact-head source, built ESM, built CJS; global prototype descriptors unchanged", "evidence": "boundary-results.json"},
+      {"command": "cp ../public-export-probe.mjs ./public-export-probe.mjs; node public-export-probe.mjs > public-export-probe.log 2>&1; code=$?; cat public-export-probe.log; exit $code", "exit_code": 0, "status": "pass", "output": "Existing probe reused unchanged: ESM/CJS fragmented stream, valid move/copy, rejected identity, adapter write counts pass", "evidence": "public-export-probe.json"},
+      {"command": "bun --no-env-file renderer-boundary-probe.mjs > renderer-boundary-probe.log 2>&1; code=$?; cat renderer-boundary-probe.log; exit $code", "exit_code": 1, "status": "excluded_wrong_dependency_identity", "output": "Prototype assertion failed; later loader diagnostic proves shared sibling core was loaded, not exact-head core", "evidence": "renderer-boundary-probe.log"},
+      {"command": "bun --no-env-file renderer-loader-diagnostic.mjs > renderer-loader-diagnostic.log 2>&1; code=$?; cat renderer-loader-diagnostic.log; exit $code", "exit_code": 1, "status": "diagnosed_wrong_dependency_identity", "output": "core_resolutions empty; linked core outside target; direct exact-head source is guarded; wrong-core assertion repeats in disposable process", "evidence": "renderer-loader-diagnostic.log"},
+      {"command": "bun --no-env-file renderer-boundary-pinned.mjs > renderer-boundary-pinned.log 2>&1; code=$?; cat renderer-boundary-pinned.log; exit $code", "exit_code": 1, "status": "excluded_import_resolution_failure", "output": "Cannot resolve ./contexts/state from copied hook; no cases ran", "evidence": "renderer-boundary-pinned.log"},
+      {"command": "bun --no-env-file renderer-boundary-resolved.mjs > renderer-boundary-resolved.log 2>&1; code=$?; cat renderer-boundary-resolved.log; exit $code", "exit_code": 0, "status": "pass", "output": "Six actual hook characterization cases pass with exact-head core imports; global prototypes unchanged; local dictionary prototype exception and F1-like outcomes retained", "evidence": "renderer-boundary-results.json"},
+      {"command": "git --no-optional-locks -C $TARGET show $BASE:$CALLER; git --no-optional-locks -C $TARGET show $HEAD:$CALLER", "exit_code": 0, "status": "pass", "command_note": "Python inline byte-comparison for six caller files listed in evidence; placeholders identify target/base/head from fingerprint and each listed caller", "output": "Six caller files are byte-identical at base/head", "evidence": "caller-base-identity.json"}
+    ],
+    "reused_evidence": [
+      {"artifact": "../core-tests.log", "meaning": "Historical 577 tests/12 files passed; not rerun, not a new Test Strength pass", "identity_check": "identity-check.json"},
+      {"artifact": "../core-build.log", "meaning": "Historical build only; five current source maps match exact-head source and current bundle hashes are recorded", "identity_check": "identity-check.json"},
+      {"artifact": "../public-export-probe.mjs", "meaning": "Copied unchanged and rerun in this artifact directory after core identity verification", "identity_check": "identity-check.json"},
+      {"artifact": "../coordinator/hook-proof-head.json", "meaning": "Saved F1 observation used with static tracing and new pinned-source hook characterization, not represented as newly rerun built-hook evidence", "identity_check": "identity-check.json"},
+      {"artifact": "../consumer/result.json", "meaning": "Saved F2 correctness observation; no fresh StateProvider runtime or deployment proof claimed", "identity_check": "identity-check.json"}
+    ],
+    "cleanup": "Every probe ran in a disposable process and completed. fetch and DOM globals restored in hook finally blocks; hooks unmounted and jsdom window closed. Failed wrong-core processes terminated with their in-memory marker state. No server/listener or network request was created. No package dependency, symlink, target source, manifest, run-report or other specialist file was written. Own logs and import-only copies are intentionally retained.",
+    "gaps": [
+      {"id": "G1", "material_to_stated_security_conclusion": false, "gap": "No supported deployment, tenant/authorization boundary or privileged persistence callback supplied", "consequence": "No application-specific auth, tenant isolation, availability or callback-exploitation conclusion"},
+      {"id": "G2", "material_to_stated_security_conclusion": false, "gap": "Non-JSON host object graphs, accessors/proxies, preexisting pollution and resource exhaustion not actively tested", "consequence": "Ordinary JSON/API scope only; SEC-005 remains hardening, not a confirmed vulnerability"},
+      {"id": "G3", "material_to_stated_security_conclusion": false, "gap": "No full browser or other renderer runtime matrix, fresh StateProvider runtime or rebuild/type-check", "consequence": "Static caller tracing and source-pinned React characterization complement core public-boundary tests; no package-wide correctness or runtime coverage claim"},
+      {"id": "G4", "material_to_stated_security_conclusion": false, "gap": "No independent-family reviewer or reproducible-build attestation", "consequence": "Native provenance only; source-map corroboration and existing log identity do not satisfy a separate Review Gate independence requirement"},
+      {"id": "G5", "material_to_stated_security_conclusion": false, "gap": "Live GitHub head not fetched", "consequence": "Receipt applies only to the exact user-specified local head; promotion must revalidate remote state separately"}
+    ],
+    "final_integrity_evidence": "final-identity-check.json",
+    "receipt_validation_evidence": "receipt-validation.json"
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": ["SEC-004: align legacy renderer rejection/element dictionary semantics; no new authority demonstrated", "SEC-005: separately model non-JSON host graphs if a deployment relies on them"],
+    "routed_non_security_defects": ["F1 (SEC-002)", "F2 (SEC-003)", "SEC-004 universal renderer rejection-contract limitation"],
+    "conclusion": "Security pass for the stated core cross-authority property under the documented scope. This is not a universal renderer rejection, correctness, conformance or promotion pass. Review Gate owns the final verdict; existing F1/F2 and other specialist results are not changed."
+  },
+  "artifact": "security-review.md"
+}

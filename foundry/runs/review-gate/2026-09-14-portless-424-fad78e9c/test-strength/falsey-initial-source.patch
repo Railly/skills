@@ -1,0 +1,11 @@
+--- src/hosts.ts
++++ src/hosts.ts
+@@ -103,7 +103,7 @@
+  */
+ export function syncHostsFile(hostnames: string[]): boolean {
+   const content = readHostsFile();
+-  if (content === null) return false;
++  if (!content) return false;
+   if (blockMatchesHostnames(content, hostnames)) return true;
+   try {
+     const cleaned = removeBlock(content);

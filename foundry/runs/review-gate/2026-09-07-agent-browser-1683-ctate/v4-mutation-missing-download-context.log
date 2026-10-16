@@ -1,0 +1,35 @@
+   Compiling agent-browser v0.36.0 (/Users/raillyhugo/Programming/vercel/agent-browser-1683/cli)
+warning: variable does not need to be mutable
+    --> src/native/browser.rs:2356:13
+     |
+2356 |         let mut params = json!({
+     |             ----^^^^^^
+     |             |
+     |             help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `agent-browser` (bin "agent-browser") generated 1 warning (run `cargo fix --bin "agent-browser" -p agent-browser` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.38s
+     Running tests/isolate_context_cli.rs (cli/target/debug/deps/isolate_context_cli-33ea5fb5172ef094)
+
+running 1 test
+test isolated_downloads_preserve_other_context_destinations ... 
+thread 'isolated_downloads_preserve_other_context_destinations' (14504240) panicked at tests/isolate_context_cli.rs:127:9:
+command failed for isolate-stress-agent-a: ["download", "#download", "/var/folders/t_/srzvjq016kn2zdmpxsr841b00000gn/T/.tmpxEoSjc/a/first.bin"]
+stdout:
+{"success":false,"data":null,"error":"Download was canceled"}
+
+stderr:
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    isolated_downloads_preserve_other_context_destinations
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 3.61s
+
+error: test failed, to rerun pass `--test isolate_context_cli`

@@ -1,0 +1,425 @@
+{
+  "frozen_before_production_import": true,
+  "timestamp": "2026-09-14T18:33:19.459Z",
+  "corpus_sha256": "sha256:d936a900e5691d35bfffe6cced40fcef951addcea29253abe7c55002a63bd4c4",
+  "runner_sha256": "sha256:edf290ac15048edf54c47d345de2f3a04f0473d6df412e217b09395564b9f254",
+  "sources": {
+    "pointer_example": {
+      "path": "../rfc6901.txt",
+      "lines": [
+        231,
+        259
+      ],
+      "section": "5",
+      "authority": "external normative document, example input and expected table",
+      "resolved_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/rfc6901.txt",
+      "sha256": "sha256:12f9f4fc13d686aa4fbe7d144d70166cd3fcd4ab89174c2b13bda8f4b55e49da",
+      "excerpt": "   For example, given the JSON document\n\n   {\n      \"foo\": [\"bar\", \"baz\"],\n      \"\": 0,\n      \"a/b\": 1,\n      \"c%d\": 2,\n      \"e^f\": 3,\n      \"g|h\": 4,\n      \"i\\\\j\": 5,\n      \"k\\\"l\": 6,\n      \" \": 7,\n      \"m~n\": 8\n   }\n\n   The following JSON strings evaluate to the accompanying values:\n\n    \"\"           // the whole document\n    \"/foo\"       [\"bar\", \"baz\"]\n    \"/foo/0\"     \"bar\"\n    \"/\"          0\n    \"/a~1b\"      1\n    \"/c%d\"       2\n    \"/e^f\"       3\n    \"/g|h\"       4\n    \"/i\\\\j\"      5\n    \"/k\\\"l\"      6\n    \"/ \"         7\n    \"/m~0n\"      8"
+    },
+    "pointer_decode": {
+      "path": "../rfc6901.txt",
+      "lines": [
+        133,
+        159
+      ],
+      "section": "4",
+      "authority": "external normative decoding and object-member rules",
+      "resolved_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/rfc6901.txt",
+      "sha256": "sha256:12f9f4fc13d686aa4fbe7d144d70166cd3fcd4ab89174c2b13bda8f4b55e49da",
+      "excerpt": "4.  Evaluation\n\n   Evaluation of a JSON Pointer begins with a reference to the root\n   value of a JSON document and completes with a reference to some value\n   within the document.  Each reference token in the JSON Pointer is\n   evaluated sequentially.\n\n   Evaluation of each reference token begins by decoding any escaped\n   character sequence.  This is performed by first transforming any\n   occurrence of the sequence '~1' to '/', and then transforming any\n   occurrence of the sequence '~0' to '~'.  By performing the\n   substitutions in this order, an implementation avoids the error of\n   turning '~01' first into '~1' and then into '/', which would be\n   incorrect (the string '~01' correctly becomes '~1' after\n   transformation).\n\n   The reference token then modifies which value is referenced according\n   to the following scheme:\n\n   o  If the currently referenced value is a JSON object, the new\n      referenced value is the object member with the name identified by\n      the reference token.  The member name is equal to the token if it\n      has the same number of Unicode characters as the token and their\n      code points are byte-by-byte equal.  No Unicode character\n      normalization is performed.  If a referenced member name is not\n      unique in an object, the member that is referenced is undefined,\n      and evaluation fails (see below)."
+    },
+    "array_grammar": {
+      "path": "../rfc6901.txt",
+      "lines": [
+        175,
+        205
+      ],
+      "section": "4",
+      "authority": "external normative array grammar, no maximum integer bound specified",
+      "resolved_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/rfc6901.txt",
+      "sha256": "sha256:12f9f4fc13d686aa4fbe7d144d70166cd3fcd4ab89174c2b13bda8f4b55e49da",
+      "excerpt": "   o  If the currently referenced value is a JSON array, the reference\n      token MUST contain either:\n\n      *  characters comprised of digits (see ABNF below; note that\n         leading zeros are not allowed) that represent an unsigned\n         base-10 integer value, making the new referenced value the\n         array element with the zero-based index identified by the\n         token, or\n\n      *  exactly the single character \"-\", making the new referenced\n         value the (nonexistent) member after the last array element.\n\n   The ABNF syntax for array indices is:\n\n   array-index = %x30 / ( %x31-39 *(%x30-39) )\n                 ; \"0\", or digits without a leading \"0\"\n\n   Implementations will evaluate each reference token against the\n   document's contents and will raise an error condition if it fails to\n   resolve a concrete value for any of the JSON pointer's reference\n   tokens.  For example, if an array is referenced with a non-numeric\n   token, an error condition will be raised.  See Section 7 for details.\n\n   Note that the use of the \"-\" character to index an array will always\n   result in such an error condition because by definition it refers to\n   a nonexistent array element.  Thus, applications of JSON Pointer need\n   to specify how that character is to be handled, if it is to be\n   useful.\n\n   Any error condition for which a specific action is not defined by the\n   JSON Pointer application results in termination of evaluation."
+    },
+    "pointer_errors": {
+      "path": "../rfc6901.txt",
+      "lines": [
+        303,
+        320
+      ],
+      "section": "7",
+      "authority": "application defines error handling, not universal silent-no-op policy",
+      "resolved_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/rfc6901.txt",
+      "sha256": "sha256:12f9f4fc13d686aa4fbe7d144d70166cd3fcd4ab89174c2b13bda8f4b55e49da",
+      "excerpt": "7.  Error Handling\n\n   In the event of an error condition, evaluation of the JSON Pointer\n   fails to complete.\n\n   Error conditions include, but are not limited to:\n\n   o  Invalid pointer syntax\n\n   o  A pointer that references a nonexistent value\n\n   This specification does not define how errors are handled.  An\n   application of JSON Pointer SHOULD specify the impact and handling of\n   each type of error.\n\n   For example, some applications might stop pointer processing upon an\n   error, while others may attempt to recover from missing values by\n   inserting default ones."
+    },
+    "patch_add_remove": {
+      "path": "../rfc6902.txt",
+      "lines": [
+        211,
+        314
+      ],
+      "section": "4.1-4.3",
+      "authority": "external normative mutation rules",
+      "resolved_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/rfc6902.txt",
+      "sha256": "sha256:ded8fa1754ab1566fd72611c9d5bcde931cd2bdf8351889e2ef5b50efdf1eed4",
+      "excerpt": "4.1.  add\n\n   The \"add\" operation performs one of the following functions,\n   depending upon what the target location references:\n\n   o  If the target location specifies an array index, a new value is\n      inserted into the array at the specified index.\n\n   o  If the target location specifies an object member that does not\n      already exist, a new member is added to the object.\n\n\n\n\n\nBryan & Nottingham           Standards Track                    [Page 4]\n\f\nRFC 6902                       JSON Patch                     April 2013\n\n\n   o  If the target location specifies an object member that does exist,\n      that member's value is replaced.\n\n   The operation object MUST contain a \"value\" member whose content\n   specifies the value to be added.\n\n   For example:\n\n   { \"op\": \"add\", \"path\": \"/a/b/c\", \"value\": [ \"foo\", \"bar\" ] }\n\n   When the operation is applied, the target location MUST reference one\n   of:\n\n   o  The root of the target document - whereupon the specified value\n      becomes the entire content of the target document.\n\n   o  A member to add to an existing object - whereupon the supplied\n      value is added to that object at the indicated location.  If the\n      member already exists, it is replaced by the specified value.\n\n   o  An element to add to an existing array - whereupon the supplied\n      value is added to the array at the indicated location.  Any\n      elements at or above the specified index are shifted one position\n      to the right.  The specified index MUST NOT be greater than the\n      number of elements in the array.  If the \"-\" character is used to\n      index the end of the array (see [RFC6901]), this has the effect of\n      appending the value to the array.\n\n   Because this operation is designed to add to existing objects and\n   arrays, its target location will often not exist.  Although the\n   pointer's error handling algorithm will thus be invoked, this\n   specification defines the error handling behavior for \"add\" pointers\n   to ignore that error and add the value as specified.\n\n   However, the object itself or an array containing it does need to\n   exist, and it remains an error for that not to be the case.  For\n   example, an \"add\" with a target location of \"/a/b\" starting with this\n   document:\n\n   { \"a\": { \"foo\": 1 } }\n\n   is not an error, because \"a\" exists, and \"b\" will be added to its\n   value.  It is an error in this document:\n\n   { \"q\": { \"bar\": 2 } }\n\n   because \"a\" does not exist.\n\n\n\n\nBryan & Nottingham           Standards Track                    [Page 5]\n\f\nRFC 6902                       JSON Patch                     April 2013\n\n\n4.2.  remove\n\n   The \"remove\" operation removes the value at the target location.\n\n   The target location MUST exist for the operation to be successful.\n\n   For example:\n\n   { \"op\": \"remove\", \"path\": \"/a/b/c\" }\n\n   If removing an element from an array, any elements above the\n   specified index are shifted one position to the left.\n\n4.3.  replace\n\n   The \"replace\" operation replaces the value at the target location\n   with a new value.  The operation object MUST contain a \"value\" member\n   whose content specifies the replacement value.\n\n   The target location MUST exist for the operation to be successful.\n\n   For example:\n\n   { \"op\": \"replace\", \"path\": \"/a/b/c\", \"value\": 42 }\n\n   This operation is functionally identical to a \"remove\" operation for\n   a value, followed immediately by an \"add\" operation at the same\n   location with the replacement value."
+    },
+    "patch_move_copy": {
+      "path": "../rfc6902.txt",
+      "lines": [
+        316,
+        362
+      ],
+      "section": "4.4-4.5",
+      "authority": "external normative source existence and remove-then-add ordering",
+      "resolved_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/rfc6902.txt",
+      "sha256": "sha256:ded8fa1754ab1566fd72611c9d5bcde931cd2bdf8351889e2ef5b50efdf1eed4",
+      "excerpt": "4.4.  move\n\n   The \"move\" operation removes the value at a specified location and\n   adds it to the target location.\n\n   The operation object MUST contain a \"from\" member, which is a string\n   containing a JSON Pointer value that references the location in the\n   target document to move the value from.\n\n   The \"from\" location MUST exist for the operation to be successful.\n\n   For example:\n\n   { \"op\": \"move\", \"from\": \"/a/b/c\", \"path\": \"/a/b/d\" }\n\n   This operation is functionally identical to a \"remove\" operation on\n   the \"from\" location, followed immediately by an \"add\" operation at\n   the target location with the value that was just removed.\n\n\n\n\nBryan & Nottingham           Standards Track                    [Page 6]\n\f\nRFC 6902                       JSON Patch                     April 2013\n\n\n   The \"from\" location MUST NOT be a proper prefix of the \"path\"\n   location; i.e., a location cannot be moved into one of its children.\n\n4.5.  copy\n\n   The \"copy\" operation copies the value at a specified location to the\n   target location.\n\n   The operation object MUST contain a \"from\" member, which is a string\n   containing a JSON Pointer value that references the location in the\n   target document to copy the value from.\n\n   The \"from\" location MUST exist for the operation to be successful.\n\n   For example:\n\n   { \"op\": \"copy\", \"from\": \"/a/b/c\", \"path\": \"/a/b/e\" }\n\n   This operation is functionally identical to an \"add\" operation at the\n   target location using the value specified in the \"from\" member."
+    },
+    "patch_examples": {
+      "path": "../rfc6902.txt",
+      "lines": [
+        620,
+        982
+      ],
+      "section": "Appendix A",
+      "authority": "external examples, each case names its subsection",
+      "resolved_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/rfc6902.txt",
+      "sha256": "sha256:ded8fa1754ab1566fd72611c9d5bcde931cd2bdf8351889e2ef5b50efdf1eed4",
+      "excerpt": "RFC 6902                       JSON Patch                     April 2013\n\n\nAppendix A.  Examples\n\nA.1.  Adding an Object Member\n\n   An example target JSON document:\n\n   { \"foo\": \"bar\"}\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"add\", \"path\": \"/baz\", \"value\": \"qux\" }\n   ]\n\n   The resulting JSON document:\n\n   {\n     \"baz\": \"qux\",\n     \"foo\": \"bar\"\n   }\n\nA.2.  Adding an Array Element\n\n   An example target JSON document:\n\n   { \"foo\": [ \"bar\", \"baz\" ] }\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"add\", \"path\": \"/foo/1\", \"value\": \"qux\" }\n   ]\n\n   The resulting JSON document:\n\n   { \"foo\": [ \"bar\", \"qux\", \"baz\" ] }\n\nA.3.  Removing an Object Member\n\n   An example target JSON document:\n\n   {\n     \"baz\": \"qux\",\n     \"foo\": \"bar\"\n   }\n\n\n\n\n\n\nBryan & Nottingham           Standards Track                   [Page 12]\n\f\nRFC 6902                       JSON Patch                     April 2013\n\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"remove\", \"path\": \"/baz\" }\n   ]\n\n   The resulting JSON document:\n\n   { \"foo\": \"bar\" }\n\nA.4.  Removing an Array Element\n\n   An example target JSON document:\n\n   { \"foo\": [ \"bar\", \"qux\", \"baz\" ] }\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"remove\", \"path\": \"/foo/1\" }\n   ]\n\n   The resulting JSON document:\n\n   { \"foo\": [ \"bar\", \"baz\" ] }\n\nA.5.  Replacing a Value\n\n   An example target JSON document:\n\n   {\n     \"baz\": \"qux\",\n     \"foo\": \"bar\"\n   }\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"replace\", \"path\": \"/baz\", \"value\": \"boo\" }\n   ]\n\n   The resulting JSON document:\n\n   {\n     \"baz\": \"boo\",\n     \"foo\": \"bar\"\n   }\n\n\n\n\nBryan & Nottingham           Standards Track                   [Page 13]\n\f\nRFC 6902                       JSON Patch                     April 2013\n\n\nA.6.  Moving a Value\n\n   An example target JSON document:\n\n   {\n     \"foo\": {\n       \"bar\": \"baz\",\n       \"waldo\": \"fred\"\n     },\n     \"qux\": {\n       \"corge\": \"grault\"\n     }\n   }\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"move\", \"from\": \"/foo/waldo\", \"path\": \"/qux/thud\" }\n   ]\n\n   The resulting JSON document:\n\n   {\n     \"foo\": {\n       \"bar\": \"baz\"\n     },\n     \"qux\": {\n       \"corge\": \"grault\",\n       \"thud\": \"fred\"\n     }\n   }\n\nA.7.  Moving an Array Element\n\n   An example target JSON document:\n\n   { \"foo\": [ \"all\", \"grass\", \"cows\", \"eat\" ] }\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"move\", \"from\": \"/foo/1\", \"path\": \"/foo/3\" }\n   ]\n\n   The resulting JSON document:\n\n   { \"foo\": [ \"all\", \"cows\", \"eat\", \"grass\" ] }\n\n\n\n\nBryan & Nottingham           Standards Track                   [Page 14]\n\f\nRFC 6902                       JSON Patch                     April 2013\n\n\nA.8.  Testing a Value: Success\n\n   An example target JSON document:\n\n   {\n     \"baz\": \"qux\",\n     \"foo\": [ \"a\", 2, \"c\" ]\n   }\n\n   A JSON Patch document that will result in successful evaluation:\n\n   [\n     { \"op\": \"test\", \"path\": \"/baz\", \"value\": \"qux\" },\n     { \"op\": \"test\", \"path\": \"/foo/1\", \"value\": 2 }\n   ]\n\nA.9.  Testing a Value: Error\n\n   An example target JSON document:\n\n   { \"baz\": \"qux\" }\n\n   A JSON Patch document that will result in an error condition:\n\n   [\n     { \"op\": \"test\", \"path\": \"/baz\", \"value\": \"bar\" }\n   ]\n\nA.10.  Adding a Nested Member Object\n\n   An example target JSON document:\n\n   { \"foo\": \"bar\" }\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"add\", \"path\": \"/child\", \"value\": { \"grandchild\": { } } }\n   ]\n\n\n\n\n\n\n\n\n\n\n\n\nBryan & Nottingham           Standards Track                   [Page 15]\n\f\nRFC 6902                       JSON Patch                     April 2013\n\n\n   The resulting JSON document:\n\n   {\n     \"foo\": \"bar\",\n     \"child\": {\n       \"grandchild\": {\n       }\n     }\n   }\n\nA.11.  Ignoring Unrecognized Elements\n\n   An example target JSON document:\n\n   { \"foo\": \"bar\" }\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"add\", \"path\": \"/baz\", \"value\": \"qux\", \"xyz\": 123 }\n   ]\n\n   The resulting JSON document:\n\n   {\n     \"foo\": \"bar\",\n     \"baz\": \"qux\"\n   }\n\nA.12.  Adding to a Nonexistent Target\n\n   An example target JSON document:\n\n   { \"foo\": \"bar\" }\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"add\", \"path\": \"/baz/bat\", \"value\": \"qux\" }\n   ]\n\n   This JSON Patch document, applied to the target JSON document above,\n   would result in an error (therefore, it would not be applied),\n   because the \"add\" operation's target location that references neither\n   the root of the document, nor a member of an existing object, nor a\n   member of an existing array.\n\n\n\n\n\nBryan & Nottingham           Standards Track                   [Page 16]\n\f\nRFC 6902                       JSON Patch                     April 2013\n\n\nA.13.  Invalid JSON Patch Document\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"add\", \"path\": \"/baz\", \"value\": \"qux\", \"op\": \"remove\" }\n   ]\n\n   This JSON Patch document cannot be treated as an \"add\" operation,\n   because it contains a later \"op\":\"remove\" element.  JSON requires\n   that object member names be unique with a \"SHOULD\" requirement, and\n   there is no standard error handling for duplicates.\n\nA.14.  ~ Escape Ordering\n\n   An example target JSON document:\n\n   {\n     \"/\": 9,\n     \"~1\": 10\n   }\n\n   A JSON Patch document:\n\n   [\n     {\"op\": \"test\", \"path\": \"/~01\", \"value\": 10}\n   ]\n\n   The resulting JSON document:\n\n   {\n     \"/\": 9,\n     \"~1\": 10\n   }\n\nA.15.  Comparing Strings and Numbers\n\n   An example target JSON document:\n\n   {\n     \"/\": 9,\n     \"~1\": 10\n   }\n\n\n\n\n\n\n\n\nBryan & Nottingham           Standards Track                   [Page 17]\n\f\nRFC 6902                       JSON Patch                     April 2013\n\n\n   A JSON Patch document:\n\n   [\n     {\"op\": \"test\", \"path\": \"/~01\", \"value\": \"10\"}\n   ]\n\n   This results in an error, because the test fails.  The document value\n   is numeric, whereas the value being tested for is a string.\n\nA.16.  Adding an Array Value\n\n   An example target JSON document:\n\n   { \"foo\": [\"bar\"] }\n\n   A JSON Patch document:\n\n   [\n     { \"op\": \"add\", \"path\": \"/foo/-\", \"value\": [\"abc\", \"def\"] }\n   ]\n\n   The resulting JSON document:\n\n   { \"foo\": [\"bar\", [\"abc\", \"def\"]] }"
+    },
+    "patch_errors": {
+      "path": "../rfc6902.txt",
+      "lines": [
+        417,
+        436
+      ],
+      "section": "5",
+      "authority": "patch failure and HTTP PATCH atomicity, not SpecStream recovery",
+      "resolved_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/rfc6902.txt",
+      "sha256": "sha256:ded8fa1754ab1566fd72611c9d5bcde931cd2bdf8351889e2ef5b50efdf1eed4",
+      "excerpt": "5.  Error Handling\n\n   If a normative requirement is violated by a JSON Patch document, or\n   if an operation is not successful, evaluation of the JSON Patch\n   document SHOULD terminate and application of the entire patch\n   document SHALL NOT be deemed successful.\n\n   See [RFC5789], Section 2.2 for considerations regarding handling\n   errors when JSON Patch is used with the HTTP PATCH method, including\n   suggested status codes to use to indicate various conditions.\n\n   Note that the HTTP PATCH method is atomic, as per [RFC5789].\n   Therefore, the following patch would result in no changes being made\n   to the document at all (because the \"test\" operation results in an\n   error):\n\n   [\n     { \"op\": \"replace\", \"path\": \"/a/b/c\", \"value\": 42 },\n     { \"op\": \"test\", \"path\": \"/a/b/c\", \"value\": \"C\" }\n   ]"
+    },
+    "product_paths": {
+      "path": "target:apps/web/app/(main)/docs/api/core/page.mdx",
+      "lines": [
+        454,
+        467
+      ],
+      "authority": "same-PR product contract, NOT external normative independence",
+      "resolved_path": "/Users/raillyhugo/Programming/vercel/json-render-336-review/apps/web/app/(main)/docs/api/core/page.mdx",
+      "sha256": "sha256:a9e00c64f7db686c75828666257b4dcd31836f3fff9fee21ea45be7629a0466a",
+      "excerpt": "Array tokens must use canonical decimal indices: `0` or a non-zero digit\nfollowed by digits, from `0` through `4294967294`. For example, `/items/1` is\nvalid, but `/items/01`, `/items/1.5`, and `/items/1e1` are not. Object keys are\nalways literal, so `{ \"01\": \"value\" }` can be addressed with `/01` when the\ncurrent value is an object.\n\n`setByPath` and `addByPath` accept a terminal `-` to append to an array.\nInvalid array reads return `undefined`, and invalid writes or removals are\nno-ops. A `-` token is not valid for reads, removals, or intermediate array\nsegments.\n\nFor prototype safety, path utilities, state stores, and SpecStream patches\nreject JSON Pointer paths containing `__proto__`, `constructor`, or `prototype`\ntokens. Compound patches validate both `path` and `from` before mutating data."
+    },
+    "product_store": {
+      "path": "target:packages/core/README.md",
+      "lines": [
+        283,
+        329
+      ],
+      "authority": "same-PR product contract, NOT external normative independence",
+      "resolved_path": "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/README.md",
+      "sha256": "sha256:12055a887751b1937e094271f30578c3ef222f303799563eb43ea2ecdce779dd",
+      "excerpt": "#### Array paths and no-op writes\n\nWhen a JSON Pointer token addresses an array, it must be a canonical decimal\nindex: `0` or a non-zero digit followed by digits, from `0` through\n`4294967294`. For example, `/items/1` is valid, while `/items/01`,\n`/items/1.5`, and `/items/1e1` are not. Object keys remain literal, so an\nobject can still contain a key named `\"01\"`.\n\n`setByPath` and `addByPath` accept a terminal `-` to append to an array. It is\nnot valid for array reads, removals, or intermediate traversal. Invalid array\nwrites are no-ops: they do not create named array properties, change a store\nsnapshot, or notify subscribers. A batched `update` applies accepted entries\nagainst the progressively updated snapshot and notifies once only when at\nleast one entry changes state.\n\n### Store Utilities (for adapter authors)\n\nAvailable via `@json-render/core/store-utils`:\n\n| Export | Purpose |\n|--------|---------|\n| `createStoreAdapter(config)` | Build a full `StateStore` from a minimal `{ getSnapshot, setSnapshot, subscribe }` config |\n| `immutableSetByPath(root, path, value)` | Immutably set a value at a JSON Pointer path with structural sharing |\n| `flattenToPointers(obj)` | Flatten a nested object into JSON Pointer keyed entries |\n| `StoreAdapterConfig` | Config type for `createStoreAdapter` |\n\n```typescript\nimport { createStoreAdapter, immutableSetByPath, flattenToPointers } from \"@json-render/core/store-utils\";\n```\n\n`createStoreAdapter` handles `get`, `set` (with no-op detection), batched `update`, `getSnapshot`, `getServerSnapshot`, and `subscribe` -- adapter authors only need to supply the snapshot source, write API, and subscribe mechanism:\n\n```typescript\nimport { createStoreAdapter } from \"@json-render/core/store-utils\";\n\nconst store = createStoreAdapter({\n  getSnapshot: () => myLib.getState(),\n  setSnapshot: (next) => myLib.setState(next),\n  subscribe: (listener) => myLib.subscribe(listener),\n});\n```\n\nThe official adapter packages (`@json-render/redux`, `@json-render/zustand`, `@json-render/jotai`) are all built on top of `createStoreAdapter`.\n\nLike `createStateStore`, adapters skip their `setSnapshot` call when every\nwrite in a batch is unchanged or rejected. This keeps externally managed\nsnapshots stable for all-invalid updates."
+    },
+    "product_literal": {
+      "path": "target:skills/core/SKILL.md",
+      "lines": [
+        248,
+        260
+      ],
+      "authority": "same-PR product contract, NOT external normative independence",
+      "resolved_path": "/Users/raillyhugo/Programming/vercel/json-render-336-review/skills/core/SKILL.md",
+      "sha256": "sha256:40b467b44fda1803842037a66dff529dae2cf24810fce1a729e384437a8b5ed2",
+      "excerpt": "### State path rules\n\nUse JSON Pointer paths. When a token addresses an array, it must be a canonical\ndecimal index (`0` or a non-zero digit followed by digits) in the JavaScript\narray-index range. Do not use leading zeros, fractions, signs, exponents, or\nwhitespace: use `/items/1`, not `/items/01` or `/items/1e1`. Object keys remain\nliteral, including keys such as `\"01\"`, `\"\"`, and `\"-\"`.\n\n`set` and `update` accept a final `-` token to append to an array. It is not\nvalid for reads, removals, or intermediate array traversal. Invalid array\nwrites are silent no-ops: they preserve snapshot identity and do not notify\nsubscribers or call an adapter's snapshot writer. A batch applies valid entries\nin order and emits at most one notification/write when state changes."
+    },
+    "product_compound": {
+      "path": "../contract.json",
+      "lines": [
+        4,
+        7
+      ],
+      "authority": "review acceptance A1-A4, supplemental policy oracle, NOT external provenance",
+      "resolved_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/contract.json",
+      "sha256": "sha256:23a325d76e201c8e2b83f8ce0d0540284d19142c6027803937148cb2c324d22a",
+      "excerpt": "    \"A1\": \"Canonical decimal array tokens; literal numeric-looking object keys; existing append and valid path behavior preserved\",\n    \"A2\": \"Rejected immutable writes retain identity and produce no notification or adapter write; batches evaluate progressively\",\n    \"A3\": \"Invalid compound patches cannot delete source or insert undefined; valid move/copy still work through compiled stream\",\n    \"A4\": \"Reserved decoded tokens cannot traverse or mutate prototypes through read/write/remove/state/compound boundaries\""
+    }
+  },
+  "identity": {
+    "target": "/Users/raillyhugo/Programming/vercel/json-render-336-review",
+    "head_sha": "de6a9bdbc0100ac778dff1ad48ab2f732b7d181e",
+    "base_sha": "6c7164342a37fab055907f1666658e1333e2cb86",
+    "dirty_digest": "clean",
+    "authorization": "read-only",
+    "changed_paths": [
+      "apps/web/app/(main)/docs/api/core/page.mdx",
+      "apps/web/app/(main)/docs/data-binding/page.mdx",
+      "packages/core/README.md",
+      "packages/core/src/path-utils.ts",
+      "packages/core/src/state-store.test.ts",
+      "packages/core/src/state-store.ts",
+      "packages/core/src/types.test.ts",
+      "packages/core/src/types.ts",
+      "skills/core/SKILL.md"
+    ],
+    "contract_digest": "sha256:966d5e729ab34ac0eb09368cdf0864277c5f7f8d51a63468e6c23c8221d90be5",
+    "contract_file_sha256": "sha256:23a325d76e201c8e2b83f8ce0d0540284d19142c6027803937148cb2c324d22a",
+    "contract_digest_serialization": "JSON.stringify(JSON.parse(file)), preserving key order",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "skill_tree": "git-tree:54c8a332dab0febea175fc4fc375785e8745e6c4",
+    "runtime": {
+      "executable": "/Users/raillyhugo/.bun/bin/bun",
+      "bun": "1.3.11",
+      "node_compatibility": "v24.3.0",
+      "os": "darwin",
+      "arch": "arm64"
+    },
+    "build_log": {
+      "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-14-json-render-336-de6a9bd/core-build.log",
+      "sha256": "sha256:28ddbe90c4fda20b0af7f6c4a27348d0e848aff4ba987dcaff3b114ebb7b07a2"
+    },
+    "build_binding": "Saved successful build log plus all current sourcemap sourcesContent compared byte-for-byte to exact HEAD. No rebuild or signed build attestation; output bytes pinned by hashes.",
+    "dist_sha256": {
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/chunk-2ZV3P2JU.mjs": "sha256:4fc9dd8f19778b90ad1df4bf6745e267722034bf2773ad866fb21baa6c1f5e4c",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/chunk-2ZV3P2JU.mjs.map": "sha256:4f9384a5d89075f997677d45b7f47ac88d5bae07a7a2534dd0f4b3948549b970",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/index.d.mts": "sha256:b460f649389715701015d901bfbdfffc2cee5916d37d90cd53e92aefc6544a0b",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/index.d.ts": "sha256:786aeed2fe2dc68383eeffb0a9a9a4b7faddc5a3e9c30c1ba5d11ea63f8e7e2a",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/index.js": "sha256:eb8d070264621c7e09e9b234d118ac41ab3125c87de18c06b904dbe92ee45383",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/index.js.map": "sha256:5250cc09b9841bb5810d8211e2bdbd0068f3c8abc5c93cb742f0d16814ac7617",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/index.mjs": "sha256:91818e1f6307373b1c358b73537ee279588601881d36a661e6671e5118f42bd4",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/index.mjs.map": "sha256:96d548aa51b016f9d2691760c35b57c237e19308e53b333b5313d0760d7361de",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/store-utils-CGwRAVOR.d.mts": "sha256:b61055bad34f9657742e53c3499c322908f5ff9e0abdd16cb5895963f5e04f12",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/store-utils-CGwRAVOR.d.ts": "sha256:b61055bad34f9657742e53c3499c322908f5ff9e0abdd16cb5895963f5e04f12",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/store-utils.d.mts": "sha256:0c37e2af349f48cd1d59fbd03c351f37477489db2fc1f2037b14209b134c767f",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/store-utils.d.ts": "sha256:7cc248bc533ff8f67baffd0cda991b598cea279126be7a323dd26c81764628f0",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/store-utils.js": "sha256:e163259e967eed1b11b8bac4f623249e1c006264e9584533dd9692c5e240903b",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/store-utils.js.map": "sha256:4514f371c6b186e3ef716238f633a2efe718d2b39b140bb3e318c0dbc229c0f2",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/store-utils.mjs": "sha256:f262d419772375fc42a571c8152f691d827542d7ada2faa2c781b0866ca91d6e",
+      "/Users/raillyhugo/Programming/vercel/json-render-336-review/packages/core/dist/store-utils.mjs.map": "sha256:cba81f7ad4d5b1b629bf43823f1082e73a10d0c3114c937515e7f8c1047629b3"
+    },
+    "source_map_checks": [
+      {
+        "map": "packages/core/dist/chunk-2ZV3P2JU.mjs.map",
+        "source": "packages/core/src/types.ts",
+        "source_sha256": "sha256:28ded9374da090d13281a4faf344aa702d77370263c3df16bac5c31fb86ca346",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/chunk-2ZV3P2JU.mjs.map",
+        "source": "packages/core/src/path-utils.ts",
+        "source_sha256": "sha256:4ea50ca9245a2a91f753f5e06fc641ffa858fbe232106282543e1a363b0a95b9",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/chunk-2ZV3P2JU.mjs.map",
+        "source": "packages/core/src/state-store.ts",
+        "source_sha256": "sha256:0a62e72962cf55dea895d9f803bee85bd9a32e0ee9edefed6748dc7f8cbf21f3",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/index.ts",
+        "source_sha256": "sha256:30a1f6b744dcbb2ab5c1e0da828d9399c1709be02973c4a3a17f896528115486",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/types.ts",
+        "source_sha256": "sha256:28ded9374da090d13281a4faf344aa702d77370263c3df16bac5c31fb86ca346",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/path-utils.ts",
+        "source_sha256": "sha256:4ea50ca9245a2a91f753f5e06fc641ffa858fbe232106282543e1a363b0a95b9",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/state-store.ts",
+        "source_sha256": "sha256:0a62e72962cf55dea895d9f803bee85bd9a32e0ee9edefed6748dc7f8cbf21f3",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/visibility.ts",
+        "source_sha256": "sha256:26dd54a3a6f6878fbe6d355c07cbb7ddd0bd18e2e3c3b6708e13c7ad9e78bf7e",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/directives.ts",
+        "source_sha256": "sha256:1709d38449811be1c3a471e3f0842a335131f528a8fe4bc03ee6491b0359a94b",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/props.ts",
+        "source_sha256": "sha256:fa2b83993cab4a53971c0237de0fddb83571c7d3e7c757855e25e3c3caba8ecf",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/action-observer.ts",
+        "source_sha256": "sha256:13cfb184b8fd108c388e99f03c830201e2e6a9c352ed3786e967feeb208338b0",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/devtools-flag.ts",
+        "source_sha256": "sha256:e8ba396505faa0958af88f569d820094c141d3d589c04794b5e088e7d9dac76c",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/actions.ts",
+        "source_sha256": "sha256:f16366660a1700c56ca3ecdf859581d8186381a9a5aec44c0afff67e5c10a1c5",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/validation.ts",
+        "source_sha256": "sha256:7b7b5048bba5493c022bc5913ff8bbcc9b4bdecaa0ab0b49a2888d1bcd7bf419",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/spec-validator.ts",
+        "source_sha256": "sha256:22fe8d3426848893ba67085fd40770c1b304239390aeb184a6167fc944c52c9c",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/schema.ts",
+        "source_sha256": "sha256:138bcc372ee3089f68a3c070e6256984b8fafb7cf2c9f7f466fa42412c9f21fb",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/edit-modes.ts",
+        "source_sha256": "sha256:ed665b0c55c95ab3d094dcbaffb29f1158f3cc8affaadcf356aa23dcff85ca4a",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/prompt.ts",
+        "source_sha256": "sha256:52a3cda5d7a2b9eef7d156c59f0bbee47cb85a76aa4890a9fb98372949b47b11",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/merge.ts",
+        "source_sha256": "sha256:b5c9777c504c50e6560f5a3d543836634228ed2b4b4c7c6ac366cf06aade89e4",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.js.map",
+        "source": "packages/core/src/diff.ts",
+        "source_sha256": "sha256:c0aa1450f1187866de8ca083f7d2f405e946669a16dfc1becc8f6d6e20be85d0",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/visibility.ts",
+        "source_sha256": "sha256:26dd54a3a6f6878fbe6d355c07cbb7ddd0bd18e2e3c3b6708e13c7ad9e78bf7e",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/directives.ts",
+        "source_sha256": "sha256:1709d38449811be1c3a471e3f0842a335131f528a8fe4bc03ee6491b0359a94b",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/props.ts",
+        "source_sha256": "sha256:fa2b83993cab4a53971c0237de0fddb83571c7d3e7c757855e25e3c3caba8ecf",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/action-observer.ts",
+        "source_sha256": "sha256:13cfb184b8fd108c388e99f03c830201e2e6a9c352ed3786e967feeb208338b0",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/devtools-flag.ts",
+        "source_sha256": "sha256:e8ba396505faa0958af88f569d820094c141d3d589c04794b5e088e7d9dac76c",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/actions.ts",
+        "source_sha256": "sha256:f16366660a1700c56ca3ecdf859581d8186381a9a5aec44c0afff67e5c10a1c5",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/validation.ts",
+        "source_sha256": "sha256:7b7b5048bba5493c022bc5913ff8bbcc9b4bdecaa0ab0b49a2888d1bcd7bf419",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/spec-validator.ts",
+        "source_sha256": "sha256:22fe8d3426848893ba67085fd40770c1b304239390aeb184a6167fc944c52c9c",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/schema.ts",
+        "source_sha256": "sha256:138bcc372ee3089f68a3c070e6256984b8fafb7cf2c9f7f466fa42412c9f21fb",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/edit-modes.ts",
+        "source_sha256": "sha256:ed665b0c55c95ab3d094dcbaffb29f1158f3cc8affaadcf356aa23dcff85ca4a",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/prompt.ts",
+        "source_sha256": "sha256:52a3cda5d7a2b9eef7d156c59f0bbee47cb85a76aa4890a9fb98372949b47b11",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/merge.ts",
+        "source_sha256": "sha256:b5c9777c504c50e6560f5a3d543836634228ed2b4b4c7c6ac366cf06aade89e4",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/index.mjs.map",
+        "source": "packages/core/src/diff.ts",
+        "source_sha256": "sha256:c0aa1450f1187866de8ca083f7d2f405e946669a16dfc1becc8f6d6e20be85d0",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/store-utils.js.map",
+        "source": "packages/core/src/store-utils.ts",
+        "source_sha256": "sha256:5ecb8878c0a8b5e8deb6e0019cd7ef168cc8479de402482e0cf7f56384f48c30",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/store-utils.js.map",
+        "source": "packages/core/src/types.ts",
+        "source_sha256": "sha256:28ded9374da090d13281a4faf344aa702d77370263c3df16bac5c31fb86ca346",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/store-utils.js.map",
+        "source": "packages/core/src/path-utils.ts",
+        "source_sha256": "sha256:4ea50ca9245a2a91f753f5e06fc641ffa858fbe232106282543e1a363b0a95b9",
+        "matches_head": true
+      },
+      {
+        "map": "packages/core/dist/store-utils.js.map",
+        "source": "packages/core/src/state-store.ts",
+        "source_sha256": "sha256:0a62e72962cf55dea895d9f803bee85bd9a32e0ee9edefed6748dc7f8cbf21f3",
+        "matches_head": true
+      }
+    ]
+  }
+}

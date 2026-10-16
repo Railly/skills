@@ -1,0 +1,1167 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-07",
+    "repo": "vercel-labs/agent-browser",
+    "base": "8a346a2cfc0afa5dc259b02b896355ac476fa6e2",
+    "head": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+    "profile": "high-risk",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "complete",
+    "verdict": "pass",
+    "gaps": [],
+    "original_pr_head": "e2607d6a511cb7757a4d3e412e4284d9971f5133",
+    "main_integrated": "219c47a9dab1776f320d11e66ce934fd239b2cb7",
+    "branch": "fix/1683-ctate-local-20260907",
+    "local_result": "verified",
+    "fix_stat": "8 files changed, 720 insertions(+), 56 deletions(-)",
+    "cross_family_fix_commit": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+    "previous_verified_head": "0a53aefdcae889378132f54d8ea096805f3edcea",
+    "scope": {
+      "kind": "bounded_local_review",
+      "head": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+      "acceptance": [
+        "R0",
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+      ],
+      "platform_claim": "macOS ARM64 y Linux ARM64, Chrome/Chromium 152, sustratos realmente ejecutados",
+      "authorization": "Trabajo local autorizado por Hunter. No publicación. La pregunta opcional sobre Windows no recibió respuesta; el alcance local se declaró durante la ejecución, sin inferir aprobación del silencio.",
+      "exclusions": [
+        "Windows no ejecutado: sin entorno Windows disponible. No se certifica soporte Windows ni equivalencia del IPC Windows.",
+        "BrowserContexts entre sesiones cooperativas; no sandbox contra un controlador con autoridad CDP global.",
+        "No se promete atomicidad ante SIGKILL o pérdida del canal de disposición. Un contexto remoto puede quedar huérfano y los fallos repetidos pueden acumularlos hasta cerrar Chrome.",
+        "Matching de GUIDs de descargas simultáneas dentro de un mismo contexto y sesiones no aisladas que comparten default son comportamientos preexistentes fuera de estos dos findings.",
+        "No se afirma explorar todas las intercalaciones de procesos, todos los navegadores/versiones o todas las fallas de CDP."
+      ],
+      "historical_solution_gate": "Permanece incomplete. La revisión posterior de Claude no se presenta como shaping independiente previo. La auditoría nueva de admisión también queda incomplete y no se consume como evidencia aprobatoria del Review Gate.",
+      "basis": "review-gate/references/proof-obligations.md permite acotar la propiedad al sustrato ejecutado; no sustituir entornos ausentes con fixtures."
+    }
+  },
+  "execution": {
+    "mode": "fx_worker",
+    "degraded_from": "native_subagent",
+    "independence_gap": null,
+    "receipt": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/fx-cross-family-final.json",
+    "schema_failures": 1,
+    "operations": [
+      {
+        "operation": "native shaping",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "FX review and follow-up",
+        "attempted_calls": 3,
+        "schema_failures": 0,
+        "identical_retry": false
+      },
+      {
+        "operation": "FX cross-family review and follow-up",
+        "attempted_calls": 3,
+        "schema_failures": 0,
+        "identical_retry": false,
+        "timeout_count": 1,
+        "evidence": "fx-cross-family.json (timeout); fx-cross-family-packet.json; fx-cross-family-final.json"
+      }
+    ],
+    "completion_audit": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/completion/candidate-admission-receipt.json"
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/contract.md",
+    "spec_status": "incomplete",
+    "acceptance_reviewed": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4"
+    ],
+    "gaps": [],
+    "historical_spec_deviation": "Permanece incomplete. La revisión posterior de Claude no se presenta como shaping independiente previo. La auditoría nueva de admisión también queda incomplete y no se consume como evidencia aprobatoria del Review Gate.",
+    "scope_artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/completion/scope.json"
+  },
+  "provenance": {
+    "author_model": "gpt-6",
+    "reviewer_model": "anthropic/claude-opus-5",
+    "same_family": false
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "durable session state",
+      "BrowserContext lifecycle"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": true,
+      "method": "cross_family_review",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/fx-cross-family-final.json",
+      "evidence": "Claude Opus 5 mediante FX + AI Gateway Keychain. Paquete de git show/diff con SHA256 ligado a HEAD 5b2b1cc; revisión estática externa al implementador. Tres findings reproducidos y corregidos; seguimiento confirma correcciones. El revisor no ejecutó pruebas ni verificó Git por sí mismo en los paquetes."
+    }
+  },
+  "security_review": {
+    "status": "pass",
+    "fingerprint": {
+      "repository": "vercel-labs/agent-browser",
+      "base_sha": "8a346a2cfc0afa5dc259b02b896355ac476fa6e2",
+      "head_sha": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+      "dirty_digest": "clean",
+      "changed_path_digest": "sha256:c2660dfcf1036a5c1e8ed88038cf6000a1e81713713def5ea4d152f2f0a5e401",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+    },
+    "claim": {
+      "property": "partición funcional entre sesiones cooperativas",
+      "attacker": "no se promete aislamiento contra controladores con acceso CDP global",
+      "scope": "comportamiento local verificado de los dos findings y variantes"
+    },
+    "trust_model": {
+      "assets": [
+        "cookies/storage, archivos descargados, binding persistido"
+      ],
+      "principals": [
+        "usuario local/CLI autorizado",
+        "daemon de sesión",
+        "Chrome compartido"
+      ],
+      "boundaries": [
+        "BrowserContext lógico",
+        "memoria a binding durable"
+      ],
+      "entrypoints": [
+        "CLI, execute_command"
+      ],
+      "sinks": [
+        "Browser.setDownloadBehavior",
+        "Target.create/disposeBrowserContext",
+        "tab_binding.save"
+      ]
+    },
+    "observations": [
+      {
+        "id": "SEC-1",
+        "classification": "non_security_defect",
+        "scope": "unrelated_bug",
+        "prerequisites": [
+          "control autorizado del CLI/CDP"
+        ],
+        "chain": {
+          "capability": "controlador ya dispone de CDP global",
+          "reachability": "comandos normales y solicitudes fallidas",
+          "control": "flags propios",
+          "boundary": "partición accidental entre sesiones cooperativas",
+          "impact": "configuración o continuidad incorrectas; no nueva autoridad demostrada"
+        },
+        "confidence": "high",
+        "evidence": [
+          "cli-v4.log",
+          "isolation-e2e-v4.log"
+        ]
+      }
+    ],
+    "verification": {
+      "authorized_scope": "worktree y Chrome efímeros locales",
+      "commands": [
+        "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; cargo test --manifest-path cli/Cargo.toml e2e_isolat -- --ignored --test-threads=1; AGENT_BROWSER_ISOLATION_STRESS_ROUNDS=10 cargo test --manifest-path cli/Cargo.toml --test isolate_context_cli -- --ignored --test-threads=1; cargo test --manifest-path cli/Cargo.toml test_isolation_commit_requires_a_durable_context_without_a_target -- --ignored --test-threads=1"
+      ],
+      "cleanup": "Sessions Drop y ChromeProcess Drop; sin cleanup global",
+      "gaps": []
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": [
+        "dos findings ctate y tres variantes corregidos",
+        "continuidad tras reconexión/error, recreación histórica y commit sin target durable, corregidos tras revisión Claude"
+      ]
+    },
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/security.json"
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md; threads.json",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "contrato sin nuevas flags ni formatos públicos"
+    },
+    {
+      "source": "design",
+      "location": "solution.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "contrato sin nuevas flags ni formatos públicos"
+    },
+    {
+      "source": "user_facing",
+      "location": "README.md; docs/src/app/commands/page.mdx; help/MCP existentes",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "contrato sin nuevas flags ni formatos públicos"
+    },
+    {
+      "source": "implementation",
+      "location": "fix.diff; integration.diff",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "contrato sin nuevas flags ni formatos públicos"
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "Las descargas aisladas completan en el destino propio y no reconfiguran default/B.",
+      "kind": "browser-context",
+      "status": "verified",
+      "oracle": {
+        "observes": "Las descargas aisladas completan en el destino propio y no reconfiguran default/B.",
+        "layer": "Chrome/CDP, filesystem y siguiente comando",
+        "method": "cli-v4.log; mutation-missing-download-context.log",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "éxito del comando",
+        "counterexample": "Se verifican bytes y destinos posteriores, no solo success.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "cli-v4.log; mutation-missing-download-context.log"
+      },
+      "substrates": [
+        {
+          "name": "macOS ARM64 Chrome 152",
+          "status": "exercised",
+          "evidence": "cli-v4.log; mutation-missing-download-context.log"
+        },
+        {
+          "name": "Linux ARM64 Debian12 Chromium152",
+          "status": "exercised",
+          "evidence": "completion/linux-isolation-e2e.log; completion/linux-cli-subreaper.log; completion/linux-auto-connect.json"
+        }
+      ],
+      "evidence": "cli-v4.log; mutation-missing-download-context.log"
+    },
+    {
+      "id": "P2",
+      "claim": "Los fallos modelados no activan nuevo aislamiento sticky ni publican binding; estado previamente persistido se conserva.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Solicitudes inválidas/fallidas no activan ni persisten nuevo aislamiento.",
+        "layer": "Chrome/CDP, filesystem y siguiente comando",
+        "method": "isolation-e2e-v4.log; cli-v4.log; first-request-red.log; implicit-red.log; cross-family-no-target-green.log; completion/fault-repeat-*.json; completion/late-commit-mutant.json; completion/linux-auto-connect.json",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "mensaje de error correcto",
+        "counterexample": "La implementación antigua devolvía error pero dejaba booleano/binding o entorno sticky.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "isolation-e2e-v4.log; cli-v4.log; first-request-red.log; implicit-red.log"
+      },
+      "substrates": [
+        {
+          "name": "macOS ARM64 Chrome 152",
+          "status": "exercised",
+          "evidence": "isolation-e2e-v4.log; cli-v4.log; first-request-red.log; implicit-red.log"
+        },
+        {
+          "name": "Linux ARM64 Debian12 Chromium152",
+          "status": "exercised",
+          "evidence": "completion/linux-isolation-e2e.log; completion/linux-cli-subreaper.log; completion/linux-auto-connect.json"
+        }
+      ],
+      "evidence": "isolation-e2e-v4.log; cli-v4.log; first-request-red.log; implicit-red.log; cross-family-no-target-green.log; completion/fault-repeat-*.json; completion/late-commit-mutant.json; completion/linux-auto-connect.json"
+    },
+    {
+      "id": "P3",
+      "claim": "Éxito persiste aislamiento a través de omisión y reconexión; close mantiene reset del baseline.",
+      "kind": "lifecycle",
+      "status": "verified",
+      "oracle": {
+        "observes": "Éxito persiste aislamiento a través de omisión y reconexión; close mantiene reset del baseline.",
+        "layer": "Chrome/CDP, filesystem y siguiente comando",
+        "method": "isolation-e2e-v4.log; cli-v4.log; mutation-missing-sticky-commit.log",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "conexión exitosa",
+        "counterexample": "Se comparan contexto, target, cinco sustratos de storage y nuevo DaemonState.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "isolation-e2e-v4.log; cli-v4.log; mutation-missing-sticky-commit.log"
+      },
+      "substrates": [
+        {
+          "name": "macOS ARM64 Chrome 152",
+          "status": "exercised",
+          "evidence": "isolation-e2e-v4.log; cli-v4.log; mutation-missing-sticky-commit.log"
+        },
+        {
+          "name": "Linux ARM64 Debian12 Chromium152",
+          "status": "exercised",
+          "evidence": "completion/linux-isolation-e2e.log; completion/linux-cli-subreaper.log; completion/linux-auto-connect.json"
+        }
+      ],
+      "evidence": "isolation-e2e-v4.log; cli-v4.log; mutation-missing-sticky-commit.log; cross-family-red.log primer fallo; cross-family-reconnect-red.log; isolation-e2e-v4.log"
+    },
+    {
+      "id": "P4",
+      "claim": "Integración de main conserva recording sobre la página actual y filtro aislado.",
+      "kind": "integration",
+      "status": "verified",
+      "oracle": {
+        "observes": "Integración de main conserva recording sobre la página actual y filtro aislado.",
+        "layer": "Chrome/CDP, filesystem y siguiente comando",
+        "method": "integration.diff; isolation-e2e-v4.log",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "merge sin marcadores",
+        "counterexample": "Recording mantiene un contexto y close solo dispone el propio.",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "integration.diff; isolation-e2e-v4.log"
+      },
+      "substrates": [
+        {
+          "name": "macOS ARM64 Chrome 152",
+          "status": "exercised",
+          "evidence": "integration.diff; isolation-e2e-v4.log"
+        },
+        {
+          "name": "Linux ARM64 Debian12 Chromium152",
+          "status": "exercised",
+          "evidence": "completion/linux-isolation-e2e.log; completion/linux-cli-subreaper.log; completion/linux-auto-connect.json"
+        }
+      ],
+      "evidence": "integration.diff; isolation-e2e-v4.log"
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/test-strength.json",
+      "evidence": "Cuatro mutaciones de las correcciones originales repetidas sobre el árbol final, todas rechazadas por assertions conductuales. Tres variantes anteriores y tres findings cross-family tienen trazas rojas previas; suite final restaurada verde. No se afirma cubrir las particiones excluidas. Quinta mutación final en call site del drain rechazada; 11 probes de fallos más restauración, Linux y auto-connect real.",
+      "fingerprint": {
+        "head_sha": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+        "changed_paths_digest": "sha256:c2660dfcf1036a5c1e8ed88038cf6000a1e81713713def5ea4d152f2f0a5e401",
+        "contract_digest": "sha256:273e39546dafb53cc3dda769fda45f88145862e8202929ff1bff5b42016ba2be",
+        "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; cargo test --manifest-path cli/Cargo.toml e2e_isolat -- --ignored --test-threads=1; AGENT_BROWSER_ISOLATION_STRESS_ROUNDS=10 cargo test --manifest-path cli/Cargo.toml --test isolate_context_cli -- --ignored --test-threads=1; cargo test --manifest-path cli/Cargo.toml test_isolation_commit_requires_a_durable_context_without_a_target -- --ignored --test-threads=1; Linux: mismas suites --locked con env de environment.json; bun completion/cdp-fault-probe.ts {late,late-drop,kill} {new,persisted}; python3 completion/linux-auto-connect.py",
+        "environment_digest": "sha256:1af9743f261ddf095c68a70bcb367c5b7b6517bc29bb95791eaa51948b8d2326",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "cli/src/connection.rs",
+          "cli/src/doctor/launch.rs",
+          "cli/src/doctor/webgpu.rs",
+          "cli/src/main.rs",
+          "cli/src/native/actions.rs",
+          "cli/src/native/browser.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/tests/isolate_context_cli.rs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "evidence_scope": "HEAD final limpio; macOS/Linux ARM64. Árbol final inmutable salvo mutación reversible ya restaurada; hashes verificados. Ver completion/scope.json.",
+        "scope_digest": "sha256:5db5451765698a2ee34966de8383cd2fc37a462624b8bc382b29f00f4a2c28fb"
+      },
+      "dimensions": {
+        "values": [
+          "prior false/true; request true/omitted/false; close resets",
+          "explicit URL/port; implicit CDP; first CLI request; skip/policy deny/pending",
+          "invalid mode, refused transport, malformed storage, binding-write failure, malformed implicit action",
+          "default/A/B downloads; sequential/concurrent A/B; bytes and previous directory configuration",
+          "pinned default to isolated; successful reuse/reconnect; browser restart; daemon restart; recording",
+          "reconexión a contexto persistido + error de acción conserva conexión; recreación ya persistida + launch inválido conserva contexto",
+          "target desaparecido antes del commit: contexto nuevo falla y se dispone; contexto persistido conserva binding e intención",
+          "auto-connect real, drain final real, corte de disposición, SIGKILL antes de binding; reintento inmediato y restart"
+        ],
+        "exclusions": [
+          "Windows no ejecutado: sin entorno Windows disponible. No se certifica soporte Windows ni equivalencia del IPC Windows.",
+          "BrowserContexts entre sesiones cooperativas; no sandbox contra un controlador con autoridad CDP global.",
+          "No se promete atomicidad ante SIGKILL o pérdida del canal de disposición. Un contexto remoto puede quedar huérfano y los fallos repetidos pueden acumularlos hasta cerrar Chrome.",
+          "Matching de GUIDs de descargas simultáneas dentro de un mismo contexto y sesiones no aisladas que comparten default son comportamientos preexistentes fuera de estos dos findings.",
+          "No se afirma explorar todas las intercalaciones de procesos, todos los navegadores/versiones o todas las fallas de CDP."
+        ],
+        "evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/completion/test-strength-matrix.json"
+      },
+      "oracle": {
+        "source": "ctate acceptance and baseline explicit-close semantics; real Chrome BrowserContexts and files",
+        "independent": true,
+        "evidence": "threads.json; pr.json; original handle_close at e2607d6; actual bytes/storage/target assertions"
+      },
+      "producer": {
+        "name": "Chrome 152 macOS y Chromium 152 Linux; CLI compilado, archivos reales, señales de proceso y eventos reales de auto-attach",
+        "status": "exercised",
+        "evidence": "cli-v4.log; completion/linux-cli-subreaper.log; completion/linux-auto-connect.json; completion/fault-repeat-*.json"
+      },
+      "falsification": [
+        {
+          "mutation": "eager-sticky",
+          "red_evidence": "v4-mutation-eager-sticky.log: exit 101, assertion conductual o descarga cancelada; sin error de compilación",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log; full-tests-v4.log"
+        },
+        {
+          "mutation": "early-binding",
+          "red_evidence": "v4-mutation-early-binding.log: exit 101, assertion conductual o descarga cancelada; sin error de compilación",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log; full-tests-v4.log"
+        },
+        {
+          "mutation": "missing-sticky-commit",
+          "red_evidence": "v4-mutation-missing-sticky-commit.log: exit 101, assertion conductual o descarga cancelada; sin error de compilación",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log; full-tests-v4.log"
+        },
+        {
+          "mutation": "missing-download-context",
+          "red_evidence": "v4-mutation-missing-download-context.log: exit 101, assertion conductual o descarga cancelada; sin error de compilación",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log; full-tests-v4.log"
+        },
+        {
+          "mutation": "primer flag en entorno del daemon",
+          "red_evidence": "first-request-red.log",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log"
+        },
+        {
+          "mutation": "restaurar target pinned de contexto anterior",
+          "red_evidence": "pinned-implicit-red.log",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log"
+        },
+        {
+          "mutation": "commit implícito antes de validar acción",
+          "red_evidence": "implicit-red.log",
+          "restored_green_evidence": "isolation-e2e-v4.log; cli-v4.log"
+        },
+        {
+          "mutation": "rollback tras reconexión persistida",
+          "red_evidence": "cross-family-reconnect-red.log",
+          "restored_green_evidence": "isolation-e2e-v4.log",
+          "scope": "execute_command con Chrome"
+        },
+        {
+          "mutation": "flag histórico context_recreated",
+          "red_evidence": "cross-family-red.log, solo primer fallo; PoisonError secundarios excluidos",
+          "restored_green_evidence": "isolation-e2e-v4.log",
+          "scope": "execute_command tras reinicio Chrome"
+        },
+        {
+          "mutation": "commit sin target durable",
+          "red_evidence": "cross-family-no-target-red.log",
+          "restored_green_evidence": "cross-family-no-target-green.log",
+          "scope": "helper commit con cierre y eventos Chrome reales; no se inyecta carrera del comando completo"
+        },
+        {
+          "mutation": "Commit de aislamiento adelantado al call site anterior al drain final",
+          "red_evidence": "completion/late-commit-mutant.json: failed request must not publish binding",
+          "restored_green_evidence": "completion/late-commit-restored.json; completion/fault-repeat-late-new.json",
+          "site": "execute_command, producción, orden entre commit_isolated_connection y drain_browser_events"
+        }
+      ],
+      "gaps": [],
+      "reason": "Obligaciones del alcance local ejecutadas y falsificadas; exclusiones y degradaciones medidas explícitas, sin certificación Windows.",
+      "report_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/completion/test-strength-matrix.json",
+      "elapsed_time_evidence": "Duraciones en logs de suites y timestamps de traces; no se inventa una duración total de etapas previas.",
+      "scope": {
+        "kind": "bounded_local_review",
+        "head": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+        "acceptance": [
+          "R0",
+          "R1",
+          "R2",
+          "R3",
+          "R4"
+        ],
+        "platform_claim": "macOS ARM64 y Linux ARM64, Chrome/Chromium 152, sustratos realmente ejecutados",
+        "authorization": "Trabajo local autorizado por Hunter. No publicación. La pregunta opcional sobre Windows no recibió respuesta; el alcance local se declaró durante la ejecución, sin inferir aprobación del silencio.",
+        "exclusions": [
+          "Windows no ejecutado: sin entorno Windows disponible. No se certifica soporte Windows ni equivalencia del IPC Windows.",
+          "BrowserContexts entre sesiones cooperativas; no sandbox contra un controlador con autoridad CDP global.",
+          "No se promete atomicidad ante SIGKILL o pérdida del canal de disposición. Un contexto remoto puede quedar huérfano y los fallos repetidos pueden acumularlos hasta cerrar Chrome.",
+          "Matching de GUIDs de descargas simultáneas dentro de un mismo contexto y sesiones no aisladas que comparten default son comportamientos preexistentes fuera de estos dos findings.",
+          "No se afirma explorar todas las intercalaciones de procesos, todos los navegadores/versiones o todas las fallas de CDP."
+        ],
+        "historical_solution_gate": "Permanece incomplete. La revisión posterior de Claude no se presenta como shaping independiente previo. La auditoría nueva de admisión también queda incomplete y no se consume como evidencia aprobatoria del Review Gate.",
+        "basis": "review-gate/references/proof-obligations.md permite acotar la propiedad al sustrato ejecutado; no sustituir entornos ausentes con fixtures."
+      },
+      "matrix": {
+        "scope": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/completion/scope.json",
+        "partition_basis": "Clases por propiedad y dueño de falla, derivadas de R0-R4 y ciclo Chrome/proceso/archivo. No es el producto cartesiano de todos los flags y transportes.",
+        "dimensions": [
+          "prior false/true; request true/omitted/false; close resets",
+          "explicit URL/port; implicit CDP; first CLI request; skip/policy deny/pending",
+          "invalid mode, refused transport, malformed storage, binding-write failure, malformed implicit action",
+          "default/A/B downloads; sequential/concurrent A/B; bytes and previous directory configuration",
+          "pinned default to isolated; successful reuse/reconnect; browser restart; daemon restart; recording",
+          "reconexión a contexto persistido + error de acción conserva conexión; recreación ya persistida + launch inválido conserva contexto",
+          "target desaparecido antes del commit: contexto nuevo falla y se dispone; contexto persistido conserva binding e intención",
+          "auto-connect real, drain final real, corte de disposición, SIGKILL antes de binding; reintento inmediato y restart"
+        ],
+        "classes": [
+          {
+            "id": "T1",
+            "pre_state_and_event": "Sin aislamiento previo; solicitud inválida/denegada/skip",
+            "expected": "Error/skip sin nuevo sticky; siguiente comando conserva default",
+            "green": "isolation-e2e-v4.log; cli-v4.log; completion/linux-isolation-e2e.log",
+            "falsifier": "v4-mutation-eager-sticky.log; first-request-red.log"
+          },
+          {
+            "id": "T2",
+            "pre_state_and_event": "Nueva conexión rechazada o fallo post-create de storage/publicación/acción implícita",
+            "expected": "No binding nuevo; disposición cuando CDP alcanzable; reintento válido exitoso",
+            "green": "isolation-e2e-v4.log; completion/linux-isolation-e2e.log",
+            "falsifier": "v4-mutation-early-binding.log; implicit-red.log"
+          },
+          {
+            "id": "T3",
+            "pre_state_and_event": "Conexión compatible exitosa; solicitud true, false u omitida; reuse/restart/close",
+            "expected": "Contexto y target persistidos; false no es clear; close sí limpia intención",
+            "green": "isolation-e2e-v4.log; cli-v4.log; completion/linux-cli-subreaper.log; completion/linux-auto-connect.json",
+            "falsifier": "v4-mutation-missing-sticky-commit.log"
+          },
+          {
+            "id": "T4",
+            "pre_state_and_event": "Sesión pinned default solicita aislamiento",
+            "expected": "No restaurar target extranjero; crear/persistir contexto propio",
+            "green": "isolation-e2e-v4.log; completion/linux-isolation-e2e.log",
+            "falsifier": "pinned-implicit-red.log"
+          },
+          {
+            "id": "T5",
+            "pre_state_and_event": "Contexto persistido se reconecta y luego falla la acción",
+            "expected": "Conservar conexión, binding e intención previos",
+            "green": "isolation-e2e-v4.log; completion/fault-repeat-late-persisted.json",
+            "falsifier": "cross-family-reconnect-red.log"
+          },
+          {
+            "id": "T6",
+            "pre_state_and_event": "Contexto recreado ya persistido seguido de launch inválido",
+            "expected": "No disponerlo por flag histórico de recreación",
+            "green": "isolation-e2e-v4.log; completion/linux-isolation-e2e.log",
+            "falsifier": "cross-family-red.log: primer fallo; PoisonError secundarios excluidos"
+          },
+          {
+            "id": "T7",
+            "pre_state_and_event": "Target desaparece antes de commit: contexto nuevo o previamente persistido",
+            "expected": "Nuevo: error y disposición; persistido: conservar binding/intención",
+            "green": "cross-family-no-target-green.log; completion/linux-no-target.log",
+            "falsifier": "cross-family-no-target-red.log; helper con eventos Chrome reales, sin claim de carrera completa"
+          },
+          {
+            "id": "T8",
+            "pre_state_and_event": "Error en drain final tras evento real de auto-attach",
+            "expected": "No publicar binding nuevo; conservar binding anterior; reintento funciona",
+            "green": "completion/fault-repeat-late-new.json; completion/fault-repeat-late-persisted.json",
+            "falsifier": "completion/late-commit-mutant.json: call site movido antes del drain; completion/late-commit-restored.json"
+          },
+          {
+            "id": "T9",
+            "pre_state_and_event": "Descarga aislada con default y A/B previamente configurados",
+            "expected": "Bytes correctos en destino propio; posteriores default/B conservan destinos",
+            "green": "cli-v4.log; completion/linux-cli-subreaper.log",
+            "falsifier": "v4-mutation-missing-download-context.log"
+          },
+          {
+            "id": "T10",
+            "pre_state_and_event": "Corte de CDP durante disposición o muerte de daemon antes de binding",
+            "expected": "No nuevo sticky/binding; flagless no aislado; reintento y reinicio funcionan; residual remoto medido",
+            "green": "completion/fault-repeat-late-drop-new.json; completion/fault-repeat-kill-new.json",
+            "falsifier": "Fault injection en conexión real/SIGKILL real; oracle distingue binding ausente de leak remoto; sin claim de cleanup infalible"
+          }
+        ],
+        "methods": {
+          "mutation": "Cinco mutaciones sobre árbol final: cuatro v4 y mover el commit antes del drain. Todas fallan por assertion conductual, no compilación; restauración verde.",
+          "properties": "Campaña determinista de 10 rondas con dos sesiones y valores por ronda: cookies, localStorage, sessionStorage, IndexedDB/cache, targets y descargas; intercalación secuencial y concurrente real. Repetida en macOS y Linux. No se presenta como fuzzing aleatorio o prueba exhaustiva.",
+          "differential": "Oracle externo: BrowserContexts/targets de Chrome y bytes/archivos observados, comparados con R0-R4 de ctate. Protocolo Browser/Target archivado en completion, no constantes derivadas del helper bajo prueba.",
+          "structured_fuzzing": "No aplica al diff: no cambia parser/serializer ni gramática de entrada; clases inválidas de modo, transporte, storage y acción se fuerzan determinísticamente.",
+          "replay": "Logs v4; completion/cdp-fault-probe.ts; linux-auto-connect.py; linux-subreaper.py. Puertos/IDs reales en cada trace; secuencias deterministas. Harnesses externos no agregados al repo."
+        },
+        "exclusions": [
+          "Windows no ejecutado: sin entorno Windows disponible. No se certifica soporte Windows ni equivalencia del IPC Windows.",
+          "BrowserContexts entre sesiones cooperativas; no sandbox contra un controlador con autoridad CDP global.",
+          "No se promete atomicidad ante SIGKILL o pérdida del canal de disposición. Un contexto remoto puede quedar huérfano y los fallos repetidos pueden acumularlos hasta cerrar Chrome.",
+          "Matching de GUIDs de descargas simultáneas dentro de un mismo contexto y sesiones no aisladas que comparten default son comportamientos preexistentes fuera de estos dos findings.",
+          "No se afirma explorar todas las intercalaciones de procesos, todos los navegadores/versiones o todas las fallas de CDP."
+        ],
+        "coverage_limits": "Los red previos CF1-CF3 y variantes se ejecutaron antes de corregirlos; los greens son del HEAD actual. No se los etiqueta como mutantes repetidos en HEAD final. La integración de recording conserva pruebas existentes, no se afirma mutación específica de recording."
+      }
+    },
+    "resilience": {
+      "required": true,
+      "status": "pass",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+      "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/resilience.json",
+      "fingerprint": {
+        "head_sha": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+        "changed_paths_digest": "sha256:c2660dfcf1036a5c1e8ed88038cf6000a1e81713713def5ea4d152f2f0a5e401",
+        "contract_digest": "sha256:273e39546dafb53cc3dda769fda45f88145862e8202929ff1bff5b42016ba2be",
+        "command": "cargo test --manifest-path cli/Cargo.toml -- --test-threads=1; cargo test --manifest-path cli/Cargo.toml e2e_isolat -- --ignored --test-threads=1; AGENT_BROWSER_ISOLATION_STRESS_ROUNDS=10 cargo test --manifest-path cli/Cargo.toml --test isolate_context_cli -- --ignored --test-threads=1; cargo test --manifest-path cli/Cargo.toml test_isolation_commit_requires_a_durable_context_without_a_target -- --ignored --test-threads=1; Linux: mismas suites --locked con env de environment.json; bun completion/cdp-fault-probe.ts {late,late-drop,kill} {new,persisted}; python3 completion/linux-auto-connect.py",
+        "environment_digest": "sha256:1af9743f261ddf095c68a70bcb367c5b7b6517bc29bb95791eaa51948b8d2326",
+        "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+        "relevant_paths": [
+          "cli/src/connection.rs",
+          "cli/src/doctor/launch.rs",
+          "cli/src/doctor/webgpu.rs",
+          "cli/src/main.rs",
+          "cli/src/native/actions.rs",
+          "cli/src/native/browser.rs",
+          "cli/src/native/e2e_tests.rs",
+          "cli/tests/isolate_context_cli.rs"
+        ],
+        "reusable": false,
+        "reuse_evidence": null,
+        "evidence_scope": "HEAD final limpio; macOS/Linux ARM64. Árbol final inmutable salvo mutación reversible ya restaurada; hashes verificados. Ver completion/scope.json.",
+        "scope_digest": "sha256:5db5451765698a2ee34966de8383cd2fc37a462624b8bc382b29f00f4a2c28fb"
+      },
+      "evidence": "Fallos forzados de validación, transporte, storage, publicación, primer comando e implícito; reconexión y continuidad observadas. Contextos ya persistidos conservan conexión tras error de acción; target desaparecido en commit se probó con eventos Chrome reales, nuevo/persistido. Se forzaron drain final, corte de CDP durante disposición y SIGKILL; nuevos/persistidos discriminados. Repetición y cierre real de Chrome observados.",
+      "commit_points": [
+        {
+          "id": "C1",
+          "effect": "nuevo BrowserContext remoto",
+          "owner": "BrowserManager",
+          "commit_event": "Target.createBrowserContext",
+          "later_fallible_stages": [
+            "attach/setup",
+            "storage load",
+            "binding save",
+            "implicit action",
+            "final event drain",
+            "missing bindable target at commit"
+          ],
+          "failure_partitions": [
+            {
+              "ownership_region": "storage",
+              "covers": [
+                "storage load"
+              ],
+              "forced": true,
+              "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+              "cleanup_owner": "rollback_failed_launch",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "isolation-e2e-v4.log"
+              },
+              "evidence": "isolation-e2e-v4.log: invalid JSON"
+            },
+            {
+              "ownership_region": "filesystem",
+              "covers": [
+                "binding save"
+              ],
+              "forced": true,
+              "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+              "cleanup_owner": "rollback_failed_launch",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "isolation-e2e-v4.log"
+              },
+              "evidence": "isolation-e2e-v4.log: target.tmp directory fault"
+            },
+            {
+              "ownership_region": "dispatch",
+              "covers": [
+                "implicit action"
+              ],
+              "forced": true,
+              "residual_observed": "Sin nuevo estado sticky o binding aislado; contexto nuevo eliminado cuando CDP disponible.",
+              "cleanup_owner": "rollback_failed_launch",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "isolation-e2e-v4.log"
+              },
+              "evidence": "isolation-e2e-v4.log: missing URL"
+            },
+            {
+              "ownership_region": "target lifecycle",
+              "covers": [
+                "missing bindable target at commit"
+              ],
+              "forced": true,
+              "residual_observed": "Nuevo contexto sin target: error, sin sticky/binding y contexto dispuesto. Persistido sin target: binding/intent conservados.",
+              "cleanup_owner": "rollback_failed_launch",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "cross-family-no-target-green.log: siguiente estado de misma sesión crea y persiste contexto antes del cierre externo"
+              },
+              "evidence": "cross-family-no-target-red.log; cross-family-no-target-green.log; helper aislado con Chrome real"
+            },
+            {
+              "ownership_region": "CDP target setup / final event drain",
+              "covers": [
+                "attach/setup",
+                "final event drain"
+              ],
+              "forced": true,
+              "residual_observed": "Nuevo: cero contextos residuales, sin binding. Persistido: binding/contexto anterior intactos. Error Runtime.enable devuelto sobre sessionId generado por Chrome tras Target.attachedToTarget real.",
+              "cleanup_owner": "rollback_failed_launch; BrowserManager dispose del contexto nuevo",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "completion/fault-repeat-late-new.json; completion/fault-repeat-late-persisted.json"
+              },
+              "evidence": "completion/cdp-fault-probe.ts; completion/fault-repeat-late-new.json; completion/late-commit-mutant.json"
+            },
+            {
+              "ownership_region": "transport disposal loss",
+              "covers": [
+                "cleanup transport interruption"
+              ],
+              "forced": true,
+              "residual_observed": "Un contexto remoto huérfano, sin binding/sticky nuevo; flagless posterior no aislado. No se confunde ausencia de binding con cleanup.",
+              "cleanup_owner": "Disposición imposible sin CDP; host Chrome conserva recurso hasta cierre; cierre host/CDP observado",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "completion/fault-repeat-late-drop-new.json"
+              },
+              "evidence": "completion/fault-repeat-late-drop-new.json",
+              "classification": "recoverable degradation with remote leak"
+            },
+            {
+              "ownership_region": "process death before publication",
+              "covers": [
+                "daemon SIGKILL before binding"
+              ],
+              "forced": true,
+              "residual_observed": "Un contexto remoto huérfano y ningún binding publicado; siguiente comando sin aislamiento permanece no aislado; retry y restart exitosos.",
+              "cleanup_owner": "Daemon muerto no puede rollback; recurso termina con host Chrome; cierre CDP host observado",
+              "retry": {
+                "attempted": true,
+                "outcome": "success",
+                "evidence": "completion/fault-repeat-kill-new.json"
+              },
+              "evidence": "completion/fault-repeat-kill-new.json",
+              "classification": "recoverable degradation with remote leak"
+            }
+          ]
+        },
+        {
+          "id": "C2",
+          "effect": "binding durable y booleano sticky",
+          "owner": "commit_isolated_connection",
+          "commit_event": "save/fsync/rename succeeded, then bool=true",
+          "later_fallible_stages": [],
+          "failure_partitions": []
+        }
+      ],
+      "gaps": [],
+      "reason": "Obligaciones del alcance local ejecutadas y falsificadas; exclusiones y degradaciones medidas explícitas, sin certificación Windows.",
+      "report_path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1683-ctate/completion/resilience-matrix.json",
+      "elapsed_time_evidence": "Duraciones en logs de suites y timestamps de traces; no se inventa una duración total de etapas previas.",
+      "scope": {
+        "kind": "bounded_local_review",
+        "head": "5b2b1cc6b0b03b584799fe89d0a61f46df5d1355",
+        "acceptance": [
+          "R0",
+          "R1",
+          "R2",
+          "R3",
+          "R4"
+        ],
+        "platform_claim": "macOS ARM64 y Linux ARM64, Chrome/Chromium 152, sustratos realmente ejecutados",
+        "authorization": "Trabajo local autorizado por Hunter. No publicación. La pregunta opcional sobre Windows no recibió respuesta; el alcance local se declaró durante la ejecución, sin inferir aprobación del silencio.",
+        "exclusions": [
+          "Windows no ejecutado: sin entorno Windows disponible. No se certifica soporte Windows ni equivalencia del IPC Windows.",
+          "BrowserContexts entre sesiones cooperativas; no sandbox contra un controlador con autoridad CDP global.",
+          "No se promete atomicidad ante SIGKILL o pérdida del canal de disposición. Un contexto remoto puede quedar huérfano y los fallos repetidos pueden acumularlos hasta cerrar Chrome.",
+          "Matching de GUIDs de descargas simultáneas dentro de un mismo contexto y sesiones no aisladas que comparten default son comportamientos preexistentes fuera de estos dos findings.",
+          "No se afirma explorar todas las intercalaciones de procesos, todos los navegadores/versiones o todas las fallas de CDP."
+        ],
+        "historical_solution_gate": "Permanece incomplete. La revisión posterior de Claude no se presenta como shaping independiente previo. La auditoría nueva de admisión también queda incomplete y no se consume como evidencia aprobatoria del Review Gate.",
+        "basis": "review-gate/references/proof-obligations.md permite acotar la propiedad al sustrato ejecutado; no sustituir entornos ausentes con fixtures."
+      }
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "source": "scope",
+      "claim": "BrowserContext es partición entre sesiones cooperativas, no sandbox contra controladores CDP globales.",
+      "status": "verified",
+      "evidence": "host autorizado enumera targets; tests verifican aislamiento lógico."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface (promoted)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "New-domain matrix (promoted)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers (promoted)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Shell re-parse append domain (candidate)",
+      "status": "skipped",
+      "reason": "No se modifica shell/shim, latch de emisión, ejemplo público ni algoritmo por elemento; trigger ausente en este diff."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability (candidate)",
+      "status": "skipped",
+      "reason": "No se modifica shell/shim, latch de emisión, ejemplo público ni algoritmo por elemento; trigger ausente en este diff."
+    },
+    {
+      "name": "Shim hermeticity (candidate)",
+      "status": "skipped",
+      "reason": "No se modifica shell/shim, latch de emisión, ejemplo público ni algoritmo por elemento; trigger ausente en este diff."
+    },
+    {
+      "name": "Deliberate-default check (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Fresh-seam scan (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Substrate differential corpus (promoted)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Reference-implementation oracle (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "New-failure-outcome propagation (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Error-path forcing (promoted)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Non-destructive recovery (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Cancellation and timeout hygiene (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Boundary pipeline trace (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Substrate verification (promoted)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Dogfood the built artifact (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Newly-asserted invariant ownership (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Docs-behavior parity (candidate)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Demonstrative example (candidate)",
+      "status": "skipped",
+      "reason": "No se modifica shell/shim, latch de emisión, ejemplo público ni algoritmo por elemento; trigger ausente en este diff."
+    },
+    {
+      "name": "Choice audit (candidate, needs a decision trail to fire)",
+      "status": "run",
+      "reason": "Diff final revisado por Claude (fx-cross-family-final.json), disposiciones cross-family y pruebas locales de completion. El challenger no ejecutó pruebas; orchestrator verificó los sustratos. Ver matrices por clase."
+    },
+    {
+      "name": "Complexity budget (candidate)",
+      "status": "skipped",
+      "reason": "No se modifica shell/shim, latch de emisión, ejemplo público ni algoritmo por elemento; trigger ausente en este diff."
+    },
+    {
+      "name": "security",
+      "status": "run",
+      "reason": "security.json: partición cooperativa, sin claim de sandbox contra CDP global; receipt exacto existente vigente."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "identidad e integración",
+      "outcome": "pass",
+      "reason": "Worktree limpio en fix/1683-ctate-local-20260907. PR original e2607d6a511cb7757a4d3e412e4284d9971f5133; main integrado 219c47a9dab1776f320d11e66ce934fd239b2cb7; merge local 8a346a2cfc0afa5dc259b02b896355ac476fa6e2; fixes 0a53aefdcae889378132f54d8ea096805f3edcea y 5b2b1cc6b0b03b584799fe89d0a61f46df5d1355. Sin rebase/push/publicaciones/merge remoto. Fix total: 8 files changed, 720 insertions(+), 56 deletions(-)"
+    },
+    {
+      "check": "cargo test serial",
+      "outcome": "pass",
+      "reason": "1256 passed, 0 failed; full-tests-v4.log"
+    },
+    {
+      "check": "isolation e2e",
+      "outcome": "pass",
+      "reason": "5 passed; isolation-e2e-v4.log. Nueva prueba Chrome del commit sin target: 1 passed; cross-family-no-target-green.log."
+    },
+    {
+      "check": "compiled CLI",
+      "outcome": "pass",
+      "reason": "3 passed, 10 stress rounds; cli-v4.log"
+    },
+    {
+      "check": "fmt and CI clippy",
+      "outcome": "pass",
+      "reason": "cargo fmt --check; cargo clippy -- -D warnings"
+    },
+    {
+      "check": "clippy all-targets extra",
+      "outcome": "acknowledged",
+      "reason": "Dos lints preexistentes con Rust 1.98 en tests: for_unbounded_range browser.rs y result_large_err cdp/client.rs. Ambos presentes en main 219c47a."
+    },
+    {
+      "check": "surfaces",
+      "outcome": "acknowledged",
+      "reason": "Corrección del contrato existente, sin flags/formatos/capacidades nuevas. CLI y MCP comparten comandos; no se modifica documentación pública."
+    },
+    {
+      "check": "xref",
+      "outcome": "acknowledged",
+      "reason": "xref.txt/xref.json: #1117 y #1683 compiten por #1068 (13 archivos compartidos); #1340 comparte 10 con #1683 y 8 con #1117. Abiertos relacionados #1624, #896, #1211, #1272, #1280. No se absorbió ni cerró ninguno. Hubs: xref 1589 --repo vercel-labs/agent-browser --depth 1; xref 326 --repo vercel-labs/agent-browser --depth 1; xref 896 --repo vercel-labs/agent-browser --depth 1. Primer snapshot de esta selección; no diff anterior."
+    },
+    {
+      "check": "falsificación final",
+      "outcome": "pass",
+      "reason": "v4-mutations.json: cuatro exit 101; revisados logs para excluir compilación/setup ajeno. Árbol original restaurado y checks finales verdes."
+    },
+    {
+      "check": "remote revalidation",
+      "outcome": "acknowledged",
+      "reason": "pr-v4.json: OPEN, e2607d6, CONFLICTING/DIRTY. refs/heads/main verificado por git ls-remote HTTPS autenticado en 219c47a9dab1776f320d11e66ce934fd239b2cb7. GraphQL baseRefOid devuelve bf3c85f4b6fd08c43c01627dc28502d37b2a330a pero baseRef.target/defaultBranchRef/ref y transporte Git coinciden en 219c47a; no se usa baseRefOid como main actual."
+    },
+    {
+      "check": "covered",
+      "outcome": "pass",
+      "reason": "Índice run-report-5b2b1cc.json generado desde reporte canónico de este HEAD. Cobertura por nombre no sustituye validación gate.sh report."
+    },
+    {
+      "check": "Linux ordinary suite",
+      "outcome": "pass",
+      "reason": "1258 passed: 1252 unit +4 dashboard +2 doctor; completion/linux-user-tests.log"
+    },
+    {
+      "check": "Linux isolation / compiled CLI",
+      "outcome": "pass",
+      "reason": "5 e2e +1 no-target +3 CLI, diez rondas; completion/linux-isolation-e2e.log, linux-no-target.log, linux-cli-subreaper.log"
+    },
+    {
+      "check": "Real auto-connect discovery",
+      "outcome": "pass",
+      "reason": "DevToolsActivePort puerto aleatorio; ausencia de Chrome falla sin sticky; éxito conserva contexto/target al reiniciar; close resetea. completion/linux-auto-connect.json"
+    },
+    {
+      "check": "Late failure, disposal transport, process death",
+      "outcome": "pass",
+      "reason": "11 traces de fallos y green restaurado; cierre host observado en cuatro repeticiones. Degradación remota documentada; completion/resilience-matrix.json"
+    },
+    {
+      "check": "Late commit call-site mutation",
+      "outcome": "pass",
+      "reason": "Mutante compila y falla por failed request must not publish binding; fuente restaurada pasa. completion/late-commit-{mutant,restored}.json"
+    },
+    {
+      "check": "Final identity / skill identity / deterministic checks",
+      "outcome": "pass",
+      "reason": "completion/final-identity.json y deterministic.json; style, callers commit/rollback, execdeps pasan; source Linux coincide con HEAD local limpio."
+    },
+    {
+      "check": "Environment fixture failures",
+      "outcome": "acknowledged",
+      "reason": "Logs iniciales preservados; OOM, home/env de root, recolección de zombies y dos errores de harness corregidos sin tocar código/tests. completion/resilience-matrix.json"
+    },
+    {
+      "check": "historical Solution Gate",
+      "outcome": "acknowledged",
+      "reason": "Etapa previa incomplete; auditoría adicional de admisión también incomplete. No se representa como factory completo ni se consume para aprobar Review Gate."
+    },
+    {
+      "check": "Alcance del PASS local",
+      "outcome": "acknowledged",
+      "reason": "Validado en macOS ARM64 y Linux ARM64 con Chrome/Chromium152. Windows no probado y excluido de este veredicto. Pérdida de CDP/SIGKILL puede dejar un contexto remoto huérfano por fallo hasta cerrar Chrome; reintento no exige borrar estado. No se afirma cota global ante fallos repetidos ni sandbox frente a CDP global. Solution Gate histórico y auditoría nueva de admisión siguen incomplete; no se presentan como pasos previos aprobados."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "state": "confirmed",
+      "claim": "download context omitted",
+      "evidence": "download-red.log; cli-v4.log",
+      "layer": "runtime",
+      "source": "ctate or FX",
+      "path": "fix.diff",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F2",
+      "state": "confirmed",
+      "claim": "premature sticky/binding commit",
+      "evidence": "sticky-red.log; mutation-early-binding.log; isolation-e2e-v4.log",
+      "layer": "runtime",
+      "source": "ctate or FX",
+      "path": "fix.diff",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F3",
+      "state": "confirmed",
+      "claim": "pinned conversion fails durable context binding",
+      "evidence": "pinned-implicit-red.log; isolation-e2e-v4.log",
+      "layer": "runtime",
+      "source": "ctate or FX",
+      "path": "fix.diff",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F4",
+      "state": "confirmed",
+      "claim": "first request poisons spawn environment",
+      "evidence": "first-request-red.log; cli-v4.log",
+      "layer": "runtime",
+      "source": "ctate or FX",
+      "path": "fix.diff",
+      "resolution": "fixed"
+    },
+    {
+      "id": "F5",
+      "state": "confirmed",
+      "claim": "invalid implicit command commits isolation",
+      "evidence": "implicit-red.log; isolation-e2e-v4.log",
+      "layer": "runtime",
+      "source": "ctate or FX",
+      "path": "fix.diff",
+      "resolution": "fixed"
+    },
+    {
+      "id": "R-close",
+      "state": "refuted",
+      "claim": "explicit close must retain isolation true",
+      "evidence": "e2607d6 handle_close already clears true; frozen contract retains explicit close semantics",
+      "layer": "contract",
+      "source": "FX round 1 / ambiguous prompt wording",
+      "path": "actions.rs handle_close",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "R-cli-policy",
+      "state": "refuted",
+      "claim": "Un launch válido completado debe revertirse si otra solicitud posterior es denegada por política",
+      "evidence": "main.rs envía dos envelopes. La primera solicitud recibe launch success; la segunda hereda aislamiento ya confirmado. El contrato pide persistir tras conexión compatible exitosa y preservar estado previo ante error. No promete atomicidad entre envelopes.",
+      "layer": "request contract",
+      "source": "FX round 2",
+      "path": "main.rs CDP prelaunch",
+      "resolution": "not_applicable"
+    },
+    {
+      "id": "F6",
+      "state": "confirmed",
+      "claim": "El drain final aún podía convertir un launch en error después de publicar aislamiento",
+      "evidence": "fx-cross-family-final.json; completion/late-commit-mutant.json rojo por binding publicado; completion/late-commit-restored.json y fault-repeat-late-new.json verdes con Chrome real",
+      "layer": "late failure ordering",
+      "source": "FX round 2",
+      "path": "actions.rs execute_command",
+      "resolution": "fixed"
+    },
+    {
+      "id": "CF1",
+      "state": "confirmed",
+      "claim": "Rollback tras reconexión persistida cerraba la conexión ante error ordinario",
+      "evidence": "cross-family-reconnect-red.log; fx-cross-family-final.json; checks v4 verdes",
+      "layer": "Chrome/session lifecycle",
+      "source": "Claude Opus 5 FX packet review",
+      "path": "cli/src/native/actions.rs",
+      "resolution": "fixed"
+    },
+    {
+      "id": "CF2",
+      "state": "confirmed",
+      "claim": "context_recreated histórico disparaba teardown tras un error posterior",
+      "evidence": "cross-family-red.log primer fallo; fx-cross-family-final.json; checks v4 verdes",
+      "layer": "Chrome/session lifecycle",
+      "source": "Claude Opus 5 FX packet review",
+      "path": "cli/src/native/actions.rs",
+      "resolution": "fixed"
+    },
+    {
+      "id": "CF3",
+      "state": "confirmed",
+      "claim": "Commit sin snapshot devolvía éxito sin contexto durable",
+      "evidence": "cross-family-no-target-red.log; fx-cross-family-final.json; checks v4 verdes",
+      "layer": "Chrome/session lifecycle",
+      "source": "Claude Opus 5 FX packet review",
+      "path": "cli/src/native/actions.rs",
+      "resolution": "fixed"
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Public docs, help and MCP unchanged in fix commit",
+      "evidence": "Existing documented flag/command contract is restored. No public option, parser or wire-format change."
+    }
+  ],
+  "issue_candidates": [
+    {
+      "id": "follow-up-download-guid",
+      "claim": "Matching de eventos de descarga dentro de un mismo contexto no compara el GUID capturado antes de aceptar progreso",
+      "source": "fx-cross-family-final.json item 2",
+      "disposition": "pre-existing, source-only; no issue/comment publicado; no implementación en este trabajo"
+    },
+    {
+      "id": "follow-up-cleanup-signal",
+      "claim": "Errores de cleanup pueden quedar sin señal en la respuesta y un kill antes de persistir puede dejar contexto sin binding",
+      "source": "fx-cross-family-final.json item 4; cross-family-dispositions.json CF4",
+      "disposition": "Límite medido: un contexto remoto huérfano por pérdida de disposición o SIGKILL; sin sticky/binding nuevo. Reintento y restart funcionan. Conexión del host cierra al cerrar Chrome. No journal/crash-atomicity añadido.",
+      "evidence": "completion/fault-repeat-late-drop-new.json; completion/fault-repeat-kill-new.json"
+    }
+  ]
+}

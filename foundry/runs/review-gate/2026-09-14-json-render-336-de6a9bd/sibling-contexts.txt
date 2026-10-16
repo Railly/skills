@@ -1,0 +1,186 @@
+skills/react-native/SKILL.md-144-
+skills/react-native/SKILL.md-145-| Provider | Purpose |
+skills/react-native/SKILL.md-146-|----------|---------|
+skills/react-native/SKILL.md:147:| `StateProvider` | Share state across components (JSON Pointer paths). Accepts optional `store` prop for controlled mode. |
+skills/react-native/SKILL.md-148-| `ActionProvider` | Handle actions dispatched from components |
+skills/react-native/SKILL.md-149-| `VisibilityProvider` | Enable conditional rendering based on state |
+skills/react-native/SKILL.md-150-| `ValidationProvider` | Form field validation |
+--
+packages/svelte/README.md-80-
+packages/svelte/README.md-81-| Provider | Purpose |
+packages/svelte/README.md-82-|----------|---------|
+packages/svelte/README.md:83:| `StateProvider` | Share state across components (JSON Pointer paths). Accepts optional `store` prop for controlled mode. |
+packages/svelte/README.md-84-| `ActionProvider` | Handle actions dispatched via the event system |
+packages/svelte/README.md-85-| `VisibilityProvider` | Enable conditional rendering based on state |
+packages/svelte/README.md-86-| `ValidationProvider` | Form field validation |
+--
+skills/react/SKILL.md-118-
+skills/react/SKILL.md-119-| Provider             | Purpose                                                                                                |
+skills/react/SKILL.md-120-| -------------------- | ------------------------------------------------------------------------------------------------------ |
+skills/react/SKILL.md:121:| `StateProvider`      | Share state across components (JSON Pointer paths). Accepts optional `store` prop for controlled mode. |
+skills/react/SKILL.md-122-| `ActionProvider`     | Handle actions dispatched via the event system                                                         |
+skills/react/SKILL.md-123-| `VisibilityProvider` | Enable conditional rendering based on state                                                            |
+skills/react/SKILL.md-124-| `ValidationProvider` | Form field validation                                                                                  |
+--
+packages/react/README.md-161-
+packages/react/README.md-162-### StateProvider
+packages/react/README.md-163-
+packages/react/README.md:164:Share data across components with JSON Pointer paths:
+packages/react/README.md-165-
+packages/react/README.md-166-```tsx
+packages/react/README.md-167-<StateProvider initialState={{ user: { name: "John" } }}>
+--
+packages/solid/README.md-137-
+packages/solid/README.md-138-| Provider              | Purpose                                              |
+packages/solid/README.md-139-| --------------------- | ---------------------------------------------------- |
+packages/solid/README.md:140:| `StateProvider`       | State model and JSON Pointer read/write APIs         |
+packages/solid/README.md-141-| `ActionProvider`      | Action dispatch, loading tracking, confirmation flow |
+packages/solid/README.md-142-| `VisibilityProvider`  | Visibility condition evaluation from current state   |
+packages/solid/README.md-143-| `ValidationProvider`  | Field-level and full-form validation                 |
+--
+packages/solid/README.md-162-| Hook                                          | Purpose                                               |
+packages/solid/README.md-163-| --------------------------------------------- | ----------------------------------------------------- |
+packages/solid/README.md-164-| `useStateStore()`                             | Access `state`, `get`, `set`, `update`, `getSnapshot` |
+packages/solid/README.md:165:| `useStateValue(path)`                         | Read a value by JSON Pointer path via accessor        |
+packages/solid/README.md-166-| `useStateBinding(path)`                       | Legacy two-way binding helper returning an accessor   |
+packages/solid/README.md-167-| `useVisibility()` / `useIsVisible()`          | Visibility context and checks                         |
+packages/solid/README.md-168-| `useActions()` / `useAction()`                | Action context and single-action helper               |
+--
+packages/core/README.md-126-
+packages/core/README.md-127-All six RFC 6902 operations are supported: `add`, `remove`, `replace`, `move`, `copy`, `test`.
+packages/core/README.md-128-
+packages/core/README.md:129:For prototype safety, JSON Pointer paths containing `__proto__`, `constructor`, or `prototype` tokens are rejected by path utilities, state stores, and SpecStream. This applies to both `path` and `from` in compound patches.
+packages/core/README.md-130-
+packages/core/README.md-131-### Low-Level Utilities
+packages/core/README.md-132-
+--
+packages/core/README.md-282-
+packages/core/README.md-283-#### Array paths and no-op writes
+packages/core/README.md-284-
+packages/core/README.md:285:When a JSON Pointer token addresses an array, it must be a canonical decimal
+packages/core/README.md-286-index: `0` or a non-zero digit followed by digits, from `0` through
+packages/core/README.md-287-`4294967294`. For example, `/items/1` is valid, while `/items/01`,
+packages/core/README.md-288-`/items/1.5`, and `/items/1e1` are not. Object keys remain literal, so an
+--
+packages/core/README.md-302-| Export | Purpose |
+packages/core/README.md-303-|--------|---------|
+packages/core/README.md-304-| `createStoreAdapter(config)` | Build a full `StateStore` from a minimal `{ getSnapshot, setSnapshot, subscribe }` config |
+packages/core/README.md:305:| `immutableSetByPath(root, path, value)` | Immutably set a value at a JSON Pointer path with structural sharing |
+packages/core/README.md:306:| `flattenToPointers(obj)` | Flatten a nested object into JSON Pointer keyed entries |
+packages/core/README.md-307-| `StoreAdapterConfig` | Config type for `createStoreAdapter` |
+packages/core/README.md-308-
+packages/core/README.md-309-```typescript
+--
+skills/ink/SKILL.md-197-
+skills/ink/SKILL.md-198-| Provider | Purpose |
+skills/ink/SKILL.md-199-|----------|---------|
+skills/ink/SKILL.md:200:| `StateProvider` | Share state across components (JSON Pointer paths). Accepts optional `store` prop for controlled mode. |
+skills/ink/SKILL.md-201-| `ActionProvider` | Handle actions dispatched via the event system |
+skills/ink/SKILL.md-202-| `VisibilityProvider` | Enable conditional rendering based on state |
+skills/ink/SKILL.md-203-| `ValidationProvider` | Form field validation |
+--
+skills/svelte/SKILL.md-160-
+skills/svelte/SKILL.md-161-| Context             | Purpose                                            |
+skills/svelte/SKILL.md-162-| ------------------- | -------------------------------------------------- |
+skills/svelte/SKILL.md:163:| `StateContext`      | Share state across components (JSON Pointer paths) |
+skills/svelte/SKILL.md-164-| `ActionContext`     | Handle actions dispatched via the event system     |
+skills/svelte/SKILL.md-165-| `VisibilityContext` | Enable conditional rendering based on state        |
+skills/svelte/SKILL.md-166-| `ValidationContext` | Form field validation                              |
+--
+skills/vue/SKILL.md-113-
+skills/vue/SKILL.md-114-| Provider | Purpose |
+skills/vue/SKILL.md-115-|----------|---------|
+skills/vue/SKILL.md:116:| `StateProvider` | Share state across components (JSON Pointer paths). Accepts `initialState` or `store` for controlled mode. |
+skills/vue/SKILL.md-117-| `ActionProvider` | Handle actions dispatched via the event system |
+skills/vue/SKILL.md-118-| `VisibilityProvider` | Enable conditional rendering based on state |
+skills/vue/SKILL.md-119-| `ValidationProvider` | Form field validation |
+--
+packages/vue/README.md-199-
+packages/vue/README.md-200-### StateProvider
+packages/vue/README.md-201-
+packages/vue/README.md:202:Share data across components with JSON Pointer paths:
+packages/vue/README.md-203-
+packages/vue/README.md-204-```vue
+packages/vue/README.md-205-<StateProvider :initial-state="{ user: { name: 'John' } }">
+--
+skills/devtools/SKILL.md-107-## Panels
+skills/devtools/SKILL.md-108-
+skills/devtools/SKILL.md-109-- **Spec** — element tree rooted at `spec.root`; props/visibility/events/watchers detail; integrated `validateSpec` warnings.
+skills/devtools/SKILL.md:110:- **State** — every JSON Pointer path with inline edit via `store.set`.
+skills/devtools/SKILL.md-111-- **Actions** — dispatched actions timeline (name, params, result/error, duration).
+skills/devtools/SKILL.md-112-- **Stream** — spec patches, text chunks, token usage, lifecycle markers grouped by generation.
+skills/devtools/SKILL.md-113-- **Catalog** — components + actions declared in the catalog with prop chips.
+--
+apps/web/app/(main)/docs/streaming/page.mdx-29-
+apps/web/app/(main)/docs/streaming/page.mdx-30-## Path Format
+apps/web/app/(main)/docs/streaming/page.mdx-31-
+apps/web/app/(main)/docs/streaming/page.mdx:32:Paths follow JSON Pointer (RFC 6901) into the spec object:
+apps/web/app/(main)/docs/streaming/page.mdx-33-
+apps/web/app/(main)/docs/streaming/page.mdx-34-```bash
+apps/web/app/(main)/docs/streaming/page.mdx-35-/root                       -> Root element key (string)
+--
+apps/web/app/(main)/docs/computed-values/page.mdx-7-
+apps/web/app/(main)/docs/computed-values/page.mdx-8-## `$template` — String Interpolation
+apps/web/app/(main)/docs/computed-values/page.mdx-9-
+apps/web/app/(main)/docs/computed-values/page.mdx:10:Use `{ "$template": "..." }` to embed state values into a string. References use `${/path}` syntax where the path is a JSON Pointer:
+apps/web/app/(main)/docs/computed-values/page.mdx-11-
+apps/web/app/(main)/docs/computed-values/page.mdx-12-```json
+apps/web/app/(main)/docs/computed-values/page.mdx-13-{
+--
+apps/web/app/(main)/docs/data-binding/page.mdx-27-
+apps/web/app/(main)/docs/data-binding/page.mdx-28-State can also be provided programmatically at runtime. In `@json-render/react`, this is done via `StateProvider` and hooks like `useStateStore`. See the [React API reference](/docs/api/react) for details.
+apps/web/app/(main)/docs/data-binding/page.mdx-29-
+apps/web/app/(main)/docs/data-binding/page.mdx:30:## JSON Pointer Paths
+apps/web/app/(main)/docs/data-binding/page.mdx-31-
+apps/web/app/(main)/docs/data-binding/page.mdx:32:All paths in json-render follow JSON Pointer (RFC 6901). A path is a string of `/`-separated tokens starting from the root:
+apps/web/app/(main)/docs/data-binding/page.mdx-33-
+apps/web/app/(main)/docs/data-binding/page.mdx-34-```
+apps/web/app/(main)/docs/data-binding/page.mdx-35-Given this state:
+--
+apps/web/app/(main)/docs/data-binding/page.mdx-137-}
+apps/web/app/(main)/docs/data-binding/page.mdx-138-```
+apps/web/app/(main)/docs/data-binding/page.mdx-139-
+apps/web/app/(main)/docs/data-binding/page.mdx:140:- `repeat.statePath`: root JSON Pointer to the state array, or `{ "$item": "field" }` for an array on the enclosing repeat item
+apps/web/app/(main)/docs/data-binding/page.mdx-141-- `repeat.key` — field name on each item to use as a stable key for rendering
+apps/web/app/(main)/docs/data-binding/page.mdx-142-
+apps/web/app/(main)/docs/data-binding/page.mdx-143-Inside `todo-item`, `{ "$item": "title" }` reads the `title` field from whichever array item is currently being rendered. `{ "$index": true }` would return `0` for the first item, `1` for the second, and so on.
+--
+apps/web/app/(main)/docs/specs/page.mdx-210-
+apps/web/app/(main)/docs/specs/page.mdx-211-### Dynamic Data
+apps/web/app/(main)/docs/specs/page.mdx-212-
+apps/web/app/(main)/docs/specs/page.mdx:213:Props can reference data from the state model using `$state` expressions. The value is a JSON Pointer (RFC 6901) path into the state:
+apps/web/app/(main)/docs/specs/page.mdx-214-
+apps/web/app/(main)/docs/specs/page.mdx-215-```json
+apps/web/app/(main)/docs/specs/page.mdx-216-{
+--
+apps/web/app/(main)/docs/visibility/page.mdx-7-
+apps/web/app/(main)/docs/visibility/page.mdx-8-## State-Based Visibility
+apps/web/app/(main)/docs/visibility/page.mdx-9-
+apps/web/app/(main)/docs/visibility/page.mdx:10:Show/hide based on state values. Use `$state` with a JSON Pointer path:
+apps/web/app/(main)/docs/visibility/page.mdx-11-
+apps/web/app/(main)/docs/visibility/page.mdx-12-```json
+apps/web/app/(main)/docs/visibility/page.mdx-13-{
+--
+apps/web/app/(main)/docs/schemas/page.mdx-71-
+apps/web/app/(main)/docs/schemas/page.mdx-72-### Data Binding Syntax
+apps/web/app/(main)/docs/schemas/page.mdx-73-
+apps/web/app/(main)/docs/schemas/page.mdx:74:Reference dynamic data using `$state` expressions in props. The value is a JSON Pointer path into the state model:
+apps/web/app/(main)/docs/schemas/page.mdx-75-
+apps/web/app/(main)/docs/schemas/page.mdx-76-```json
+apps/web/app/(main)/docs/schemas/page.mdx-77-{
+--
+apps/web/app/(main)/docs/api/core/page.mdx-444-```typescript
+apps/web/app/(main)/docs/api/core/page.mdx-445-import { getByPath, setByPath } from '@json-render/core';
+apps/web/app/(main)/docs/api/core/page.mdx-446-
+apps/web/app/(main)/docs/api/core/page.mdx:447:// Get value by JSON Pointer path
+apps/web/app/(main)/docs/api/core/page.mdx-448-const value = getByPath(state, '/user/name');  // "Alice"
+apps/web/app/(main)/docs/api/core/page.mdx-449-
+apps/web/app/(main)/docs/api/core/page.mdx-450-// Set value by path (mutates object)
+--
+apps/web/app/(main)/docs/api/core/page.mdx-463-segments.
+apps/web/app/(main)/docs/api/core/page.mdx-464-
+apps/web/app/(main)/docs/api/core/page.mdx-465-For prototype safety, path utilities, state stores, and SpecStream patches
+apps/web/app/(main)/docs/api/core/page.mdx:466:reject JSON Pointer paths containing `__proto__`, `constructor`, or `prototype`
+apps/web/app/(main)/docs/api/core/page.mdx-467-tokens. Compound patches validate both `path` and `from` before mutating data.
+apps/web/app/(main)/docs/api/core/page.mdx-468-
+apps/web/app/(main)/docs/api/core/page.mdx-469-### resolveDynamicValue

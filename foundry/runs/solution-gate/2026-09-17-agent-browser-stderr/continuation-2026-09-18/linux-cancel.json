@@ -1,0 +1,164 @@
+{
+  "date": "2026-09-18",
+  "status": "PRIMITIVE_ONLY_TESTS_SUCCEEDED",
+  "scope": "Exact Unix cancellation primitive on Linux aarch64 only",
+  "production": false,
+  "production_integration_verified": false,
+  "gate_pass": false,
+  "C6_validated": false,
+  "workspace": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe",
+  "report": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-stderr/continuation-2026-09-18/linux-cancel.md",
+  "report_words": 360,
+  "primitive": {
+    "source": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/resource-cancellation-probe/source/cli/src/native/cdp/stderr_drain.rs",
+    "sha256": "0e5365eb1f352641e464f316d98a5fc5c513f1dacb7a304b066bafb3da64cca3",
+    "bytes": 2873,
+    "lines": 72,
+    "imported_path": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/src/stderr_drain.rs",
+    "byte_identical": true,
+    "original_unchanged": true,
+    "compiled_with_cfg_test": true
+  },
+  "image": {
+    "tag": "rust:1.97-bookworm",
+    "id": "sha256:0e2bcaef56d041a486784e54104a81aebe0da44bd03019bd70bc0401e42e4a97",
+    "architecture": "linux/arm64",
+    "runtime_uname": "Linux aarch64",
+    "rustc": "1.97.1 (8bab26f4f 2026-07-14)",
+    "cargo": "1.97.1 (c980f4866 2026-06-30)"
+  },
+  "dependency": {
+    "name": "libc",
+    "version": "0.2.189",
+    "host_path": "/Users/raillyhugo/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.189",
+    "container_path": "/libc",
+    "path_dependency": true,
+    "read_only_mount": true,
+    "installed": false
+  },
+  "isolation": {
+    "network": "none",
+    "auto_remove": true,
+    "pull": "never",
+    "source_mount_read_only": true,
+    "host_environment_forwarded": false,
+    "credential_or_private_state_mounts": false,
+    "target_dir": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/target",
+    "target_shared": false,
+    "detached_processes": false,
+    "github_access": false
+  },
+  "commands": {
+    "entrypoint": "sh /Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/run.sh",
+    "docker": "docker run --rm --pull never --network none --name agent-browser-unix-cancellation-probe-20260918 \\\n  --mount type=bind,src=/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe,dst=/probe \\\n  --mount type=bind,src=/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/src,dst=/probe/src,readonly \\\n  --mount type=bind,src=/Users/raillyhugo/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.189,dst=/libc,readonly \\\n  --workdir /probe rust:1.97-bookworm \\\n  timeout --signal=TERM --kill-after=5s 90s sh -c 'rustc --version && cargo --version && uname -sm && cargo build --offline --bin writer --target-dir /probe/target && cargo test --offline --locked --lib --target-dir /probe/target -- --nocapture --test-threads=1' > cargo.log 2>&1",
+    "build": "cargo build --offline --bin writer --target-dir /probe/target",
+    "test": "cargo test --offline --locked --lib --target-dir /probe/target -- --nocapture --test-threads=1"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "exit_code": 101,
+      "test_seconds": 60.13,
+      "status": "HARNESS_FAILURE",
+      "cause": "Unflushed stdout readiness byte delivered only at quiet child exit",
+      "correction": "Explicit stdout flush after readiness byte in both live-writer modes; primitive unchanged",
+      "writer_sha256": "68cff96b0bd17bc5b25634d0f3b1e02a108aabcfd5b75f30329d721d5f6a5054",
+      "log": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/attempt-1.log"
+    },
+    {
+      "attempt": 2,
+      "exit_code": 0,
+      "test_seconds": 7.68,
+      "status": "SUCCEEDED",
+      "result": "1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out",
+      "log": "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/cargo.log"
+    }
+  ],
+  "tests": {
+    "cycles_per_mode": 32,
+    "burst_bytes": 8388608,
+    "quiet_idle_ms": 100,
+    "quiet_polls": 1,
+    "fd_baseline": 4,
+    "task_baseline": 2,
+    "fd_final": 4,
+    "task_final": 2,
+    "max_quiet_drop_us": 552,
+    "max_continuous_drop_us": 326,
+    "max_burst_ms": 18,
+    "min_continuous_progress_bytes": 28114944,
+    "children_spawned": 97,
+    "children_reaped": 97,
+    "unwind_cleanup": true,
+    "quiet_alive_after_drop_ms": 20,
+    "quiet_stderr_pipe_identity_retained": true,
+    "continuous_observation_ms": 50,
+    "drop_assertion_limit_us": 1000000,
+    "burst_deadline_seconds": 5,
+    "settle_deadline_seconds": 2,
+    "mode_cleanup_checks": 96,
+    "counts_settled_after_every_mode": true,
+    "fd_count_includes_enumeration_descriptor": true,
+    "real_command_child_stderr": true,
+    "unwind_panic_expected_and_caught": true
+  },
+  "cleanup": {
+    "command": [
+      "docker",
+      "ps",
+      "-a",
+      "--filter",
+      "name=agent-browser-unix-cancellation-probe-20260918",
+      "--format",
+      "{{.Names}} {{.Status}}"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "container_removed": true,
+    "raii_child_kill_and_wait": true,
+    "watchdog": "timeout --signal=TERM --kill-after=5s 90s",
+    "watchdog_process_bound": true,
+    "watchdog_triggered": false,
+    "watchdog_escalation_tested": false
+  },
+  "new_code_lines": {
+    "src/lib.rs": 117,
+    "src/main.rs": 19,
+    "run.sh": 12
+  },
+  "new_rust_lines": 136,
+  "total_new_code_lines_including_runner": 148,
+  "preservation_validation_exit_code": 0,
+  "artifact_sha256": {
+    "Cargo.toml": "2befab4cbb7a346d3b832d4f5be7272338d954ac4ba23092fb40f98df25114b9",
+    "Cargo.lock": "5b1461b061c8f8224632a651600bdae12df9450bb7f8fad6ab371274e8af0d81",
+    "src/lib.rs": "4dd674e8a4fd0b16d2846bcea1b27a879145d40b596a803bb053a5a84d324fd9",
+    "src/main.rs": "7663d445465a2ef619d80b41e2d3ce6b5e7b29a637f0fddfe34c98f4940a1ffb",
+    "src/stderr_drain.rs": "0e5365eb1f352641e464f316d98a5fc5c513f1dacb7a304b066bafb3da64cca3",
+    "run.sh": "3279872f8add145a8d15be173f5ade819b06b02b9966e9d6bc804426d79feb81",
+    "cargo.log": "f908502ed5ab9712b6cda570c5c6b811adee75fd5d1616f5cd0da12911650665",
+    "attempt-1.log": "5348255773a9bcf6e84c1e2a1cf2019f03a856ea750ace026c8c7e4383b0375c"
+  },
+  "evidence": [
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/cargo.log",
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/attempt-1.log",
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/final-validation.json",
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/preservation-before.json",
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/Cargo.lock",
+    "/Users/raillyhugo/Programming/vercel/agent-browser-stderr-gate/unix-cancellation-probe/run.sh"
+  ],
+  "parent_context": {
+    "macos": "Parent real-launcher spike succeeded; inherited evidence, not rerun",
+    "macos_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-stderr/continuation-2026-09-18/resources-cancel.json",
+    "windows": "Compile-only; runtime blocker unchanged",
+    "windows_evidence": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-17-agent-browser-stderr/continuation-2026-09-18/windows-cancel.json"
+  },
+  "limits": [
+    "Primitive-only Linux, not full Chrome/Job/CLI verification",
+    "Observed timings are not hard stop/join scheduling bounds",
+    "Idle-poll evidence limited to repeated 100 ms windows",
+    "No setup/resource exhaustion fault injection",
+    "No watchdog-escalation validation",
+    "No production integration, gate Pass, or C6 claim"
+  ]
+}

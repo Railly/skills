@@ -1,0 +1,51 @@
+
+running 3 tests
+test native::e2e_tests::e2e_auth_login_uses_visible_duplicate_password ... FAILED
+test native::e2e_tests::e2e_auth_login_uses_visible_duplicate_submit ... FAILED
+test native::e2e_tests::e2e_auth_login_uses_visible_duplicate_username ... FAILED
+
+failures:
+
+---- native::e2e_tests::e2e_auth_login_uses_visible_duplicate_password stdout ----
+
+thread 'native::e2e_tests::e2e_auth_login_uses_visible_duplicate_password' (1338665) panicked at src/native/e2e_tests.rs:24:5:
+assertion `left == right` failed: Expected success but got: {
+  "error": "Tierror: test failed, to rerun pass `--bin agent-browser`
+rd]'",
+  "id": "4",
+  "success": false
+}
+  left: Some(false)
+ right: Some(true)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- native::e2e_tests::e2e_auth_login_uses_visible_duplicate_submit stdout ----
+
+thread 'native::e2e_tests::e2e_auth_login_uses_visible_duplicate_submit' (1339020) panicked at src/native/e2e_tests.rs:24:5:
+assertion `left == right` failed: Expected success but got: {
+  "error": "Timed out waiting for submit button (tried selectors: button[type=submit], input[type=submit], button:not([type]))",
+  "id": "4",
+  "success": false
+}
+  left: Some(false)
+ right: Some(true)
+
+---- native::e2e_tests::e2e_auth_login_uses_visible_duplicate_username stdout ----
+
+thread 'native::e2e_tests::e2e_auth_login_uses_visible_duplicate_username' (1339355) panicked at src/native/e2e_tests.rs:24:5:
+assertion `left == right` failed: Expected success but got: {
+  "error": "Timed out waiting for username field (preferred selectors for 1000ms: input[type=email], input[name=email], input[id=email], input[autocomplete=email], input[autocomplete=username], input[name=username], input[name*=email i], input[name*=user i], input[id*=email i], input[id*=user i], input[type=text][name*=email i], input[type=text][name*=user i], input[type=text][id*=email i], input[type=text][id*=user i], input[type=text][autocomplete=email], input[type=text][autocomplete=username])",
+  "id": "4",
+  "success": false
+}
+  left: Some(false)
+ right: Some(true)
+
+
+failures:
+    native::e2e_tests::e2e_auth_login_uses_visible_duplicate_password
+    native::e2e_tests::e2e_auth_login_uses_visible_duplicate_submit
+    native::e2e_tests::e2e_auth_login_uses_visible_duplicate_username
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 1533 filtered out; finished in 4.60s
+

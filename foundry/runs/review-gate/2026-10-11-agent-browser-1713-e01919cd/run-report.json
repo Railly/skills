@@ -1,0 +1,348 @@
+{
+ "schemaVersion": 1,
+ "run": {
+  "date": "2026-10-11",
+  "repo": "vercel-labs/agent-browser",
+  "base": "d9570915",
+  "head": "e01919cd",
+  "profile": "high-risk",
+  "skill_revision": "git:0567ddf",
+  "status": "incomplete",
+  "verdict": "incomplete",
+  "gaps": [
+   "Test Strength receipt not run (state-machine change: replay/warning delivery)",
+   "Resilience Audit receipt not run (failure-path change: replace, adopt, fallback)",
+   "Security Review receipt not run (replacement tab re-installs domain filter and proxy auth)",
+   "FX worker unavailable: missing Keychain item Vercel AI Gateway; degraded to native subagent",
+   "Windows TCP delivery of the wedge report not exercised"
+  ]
+ },
+ "execution": {
+  "mode": "native_subagent",
+  "degraded_from": "fx_worker",
+  "independence_gap": "reviewer is a native subagent, model family not confirmed different from the author",
+  "receipt": null,
+  "schema_failures": 0,
+  "operations": [
+   {
+    "operation": "fx review",
+    "attempted_calls": 1,
+    "schema_failures": 0,
+    "identical_retry": false
+   },
+   {
+    "operation": "native subagent review",
+    "attempted_calls": 1,
+    "schema_failures": 0,
+    "identical_retry": false
+   }
+  ]
+ },
+ "contract": {
+  "path": "~/Programming/vercel/agent-browser-1713-shaping/packet.md",
+  "spec_status": "not_written",
+  "acceptance_reviewed": [
+   "S1",
+   "S2",
+   "S3",
+   "M1",
+   "M2",
+   "M3"
+  ],
+  "gaps": [
+   "no Issue Contract file under foundry/missions; packet used"
+  ]
+ },
+ "provenance": {
+  "author_model": "claude-opus-5.5",
+  "reviewer_model": "occam subagent (unconfirmed)",
+  "same_family": true
+ },
+ "risk": {
+  "level": "high",
+  "triggers": [
+   "session recovery state machine",
+   "closes a browser target",
+   "re-installs network controls"
+  ],
+  "independent_challenge": {
+   "required": true,
+   "satisfied": false,
+   "method": "native_subagent_static",
+   "artifact": "independent-challenge-prompt.md",
+   "evidence": "Static review found 7 items; 5 fixed, 2 kept as owner decisions."
+  }
+ },
+ "claim_inventory": [
+  {
+   "source": "contract",
+   "location": "packet.md S1-S3, M1-M3",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "Bounded failure, recovery, machine-readable code."
+  },
+  {
+   "source": "design",
+   "location": "packet.md Shape A",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2",
+    "P3"
+   ],
+   "evidence": "A1-A5 parts."
+  },
+  {
+   "source": "user_facing",
+   "location": "README.md, skill-data/core/SKILL.md",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2"
+   ],
+   "evidence": "page_wedged notes."
+  },
+  {
+   "source": "implementation",
+   "location": "cli/src/native/{actions,browser,daemon}.rs, cli/src/output.rs",
+   "status": "reviewed",
+   "properties": [
+    "P1",
+    "P2",
+    "P3",
+    "P4"
+   ],
+   "evidence": "diff d9570915..e01919cd"
+  }
+ ],
+ "properties": [
+  {
+   "id": "P1",
+   "claim": "A wedged tab in a launched browser is replaced and the session works after",
+   "kind": "lifecycle",
+   "status": "verified",
+   "evidence": "e2e_wedged_page_is_replaced_and_session_recovers red on base, green on head; CLI dogfood: get url 3s after wedge, navigate ok"
+  },
+  {
+   "id": "P2",
+   "claim": "Attached browsers keep their tab",
+   "kind": "boundary",
+   "status": "verified",
+   "evidence": "--cdp dogfood: targets before and after identical, page_wedged at 36s"
+  },
+  {
+   "id": "P3",
+   "claim": "Replacement tab keeps session headers/network controls",
+   "kind": "invariant",
+   "status": "verified",
+   "evidence": "e2e_wedged_page_replacement_keeps_session_network_controls red before a40027dc, green after"
+  },
+  {
+   "id": "P4",
+   "claim": "Dialog-blocked tabs are not replaced",
+   "kind": "classifier",
+   "status": "verified",
+   "evidence": "e2e_dialog_blocked_tab_is_not_treated_as_wedged red at a40027dc (tab replaced), green at e01919cd"
+  }
+ ],
+ "stage_receipts": {
+  "test_strength": {
+   "required": true,
+   "status": "unavailable",
+   "reason": "not run in this cycle"
+  },
+  "resilience": {
+   "required": true,
+   "status": "unavailable",
+   "reason": "not run in this cycle"
+  }
+ },
+ "assumptions": [
+  {
+   "id": "A1",
+   "source": "packet U3",
+   "claim": "Target.closeTarget works while the renderer spins",
+   "status": "verified",
+   "evidence": "raw CDP probe 2026-10-10 and e2e through the daemon"
+  },
+  {
+   "id": "A2",
+   "source": "implementation",
+   "claim": "a failed socket write means the client did not receive the report",
+   "status": "unverified",
+   "evidence": "holds for Unix sockets (EPIPE, dogfood); not exercised on Windows TCP"
+  }
+ ],
+ "lenses": [
+  {
+   "name": "probe false positives",
+   "status": "run",
+   "reason": ""
+  },
+  {
+   "name": "daemon dispatch state on active-target change",
+   "status": "run",
+   "reason": ""
+  },
+  {
+   "name": "error conventions",
+   "status": "run",
+   "reason": ""
+  },
+  {
+   "name": "surfaces",
+   "status": "run",
+   "reason": ""
+  },
+  {
+   "name": "security",
+   "status": "skipped",
+   "reason": "Security Review not run; recorded as gap"
+  }
+ ],
+ "deterministic": [
+  {
+   "check": "style",
+   "outcome": "pass",
+   "reason": ""
+  },
+  {
+   "check": "surfaces",
+   "outcome": "acknowledged",
+   "reason": "docs/src/app no longer exists; docs/content commands.mdx and skill commands.md have no error-code section; README and SKILL.md troubleshooting updated"
+  },
+  {
+   "check": "siblings tab_gone",
+   "outcome": "acknowledged",
+   "reason": "every hit is pin-tab specific; MCP passes code and data through generically (tool_result_from_run)"
+  },
+  {
+   "check": "producers",
+   "outcome": "acknowledged",
+   "reason": "client.rs:519 is the only producer and matches contains()"
+  },
+  {
+   "check": "timings",
+   "outcome": "pass",
+   "reason": ""
+  },
+  {
+   "check": "cargo fmt",
+   "outcome": "pass",
+   "reason": ""
+  },
+  {
+   "check": "cargo clippy -D warnings",
+   "outcome": "acknowledged",
+   "reason": "3 errors at browser.rs:4427, cdp/client.rs:1108, e2e_tests.rs:9649, same lines fail on origin/main"
+  },
+  {
+   "check": "cargo test",
+   "outcome": "pass",
+   "reason": "1447 pass; 17 related e2e pass"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "state": "confirmed",
+   "claim": "replacement tab missed session setup and network controls",
+   "evidence": "e2e red",
+   "layer": "daemon state",
+   "source": "lens",
+   "path": "",
+   "resolution": "fixed"
+  },
+  {
+   "id": "F2",
+   "state": "confirmed",
+   "claim": "human output dropped warning for most actions",
+   "evidence": "dogfood: get url printed no warning",
+   "layer": "CLI output",
+   "source": "dogfood",
+   "path": "",
+   "resolution": "fixed"
+  },
+  {
+   "id": "F3",
+   "state": "confirmed",
+   "claim": "dialog opened by the command classified as wedge",
+   "evidence": "e2e red: confirm() tab replaced",
+   "layer": "classifier",
+   "source": "reviewer",
+   "path": "",
+   "resolution": "fixed"
+  },
+  {
+   "id": "F4",
+   "state": "confirmed",
+   "claim": "tab binding persisted before swap",
+   "evidence": "code order",
+   "layer": "persistence",
+   "source": "reviewer",
+   "path": "",
+   "resolution": "fixed"
+  },
+  {
+   "id": "F5",
+   "state": "confirmed",
+   "claim": "old session WebMCP state not cleared",
+   "evidence": "targetDestroyed lookup by rewritten target",
+   "layer": "daemon state",
+   "source": "reviewer",
+   "path": "",
+   "resolution": "fixed"
+  },
+  {
+   "id": "F6",
+   "state": "confirmed",
+   "claim": "pending report dropped by early returns and warnings overwritten",
+   "evidence": "code paths",
+   "layer": "delivery",
+   "source": "reviewer",
+   "path": "",
+   "resolution": "fixed"
+  },
+  {
+   "id": "F7",
+   "state": "confirmed",
+   "claim": "delivery ack cleared another request's report",
+   "evidence": "daemon.rs re-lock gap",
+   "layer": "delivery",
+   "source": "reviewer",
+   "path": "",
+   "resolution": "fixed"
+  },
+  {
+   "id": "F8",
+   "state": "unverified",
+   "claim": "heavy finite script (>30s) tab gets replaced",
+   "evidence": "static: probe cannot tell slow from stuck",
+   "layer": "classifier",
+   "source": "reviewer",
+   "path": "",
+   "resolution": "open"
+  },
+  {
+   "id": "F9",
+   "state": "unverified",
+   "claim": "wedged OOPIF under frame scope not detected; non-active-session timeouts can trigger the probe",
+   "evidence": "static",
+   "layer": "classifier",
+   "source": "reviewer",
+   "path": "",
+   "resolution": "open"
+  }
+ ],
+ "exemptions": [],
+ "issue_candidates": [
+  {
+   "title": "CLI 30s read floor equals CDP 30s timeout, so the wedging command itself returns outcome_unknown",
+   "evidence": "dogfood",
+   "why_out_of_scope": "separate contract (read_timeout_for)"
+  }
+ ]
+}

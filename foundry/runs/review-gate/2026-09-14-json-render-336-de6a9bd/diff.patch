@@ -1,0 +1,1483 @@
+diff --git a/apps/web/app/(main)/docs/api/core/page.mdx b/apps/web/app/(main)/docs/api/core/page.mdx
+index 020a014..5c728eb 100644
+--- a/apps/web/app/(main)/docs/api/core/page.mdx
++++ b/apps/web/app/(main)/docs/api/core/page.mdx
+@@ -451,6 +451,21 @@ const value = getByPath(state, '/user/name');  // "Alice"
+ setByPath(state, '/user/email', 'alice@example.com');
+ ```
+ 
++Array tokens must use canonical decimal indices: `0` or a non-zero digit
++followed by digits, from `0` through `4294967294`. For example, `/items/1` is
++valid, but `/items/01`, `/items/1.5`, and `/items/1e1` are not. Object keys are
++always literal, so `{ "01": "value" }` can be addressed with `/01` when the
++current value is an object.
++
++`setByPath` and `addByPath` accept a terminal `-` to append to an array.
++Invalid array reads return `undefined`, and invalid writes or removals are
++no-ops. A `-` token is not valid for reads, removals, or intermediate array
++segments.
++
++For prototype safety, path utilities, state stores, and SpecStream patches
++reject JSON Pointer paths containing `__proto__`, `constructor`, or `prototype`
++tokens. Compound patches validate both `path` and `from` before mutating data.
++
+ ### resolveDynamicValue
+ 
+ ```typescript
+diff --git a/apps/web/app/(main)/docs/data-binding/page.mdx b/apps/web/app/(main)/docs/data-binding/page.mdx
+index 6bdc3bb..9fd3a58 100644
+--- a/apps/web/app/(main)/docs/data-binding/page.mdx
++++ b/apps/web/app/(main)/docs/data-binding/page.mdx
+@@ -47,6 +47,17 @@ Given this state:
+ "/todos/1/done"   -> true
+ ```
+ 
++When a token addresses an array, write the index in canonical decimal form:
++`0` or a non-zero digit followed by digits. `/todos/1` is valid; `/todos/01`,
++`/todos/1.5`, and `/todos/1e1` are not. This rule applies only to arrays, so
++an object key named `"01"` remains a literal key. Invalid array paths resolve
++to `undefined` instead of coercing to another item.
++
++For writes, a final `-` token appends to an array (for example,
++`/todos/-`). It cannot be used to read, remove, or traverse through an array.
++Rejected array writes are no-ops and do not create hidden named properties on
++arrays.
++
+ ## Expressions
+ 
+ Expressions are special objects you place in props to read dynamic values instead of hardcoding them. There are six expression types.
+diff --git a/packages/core/README.md b/packages/core/README.md
+index 3e40a08..d7a288e 100644
+--- a/packages/core/README.md
++++ b/packages/core/README.md
+@@ -126,6 +126,8 @@ SpecStream format uses [RFC 6902 JSON Patch](https://datatracker.ietf.org/doc/ht
+ 
+ All six RFC 6902 operations are supported: `add`, `remove`, `replace`, `move`, `copy`, `test`.
+ 
++For prototype safety, JSON Pointer paths containing `__proto__`, `constructor`, or `prototype` tokens are rejected by path utilities, state stores, and SpecStream. This applies to both `path` and `from` in compound patches.
++
+ ### Low-Level Utilities
+ 
+ ```typescript
+@@ -278,6 +280,21 @@ const unsubscribe = store.subscribe(() => {
+ 
+ Pass the store to `StateProvider` in any renderer package (`@json-render/react`, `@json-render/react-native`, `@json-render/react-pdf`) for controlled mode.
+ 
++#### Array paths and no-op writes
++
++When a JSON Pointer token addresses an array, it must be a canonical decimal
++index: `0` or a non-zero digit followed by digits, from `0` through
++`4294967294`. For example, `/items/1` is valid, while `/items/01`,
++`/items/1.5`, and `/items/1e1` are not. Object keys remain literal, so an
++object can still contain a key named `"01"`.
++
++`setByPath` and `addByPath` accept a terminal `-` to append to an array. It is
++not valid for array reads, removals, or intermediate traversal. Invalid array
++writes are no-ops: they do not create named array properties, change a store
++snapshot, or notify subscribers. A batched `update` applies accepted entries
++against the progressively updated snapshot and notifies once only when at
++least one entry changes state.
++
+ ### Store Utilities (for adapter authors)
+ 
+ Available via `@json-render/core/store-utils`:
+@@ -307,6 +324,10 @@ const store = createStoreAdapter({
+ 
+ The official adapter packages (`@json-render/redux`, `@json-render/zustand`, `@json-render/jotai`) are all built on top of `createStoreAdapter`.
+ 
++Like `createStateStore`, adapters skip their `setSnapshot` call when every
++write in a batch is unchanged or rejected. This keeps externally managed
++snapshots stable for all-invalid updates.
++
+ ### Types
+ 
+ | Export | Purpose |
+diff --git a/packages/core/src/path-utils.ts b/packages/core/src/path-utils.ts
+new file mode 100644
+index 0000000..8730092
+--- /dev/null
++++ b/packages/core/src/path-utils.ts
+@@ -0,0 +1,24 @@
++/**
++ * Parse a JSON Pointer token that addresses an array item.
++ *
++ * JavaScript arrays accept many property names that are not array indices.
++ * JSON Pointer paths use only canonical decimal array indices: `0` or a
++ * non-zero digit followed by digits, within the JavaScript array-index range.
++ */
++export function parseArrayIndex(token: string): number | undefined {
++  if (!/^(?:0|[1-9]\d*)$/.test(token)) {
++    return undefined;
++  }
++
++  const index = Number(token);
++  if (
++    !Number.isInteger(index) ||
++    index < 0 ||
++    index > 4_294_967_294 ||
++    String(index) !== token
++  ) {
++    return undefined;
++  }
++
++  return index;
++}
+diff --git a/packages/core/src/state-store.test.ts b/packages/core/src/state-store.test.ts
+index 47d6fa0..12f0360 100644
+--- a/packages/core/src/state-store.test.ts
++++ b/packages/core/src/state-store.test.ts
+@@ -1,5 +1,97 @@
+ import { describe, it, expect, vi } from "vitest";
+-import { createStateStore, flattenToPointers } from "./state-store";
++import {
++  createStateStore,
++  createStoreAdapter,
++  flattenToPointers,
++  immutableSetByPath,
++} from "./state-store";
++
++function createAdapterHarness(initialState: Record<string, unknown>) {
++  let snapshot = initialState;
++  const listeners = new Set<() => void>();
++  const setSnapshot = vi.fn((next: Record<string, unknown>) => {
++    snapshot = next;
++    for (const listener of listeners) {
++      listener();
++    }
++  });
++  const store = createStoreAdapter({
++    getSnapshot: () => snapshot,
++    setSnapshot,
++    subscribe: (listener) => {
++      listeners.add(listener);
++      return () => listeners.delete(listener);
++    },
++  });
++
++  return {
++    store,
++    getSnapshot: () => snapshot,
++    setSnapshot,
++  };
++}
++
++describe("immutableSetByPath", () => {
++  it.each(["01", "1x", "1.5", "-1", "4294967295"])(
++    "returns the original snapshot for invalid array leaf token %j",
++    (token) => {
++      const root = { items: ["zero", "one"] };
++      const result = immutableSetByPath(root, `/items/${token}`, "changed");
++
++      expect(result).toBe(root);
++      expect(root.items).toEqual(["zero", "one"]);
++      expect(Object.keys(root.items)).toEqual(["0", "1"]);
++    },
++  );
++
++  it.each(["01", "1x", "1.5", "-1", "4294967295"])(
++    "returns the original snapshot for invalid intermediate array token %j",
++    (token) => {
++      const root = { items: [{ values: ["zero", "one"] }] };
++      const result = immutableSetByPath(
++        root,
++        `/items/0/values/${token}/name`,
++        "changed",
++      );
++
++      expect(result).toBe(root);
++      expect(root.items[0]!.values).toEqual(["zero", "one"]);
++      expect(Object.keys(root.items[0]!.values)).toEqual(["0", "1"]);
++    },
++  );
++
++  it("preserves structural sharing and infers canonical arrays only", () => {
++    const root = {
++      items: [{ name: "old", untouched: true }],
++      sibling: { retained: true },
++    };
++    const result = immutableSetByPath(root, "/items/0/name", "new");
++    const inferred = immutableSetByPath({}, "/records/01/name", "literal");
++    const appended = immutableSetByPath({}, "/items/-", "appended");
++    const resultItems = result.items as Array<Record<string, unknown>>;
++
++    expect(result).not.toBe(root);
++    expect(result.items).not.toBe(root.items);
++    expect(resultItems[0]).not.toBe(root.items[0]);
++    expect(result.sibling).toBe(root.sibling);
++    expect(root.items[0]).toEqual({ name: "old", untouched: true });
++    expect(resultItems[0]).toEqual({ name: "new", untouched: true });
++    expect(inferred).toEqual({ records: { "01": { name: "literal" } } });
++    expect(appended).toEqual({ items: ["appended"] });
++  });
++
++  it.each(["__proto__", "constructor", "prototype"])(
++    "rejects %s without changing snapshot identity or its prototype",
++    (token) => {
++      const state = { safe: true };
++      const result = immutableSetByPath(state, `/${token}/polluted`, "value");
++
++      expect(result).toBe(state);
++      expect(Object.getPrototypeOf(result)).toBe(Object.prototype);
++      expect(result).toEqual({ safe: true });
++    },
++  );
++});
+ 
+ describe("createStateStore", () => {
+   it("creates a store with initial state", () => {
+@@ -135,6 +227,144 @@ describe("createStateStore", () => {
+     store.set("/x", 2);
+     expect(store.getServerSnapshot!()).toBe(store.getSnapshot());
+   });
++
++  it("silently ignores malformed array writes without changing snapshot identity", () => {
++    const store = createStateStore({
++      items: [{ values: ["zero", "one"] }],
++    });
++    const listener = vi.fn();
++    store.subscribe(listener);
++    const before = store.getSnapshot();
++
++    store.set("/items/01", "changed");
++    store.set("/items/0/values/01/name", "changed");
++
++    expect(store.getSnapshot()).toBe(before);
++    expect(store.getSnapshot().items).toEqual([{ values: ["zero", "one"] }]);
++    expect(Object.keys(store.getSnapshot().items as unknown[])).toEqual(["0"]);
++    expect(
++      Object.keys(
++        (store.getSnapshot().items as Array<Record<string, unknown>>)[0]!
++          .values as unknown[],
++      ),
++    ).toEqual(["0", "1"]);
++    expect(listener).not.toHaveBeenCalled();
++  });
++
++  it("skips all-invalid batches and applies mixed batches only once", () => {
++    const store = createStateStore({ items: ["zero"], stable: true });
++    const listener = vi.fn();
++    store.subscribe(listener);
++    const before = store.getSnapshot();
++
++    store.update({ "/items/01": "ignored", "/items/1x": "ignored" });
++    expect(store.getSnapshot()).toBe(before);
++    expect(listener).not.toHaveBeenCalled();
++
++    store.update({ "/items/01": "ignored", "/stable": false });
++    expect(store.getSnapshot()).toEqual({ items: ["zero"], stable: false });
++    expect(listener).toHaveBeenCalledTimes(1);
++  });
++
++  it("evaluates batch entries against progressively updated state", () => {
++    const store = createStateStore({});
++
++    store.update({ "/items": [], "/items/0/name": "first" });
++
++    expect(store.getSnapshot()).toEqual({ items: [{ name: "first" }] });
++  });
++
++  it.each(["__proto__", "constructor", "prototype"])(
++    "rejects %s state paths without publishing a snapshot",
++    (token) => {
++      const store = createStateStore({ safe: true });
++      const listener = vi.fn();
++      const snapshot = store.getSnapshot();
++      store.subscribe(listener);
++
++      store.set(`/${token}/polluted`, "value");
++      store.update({ [`/safe/${token}/polluted`]: "value" });
++
++      expect(store.getSnapshot()).toBe(snapshot);
++      expect(listener).not.toHaveBeenCalled();
++    },
++  );
++});
++
++describe("createStoreAdapter", () => {
++  it("does not write snapshots for invalid sets or all-invalid batches", () => {
++    const harness = createAdapterHarness({ items: ["zero", "one"] });
++    const listener = vi.fn();
++    harness.store.subscribe(listener);
++    const before = harness.getSnapshot();
++
++    harness.store.set("/items/01", "changed");
++    harness.store.update({
++      "/items/1x": "ignored",
++      "/items/1.5": "ignored",
++    });
++
++    expect(harness.getSnapshot()).toBe(before);
++    expect(harness.setSnapshot).not.toHaveBeenCalled();
++    expect(listener).not.toHaveBeenCalled();
++    expect(Object.keys(harness.getSnapshot().items as unknown[])).toEqual([
++      "0",
++      "1",
++    ]);
++  });
++
++  it("writes once for a mixed batch and preserves earlier snapshots", () => {
++    const harness = createAdapterHarness({
++      items: ["zero"],
++      nested: { untouched: true },
++    });
++    const listener = vi.fn();
++    harness.store.subscribe(listener);
++    const before = harness.getSnapshot();
++
++    harness.store.update({
++      "/items/01": "ignored",
++      "/items/1": "one",
++      "/nested/untouched": false,
++    });
++
++    const after = harness.getSnapshot();
++    expect(harness.setSnapshot).toHaveBeenCalledTimes(1);
++    expect(listener).toHaveBeenCalledTimes(1);
++    expect(after).toEqual({
++      items: ["zero", "one"],
++      nested: { untouched: false },
++    });
++    expect(before).toEqual({
++      items: ["zero"],
++      nested: { untouched: true },
++    });
++    expect(after.items).not.toBe(before.items);
++    expect(after.nested).not.toBe(before.nested);
++  });
++
++  it("evaluates sequential adapter batch paths against the latest snapshot", () => {
++    const harness = createAdapterHarness({});
++
++    harness.store.update({ "/items": [], "/items/0/name": "first" });
++
++    expect(harness.setSnapshot).toHaveBeenCalledTimes(1);
++    expect(harness.getSnapshot()).toEqual({ items: [{ name: "first" }] });
++  });
++
++  it.each(["__proto__", "constructor", "prototype"])(
++    "rejects %s state paths without writing a snapshot",
++    (token) => {
++      const harness = createAdapterHarness({ safe: true });
++      const snapshot = harness.getSnapshot();
++
++      harness.store.set(`/${token}/polluted`, "value");
++      harness.store.update({ [`/safe/${token}/polluted`]: "value" });
++
++      expect(harness.getSnapshot()).toBe(snapshot);
++      expect(harness.setSnapshot).not.toHaveBeenCalled();
++    },
++  );
+ });
+ 
+ describe("flattenToPointers", () => {
+diff --git a/packages/core/src/state-store.ts b/packages/core/src/state-store.ts
+index 1964e05..79c5ab3 100644
+--- a/packages/core/src/state-store.ts
++++ b/packages/core/src/state-store.ts
+@@ -1,9 +1,68 @@
+ import {
+   getByPath,
++  isSafeJsonPointerPath,
+   parseJsonPointer,
+   type StateModel,
+   type StateStore,
+ } from "./types";
++import { parseArrayIndex } from "./path-utils";
++
++function isContainer(
++  value: unknown,
++): value is Record<string, unknown> | unknown[] {
++  return value !== null && typeof value === "object";
++}
++
++function createMissingContainer(
++  nextSegment: string,
++  nextIsTerminal: boolean,
++): Record<string, unknown> | unknown[] {
++  return parseArrayIndex(nextSegment) !== undefined ||
++    (nextIsTerminal && nextSegment === "-")
++    ? []
++    : {};
++}
++
++/**
++ * Validate a path before cloning so rejected array tokens retain the original
++ * snapshot reference and cannot create a partial branch.
++ */
++function canImmutableSetBySegments(
++  root: StateModel,
++  segments: string[],
++): boolean {
++  let current: unknown = root;
++
++  for (let i = 0; i < segments.length - 1; i++) {
++    const segment = segments[i]!;
++    const nextSegment = segments[i + 1]!;
++    const nextIsTerminal = i + 1 === segments.length - 1;
++
++    if (Array.isArray(current)) {
++      const index = parseArrayIndex(segment);
++      if (index === undefined) return false;
++      const child = current[index];
++      current = isContainer(child)
++        ? child
++        : createMissingContainer(nextSegment, nextIsTerminal);
++    } else if (isContainer(current)) {
++      const object = current as Record<string, unknown>;
++      const child = object[segment];
++      current = isContainer(child)
++        ? child
++        : createMissingContainer(nextSegment, nextIsTerminal);
++    } else {
++      return false;
++    }
++  }
++
++  if (Array.isArray(current)) {
++    const lastSegment = segments[segments.length - 1]!;
++    return lastSegment === "-" || parseArrayIndex(lastSegment) !== undefined;
++  }
++
++  return isContainer(current);
++}
+ 
+ /**
+  * Immutably set a value at a JSON Pointer path using structural sharing.
+@@ -15,32 +74,47 @@ export function immutableSetByPath(
+   path: string,
+   value: unknown,
+ ): StateModel {
++  if (!isSafeJsonPointerPath(path)) return root;
++
+   const segments = parseJsonPointer(path);
+   if (segments.length === 0) return root;
++  if (!canImmutableSetBySegments(root, segments)) return root;
+ 
+   const result = { ...root };
+-  let current: Record<string, unknown> = result;
++  let current: Record<string, unknown> | unknown[] = result;
+ 
+   for (let i = 0; i < segments.length - 1; i++) {
+     const seg = segments[i]!;
+-    const child = current[seg];
+-    if (Array.isArray(child)) {
+-      current[seg] = [...child];
+-    } else if (child !== null && typeof child === "object") {
+-      current[seg] = { ...(child as Record<string, unknown>) };
++    const nextSegment = segments[i + 1]!;
++    const nextIsTerminal = i + 1 === segments.length - 1;
++
++    if (Array.isArray(current)) {
++      const index = parseArrayIndex(seg)!;
++      const child = current[index];
++      current[index] = Array.isArray(child)
++        ? [...child]
++        : isContainer(child)
++          ? { ...child }
++          : createMissingContainer(nextSegment, nextIsTerminal);
++      current = current[index] as Record<string, unknown> | unknown[];
+     } else {
+-      const nextSeg = segments[i + 1];
+-      current[seg] = nextSeg !== undefined && /^\d+$/.test(nextSeg) ? [] : {};
++      const object = current as Record<string, unknown>;
++      const child = object[seg];
++      object[seg] = Array.isArray(child)
++        ? [...child]
++        : isContainer(child)
++          ? { ...child }
++          : createMissingContainer(nextSegment, nextIsTerminal);
++      current = object[seg] as Record<string, unknown> | unknown[];
+     }
+-    current = current[seg] as Record<string, unknown>;
+   }
+ 
+   const lastSeg = segments[segments.length - 1]!;
+   if (Array.isArray(current)) {
+     if (lastSeg === "-") {
+-      (current as unknown[]).push(value);
++      current.push(value);
+     } else {
+-      (current as unknown[])[parseInt(lastSeg, 10)] = value;
++      current[parseArrayIndex(lastSeg)!] = value;
+     }
+   } else {
+     current[lastSeg] = value;
+@@ -72,8 +146,11 @@ export function createStateStore(initialState: StateModel = {}): StateStore {
+     },
+ 
+     set(path: string, value: unknown): void {
++      if (!isSafeJsonPointerPath(path)) return;
+       if (getByPath(state, path) === value) return;
+-      state = immutableSetByPath(state, path, value);
++      const next = immutableSetByPath(state, path, value);
++      if (next === state) return;
++      state = next;
+       notify();
+     },
+ 
+@@ -81,9 +158,13 @@ export function createStateStore(initialState: StateModel = {}): StateStore {
+       let changed = false;
+       let next = state;
+       for (const [path, value] of Object.entries(updates)) {
++        if (!isSafeJsonPointerPath(path)) continue;
+         if (getByPath(next, path) !== value) {
+-          next = immutableSetByPath(next, path, value);
+-          changed = true;
++          const updated = immutableSetByPath(next, path, value);
++          if (updated !== next) {
++            next = updated;
++            changed = true;
++          }
+         }
+       }
+       if (!changed) return;
+@@ -137,18 +218,25 @@ export function createStoreAdapter(config: StoreAdapterConfig): StateStore {
+     },
+ 
+     set(path: string, value: unknown): void {
++      if (!isSafeJsonPointerPath(path)) return;
+       const current = config.getSnapshot();
+       if (getByPath(current, path) === value) return;
+-      config.setSnapshot(immutableSetByPath(current, path, value));
++      const next = immutableSetByPath(current, path, value);
++      if (next === current) return;
++      config.setSnapshot(next);
+     },
+ 
+     update(updates: Record<string, unknown>): void {
+       let next = config.getSnapshot();
+       let changed = false;
+       for (const [path, value] of Object.entries(updates)) {
++        if (!isSafeJsonPointerPath(path)) continue;
+         if (getByPath(next, path) !== value) {
+-          next = immutableSetByPath(next, path, value);
+-          changed = true;
++          const updated = immutableSetByPath(next, path, value);
++          if (updated !== next) {
++            next = updated;
++            changed = true;
++          }
+         }
+       }
+       if (!changed) return;
+diff --git a/packages/core/src/types.test.ts b/packages/core/src/types.test.ts
+index 31701a9..aa77533 100644
+--- a/packages/core/src/types.test.ts
++++ b/packages/core/src/types.test.ts
+@@ -60,6 +60,126 @@ describe("getByPath", () => {
+   });
+ });
+ 
++const invalidArrayTokens = [
++  "01",
++  "00",
++  "1x",
++  "1.5",
++  "+1",
++  "-1",
++  "-0",
++  "1e1",
++  "0x10",
++  "",
++  " ",
++  "1\n",
++  "NaN",
++  "Infinity",
++  "4294967295",
++  "9007199254740992",
++  "1234567890123456789012345678901234567890",
++] as const;
++
++function expectUntouchedArray(array: unknown[], values: unknown[]) {
++  expect(array).toEqual(values);
++  expect(Object.keys(array)).toEqual(values.map((_, index) => String(index)));
++}
++
++describe("array JSON Pointer tokens", () => {
++  it.each(invalidArrayTokens)(
++    "does not coerce invalid token %j at an array leaf",
++    (token) => {
++      const data: Record<string, unknown> = { items: ["zero", "one"] };
++      const items = data.items as unknown[];
++
++      expect(getByPath(data, `/items/${token}`)).toBeUndefined();
++      setByPath(data, `/items/${token}`, "set");
++      addByPath(data, `/items/${token}`, "add");
++      removeByPath(data, `/items/${token}`);
++
++      expectUntouchedArray(items, ["zero", "one"]);
++    },
++  );
++
++  it.each(invalidArrayTokens)(
++    "does not mutate or create properties below invalid intermediate token %j",
++    (token) => {
++      const data: Record<string, unknown> = {
++        items: [{ values: ["zero", "one"] }],
++      };
++      const values = (data.items as Array<Record<string, unknown>>)[0]!
++        .values as unknown[];
++
++      expect(getByPath(data, `/items/0/values/${token}/name`)).toBeUndefined();
++      setByPath(data, `/items/0/values/${token}/name`, "set");
++      addByPath(data, `/items/0/values/${token}/name`, "add");
++      removeByPath(data, `/items/0/values/${token}/name`);
++
++      expectUntouchedArray(values, ["zero", "one"]);
++    },
++  );
++
++  it("keeps numeric-looking and special tokens as literal object keys", () => {
++    const data: Record<string, unknown> = {
++      records: { "01": {}, "": {}, "-": {}, "a/b": {} },
++    };
++
++    setByPath(data, "/records/01/name", "leading zero");
++    setByPath(data, "/records//name", "empty");
++    setByPath(data, "/records/-/name", "dash");
++    setByPath(data, "/records/a~1b/name", "escaped slash");
++
++    expect(data.records).toEqual({
++      "01": { name: "leading zero" },
++      "": { name: "empty" },
++      "-": { name: "dash" },
++      "a/b": { name: "escaped slash" },
++    });
++  });
++
++  it("infers arrays only for canonical indices and a terminal append token", () => {
++    const data: Record<string, unknown> = {};
++
++    setByPath(data, "/items/0/name", "first");
++    setByPath(data, "/appended/-", "last");
++    setByPath(data, "/records/01/name", "literal");
++    setByPath(data, "/empty//name", "literal empty");
++    setByPath(data, "/dash/-/name", "literal dash");
++
++    expect(data.items).toEqual([{ name: "first" }]);
++    expect(data.appended).toEqual(["last"]);
++    expect(data.records).toEqual({ "01": { name: "literal" } });
++    expect(data.empty).toEqual({ "": { name: "literal empty" } });
++    expect(data.dash).toEqual({ "-": { name: "literal dash" } });
++  });
++
++  it("supports canonical indices, ordering, and terminal append", () => {
++    const data: Record<string, unknown> = { items: ["zero", "two"] };
++
++    setByPath(data, "/items/1", "one");
++    addByPath(data, "/items/1", "inserted");
++    addByPath(data, "/items/-", "last");
++    removeByPath(data, "/items/1");
++
++    expect(data.items).toEqual(["zero", "one", "last"]);
++    expect(getByPath(data, "/items/-")).toBeUndefined();
++    removeByPath(data, "/items/-");
++    expect(data.items).toEqual(["zero", "one", "last"]);
++  });
++
++  it("rejects an append token for reads, removals, and intermediate traversal", () => {
++    const data: Record<string, unknown> = { items: ["zero"] };
++    const items = data.items as unknown[];
++
++    expect(getByPath(data, "/items/-")).toBeUndefined();
++    setByPath(data, "/items/-/name", "ignored");
++    addByPath(data, "/items/-/name", "ignored");
++    removeByPath(data, "/items/-/name");
++
++    expectUntouchedArray(items, ["zero"]);
++  });
++});
++
+ describe("resolveRepeatStatePath", () => {
+   it("preserves string paths exactly", () => {
+     expect(resolveRepeatStatePath("/items")).toBe("/items");
+@@ -215,6 +335,67 @@ describe("JSON Pointer escaping (RFC 6901)", () => {
+   });
+ });
+ 
++// =============================================================================
++// JSON Pointer prototype safety
++// =============================================================================
++
++describe("JSON Pointer prototype safety", () => {
++  const blockedTokens = ["__proto__", "constructor", "prototype"];
++
++  it.each(blockedTokens)("rejects %s in path utility writes", (token) => {
++    const pollutionKey = "__json_render_pollution_probe__";
++    const data: Record<string, unknown> = {};
++
++    try {
++      setByPath(data, `/${token}/${pollutionKey}`, "set");
++      addByPath(data, `/safe/${token}/${pollutionKey}`, "add");
++
++      expect(data).toEqual({});
++      expect(Object.prototype).not.toHaveProperty(pollutionKey);
++    } finally {
++      delete (Object.prototype as Record<string, unknown>)[pollutionKey];
++    }
++  });
++
++  it("does not read or remove values through Object.prototype", () => {
++    const pollutionKey = "__json_render_inherited_probe__";
++    (Object.prototype as Record<string, unknown>)[pollutionKey] = "keep";
++
++    try {
++      expect(getByPath({}, `/__proto__/${pollutionKey}`)).toBeUndefined();
++      removeByPath({}, `/__proto__/${pollutionKey}`);
++      expect((Object.prototype as Record<string, unknown>)[pollutionKey]).toBe(
++        "keep",
++      );
++    } finally {
++      delete (Object.prototype as Record<string, unknown>)[pollutionKey];
++    }
++  });
++
++  it.each(blockedTokens)(
++    "rejects compound patches containing %s before mutation",
++    (token) => {
++      const destination: Record<string, unknown> = { source: "one" };
++      applySpecStreamPatch(destination, {
++        op: "move",
++        from: "/source",
++        path: `/${token}/moved`,
++      });
++
++      const source: Record<string, unknown> = {};
++      applySpecStreamPatch(source, {
++        op: "copy",
++        from: `/${token}/value`,
++        path: "/copy",
++      });
++
++      expect(destination).toEqual({ source: "one" });
++      expect(source).toEqual({});
++      expect(Object.hasOwn(source, "copy")).toBe(false);
++    },
++  );
++});
++
+ // =============================================================================
+ // addByPath (RFC 6902 "add" semantics)
+ // =============================================================================
+@@ -421,6 +602,119 @@ describe("applySpecStreamPatch", () => {
+     });
+   });
+ 
++  describe("malformed array paths", () => {
++    it("does not copy undefined from a malformed source or write to a malformed destination", () => {
++      const malformedSource: Record<string, unknown> = { items: ["one"] };
++      applySpecStreamPatch(malformedSource, {
++        op: "copy",
++        from: "/items/01",
++        path: "/copy",
++      });
++
++      const malformedDestination: Record<string, unknown> = {
++        source: "one",
++        items: ["two"],
++      };
++      applySpecStreamPatch(malformedDestination, {
++        op: "copy",
++        from: "/source",
++        path: "/items/01",
++      });
++
++      expect(malformedSource).toEqual({ items: ["one"] });
++      expect(malformedDestination).toEqual({
++        source: "one",
++        items: ["two"],
++      });
++      expect(Object.keys(malformedDestination.items as unknown[])).toEqual([
++        "0",
++      ]);
++    });
++
++    it("does not delete a move source when its destination is malformed", () => {
++      const obj: Record<string, unknown> = {
++        source: "one",
++        items: ["two"],
++      };
++
++      applySpecStreamPatch(obj, {
++        op: "move",
++        from: "/source",
++        path: "/items/01",
++      });
++
++      expect(obj).toEqual({ source: "one", items: ["two"] });
++      expect(Object.keys(obj.items as unknown[])).toEqual(["0"]);
++    });
++
++    it("stages a move destination after removing its source", () => {
++      const obj: Record<string, unknown> = { items: ["one"] };
++
++      applySpecStreamPatch(obj, {
++        op: "move",
++        from: "/items",
++        path: "/items/01/value",
++      });
++
++      expect(obj).toEqual({ items: { "01": { value: ["one"] } } });
++    });
++
++    it("does not traverse unrelated branches while staging a move", () => {
++      const unrelated: Record<string, unknown> = {};
++      let current = unrelated;
++      for (let i = 0; i < 12_000; i++) {
++        const next: Record<string, unknown> = {};
++        current.next = next;
++        current = next;
++      }
++      const obj: Record<string, unknown> = { a: "one", b: "two", unrelated };
++
++      applySpecStreamPatch(obj, { op: "move", from: "/a", path: "/b" });
++
++      expect(obj).toEqual({ b: "one", unrelated });
++      expect(obj.unrelated).toBe(unrelated);
++    });
++
++    it("does not access unrelated properties while staging a move", () => {
++      const obj: Record<string, unknown> = { a: "one", b: "two" };
++      Object.defineProperty(obj, "unrelated", {
++        enumerable: true,
++        get() {
++          throw new Error("unrelated property was accessed");
++        },
++      });
++
++      expect(() =>
++        applySpecStreamPatch(obj, { op: "move", from: "/a", path: "/b" }),
++      ).not.toThrow();
++      expect(obj.b).toBe("one");
++      expect("a" in obj).toBe(false);
++    });
++
++    it("does not throw or delete the source for a self-referential staged destination", () => {
++      const obj: Record<string, unknown> = { source: "one" };
++
++      expect(() =>
++        applySpecStreamPatch(obj, {
++          op: "move",
++          from: "/source",
++          path: "/__proto__/moved",
++        }),
++      ).not.toThrow();
++
++      expect(obj).toEqual({ source: "one" });
++      expect(Object.prototype).not.toHaveProperty("moved");
++    });
++
++    it("keeps applying later stream patches after a malformed path", () => {
++      const result = compileSpecStream(`{"op":"add","path":"/items","value":[]}
++{"op":"add","path":"/items/01","value":"ignored"}
++{"op":"add","path":"/items/-","value":"accepted"}`);
++
++      expect(result).toEqual({ items: ["accepted"] });
++    });
++  });
++
+   describe("test operation", () => {
+     it("succeeds when values match", () => {
+       const obj: Record<string, unknown> = { name: "Alice" };
+diff --git a/packages/core/src/types.ts b/packages/core/src/types.ts
+index c051449..def228d 100644
+--- a/packages/core/src/types.ts
++++ b/packages/core/src/types.ts
+@@ -1,5 +1,6 @@
+ import { z } from "zod";
+ import type { ActionBinding } from "./actions";
++import { parseArrayIndex } from "./path-utils";
+ 
+ /**
+  * Dynamic value - can be a literal or a `{ $state }` reference to the state model.
+@@ -280,34 +281,84 @@ export function parseJsonPointer(path: string): string[] {
+   return raw.map(unescapeJsonPointer);
+ }
+ 
++const blockedJsonPointerTokens = new Set([
++  "__proto__",
++  "constructor",
++  "prototype",
++]);
++
++/**
++ * Reject tokens that can traverse or modify JavaScript prototype chains.
++ * Validation happens after JSON Pointer unescaping so encoded paths cannot
++ * bypass it.
++ */
++function hasBlockedJsonPointerToken(segments: string[]): boolean {
++  return segments.some((segment) => blockedJsonPointerTokens.has(segment));
++}
++
++/** @internal Shared by JSON Pointer-based state stores. */
++export function isSafeJsonPointerPath(path: string): boolean {
++  return !hasBlockedJsonPointerToken(parseJsonPointer(path));
++}
++
+ /**
+  * Get a value from an object by JSON Pointer path (RFC 6901)
+  */
+ export function getByPath(obj: unknown, path: string): unknown {
++  const result = readByPath(obj, path);
++  return result.exists ? result.value : undefined;
++}
++
++interface PathReadResult {
++  /** False when an array token is not a canonical array index. */
++  valid: boolean;
++  /** False when a syntactically valid path does not resolve to a value. */
++  exists: boolean;
++  value?: unknown;
++}
++
++/**
++ * Read a path while preserving the distinction between a missing path and an
++ * invalid array token. Patch operations use that distinction to avoid turning
++ * malformed paths into writes of `undefined`.
++ */
++function readByPath(obj: unknown, path: string): PathReadResult {
+   if (!path || path === "/") {
+-    return obj;
++    return { valid: true, exists: true, value: obj };
+   }
+ 
+   const segments = parseJsonPointer(path);
++  if (hasBlockedJsonPointerToken(segments)) {
++    return { valid: false, exists: false };
++  }
+ 
+   let current: unknown = obj;
+ 
+   for (const segment of segments) {
+     if (current === null || current === undefined) {
+-      return undefined;
++      return { valid: true, exists: false };
+     }
+ 
+     if (Array.isArray(current)) {
+-      const index = parseInt(segment, 10);
++      const index = parseArrayIndex(segment);
++      if (index === undefined) {
++        return { valid: false, exists: false };
++      }
++      if (!(index in current)) {
++        return { valid: true, exists: false };
++      }
+       current = current[index];
+     } else if (typeof current === "object") {
++      if (!(segment in current)) {
++        return { valid: true, exists: false };
++      }
+       current = (current as Record<string, unknown>)[segment];
+     } else {
+-      return undefined;
++      return { valid: true, exists: false };
+     }
+   }
+ 
+-  return current;
++  return { valid: true, exists: true, value: current };
+ }
+ 
+ export function resolveRepeatStatePath(
+@@ -344,60 +395,162 @@ function joinStatePath(basePath: string, childPath: string): string {
+   return `${basePath}/${child}`;
+ }
+ 
++function isContainer(
++  value: unknown,
++): value is Record<string, unknown> | unknown[] {
++  return value !== null && typeof value === "object";
++}
++
++function createMissingContainer(
++  nextSegment: string,
++  nextIsTerminal: boolean,
++): Record<string, unknown> | unknown[] {
++  return parseArrayIndex(nextSegment) !== undefined ||
++    (nextIsTerminal && nextSegment === "-")
++    ? []
++    : {};
++}
++
+ /**
+- * Check if a string is a numeric index
++ * Validate a set/add path without mutating it. This prevents an invalid array
++ * token late in a path from leaving partially-created containers behind.
+  */
+-function isNumericIndex(str: string): boolean {
+-  return /^\d+$/.test(str);
++function canWriteBySegments(
++  root: Record<string, unknown>,
++  segments: string[],
++): boolean {
++  if (hasBlockedJsonPointerToken(segments)) return false;
++
++  let current: unknown = root;
++
++  for (let i = 0; i < segments.length - 1; i++) {
++    const segment = segments[i]!;
++    const nextSegment = segments[i + 1]!;
++    const nextIsTerminal = i + 1 === segments.length - 1;
++
++    if (Array.isArray(current)) {
++      const index = parseArrayIndex(segment);
++      if (index === undefined) return false;
++      const child = current[index];
++      current = isContainer(child)
++        ? child
++        : createMissingContainer(nextSegment, nextIsTerminal);
++    } else if (isContainer(current)) {
++      const object = current as Record<string, unknown>;
++      const child = object[segment];
++      current = isContainer(child)
++        ? child
++        : createMissingContainer(nextSegment, nextIsTerminal);
++    } else {
++      return false;
++    }
++  }
++
++  if (Array.isArray(current)) {
++    const lastSegment = segments[segments.length - 1]!;
++    return lastSegment === "-" || parseArrayIndex(lastSegment) !== undefined;
++  }
++
++  return isContainer(current);
+ }
+ 
+ /**
+- * Set a value in an object by JSON Pointer path (RFC 6901).
+- * Automatically creates arrays when the path segment is a numeric index.
++ * Return the mutable parent for a valid write path, creating intermediate
++ * containers after validation has succeeded.
+  */
+-export function setByPath(
+-  obj: Record<string, unknown>,
+-  path: string,
+-  value: unknown,
+-): void {
+-  const segments = parseJsonPointer(path);
++function getWritableParent(
++  root: Record<string, unknown>,
++  segments: string[],
++): Record<string, unknown> | unknown[] | undefined {
++  if (!canWriteBySegments(root, segments)) return undefined;
+ 
+-  if (segments.length === 0) return;
+-
+-  let current: Record<string, unknown> | unknown[] = obj;
++  let current: Record<string, unknown> | unknown[] = root;
+ 
+   for (let i = 0; i < segments.length - 1; i++) {
+     const segment = segments[i]!;
+-    const nextSegment = segments[i + 1];
+-    const nextIsNumeric =
+-      nextSegment !== undefined &&
+-      (isNumericIndex(nextSegment) || nextSegment === "-");
++    const nextSegment = segments[i + 1]!;
++    const nextIsTerminal = i + 1 === segments.length - 1;
+ 
+     if (Array.isArray(current)) {
+-      const index = parseInt(segment, 10);
+-      if (current[index] === undefined || typeof current[index] !== "object") {
+-        current[index] = nextIsNumeric ? [] : {};
++      const index = parseArrayIndex(segment)!;
++      const child = current[index];
++      if (!isContainer(child)) {
++        current[index] = createMissingContainer(nextSegment, nextIsTerminal);
+       }
+       current = current[index] as Record<string, unknown> | unknown[];
+     } else {
+-      if (!(segment in current) || typeof current[segment] !== "object") {
+-        current[segment] = nextIsNumeric ? [] : {};
++      const object = current as Record<string, unknown>;
++      const child = object[segment];
++      if (!isContainer(child)) {
++        object[segment] = createMissingContainer(nextSegment, nextIsTerminal);
+       }
+-      current = current[segment] as Record<string, unknown> | unknown[];
++      current = object[segment] as Record<string, unknown> | unknown[];
++    }
++  }
++
++  return current;
++}
++
++function setByPathInternal(
++  obj: Record<string, unknown>,
++  path: string,
++  value: unknown,
++): boolean {
++  const segments = parseJsonPointer(path);
++  if (segments.length === 0) return false;
++
++  const current = getWritableParent(obj, segments);
++  if (!current) return false;
++
++  const lastSegment = segments[segments.length - 1]!;
++  if (Array.isArray(current)) {
++    if (lastSegment === "-") {
++      current.push(value);
++    } else {
++      current[parseArrayIndex(lastSegment)!] = value;
+     }
++  } else {
++    current[lastSegment] = value;
+   }
+ 
++  return true;
++}
++
++function addByPathInternal(
++  obj: Record<string, unknown>,
++  path: string,
++  value: unknown,
++): boolean {
++  const segments = parseJsonPointer(path);
++  if (segments.length === 0) return false;
++
++  const current = getWritableParent(obj, segments);
++  if (!current) return false;
++
+   const lastSegment = segments[segments.length - 1]!;
+   if (Array.isArray(current)) {
+     if (lastSegment === "-") {
+       current.push(value);
+     } else {
+-      const index = parseInt(lastSegment, 10);
+-      current[index] = value;
++      current.splice(parseArrayIndex(lastSegment)!, 0, value);
+     }
+   } else {
+     current[lastSegment] = value;
+   }
++
++  return true;
++}
++
++/**
++ * Set a value in an object by JSON Pointer path (RFC 6901).
++ * Automatically creates arrays when the path segment is a numeric index.
++ */
++export function setByPath(
++  obj: Record<string, unknown>,
++  path: string,
++  value: unknown,
++): void {
++  setByPathInternal(obj, path, value);
+ }
+ 
+ /**
+@@ -410,84 +563,191 @@ export function addByPath(
+   path: string,
+   value: unknown,
+ ): void {
++  addByPathInternal(obj, path, value);
++}
++
++/**
++ * Remove a value per RFC 6902 "remove" semantics.
++ * For objects: delete the property.
++ * For arrays: splice out the element at the given index.
++ */
++export function removeByPath(obj: Record<string, unknown>, path: string): void {
++  removeByPathInternal(obj, path);
++}
++
++function removeByPathInternal(
++  obj: Record<string, unknown>,
++  path: string,
++  stageObjectRemoval = false,
++): boolean {
+   const segments = parseJsonPointer(path);
+ 
+-  if (segments.length === 0) return;
++  if (segments.length === 0 || hasBlockedJsonPointerToken(segments)) {
++    return false;
++  }
+ 
+   let current: Record<string, unknown> | unknown[] = obj;
+ 
+   for (let i = 0; i < segments.length - 1; i++) {
+     const segment = segments[i]!;
+-    const nextSegment = segments[i + 1];
+-    const nextIsNumeric =
+-      nextSegment !== undefined &&
+-      (isNumericIndex(nextSegment) || nextSegment === "-");
+ 
+     if (Array.isArray(current)) {
+-      const index = parseInt(segment, 10);
+-      if (current[index] === undefined || typeof current[index] !== "object") {
+-        current[index] = nextIsNumeric ? [] : {};
++      const index = parseArrayIndex(segment);
++      if (index === undefined || !isContainer(current[index])) {
++        return false; // path does not exist or is invalid
+       }
+       current = current[index] as Record<string, unknown> | unknown[];
+     } else {
+-      if (!(segment in current) || typeof current[segment] !== "object") {
+-        current[segment] = nextIsNumeric ? [] : {};
++      const object = current as Record<string, unknown>;
++      if (!(segment in object) || !isContainer(object[segment])) {
++        return false; // path does not exist
+       }
+-      current = current[segment] as Record<string, unknown> | unknown[];
++      current = object[segment] as Record<string, unknown> | unknown[];
+     }
+   }
+ 
+   const lastSegment = segments[segments.length - 1]!;
+   if (Array.isArray(current)) {
+-    if (lastSegment === "-") {
+-      current.push(value);
+-    } else {
+-      const index = parseInt(lastSegment, 10);
+-      current.splice(index, 0, value);
++    const index = parseArrayIndex(lastSegment);
++    if (index !== undefined && index < current.length) {
++      current.splice(index, 1);
++      return true;
+     }
+   } else {
+-    current[lastSegment] = value;
++    // A staged object inherits untouched properties from the original. Shadow
++    // an own removed property with undefined so destination validation observes
++    // the state after removal without mutating or copying unrelated properties.
++    if (stageObjectRemoval) {
++      const source = Object.getPrototypeOf(current);
++      if (
++        Object.hasOwn(current, lastSegment) ||
++        (source !== null && Object.hasOwn(source, lastSegment))
++      ) {
++        current[lastSegment] = undefined;
++      }
++    } else {
++      delete current[lastSegment];
++    }
++    return true;
+   }
++
++  return false;
+ }
+ 
++type MutableContainer = Record<string, unknown> | unknown[];
++
+ /**
+- * Remove a value per RFC 6902 "remove" semantics.
+- * For objects: delete the property.
+- * For arrays: splice out the element at the given index.
++ * Make a path-local copy-on-write container for move preflight. Objects defer
++ * unrelated properties to the original through their prototype; arrays are
++ * copied because staging a splice must preserve their indexed semantics.
+  */
+-export function removeByPath(obj: Record<string, unknown>, path: string): void {
+-  const segments = parseJsonPointer(path);
++function clonePatchContainer(value: MutableContainer): MutableContainer {
++  if (Array.isArray(value)) {
++    const copy: unknown[] = new Array(value.length);
++    for (const key of Object.keys(value)) {
++      (copy as unknown as Record<string, unknown>)[key] = (
++        value as unknown as Record<string, unknown>
++      )[key];
++    }
++    return copy;
++  }
+ 
+-  if (segments.length === 0) return;
++  return Object.create(value) as Record<string, unknown>;
++}
+ 
+-  let current: Record<string, unknown> | unknown[] = obj;
++/**
++ * Clone only existing containers leading to a path's parent. Missing and
++ * primitive children do not need cloning because the staged write will replace
++ * them on an already-cloned parent.
++ */
++function stagePathContainers(
++  root: MutableContainer,
++  segments: string[],
++  clones: WeakMap<object, MutableContainer>,
++  stagedContainers: WeakSet<object>,
++): boolean {
++  let current = root;
+ 
+   for (let i = 0; i < segments.length - 1; i++) {
+     const segment = segments[i]!;
++    let child: unknown;
++    let arrayIndex: number | undefined;
+ 
+     if (Array.isArray(current)) {
+-      const index = parseInt(segment, 10);
+-      if (current[index] === undefined || typeof current[index] !== "object") {
+-        return; // path does not exist
+-      }
+-      current = current[index] as Record<string, unknown> | unknown[];
++      arrayIndex = parseArrayIndex(segment);
++      if (arrayIndex === undefined) return true;
++      child = current[arrayIndex];
++    } else {
++      child = current[segment];
++    }
++
++    if (!isContainer(child)) return true;
++
++    let stagedChild: MutableContainer;
++    if (stagedContainers.has(child)) {
++      stagedChild = child;
+     } else {
+-      if (!(segment in current) || typeof current[segment] !== "object") {
+-        return; // path does not exist
++      stagedChild = clones.get(child) ?? clonePatchContainer(child);
++      clones.set(child, stagedChild);
++      stagedContainers.add(stagedChild);
++    }
++
++    // A prototype-backed lookup can resolve the original root back to its
++    // staged clone (for example through `__proto__`). Assigning that clone to
++    // itself would throw, while continuing without the assignment would let
++    // preflight mutate the original. Treat the move as invalid instead.
++    if (stagedChild === current) return false;
++
++    if (stagedChild !== child) {
++      if (Array.isArray(current)) {
++        current[arrayIndex!] = stagedChild;
++      } else {
++        current[segment] = stagedChild;
+       }
+-      current = current[segment] as Record<string, unknown> | unknown[];
+     }
++    current = stagedChild;
+   }
+ 
+-  const lastSegment = segments[segments.length - 1]!;
+-  if (Array.isArray(current)) {
+-    const index = parseInt(lastSegment, 10);
+-    if (index >= 0 && index < current.length) {
+-      current.splice(index, 1);
+-    }
+-  } else {
+-    delete current[lastSegment];
++  return true;
++}
++
++/**
++ * Verify a move against a path-local staged target. The destination must be
++ * evaluated after the source is removed, without touching unrelated branches.
++ */
++function canMoveByPath(
++  obj: Record<string, unknown>,
++  from: string,
++  path: string,
++  value: unknown,
++): boolean {
++  const staged = clonePatchContainer(obj) as Record<string, unknown>;
++  const clones = new WeakMap<object, MutableContainer>([[obj, staged]]);
++  const stagedContainers = new WeakSet<object>([staged]);
++
++  if (
++    !stagePathContainers(
++      staged,
++      parseJsonPointer(from),
++      clones,
++      stagedContainers,
++    )
++  ) {
++    return false;
+   }
++  if (!removeByPathInternal(staged, from, true)) return false;
++
++  if (
++    !stagePathContainers(
++      staged,
++      parseJsonPointer(path),
++      clones,
++      stagedContainers,
++    )
++  ) {
++    return false;
++  }
++  return addByPathInternal(staged, path, value);
+ }
+ 
+ /**
+@@ -617,6 +877,15 @@ export function applySpecStreamPatch<T extends Record<string, unknown>>(
+   obj: T,
+   patch: SpecStreamLine,
+ ): T {
++  if (!isSafeJsonPointerPath(patch.path)) return obj;
++  if (
++    (patch.op === "move" || patch.op === "copy") &&
++    patch.from !== undefined &&
++    !isSafeJsonPointerPath(patch.from)
++  ) {
++    return obj;
++  }
++
+   switch (patch.op) {
+     case "add":
+       addByPath(obj, patch.path, patch.value);
+@@ -630,15 +899,24 @@ export function applySpecStreamPatch<T extends Record<string, unknown>>(
+       break;
+     case "move": {
+       if (!patch.from) break;
+-      const moveValue = getByPath(obj, patch.from);
+-      removeByPath(obj, patch.from);
+-      addByPath(obj, patch.path, moveValue);
++      const source = readByPath(obj, patch.from);
++      if (!source.valid || !source.exists) break;
++
++      // A move's destination is evaluated after its source is removed. Stage
++      // both operations first so a malformed destination cannot delete source.
++      if (!canMoveByPath(obj, patch.from, patch.path, source.value)) {
++        break;
++      }
++
++      removeByPathInternal(obj, patch.from);
++      addByPathInternal(obj, patch.path, source.value);
+       break;
+     }
+     case "copy": {
+       if (!patch.from) break;
+-      const copyValue = getByPath(obj, patch.from);
+-      addByPath(obj, patch.path, copyValue);
++      const source = readByPath(obj, patch.from);
++      if (!source.valid || !source.exists) break;
++      addByPathInternal(obj, patch.path, source.value);
+       break;
+     }
+     case "test": {
+diff --git a/skills/core/SKILL.md b/skills/core/SKILL.md
+index 7d869db..1eafc60 100644
+--- a/skills/core/SKILL.md
++++ b/skills/core/SKILL.md
+@@ -77,6 +77,8 @@ const { result, newPatches } = compiler.push(chunk);
+ const finalSpec = compiler.getResult();
+ ```
+ 
++JSON Pointer paths containing `__proto__`, `constructor`, or `prototype` tokens are rejected by path utilities, state stores, and SpecStream. For `move` and `copy`, this applies to both `path` and `from`.
++
+ ## Dynamic Prop Expressions
+ 
+ Any prop value can be a dynamic expression resolved at render time:
+@@ -243,6 +245,20 @@ store.subscribe(() => {
+ 
+ The `StateStore` interface: `get(path)`, `set(path, value)`, `update(updates)`, `getSnapshot()`, `subscribe(listener)`.
+ 
++### State path rules
++
++Use JSON Pointer paths. When a token addresses an array, it must be a canonical
++decimal index (`0` or a non-zero digit followed by digits) in the JavaScript
++array-index range. Do not use leading zeros, fractions, signs, exponents, or
++whitespace: use `/items/1`, not `/items/01` or `/items/1e1`. Object keys remain
++literal, including keys such as `"01"`, `""`, and `"-"`.
++
++`set` and `update` accept a final `-` token to append to an array. It is not
++valid for reads, removals, or intermediate array traversal. Invalid array
++writes are silent no-ops: they preserve snapshot identity and do not notify
++subscribers or call an adapter's snapshot writer. A batch applies valid entries
++in order and emits at most one notification/write when state changes.
++
+ ## Key Exports
+ 
+ | Export | Purpose |

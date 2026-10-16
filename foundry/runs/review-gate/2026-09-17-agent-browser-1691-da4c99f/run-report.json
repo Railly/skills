@@ -1,0 +1,702 @@
+{
+  "schemaVersion": 1,
+  "run": {
+    "date": "2026-09-17",
+    "repo": "vercel-labs/agent-browser",
+    "pr": 1691,
+    "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+    "head": "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+    "profile": "external-pr",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af",
+    "status": "incomplete",
+    "verdict": "incomplete",
+    "gaps": [
+      "Required exact-head passing Test Strength receipt is unavailable. Authored green tests do not establish fix-absent falsification or a complete provider protocol matrix.",
+      "Required exact-head passing Resilience Audit receipt is unavailable. The two focused failure probes do not cover all post-create/CDP/cleanup ownership partitions.",
+      "No BROWSER_USE_API_KEY was present in the environment; live Cloud create, CDP attach, profile persistence, recording, stop and billing observations remain unverified.",
+      "Native reviewer is another OpenAI-family context and author model is unknown. Saved official API contract supplies an independent protocol oracle, but there is no complete cross-family lifecycle challenge.",
+      "Successful create with id but absent/null cdpUrl is permitted by the response schema and loses cleanup ownership in the parser. No live active-browser instance of that shape was observed; it remains a producer-verification gap."
+    ]
+  },
+  "execution": {
+    "mode": "native_subagent",
+    "degraded_from": "fx_worker",
+    "independence_gap": "Native reviewer is another OpenAI-family context and author model is unknown. Saved official API contract supplies an independent protocol oracle, but there is no complete cross-family lifecycle challenge.",
+    "receipt": "independent-correctness-review.json",
+    "schema_failures": 2,
+    "operations": [
+      {
+        "operation": "FX reviewer startup",
+        "attempted_calls": 1,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "Native reviewer fallback",
+        "attempted_calls": 2,
+        "schema_failures": 1,
+        "identical_retry": false
+      },
+      {
+        "operation": "Nested native corroboration",
+        "attempted_calls": 1,
+        "schema_failures": 0,
+        "identical_retry": false
+      }
+    ]
+  },
+  "contract": {
+    "path": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/contract.md",
+    "spec_status": "not_provided",
+    "acceptance_reviewed": [
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "gaps": []
+  },
+  "provenance": {
+    "author_model": "unknown; contributor MagMueller",
+    "reviewer_model": "gpt-6-astra native isolated reviewer; same OpenAI family, existing empirical evidence visible",
+    "same_family": true
+  },
+  "risk": {
+    "level": "high",
+    "triggers": [
+      "remote billable browser creation and cleanup",
+      "process lifecycle",
+      "API credential handling"
+    ],
+    "independent_challenge": {
+      "required": true,
+      "satisfied": false,
+      "method": "reference_oracle",
+      "artifact": "oracle-and-boundaries.md",
+      "evidence": "Official API schemas and lifecycle text are saved and checked. Independent protocol evidence supports F2; cross-family lifecycle review remains unavailable."
+    }
+  },
+  "security_review": {
+    "status": "pass",
+    "fingerprint": {
+      "repository": "vercel-labs/agent-browser",
+      "base_sha": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+      "head_sha": "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+      "dirty_digest": "clean",
+      "changed_path_digest": "sha256:9097d5b19b97d4b2cfe0f704d61fe9dca24f179bcca1a652723ac494af694005",
+      "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+    },
+    "claim": {
+      "property": "API credentials are sent only to the authenticated Browser Use API endpoint; provider options do not introduce a lower-privilege credential reader",
+      "attacker": "remote network or web-page content attacker without TLS identity for api.browser-use.com; local operator and configured provider already trusted",
+      "scope": "changed Browser Use provider credential and response path"
+    },
+    "trust_model": {
+      "assets": [
+        "Browser Use API key",
+        "remote browser session with possible profile cookies",
+        "session recording and provider session ID"
+      ],
+      "principals": [
+        {
+          "name": "local operator/daemon",
+          "existing_authority": "sets and reads its own process environment and cloud credential"
+        },
+        {
+          "name": "Browser Use API",
+          "existing_authority": "authorized recipient of API key, creates remote browser and stores requested profile/recording"
+        },
+        {
+          "name": "browser page",
+          "existing_authority": "controls its own content, no changed path to provider environment"
+        },
+        {
+          "name": "network peer",
+          "existing_authority": "can fail or delay transport; lacks accepted API TLS certificate"
+        }
+      ],
+      "boundaries": [
+        "operator environment to daemon",
+        "daemon HTTPS to fixed Browser Use API host",
+        "provider response to CDP connection",
+        "remote page to browser automation"
+      ],
+      "entrypoints": [
+        "BROWSER_USE_API_KEY",
+        "BROWSER_USE_PROFILE_ID",
+        "BROWSER_USE_PROXY_COUNTRY",
+        "BROWSER_USE_ENABLE_RECORDING",
+        "HTTPS response body containing id and cdpUrl"
+      ],
+      "sinks": [
+        "X-Browser-Use-API-Key header on POST/PATCH",
+        "request JSON",
+        "returned CDP endpoint connection",
+        "API error text returned to same local caller"
+      ]
+    },
+    "observations": [
+      {
+        "id": "SEC-001",
+        "classification": "informational",
+        "scope": "out_of_scope_hardening",
+        "prerequisites": [
+          "operator supplies API credential",
+          "Browser Use API authenticated by reqwest TLS verification"
+        ],
+        "chain": {
+          "capability": "network attacker can interrupt transport",
+          "reachability": "new POST uses fixed https://api.browser-use.com/api/v4/browsers",
+          "control": "no user/page-controlled destination in new POST; custom env values are JSON serialized",
+          "boundary": "credential remains between authorized daemon and provider",
+          "impact": "no new unauthorized credential reader or injection demonstrated"
+        },
+        "confidence": "high",
+        "evidence": [
+          "cli/src/native/providers.rs:388-410 uses reqwest client with default certificate verification and header auth; it removes prior API key query-string connection URL",
+          "cli/Cargo.lock pins reqwest 0.12.28 and cli/Cargo.toml enables rustls-tls-webpki-roots",
+          "browser-use-v4-openapi.json specifies APIKeyHeader for POST and PATCH"
+        ]
+      },
+      {
+        "id": "SEC-002",
+        "classification": "non_security_defect",
+        "scope": "unrelated_bug",
+        "prerequisites": [
+          "provider transport stalls or stop fails"
+        ],
+        "chain": {
+          "capability": "failure of a dependency",
+          "reachability": "new create request holds daemon state lock; existing stop helper now receives Browser Use sessions",
+          "control": "bounded local proxy forced no-response; no hostile deployed service boundary assumed",
+          "boundary": "no additional attacker authority established",
+          "impact": "hang and cleanup loss are correctness failures, not proven security vulnerabilities"
+        },
+        "confidence": "high",
+        "evidence": [
+          "dogfood.json",
+          "cli/src/native/actions.rs:2067-2069 and 553-554 in daemon.rs",
+          "F1/F2 routed to Review Gate"
+        ]
+      }
+    ],
+    "verification": {
+      "authorized_scope": "read-only source tracing and bounded localhost transport fixture with dummy API key; no cloud session creation or third-party account access",
+      "commands": [
+        "cargo build --locked --manifest-path cli/Cargo.toml",
+        "python3 /Users/raillyhugo/Programming/vercel/agent-browser-1691-proof/dogfood.py",
+        "read exact provider, caller, lockfile, and official OpenAPI source"
+      ],
+      "cleanup": "Fixture proxy released, isolated daemon closed, dummy credential only. Target worktree clean.",
+      "gaps": [],
+      "limits": [
+        "Static security review of changed transmission boundaries; this is not a cloud provider penetration test."
+      ]
+    },
+    "merge_relevance": {
+      "security_blockers": [],
+      "follow_ups": [],
+      "routed_non_security_defects": [
+        "F1 bounded provider request",
+        "F2 failed stop acknowledgement and retry ownership"
+      ]
+    },
+    "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/security-review.json"
+  },
+  "claim_inventory": [
+    {
+      "source": "contract",
+      "location": "contract.md",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "A1-A4 extracted from contributor PR claims, not an admitted solution."
+    },
+    {
+      "source": "design",
+      "location": "No Solution Gate or implementation trail supplied",
+      "status": "not_provided",
+      "properties": [],
+      "evidence": "No separate design receipt available; no design approval inferred."
+    },
+    {
+      "source": "user_facing",
+      "location": "pr.json, README.md:1799-1835, web provider page:20-44, CLI help, bundled command reference",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "Claims new V4 create, supported env options, active session lifecycle and immediate billing stop."
+    },
+    {
+      "source": "implementation",
+      "location": "cli/src/native/providers.rs diff and actions.rs callers",
+      "status": "reviewed",
+      "properties": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "evidence": "POST introduces remote side effect, response parser returns Some session, existing cleanup receives new managed state."
+    }
+  ],
+  "properties": [
+    {
+      "id": "P1",
+      "claim": "V4 create yields a usable CDP session and retains cleanup ownership.",
+      "kind": "lifecycle",
+      "status": "unverified",
+      "oracle": {
+        "observes": "server create response plus actual CDP attachment",
+        "layer": "user CLI, provider HTTP boundary and lifecycle state",
+        "method": "Compare official V4 schema and source, then live provider attach",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Correct POST endpoint and green parser unit test",
+        "counterexample": "201 includes id but no usable cdpUrl; parser throws away cleanup handle",
+        "attempted": false,
+        "outcome": "not_separated",
+        "evidence": "Wire names verified; full successful remote create/attach and failure cleanup not observed."
+      },
+      "substrates": [
+        {
+          "name": "official V4 OpenAPI and exact-head source",
+          "status": "exercised",
+          "evidence": "browser-use-v4-openapi.json and diff.patch"
+        },
+        {
+          "name": "live Browser Use Cloud browser",
+          "status": "unavailable",
+          "evidence": "No API credential available."
+        }
+      ],
+      "evidence": "Wire names verified; full successful remote create/attach and failure cleanup not observed."
+    },
+    {
+      "id": "P2",
+      "claim": "Profile, country/direct, and recording settings reach the V4 create body.",
+      "kind": "behavior",
+      "status": "unverified",
+      "oracle": {
+        "observes": "actual wire payload accepted by remote API",
+        "layer": "user CLI, provider HTTP boundary and lifecycle state",
+        "method": "Trace env lookup and compare schema; unit-test request shape",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Green helper assertions",
+        "counterexample": "A correctly constructed JSON body could be dropped before send or rejected by server",
+        "attempted": false,
+        "outcome": "not_separated",
+        "evidence": "Two authored Browser Use tests pass and schema keys match; live option effects remain unverified."
+      },
+      "substrates": [
+        {
+          "name": "Rust helper tests and normative OpenAPI",
+          "status": "exercised",
+          "evidence": "tests.log: test_browser_use_v4_options_and_response and test_browser_use_managed_proxy_can_be_disabled"
+        },
+        {
+          "name": "remote browser profile, proxy and recording effects",
+          "status": "unavailable",
+          "evidence": "No live credential."
+        }
+      ],
+      "evidence": "Two authored Browser Use tests pass and schema keys match; live option effects remain unverified."
+    },
+    {
+      "id": "P3",
+      "claim": "Close stops the owned session or reports and preserves a retryable cleanup failure.",
+      "kind": "lifecycle",
+      "status": "refuted",
+      "oracle": {
+        "observes": "stop transport outcome, close result, retained session ID and retry request count",
+        "layer": "user CLI, provider HTTP boundary and lifecycle state",
+        "method": "Force local proxy to reject stop CONNECT; invoke production execute_command close twice",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "CLI reports closed:true",
+        "counterexample": "Failed stop transport still returns success, drops ownership, and prevents another stop request",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "cleanup-probe-final.log reproduced success after failed stop; retained session=false; STOP_TRANSPORT_ATTEMPTS=1 after two closes."
+      },
+      "substrates": [
+        {
+          "name": "isolated exact-head caller with appended test only",
+          "status": "exercised",
+          "evidence": "cleanup-probe.patch and cleanup-probe-final.log"
+        },
+        {
+          "name": "real remote billing ledger",
+          "status": "unavailable",
+          "evidence": "Not measured; impact follows provider lifecycle contract."
+        }
+      ],
+      "evidence": "cleanup-probe-final.log reproduced success after failed stop; retained session=false; STOP_TRANSPORT_ATTEMPTS=1 after two closes."
+    },
+    {
+      "id": "P4",
+      "claim": "Provider setup and failure leave the daemon able to respond or terminate within a finite deadline.",
+      "kind": "lifecycle",
+      "status": "refuted",
+      "oracle": {
+        "observes": "real open/close processes and daemon identity under stalled transport",
+        "layer": "user CLI, provider HTTP boundary and lifecycle state",
+        "method": "Drive exact binary with named isolated session and localhost no-response CONNECT proxy",
+        "proxy_only": false
+      },
+      "proxy_challenge": {
+        "proxy": "Client read timeout or configured idle timeout exists",
+        "counterexample": "Provider future holds state lock past both budgets, preventing close and idle shutdown",
+        "attempted": true,
+        "outcome": "separated",
+        "evidence": "Final dogfood.json: open exceeded 36.004s, close exceeded 5.004s; daemon survived explicit 1s idle timeout. Releasing fixture restores progress."
+      },
+      "substrates": [
+        {
+          "name": "macOS exact-head built CLI and localhost proxy",
+          "status": "exercised",
+          "evidence": "Binary digest and daemon ps path in dogfood.json."
+        }
+      ],
+      "evidence": "Final dogfood.json: open exceeded 36.004s, close exceeded 5.004s; daemon survived explicit 1s idle timeout. Releasing fixture restores progress."
+    }
+  ],
+  "stage_receipts": {
+    "test_strength": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "No upstream receipt supplied or found for this head. Review Gate consumes Test Strength, not a substitute authored-test receipt."
+    },
+    "resilience": {
+      "required": true,
+      "status": "unavailable",
+      "reason": "Managed remote lifecycle and partial commit points trigger this stage; no passing exact-head receipt found. Focused reproductions establish findings only."
+    }
+  },
+  "assumptions": [
+    {
+      "id": "AS1",
+      "source": "new docs and existing provider lifecycle",
+      "claim": "Sending a stop request is enough to promise close stops the cloud session and billing.",
+      "status": "refuted",
+      "evidence": "cleanup-probe-final.log: first and second close success, retained session false, exactly one failed transport attempt. Official provider docs say CDP disconnect does not stop billing."
+    },
+    {
+      "id": "AS2",
+      "source": "connect_browser_use parser",
+      "claim": "Every successful create response has usable id and cdpUrl before cleanup ownership is needed.",
+      "status": "unverified",
+      "evidence": "OpenAPI requires id but permits nullable/absent cdpUrl. Source error discards id. No real active-browser null-url response obtained."
+    },
+    {
+      "id": "AS3",
+      "source": "new API request settings",
+      "claim": "Profile/proxy/recording keys and stop action are valid V4 wire names.",
+      "status": "verified",
+      "evidence": "browser-use-v4-openapi.json, schemas CreateBrowserSessionRequest and UpdateBrowserSessionRequest; authored options tests pass."
+    }
+  ],
+  "lenses": [
+    {
+      "name": "Inverse regression surface",
+      "status": "run",
+      "reason": "Direct unowned WebSocket connection becomes remote POST plus retained session; reviewed API discovery/cleanup differences. P1 gap retained."
+    },
+    {
+      "name": "New-domain matrix",
+      "status": "skipped",
+      "reason": "No validator widening; provider protocol replacement covered by inverse/reference and lifecycle lenses."
+    },
+    {
+      "name": "Resolution-rule consistency across consumers",
+      "status": "skipped",
+      "reason": "No changed discovery/precedence rule; the new env helper has one production caller shared by both launch families."
+    },
+    {
+      "name": "Shell re-parse append domain",
+      "status": "skipped",
+      "reason": "No shell command construction changed."
+    },
+    {
+      "name": "Emission channel and one-shot latch reachability",
+      "status": "run",
+      "reason": "Missing-key error reached CLI JSON. Provider errors returned through callers; silent stop failure is F2."
+    },
+    {
+      "name": "Shim hermeticity",
+      "status": "skipped",
+      "reason": "Contributor adds no external-binary shim."
+    },
+    {
+      "name": "Deliberate-default check",
+      "status": "run",
+      "reason": "Historical direct-WSS changelog is deliberate past behavior but current normative Cloud docs require V4 create/CDP/stop. Live root-cause claim remains unverified."
+    },
+    {
+      "name": "Fresh-seam scan",
+      "status": "skipped",
+      "reason": "No runtime signal patch or framework seam."
+    },
+    {
+      "name": "Substrate differential corpus",
+      "status": "skipped",
+      "reason": "No substrate-modeling guard or detector added."
+    },
+    {
+      "name": "Reference-implementation oracle",
+      "status": "run",
+      "reason": "Saved official V4 OpenAPI verifies API fields and stop semantics; full live matrix missing."
+    },
+    {
+      "name": "New-failure-outcome propagation",
+      "status": "run",
+      "reason": "All auto-launch, explicit launch and cleanup call sites enumerated through gate and radius, read at caller layer; F1/F2 cover lock and ownership failures."
+    },
+    {
+      "name": "Flag-propagation dispatch sweep",
+      "status": "run",
+      "reason": "Both provider dispatch variants reach same env lookup. MCP inherits process env and existing CLI provider dispatch; no new per-command flags. Live configuration transition matrix not verified."
+    },
+    {
+      "name": "Error-path forcing",
+      "status": "run",
+      "reason": "Missing API key, stalled create and failed cleanup transport forced. Required full resilience partitions unavailable."
+    },
+    {
+      "name": "Non-destructive recovery",
+      "status": "skipped",
+      "reason": "No heuristic recovery added."
+    },
+    {
+      "name": "Cancellation and timeout hygiene",
+      "status": "run",
+      "reason": "Real CLI exceeded 36s; close blocked, 1s idle timeout ineffective; F1."
+    },
+    {
+      "name": "Boundary pipeline trace",
+      "status": "run",
+      "reason": "Traced create, body decode, CDP connect, active session remember, close and shutdown; parse-before-ownership gap noted."
+    },
+    {
+      "name": "Substrate verification",
+      "status": "run",
+      "reason": "Binary SHA and responding daemon process verified. Stop proxy observes attempt count and response failure; no remote billing assertion from mere closed output."
+    },
+    {
+      "name": "Dogfood the built artifact",
+      "status": "run",
+      "reason": "Actual CLI help, missing key, blocked provider setup and recovery driven before authored tests. Live happy path unavailable."
+    },
+    {
+      "name": "Newly-asserted invariant ownership",
+      "status": "run",
+      "reason": "Close/billing invariant depends on remote stop outcome, which helper discards and caller forgets; F2."
+    },
+    {
+      "name": "Docs-behavior parity",
+      "status": "run",
+      "reason": "All changed surfaces consistent on env fields. New billing-stop guarantee disproved by F2 and idle shutdown guarantee defeated by F1."
+    },
+    {
+      "name": "Demonstrative example",
+      "status": "run",
+      "reason": "New docs example uses new env settings, verified structurally against API; not executed against a paid session."
+    },
+    {
+      "name": "Choice audit",
+      "status": "skipped",
+      "reason": "No contributor decision trail supplied."
+    },
+    {
+      "name": "Complexity budget",
+      "status": "skipped",
+      "reason": "No per-element loop, membership or candidate scan added."
+    }
+  ],
+  "deterministic": [
+    {
+      "check": "style",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/style.log"
+    },
+    {
+      "check": "surfaces",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/surfaces.log"
+    },
+    {
+      "check": "stale",
+      "outcome": "acknowledged",
+      "reason": "Only CHANGELOG.md:546 retains old endpoint as historical release record; read and exempted."
+    },
+    {
+      "check": "siblings",
+      "outcome": "acknowledged",
+      "reason": "Unchanged API-key setup examples remain correct; doctor/providers.rs only tests required credential presence; current provider source reads existing key. No stale behavior in those passages."
+    },
+    {
+      "check": "callers",
+      "outcome": "acknowledged",
+      "reason": "Every listed caller read in actions.rs, including failed attach and close ownership; F1/F2 remain open."
+    },
+    {
+      "check": "callers-options",
+      "outcome": "acknowledged",
+      "reason": "Every listed caller read in actions.rs, including failed attach and close ownership; F1/F2 remain open."
+    },
+    {
+      "check": "cleanup-callers",
+      "outcome": "acknowledged",
+      "reason": "Every listed caller read in actions.rs, including failed attach and close ownership; F1/F2 remain open."
+    },
+    {
+      "check": "timings",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/timings.log"
+    },
+    {
+      "check": "execdeps",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/execdeps.log"
+    },
+    {
+      "check": "diff-check",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/diff-check.log"
+    },
+    {
+      "check": "fmt",
+      "outcome": "pass",
+      "reason": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-17-agent-browser-1691-da4c99f/fmt.log"
+    },
+    {
+      "check": "covered initial",
+      "outcome": "acknowledged",
+      "reason": "Implementation checks only directory name; passed because run directory contains head prefix before report existed. Final report validator is authoritative."
+    },
+    {
+      "check": "exact skill identity",
+      "outcome": "pass",
+      "reason": "skill-identity.json; canonical tracked skill clean and installed symlink resolves to revision."
+    },
+    {
+      "check": "cargo build --locked",
+      "outcome": "pass",
+      "reason": "build.log, exact binary digest recorded in dogfood.json."
+    },
+    {
+      "check": "cargo clippy --locked",
+      "outcome": "pass",
+      "reason": "fmt-clippy.log exit 0."
+    },
+    {
+      "check": "cargo test --locked -- --test-threads=1",
+      "outcome": "pass",
+      "reason": "tests.log: 1157 unit tests and 2 integration tests passed; 107 tests ignored."
+    },
+    {
+      "check": "radius impact",
+      "outcome": "acknowledged",
+      "reason": "impact-map.json saved canonically; rust-analyzer duplicate-symbol diagnostics limit completeness. All material caller edges independently enumerated by rg."
+    },
+    {
+      "check": "docs production build",
+      "outcome": "pass",
+      "reason": "bun run --cwd docs build --webpack exit 0, docs-build-webpack.log. Unchanged package manifest with temporary reused dependencies. Default Turbopack rejected out-of-root dependency symlinks; no source build error found."
+    },
+    {
+      "check": "failed-stop caller probe",
+      "outcome": "pass",
+      "reason": "cleanup-probe-final.log: clean rerun exit 0, explicitly asserts the defective behavior; confirms F2 rather than accepting the implementation."
+    },
+    {
+      "check": "final identity",
+      "outcome": "pass",
+      "reason": "final-state.json: remote PR head unchanged, local dirty state clean, final binary SHA matches replayed dogfood; review-created dependency symlinks removed."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "priority": "P1",
+      "state": "confirmed",
+      "claim": "Bound the new Browser Use create request so a stalled connection cannot monopolize the daemon command lock.",
+      "evidence": "dogfood.json: actual open still blocked after 36.004s, close blocked past 5s, and daemon remains alive despite AGENT_BROWSER_IDLE_TIMEOUT_MS=1000. actions.rs awaits provider creation under daemon.rs:553-554 state lock; reqwest Client::new has no request deadline. Releasing localhost proxy restores progress.",
+      "layer": "built CLI and daemon lifecycle",
+      "source": "dogfood and cancellation lens",
+      "path": "cli/src/native/providers.rs:388-396",
+      "line_start": 388,
+      "line_end": 396,
+      "resolution": "open",
+      "recommendation": "Bound connect/send/body and cleanup waits, and ensure caller timeout/cancellation cannot leave provider work holding the daemon lock."
+    },
+    {
+      "id": "F2",
+      "priority": "P1",
+      "state": "confirmed",
+      "claim": "Do not discard the managed Browser Use session after an unacknowledged stop.",
+      "evidence": "New Some(ProviderSession) at providers.rs:469-472 activates the cleanup path. actions.rs:2067-2069 takes ownership before stop; providers.rs:140-151 ignores transport and HTTP results. cleanup-probe-final.log forces CONNECT 502, observes closed:true, no retained id, and no second stop attempt on retry. Official docs state disconnect does not stop the cloud browser.",
+      "layer": "production close command, cleanup ownership and provider lifecycle contract",
+      "source": "caller sweep, failure probe and API oracle",
+      "path": "cli/src/native/providers.rs:469-472",
+      "line_start": 469,
+      "line_end": 472,
+      "resolution": "open",
+      "recommendation": "Check transport and HTTP stop outcome, surface failure, preserve the session ID for bounded retry/recovery, and qualify billing claims until stop is acknowledged."
+    }
+  ],
+  "exemptions": [
+    {
+      "claim": "Historical CHANGELOG old connect endpoint untouched",
+      "evidence": "Historical #1092 behavior, not current setup instructions."
+    },
+    {
+      "claim": "MCP source unchanged",
+      "evidence": "No new CLI tool parameter or parser change. Built-in provider settings read inherited environment in shared provider helper; mcp command dispatch still delegates through CLI."
+    },
+    {
+      "claim": "Generic configuration environment table lacks BROWSER_USE optional fields",
+      "evidence": "This table lists AGENT_BROWSER options, not provider-specific credentials/config. Provider-specific page is updated."
+    },
+    {
+      "claim": "No getByRole contract run",
+      "evidence": "No role lookup, accessibility tree normalization or locator change."
+    }
+  ],
+  "issue_candidates": [],
+  "outcomes": {
+    "external_findings": 0,
+    "review_rounds": 1,
+    "human_corrections": 0,
+    "escaped_finding_class": null,
+    "github_writes": false,
+    "source_fixes": false,
+    "native_review_contexts": 2
+  },
+  "adjudications": [
+    {
+      "source": "independent-correctness-review.json IR1/IR2",
+      "decision": "Confirmed and merged into F2/F1. Both native passes agree, with evidence visible and no cross-family claim."
+    },
+    {
+      "source": "independent-correctness-review.json IR3",
+      "decision": "Retain verification gap. Official response schema permits nullable/missing cdpUrl; no active-browser real producer measured."
+    },
+    {
+      "source": "secondary-review-corroboration.json",
+      "decision": "Inspection-time uncertainties superseded by finished tests.log (1159 pass), clean cleanup-probe-final.log, removed dependency symlinks, and final binary dogfood replay. No production source changed."
+    }
+  ]
+}

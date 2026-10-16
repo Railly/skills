@@ -1,0 +1,56 @@
+skill-data/core/references/authentication.md:155:agent-browser auth login my-app --no-navigate
+skill-data/core/references/authentication.md:158:`--no-navigate` suppresses only the initial navigation that `auth login` normally performs. An existing active top-level HTTP(S) page is required. Before either credential is filled, agent-browser compares the page origin with the effective credential URL using scheme, host, and effective port. Paths, queries, and fragments may differ. Selector waits, credential filling, submit clicking, and submit-triggered navigation remain unchanged.
+skill-data/core/references/authentication.md:163:agent-browser auth login work --no-navigate --url https://identity.example.com/login
+skill-data/core/references/authentication.md:215:agent-browser auth login my-app --credential-provider vault --item "My App"
+skill-data/core/references/authentication.md:221:agent-browser auth login my-app --credential-provider vault --item "My App" --no-navigate --url https://identity.example.com/login
+skill-data/core/references/authentication.md:233:Use `--url`, `--username-selector`, `--password-selector`, and `--submit-selector` on `auth login` to override plugin-provided metadata for the current login only.
+skill-data/core/references/authentication.md:238:agent-browser --confirm-actions plugin:vault:credential.read auth login my-app --credential-provider vault --item "My App"
+skill-data/core/references/commands.md:332:agent-browser auth login <name>          # Login using saved credentials
+skill-data/core/references/commands.md:333:agent-browser auth login <name> --no-navigate
+skill-data/core/references/commands.md:335:agent-browser auth login <name> --credential-provider <plugin> [--item <ref>] [--url <url>]
+skill-data/core/references/commands.md:336:agent-browser auth login <name> --username-selector <s> --password-selector <s> [--submit-selector <s>]
+skill-data/core/references/commands.md:347:`auth login` normally navigates to the effective credential URL. `--no-navigate` requires an existing active top-level HTTP(S) page, checks that its scheme, host, and effective port match the effective credential URL, then uses the normal selector waits, fills, and submit click without replacing the document. Paths, queries, and fragments may differ, and submit-triggered navigation remains enabled. Command-level `--url` takes precedence over stored or provider metadata and becomes the expected-origin constraint in this mode.
+docs/src/app/commands/page.mdx:367:agent-browser auth login <name>          # Login using saved credentials
+docs/src/app/commands/page.mdx:368:agent-browser auth login <name> --no-navigate
+docs/src/app/commands/page.mdx:370:agent-browser auth login <name> --credential-provider <plugin> [--item <ref>] [--url <url>]
+docs/src/app/commands/page.mdx:372:agent-browser auth login <name> --username-selector <s> --password-selector <s> [--submit-selector <s>]
+docs/src/app/commands/page.mdx:390:- `--username-selector <sel>`: custom CSS selector for username field
+docs/src/app/commands/page.mdx:391:- `--password-selector <sel>`: custom CSS selector for password field
+docs/src/app/commands/page.mdx:392:- `--submit-selector <sel>`: custom CSS selector for submit button
+docs/src/app/commands/page.mdx:394:`auth login` navigates with `load` and then waits for the username/password/submit selectors to appear before interacting. This improves reliability on SPA login pages where fields render after initial page load.
+docs/src/app/commands/page.mdx:401:agent-browser auth login work --no-navigate
+docs/src/app/commands/page.mdx:412:- `--username-selector <sel>`: selector override for this login
+docs/src/app/commands/page.mdx:413:- `--password-selector <sel>`: selector override for this login
+docs/src/app/commands/page.mdx:414:- `--submit-selector <sel>`: selector override for this login
+docs/src/app/commands/page.mdx:428:agent-browser auth login github
+docs/src/app/commands/page.mdx:430:agent-browser auth login my-app --credential-provider vault --item "My App"
+docs/src/app/commands/page.mdx:431:agent-browser auth login my-app --credential-provider vault --item "My App" --no-navigate --url https://identity.example.com/login
+README.md:666:| **Auth vault** | Store credentials locally (encrypted), login by name | `auth save` / `auth login` |
+README.md:670:By default, `auth login` navigates to the effective credential URL before it locates the form. Use `--no-navigate` after an in-page click, challenge clearance, consent dismissal, or other stateful setup that must survive credential entry:
+README.md:675:agent-browser auth login work --no-navigate
+README.md:683:agent-browser auth login work --credential-provider vault --item "Work" --no-navigate --url https://identity.example.com/login
+README.md:872:- **Authentication Vault**: Store credentials locally (always encrypted), reference by name. The LLM never sees passwords. `auth login` navigates with `load` and then waits for login form selectors to appear (SPA-friendly, timeout follows the default action timeout). Use `auth login <name> --no-navigate` to preserve an already prepared active page after its origin is checked against the credential URL. A key is auto-generated at `~/.agent-browser/.encryption-key` if `AGENT_BROWSER_ENCRYPTION_KEY` is not set: `echo "pass" | agent-browser auth save github --url https://github.com/login --username user --password-stdin` then `agent-browser auth login github`
+README.md:945:agent-browser auth login my-app --credential-provider vault --item "My App"
+README.md:946:agent-browser auth login my-app --credential-provider vault --item "My App" --url https://app.example.com/login --username-selector "#email" --password-selector "#password" --submit-selector "button[type=submit]"
+README.md:947:agent-browser auth login my-app --credential-provider vault --item "My App" --no-navigate --url https://identity.example.com/login
+README.md:973:agent-browser --confirm-actions plugin:vault:credential.read auth login my-app --credential-provider vault --item "My App"
+cli/src/mcp.rs:3213:        ("usernameSelector", "--username-selector"),
+cli/src/mcp.rs:3214:        ("passwordSelector", "--password-selector"),
+cli/src/mcp.rs:3215:        ("submitSelector", "--submit-selector"),
+cli/src/output.rs:2768:  --username-selector <s>  Custom CSS selector for username field
+cli/src/output.rs:2769:  --password-selector <s>  Custom CSS selector for password field
+cli/src/output.rs:2770:  --submit-selector <s>    Custom CSS selector for submit button
+cli/src/output.rs:2777:  --username-selector <s>   Username selector override for this login
+cli/src/output.rs:2778:  --password-selector <s>   Password selector override for this login
+cli/src/output.rs:2779:  --submit-selector <s>     Submit selector override for this login
+cli/src/output.rs:2782:  auth login navigates, then waits for form selectors before filling/clicking.
+cli/src/output.rs:2795:  agent-browser auth login github
+cli/src/output.rs:2796:  agent-browser auth login github --no-navigate
+cli/src/output.rs:2797:  agent-browser auth login my-app --credential-provider vault --item "My App"
+cli/src/output.rs:3753:  credential.read          Resolve credentials for auth login
+cli/src/output.rs:3759:Use auth login for credential.read, --provider for browser.provider, and
+cli/src/output.rs:3780:  agent-browser auth login my-app --credential-provider vault --item "My App"
+cli/src/output.rs:3940:  auth login <name>          Login using saved credentials (waits for form fields)
+cli/src/output.rs:3941:  auth login <name> --no-navigate
+cli/src/output.rs:3943:  auth login <name> --credential-provider <plugin> [--item <ref>] [--url <url>]
+cli/src/output.rs:3945:  auth login <name> --username-selector <s> --password-selector <s>

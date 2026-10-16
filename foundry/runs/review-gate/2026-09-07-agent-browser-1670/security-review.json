@@ -1,0 +1,120 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/agent-browser",
+    "base_sha": "a45f1b656cb13c74bf1dca2f1439b77e8020360c",
+    "head_sha": "a45f1b656cb13c74bf1dca2f1439b77e8020360c",
+    "dirty_digest": "1c50ffee94cbae40be0971be6d1e1862a3eaed1d879d426094baa8a444c5c54d",
+    "changed_path_digest": "fc8dcb0c5ec25ad65c7f8a1f79127967afa294c82dc1161f1763a9964b0f72bc",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af"
+  },
+  "claim": {
+    "property": "Remote TLS peers cannot bypass issuer, hostname or expiry validation; invalid explicit source cannot silently fall back or reuse stale trust.",
+    "attacker": "Remote peer or intercepting network lacking a root selected by the local operator.",
+    "scope": "CLI HTTP/WSS TLS amendment; existing browser trust and OS store configuration preserved."
+  },
+  "trust_model": {
+    "assets": [
+      "HTTP response integrity and confidentiality",
+      "CDP transport integrity",
+      "operator-selected trust roots"
+    ],
+    "principals": [
+      "local CLI operator controlling session and config",
+      "same-user session daemon",
+      "remote TLS peer",
+      "read-only stream observer"
+    ],
+    "boundaries": [
+      "local CLI command to serialized daemon dispatcher",
+      "daemon or installer TLS client to remote peer",
+      "internal command fields to stream broadcasts"
+    ],
+    "entrypoints": [
+      "CLI flags/config/env",
+      "MCP canonical CLI parser",
+      "typed tlsOptions local command field",
+      "remote certificate chain"
+    ],
+    "sinks": [
+      "rustls ClientConfig",
+      "reqwest HTTP pool",
+      "WSS connector"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-1",
+      "classification": "informational",
+      "scope": "in_scope_security_regression",
+      "prerequisites": [
+        "peer is not trusted by selected roots"
+      ],
+      "chain": {
+        "capability": "remote peer supplies certificate",
+        "reachability": "actual HTTPS and WSS handshakes",
+        "control": "peer controls its leaf and chain, not local source selection",
+        "boundary": "TLS verification",
+        "impact": "rejected before HTTP request for untrusted, expired and mismatched-host certificates"
+      },
+      "confidence": "high",
+      "evidence": [
+        "cli/tests/tls_cli.rs",
+        "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/cargo-test.log",
+        "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pool-proof.json"
+      ]
+    },
+    {
+      "id": "SEC-2",
+      "classification": "informational",
+      "scope": "in_scope_security_regression",
+      "prerequisites": [
+        "explicit CA file becomes invalid or roots rotate"
+      ],
+      "chain": {
+        "capability": "operator updates source file",
+        "reachability": "next client acquisition rereads it",
+        "control": "same operator already chooses trust roots",
+        "boundary": "trust-generation publication",
+        "impact": "invalid explicit input fails; valid new roots retire old pool for later acquisitions"
+      },
+      "confidence": "high",
+      "evidence": [
+        "cli/src/tls.rs",
+        "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/mutations.json",
+        "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pool-proof.json"
+      ]
+    }
+  ],
+  "verification": {
+    "authorized_scope": "Local isolated fixtures and built CLI; no external writes or system store changes.",
+    "commands": [
+      "cargo test --manifest-path cli/Cargo.toml --locked -- --test-threads=1",
+      "python3 /Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/pool-proof.py",
+      "python3 protocol-proof.py against the packaged release binary",
+      "python3 pressure-proof.py against the release binary",
+      "Linux Docker: native trust-store and Chromium NSS proofs"
+    ],
+    "cleanup": "Per-test sessions closed; fixture sockets shut down; temp HOME/socket dirs removed.",
+    "gaps": [],
+    "limitations": [
+      "Zscaler interception with MDM-managed macOS Keychain rotation on the reporter machine.",
+      "Native Windows store acceptance and rotation not executed."
+    ]
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [],
+    "routed_non_security_defects": []
+  },
+  "artifact": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/review-gate/2026-09-07-agent-browser-1670/security-review.json",
+  "independent_review": "/Users/raillyhugo/Programming/railly/skills/foundry/runs/solution-gate/2026-09-07-agent-browser-1670/fx-review.json",
+  "review_corrections": [
+    "Reviewer migration summary was wrong: old PID 8333 changed once to 8335, then stayed 8335.",
+    "Reviewer F2 is not a defect: configure_cli runs once per foreground CLI process.",
+    "MCP false_retains_bundle smoke covers the stated explicit-false retention gap.",
+    "Provider CA clear envelope already has test_provider_launch_command_preserves_ca_clear_transition in main.rs.",
+    "Only schema array formatting changed after frozen review; JSON semantics identical and exact schema parity test rerun passed.",
+    "Follow-up changed tests only; production diff digest matches the reviewed and packaged source. New native Debian/Chromium boundary evidence closes Linux substrate gap."
+  ]
+}

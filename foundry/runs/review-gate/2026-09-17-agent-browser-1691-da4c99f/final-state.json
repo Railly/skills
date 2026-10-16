@@ -1,0 +1,27 @@
+{
+  "observed_at": "2026-09-17T06:43:40.513737+00:00",
+  "head": "da4c99fa1c781b6bd6a440348c147287f0cdb603",
+  "base": "fbd046c23a2c1156891bda294aaaee715c23b3f1",
+  "dirty_digest": "clean",
+  "binary_sha256": "2319bc96c9534cddca929b80e48339b013acc1ee32b5695ce10fecaf0bf2f71c",
+  "dogfood_binary_matches": true,
+  "dogfood": "dogfood.json",
+  "cli_tests": {
+    "passed": 1159,
+    "failed": 0,
+    "ignored": 107
+  },
+  "docs_build": {
+    "command": "bun run --cwd docs build --webpack",
+    "exit_code": 0
+  },
+  "cleanup_probe": {
+    "command": "cargo test review_1691_failed_stop -- --nocapture --test-threads=1 (isolated probe worktree)",
+    "exit_code": 0
+  },
+  "cleanup": {
+    "review_dependency_symlinks_removed": true,
+    "dummy_provider_credentials_only": true,
+    "cloud_resources_created": 0
+  }
+}

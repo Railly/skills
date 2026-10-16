@@ -1,0 +1,36 @@
+
+running 1 test
+test native::actions::tests::test_auth_login_releases_remote_objects_after_failures ... FAILED
+
+failures:
+
+---- native::actions::tests::test_auth_login_releases_remote_objects_after_failures stdout ----
+
+thread 'native::actions::tests::test_auth_login_releases_remote_objects_after_failures' (1629507) panicked at src/native/actions.rs:13757:13:
+assertion `left == right` failed: fill-exception
+  left: ["login-node", "node-1"]
+ right: ["exception", "login-node", "node-1", "rejected-result"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    native::actions::tests::test_auth_login_releases_remote_objects_after_failures
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1534 filtered out; finished in 0.22s
+
+   Compiling agent-browser v0.38.1 (/Users/raillyhugo/Programming/vercel/agent-browser-2014-reduction-red/cli)
+warning: variable does not need to be mutable
+     --> src/native/actions.rs:12302:13
+      |
+12302 |         let mut object_ids = std::collections::HashSet::from([object_id]);
+      |             ----^^^^^^^^^^
+      |             |
+      |             help: remove this `mut`
+      |
+      = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `agent-browser` (bin "agent-browser") generated 1 warning (run `cargo fix --bin "agent-browser" -p agent-browser` to apply 1 suggestion)
+warning: `agent-browser` (bin "agent-browser" test) generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.92s
+     Running unittests src/main.rs (/Users/raillyhugo/Programming/vercel/agent-browser-1999-evidence/target-head/debug/deps/agent_browser-445f2c75b50aa6d3)
+error: test failed, to rerun pass `--bin agent-browser`

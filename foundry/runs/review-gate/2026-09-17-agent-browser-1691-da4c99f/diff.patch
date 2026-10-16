@@ -1,0 +1,267 @@
+diff --git a/README.md b/README.md
+index 5368366..fe53f30 100644
+--- a/README.md
++++ b/README.md
+@@ -1798,7 +1798,7 @@ Get your API key from the [Browserbase Dashboard](https://browserbase.com/overvi
+ 
+ ### Browser Use
+ 
+-[Browser Use](https://browser-use.com) provides cloud browser infrastructure for AI agents. Use it when running agent-browser in environments where a local browser isn't available (serverless, CI/CD, etc.).
++[Browser Use](https://browser-use.com) is an open-source browser automation project for AI agents with [over 100,000 GitHub stars](https://github.com/browser-use/browser-use), plus a managed Cloud browser service. Browser Use Cloud is useful when running agent-browser in environments where a local browser isn't available, such as serverless and CI environments.
+ 
+ To enable Browser Use, use the `-p` flag:
+ 
+@@ -1815,9 +1815,26 @@ export BROWSER_USE_API_KEY="your-api-key"
+ agent-browser open https://example.com
+ ```
+ 
+-When enabled, agent-browser connects to a Browser Use cloud session instead of launching a local browser. All commands work identically.
++Optional Browser Use Cloud settings:
+ 
+-Get your API key from the [Browser Use Cloud Dashboard](https://cloud.browser-use.com/settings?tab=api-keys). Free credits are available to get started, with pay-as-you-go pricing after.
++| Variable                       | Description                                                |
++| ------------------------------ | ---------------------------------------------------------- |
++| `BROWSER_USE_PROFILE_ID`       | Profile UUID for persistent cookies and logins             |
++| `BROWSER_USE_PROXY_COUNTRY`    | Managed proxy country, or `none`/`direct` to disable proxy |
++| `BROWSER_USE_ENABLE_RECORDING` | Record the Cloud browser session                           |
++
++```bash
++export BROWSER_USE_PROFILE_ID="your-profile-uuid"
++export BROWSER_USE_PROXY_COUNTRY="de"
++export BROWSER_USE_ENABLE_RECORDING="true"
++agent-browser -p browseruse open https://example.com
++```
++
++When enabled, agent-browser creates a Browser Use Cloud V4 session and connects to its CDP endpoint. Existing provider lifecycle handling stops the Cloud session when agent-browser closes it.
++
++The Cloud browser stays active between commands; run `agent-browser close` when the task finishes to stop the session and billing immediately, otherwise it stops when the daemon exits, including after the one-hour default idle timeout.
++
++Get your API key from the [Browser Use Cloud Dashboard](https://cloud.browser-use.com/settings?tab=api-keys).
+ 
+ ### Kernel
+ 
+diff --git a/cli/src/native/providers.rs b/cli/src/native/providers.rs
+index c6848c0..1fef5f2 100644
+--- a/cli/src/native/providers.rs
++++ b/cli/src/native/providers.rs
+@@ -141,7 +141,7 @@ pub async fn close_provider_session_with_plugins(
+             if let Ok(api_key) = env::var("BROWSER_USE_API_KEY") {
+                 let _ = client
+                     .patch(format!(
+-                        "https://api.browser-use.com/api/v2/browsers/{}",
++                        "https://api.browser-use.com/api/v4/browsers/{}",
+                         session.session_id
+                     ))
+                     .header("X-Browser-Use-API-Key", &api_key)
+@@ -385,9 +385,92 @@ async fn connect_browser_use() -> Result<(String, Option<ProviderSession>), Stri
+     let api_key = env::var("BROWSER_USE_API_KEY")
+         .map_err(|_| "BROWSER_USE_API_KEY environment variable is not set")?;
+ 
+-    let ws_url = format!("wss://connect.browser-use.com?apiKey={}", api_key);
++    let response = reqwest::Client::new()
++        .post("https://api.browser-use.com/api/v4/browsers")
++        .header("X-Browser-Use-API-Key", &api_key)
++        .header("Content-Type", "application/json")
++        .json(&browser_use_create_body_from_lookup(|name| {
++            env::var(name).ok()
++        }))
++        .send()
++        .await
++        .map_err(|e| format!("Browser Use request failed: {}", e))?;
+ 
+-    Ok((ws_url, None))
++    let status = response.status();
++    let body = response
++        .text()
++        .await
++        .map_err(|e| format!("Failed to read Browser Use response: {}", e))?;
++    if !status.is_success() {
++        return Err(format!(
++            "Browser Use API error ({}): {}",
++            status.as_u16(),
++            body
++        ));
++    }
++
++    let response: Value =
++        serde_json::from_str(&body).map_err(|e| format!("Invalid Browser Use response: {}", e))?;
++    parse_browser_use_connection(&response)
++}
++
++/// Build the supported Browser Use Cloud V4 options. Custom proxies are not exposed.
++fn browser_use_create_body_from_lookup<F>(mut lookup: F) -> Value
++where
++    F: FnMut(&str) -> Option<String>,
++{
++    let mut body = serde_json::Map::new();
++
++    if let Some(profile_id) = lookup("BROWSER_USE_PROFILE_ID").filter(|value| !value.is_empty()) {
++        body.insert("profileId".to_string(), json!(profile_id));
++    }
++
++    if let Some(proxy_country) =
++        lookup("BROWSER_USE_PROXY_COUNTRY").filter(|value| !value.is_empty())
++    {
++        let proxy_country = proxy_country.to_ascii_lowercase();
++        body.insert(
++            "proxyCountryCode".to_string(),
++            if matches!(proxy_country.as_str(), "none" | "direct") {
++                Value::Null
++            } else {
++                json!(proxy_country)
++            },
++        );
++    }
++
++    if let Some(recording) = lookup("BROWSER_USE_ENABLE_RECORDING") {
++        body.insert(
++            "enableRecording".to_string(),
++            json!(!matches!(
++                recording.to_ascii_lowercase().as_str(),
++                "0" | "false" | "no" | ""
++            )),
++        );
++    }
++
++    Value::Object(body)
++}
++
++fn parse_browser_use_connection(
++    response: &Value,
++) -> Result<(String, Option<ProviderSession>), String> {
++    let session_id = response
++        .get("id")
++        .and_then(Value::as_str)
++        .ok_or_else(|| "Browser Use response missing id".to_string())?;
++    let ws_url = response
++        .get("cdpUrl")
++        .and_then(Value::as_str)
++        .ok_or_else(|| "Browser Use response missing cdpUrl".to_string())?;
++
++    Ok((
++        ws_url.to_string(),
++        Some(ProviderSession {
++            provider: "browser-use".to_string(),
++            session_id: session_id.to_string(),
++        }),
++    ))
+ }
+ 
+ async fn connect_kernel() -> Result<(String, Option<ProviderSession>), String> {
+@@ -869,6 +952,43 @@ mod tests {
+     use super::*;
+     use crate::test_utils::EnvGuard;
+ 
++    #[test]
++    fn test_browser_use_v4_options_and_response() {
++        let values = std::collections::HashMap::from([
++            ("BROWSER_USE_PROFILE_ID", "profile-123"),
++            ("BROWSER_USE_PROXY_COUNTRY", "DE"),
++            ("BROWSER_USE_ENABLE_RECORDING", "true"),
++        ]);
++        let body = browser_use_create_body_from_lookup(|name| {
++            values.get(name).map(|value| (*value).to_string())
++        });
++        assert_eq!(
++            body,
++            json!({
++                "profileId": "profile-123",
++                "proxyCountryCode": "de",
++                "enableRecording": true,
++            })
++        );
++        assert!(body.get("customProxy").is_none());
++
++        let (ws_url, session) = parse_browser_use_connection(&json!({
++            "id": "browser-123",
++            "cdpUrl": "wss://browser.example/devtools/browser/123",
++        }))
++        .unwrap();
++        assert_eq!(ws_url, "wss://browser.example/devtools/browser/123");
++        assert_eq!(session.unwrap().session_id, "browser-123");
++    }
++
++    #[test]
++    fn test_browser_use_managed_proxy_can_be_disabled() {
++        let body = browser_use_create_body_from_lookup(|name| {
++            (name == "BROWSER_USE_PROXY_COUNTRY").then(|| "direct".to_string())
++        });
++        assert_eq!(body, json!({ "proxyCountryCode": null }));
++    }
++
+     #[test]
+     fn test_connect_provider_unknown() {
+         let guard = EnvGuard::new(&["AGENT_BROWSER_PLUGINS"]);
+diff --git a/cli/src/output.rs b/cli/src/output.rs
+index ef6310e..a71656f 100644
+--- a/cli/src/output.rs
++++ b/cli/src/output.rs
+@@ -3812,6 +3812,10 @@ Environment:
+   AGENT_BROWSER_CA_CERT          Path to CA certificate to trust (HTTPS interception proxies)
+   AGENT_BROWSER_CLEAR_CA_CERT    Clear CA trust retained by the running browser session
+   AGENT_BROWSER_PROVIDER         Browser provider (ios, browserbase, kernel, browseruse, browserless, agentcore, or plugin name)
++  BROWSER_USE_API_KEY            Browser Use Cloud API key
++  BROWSER_USE_PROFILE_ID         Browser Use profile UUID
++  BROWSER_USE_PROXY_COUNTRY      Managed proxy country; none/direct disables proxy
++  BROWSER_USE_ENABLE_RECORDING   Record the Browser Use Cloud session
+   AGENT_BROWSER_AUTO_CONNECT     Auto-discover and connect to running Chrome
+   AGENT_BROWSER_PIN_TAB          Pin the session to its bound tab (strict tab binding)
+   AGENT_BROWSER_ALLOW_FILE_ACCESS Allow file:// URLs to access local files
+diff --git a/docs/src/app/providers/browser-use/page.mdx b/docs/src/app/providers/browser-use/page.mdx
+index a9d3533..1e39333 100644
+--- a/docs/src/app/providers/browser-use/page.mdx
++++ b/docs/src/app/providers/browser-use/page.mdx
+@@ -1,6 +1,6 @@
+ # Browser Use
+ 
+-[Browser Use](https://browser-use.com) provides cloud browser infrastructure for AI agents. Use it when running agent-browser in environments where a local browser isn't available (serverless, CI/CD, etc.).
++[Browser Use](https://browser-use.com) is an open-source browser automation project for AI agents with [over 100,000 GitHub stars](https://github.com/browser-use/browser-use), plus a managed Cloud browser service. Browser Use Cloud is useful when running agent-browser in environments where a local browser isn't available, such as serverless and CI environments.
+ 
+ ## Setup
+ 
+@@ -19,6 +19,28 @@ agent-browser open https://example.com
+ 
+ The `-p` flag takes precedence over `AGENT_BROWSER_PROVIDER`.
+ 
+-When enabled, agent-browser connects to a Browser Use cloud session instead of launching a local browser. All commands work identically.
++## Browser settings
+ 
+-Get your API key from the [Browser Use Cloud Dashboard](https://cloud.browser-use.com/settings?tab=api-keys). Free credits are available to get started, with pay-as-you-go pricing after.
++<table>
++  <thead>
++    <tr><th>Environment variable</th><th>Description</th></tr>
++  </thead>
++  <tbody>
++    <tr><td><code>BROWSER_USE_PROFILE_ID</code></td><td>Profile UUID for persistent cookies and logins</td></tr>
++    <tr><td><code>BROWSER_USE_PROXY_COUNTRY</code></td><td>Managed proxy country, or <code>none</code>/<code>direct</code> to disable proxy</td></tr>
++    <tr><td><code>BROWSER_USE_ENABLE_RECORDING</code></td><td>Record the Cloud browser session</td></tr>
++  </tbody>
++</table>
++
++```bash
++export BROWSER_USE_PROFILE_ID="your-profile-uuid"
++export BROWSER_USE_PROXY_COUNTRY="de"
++export BROWSER_USE_ENABLE_RECORDING="true"
++agent-browser -p browseruse open https://example.com
++```
++
++When enabled, agent-browser creates a Browser Use Cloud V4 session and connects to its CDP endpoint. Existing provider lifecycle handling stops the Cloud session when agent-browser closes it.
++
++The Cloud browser stays active between commands; run `agent-browser close` when the task finishes to stop the session and billing immediately, otherwise it stops when the daemon exits, including after the one-hour default idle timeout.
++
++Get your API key from the [Browser Use Cloud Dashboard](https://cloud.browser-use.com/settings?tab=api-keys).
+diff --git a/skill-data/core/references/commands.md b/skill-data/core/references/commands.md
+index 3e009c2..3d2b993 100644
+--- a/skill-data/core/references/commands.md
++++ b/skill-data/core/references/commands.md
+@@ -492,6 +492,10 @@ AGENT_BROWSER_HIDE_SCROLLBARS="false"        # Keep native scrollbars visible in
+ AGENT_BROWSER_WEBGPU="1"                     # Enable the WebGPU launch preset (see references/webgpu.md)
+ AGENT_BROWSER_NO_XVFB="1"                    # Disable automatic Xvfb for headed mode on displayless Linux
+ AGENT_BROWSER_PROVIDER="browserbase"         # Browser provider or configured provider plugin
++BROWSER_USE_API_KEY="your-api-key"           # Browser Use Cloud API key
++BROWSER_USE_PROFILE_ID="profile-uuid"        # Optional Browser Use profile UUID
++BROWSER_USE_PROXY_COUNTRY="de"               # Managed proxy country; none/direct disables proxy
++BROWSER_USE_ENABLE_RECORDING="true"          # Record the Browser Use Cloud session
+ AGENT_BROWSER_STREAM_PORT="9223"             # Override WebSocket streaming port (default: OS-assigned)
+ AGENT_BROWSER_CONFIG="./agent-browser.json"  # Custom config file
+ AGENT_BROWSER_CDP="9222"                     # Connect daemon to CDP port or WebSocket URL

@@ -1,0 +1,90 @@
+{
+  "status": "pass",
+  "fingerprint": {
+    "repository": "vercel-labs/agent-browser",
+    "base_sha": "d01253d9db28d75080e36da3c1c31ef89454731e",
+    "head_sha": "fad34d20403e67619cde5340731575745e2762e6",
+    "dirty_digest": "clean",
+    "changed_path_digest": "sha256:ff529690c5e679d2c9a9bff9b58c2ccc570233b4879144b68af2469c603311fd",
+    "skill_revision": "git:77fdde3e8d7e13b7c27c7660f7c15619839e38af;package-sha256:0d81ec048ec1229f916132cc9226f5fa594cb9e71033d89c3da9d86be3f85743"
+  },
+  "claim": {
+    "property": "Credentials are delivered only to the exact usable controls selected for the intended origin, and replacement or focus redirection rejects before submit.",
+    "attacker": "Page script or dynamic UI capable of replacing fields or redirecting focus within the current origin.",
+    "scope": "Auth login control selection, credential insertion, origin binding, submission ordering, and remote-object lifetime in the exact commit."
+  },
+  "trust_model": {
+    "assets": [
+      "username and password values",
+      "intended page origin",
+      "exact selected DOM node identity"
+    ],
+    "principals": [
+      "local operator and credential provider",
+      "agent-browser process",
+      "browser/CDP runtime",
+      "scripts executing in the current page origin"
+    ],
+    "boundaries": [
+      "credential provider to CLI memory",
+      "CLI through CDP to the selected page node",
+      "current origin to navigation destination"
+    ],
+    "entrypoints": [
+      "auth login CLI action",
+      "MCP auth_login delegation",
+      "explicit CSS selector inputs"
+    ],
+    "sinks": [
+      "native browser edit on the selected node",
+      "input event dispatch",
+      "submit control click"
+    ]
+  },
+  "observations": [
+    {
+      "id": "SEC-001",
+      "classification": "hardening",
+      "scope": "out_of_scope_hardening",
+      "confidence": "high",
+      "evidence": [
+        "The old implementation could type into a same-origin decoy after focus redirection. Same-origin scripts already have page-level access to entered credentials, so this does not establish a new privilege crossing; exact-node binding still removes the unsafe delivery path."
+      ]
+    },
+    {
+      "id": "SEC-002",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "confidence": "high",
+      "evidence": [
+        "The diff adds no credential logging, persistence, network destination, origin relaxation, public flag, or protocol input. Cross-origin no-navigate rejection remains green."
+      ]
+    },
+    {
+      "id": "SEC-003",
+      "classification": "informational",
+      "scope": "out_of_scope_hardening",
+      "confidence": "high",
+      "evidence": [
+        "Remote-object cleanup is best effort after cancellation or transport destruction; object handles are renderer-internal capabilities and the destroyed renderer/transport bounds their remaining lifetime."
+      ]
+    }
+  ],
+  "verification": {
+    "commands": [
+      "cargo test",
+      "cargo test e2e_auth_login -- --ignored --test-threads=1",
+      "Chrome and Lightpanda replacement-race probes"
+    ],
+    "cleanup": "Disposable local browser fixtures only; no external credentials or third-party accounts were used.",
+    "gaps": []
+  },
+  "merge_relevance": {
+    "security_blockers": [],
+    "follow_ups": [
+      "Keep cancellation/transport-destruction cleanup documented as a best-effort lifecycle limit."
+    ],
+    "routed_non_security_defects": []
+  },
+  "artifact": "security-review.md"
+}
