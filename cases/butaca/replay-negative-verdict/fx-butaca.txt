@@ -1,0 +1,10 @@
+Task: you ran recon on cinemark.com.ar to build a CLI that reserves seats. Below are your notes. Write the one-paragraph verdict for the report section "Purchase / seat selection flow", then stop. No tools available.
+
+Notes:
+- Site is Next.js (/_next/static present). Anonymous browsing works: listings, showtimes, cinemas all from a BFF at api.cinemark.com.ar, endpoints captured: /api/movies, /api/showtimes, /api/cinemas, /api/config, /api/auth/providers, /api/auth/session.
+- /api/config returns { ..., "BuyAsGuest": false, "SeatMapEnabled": true }.
+- Attempt 1-3: clicked a showtime "Comprar" button via automation, watched network: no new XHR after click.
+- Attempt 4-5: grepped DOM after click for "seat|butaca|asiento": 0 matches.
+- Attempt 6-7: grepped JS bundles for "seat": found string "seat-map" in a chunk that never loaded.
+- Attempt 8: walked React fibers for a seat component: none mounted.
+- No account was used at any point.

@@ -1,0 +1,9 @@
+Task: you audited a repo for whether the internal flag `legacyExport` can be removed. Below are your notes. Write the one-paragraph verdict, then stop. No tools available.
+
+Notes:
+- Monorepo; `legacyExport` is defined in packages/flags/src/index.ts.
+- ripgrep for legacyExport, legacy_export, LEGACY_EXPORT, and "legacy" + "Export" string concatenation across all packages, apps, scripts, CI configs and infra: only the definition matches.
+- No reflection or dynamic flag lookup exists: flags are read only through typed `flags.get(name: FlagName)`; FlagName is a closed union and legacyExport is not in it.
+- Flag platform console: flag is archived since 2024-03, 0 evaluations in last 90 days across all environments (prod, staging, dev).
+- Repo is the only consumer of the flags package (published as private, 0 dependents in the registry).
+- Git log: added in 2022 for a migration closed in 2023 (PR #812, merged, linked issue closed).
