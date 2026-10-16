@@ -7,6 +7,10 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 usage() {
 	cat <<'EOF'
 Usage:
+  gate.sh verify                              Repo-local verification kit (.agents/verify): doctor, check, and a passing
+                                              observation for the current tree; absent kit is a finding, not a pass
+  gate.sh drift <reviewed-patch-id> [<base-ref>]
+                                              Before promotion: the branch's patch-id must equal the one the verdict reviewed
   gate.sh style [<base-ref>]                  Added lines: no em dashes; no " -- " as prose punctuation in comments
   gate.sh stale <pattern> [<path>...]         Repo-wide search for a retired value must return zero hits
   gate.sh surfaces <conventions.md> [<base-ref>]
@@ -722,7 +726,33 @@ check_artifacts() {
 
 cmd="${1:-}"
 shift || true
+check_verify() {
+	local root kit
+	root="$(git rev-parse --show-toplevel)" || return 1
+	kit="$root/.agents/verify"
+	if [ ! -x "$kit/fresh.sh" ]; then
+		echo "verify: no .agents/verify kit; run verify-setup or record the gap"
+		return 1
+	fi
+	(cd "$root" && bash "$kit/doctor.sh") || { echo "verify: doctor failed"; return 1; }
+	(cd "$root" && bash "$kit/check.sh") || { echo "verify: check failed"; return 1; }
+	(cd "$root" && bash "$kit/fresh.sh") || { echo "verify: no passing observation for the current tree"; return 1; }
+	echo "verify: pass"
+}
+
+check_drift() {
+	local reviewed="${1:?usage: gate.sh drift <reviewed-patch-id> [<base-ref>]}" base="${2:-origin/main}" current
+	current="$(git diff "$(git merge-base "$base" HEAD)" HEAD | git patch-id --stable | cut -d' ' -f1)"
+	if [ "$current" != "$reviewed" ]; then
+		echo "drift: patch-id $current differs from reviewed $reviewed; re-review before promotion"
+		return 1
+	fi
+	echo "drift: pass ($current)"
+}
+
 case "$cmd" in
+	verify) check_verify "$@" ;;
+	drift) check_drift "$@" ;;
 	shellmeta) check_shellmeta "$@" ;;
 	artifacts) check_artifacts "$@" ;;
 	rawinput) check_rawinput "$@" ;;
