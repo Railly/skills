@@ -18,6 +18,7 @@ Role: contributor | maintainer
 Source: <retrieval handles>
 Knowledge disposition: link-existing | create-candidate | gap | no-change
 Knowledge target: pattern.<id> | gap.<id> | none
+Enforcer: check: <path or command that fails on this mistake> | none: <why no check is possible>
 
 > <unvalidated or review note when applicable>
 

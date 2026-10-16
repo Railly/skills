@@ -20,7 +20,7 @@ workstream-reconcile or another queue
 
 ## Boundary
 
-Do not infer priorities, reconcile handoffs, implement changes, or replace `solution-gate`, `software-factory`, `review-gate`, or `handoff`. Do not keep a standing panel of reviewers. A specialist is born for one bounded pass, reports evidence, and may be closed by the user or owning workflow.
+Do not infer priorities, reconcile handoffs, implement changes, or replace `solution-gate`, `loop`, `review-gate`, or `handoff`. Do not keep a standing panel of reviewers. A specialist is born for one bounded pass, reports evidence, and may be closed by the user or owning workflow.
 
 This workflow requires `HERDR_ENV=1`, the `herdr` CLI, `jq`, and local checkouts for selected workstreams. Agent roles also require their corresponding installed runtimes.
 

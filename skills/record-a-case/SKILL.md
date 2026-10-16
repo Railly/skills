@@ -66,6 +66,8 @@ Choose the smallest provisional destination:
 - `coverage gap`
 - `no change`
 
+Then set `Enforcer`. A mistake that escaped any step gets a check that fails on it: run `correct` and record `check: <path or command>`. Write `none: <reason>` only when no observable signal exists. A lesson with neither is a diary entry, not a case.
+
 **Complete when:** the lesson states its evidence boundary and exactly one smallest destination is selected.
 
 ## 5. Classify compiled knowledge

@@ -13,6 +13,7 @@ Role: maintainer
 Source: V1 and V2 precursor https://github.com/Railly/skills/pull/22 at `4b3203c`; implementation head `a7e38d32bb42392261a26c307438c0a1aa24363b`; local V3 procedure commit `9a6fb05`; `foundry/runs/review-gate/2026-08-29-skills-a7e38d3.json`
 Knowledge disposition: link-existing
 Knowledge target: pattern.drive-the-shipped-surface
+Enforcer: check: bun test scripts/lib/knowledge.test.mjs (private pointer rejection corpus)
 
 > The pointer implementation and its exact-head review are retrievable in the V1 and V2 precursor pull request. This V3 case and compilation remain local; human review and maintainer acceptance are pending.
 

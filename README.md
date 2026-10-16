@@ -46,13 +46,21 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Before After](skills/.experimental/before-after) creates granular visual proof for web UI changes. It composes `agent-browser` to capture the same real DOM element before and after on one controlled basis, verifies image comparability, and generates a browser-openable evidence report using the official Vercel report foundation.
 
-### Factory Loop
+### Correct
 
-[Factory Loop](skills/.experimental/factory-loop) routes one engineering work item through admission, contract, shaping, staged execution, exact-head review, before/after acceptance, human promotion, re-entry, and case capture. It enters at the earliest incomplete current state and delegates every phase to its owning skill.
+[Correct](skills/.experimental/correct) turns one escaped mistake into a check that fails on it, proves it fails on the original mistake and passes on the fix, and records it in the repo's enforcer table and the case.
+
+### Contract
+
+[Contract](skills/.experimental/contract) writes the done criteria for one piece of work before code changes: intent, size class, and acceptance and must-not-change items each mapped to a verify driver, which `fresh.sh` enforces.
 
 ### Handoff
 
 [Handoff](skills/.experimental/handoff) closes a working cycle so the next session resumes without rereading the transcript. It verifies state against git before asserting it, keeps delivery, verification, and human judgment independent, and stacks each session onto the prior document instead of overwriting it. Closed work with a transferable lesson goes to Record a Case instead.
+
+### Loop
+
+[Loop](skills/.experimental/loop) runs one change from contract to a reviewed, observed, human-approved state. Ceremony scales with the size class, and every step ends on command output, never on a claim.
 
 ### Herdr Workstreams
 
@@ -82,13 +90,9 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Simplify](skills/.experimental/simplify) reduces code, diff size, duplication, tests, and maintenance surface within a bounded target while preserving behavior and proving that consolidated regression protection still detects defects.
 
-### Software Factory
+### Verify Setup
 
-[Software Factory](skills/.experimental/software-factory) runs an admitted change through staged execution between Solution Gate and Review Gate. It implements, reduces, hardens applicable failure paths, runs Test Strength on the final code, and proves real behavior through independent evidence-producing passes.
-
-### Work Intake
-
-[Work Intake](skills/.experimental/work-intake) assesses one already-selected issue, pull request, or manual request before the factory grants mutation authority. It classifies intent, recommends the minimum workflow, and stops for human confirmation.
+[Verify Setup](skills/.experimental/verify-setup) gives a repository an executable verification kit under `.agents/verify`: doctor, checks, per-feature drivers that keep evidence tied to the exact tree, and a fresh-evidence check a Stop hook can call. `--local` keeps the kit out of git.
 
 ### Workstream Reconcile
 
@@ -100,29 +104,29 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 ## Workflow
 
-Every active Issue Contract has a schema-v1 manifest sidecar. It carries exact repository identity, authorization, the risk profile and time budget, orchestration degradation, atomic stage receipts, evidence fingerprints, outcomes, and close-cycle state. Each stage reads that manifest first and verifies only fields that may have drifted.
+Every change starts from a contract in the target repo's `.agents/verify/contract.md`. Each acceptance item names a driver, and done means `fresh.sh` passes for the exact tree.
 
 ```mermaid
 flowchart LR
-  Select[issue-intake if needed] --> Admit[work-intake]
-  Admit --> HumanA{Human admits Formula}
-  HumanA --> Contract[Reproduce and freeze Issue Contract]
-  Contract --> Shape[solution-gate and shaping]
-  Shape --> Factory[software-factory]
-  Factory --> Spec[Independent Spec review]
-  Spec --> Review[review-gate on exact state]
-  Review --> Show[before-after]
+  Select[issue-intake if needed] --> Contract[contract]
+  Contract --> Shape[solution-gate, heavy only]
+  Contract --> Implement
+  Shape --> Implement[loop: implement]
+  Implement --> Observe[observe.sh and fresh.sh]
+  Observe --> Lenses[triggered lenses]
+  Lenses --> Review[review-gate on exact state]
+  Review --> Show[before-after, heavy only]
   Show --> HumanP{Human promotion gate}
-  HumanP --> Deliver[Authorized external action]
+  HumanP -->|gate.sh drift passes| Deliver[ship]
   Deliver --> Case[record-a-case]
-  Review -.code finding.-> Factory
-  Review -.contract finding.-> Shape
-  Factory -.cycle ends open.-> Handoff[handoff]
+  Observe -.failure.-> Implement
+  Review -.code finding.-> Implement
+  Review -.contract finding.-> Contract
+  Implement -.cycle ends open.-> Handoff[handoff]
   Handoff --> Reconcile[workstream-reconcile]
-  Reconcile -.earliest incomplete state.-> Admit
 ```
 
-`factory-loop` enters at the earliest incomplete state instead of replaying the whole graph. Inside `software-factory`, the order is implementation, bounded simplification, applicable Resilience Audit, final-code Test Strength, and real-behavior proof.
+`loop` enters at the earliest step whose evidence is missing or stale for the current tree. The size class in the contract decides which bracketed steps run.
 
 Not every cycle reaches promotion. When work stops with the cycle still open, `handoff` carries state to the next session; `record-a-case` takes over once the cycle closes and leaves a transferable lesson.
 
