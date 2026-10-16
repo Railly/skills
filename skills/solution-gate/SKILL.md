@@ -3,7 +3,6 @@ name: solution-gate
 description: "Orchestrate Shaping to decide whether a fix or contributor PR is the right thing to build. Use before implementation when a defect has multiple solution shapes, changes a contract or persistent state, follows a prior review finding, or requires adopting, amending, absorbing, recreating, or rejecting an existing patch. Freeze the evidence-backed contract, run isolated Shaping passes, refute their weakest assumptions, feed evidence back into their fit checks, then gate the selected shape. Skip mechanical changes."
 allowed-tools:
   - Skill(shaping)
-  - Skill(herdr-workstreams)
   - Agent
 ---
 # Solution gate

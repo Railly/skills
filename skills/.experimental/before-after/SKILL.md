@@ -18,7 +18,7 @@ Use this skill only when the changed behavior can be seen in a browser:
 - Loading, empty, error, validation, hover, focus, or interaction states.
 - A visual regression fix that can be reproduced deterministically.
 
-Do not use it merely because code changed. Use relevant tests for nonvisual work, `performance-proof` for measured performance claims, and `explain-diff` for code understanding. If the delta cannot be reproduced honestly, report the evidence gap instead of manufacturing a comparison.
+Do not use it merely because code changed. Use relevant tests for nonvisual work, benchmarks for measured performance claims, and `explain-diff` for code understanding. If the delta cannot be reproduced honestly, report the evidence gap instead of manufacturing a comparison.
 
 ## Required proof basis
 

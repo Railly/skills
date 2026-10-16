@@ -1,6 +1,6 @@
 ---
 name: simplify
-description: "Reduce code size, PR additions, duplication, ceremony, or maintenance surface while preserving behavior and regression protection. Use whenever the user asks to simplify, deduplicate, delete unnecessary code or tests, reduce LOC, shrink a diff below a line budget, centralize repeated runtime logic, or make a feature smaller without changing its contract. Implement when edits are authorized; remain read-only for audit-only requests. Use quality-baseline for broad repository health audits and improve for broad advisory planning."
+description: "Reduce code size, PR additions, duplication, ceremony, or maintenance surface while preserving behavior and regression protection. Use whenever the user asks to simplify, deduplicate, delete unnecessary code or tests, reduce LOC, shrink a diff below a line budget, centralize repeated runtime logic, or make a feature smaller without changing its contract. Implement when edits are authorized; remain read-only for audit-only requests. Do not use for broad repository health audits or advisory planning."
 compatibility: Requires git and the repository's normal build and test tools. A writable repository is required only when implementation is authorized.
 ---
 
@@ -8,7 +8,7 @@ compatibility: Requires git and the repository's normal build and test tools. A 
 
 Produce a smaller system, not merely a smaller-looking diff. Preserve the feature, public contracts, distinct regression invariants, and operational behavior while removing duplicated or unnecessary structure.
 
-This skill takes precedence over `quality-baseline` and `improve` only for a bounded simplification request. Do not use it to refactor unrelated code. Read [method details](references/method.md) before measuring or editing.
+Use it only for a bounded simplification request. Do not use it to refactor unrelated code. Read [method details](references/method.md) before measuring or editing.
 
 ## 1. Establish authority and state
 

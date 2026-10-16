@@ -2,7 +2,7 @@
 name: review-gate
 description: "Gate a diff before pushing or requesting review: verify exact-state identity, run deterministic checks, consume Test Strength and Resilience receipts, then run only the judgment lenses triggered by the change. Use before opening or updating a PR, for pre-review, or after an external review round. Scale the path from mechanical through high-risk and external-PR profiles."
 compatibility: Requires git and bash for the deterministic layer.
-allowed-tools: [Skill(herdr-workstreams), Agent]
+allowed-tools: [Agent]
 ---
 
 # Review gate

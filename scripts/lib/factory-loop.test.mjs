@@ -29,11 +29,6 @@ describe("factory workflow contract", () => {
 		for (const size of ["`trivial`", "`normal`", "`heavy`"]) expect(contract).toContain(size);
 	});
 
-	test("Herdr stays a runtime adapter instead of becoming a lifecycle owner", () => {
-		const herdr = read("skills/.experimental/herdr-workstreams/SKILL.md");
-		expect(herdr).toContain("`solution-gate`, `loop`, `review-gate`");
-	});
-
 	test("isolated review prefers FX through AI Gateway and excludes Cursor", () => {
 		const review = read("skills/review-gate/SKILL.md");
 		const runtime = read(
