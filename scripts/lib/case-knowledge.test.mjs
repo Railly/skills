@@ -8,10 +8,14 @@ const pattern = {
 	evidence: [{ path, relationship: "application", status: "active" }],
 };
 
+const enforcer = "\nEnforcer: none: fixture covers knowledge fields only";
+
 function validate(fields, options = {}) {
+	const text =
+		options.raw || !fields.startsWith("Case schema: 2") ? fields : fields + enforcer;
 	return validateCaseKnowledge({
 		path,
-		text: fields,
+		text,
 		patterns: options.patterns ?? [pattern],
 		gaps: options.gaps ?? ["gap.record-a-case.missing-proof"],
 	}).errors;
@@ -130,5 +134,18 @@ describe("case knowledge disposition", () => {
 				"Case schema: 2\nKnowledge disposition: no-change\nKnowledge target: pattern.drive-the-surface",
 			),
 		).toContain(`${path}: no-change requires Knowledge target "none"`);
+	});
+
+	test("schema 2 requires exactly one enforcer with a check or a reason", () => {
+		const base = "Case schema: 2\nKnowledge disposition: no-change\nKnowledge target: none";
+		expect(validate(base, { raw: true })).toContain(`${path}: Enforcer must appear exactly once`);
+		expect(validate(`${base}\nEnforcer: check: .agents/verify/drive/login-wall.sh`, { raw: true })).toEqual([]);
+		expect(validate(`${base}\nEnforcer: none: lesson is about judgment, no observable signal`, { raw: true })).toEqual([]);
+		expect(validate(`${base}\nEnforcer: none: n/a`, { raw: true })).toContain(
+			`${path}: Enforcer must be "check: <path or command>" or "none: <reason>"`,
+		);
+		expect(validate(`${base}\nEnforcer: later`, { raw: true })).toContain(
+			`${path}: Enforcer must be "check: <path or command>" or "none: <reason>"`,
+		);
 	});
 });

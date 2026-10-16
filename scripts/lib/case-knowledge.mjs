@@ -5,6 +5,7 @@ const DISPOSITIONS = new Set([
 	"no-change",
 ]);
 const PATTERN_ID = /^pattern\.[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const ENFORCER = /^(check: \S.*|none: \S.{9,})$/;
 const GAP_ID = /^gap\.[a-z0-9]+(?:[.-][a-z0-9]+)*$/;
 const SUPPORTIVE_RELATIONSHIPS = new Set([
 	"origin",
@@ -53,6 +54,15 @@ export function validateCaseKnowledge({
 	}
 	if (dispositions.length !== 1 || targets.length !== 1) {
 		return { errors, legacy: false };
+	}
+
+	const enforcers = fieldValues(text, "Enforcer");
+	if (enforcers.length !== 1) {
+		errors.push(`${path}: Enforcer must appear exactly once`);
+	} else if (!ENFORCER.test(enforcers[0])) {
+		errors.push(
+			`${path}: Enforcer must be "check: <path or command>" or "none: <reason>"`,
+		);
 	}
 
 	const disposition = dispositions[0];

@@ -46,6 +46,10 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Before After](skills/.experimental/before-after) creates granular visual proof for web UI changes. It composes `agent-browser` to capture the same real DOM element before and after on one controlled basis, verifies image comparability, and generates a browser-openable evidence report using the official Vercel report foundation.
 
+### Correct
+
+[Correct](skills/.experimental/correct) turns one escaped mistake into a check that fails on it, proves it fails on the original mistake and passes on the fix, and records it in the repo's enforcer table and the case.
+
 ### Contract
 
 [Contract](skills/.experimental/contract) writes the done criteria for one piece of work before code changes: intent, size class, and acceptance and must-not-change items each mapped to a verify driver, which `fresh.sh` enforces.
