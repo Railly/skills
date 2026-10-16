@@ -10,13 +10,14 @@ here="$root/.agents/verify"
 dirty="$(tree_digest "$root")"
 head="$(git -C "$root" rev-parse HEAD)"
 
-# Latest observation of a feature for this exact tree, or nothing. Evidence
+# Latest observation of a feature for this exact tree contents, or nothing.
+# The digest is content-addressed, so a commit of the observed code keeps it valid. Evidence
 # directories are named <UTC timestamp>-<feature>, so a lexical sort is a time sort.
 latest() {
   local meta found=""
   for meta in "$here"/evidence/*-"$1"/meta.json; do
     [ -f "$meta" ] || continue
-    grep -q "\"feature\":\"$1\"" "$meta" && grep -q "\"head\":\"$head\"" "$meta" && grep -q "\"dirty\":\"$dirty\"" "$meta" && found="$meta"
+    grep -q "\"feature\":\"$1\"" "$meta" && grep -q "\"dirty\":\"$dirty\"" "$meta" && found="$meta"
   done
   [ -n "$found" ] && echo "$found"
 }
@@ -32,7 +33,7 @@ if [ -z "$required" ]; then
   # No contract: every feature observed on this tree must have passed last time.
   required="$(for d in "$here"/evidence/*/; do [ -f "$d/meta.json" ] && sed -nE 's/.*"feature":"([^"]+)".*/\1/p' "$d/meta.json"; done | sort -u | while read -r f; do latest "$f" >/dev/null && echo "$f"; done)"
   if [ -z "$required" ]; then
-    echo "no observation for HEAD $head with tree digest $dirty" >&2
+    echo "no observation for tree $dirty (HEAD $head)" >&2
     exit 1
   fi
 fi

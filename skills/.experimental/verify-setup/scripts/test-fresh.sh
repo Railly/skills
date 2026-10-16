@@ -16,5 +16,13 @@ RESULT=1 bash .agents/verify/observe.sh f >/dev/null
 if bash .agents/verify/fresh.sh 2>/dev/null; then echo "FAIL: an older pass outvoted a newer fail"; fail=1; fi
 sleep 1; RESULT=0 bash .agents/verify/observe.sh f >/dev/null
 bash .agents/verify/fresh.sh 2>/dev/null || { echo "FAIL: a newer pass should be fresh again"; fail=1; }
+# Committing the observed code keeps the observation; editing it does not.
+rm -f .agents/verify/contract.md
+sleep 1; RESULT=0 bash .agents/verify/observe.sh f >/dev/null
+echo y > b && sleep 1 && RESULT=0 bash .agents/verify/observe.sh f >/dev/null
+git add b && git -c user.email=t@t -c user.name=t commit -qm b
+bash .agents/verify/fresh.sh 2>/dev/null || { echo "FAIL: a commit of the observed tree invalidated its evidence"; fail=1; }
+echo z >> b
+if bash .agents/verify/fresh.sh 2>/dev/null; then echo "FAIL: an edit after observing kept the old evidence"; fail=1; fi
 [ "$fail" -eq 0 ] && echo "PASS: fresh.sh uses the latest observation per feature"
 exit "$fail"
