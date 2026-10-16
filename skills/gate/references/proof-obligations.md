@@ -55,4 +55,4 @@ Record:
 - fix-absent mutations that fail for the intended reason and restored green evidence;
 - the real input producer and user-visible boundary exercised.
 
-Selected examples do not prove a matrix. A type-valid synthetic object does not prove a reachable event. If a real producer or independent oracle is unavailable, leave the Review Gate run incomplete.
+Selected examples do not prove a matrix. A type-valid synthetic object does not prove a reachable event. If a real producer or independent oracle is unavailable, leave the Gate run incomplete.

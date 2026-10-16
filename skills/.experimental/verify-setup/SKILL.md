@@ -1,6 +1,6 @@
 ---
 name: verify-setup
-description: "Give a repository its own executable verification kit under .agents/verify: doctor, deterministic checks, per-feature drivers that observe the real surface and keep evidence tied to the exact tree, and an enforcer table. Use when a repo has no way for an agent to prove a change works, when setting up verification for a new repo, when adding a driver for a feature, when a done claim was wrong because the wrong surface was checked, or when the verify-before-done hook blocks for lack of evidence. Do not use to review a diff (review-gate) or to record a case (record-a-case)."
+description: "Give a repository its own executable verification kit under .agents/verify: doctor, deterministic checks, per-feature drivers that observe the real surface and keep evidence tied to the exact tree, and an enforcer table. Use when a repo has no way for an agent to prove a change works, when setting up verification for a new repo, when adding a driver for a feature, when a done claim was wrong because the wrong surface was checked, or when the verify-before-done hook blocks for lack of evidence. Do not use to review a diff (gate) or to record a case (correct)."
 compatibility: "Requires git, bash, and Node or Bun for the scaffold. Drivers use whatever the surface needs, such as agent-browser, curl, or the repo's own CLI."
 ---
 

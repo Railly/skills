@@ -301,7 +301,7 @@ expect_finding \
 behavioral_repo="$tmp_dir/behavioral-repo"
 mkdir -p "$behavioral_repo/src"
 git -C "$behavioral_repo" init -q
-git -C "$behavioral_repo" config user.name "Review Gate Fixture"
+git -C "$behavioral_repo" config user.name "Gate Fixture"
 git -C "$behavioral_repo" config user.email "fixture@example.com"
 git -C "$behavioral_repo" config commit.gpgsign false
 printf '%s\n' 'export const identity = (value) => value;' >"$behavioral_repo/src/base.ts"

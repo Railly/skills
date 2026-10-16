@@ -1,4 +1,4 @@
-# Review Gate run report schema v1
+# Gate run report schema v1
 
 Author one JSON report under `foundry/runs/review-gate/`. Generate its Markdown view with:
 
@@ -55,13 +55,13 @@ Fallback order:
 
 Record `mode`, `degraded_from`, and `independence_gap`. Sequential isolation does not satisfy a high-risk independent challenge by itself.
 
-When `execution.mode=fx_worker`, `execution.receipt` must point to the wrapper's local JSON artifact. The gate verifies `runtime=fx_worker`, `provider=vercel-ai-gateway`, `auth=AI_GATEWAY_API_KEY`, `credential_source=macos-keychain`, successful completion, and no timeout. Never use Cursor or `cursor-agent` as a Review Gate fallback.
+When `execution.mode=fx_worker`, `execution.receipt` must point to the wrapper's local JSON artifact. The gate verifies `runtime=fx_worker`, `provider=vercel-ai-gateway`, `auth=AI_GATEWAY_API_KEY`, `credential_source=macos-keychain`, successful completion, and no timeout. Never use Cursor or `cursor-agent` as a Gate fallback.
 
 Pass `--timeout-ms` from the work item's remaining review-stage wall-time budget. The wrapper writes a failed receipt even when FX exits non-zero, times out, exceeds its output buffer, or emits partial non-JSON output.
 
 ## Stage receipts
 
-Review Gate consumes, but does not recreate:
+Gate consumes, but does not recreate:
 
 - `stage_receipts.test_strength`, containing behavioral dimensions, exclusions, independent oracle, real producer, and fix-absent falsification;
 - `stage_receipts.resilience`, containing commit points, later fallible stages, forced failure partitions, cleanup owners, and immediate retry evidence.

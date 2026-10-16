@@ -35,7 +35,7 @@ const lens = (value) =>
 	`${value.name}: ${value.status}${value.reason ? `. ${value.reason}` : ""}`;
 
 const lines = [
-	`# Review Gate: ${report.run?.repo ?? "unknown repository"}`,
+	`# Gate: ${report.run?.repo ?? "unknown repository"}`,
 	"",
 	`Date: ${report.run?.date ?? "unknown"}`,
 	`Repository: ${report.run?.repo ?? "unknown"}`,
@@ -101,7 +101,7 @@ const lines = [
 const markdown = lines.join("\n");
 if (output) {
 	writeFileSync(resolve(output), markdown);
-	console.log(`Review Gate prose written: ${resolve(output)}`);
+	console.log(`Gate prose written: ${resolve(output)}`);
 } else {
 	process.stdout.write(markdown);
 }

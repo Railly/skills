@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deterministic layer of the review gate. Every check is binary: exit 0 (pass) or 1 (findings).
+# Deterministic layer of the gate. Every check is binary: exit 0 (pass) or 1 (findings).
 # Run from inside the target repository.
 set -uo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

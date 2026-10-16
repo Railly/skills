@@ -1,20 +1,19 @@
 ---
 name: loop
-description: "Run one engineering change from contract to a reviewed, observed, human-approved state, with ceremony scaled by size class. Each step ends on command output, never on a claim. Use when the user says take this to PR-ready, fix this issue, implement this, run the full cycle, or resume an interrupted change. Enter at the earliest incomplete step. Do not use for a question or investigation with no code change, or to review someone else's PR (review-gate)."
-compatibility: "Requires a contract (contract skill), a .agents/verify kit (verify-setup), and the review-gate scripts."
+description: "Run one engineering change from contract to a reviewed, observed, human-approved state, with ceremony scaled by size class. Each step ends on command output, never on a claim. Use when the user says take this to PR-ready, fix this issue, implement this, run the full cycle, or resume an interrupted change. Enter at the earliest incomplete step. Do not use for a question or investigation with no code change, or to review someone else's PR (gate)."
+compatibility: "Requires a contract (contract skill), a .agents/verify kit (verify-setup), and the gate scripts."
 allowed-tools:
   - Skill(contract)
   - Skill(verify-setup)
-  - Skill(review-gate)
+  - Skill(gate)
   - Skill(correct)
-  - Skill(record-a-case)
   - Agent
 ---
 
 # Loop
 
 ```text
-contract → [shape] → implement → observe → review-gate → human → deliver → record → correct
+contract → [shape] → implement → observe → gate → human → deliver → correct
     ↑          ↑__________ contract or shape change __________|
 ```
 
@@ -42,15 +41,15 @@ Two reversals on the same pair of behaviors (fix A breaks B, fix B breaks A) end
 
 ## 4. Review
 
-Run `review-gate` with the profile matching the class (`trivial` = mechanical, `normal` = standard, `heavy` = high-risk). It runs `gate.sh verify` and the deep lenses the diff triggers (test strength, resilience, security, simplify). Any lens that edits code sends the run back to step 3. Record the patch-id it reviewed: `git diff $(git merge-base origin/main HEAD) HEAD | git patch-id --stable`.
+Run `gate` with the profile matching the class (`trivial` = mechanical, `normal` = standard, `heavy` = high-risk). It runs `gate.sh verify` and the deep lenses the diff triggers (test strength, resilience, security, simplify). Any lens that edits code sends the run back to step 3. Record the patch-id it reviewed: `git diff $(git merge-base origin/main HEAD) HEAD | git patch-id --stable`.
 
 ## 5. Human promotion
 
 Show the contract result per item, the evidence paths, the review verdict, gaps, and the exact action proposed (commit, push, PR). Wait for explicit approval. Before acting, `gate.sh drift <reviewed-patch-id>` must pass; any drift goes back to step 4. PRs target the default branch, never another feature branch. Authority for one action never implies another.
 
-## 6. Record and correct
+## 6. Correct
 
-Run `record-a-case`. Every mistake that escaped a step goes through `correct`: a check that fails on it, plus a row in `ENFORCERS.md`. If no check is possible, write why.
+Run `correct`: it records the case, and every mistake that escaped a step becomes a check that fails on it, plus a row in `ENFORCERS.md`. If no check is possible, it writes why.
 
 When the cycle ends open, append `## Handoff` to the contract: the current step, the exact tree (HEAD and `fresh.sh` result), what is unverified, and the next command. The next session enters at step 0 from that note.
 
