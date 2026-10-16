@@ -1,6 +1,6 @@
-# Agentic Engineering, Applied
+# Skills for Agentic Software Engineering
 
-**Evidence-driven methods, dogfooded on real engineering work.**
+**Done means observed.**
 
 These skills turn real engineering work into portable agent protocols. They favor retrievable evidence over confident prose and keep public methods agnostic across repositories, stacks, editors, and agents.
 

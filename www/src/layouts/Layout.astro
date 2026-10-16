@@ -17,7 +17,8 @@ const ogImage = new URL("/og.svg", site);
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="theme-color" content="#111111" />
+		<meta name="theme-color" content="#fcfcfc" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
 		<meta name="description" content={description} />
 		<meta name="generator" content={Astro.generator} />
 		<link rel="canonical" href={canonical.href} />
@@ -40,16 +41,9 @@ const ogImage = new URL("/og.svg", site);
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImage.href} />
-		<script is:inline>
-			try {
-				const theme = localStorage.getItem("railly-skills-theme");
-				if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
-			} catch {}
-		</script>
 		<title>{title}</title>
 	</head>
 	<body>
-		<a class="skip-link" href="#main-content">Skip to content</a>
 		<slot />
 	</body>
 </html>

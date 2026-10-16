@@ -37,25 +37,15 @@ describe("factory workflow contract", () => {
 		expect(review).toContain("Cursor and `cursor-agent` are not supported");
 	});
 
-	test("the public graph shows the core in order", () => {
-		const graph = read("www/src/components/WorkflowGraph.astro");
-		const order = ["Contract", "Implement", "Observe", "Review", "Promote", "Correct"].map(
-			(name) => graph.indexOf(`name: "${name}"`),
+
+	test("the site lists the core in order under the motto", () => {
+		const page = read("www/src/pages/index.astro");
+		const data = read("www/src/data/skills.ts");
+		expect(page).toContain("Skills for Agentic Software Engineering");
+		const order = ["contract", "loop", "verify-setup", "gate", "correct"].map((name) =>
+			data.indexOf(`name: "${name}"`),
 		);
 		expect(order[0]).toBeGreaterThan(-1);
 		for (let i = 1; i < order.length; i++) expect(order[i]).toBeGreaterThan(order[i - 1]);
-	});
-
-	test("the public graph and release summary scale from current data", () => {
-		const styles = read("www/src/styles/global.css");
-		const evidence = read("www/src/components/EvidenceKey.astro");
-		expect(styles).toContain(
-			"grid-template-columns: repeat(6, minmax(145px, 1fr));",
-		);
-		expect(styles.match(/min-width: 870px;/g)).toHaveLength(2);
-		expect(evidence).toContain(
-			'import { evaluatedCount, release, skills } from "../data/skills"',
-		);
-		expect(evidence).not.toContain("Release 0.0.5");
 	});
 });
