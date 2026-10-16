@@ -21,7 +21,7 @@ Bracketed steps depend on the size class in `.agents/verify/contract.md`.
 
 ## 0. Enter
 
-Read the contract. If it is missing, run `contract`. If `.agents/verify/` is missing, run `verify-setup` (use `--local` in a repo you do not own). Find the earliest step whose evidence is missing or stale for the current tree. A handoff note or an earlier claim is a lead, not evidence.
+Read the contract. If it is missing, run `contract`. If `.agents/verify/` is missing, run `verify-setup` (use `--local` in a repo you do not own); if it exists, its `scaffold.mjs --check` must pass first. Find the earliest step whose evidence is missing or stale for the current tree. A handoff note or an earlier claim is a lead, not evidence.
 
 ## 1. Shape (heavy only)
 
@@ -35,6 +35,8 @@ For an unverified bug, run the driver first and see it fail on the reported beha
 
 Run `bash .agents/verify/check.sh`, then `bash .agents/verify/observe.sh <feature>` for every feature in the contract. Open each screenshot or output and read it. `bash .agents/verify/fresh.sh` must exit 0. A failure returns to step 2 with the evidence, not with a retry of the same thing.
 
+A subagent's PASS is a lead, not evidence. The orchestrator reruns every contract driver itself after the subagent returns. When the change touches timing, processes, sockets, or lifecycle, run each driver repeatedly and report runs and failures: one green run hid a close race in agent-browser #2135.
+
 For heavy visual or behavioral changes, also observe the baseline: run the same driver on the merge base in a separate worktree and keep both evidence directories, so the human sees before and after on one basis.
 
 Two reversals on the same pair of behaviors (fix A breaks B, fix B breaks A) end the run and return to step 1. That is a wrong change surface, not a bug to keep patching.
@@ -45,7 +47,7 @@ Run `gate` with the profile matching the class (`trivial` = mechanical, `normal`
 
 ## 5. Human promotion
 
-Show the contract result per item, the evidence paths, the review verdict, gaps, and the exact action proposed (commit, push, PR). Wait for explicit approval. Before acting, `gate.sh drift <reviewed-patch-id>` must pass; any drift goes back to step 4. PRs target the default branch, never another feature branch. Authority for one action never implies another.
+Show the contract result per item, the evidence paths, the review verdict, gaps, and the exact action proposed (commit, push, PR). Wait for explicit approval. Before acting, `gate.sh drift <reviewed-patch-id>` must pass; any drift goes back to step 4. Stage explicit paths, never `git add -A`, and `gate.sh scope` must pass. A PR body is written to a file first and `gate.sh prbody <file>` must pass: `## Problem`, `## Changes`, `## Visual proof` with a screenshot or video, uploaded with `gh pr create|edit --body-file <file> --attach <image>`. PRs target the default branch, never another feature branch. Authority for one action never implies another.
 
 ## 6. Correct
 

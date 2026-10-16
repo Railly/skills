@@ -47,6 +47,8 @@ intent: <intent>   class: <trivial|normal|heavy>
 ## Must not change
 - M1: <behavior that must stay>
   - observe: <feature>
+## Change surface
+- surface: <glob of paths this work may touch, e.g. cli/src/native/*>
 ## Non-goals
 - N1: <explicitly out of scope>
 ## Unknowns

@@ -9,6 +9,10 @@ usage() {
 Usage:
   gate.sh verify                              Repo-local verification kit (.agents/verify): doctor, check, and a passing
                                               observation for the current tree; absent kit is a finding, not a pass
+  gate.sh prbody <body.md>                    PR body has ## Problem, ## Changes and ## Visual proof, and the
+                                              proof section embeds at least one image or video
+  gate.sh scope [<contract.md>]               Every staged path matches a `surface:` glob in the contract
+                                              (default .agents/verify/contract.md); nothing else rides along
   gate.sh drift <reviewed-patch-id> [<base-ref>]
                                               Before promotion: the branch's patch-id must equal the one the verdict reviewed
   gate.sh style [<base-ref>]                  Added lines: no em dashes; no " -- " as prose punctuation in comments
@@ -740,6 +744,41 @@ check_verify() {
 	echo "verify: pass"
 }
 
+check_prbody() {
+	local body="${1:?usage: gate.sh prbody <body.md>}" rc=0 heading proof
+	for heading in "## Problem" "## Changes" "## Visual proof"; do
+		grep -qx "$heading" "$body" || { echo "prbody: missing \"$heading\""; rc=1; }
+	done
+	proof="$(awk '/^## Visual proof$/{on=1;next} /^## /{on=0} on' "$body")"
+	if ! grep -qE '!\[[^]]*\]\([^)]+\)|<video|<img|\.(mp4|mov|webm|gif|png)\b' <<<"$proof"; then
+		echo "prbody: Visual proof has no image or video"
+		rc=1
+	fi
+	[ "$rc" -eq 0 ] && echo "prbody: pass"
+	return "$rc"
+}
+
+check_scope() {
+	local contract="${1:-.agents/verify/contract.md}" rc=0 path glob ok
+	local globs
+	globs="$(sed -nE 's/^[-*[:space:]]*surface:[[:space:]]*(.+)$/\1/p' "$contract" 2>/dev/null)"
+	if [ -z "$globs" ]; then
+		echo "scope: no \`surface:\` lines in $contract"
+		return 1
+	fi
+	while IFS= read -r path; do
+		[ -n "$path" ] || continue
+		ok=0
+		while IFS= read -r glob; do
+			# shellcheck disable=SC2053
+			[[ "$path" == $glob ]] && ok=1 && break
+		done <<<"$globs"
+		[ "$ok" -eq 1 ] || { echo "scope: staged path outside the contract surface: $path"; rc=1; }
+	done <<<"$(git diff --cached --name-only)"
+	[ "$rc" -eq 0 ] && echo "scope: pass"
+	return "$rc"
+}
+
 check_drift() {
 	local reviewed="${1:?usage: gate.sh drift <reviewed-patch-id> [<base-ref>]}" base="${2:-origin/main}" current
 	current="$(git diff "$(git merge-base "$base" HEAD)" HEAD | git patch-id --stable | cut -d' ' -f1)"
@@ -753,6 +792,8 @@ check_drift() {
 case "$cmd" in
 	verify) check_verify "$@" ;;
 	drift) check_drift "$@" ;;
+	prbody) check_prbody "$@" ;;
+	scope) check_scope "$@" ;;
 	shellmeta) check_shellmeta "$@" ;;
 	artifacts) check_artifacts "$@" ;;
 	rawinput) check_rawinput "$@" ;;

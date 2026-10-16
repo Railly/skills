@@ -44,4 +44,7 @@ A repo is verifiable when an agent that has never seen it can run one command an
 
 ## Maintenance
 
+Run `node scripts/scaffold.mjs <repo-root> --check` before relying on a kit: it fails when `lib.sh`, `observe.sh`, or `fresh.sh` differ from this skill's copies. Copy the current ones over; repo-specific files are left alone.
+
+
 When a change adds or moves a feature, update its driver and feature file in the same diff. When a mistake escapes, add a check that fails on that mistake and a row in `ENFORCERS.md`.
