@@ -1,16 +1,7 @@
----
-name: record-a-case
-description: "Record completed or interrupted maintenance work as an evidence ledger and classify its compiled-knowledge disposition. Use after resolving, disproving, reviewing, or investigating an issue, PR, incident, or agent run; when backfilling an old session; or when another skill needs durable evidence before extracting or reinforcing a pattern."
-compatibility: Requires access to the work evidence. Writing a case requires an authorized destination; live issue, PR, branch, and release checks require network access.
----
+# Case ledger
 
-# Record a case
 
 Treat the case as an evidence ledger. Preserve what happened before extracting a method. Promotion is a separate process.
-
-## Canonical write root
-
-Before writing, run the packaged `scripts/resolve-source-root.mjs`, which honors `RAILLY_SKILLS_REPO`. Never write a case, eval, or log into the current repo's `.agents/skills`, `.claude/skills`, another installed skill copy, or the target repository. If the source root is unavailable, return the draft and report the blocked write.
 
 ## 1. Bound one case
 
@@ -66,7 +57,7 @@ Choose the smallest provisional destination:
 - `coverage gap`
 - `no change`
 
-Then set `Enforcer`. A mistake that escaped any step gets a check that fails on it: run `correct` and record `check: <path or command>`. Write `none: <reason>` only when no observable signal exists. A lesson with neither is a diary entry, not a case.
+Then set `Enforcer`. A mistake that escaped any step gets a check that fails on it: continue to step 2 of Correct and record `check: <path or command>`. Write `none: <reason>` only when no observable signal exists. A lesson with neither is a diary entry, not a case.
 
 **Complete when:** the lesson states its evidence boundary and exactly one smallest destination is selected.
 
@@ -91,7 +82,7 @@ For a public case, retain public repositories and the author's public work. Sani
 
 ## 7. Materialize the case
 
-Read [the case schema and allowed values](references/template.md), then write to `cases/<repo>/` under the canonical source root. Use another destination only when the user explicitly names it and it is not an installed skill copy. Follow the canonical corpus naming and validation rules. Without write authority, return the complete draft in the response.
+Read [the case schema and allowed values](template.md), then write to `cases/<repo>/` under the canonical source root. Use another destination only when the user explicitly names it and it is not an installed skill copy. Follow the canonical corpus naming and validation rules. Without write authority, return the complete draft in the response.
 
 Set human-review status only from explicit human feedback or retrievable review evidence. Present new agent-authored records as pending review.
 

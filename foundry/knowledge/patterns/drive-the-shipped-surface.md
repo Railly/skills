@@ -32,12 +32,12 @@
   ],
   "skills": [
     {
-      "name": "review-gate",
+      "name": "gate",
       "relationship": "motivates",
       "status": "active"
     },
     {
-      "name": "record-a-case",
+      "name": "correct",
       "relationship": "supports",
       "status": "active"
     }

@@ -62,7 +62,7 @@ Run gates in this order unless repository instructions are stricter:
 2. all deterministic build, type-check, test, lint, format, and diff checks;
 3. the [test strength lens](test-strength.md) with reversible force-red mutations for moved or consolidated protection;
 4. the [resilience lens](resilience.md) when persistence, retry, concurrency, cleanup, queues, partial writes, or recovery changed;
-5. Review Gate against the exact final tree or commit.
+5. Gate against the exact final tree or commit.
 
 External reviewers must finish. Budget exhaustion, missing credentials, runtime failure, and absent reports are gaps, never passes. Use existing authorized credential setup when available and do not impose an artificial review budget.
 

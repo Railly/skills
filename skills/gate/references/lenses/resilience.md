@@ -59,7 +59,7 @@ Repeat the failure, combine it with realistic concurrency or load, and inspect p
 
 ## 7. Report and gate
 
-Report the pressure matrix, traces, violated invariants, fixes, remaining gaps, operational signals, and rollback. Run the repository review gate when available.
+Report the pressure matrix, traces, violated invariants, fixes, remaining gaps, operational signals, and rollback. Run the repository gate when available.
 
 Emit a stage receipt containing status, head, command, relevant paths, contract digest, environment digest, skill revision, elapsed time, report path, commit points, forced partitions, cleanup owners, retries, and a reusable flag with dependency-cone evidence. Update the manifest atomically.
 

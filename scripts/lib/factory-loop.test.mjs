@@ -11,7 +11,7 @@ describe("factory workflow contract", () => {
 		const observe = loop.indexOf("## 3. Observe");
 		const review = loop.indexOf("## 4. Review");
 		const promote = loop.indexOf("## 5. Human promotion");
-		const record = loop.indexOf("## 6. Record and correct");
+		const record = loop.indexOf("## 6. Correct");
 		expect(observe).toBeGreaterThan(-1);
 		expect(review).toBeGreaterThan(observe);
 		expect(promote).toBeGreaterThan(review);
@@ -31,7 +31,7 @@ describe("factory workflow contract", () => {
 	});
 
 	test("isolated review prefers FX through AI Gateway and excludes Cursor", () => {
-		const review = read("skills/review-gate/SKILL.md");
+		const review = read("skills/gate/SKILL.md");
 		expect(review).toContain("scripts/run-fx-review.mjs");
 		expect(review).toContain("Vercel AI Gateway");
 		expect(review).toContain("Cursor and `cursor-agent` are not supported");
@@ -39,7 +39,7 @@ describe("factory workflow contract", () => {
 
 	test("the public graph shows the core in order", () => {
 		const graph = read("www/src/components/WorkflowGraph.astro");
-		const order = ["Contract", "Implement", "Observe", "Review", "Promote", "Record", "Correct"].map(
+		const order = ["Contract", "Implement", "Observe", "Review", "Promote", "Correct"].map(
 			(name) => graph.indexOf(`name: "${name}"`),
 		);
 		expect(order[0]).toBeGreaterThan(-1);
@@ -50,9 +50,9 @@ describe("factory workflow contract", () => {
 		const styles = read("www/src/styles/global.css");
 		const evidence = read("www/src/components/EvidenceKey.astro");
 		expect(styles).toContain(
-			"grid-template-columns: repeat(7, minmax(145px, 1fr));",
+			"grid-template-columns: repeat(6, minmax(145px, 1fr));",
 		);
-		expect(styles.match(/min-width: 1015px;/g)).toHaveLength(2);
+		expect(styles.match(/min-width: 870px;/g)).toHaveLength(2);
 		expect(evidence).toContain(
 			'import { evaluatedCount, release, skills } from "../data/skills"',
 		);

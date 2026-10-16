@@ -1,21 +1,21 @@
 ---
-name: review-gate
+name: gate
 description: "Gate a diff before pushing or requesting review: verify exact-state identity, run deterministic checks, then run only the lenses the change triggers, including test strength, resilience, security, and simplification. Use before opening or updating a PR, for pre-review, or after an external review round. Scale the path from mechanical through high-risk and external-PR profiles."
 compatibility: Requires git and bash for the deterministic layer.
 allowed-tools: [Agent]
 ---
 
-# Review gate
+# Gate
 
-Review Gate decides whether one exact diff is ready for human promotion. It owns deterministic checks, claim review, triggered judgment lenses, empirical verification, and the final verdict. Its deep lenses live in `references/lenses/`: [test strength](references/lenses/test-strength.md) for behavioral falsification, [resilience](references/lenses/resilience.md) for failure-path pressure, [security](references/lenses/security.md) for attacker modeling and vulnerability classification, and [simplify](references/lenses/simplify.md) for bounded reduction. Each emits the receipt the report schema expects.
+Gate decides whether one exact diff is ready for human promotion. It owns deterministic checks, claim review, triggered judgment lenses, empirical verification, and the final verdict. Its deep lenses live in `references/lenses/`: [test strength](references/lenses/test-strength.md) for behavioral falsification, [resilience](references/lenses/resilience.md) for failure-path pressure, [security](references/lenses/security.md) for attacker modeling and vulnerability classification, and [simplify](references/lenses/simplify.md) for bounded reduction. Each emits the receipt the report schema expects.
 
 ## Canonical state and execution identity
 
 Run the packaged `scripts/resolve-source-root.mjs`, which honors `RAILLY_SKILLS_REPO`, to resolve the canonical `Railly/skills` checkout. Never write cases, conventions, run reports, Impact Maps, or ledgers into the target repo, `.agents/skills`, `.claude/skills`, or another installed copy.
 
-Read the work-item manifest first. Verify only drift-prone fields: target HEAD, dirty digest, authorization, profile, stage fingerprints, and executing skill revision. A stable pass requires an exact `skill_revision` and an executing package whose digest is tied to that revision. Run `bun scripts/skills-doctor.mjs --installed <skills-root> --skill review-gate` from the canonical checkout when identity is uncertain.
+Read the work-item manifest first. Verify only drift-prone fields: target HEAD, dirty digest, authorization, profile, stage fingerprints, and executing skill revision. A stable pass requires an exact `skill_revision` and an executing package whose digest is tied to that revision. Run `bun scripts/skills-doctor.mjs --installed <skills-root> --skill gate` from the canonical checkout when identity is uncertain.
 
-Use the manifest's runtime record. Prefer the packaged `scripts/run-fx-review.mjs` for an isolated reviewer. It reads the `Vercel AI Gateway` / `vercel-ai-gateway` credential from macOS Keychain, disables FX's stored-session lookup for that process, verifies that FX reports `auth=AI_GATEWAY_API_KEY`, and writes a sanitized JSON artifact. Never put the key in a prompt, artifact, manifest, or log. Cursor and `cursor-agent` are not supported Review Gate runtimes.
+Use the manifest's runtime record. Prefer the packaged `scripts/run-fx-review.mjs` for an isolated reviewer. It reads the `Vercel AI Gateway` / `vercel-ai-gateway` credential from macOS Keychain, disables FX's stored-session lookup for that process, verifies that FX reports `auth=AI_GATEWAY_API_KEY`, and writes a sanitized JSON artifact. Never put the key in a prompt, artifact, manifest, or log. Cursor and `cursor-agent` are not supported Gate runtimes.
 
 On the first runtime schema or capability failure, inspect the available capability once, never repeat the identical invalid call, and fall back in order: FX worker, native subagent, visible Herdr worker, sequential isolated pass, then unavailable. Record `execution_mode`, `degraded_from`, and `independence_gap`. More than one schema failure per operation or three in the whole turn is a protocol failure, not a reason to retry.
 
@@ -38,7 +38,7 @@ Load `cases/<repo>/conventions.md` from the canonical source root. If absent, co
 
 When the target repo has `.agents/verify/`, run `scripts/gate.sh verify`: doctor, check, and a passing observation of every contract feature for the exact tree. A repo without a kit is a recorded gap, never an implicit pass.
 
-When `radius` supports the target language, save its Impact Map under the canonical Review Gate run directory. Treat it as attention guidance, not proof.
+When `radius` supports the target language, save its Impact Map under the canonical Gate run directory. Treat it as attention guidance, not proof.
 
 ## 3. Inventory claims and consume stage receipts
 

@@ -20,13 +20,13 @@ printf '%s\n' 'fn main() { Command::new("certutil"); }' >"$fixture/src/tool.rs"
 
 if (
 	cd "$fixture"
-	"$script_dir/gate.sh" execdeps "$fixture/conventions.md" HEAD >/tmp/review-gate-execdeps-red.txt 2>&1
+	"$script_dir/gate.sh" execdeps "$fixture/conventions.md" HEAD >/tmp/gate-execdeps-red.txt 2>&1
 ); then
 	echo "expected red fixture to fail"
 	exit 1
 fi
-grep -q "install/debian.txt" /tmp/review-gate-execdeps-red.txt
-grep -q "install/fedora.txt" /tmp/review-gate-execdeps-red.txt
+grep -q "install/debian.txt" /tmp/gate-execdeps-red.txt
+grep -q "install/fedora.txt" /tmp/gate-execdeps-red.txt
 
 printf '%s\n' 'packages = ["libnss3-tools"]' >"$fixture/install/debian.txt"
 printf '%s\n' 'packages = ["nss-tools"]' >"$fixture/install/fedora.txt"

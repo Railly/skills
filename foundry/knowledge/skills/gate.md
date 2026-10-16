@@ -1,4 +1,4 @@
-# Skill provenance: review-gate
+# Skill provenance: gate
 
 ## Metadata
 
@@ -6,8 +6,8 @@
 {
   "schema_version": 1,
   "kind": "skill",
-  "skill": "review-gate",
-  "summary": "Review Gate is backed by recorded applications and a blind answer-key evaluation, including evidence of both catches and misses.",
+  "skill": "gate",
+  "summary": "Gate is backed by recorded applications and a blind answer-key evaluation, including evidence of both catches and misses.",
   "patterns": [
     "pattern.drive-the-shipped-surface"
   ],
@@ -35,9 +35,9 @@
 
 ## Provenance
 
-The dogfood case records a real Review Gate run where deterministic checks, lenses, and the author's green suite missed an invalid-selector failure. Driving the built CLI found the defect and disproved a separate code-reading hypothesis.
+The dogfood case records a real Gate run where deterministic checks, lenses, and the author's green suite missed an invalid-selector failure. Driving the built CLI found the defect and disproved a separate code-reading hypothesis.
 
-Round 002 compared blind Review Gate runs against six maintainer findings. It caught three directly, generated two more but dropped them with wrong-layer refutations, and missed one docs-precision item. A browser-capable rerun improved the score and preserved the remaining limitation.
+Round 002 compared blind Gate runs against six maintainer findings. It caught three directly, generated two more but dropped them with wrong-layer refutations, and missed one docs-precision item. A browser-capable rerun improved the score and preserved the remaining limitation.
 
 ## Procedure impact
 

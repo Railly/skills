@@ -6,17 +6,16 @@ These skills turn real engineering work into portable agent protocols. They favo
 
 ## The core
 
-Six skills. Every change follows the same path, and every step ends on command output, never on a claim.
+Five skills. Every change follows the same path, and every step ends on command output, never on a claim.
 
 ```mermaid
 flowchart LR
   Contract[contract] --> Loop[loop: implement]
   Loop --> Observe[verify-setup kit: observe.sh, fresh.sh]
-  Observe --> Review[review-gate]
+  Observe --> Review[gate]
   Review --> Human{human approval}
   Human -->|gate.sh drift passes| Deliver[deliver]
-  Deliver --> Record[record-a-case]
-  Record --> Correct[correct]
+  Deliver --> Correct[correct: case and new checks]
   Observe -.failure.-> Loop
   Review -.finding.-> Loop
   Correct -.new check.-> Observe
@@ -34,23 +33,19 @@ flowchart LR
 
 [Verify Setup](skills/.experimental/verify-setup) gives a repository an executable verification kit under `.agents/verify`: doctor, checks, per-feature drivers that keep evidence tied to the exact tree, and `fresh.sh` for a Stop hook. `--local` keeps the kit out of git.
 
-### Review Gate
+### Gate
 
-[Review Gate](skills/review-gate) gates one exact diff: deterministic checks including `gate.sh verify` and `gate.sh drift`, then only the lenses the change triggers. Its deep lenses (test strength, resilience, security, simplify) live in `references/lenses/`.
-
-### Record a Case
-
-[Record a Case](skills/record-a-case) captures finished or interrupted work as an evidence ledger, with one compiled-knowledge disposition and an `Enforcer` field.
+[Gate](skills/gate) gates one exact diff: deterministic checks including `gate.sh verify` and `gate.sh drift`, then only the lenses the change triggers. Its deep lenses (test strength, resilience, security, simplify) live in `references/lenses/`.
 
 ### Correct
 
-[Correct](skills/.experimental/correct) turns one escaped mistake into a check that fails on it, proves it fails on the original mistake and passes on the fix, and records it in the repo's enforcer table and the case.
+[Correct](skills/correct) closes the work: it records the evidence ledger with one compiled-knowledge disposition, then turns each escaped mistake into a check that fails on it, proven against the original mistake, recorded in the repo's enforcer table and the case `Enforcer` field.
 
 Everything else lives in [archive/](archive/README.md).
 
 ## Maturity
 
-Distribution channel and evidence maturity are separate. Stable contains Review Gate and Record a Case. Experimental skills remain installable without implying validation.
+Distribution channel and evidence maturity are separate. Stable contains Gate and Correct. Experimental skills remain installable without implying validation.
 
 The source of truth is [foundry/maturity.json](foundry/maturity.json).
 
@@ -73,7 +68,7 @@ bunx skills add Railly/skills
 The interactive installer exposes two groups: `Stable` and `Experimental`. Install only the stable surface with:
 
 ```bash
-bunx skills add Railly/skills --skill record-a-case --skill review-gate
+bunx skills add Railly/skills --skill correct --skill gate
 ```
 
 Install the whole core with:
@@ -86,7 +81,7 @@ Or clone and link one skill:
 
 ```bash
 git clone https://github.com/Railly/skills.git ~/railly-skills
-ln -s ~/railly-skills/skills/review-gate ~/.claude/skills/review-gate
+ln -s ~/railly-skills/skills/gate ~/.claude/skills/gate
 ```
 
 For Codex, Cursor, and other compatible agents, install or link the same folder under the corresponding project or personal skills directory.
@@ -97,7 +92,7 @@ Development installs should be symlinks to the canonical checkout. Diagnose a li
 bun scripts/skills-doctor.mjs --installed ~/.agents/skills
 ```
 
-The doctor also compares each canonical package against the declared Git revision. A linked install backed by uncommitted package changes reports `source=dirty` and fails until the source can be tied to a revision. A stable Review Gate pass records the executing skill revision and refuses an unresolved, diverged, or dirty identity.
+The doctor also compares each canonical package against the declared Git revision. A linked install backed by uncommitted package changes reports `source=dirty` and fails until the source can be tied to a revision. A stable Gate pass records the executing skill revision and refuses an unresolved, diverged, or dirty identity.
 
 Preview a reversible development-link migration, then apply it only from a clean canonical package revision:
 
@@ -140,7 +135,7 @@ maintenance work
 Build a one-skill proposal packet and record a reviewed outcome with:
 
 ```bash
-bun scripts/build-proposal-packet.mjs record-a-case --output foundry/runs/proposal-impact/<run>/packet.json
+bun scripts/build-proposal-packet.mjs correct --output foundry/runs/proposal-impact/<run>/packet.json
 bun scripts/record-impact.mjs foundry/runs/proposal-impact/<run>/impact-record.json
 ```
 

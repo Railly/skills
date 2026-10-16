@@ -1,4 +1,4 @@
-# Skill provenance: record-a-case
+# Skill provenance: correct
 
 ## Metadata
 
@@ -6,8 +6,8 @@
 {
   "schema_version": 1,
   "kind": "skill",
-  "skill": "record-a-case",
-  "summary": "Record a Case now has an explicit schema 2 application that links a reviewed case to compiled knowledge without mutating installable procedure.",
+  "skill": "correct",
+  "summary": "Correct (formerly Record a Case) has an explicit schema 2 application that links a reviewed case to compiled knowledge without mutating installable procedure.",
   "patterns": [
     "pattern.drive-the-shipped-surface"
   ],

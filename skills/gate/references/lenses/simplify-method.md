@@ -47,4 +47,4 @@ Test Strength must show that consolidated tests are not decorative. Mutate the d
 
 Resilience must force applicable failures independently, then repeat under realistic concurrency. Cover malformed state, ambiguous success, retry, cleanup, partial writes, queue recovery, cancellation, and idempotency as applicable. A report for an earlier SHA is historical evidence, not a pass for the final tree.
 
-Review Gate must inspect the exact final tree. External review completes only when its report is actionable and finished, without artificial token or time budgets.
+Gate must inspect the exact final tree. External review completes only when its report is actionable and finished, without artificial token or time budgets.

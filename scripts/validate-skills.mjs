@@ -26,8 +26,8 @@ const INSTALLER_GROUPS = {
 	experimental: "experimental",
 };
 const CANONICAL_WRITERS = new Set([
-	"record-a-case",
-	"review-gate",
+	"correct",
+	"gate",
 ]);
 const errors = [];
 const knowledge = loadKnowledge(resolve("."));

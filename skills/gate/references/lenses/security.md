@@ -65,6 +65,6 @@ Do not turn severity into merge policy. A confirmed in-scope regression blocks. 
 
 Use [the receipt contract](security-receipt.md). Emit one exact-state receipt containing the trust map, exploitability chains, classifications, verification evidence, gaps, and merge relevance. Keep vulnerability details in an appropriately private artifact when disclosure would increase risk.
 
-Review Gate owns the promotion verdict. Security Review supplies the security evidence and does not fail a review for missing Test Strength, resilience, documentation, or general correctness evidence outside its boundary.
+Gate owns the promotion verdict. Security Review supplies the security evidence and does not fail a review for missing Test Strength, resilience, documentation, or general correctness evidence outside its boundary.
 
-**Complete when:** Review Gate can consume the receipt without reconstructing the threat model or confusing hardening with an exploitable boundary crossing.
+**Complete when:** Gate can consume the receipt without reconstructing the threat model or confusing hardening with an exploitable boundary crossing.

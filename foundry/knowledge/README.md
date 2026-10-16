@@ -15,7 +15,7 @@ bun scripts/validate-knowledge.mjs
 bun scripts/compile-knowledge.mjs
 bun scripts/compile-knowledge.mjs --check
 bun scripts/audit-knowledge-matches.mjs --check
-bun scripts/build-proposal-packet.mjs record-a-case
+bun scripts/build-proposal-packet.mjs correct
 bun scripts/record-impact.mjs foundry/runs/proposal-impact/<run>/impact-record.json
 ```
 
