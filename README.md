@@ -39,7 +39,7 @@ flowchart LR
 
 ### Correct
 
-[Correct](skills/correct) closes the work: it records the evidence ledger with one compiled-knowledge disposition, then turns each escaped mistake into a check that fails on it, proven against the original mistake, recorded in the repo's enforcer table and the case `Enforcer` field.
+[Correct](skills/correct) closes the work: it records the evidence ledger, then turns each escaped mistake into a check that fails on it, proven against the original mistake, recorded in the repo's enforcer table and the case `Enforcer` field.
 
 Everything else lives in [archive/](archive/README.md).
 
@@ -107,75 +107,25 @@ Pass `--source <repository>` when the migration command is running from a separa
 ## Repository structure
 
 ```text
-skills/                 stable installable surface
-skills/.experimental/   candidate and experimental installable surfaces
-cases/                  public-safe evidence ledger
-foundry/                governance, lessons, eval rounds, live runs, and decisions
-scripts/                deterministic validation and eval machinery
+skills/                 stable skills (gate, correct)
+skills/.experimental/   experimental skills (contract, loop, verify-setup)
+cases/                  evidence ledgers written by correct, plus per-repo conventions read by gate
+foundry/                maturity registry and the rounds that decided it
+scripts/                validation and eval machinery
+archive/                everything retired: old skills, cases, foundry, knowledge layer, scripts
 ```
 
-Stable skills stay flat. Candidate and Experimental skills use the standard `skills/.experimental/` catalog recognized by the skills CLI. The maturity registry assigns their distribution channel, and the plugin manifest supplies the visible `Stable`, `Candidates`, and `Experimental` installer groups.
-
-All cases, evals, run reports, decision trails, and Foundry logs follow the [canonical source repository policy](foundry/source-of-truth.md). Installed copies under `.agents/skills`, `.claude/skills`, or another agent directory are read-only distribution surfaces.
-
-## Skill foundry
-
-Real work becomes a case before it becomes an instruction:
-
-```text
-maintenance work
-→ case
-→ candidate lesson
-→ bounded proposal packet
-→ baseline comparison
-→ human review
-→ promote, absorb, or reject
-```
-
-Build a one-skill proposal packet and record a reviewed outcome with:
-
-```bash
-bun scripts/build-proposal-packet.mjs correct --output foundry/runs/proposal-impact/<run>/packet.json
-bun scripts/record-impact.mjs foundry/runs/proposal-impact/<run>/impact-record.json
-```
-
-Rejected candidates remain queryable in the compiled graph and cannot change the active skill digest. Accepted candidates require passing eval evidence and explicit human authority.
-
-Every supported agent use can also produce a private Skillkit receipt. Routine usage remains telemetry. Reviewed failures, corrections, interruptions, novel transfers, and maintainer feedback can be compiled into sanitized candidates with:
-
-```bash
-skillkit receipts --all --json > /private/path/receipts.json
-bun scripts/compile-usage-receipts.mjs /private/path/receipts.json
-```
-
-The compiler copies no transcript, local path, session ID, or private summary. It creates no canonical case and changes no skill automatically.
-
-For a closed work-item manifest, generate reviewed annotations and apply them locally only after inspecting the JSON:
-
-```bash
-bun scripts/work-item.mjs annotations /private/path/work-item.manifest.json --output /private/path/annotations.json
-skillkit receipts --annotate /private/path/annotations.json
-```
-
-Remote annotation is intentionally unsupported. Apply annotations on the machine that owns the SkillKit receipt database.
-
-Read the [product direction](NORTH.md), [foundry overview](foundry), [compiled knowledge](foundry/knowledge), [governance](foundry/governance.md), [source repository policy](foundry/source-of-truth.md), [Issue Contract workflow](foundry/missions), [eval protocol](foundry/eval-protocol.md), and [case template](foundry/case-template.md). Deprecated methods and the archived Unfold protocol remain under [foundry/deprecated](foundry/deprecated).
-
-Public issues and pull requests may become public cases. Confidential evidence stays in an organization-approved private system; only generalized, sanitized lessons cross into this repository.
+Installed copies under `.agents/skills`, `.claude/skills`, or another agent directory are read-only; cases, run reports, and rounds are written here.
 
 ## Validate
 
 ```bash
 bun scripts/validate-skills.mjs
-bun scripts/validate-issue-contracts.mjs
-bun scripts/validate-knowledge.mjs
-bun scripts/compile-knowledge.mjs --check
-bun scripts/audit-knowledge-matches.mjs --check
-bun scripts/verify-eval-fixtures.mjs
+bun test scripts/lib/*.test.mjs
 bunx @crafter/skillkit@0.13.0 audit skills --json --strict
 ```
 
-CI checks frontmatter, progressive disclosure, internal links, maturity metadata, public-case boundaries, Issue Contracts, compiled knowledge, eval metadata, and executable fixtures. Strict knowledge maturity enforcement joins CI after the four unsupported non-experimental skills gain prospective application evidence or their maturity changes.
+CI checks frontmatter, size, internal links, maturity metadata, case fields including `Enforcer`, eval metadata, and the gate scripts.
 
 ## License
 

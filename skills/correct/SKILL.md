@@ -14,7 +14,7 @@ Before writing, run the packaged `scripts/resolve-source-root.mjs`, which honors
 
 ## 1. Record the case
 
-Follow [the case ledger method](references/case-ledger.md): bound one case, build the ledger with claim classes, assign independent statuses for validation, human review, maintainer acceptance, and delivery, extract the lesson, classify compiled knowledge, pass the confidentiality gate, and write it to `cases/<repo>/` using [the template](references/template.md).
+Follow [the case ledger method](references/case-ledger.md): bound one case, build the ledger with claim classes, assign independent statuses for validation, human review, maintainer acceptance, and delivery, extract the lesson, pass the confidentiality gate, and write it to `cases/<repo>/` using [the template](references/template.md).
 
 **Complete when:** the case validates and every escaped mistake is listed with its evidence.
 

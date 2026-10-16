@@ -38,4 +38,4 @@ examples/<name> => root build.zig test-example-<name> step + examples/ index
 
 | Date | Finding | Gate that missed | Why | Closed by |
 |---|---|---|---|---|
-| 2026-07-17 | Arrow-forwarding patch reverted a same-day tested feature | (none missed — repo gate caught it pre-push) | n/a — recorded as gate WIN with two new lens candidates | [case](2026-07-17-arrow-default-was-todays-feature.md) |
+| 2026-07-17 | Arrow-forwarding patch reverted a same-day tested feature | (none missed — repo gate caught it pre-push) | n/a — recorded as gate WIN with two new lens candidates | [case](../../archive/cases/native/2026-07-17-arrow-default-was-todays-feature.md) |
