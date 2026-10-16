@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Exit 0 when the current tree has a passing observation of every feature the
-# contract names (lines "observe: <feature>" in contract.md), or of any feature
+# contract names (lines "observe: <feature>" in contract.md; "observe: none (reason)"
+# marks a named gap and requires nothing), or of any feature
 # when there is no contract. Used by the verify-before-done Stop hook.
 set -uo pipefail
 root="$(git rev-parse --show-toplevel)"
@@ -18,7 +19,7 @@ passed() {
   return 1
 }
 
-required="$(sed -nE 's/^[-*[:space:]]*observe:[[:space:]]*([A-Za-z0-9_-]+).*/\1/p' "$here/contract.md" 2>/dev/null | sort -u)"
+required="$(sed -nE 's/^[-*[:space:]]*observe:[[:space:]]*([A-Za-z0-9_-]+).*/\1/p' "$here/contract.md" 2>/dev/null | grep -vx none | sort -u)"
 if [ -z "$required" ]; then
   passed '[^"]*' && exit 0
   echo "no passing observation for HEAD $head with tree digest $dirty" >&2

@@ -1,52 +1,46 @@
 import registry from "../../../foundry/maturity.json";
 
-export type Channel = "stable" | "candidate" | "experimental";
-export type Maturity = "experimental" | "dogfooded" | "evaluated" | "validated" | "deprecated";
+type Entry = { channel: "stable" | "candidate" | "experimental"; maturity: string };
 
-type RegistryEntry = {
-	type: string;
-	channel: Channel;
-	maturity: Maturity;
-	summary: string;
-	decision: string;
-};
+const entries = registry.skills as Record<string, Entry>;
 
-export type Skill = RegistryEntry & {
-	name: string;
-	sourcePath: string;
-	sourceUrl: string;
-	decisionUrl: string;
-	installCommand: string;
-};
+const core = [
+	{
+		name: "contract",
+		step: "Contract",
+		line: "Write what done means before any code changes. Every criterion names the driver that will observe it.",
+	},
+	{
+		name: "loop",
+		step: "Loop",
+		line: "Run the change. Ceremony scales with size, and each step ends on command output, never on a claim.",
+	},
+	{
+		name: "verify-setup",
+		step: "Verify",
+		line: "Give a repo its own drivers that touch the real surface and keep evidence tied to the exact tree.",
+	},
+	{
+		name: "gate",
+		step: "Gate",
+		line: "Review one exact diff: deterministic checks first, then only the lenses the change triggers.",
+	},
+	{
+		name: "correct",
+		step: "Correct",
+		line: "Record the work, then turn each escaped mistake into a check that fails on it.",
+	},
+];
 
-const entries = registry.skills as Record<string, RegistryEntry>;
-
-export const skills: Skill[] = Object.entries(entries)
-	.map(([name, entry]) => {
-		const sourcePath = entry.channel === "stable" ? `skills/${name}` : `skills/.experimental/${name}`;
-		return {
-			name,
-			...entry,
-			sourcePath,
-			sourceUrl: `https://github.com/Railly/skills/tree/main/${sourcePath}`,
-			decisionUrl: `https://github.com/Railly/skills/tree/main/foundry/${entry.decision}`,
-			installCommand: `bunx skills add Railly/skills --skill ${name}`,
-		};
-	})
-	.sort((a, b) => {
-		const order: Record<Channel, number> = { stable: 0, candidate: 1, experimental: 2 };
-		return order[a.channel] - order[b.channel] || a.name.localeCompare(b.name);
-	});
+export const skills = core.map((skill) => {
+	const entry = entries[skill.name];
+	const path = entry.channel === "stable" ? `skills/${skill.name}` : `skills/.experimental/${skill.name}`;
+	return {
+		...skill,
+		maturity: entry.maturity,
+		sourceUrl: `https://github.com/Railly/skills/tree/main/${path}`,
+	};
+});
 
 export const release = registry.release;
 export const collectionInstallCommand = "bunx skills add Railly/skills";
-export const types = [...new Set(skills.map((skill) => skill.type))].sort();
-export const channelCounts = Object.fromEntries(
-	(["stable", "candidate", "experimental"] as const).map((channel) => [
-		channel,
-		skills.filter((skill) => skill.channel === channel).length,
-	]),
-) as Record<Channel, number>;
-export const evaluatedCount = skills.filter(
-	(skill) => skill.maturity === "evaluated" || skill.maturity === "validated",
-).length;

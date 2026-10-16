@@ -1,55 +1,84 @@
 ---
-import Catalog from "../components/Catalog.astro";
-import EvidenceKey from "../components/EvidenceKey.astro";
-import Hero from "../components/Hero.astro";
-import SiteFooter from "../components/SiteFooter.astro";
-import SiteHeader from "../components/SiteHeader.astro";
-import WorkflowGraph from "../components/WorkflowGraph.astro";
 import Layout from "../layouts/Layout.astro";
+import { collectionInstallCommand, skills } from "../data/skills";
 ---
 
 <Layout
-	title="Railly Skills: Engineering skills with receipts"
-	description="Evidence-driven agent skills shaped by real engineering work. Inspect maturity, source, limits, and installation from one registry."
+	title="Railly Skills: Skills for Agentic Software Engineering"
+	description="Skills for Agentic Software Engineering. Contract, loop, verify, gate, correct: done means observed."
 >
-	<div id="top"></div>
-	<SiteHeader />
-	<main id="main-content">
-		<Hero />
-		<WorkflowGraph />
-		<Catalog />
-		<EvidenceKey />
+	<main class="page">
+		<header class="top reveal" style="--i: 0">
+			<a class="brand" href="/">railly<span>/</span>skills</a>
+			<a class="quiet" href="https://github.com/Railly/skills" target="_blank" rel="noreferrer">GitHub</a>
+		</header>
+
+		<section class="hero">
+			<h1 class="reveal" style="--i: 1">Skills for Agentic Software Engineering</h1>
+			<p class="lede reveal" style="--i: 2">
+				Done means observed. Five skills where each step ends on command output, and every mistake that slips through becomes a check that fails on it.
+			</p>
+			<div class="install reveal" style="--i: 3">
+				<code><span aria-hidden="true">$</span> {collectionInstallCommand}</code>
+				<button type="button" data-copy={collectionInstallCommand} aria-label="Copy install command">
+					<span class="copy-icon" data-state="idle" aria-hidden="true">
+						<svg class="i-copy" viewBox="0 0 16 16" width="14" height="14"><rect x="5" y="5" width="8.5" height="8.5" rx="2" /><path d="M3 10.5V4a1.5 1.5 0 0 1 1.5-1.5H11" /></svg>
+						<svg class="i-check" viewBox="0 0 16 16" width="14" height="14"><path d="M3.5 8.5l3 3 6-7" /></svg>
+					</span>
+				</button>
+			</div>
+		</section>
+
+		<ol class="flow reveal" style="--i: 4" aria-label="The loop">
+			{skills.map((skill) => <li>{skill.step}</li>)}
+		</ol>
+
+		<section aria-label="Skills">
+			<ul class="skills">
+				{skills.map((skill, index) => (
+					<li class="reveal" style={`--i: ${5 + index}`}>
+						<a href={skill.sourceUrl} target="_blank" rel="noreferrer">
+							<span class="num">{String(index + 1).padStart(2, "0")}</span>
+							<span class="body">
+								<span class="name">{skill.name}<span class="tag">{skill.maturity}</span></span>
+								<span class="line">{skill.line}</span>
+							</span>
+							<span class="arrow" aria-hidden="true">↗</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		</section>
+
+		<section class="note reveal" style="--i: 10">
+			<p>
+				Prose rules get read and skipped. These skills ship scripts instead: a contract the harness can check, drivers that look at the real screen, a gate that refuses a stale verdict, and an enforcer table that only grows.
+			</p>
+		</section>
+
+		<footer class="foot reveal" style="--i: 11">
+			<span>MIT</span>
+			<a class="quiet" href="https://railly.dev" target="_blank" rel="noreferrer">Railly Hugo</a>
+		</footer>
 	</main>
-	<SiteFooter />
-	<div class="copy-toast" data-copy-toast role="status" aria-live="polite" aria-atomic="true"></div>
 </Layout>
 
 <script>
-	const toast = document.querySelector<HTMLElement>("[data-copy-toast]");
-	let toastTimer = 0;
-
 	for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+		const icon = button.querySelector<HTMLElement>(".copy-icon");
+		let timer = 0;
 		button.addEventListener("click", async () => {
-			const command = button.dataset.copy;
-			if (!command) return;
 			try {
-				await navigator.clipboard.writeText(command);
-				const label = button.querySelector<HTMLElement>("[data-copy-label]");
-				if (label) label.textContent = "Copied";
-				if (toast) {
-					toast.textContent = "Install command copied";
-					toast.dataset.visible = "true";
-				}
-				window.clearTimeout(toastTimer);
-				toastTimer = window.setTimeout(() => {
-					if (label) label.textContent = "Copy";
-					if (toast) delete toast.dataset.visible;
-				}, 1800);
+				await navigator.clipboard.writeText(button.dataset.copy ?? "");
+				if (icon) icon.dataset.state = "done";
+				button.setAttribute("aria-label", "Copied");
+				window.clearTimeout(timer);
+				timer = window.setTimeout(() => {
+					if (icon) icon.dataset.state = "idle";
+					button.setAttribute("aria-label", "Copy install command");
+				}, 1600);
 			} catch {
-				if (toast) {
-					toast.textContent = "Copy failed. Select the command manually.";
-					toast.dataset.visible = "true";
-				}
+				button.setAttribute("aria-label", "Copy failed, select the command manually");
 			}
 		});
 	}
