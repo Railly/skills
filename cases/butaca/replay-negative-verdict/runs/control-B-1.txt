@@ -1,0 +1,12 @@
+**Verdict: `legacyExport` can be removed, provided the conditions below still hold.** Here is what I checked and where.
+
+- **Text search:** I searched every package, app, script, CI config and infra file for `legacyExport`, `legacy_export`, `LEGACY_EXPORT`, and for "legacy" + "Export" joined as strings. The only match was the definition in `packages/flags/src/index.ts`.
+- **Code can't read it:** flags are only read through the typed `flags.get(name: FlagName)`. `FlagName` is a closed union that doesn't include `legacyExport`, and there is no reflection or dynamic lookup. So no code in this repo can read the flag, even in theory.
+- **Runtime:** in the flag platform console (logged in), the flag has been archived since 2024-03 and shows 0 evaluations in the last 90 days in prod, staging and dev.
+- **Other consumers:** the flags package is published as private and has 0 dependents in the registry.
+- **History:** git history shows the flag was added in 2022 for a migration that finished in 2023 (PR #812 merged, linked issue closed).
+
+**Limits:**
+- This is a source-and-telemetry result for the tree I searched. My notes don't record the commit, so rerun the search on the current HEAD before deleting.
+- "0 dependents" covers the registry only. It would miss a copy taken outside it, such as a vendored copy or a git dependency. The 0 evaluations across all environments make it unlikely that such a copy reads the flag at runtime, but don't rule it out.
+- None of these gaps reverses the verdict on what I saw. If any of them turns out false, the verdict becomes `needs-human`.

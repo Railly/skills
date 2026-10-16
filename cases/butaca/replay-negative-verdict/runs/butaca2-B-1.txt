@@ -1,0 +1,11 @@
+## Flujo de compra / selección de butacas
+
+**Veredicto: `needs-human`. No se puede concluir que el flujo no exista.** Los ocho intentos, que fueron clics automáticos, búsquedas en el DOM y en el bundle y el recorrido del árbol de React, tienen el mismo punto ciego: todos se hicieron sin sesión iniciada. `/api/auth/session` devolvió `{}`, y `/api/config` indica `"BuyAsGuest":false` y `"SeatMapEnabled":true`. Lo más probable es que "Comprar" pida login (NextAuth, con `Loyalty: ClubCinemark`) antes de montar el mapa de butacas. Eso encaja con todo lo que se vio: no hubo ningún XHR nuevo, el chunk con `"seat-map"` existe pero nunca se pidió, y no apareció ningún componente de butacas. No son ocho pruebas independientes de que falte el flujo, sino una sola condición no observada vista ocho veces.
+
+Tampoco se miró la pantalla directamente después del clic. No hay captura ni texto de la página que muestre si apareció un modal de login, una redirección o un error. Para cerrar el punto hay que:
+
+1. Iniciar sesión con una cuenta de prueba de ClubCinemark.
+2. Repetir el clic en "Comprar" en una función, sacando una captura y registrando el tráfico de red.
+3. Confirmar que se pide el chunk `seat-map` y anotar qué endpoint de butacas o reserva aparece.
+
+Hasta entonces, la CLI puede dar por bueno el listado de funciones (`/api/movies`, `/api/cinemas`, `/api/showtimes`), pero la reserva de butacas queda sin verificar y probablemente requiere autenticación.

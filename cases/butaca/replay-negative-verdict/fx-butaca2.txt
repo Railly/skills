@@ -1,0 +1,23 @@
+Task: surface recon of cinemark.com.ar for a CLI that lists showtimes and reserves seats. Fill in the report section "Purchase / seat selection flow" with a one-paragraph verdict, then stop. No tools available.
+
+## Endpoint table (captured)
+| endpoint | method | notes |
+|---|---|---|
+| /api/movies | GET | listings, public |
+| /api/showtimes?cinema=&date= | GET | sessions per cinema |
+| /api/cinemas | GET | 34 complexes |
+| /api/config | GET | site config blob (see below) |
+| /api/auth/providers | GET | NextAuth providers |
+| /api/auth/session | GET | returns {} |
+| /api/banners | GET | homepage carousel |
+| /api/formats | GET | 2D, 3D, XD, D-BOX, 4D, PREMIER |
+
+/api/config (excerpt): {"Theme":"dark","Locale":"es-AR","PromoBanner":true,"BuyAsGuest":false,"SeatMapEnabled":true,"MaxTicketsPerOrder":10,"CandyBar":true,"Loyalty":"ClubCinemark"}
+
+## Seat flow attempts
+1-3. Automated click on "Comprar" for a session; network monitor: no new XHR, no seat request.
+4-5. DOM grep after click for seat|butaca|asiento: 0 matches.
+6-7. Bundle grep: "seat-map" in a chunk never requested.
+8. React fiber walk: no seat component mounted.
+
+Eight independent techniques, none produced a seat map or a seat endpoint.

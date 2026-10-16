@@ -55,6 +55,10 @@ Run `correct`: it records the case, and every mistake that escaped a step become
 
 When the cycle ends open, append `## Handoff` to the contract: the current step, the exact tree (HEAD and `fresh.sh` result), what is unverified, and the next command. The next session enters at step 0 from that note.
 
+## Negative verdicts
+
+A finding that something does not exist, is unused, is unreachable, or can be removed is a claim about everything you did not look at. Write it with its preconditions: what you observed and from where (anonymous or authenticated, which surface, which consumers). Before writing it, look at the user-visible surface directly (screenshot or page text), not only traffic or source. If a precondition you could not observe would change the verdict, the verdict is `needs-human: <what was not observed and how to observe it>`, not a conclusion.
+
 ## Rules
 
 - A step ends when its command says so.
