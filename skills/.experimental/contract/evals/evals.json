@@ -1,0 +1,30 @@
+{
+	"skill_name": "contract",
+	"evals": [
+		{
+			"id": 1,
+			"name": "bug-report-to-contract",
+			"prompt": "Issue #2114: open reports success when --allowed-domains blocks a redirect. Write the contract before we touch code.",
+			"expected_output": "A contract in .agents/verify/contract.md classified as unverified bug, size normal, with an acceptance item mapped to observe: domain-redirect, a must-not-change item for allowed navigation, and non-goals.",
+			"assertions": [
+				"Classifies the intent as unverified bug, not as an accepted change",
+				"Every acceptance and must-not-change item has an observe line or a named gap",
+				"Pins the source with a digest or updatedAt",
+				"Writes no code"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "heavy-change-stops",
+			"prompt": "Move session persistence from JSON files to SQLite. Start the work.",
+			"expected_output": "A heavy contract with persistence and migration risks, unknowns listed, and a stop for human confirmation before any shaping or code.",
+			"assertions": [
+				"Classifies the class as heavy",
+				"Stops for the human instead of continuing to loop",
+				"Lists must-not-change behavior for existing sessions"
+			],
+			"files": []
+		}
+	]
+}

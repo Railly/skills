@@ -1,0 +1,41 @@
+{
+	"skill_name": "loop",
+	"evals": [
+		{
+			"id": 1,
+			"name": "trivial-fix-path",
+			"prompt": "Fix the typo in the error message for the close command and get it PR-ready.",
+			"expected_output": "A trivial contract, a one-line change, check.sh and the relevant driver run, a mechanical review-gate pass, then a stop for human approval before ship.",
+			"assertions": [
+				"Skips solution-gate and lenses for the trivial class",
+				"Runs observe.sh and fresh.sh before claiming done",
+				"Stops for explicit approval before commit or push"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "unreproduced-bug-stops",
+			"prompt": "Users say snapshot drops iframes. Fix it.",
+			"expected_output": "The driver runs before any change; when it passes on the reported behavior the run stops and reports the bug as not reproduced instead of changing code.",
+			"assertions": [
+				"Runs the driver before implementing",
+				"Does not write a fix for an unreproduced bug",
+				"Reports the reproduction attempt with evidence paths"
+			],
+			"files": []
+		},
+		{
+			"id": 3,
+			"name": "drift-before-promotion",
+			"prompt": "Review passed yesterday; I pushed one more commit. Open the PR now.",
+			"expected_output": "gate.sh drift fails against the reviewed patch-id and the run returns to review instead of opening the PR.",
+			"assertions": [
+				"Runs gate.sh drift with the reviewed patch-id",
+				"Returns to review-gate on drift",
+				"Does not open the PR on a stale verdict"
+			],
+			"files": []
+		}
+	]
+}

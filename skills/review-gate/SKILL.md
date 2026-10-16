@@ -36,6 +36,8 @@ Escalate the profile or wall-time budget only when new evidence exposes a new ri
 
 Load `cases/<repo>/conventions.md` from the canonical source root. If absent, compile it from target-repo instructions before review. Run every applicable check in [scripts/gate.sh](scripts/gate.sh), starting with `covered` when an exact-head report is expected. A finding is fixed or acknowledged with evidence, never skipped silently.
 
+When the target repo has `.agents/verify/`, run `scripts/gate.sh verify`: doctor, check, and a passing observation of every contract feature for the exact tree. A repo without a kit is a recorded gap, never an implicit pass.
+
 When `radius` supports the target language, save its Impact Map under the canonical Review Gate run directory. Treat it as attention guidance, not proof.
 
 ## 3. Inventory claims and consume stage receipts
@@ -71,6 +73,8 @@ Run `security-review` when the diff or stated claim touches authentication, auth
 Read [the run-report schema](references/run-report.md) when materializing the exact-head verdict. Treat schema-v1 JSON as the only authored report. Generate the human view with `scripts/gate.sh render <run-report.json> <run-report.md>`. Never maintain an independently authored prose twin.
 
 Run `scripts/gate.sh report <run-report.json>`. A pass requires the exact current head, resolved required receipts, no open finding or gap, and required independence. Update the manifest's `review` stage atomically.
+
+Record the reviewed patch-id in the report. Before any promotion, `scripts/gate.sh drift <reviewed-patch-id>` must pass; a different patch-id voids the verdict.
 
 After an external review, harvest each escaped finding into the smallest durable destination: deterministic gate, triggered lens, project norm, or subsystem invariant. Record outcome fields including external findings, review rounds, human corrections, and escaped finding class.
 
