@@ -112,7 +112,7 @@ skills/.experimental/   experimental skills (contract, loop, verify-setup)
 cases/                  evidence ledgers written by correct, plus per-repo conventions read by gate
 foundry/                maturity registry and the rounds that decided it
 scripts/                validation and eval machinery
-archive/                everything retired: old skills, cases, foundry, knowledge layer, scripts
+archive/                everything retired: old skills, cases, foundry, knowledge layer, scripts, subagents, notes
 ```
 
 Installed copies under `.agents/skills`, `.claude/skills`, or another agent directory are read-only; cases, run reports, and rounds are written here.
