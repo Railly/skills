@@ -1,0 +1,32 @@
+{
+	"skill_name": "verify-setup",
+	"evals": [
+		{
+			"id": 1,
+			"name": "cli-repo-first-kit",
+			"prompt": "This Rust CLI repo has no way for an agent to prove a change works beyond cargo test. Set up verification so the next agent can prove the snapshot command really works.",
+			"expected_output": "A .agents/verify kit with a real doctor and check, a snapshot driver that runs the built binary against a real page and asserts on output, a feature file with what usually lies, and proof that the driver fails on a broken state.",
+			"assertions": [
+				"Scaffolds with scripts/scaffold.mjs instead of hand-writing the kit",
+				"check.sh runs the same commands CI runs",
+				"The driver exercises the built binary, not a unit test or mock",
+				"The driver is shown failing on a deliberately broken state and passing on the fixed one",
+				"Stops before committing the kit into a repo the user does not own"
+			],
+			"files": []
+		},
+		{
+			"id": 2,
+			"name": "wrong-surface-done-claim",
+			"prompt": "Last time an agent said the seat map flow did not exist after grepping the DOM and network tab. It was behind a login wall. Add verification for that flow so this cannot happen again.",
+			"expected_output": "A driver that screenshots the real screen after each step and asserts on visible state, a feature file whose What usually lies section names the silent auth wall, and an ENFORCERS row tying the rule to the driver.",
+			"assertions": [
+				"The driver captures a screenshot and the agent looks at it",
+				"What usually lies names the auth wall that produces no network traffic",
+				"Adds an ENFORCERS.md row for the escaped mistake",
+				"doctor.sh fails with a clear reason when the required account is missing instead of faking it"
+			],
+			"files": []
+		}
+	]
+}
