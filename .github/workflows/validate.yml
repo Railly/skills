@@ -21,6 +21,8 @@ jobs:
         run: bunx @crafter/skillkit@0.13.0 audit skills --json --strict
       - name: Test validators
         run: bun test scripts/lib/*.test.mjs
+      - name: Test verify kit freshness
+        run: bash skills/.experimental/verify-setup/scripts/test-fresh.sh
       - name: Test Gate report contract
         run: bash skills/gate/scripts/test-report-gate.sh
       - name: Test FX review worker
