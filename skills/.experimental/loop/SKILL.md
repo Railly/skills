@@ -5,35 +5,28 @@ compatibility: "Requires a contract (contract skill), a .agents/verify kit (veri
 allowed-tools:
   - Skill(contract)
   - Skill(verify-setup)
-  - Skill(solution-gate)
-  - Skill(simplify)
-  - Skill(test-strength)
-  - Skill(resilience-audit)
-  - Skill(security-review)
   - Skill(review-gate)
-  - Skill(before-after)
-  - Skill(ship)
+  - Skill(correct)
   - Skill(record-a-case)
-  - Skill(handoff)
   - Agent
 ---
 
 # Loop
 
 ```text
-contract → [shape] → implement → observe → [lenses] → review-gate → [before-after] → human → ship → record
-    ↑          ↑__________ contract or shape change ___________|
+contract → [shape] → implement → observe → review-gate → human → deliver → record → correct
+    ↑          ↑__________ contract or shape change __________|
 ```
 
 Bracketed steps depend on the size class in `.agents/verify/contract.md`.
 
 ## 0. Enter
 
-Read the contract. If it is missing, run `contract`. If `.agents/verify/` is missing, run `verify-setup` (use `--local` in a repo you do not own). Find the earliest step whose evidence is missing or stale for the current tree. A handoff or an earlier claim is a lead, not evidence.
+Read the contract. If it is missing, run `contract`. If `.agents/verify/` is missing, run `verify-setup` (use `--local` in a repo you do not own). Find the earliest step whose evidence is missing or stale for the current tree. A handoff note or an earlier claim is a lead, not evidence.
 
 ## 1. Shape (heavy only)
 
-Run `solution-gate`. It must return one accepted, independently mergeable slice. No accepted slice, no implementation.
+Write two or three candidate shapes under `## Shapes` in the contract: mechanism, change surface, what each breaks, and the cheapest experiment that separates them. Run the experiments rather than arguing. Show the result to the human and record the chosen shape and one independently mergeable slice. No accepted slice, no implementation.
 
 ## 2. Implement
 
@@ -43,32 +36,23 @@ For an unverified bug, run the driver first and see it fail on the reported beha
 
 Run `bash .agents/verify/check.sh`, then `bash .agents/verify/observe.sh <feature>` for every feature in the contract. Open each screenshot or output and read it. `bash .agents/verify/fresh.sh` must exit 0. A failure returns to step 2 with the evidence, not with a retry of the same thing.
 
+For heavy visual or behavioral changes, also observe the baseline: run the same driver on the merge base in a separate worktree and keep both evidence directories, so the human sees before and after on one basis.
+
 Two reversals on the same pair of behaviors (fix A breaks B, fix B breaks A) end the run and return to step 1. That is a wrong change surface, not a bug to keep patching.
 
-## 4. Lenses (normal and heavy, when triggered)
+## 4. Review
 
-| Trigger | Skill |
-|---|---|
-| the diff grew past what the contract needs | `simplify` |
-| new or changed tests carry the proof | `test-strength` |
-| process, network, storage, cache, retry, or lifecycle boundaries | `resilience-audit` |
-| auth, secrets, origins, sandboxing, injection | `security-review` |
+Run `review-gate` with the profile matching the class (`trivial` = mechanical, `normal` = standard, `heavy` = high-risk). It runs `gate.sh verify` and the deep lenses the diff triggers (test strength, resilience, security, simplify). Any lens that edits code sends the run back to step 3. Record the patch-id it reviewed: `git diff $(git merge-base origin/main HEAD) HEAD | git patch-id --stable`.
 
-Any lens that edits code sends the run back to step 3.
+## 5. Human promotion
 
-## 5. Review
+Show the contract result per item, the evidence paths, the review verdict, gaps, and the exact action proposed (commit, push, PR). Wait for explicit approval. Before acting, `gate.sh drift <reviewed-patch-id>` must pass; any drift goes back to step 4. PRs target the default branch, never another feature branch. Authority for one action never implies another.
 
-Run `review-gate` with the profile matching the class (`trivial` = mechanical, `normal` = standard, `heavy` = high-risk). Its `gate.sh verify` must pass. Record the patch-id it reviewed: `git diff $(git merge-base origin/main HEAD) HEAD | git patch-id --stable`.
+## 6. Record and correct
 
-For heavy visual or behavioral changes, run `before-after` on the reviewed head.
+Run `record-a-case`. Every mistake that escaped a step goes through `correct`: a check that fails on it, plus a row in `ENFORCERS.md`. If no check is possible, write why.
 
-## 6. Human promotion
-
-Show the contract result per item, the evidence paths, the review verdict, gaps, and the exact action proposed (commit, push, PR). Wait for explicit approval. Before acting, `gate.sh drift <reviewed-patch-id>` must pass; any drift goes back to step 5. Then use `ship`. Authority for one action never implies another.
-
-## 7. Record
-
-Run `record-a-case`. Every mistake that escaped a step gets a check: a driver assertion, a `check.sh` command, or a `gate.sh` rule, plus a row in `ENFORCERS.md`. If no check is possible, write why. When the cycle ends open, run `handoff`.
+When the cycle ends open, append `## Handoff` to the contract: the current step, the exact tree (HEAD and `fresh.sh` result), what is unverified, and the next command. The next session enters at step 0 from that note.
 
 ## Rules
 

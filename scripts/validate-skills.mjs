@@ -26,7 +26,6 @@ const INSTALLER_GROUPS = {
 	experimental: "experimental",
 };
 const CANONICAL_WRITERS = new Set([
-	"issue-intake",
 	"record-a-case",
 	"review-gate",
 ]);
