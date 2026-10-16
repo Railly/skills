@@ -1,13 +1,13 @@
 ---
 name: review-gate
-description: "Gate a diff before pushing or requesting review: verify exact-state identity, run deterministic checks, consume Test Strength and Resilience receipts, then run only the judgment lenses triggered by the change. Use before opening or updating a PR, for pre-review, or after an external review round. Scale the path from mechanical through high-risk and external-PR profiles."
+description: "Gate a diff before pushing or requesting review: verify exact-state identity, run deterministic checks, then run only the lenses the change triggers, including test strength, resilience, security, and simplification. Use before opening or updating a PR, for pre-review, or after an external review round. Scale the path from mechanical through high-risk and external-PR profiles."
 compatibility: Requires git and bash for the deterministic layer.
 allowed-tools: [Agent]
 ---
 
 # Review gate
 
-Review Gate decides whether one exact diff is ready for human promotion. It owns deterministic checks, claim review, triggered judgment lenses, empirical verification, and the final verdict. Test Strength owns behavioral falsification. Resilience Audit owns failure-path pressure. Security Review owns attacker modeling and vulnerability classification. Consume their receipts instead of repeating their procedures.
+Review Gate decides whether one exact diff is ready for human promotion. It owns deterministic checks, claim review, triggered judgment lenses, empirical verification, and the final verdict. Its deep lenses live in `references/lenses/`: [test strength](references/lenses/test-strength.md) for behavioral falsification, [resilience](references/lenses/resilience.md) for failure-path pressure, [security](references/lenses/security.md) for attacker modeling and vulnerability classification, and [simplify](references/lenses/simplify.md) for bounded reduction. Each emits the receipt the report schema expects.
 
 ## Canonical state and execution identity
 
@@ -44,12 +44,12 @@ When `radius` supports the target language, save its Impact Map under the canoni
 
 Build the contract, design, user-facing, and implementation claim inventory. Read [the proof obligations](references/proof-obligations.md) for standard and high-risk work because those profiles must distinguish properties from proxies, carry assumptions, and map durable commit points.
 
-Consume stage receipts from the work-item manifest:
+Run each triggered deep lens and record its receipt in the report:
 
 - A Test Strength trigger requires a passing receipt tied to the current head, command, environment, contract digest, relevant paths, and Test Strength revision.
 - A resilience trigger requires a passing receipt with forced failure partitions, cleanup ownership, retry evidence, and the same identity fields.
 - A security trigger requires a passing Security Review receipt tied to the exact base, head, dirty digest, changed-path digest, and Security Review revision. An unresolved security blocker or verification gap makes the review incomplete.
-- A missing, stale, unavailable, or failed required receipt makes the review incomplete. Review Gate does not recreate the missing method.
+- A missing, stale, unavailable, or failed required receipt makes the review incomplete. Run the lens rather than skipping it.
 - A reusable receipt must show that the later diff cannot intersect its relevant paths or contract dependency cone. Final exact-head checks still run.
 
 ## 4. Run only triggered lenses
@@ -66,7 +66,7 @@ For external PRs, drive the built artifact before trusting the contributor's tes
 
 Refute findings at their own layer. Verify exemptions with the same rigor as findings. Freeze the reviewed tree while any pass runs.
 
-Run `security-review` when the diff or stated claim touches authentication, authorization, confidentiality, integrity, credentials, secrets, origin validation, tenant isolation, sandboxing, privilege, injection, or unsafe deserialization. Hardening and non-security observations remain visible but do not become blockers.
+Run the [security lens](references/lenses/security.md) when the diff or stated claim touches authentication, authorization, confidentiality, integrity, credentials, secrets, origin validation, tenant isolation, sandboxing, privilege, injection, or unsafe deserialization. Hardening and non-security observations remain visible but do not become blockers.
 
 ## 6. Emit one report and one receipt
 

@@ -9,9 +9,9 @@ describe("factory workflow contract", () => {
 	test("loop scales ceremony by class and ends steps on command output", () => {
 		const loop = read("skills/.experimental/loop/SKILL.md");
 		const observe = loop.indexOf("## 3. Observe");
-		const review = loop.indexOf("## 5. Review");
-		const promote = loop.indexOf("## 6. Human promotion");
-		const record = loop.indexOf("## 7. Record");
+		const review = loop.indexOf("## 4. Review");
+		const promote = loop.indexOf("## 5. Human promotion");
+		const record = loop.indexOf("## 6. Record and correct");
 		expect(observe).toBeGreaterThan(-1);
 		expect(review).toBeGreaterThan(observe);
 		expect(promote).toBeGreaterThan(review);
@@ -19,7 +19,8 @@ describe("factory workflow contract", () => {
 		expect(loop).toContain("A step ends when its command says so.");
 		expect(loop).toContain("`bash .agents/verify/fresh.sh` must exit 0");
 		expect(loop).toContain("gate.sh drift <reviewed-patch-id>");
-		expect(loop).toContain("Skill(ship)");
+		expect(loop).toContain("Skill(correct)");
+		expect(loop).toContain("PRs target the default branch");
 	});
 
 	test("contract maps every acceptance item to an observation", () => {
@@ -31,47 +32,27 @@ describe("factory workflow contract", () => {
 
 	test("isolated review prefers FX through AI Gateway and excludes Cursor", () => {
 		const review = read("skills/review-gate/SKILL.md");
-		const runtime = read(
-			"skills/solution-gate/references/orchestration-runtime.md",
-		);
 		expect(review).toContain("scripts/run-fx-review.mjs");
 		expect(review).toContain("Vercel AI Gateway");
 		expect(review).toContain("Cursor and `cursor-agent` are not supported");
-		expect(runtime).toContain("execution_mode: fx_worker");
-		expect(runtime).toContain("auth=AI_GATEWAY_API_KEY");
 	});
 
-	test("the public graph exposes observation, delivery, and case capture in order", () => {
+	test("the public graph shows the core in order", () => {
 		const graph = read("www/src/components/WorkflowGraph.astro");
-		const select = graph.indexOf('name: "Select"');
-		const contract = graph.indexOf('name: "Contract"');
-		const shape = graph.indexOf('name: "Shape"');
-		const implement = graph.indexOf('name: "Implement"');
-		const observe = graph.indexOf('name: "Observe"');
-		const review = graph.indexOf('name: "Review"');
-		const show = graph.indexOf('name: "Show"');
-		const promote = graph.indexOf('name: "Promote"');
-		const deliver = graph.indexOf('name: "Deliver"');
-		const record = graph.indexOf('name: "Record"');
-		expect(select).toBeGreaterThan(-1);
-		expect(contract).toBeGreaterThan(select);
-		expect(shape).toBeGreaterThan(contract);
-		expect(implement).toBeGreaterThan(shape);
-		expect(observe).toBeGreaterThan(implement);
-		expect(review).toBeGreaterThan(observe);
-		expect(show).toBeGreaterThan(review);
-		expect(promote).toBeGreaterThan(show);
-		expect(deliver).toBeGreaterThan(promote);
-		expect(record).toBeGreaterThan(deliver);
+		const order = ["Contract", "Implement", "Observe", "Review", "Promote", "Record", "Correct"].map(
+			(name) => graph.indexOf(`name: "${name}"`),
+		);
+		expect(order[0]).toBeGreaterThan(-1);
+		for (let i = 1; i < order.length; i++) expect(order[i]).toBeGreaterThan(order[i - 1]);
 	});
 
 	test("the public graph and release summary scale from current data", () => {
 		const styles = read("www/src/styles/global.css");
 		const evidence = read("www/src/components/EvidenceKey.astro");
 		expect(styles).toContain(
-			"grid-template-columns: repeat(10, minmax(145px, 1fr));",
+			"grid-template-columns: repeat(7, minmax(145px, 1fr));",
 		);
-		expect(styles.match(/min-width: 1450px;/g)).toHaveLength(2);
+		expect(styles.match(/min-width: 1015px;/g)).toHaveLength(2);
 		expect(evidence).toContain(
 			'import { evaluatedCount, release, skills } from "../data/skills"',
 		);

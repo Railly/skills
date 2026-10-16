@@ -1,15 +1,12 @@
 ---
 const steps = [
-	{ id: "01", name: "Select", skill: "issue-intake", note: "optional" },
-	{ id: "02", name: "Contract", skill: "contract", note: "done criteria" },
-	{ id: "03", name: "Shape", skill: "solution-gate", note: "heavy only" },
-	{ id: "04", name: "Implement", skill: "loop", note: "method" },
-	{ id: "05", name: "Observe", skill: "observe.sh", note: "evidence" },
-	{ id: "06", name: "Review", skill: "review-gate", note: "verdict" },
-	{ id: "07", name: "Show", skill: "before-after", note: "heavy only" },
-	{ id: "08", name: "Promote", skill: "human decision", note: "authority" },
-	{ id: "09", name: "Deliver", skill: "ship", note: "external" },
-	{ id: "10", name: "Record", skill: "record-a-case", note: "ledger" },
+	{ id: "01", name: "Contract", skill: "contract", note: "done criteria" },
+	{ id: "02", name: "Implement", skill: "loop", note: "method" },
+	{ id: "03", name: "Observe", skill: "verify-setup", note: "evidence" },
+	{ id: "04", name: "Review", skill: "review-gate", note: "verdict" },
+	{ id: "05", name: "Promote", skill: "human decision", note: "authority" },
+	{ id: "06", name: "Record", skill: "record-a-case", note: "ledger" },
+	{ id: "07", name: "Correct", skill: "correct", note: "new check" },
 ];
 ---
 
@@ -33,7 +30,7 @@ const steps = [
 			))}
 		</ol>
 		<div class="handoff-loop">
-			<strong>Cycle open?</strong><code>handoff → workstream-reconcile → earliest incomplete state</code>
+			<strong>Cycle open?</strong><code>handoff note in the contract → loop re-enters at the stale step</code>
 		</div>
 	</div>
 </section>

@@ -45,7 +45,7 @@ High-risk work needs an independent challenge source: a different model family, 
 
 ## Behavioral coverage strength
 
-Run `test-strength` when the diff implements or changes a protocol, parser, serializer, state machine, lifecycle, browser or OS event translation, adapter, or compatibility layer.
+Run the [test strength lens](lenses/test-strength.md) when the diff implements or changes a protocol, parser, serializer, state machine, lifecycle, browser or OS event translation, adapter, or compatibility layer.
 
 Record:
 

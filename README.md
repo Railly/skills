@@ -4,102 +4,53 @@
 
 These skills turn real engineering work into portable agent protocols. They favor retrievable evidence over confident prose and keep public methods agnostic across repositories, stacks, editors, and agents.
 
-## Skills
+## The core
 
-### Issue Intake
+Six skills. Every change follows the same path, and every step ends on command output, never on a claim.
 
-[Issue Intake](skills/issue-intake) surveys an external backlog, qualifies three to five candidates, presents an evidence-backed comparison matrix, recommends one, and lets the user make the final choice. It can use `xref` as an optional graph backend, but keeps qualification and selection at the skill boundary. It ends at selection and creates the canonical Issue Contract seed.
+```mermaid
+flowchart LR
+  Contract[contract] --> Loop[loop: implement]
+  Loop --> Observe[verify-setup kit: observe.sh, fresh.sh]
+  Observe --> Review[review-gate]
+  Review --> Human{human approval}
+  Human -->|gate.sh drift passes| Deliver[deliver]
+  Deliver --> Record[record-a-case]
+  Record --> Correct[correct]
+  Observe -.failure.-> Loop
+  Review -.finding.-> Loop
+  Correct -.new check.-> Observe
+```
 
-### Record a Case
+### Contract
 
-[Record a Case](skills/record-a-case) captures completed, interrupted, or backfilled maintenance work as an evidence ledger. It keeps validation, human review, maintainer acceptance, and delivery independent, then records one compiled-knowledge disposition: link an existing pattern, create a candidate pattern, preserve a gap, or make no compiled change.
+[Contract](skills/.experimental/contract) writes the done criteria before code changes: intent, size class (`trivial`, `normal`, `heavy`), and acceptance and must-not-change items each mapped to a verify driver. `fresh.sh` refuses done until every named feature is observed.
+
+### Loop
+
+[Loop](skills/.experimental/loop) runs one change from contract to a reviewed, observed, human-approved state. Ceremony scales with the size class; heavy work compares shapes with the human first and observes before and after.
+
+### Verify Setup
+
+[Verify Setup](skills/.experimental/verify-setup) gives a repository an executable verification kit under `.agents/verify`: doctor, checks, per-feature drivers that keep evidence tied to the exact tree, and `fresh.sh` for a Stop hook. `--local` keeps the kit out of git.
 
 ### Review Gate
 
-[Review Gate](skills/review-gate) runs a pre-review pass on a diff before pushing: deterministic checks first, then focused review lenses selected by what the diff changes. External review findings are harvested back into the catalog.
+[Review Gate](skills/review-gate) gates one exact diff: deterministic checks including `gate.sh verify` and `gate.sh drift`, then only the lenses the change triggers. Its deep lenses (test strength, resilience, security, simplify) live in `references/lenses/`.
 
-### Solution Gate
+### Record a Case
 
-[Solution Gate](skills/solution-gate) orchestrates Shaping before implementation. It freezes an evidence-backed contract, runs isolated Shaping passes, probes their weakest assumptions, feeds evidence back into their fit checks, and gates the surviving shape before detailing, breadboarding, or slicing.
-
-## Issue Contract
-
-The [Issue Contract](foundry/missions) is a phase-neutral state carrier, not an installable skill. It preserves outcome, observed and expected behavior, acceptance IDs, non-goals, invariants, change surface, verification claims, risk, promotion state, and the exact handoff command.
-
-## Experimental skills
-
-Experimental skills have coherent trigger and method contracts, but still need real-work cases and baseline comparison.
-
-### Before After
-
-[Before After](skills/.experimental/before-after) creates granular visual proof for web UI changes. It composes `agent-browser` to capture the same real DOM element before and after on one controlled basis, verifies image comparability, and generates a browser-openable evidence report using the official Vercel report foundation.
+[Record a Case](skills/record-a-case) captures finished or interrupted work as an evidence ledger, with one compiled-knowledge disposition and an `Enforcer` field.
 
 ### Correct
 
 [Correct](skills/.experimental/correct) turns one escaped mistake into a check that fails on it, proves it fails on the original mistake and passes on the fix, and records it in the repo's enforcer table and the case.
 
-### Contract
-
-[Contract](skills/.experimental/contract) writes the done criteria for one piece of work before code changes: intent, size class, and acceptance and must-not-change items each mapped to a verify driver, which `fresh.sh` enforces.
-
-### Handoff
-
-[Handoff](skills/.experimental/handoff) closes a working cycle so the next session resumes without rereading the transcript. It verifies state against git before asserting it, keeps delivery, verification, and human judgment independent, and stacks each session onto the prior document instead of overwriting it. Closed work with a transferable lesson goes to Record a Case instead.
-
-### Loop
-
-[Loop](skills/.experimental/loop) runs one change from contract to a reviewed, observed, human-approved state. Ceremony scales with the size class, and every step ends on command output, never on a claim.
-
-### Test Strength
-
-[Test Strength](skills/.experimental/test-strength) proves that tests detect the intended defect using falsification, mutation, properties, real boundaries, and artifact checks.
-
-### Resilience Audit
-
-[Resilience Audit](skills/.experimental/resilience-audit) forces timeouts, cancellation, retries, partial state, overload, cleanup, dependency failure, and concurrency paths.
-
-### Security Review
-
-[Security Review](skills/.experimental/security-review) models attackers, assets, authority, and trust boundaries to distinguish exploitable vulnerabilities from hardening, non-security defects, and verification gaps. It emits an exact-state security receipt for Review Gate without taking ownership of the final merge verdict.
-
-### Simplify
-
-[Simplify](skills/.experimental/simplify) reduces code, diff size, duplication, tests, and maintenance surface within a bounded target while preserving behavior and proving that consolidated regression protection still detects defects.
-
-### Verify Setup
-
-[Verify Setup](skills/.experimental/verify-setup) gives a repository an executable verification kit under `.agents/verify`: doctor, checks, per-feature drivers that keep evidence tied to the exact tree, and a fresh-evidence check a Stop hook can call. `--local` keeps the kit out of git.
-
-## Workflow
-
-Every change starts from a contract in the target repo's `.agents/verify/contract.md`. Each acceptance item names a driver, and done means `fresh.sh` passes for the exact tree.
-
-```mermaid
-flowchart LR
-  Select[issue-intake if needed] --> Contract[contract]
-  Contract --> Shape[solution-gate, heavy only]
-  Contract --> Implement
-  Shape --> Implement[loop: implement]
-  Implement --> Observe[observe.sh and fresh.sh]
-  Observe --> Lenses[triggered lenses]
-  Lenses --> Review[review-gate on exact state]
-  Review --> Show[before-after, heavy only]
-  Show --> HumanP{Human promotion gate}
-  HumanP -->|gate.sh drift passes| Deliver[ship]
-  Deliver --> Case[record-a-case]
-  Observe -.failure.-> Implement
-  Review -.code finding.-> Implement
-  Review -.contract finding.-> Contract
-  Implement -.cycle ends open.-> Handoff[handoff]
-```
-
-`loop` enters at the earliest step whose evidence is missing or stale for the current tree. The size class in the contract decides which bracketed steps run.
-
-Not every cycle reaches promotion. When work stops with the cycle still open, `handoff` carries state to the next session; `record-a-case` takes over once the cycle closes and leaves a transferable lesson.
+Everything else lives in [archive/](archive/README.md).
 
 ## Maturity
 
-Distribution channel and evidence maturity are separate. Stable contains four canonical skills. Solution Gate is stable by explicit human promotion backed by multiple dogfood runs, while its orchestration redesign and formal baseline comparison remain unevaluated. Candidate and Experimental skills remain installable without implying validation.
+Distribution channel and evidence maturity are separate. Stable contains Review Gate and Record a Case. Experimental skills remain installable without implying validation.
 
 The source of truth is [foundry/maturity.json](foundry/maturity.json).
 
@@ -119,23 +70,17 @@ Install interactively into supported agents:
 bunx skills add Railly/skills
 ```
 
-The interactive installer exposes three distinct groups: `Stable`, `Candidates`, and `Experimental`. Install only the stable surface with:
+The interactive installer exposes two groups: `Stable` and `Experimental`. Install only the stable surface with:
 
 ```bash
-bunx skills add Railly/skills --skill issue-intake --skill record-a-case --skill review-gate --skill solution-gate
+bunx skills add Railly/skills --skill record-a-case --skill review-gate
 ```
 
-Install a candidate explicitly with:
+Install the whole core with:
 
 ```bash
+bunx skills add Railly/skills --all
 ```
-
-Install an experimental skill explicitly with:
-
-```bash
-```
-
-`--all` includes all three groups.
 
 Or clone and link one skill:
 

@@ -1,6 +1,6 @@
 ---
 name: contract
-description: "Write the done criteria for one piece of engineering work before any code changes: what it really is, its size class, acceptance criteria each mapped to an executable observation, must-not-change behavior, and non-goals. Writes .agents/verify/contract.md so fresh.sh and the verify-before-done hook require every named feature to be observed. Use at the start of a bug fix, feature, refactor, or PR review, when someone says start work on this, take this issue, what does done mean, or before loop. Do not use to shortlist a backlog (issue-intake) or to pick between solution shapes (solution-gate)."
+description: "Write the done criteria for one piece of engineering work before any code changes: what it really is, its size class, acceptance criteria each mapped to an executable observation, must-not-change behavior, and non-goals. Writes .agents/verify/contract.md so fresh.sh and the verify-before-done hook require every named feature to be observed. Use at the start of a bug fix, feature, refactor, or PR review, when someone says start work on this, take this issue, what does done mean, or before loop. Do not use to shortlist a backlog or to review a finished diff (review-gate)."
 compatibility: "Requires read access to the source item and repository. Observation mapping requires a .agents/verify kit (verify-setup)."
 ---
 
@@ -28,7 +28,7 @@ Ambiguity defaults to investigation, never to implementation. Unknowns stay writ
 |---|---|---|
 | `trivial` | one obvious mechanism, one check proves it | implement, observe, review-gate mechanical |
 | `normal` | bounded behavior change in one area | add reduction and test strength when triggered, review-gate standard |
-| `heavy` | several valid shapes, shared state, contract or persistence change, security, shared infrastructure | solution-gate first, every triggered lens, review-gate high-risk, before-after |
+| `heavy` | several valid shapes, shared state, contract or persistence change, security, shared infrastructure | compare shapes with the human first, every triggered lens, review-gate high-risk, before and after observations |
 
 Changes that add reads or writes against shared infrastructure (a database, analytics store, third-party API, queue) are at least `normal` and need a load budget: requests per hour at expected scale, cost per request, and what bounds them, including cold starts.
 
