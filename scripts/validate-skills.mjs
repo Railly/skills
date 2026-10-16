@@ -29,7 +29,6 @@ const CANONICAL_WRITERS = new Set([
 	"issue-intake",
 	"record-a-case",
 	"review-gate",
-	"trail-decisions",
 ]);
 const errors = [];
 const knowledge = loadKnowledge(resolve("."));

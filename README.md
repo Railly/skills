@@ -26,18 +26,6 @@ These skills turn real engineering work into portable agent protocols. They favo
 
 The [Issue Contract](foundry/missions) is a phase-neutral state carrier, not an installable skill. It preserves outcome, observed and expected behavior, acceptance IDs, non-goals, invariants, change surface, verification claims, risk, promotion state, and the exact handoff command.
 
-## Candidate skills
-
-Candidate skills are installable methods ready for focused dogfooding.
-
-### Trail Decisions
-
-[Trail Decisions](skills/.experimental/trail-decisions) keeps an append-only implementation decision trail so review can inspect choices and evidence, not only the final diff.
-
-### Signature Repro
-
-[Signature Repro](skills/.experimental/signature-repro) investigates platform-specific or hardware-dependent bugs through structural and visual signatures observable on available machines.
-
 ## Experimental skills
 
 Experimental skills have coherent trigger and method contracts, but still need real-work cases and baseline comparison.
@@ -62,18 +50,6 @@ Experimental skills have coherent trigger and method contracts, but still need r
 
 [Loop](skills/.experimental/loop) runs one change from contract to a reviewed, observed, human-approved state. Ceremony scales with the size class, and every step ends on command output, never on a claim.
 
-### Herdr Workstreams
-
-[Herdr Workstreams](skills/.experimental/herdr-workstreams) turns a human-selected engineering queue into repo-scoped Herdr workspaces, optionally maintains a single-pane control cockpit, keeps only the lead and required runtime processes persistent, and launches planner or reviewer agents visibly on demand for the skill that owns their method.
-
-### Quality Baseline
-
-[Quality Baseline](skills/.experimental/quality-baseline) identifies repository-wide quality gaps before changes, rejects unsupported findings, and ranks one measurable pilot.
-
-### Performance Proof
-
-[Performance Proof](skills/.experimental/performance-proof) joins profiling, complexity analysis, representative benchmarks, semantic checks, and regression guards before accepting an algorithm or data-structure change.
-
 ### Test Strength
 
 [Test Strength](skills/.experimental/test-strength) proves that tests detect the intended defect using falsification, mutation, properties, real boundaries, and artifact checks.
@@ -93,14 +69,6 @@ Experimental skills have coherent trigger and method contracts, but still need r
 ### Verify Setup
 
 [Verify Setup](skills/.experimental/verify-setup) gives a repository an executable verification kit under `.agents/verify`: doctor, checks, per-feature drivers that keep evidence tied to the exact tree, and a fresh-evidence check a Stop hook can call. `--local` keeps the kit out of git.
-
-### Workstream Reconcile
-
-[Workstream Reconcile](skills/.experimental/workstream-reconcile) treats handoffs as historical leads, revalidates their drift-prone claims against live GitHub, local Git, releases, deployments, and package artifacts, and produces a current read-only operating queue without inferring stalls from age alone.
-
-### Xref
-
-[Xref](skills/.experimental/xref) snapshots the complete reference graph around a GitHub issue or pull request to surface competing work, orphans, structural links, and file-overlap risks before work begins.
 
 ## Workflow
 
@@ -123,7 +91,6 @@ flowchart LR
   Review -.code finding.-> Implement
   Review -.contract finding.-> Contract
   Implement -.cycle ends open.-> Handoff[handoff]
-  Handoff --> Reconcile[workstream-reconcile]
 ```
 
 `loop` enters at the earliest step whose evidence is missing or stale for the current tree. The size class in the contract decides which bracketed steps run.
@@ -161,13 +128,11 @@ bunx skills add Railly/skills --skill issue-intake --skill record-a-case --skill
 Install a candidate explicitly with:
 
 ```bash
-bunx skills add Railly/skills --skill signature-repro
 ```
 
 Install an experimental skill explicitly with:
 
 ```bash
-bunx skills add Railly/skills --skill quality-baseline
 ```
 
 `--all` includes all three groups.
