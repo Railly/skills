@@ -22,23 +22,30 @@ latest() {
   [ -n "$found" ] && echo "$found"
 }
 
+# passed <feature> [min-runs]: latest observation passed, over at least min-runs runs.
 passed() {
-  local meta
+  local meta runs
   meta="$(latest "$1")" || return 1
-  grep -q '"exit":0' "$meta"
+  grep -q '"exit":0' "$meta" || return 1
+  runs="$(sed -nE 's/.*"runs":([0-9]+).*/\1/p' "$meta")"
+  [ "${runs:-1}" -ge "${2:-1}" ]
 }
 
-required="$(sed -nE 's/^[-*[:space:]]*observe:[[:space:]]*([A-Za-z0-9_-]+).*/\1/p' "$here/contract.md" 2>/dev/null | grep -vx none | sort -u)"
+# Contract lines: "observe: <feature>" or "observe: <feature> x<N>" (N runs, all passing).
+required="$(sed -nE 's/^[-*[:space:]]*observe:[[:space:]]*([A-Za-z0-9_-]+)([[:space:]]+x([0-9]+))?.*/\1:\3/p' "$here/contract.md" 2>/dev/null | grep -v '^none:' | sort -u)"
 if [ -z "$required" ]; then
   # No contract: every feature observed on this tree must have passed last time.
-  required="$(for d in "$here"/evidence/*/; do [ -f "$d/meta.json" ] && sed -nE 's/.*"feature":"([^"]+)".*/\1/p' "$d/meta.json"; done | sort -u | while read -r f; do latest "$f" >/dev/null && echo "$f"; done)"
+  required="$(for d in "$here"/evidence/*/; do [ -f "$d/meta.json" ] && sed -nE 's/.*"feature":"([^"]+)".*/\1/p' "$d/meta.json"; done | sort -u | while read -r f; do latest "$f" >/dev/null && echo "$f:"; done)"
   if [ -z "$required" ]; then
     echo "no observation for tree $dirty (HEAD $head)" >&2
     exit 1
   fi
 fi
 missing=""
-for f in $required; do passed "$f" || missing="$missing $f"; done
+for spec in $required; do
+  f="${spec%%:*}"; n="${spec#*:}"
+  passed "$f" "${n:-1}" || missing="$missing $f${n:+ x$n}"
+done
 [ -z "$missing" ] && exit 0
 echo "contract features without a passing observation for this tree:$missing" >&2
 exit 1

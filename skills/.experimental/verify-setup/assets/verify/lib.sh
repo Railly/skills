@@ -11,3 +11,13 @@ tree_digest() {
   GIT_INDEX_FILE="$index" git -C "$root" write-tree
   rm -f "$index"
 }
+
+# Fail when a built artifact is older than any of its sources, so a driver never
+# observes code this tree did not produce. Usage: artifact_current <artifact> <src>...
+artifact_current() {
+  local artifact="$1"; shift
+  [ -e "$artifact" ] || { echo "missing artifact: $artifact (build it first)" >&2; return 1; }
+  local newer
+  newer="$(find "$@" -newer "$artifact" -type f 2>/dev/null | head -1)"
+  [ -z "$newer" ] || { echo "stale artifact: $artifact is older than $newer" >&2; return 1; }
+}
