@@ -16,8 +16,9 @@ A repo is verifiable when an agent that has never seen it can run one command an
 |---|---|
 | `doctor.sh` | exit 0 only when every precondition the drivers need exists |
 | `check.sh` | types, lint, unit tests; non-zero on any failure |
-| `observe.sh <feature>` | runs `drive/<feature>.sh` with `EVIDENCE_DIR` set, writes `meta.json` with HEAD, tree digest, exit code, artifact count |
-| `fresh.sh` | exit 0 when a passing observation exists for the current tree; the Stop hook calls it |
+| `observe.sh <feature> [--runs N]` | runs `drive/<feature>.sh` with `EVIDENCE_DIR` set, N times when asked; passes only if every run passes; `meta.json` records tree digest, exit, runs, passed. `observe.sh check` runs `check.sh` |
+| `fresh.sh` | exit 0 when every contract feature passed on its latest observation of the current tree contents; `observe: f x5` also needs at least 5 runs; the Stop hook calls it |
+| `lib.sh` `artifact_current <artifact> <src>...` | fails when a built artifact is older than its sources, so a driver never observes another build |
 | `drive/<feature>.sh` | reaches the feature as a user does and writes proof into `EVIDENCE_DIR` |
 | `features/<feature>.md` | where it lives, how a user reaches it, how to drive it, what usually lies |
 | `ENFORCERS.md` | rule to enforcer table |
@@ -29,7 +30,7 @@ A repo is verifiable when an agent that has never seen it can run one command an
 1. Read the repo's README, CI config, and agent instructions. List the surfaces: CLI, HTTP API, web UI, desktop, library.
 2. Scaffold the kit. Fill `doctor.sh` with the real binaries, env vars and services. Fill `check.sh` with the commands CI runs, fastest first.
 3. Pick the three to five features changes touch most often (git log, open issues). For each, write the driver and the feature file.
-4. A driver observes the outcome, not a proxy. A CLI driver runs the built binary and asserts on output. A web driver uses agent-browser to screenshot and asserts on the DOM or text. An API driver curls the running service and asserts on the body, not only the status.
+4. A driver observes the outcome, not a proxy. When it loads a built artifact (binary, WASM, bundle), it first proves the artifact came from this tree: `artifact_current`, or rebuild and compare with the committed copy. A benchmark driver measures the baseline in the same run (origin/main and this tree, same browser) and is declared with `x<N>` in the contract, since one run of a noisy number is a coin flip. A CLI driver runs the built binary and asserts on output. A web driver uses agent-browser to screenshot and asserts on the DOM or text. An API driver curls the running service and asserts on the body, not only the status.
 5. Fill "What usually lies" from real failures: cases in the canonical repo under `cases/<repo>/`, review findings, and papercuts.
 6. Prove the kit before handing it over: `doctor.sh`, `check.sh`, then `observe.sh <feature>` for every driver, on a clean tree. Open each screenshot and look at it. Then break the feature on purpose (or revert a known fix) and confirm the driver fails. A driver that cannot fail is not a driver.
 7. Report the commands run, exit codes, and evidence paths.

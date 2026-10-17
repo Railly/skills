@@ -55,7 +55,7 @@ intent: <intent>   class: <trivial|normal|heavy>
 - <open question, or none>
 ```
 
-Every acceptance and must-not-change item names a driver with `observe: <feature>`. If no driver can observe it, write a new driver with verify-setup first, or mark the item `observe: none (reason)` and keep it visible as a gap. `fresh.sh` then refuses done until every named feature has a passing observation for the current tree.
+Every acceptance and must-not-change item names a driver with `observe: <feature>`. Use `observe: check` when `check.sh` is the proof, and `observe: <feature> x<N>` for timing-sensitive or benchmark drivers, with N stated by the owner or taken from measured variance. If no driver can observe it, write a new driver with verify-setup first, or mark the item `observe: none (reason)` and keep it visible as a gap. `fresh.sh` then refuses done until every named feature has a passing observation for the current tree.
 
 ## 4. Stop or continue
 
